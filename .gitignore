@@ -1,0 +1,13 @@
+# WebStorm
+.idea
+
+# NPM
+node_modules
+
+# Build
+build
+
+# Development
+src/**/*.js
+src/**/*.js.map
+src/**/*.css

@@ -1,0 +1,388 @@
+/************************
+* GENERAL
+*************************/
+
+html
+  width: 100%
+  height: 100%
+  background-color: transparent
+
+body.iphone
+body.ipad
+body.android
+  width: 100%
+  height: 100%
+  margin: 0
+  padding: 0
+  font-family: Helvetica, sans-serif
+  color: #000
+  background-color: transparent
+  -webkit-text-size-adjust: none
+  -webkit-touch-callout: none
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
+  -webkit-user-select: none
+  -webkit-user-drag: none
+  font-weight: lighter
+
+/* for now fresh style is only on iphone */
+body.iphone
+body.ipad
+body.android
+
+  .page-container
+    width: 100%
+    height: 100%
+    overflow: hidden
+    position: absolute
+    top: 0
+    left: 0
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, hsl(0, 0, 100%)), color-stop(0%, hsl(0, 0, 75%)))
+    background: -webkit-linear-gradient(top, hsl(0, 0, 100%), hsl(0, 0, 75%))
+
+  /************************
+  *
+  * START SCREEN
+  *
+  ************************/
+
+  .none-screen
+    display: none
+
+  .campaigns-container
+    position: absolute
+    top: 0
+    bottom: 0
+    width: 100%
+    margin: auto
+
+  .header-container
+    width: 100%
+    overflow: hidden
+    .item-container
+      width: 100%
+      opacity: 0
+      float: left
+      .item-image
+        float: left
+      .item-text-small
+        color: #007aff
+
+  .video-container
+    overflow: hidden
+    #scroller-container
+      position: relative  /* On older OS versions "position" and "z-index" must be defined, */
+      z-index: 1          /* it seems that recent webkit is less picky and works anyway. */
+      overflow: visible !important
+      margin: 0 auto
+      #scroller
+        float: left
+        ul
+          list-style: none
+          li
+            box-sizing: border-box
+            display: block
+            float: left
+            background-repeat: no-repeat
+            background-position: top
+
+  .btn-play-bg
+    display: block
+    position: relative
+
+  .btn-play
+    display: block
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0,0,0,0.25)), color-stop(100%, rgba(0,0,0,1)))
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.25), rgba(0,0,0,1))
+    text-align: center
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    margin: auto
+
+  .btn-play span
+    color: #fff
+
+  #navigation-container
+    text-align: center
+    #indicator
+      display: inline-block
+      list-style: none
+      li
+        float: left
+        list-style: none
+        background-color: rgba(0,0,0,0.4)
+      li.active
+        background-color: #007aff
+
+  #game-info
+    display: block
+    list-style: none
+    li
+      text-align: center
+      display: none
+      .description
+        color: #007aff
+    li.active
+      display:block
+
+  .btn-watch-now
+    color: #fff
+    display: block
+    text-align: center
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
+    background: -webkit-linear-gradient(top, #4aaef0, #016add)
+
+  .btn-watch-now.disabled
+    -webkit-box-shadow: none
+    opacity: 0.25
+
+  .btn-watch-now:active
+    opacity: 0.5
+
+  /************************
+  *
+  * END SCREEN
+  *
+  ************************/
+
+  .campaign-container
+    width: 100%
+    height: 100%
+
+  .btn-close-region
+    position: absolute
+    z-index: 1
+
+  .btn-watch-again-region
+    position: absolute
+    z-index: 1
+
+  a.btn-watch-again
+  a.btn-close
+    z-index: 1
+    position: absolute
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #007aff
+    text-align: center
+
+  a.btn-watch-again
+    -webkit-transform: rotate(90deg)
+
+  .game-background
+    width: 100%
+    background-size: cover
+    background-position: center
+    background-repeat: no-repeat
+    background-color: #000
+    position: absolute
+    top: 0
+    bottom: 47%
+
+  .end-screen-info-background
+    position: absolute
+    bottom: 0
+    width: 100%
+    height: 47%
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, hsl(0, 0, 100%)), color-stop(0%, hsl(0, 0, 75%)))
+    background: -webkit-linear-gradient(top, hsl(0, 0, 100%), hsl(0, 0, 75%))
+
+  .name-container
+    color: #1f1e1e
+
+  .game-icon
+    float: left
+    background-color: #FFF
+    background-size: cover
+
+  .store-container
+    float: left
+
+  .game-rating
+    color: #fff
+    display: inline-block
+    position: relative
+
+  .game-rating-mask
+    color: #ff8e00
+    position: absolute
+    left: 0
+    width: 0%
+    height: 100%
+    overflow: hidden
+    font-size: inherit
+
+  .game-rating-count
+    color: #7c7c7c
+
+  .game-rating-br
+    display: none
+
+  .game-rating-postfix
+    display: none
+
+  .download-container
+    text-align: center
+    clear: both
+
+  .btn-download
+    color: #ffffff
+    display: block
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
+    background: -webkit-linear-gradient(top, #4aaef0, #016add)
+    text-shadow: 0 -1px #217fea
+    left: 0px
+    right: 0px
+
+    .icon-download
+      -webkit-transform: rotate(90deg)
+      display: block
+      float: left
+      background-color: rgba(0, 0, 0, 0.15)
+
+  .download-text-alt
+    display: none
+
+  .download-text-fresh
+    display: none
+
+  .download-text-fresh-alt2
+    display: none
+
+  .download-text-fresh-alt3
+    display: none
+
+  .download-explanation
+    display: none
+
+  .everyplay-gameads-logo
+    background-image: url('../img/unityads.png')
+    background-position: center
+    background-size: cover
+    margin: auto
+    position: absolute
+    left: 0px
+    right: 0px
+
+  .download-explanation-fresh
+    display: none
+
+  .store-badge-container
+    display: none
+
+  /************************
+  *
+  * END SCREEN landscape specific
+  *
+  ************************/
+
+  &.landscape
+    .game-background
+      width: 53%
+      bottom: 0
+
+    .end-screen-info-background
+      width: 47%
+      height: 100%
+      right: 0
+
+  /************************
+  *
+  * POPUP
+  *
+  *************************/
+
+  .popup-background
+    visibility: hidden
+    position: absolute
+    top: 0
+    left: 0
+    background-color: rgba(0, 0, 0, 0.75)
+    width: 100%
+    height: 100%
+    z-index: 100
+    text-align: center
+    background-size: cover
+
+  /************************
+  *
+  * SPINNER
+  *
+  *************************/
+
+  .spinner-container
+    display: inline-block
+    text-align: center
+    background-color: #000
+    color: #FFF
+
+  .spinner-text
+    float: left
+
+  .spinner-animation
+    width: 24px
+    height: 24px
+    float: left
+    margin-right: 15px
+    border: 4px solid #fff
+    border-left-color: transparent
+    border-right-color: transparent
+    border-radius: 200px
+    -webkit-animation: spinner 1s linear infinite
+
+  @-webkit-keyframes spinner
+    from
+      -webkit-transform: rotate(0deg)
+    to
+      -webkit-transform: rotate(360deg)
+
+  /************************
+  * ERROR
+  *************************/
+
+  .error-container
+    display: inline-block
+    text-align: center
+    background-color: #000
+    color: #FFF
+
+  .btn-ok
+    display: block
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
+    background: -webkit-linear-gradient(top, #4aaef0, #016add)
+
+#overlay
+  background-color: transparent
+  width: 100%
+  height: 100%
+  color: #FFF
+
+  .skip-button
+    position: absolute
+    top: 10px
+    left: 10px
+    height: 20px
+    border: 2px solid #fff
+    padding: 10px
+    margin: 0 10px
+
+  .video-buttons
+    position: absolute
+    bottom: 10px
+    left: 10px
+
+    .video-button
+      height: 20px
+      border: 2px solid #fff
+      padding: 10px
+      margin: 0 10px
+      float: left
+
+/************************
+* DEVICE AND GAME SPECIFICS
+*************************/
+
+@import "fresh-base-size.styl"
+@import "fresh-responsive.styl"
+@import "uglified.styl"

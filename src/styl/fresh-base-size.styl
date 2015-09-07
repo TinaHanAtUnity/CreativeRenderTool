@@ -1,0 +1,358 @@
+body.iphone
+body.ipad
+body.android
+
+  /************************
+  *
+  * START SCREEN
+  *
+  ************************/
+
+  .campaigns-container
+    height: 260px
+
+  .start-screen
+    a.btn-close
+      margin-top: 10px
+
+  .header-container
+    margin-top: 10px
+    .item-container
+      margin: 10px
+      .item-image
+        width: 50px
+        height: 50px
+        background-size: 50px
+        border-radius: 10pt
+        -webkit-box-shadow: 0 3px 3px rgba(0,0,0,0.2)
+        margin: 0 15px 0 0
+      .item-text-small
+        padding: 8px 0 0 0
+        font-size: 12px
+      .item-text-large
+        font-size: 20px
+
+  .video-container
+    #scroller-container
+      padding: 0
+      width: 280px
+      height: 167px
+      #scroller
+        width: 810px
+        height: 100%
+        padding: 0
+        ul
+          margin: 0
+          padding: 0
+          li
+            margin: 10px 0
+            width: 280px
+            height: 146px
+            background-size: 260px 146px
+
+  #navigation-container
+    padding-top: 12px
+    #indicator
+      margin: 4px auto
+      padding: 0
+      li
+        padding: 0
+        margin: 0 4px 0 0
+        text-indent: -9999em
+        width: 8px
+        height: 8px
+        border-radius: 5px  
+        -webkit-box-shadow: inset 0 2px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.1)
+      li.active
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.2)
+      li:last-child
+        margin: 0
+
+  .btn-play-bg
+    width: 258px
+    height: 144px
+    margin: 0 auto
+    -webkit-box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.5)
+    border: 1px solid rgba(162, 218, 255, 0.5)
+
+  .btn-play
+    width: 50px
+    height: 50px
+    font-size: 25px
+    line-height: 52px
+    border-radius: 200px
+    border: 4px solid #fff
+    -webkit-box-shadow:
+      0 4px 4px rgba(0, 0, 0, 0.5),
+      inset 0 -2px 5px rgba(0, 150, 255, 0.5),
+      inset 2px 0 5px rgba(0, 150, 255, 0.5),
+      inset -2px 0 5px rgba(0, 150, 255, 0.5)
+    text-shadow: 0px 4px 4px rgba(0,0,0,0.5)
+
+  .btn-play span
+    margin-left: 5px
+    font-size: 25px
+
+  #game-info
+    margin: 0
+    padding: 0
+    li
+      .game-name
+        font-size: 16px
+      .description
+        padding: 0
+        font-size: 12px
+
+  .btn-watch-now
+    padding: 15px 25px 15px 25px
+    border-radius: 5px
+    font-size: 22px
+    line-height: 20px
+    width: 150px
+    margin: 25px auto 0 auto
+
+  .btn-watch-now.disabled
+    -webkit-box-shadow: none
+    opacity: 0.25
+
+  .btn-watch-now:active
+    opacity: 0.5
+
+  /************************
+  *
+  * START SCREEN landscape specific
+  *
+  ************************/
+
+  &.landscape
+    .btn-watch-now
+      display: none
+
+    .header-container
+      margin-top: 0
+
+    .campaigns-container
+      height: 185px
+
+  /************************
+  *
+  * END SCREEN
+  *
+  ************************/
+
+  .btn-close-region
+    top: 0
+    right: 0
+    width: 55px
+    height: 55px
+
+  .btn-watch-again-region
+    top: 0
+    left: 0
+    width: 55px
+    height: 55px
+
+  a.btn-watch-again
+  a.btn-close
+    top: 10px
+    font-size: 28px
+    width: 32px
+    height: 32px
+    border-radius: 17px
+
+  a.btn-watch-again
+    line-height: 33px
+    left: 10px
+
+  a.btn-close
+    line-height: 28px
+    right: 10px
+
+  .game-background
+    -webkit-box-shadow: 0px 4px 0px 0px rgba(0,122,255,1)
+
+  .end-screen-info-background
+    border-top: 4px solid #007aff
+    -webkit-box-shadow: 0 -5px 10px rgba(28, 28, 28, 0.5)
+
+  .name-container
+    font-size: 20pt
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+  .game-info
+    margin-top: 20px
+    margin-left: 18px
+
+    .name-container
+      padding-left: 10px
+      padding-right: 10px
+      padding-top: 8px
+      font-size: 17pt
+
+  .game-icon
+    width: 75px
+    height: 75px
+    border-radius: 18pt
+    margin-bottom: 20px
+
+  .store-container
+    margin-left: 10px
+    margin-top: 5px
+
+  .game-rating
+    font-size: 20px
+    letter-spacing: 5px
+
+  .game-rating-count
+    font-size: 17px
+
+  .btn-download
+    margin: 0 15px 0 15px
+    padding: 10px 10px 10px 10px
+    border-radius: 10px
+    font-size: 18pt
+    line-height: 24pt
+    margin-top: 45px
+
+    .icon-download
+      width: 32px
+      height: 32px
+      border-radius: 16px
+      font-size: 20px
+      line-height: 29px
+
+  .everyplay-gameads-logo
+    width: 68px
+    height: 16px
+    bottom: 10px
+
+  /************************
+  *
+  * END SCREEN landscape specific
+  *
+  ************************/
+
+  &.landscape
+    .end-screen-info-background
+      border-top: none
+      border-left: 4px solid #007aff
+
+    .btn-close-region
+      top: 0
+      bottom: auto
+
+    .btn-watch-again-region
+      top: auto
+      bottom: 0
+      left: 0
+
+    a.btn-watch-again
+      top: auto
+      bottom: 10px
+      left: 10px
+
+    a.btn-close
+      top: 10px
+      bottom: auto
+
+    .end-screen
+      .btn-close-region
+        left: 0
+        right: auto
+      a.btn-close
+        left: 10px
+
+    .start-screen
+      .btn-close-region
+        right: 0
+        left: auto
+      a.btn-close
+        right: 10px
+        margin-top: 0
+
+    .game-info
+      margin-top: 25px
+      margin-left: auto
+      text-align: center
+
+    .game-icon
+      left: 0
+      right: 0
+      position: absolute
+      margin: auto
+
+    .game-icon-shadow
+      background-image: url('../img/icon_shadow.png')
+      background-position: center
+      background-size: cover
+      margin: auto
+      position: absolute
+      left: 0px
+      right: 0px
+      width: 79px
+      height: 12px
+      margin-top: 79px
+
+    .name-container
+      font-size: 18pt
+      padding-top: 95px
+
+    .store-container
+      float: none
+      clear: both
+      margin-left: auto
+      padding-top: 0
+      text-align: center
+
+    .btn-download
+      font-size: 11pt
+      padding: 5px 10px 5px 10px
+      margin-top: 15px
+
+    .icon-download
+      line-height: 22pt
+
+    .everyplay-gameads-logo
+      bottom: 20px
+
+  /************************
+  *
+  * SPINNER
+  *
+  *************************/
+
+  .spinner-container
+    padding: 10px 15px
+    border-radius: 10px
+    -webkit-box-shadow: 0px 0px 50px #FFF
+    border: 3px solid #FFF
+    letter-spacing: 1px
+
+  .spinner-text
+    line-height: 32px
+
+  /************************
+  * ERROR
+  *************************/
+
+  .error-container
+    padding: 10px 15px
+    border-radius: 20px
+    -webkit-box-shadow: 0px 0px 20px #FFF
+    border: 3px solid #FFF
+    letter-spacing: 1px
+
+  .error-text
+    line-height: 32px
+
+  .btn-ok
+    padding: 5px
+    margin: 5px 0
+    -webkit-box-shadow: 0 8px 8px rgba(0, 0, 0, 0.5)
+    border-radius: 10px
+    font-size: 18px
+    line-height: 20px

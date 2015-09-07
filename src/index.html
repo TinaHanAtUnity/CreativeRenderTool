@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Unity Ads WebView</title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <script>
+    var origin = location.search.split('?origin=')[1];
+    if(!origin) {
+      origin = 'http://localhost:8000/';
+    }
+
+    var require = {
+      baseUrl: origin + 'ts/',
+      paths: {
+        text: '../vendor/require-text',
+        html: '../html'
+      },
+      config: {
+        text: {
+          useXhr: function () {
+            return true;
+          }
+        }
+      }
+    };
+
+    var requirejs = document.createElement('script');
+    requirejs.src = origin + 'vendor/require.js';
+    requirejs.setAttribute('data-main', 'Main.js');
+
+    var style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = origin + 'styl/main.css';
+
+    var head = document.getElementsByTagName('head')[0];
+    head.appendChild(style);
+    head.appendChild(requirejs);
+  </script>
+</head>
+  <body class="android portrait"></body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "unity-ads-webview",
+  "version": "2.0.0",
+  "description": "Unity Ads WebView",
+  "author": "Ville Orkas",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Applifier/unity-ads-webview.git"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "amdclean": "^2.7.0",
+    "requirejs": "^2.1.20",
+    "stylus": "^0.52.0"
+  }
+}
