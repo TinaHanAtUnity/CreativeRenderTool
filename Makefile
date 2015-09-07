@@ -1,5 +1,5 @@
 # Binaries
-TYPESCRIPT = tsc
+TYPESCRIPT = node_modules/.bin/tsc
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
