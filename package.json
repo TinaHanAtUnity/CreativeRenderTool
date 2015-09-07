@@ -11,6 +11,7 @@
   "dependencies": {
     "amdclean": "^2.7.0",
     "requirejs": "^2.1.20",
+    "requirejs-text": "^2.0.12",
     "stylus": "^0.52.0",
     "typescript": "^1.5.3"
   }

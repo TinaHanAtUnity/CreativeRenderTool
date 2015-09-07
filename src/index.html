@@ -16,9 +16,9 @@
     }
 
     var require = {
-      baseUrl: origin + 'ts/',
+      baseUrl: origin + 'src/ts/',
       paths: {
-        text: '../vendor/require-text',
+        text: '../../node_modules/requirejs-text/text',
         html: '../html'
       },
       config: {
@@ -31,12 +31,12 @@
     };
 
     var requirejs = document.createElement('script');
-    requirejs.src = origin + 'vendor/require.js';
+    requirejs.src = origin + 'node_modules/requirejs/require.js';
     requirejs.setAttribute('data-main', 'Main.js');
 
     var style = document.createElement('link');
     style.rel = 'stylesheet';
-    style.href = origin + 'styl/main.css';
+    style.href = origin + 'src/styl/main.css';
 
     var head = document.getElementsByTagName('head')[0];
     head.appendChild(style);
