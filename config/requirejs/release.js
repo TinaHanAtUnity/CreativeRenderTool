@@ -1,9 +1,9 @@
 ({
   name: 'main',
-  baseUrl: '../../build/js/',
+  baseUrl: './../../build/js/',
   paths: {
-    text: '../../src/vendor/require-text',
-    html: '../../src/html'
+    text: './../../src/vendor/require-text',
+    html: './../../src/html'
   },
   config: {
     text: {
@@ -12,7 +12,7 @@
       }
     }
   },
-  out: '../../build/main.js',
+  out: './../../build/main.js',
   optimize: 'uglify2',
   uglify2: {
     output: {
