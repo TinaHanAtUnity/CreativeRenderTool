@@ -1,6 +1,9 @@
 sudo: false
 language: node_js
 script: make build
+cache:
+  directories:
+  - node_modules
 deploy:
   provider: s3
   access_key_id: AKIAI5V7ATZVXQHBGHYA
