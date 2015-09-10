@@ -1,5 +1,5 @@
 interface Observer {
-    trigger(id: string, ...parameters);
+    (id: string, ...parameters): void;
 }
 
 export = Observer;

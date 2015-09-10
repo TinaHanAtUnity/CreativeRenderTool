@@ -21,12 +21,12 @@ class Observable {
         }
     }
 
-    trigger(category: string, id: string, ...parameters) {
+    protected trigger(category: string, id: string, ...parameters) {
         let observers = this._observers[category];
         if(observers) {
             parameters.unshift(id);
             observers.forEach((observer: Observer) => {
-                observer.trigger.apply(observer, parameters);
+                observer.apply(observer, parameters);
             });
         }
     }

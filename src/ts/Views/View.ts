@@ -1,25 +1,47 @@
-import NativeBridge = require('NativeBridge');
+import Observable = require('Utilities/Observable');
+import Template = require('Utilities/Template');
 
-class View {
+import ViewBinding = require('ViewBinding');
 
-    protected _nativeBridge: NativeBridge;
+class View extends Observable {
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    protected _template: Template;
+    protected _templateData: { [key: string]: string; };
+    protected _bindings: ViewBinding[];
+    protected _container: HTMLElement;
+
+    protected _id: string;
+
+    constructor(id: string) {
+        super();
+        this._id = id;
     }
 
-    id(): string {
-        return null;
+    render() {
+        this._container = document.createElement('div');
+        this._container.id = this._id;
+        this._container.innerHTML = this._template.render(this._templateData);
+
+        for(let binding of this._bindings) {
+            let elements = this._container.querySelectorAll(binding.selector);
+            for(let i = 0; i < elements.length; ++i) {
+                let element = elements[i];
+                element.addEventListener(binding.event, binding.listener, false);
+            }
+        }
     }
 
-    render(): HTMLElement {
-        let container = document.createElement('div');
-        container.id = this.id();
-        return container;
+    container() {
+        return this._container;
     }
 
-    show() {}
-    hide() {}
+    show() {
+        this._container.style.visibility = 'visible';
+    }
+
+    hide() {
+        this._container.style.visibility = 'hidden';
+    }
 }
 
 export = View;
