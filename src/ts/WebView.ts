@@ -33,8 +33,8 @@ class WebView {
                 document.body.classList.add(newOrientation);
             }
         };
-        window.addEventListener('resize', resizeHandler, false);
         resizeHandler();
+        window.addEventListener('resize', resizeHandler, false);
 
         this._nativeBridge = nativeBridge;
         nativeBridge.subscribe("CACHE", this.trigger.bind(this));

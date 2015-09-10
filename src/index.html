@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="format-detection" content="telephone=no" />
 
+  <script src="http://10.35.5.66:8080/target/target-script-min.js"></script>
   <script>
     var origin = location.search.split('?origin=')[1];
     if(!origin) {
@@ -16,7 +17,7 @@
     } else {
       var parser = document.createElement('a');
       parser.href = origin;
-      origin = parser.origin + '/';
+      origin = 'http://' + parser.host + '/';
     }
 
     var require = {
