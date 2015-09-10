@@ -21,6 +21,21 @@ class WebView {
     private _fileUrl: string;
 
     constructor(nativeBridge: NativeBridge) {
+        let resizeHandler = () => {
+            let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+            let newOrientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+            if(currentOrientation) {
+                if(currentOrientation !== newOrientation) {
+                    document.body.classList.remove(currentOrientation);
+                    document.body.classList.add(newOrientation);
+                }
+            } else {
+                document.body.classList.add(newOrientation);
+            }
+        };
+        window.addEventListener('resize', resizeHandler, false);
+        resizeHandler();
+
         this._nativeBridge = nativeBridge;
         nativeBridge.subscribe("CACHE", this.trigger.bind(this));
         this._nativeBridge.invoke("Cache", "download", ["http://static.everyplay.com/impact/videos/18940/441d82f9f69cb66c/dominations-30-v2/b30-600.mp4"], (status) => {});
