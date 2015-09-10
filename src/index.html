@@ -13,6 +13,10 @@
     var origin = location.search.split('?origin=')[1];
     if(!origin) {
       origin = 'http://localhost:8000/';
+    } else {
+      var parser = document.createElement('a');
+      parser.href = origin;
+      origin = parser.origin + '/';
     }
 
     var require = {
@@ -30,17 +34,19 @@
       }
     };
 
-    var requirejs = document.createElement('script');
-    requirejs.src = origin + 'node_modules/requirejs/require.js';
-    requirejs.setAttribute('data-main', 'Main.js');
+    document.addEventListener('DOMContentLoaded', function() {
+      var requirejs = document.createElement('script');
+      requirejs.src = origin + 'node_modules/requirejs/require.js';
+      requirejs.setAttribute('data-main', 'Main.js');
 
-    var style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.href = origin + 'src/styl/main.css';
+      var style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = origin + 'src/styl/main.css';
 
-    var head = document.getElementsByTagName('head')[0];
-    head.appendChild(style);
-    head.appendChild(requirejs);
+      var head = document.getElementsByTagName('head')[0];
+      head.appendChild(style);
+      head.appendChild(requirejs);
+    }, false);
   </script>
 </head>
   <body class="android portrait"></body>
