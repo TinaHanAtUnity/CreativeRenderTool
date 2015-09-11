@@ -1,4 +1,4 @@
-enum KeyCode {
+const enum KeyCode {
     BACK = 4
 }
 

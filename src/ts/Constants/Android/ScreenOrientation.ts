@@ -1,4 +1,4 @@
-enum AndroidScreenOrientation {
+const enum AndroidScreenOrientation {
     SCREEN_ORIENTATION_UNSPECIFIED = -1,
     SCREEN_ORIENTATION_LANDSCAPE = 0,
     SCREEN_ORIENTATION_PORTRAIT = 1,
