@@ -18,14 +18,9 @@ let resizeHandler: EventListener = (event: Event) => {
 resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
-/* tslint:disable:interface-name */
-interface Window {
-    nativebridge: NativeBridge;
-    webview: WebView;
-}
-
+/* tslint:disable:no-string-literal */
 let nativeBridge: NativeBridge = new NativeBridge();
-window.nativebridge = nativeBridge;
+window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView(nativeBridge);
-window.webview = webView;
+window['webview'] = webView;
