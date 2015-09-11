@@ -29,6 +29,21 @@ if (!Function.prototype.bind) {
     };
 }
 
+let resizeHandler = () => {
+    let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+    let newOrientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+    if(currentOrientation) {
+        if(currentOrientation !== newOrientation) {
+            document.body.classList.remove(currentOrientation);
+            document.body.classList.add(newOrientation);
+        }
+    } else {
+        document.body.classList.add(newOrientation);
+    }
+};
+resizeHandler();
+window.addEventListener('resize', resizeHandler, false);
+
 let nativeBridge = new NativeBridge();
 window['nativebridge'] = nativeBridge;
 
