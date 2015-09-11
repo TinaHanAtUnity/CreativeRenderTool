@@ -18,7 +18,8 @@
     output: {
       beautify: true,
       indent_level: 2
-    }
+    },
+    warnings: true
   },
   preserveLicenseComments: true,
   onModuleBundleComplete: function (data) {
