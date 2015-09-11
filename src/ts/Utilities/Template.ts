@@ -1,10 +1,11 @@
-// Based on underscore.js templates
+/* tslint:disable:quotemark */
+// based on underscore.js templates
 
-class Template {
+export default class Template {
 
-    private static _matcher = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
+    private static _matcher: RegExp = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
 
-    private static _escapes = {
+    private static _escapes: Object = {
         "'": "'",
         '\\': '\\',
         '\r': 'r',
@@ -13,18 +14,18 @@ class Template {
         '\u2029': 'u2029'
     };
 
-    private static _escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g;
+    private static _escapeRegExp: RegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
-    private static _escapeChar = (match) => {
+    private static _escapeChar: (substring: string, ...args: any[]) => string = (match: string): string => {
         return '\\' + Template._escapes[match];
     };
 
     private _templateFunction: (data: any) => string;
 
     constructor(templateString: string) {
-        let index = 0;
-        let source = "__p+='";
-        templateString.replace(Template._matcher, function(match, interpolate, evaluate, offset) {
+        let index: number = 0;
+        let source: string = "__p+='";
+        templateString.replace(Template._matcher, (match: string, interpolate: string, evaluate: string, offset: number): string => {
             source += templateString.slice(index, offset).replace(Template._escapeRegExp, Template._escapeChar);
             index = offset + match.length;
 
@@ -41,8 +42,8 @@ class Template {
         source = "var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};\n" + source + 'return __p;\n';
 
         try {
-            let templateFunction = new Function('data', source);
-            this._templateFunction = function(data) {
+            let templateFunction: Function = new Function('data', source);
+            this._templateFunction = (data: any) => {
                 return templateFunction.call(this, data);
             };
         } catch (error) {
@@ -51,10 +52,8 @@ class Template {
         }
     }
 
-    render(data: any): string {
+    public render(data: any): string {
         return this._templateFunction(data);
     }
 
 }
-
-export = Template;

@@ -1,26 +1,25 @@
-class Url {
+export default class Url {
 
-    static addParameters(url: string, parameters: {}) {
-        let newUrl = url.toString();
+    public static addParameters(url: string, parameters: {}): string {
+        let newUrl: string = url.toString();
         if (newUrl.indexOf('?') !== -1) {
-            newUrl += "&";
-        }
-        else {
-            newUrl += "?";
+            newUrl += '&';
+        } else {
+            newUrl += '?';
         }
 
-        let pairs = [];
+        let pairs: Object[] = [];
         for (let key in parameters) {
-            let value = parameters[key];
-            if (value !== undefined) {
-                pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+            if(parameters.hasOwnProperty(key)) {
+                let value: string = parameters[key];
+                if (value !== undefined) {
+                    pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+                }
             }
         }
 
-        newUrl += pairs.join("&");
+        newUrl += pairs.join('&');
         return newUrl;
     }
 
 }
-
-export = Url;

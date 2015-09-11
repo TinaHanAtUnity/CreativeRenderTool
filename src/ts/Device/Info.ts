@@ -1,6 +1,6 @@
-import NativeBridge = require('NativeBridge');
+import NativeBridge from 'NativeBridge';
 
-class DeviceInfo {
+export default class DeviceInfo {
 
     private _nativeBridge: NativeBridge;
 
@@ -15,85 +15,83 @@ class DeviceInfo {
     constructor(nativeBridge: NativeBridge, callback: (status: string) => void) {
         this._nativeBridge = nativeBridge;
 
-        // Temporary before bundled API calls
-        let callbacks = 7;
-        this._nativeBridge.invoke("DeviceInfo", "getAndroidId", [], (status, androidId) => {
+        // temporary before bundled API calls
+        let callbacks: number = 7;
+        this._nativeBridge.invoke('DeviceInfo', 'getAndroidId', [], (status: string, androidId: string): void => {
             this._androidId = androidId;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getAdvertisingTrackingId", [], (status, advertisingIdentifier) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getAdvertisingTrackingId', [], (status: string, advertisingIdentifier: string): void => {
             this._advertisingIdentifier = advertisingIdentifier;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getLimitAdTrackingFlag", [], (status, limitAdTracking) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getLimitAdTrackingFlag', [], (status: string, limitAdTracking: boolean): void => {
             this._limitAdTracking = limitAdTracking;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getSoftwareVersion", [], (status, softwareVersion) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getSoftwareVersion', [], (status: string, softwareVersion: string): void => {
             this._softwareVersion = softwareVersion;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getHardwareVersion", [], (status, hardwareVersion) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getHardwareVersion', [], (status: string, hardwareVersion: string): void => {
             this._hardwareVersion = hardwareVersion;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getScreenLayout", [], (status, screenLayout) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getScreenLayout', [], (status: string, screenLayout: number): void => {
             this._screenLayout = screenLayout;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
 
-        this._nativeBridge.invoke("DeviceInfo", "getScreenDensity", [], (status, screenDensity) => {
+        this._nativeBridge.invoke('DeviceInfo', 'getScreenDensity', [], (status: string, screenDensity: number): void => {
             this._screenDensity = screenDensity;
             callbacks--;
             this._checkCallback(callbacks, callback);
         });
     }
 
-    private _checkCallback(callbacks, callback) {
-        if(callbacks === 0) {
-            callback("OK");
-        }
-    }
-
-    getAndroidId() {
+    public getAndroidId(): string {
         return this._androidId;
     }
 
-    getAdvertisingIdentifier() {
+    public getAdvertisingIdentifier(): string {
         return this._advertisingIdentifier;
     }
 
-    getLimitAdTracking() {
+    public getLimitAdTracking(): boolean {
         return this._limitAdTracking;
     }
 
-    getSoftwareVersion() {
+    public getSoftwareVersion(): string {
         return this._softwareVersion;
     }
 
-    getHardwareVersion() {
+    public getHardwareVersion(): string {
         return this._hardwareVersion;
     }
 
-    getScreenLayout() {
+    public getScreenLayout(): number {
         return this._screenLayout;
     }
 
-    getScreenDensity() {
+    public getScreenDensity(): number {
         return this._screenDensity;
     }
 
-}
+    private _checkCallback(callbacks: number, callback: any): void {
+        if(callbacks === 0) {
+            callback('OK');
+        }
+    }
 
-export = DeviceInfo;
+}

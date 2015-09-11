@@ -1,10 +1,10 @@
-import Observable = require('Utilities/Observable');
+// disable no-empty until we have abstract classes
+/* tslint:disable:no-empty */
+import Observable from 'Utilities/Observable';
 
-class VideoPlayer extends Observable {
-    prepare(url: string) {}
-    play() {}
-    pause() {}
-    seekTo(time: number, callback: Function) {}
+export default class VideoPlayer extends Observable {
+    public prepare(url: string): void {}
+    public play(): void {}
+    public pause(): void {}
+    public seekTo(time: number, callback: Function): void {}
 }
-
-export = VideoPlayer;

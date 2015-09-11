@@ -1,6 +1,6 @@
-import NativeBridge = require('NativeBridge');
+import NativeBridge from 'NativeBridge';
 
-class CacheManager {
+export default class CacheManager {
 
     private _nativeBridge: NativeBridge;
 
@@ -9,17 +9,21 @@ class CacheManager {
         nativeBridge.subscribe('CACHE', this.onCacheEvent.bind(this));
     }
 
-    private _urlCallbacks = {};
+    private _urlCallbacks: Object = {};
 
-    cache(url: string, callback: (url: string, fileUrl: string) => void) {
+    private _eventHandlers: Object = {
+        'DOWNLOAD_END': this.onDownloadEnd
+    };
+
+    public cache(url: string, callback: (url: string, fileUrl: string) => void): void {
         this._urlCallbacks[url] = callback;
-        this._nativeBridge.invoke("Cache", "download", [url], (status) => {});
+        this._nativeBridge.invoke('Cache', 'download', [url]);
     }
 
-    cacheAll(urls: string[], callback: (fileUrls: Object) => void) {
-        let callbacks = urls.length;
-        let fileUrls = {};
-        let finishCallback = (url: string, fileUrl: string) => {
+    public cacheAll(urls: string[], callback: (fileUrls: Object) => void): void {
+        let callbacks: number = urls.length;
+        let fileUrls: Object = {};
+        let finishCallback: (url: string, fileUrl: string) => void = (url: string, fileUrl: string) => {
             callbacks--;
             fileUrls[url] = fileUrl;
             if(callbacks === 0) {
@@ -27,31 +31,25 @@ class CacheManager {
             }
         };
 
-        urls.forEach((url) => {
+        urls.forEach((url: string): void => {
             this.cache(url, finishCallback);
         });
     }
 
-    private onDownloadEnd(url: string, size: number, duration: number) {
-        this._nativeBridge.invoke("Cache", "getFileUrl", [url], (status, fileUrl) => {
-            let urlCallback = this._urlCallbacks[url];
+    private onDownloadEnd(url: string, size: number, duration: number): void {
+        this._nativeBridge.invoke('Cache', 'getFileUrl', [url], (status: string, fileUrl: string): void => {
+            let urlCallback: Function = this._urlCallbacks[url];
             if(urlCallback) {
                 urlCallback(url, fileUrl);
             }
         });
     }
 
-    private _eventHandlers = {
-        'DOWNLOAD_END': this.onDownloadEnd
-    };
-
-    private onCacheEvent(id: string, ...parameters) {
-        let handler = this._eventHandlers[id];
+    private onCacheEvent(id: string, ...parameters: any[]): void {
+        let handler: Function = this._eventHandlers[id];
         if(handler) {
             handler.apply(this, parameters);
         }
     }
 
 }
-
-export = CacheManager;

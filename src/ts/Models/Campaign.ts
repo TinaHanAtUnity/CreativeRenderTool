@@ -1,4 +1,4 @@
-class Campaign {
+export default class Campaign {
 
     private _id: string;
     private _storeId: string;
@@ -22,54 +22,52 @@ class Campaign {
         this._video = data.trailerDownloadable;
     }
 
-    getStoreId() {
+    public getStoreId(): string {
         return this._storeId;
     }
 
-    getGameName() {
+    public getGameName(): string {
         return this._gameName;
     }
 
-    getGameIcon() {
+    public getGameIcon(): string {
         return this._gameIcon;
     }
 
-    setGameIcon(gameIcon: string) {
+    public setGameIcon(gameIcon: string): void {
         this._gameIcon = gameIcon;
     }
 
-    getRating() {
+    public getRating(): number {
         return this._rating;
     }
 
-    getRatingCount() {
+    public getRatingCount(): number {
         return this._ratingCount;
     }
 
-    getPortraitUrl() {
+    public getPortraitUrl(): string {
         return this._portrait;
     }
 
-    setPortraitUrl(portraitUrl: string) {
+    public setPortraitUrl(portraitUrl: string): void {
         this._portrait = portraitUrl;
     }
 
-    getLandscapeUrl() {
+    public getLandscapeUrl(): string {
         return this._landscape;
     }
 
-    setLandscapeUrl(landscapeUrl: string) {
+    public setLandscapeUrl(landscapeUrl: string): void {
         this._landscape = landscapeUrl;
     }
 
-    getVideoUrl() {
+    public getVideoUrl(): string {
         return this._video;
     }
 
-    setVideoUrl(videoUrl: string) {
+    public setVideoUrl(videoUrl: string): void {
         this._video = videoUrl;
     }
 
 }
-
-export = Campaign;

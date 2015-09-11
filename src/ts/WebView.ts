@@ -1,25 +1,26 @@
-import NativeBridge = require('NativeBridge');
+// disable tslint while hacky code exists
+/* tslint:disable */
 
-import EndScreen = require('Views/EndScreen');
-import Overlay = require('Views/Overlay');
+import NativeBridge from 'NativeBridge';
 
-import VideoPlayer = require('Video/VideoPlayer');
-import NativeVideoPlayer = require('Video/NativeVideoPlayer');
+import EndScreen from 'Views/EndScreen';
+import Overlay from 'Views/Overlay';
 
-import DeviceInfo = require('Device/Info');
+import VideoPlayer from 'Video/VideoPlayer';
+import NativeVideoPlayer from 'Video/NativeVideoPlayer';
 
-import CampaignManager = require('Controllers/CampaignManager');
+import DeviceInfo from 'Device/Info';
 
-import ScreenOrientation = require('Constants/Android/ScreenOrientation');
-import KeyCode = require('Constants/Android/KeyCode');
+import CampaignManager from 'Controllers/CampaignManager';
 
-import Observer = require('Utilities/Observer');
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
-import Campaign = require('Models/Campaign');
+import Campaign from 'Models/Campaign';
 
-import CacheManager = require('Cache/CacheManager');
+import CacheManager from 'Cache/CacheManager';
 
-class WebView {
+export default class WebView {
 
     private _nativeBridge: NativeBridge;
 
@@ -40,12 +41,12 @@ class WebView {
 
         this._cacheManager = new CacheManager(nativeBridge);
 
-        this._nativeBridge.invoke("AdUnit", "loadComplete", [], (status, config) => {
-            console.log("loadCompleteCallback: " + status);
+        this._nativeBridge.invoke('AdUnit', 'loadComplete', [], (status, config: string) => {
+            console.log('loadCompleteCallback: ' + status);
 
-            this._deviceInfo = new DeviceInfo(nativeBridge, (status) => {
+            this._deviceInfo = new DeviceInfo(nativeBridge, () => {
                 this._campaignController = new CampaignManager(this._nativeBridge, this._deviceInfo);
-                this._campaignController.subscribe('campaign', (id:string, campaign:Campaign) => {
+                this._campaignController.subscribe('campaign', (id: string, campaign: Campaign) => {
                     this._campaign = campaign;
 
                     this._cacheManager.cacheAll([
@@ -64,9 +65,9 @@ class WebView {
                         this._endScreen.hide();
                         document.body.appendChild(this._endScreen.container());
 
-                        this._endScreen.subscribe('end-screen', (id:string) => {
+                        this._endScreen.subscribe('end-screen', (id: string) => {
                             if (id === 'replay') {
-                                this._videoPlayer.seekTo(0, (status) => {
+                                this._videoPlayer.seekTo(0, () => {
                                     this._endScreen.hide();
                                     this._overlay.show();
                                     this._videoPlayer.play();
@@ -76,15 +77,15 @@ class WebView {
                             }
                         });
 
-                        this._nativeBridge.invoke("Listener", "sendReadyEvent", ["test"], (status) => {});
+                        this._nativeBridge.invoke('Listener', 'sendReadyEvent', ['test'], (status) => {});
                     });
                 });
-                this._campaignController.request("test");
+                this._campaignController.request('test');
             });
 
 
-            this._nativeBridge.invoke("AdUnit", "initComplete", [], (status) => {
-                console.log("initCompleteCallback: " + status);
+            this._nativeBridge.invoke('AdUnit', 'initComplete', [], (status) => {
+                console.log('initCompleteCallback: ' + status);
                 this._overlay.show();
             });
         });
@@ -96,14 +97,14 @@ class WebView {
 
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
 
-        this._videoPlayer.subscribe('videoplayer', (id:string) => {
+        this._videoPlayer.subscribe('videoplayer', (id: string) => {
             if (id === 'completed') {
                 this._overlay.hide();
                 this._endScreen.show();
             }
         });
 
-        this._overlay.subscribe('overlay', (id:string) => {
+        this._overlay.subscribe('overlay', (id: string) => {
             if (id === 'skip') {
                 this._videoPlayer.pause();
                 this._overlay.hide();
@@ -116,17 +117,17 @@ class WebView {
         });
     }
 
-    show() {
-        this._nativeBridge.invoke("AdUnit", "open", [["videoplayer", "webview"], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, [KeyCode.BACK]], (status) => {
-            console.log("openCallback: " + status);
+    public show(): void {
+        this._nativeBridge.invoke('AdUnit', 'open', [
+            ['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, [KeyCode.BACK]
+        ], (status) => {
+            console.log('openCallback: ' + status);
             this._videoPlayer.prepare(this._campaign.getVideoUrl());
         });
     }
 
-    hide() {
-        this._nativeBridge.invoke("AdUnit", "close", [], (status) => {});
+    public hide(): void {
+        this._nativeBridge.invoke('AdUnit', 'close', [], (status: string) => {});
     }
 
 }
-
-export = WebView;

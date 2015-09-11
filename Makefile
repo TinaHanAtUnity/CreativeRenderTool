@@ -1,5 +1,5 @@
 # Binaries
-TYPESCRIPT = node_modules/.bin/tsc
+TYPESCRIPT = tsc
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
@@ -16,7 +16,7 @@ clean:
 
 build: clean
 	@echo Compiling .ts to .js
-	$(TYPESCRIPT) --module amd --target ES5 --outDir $(BUILD_DIR)/js `find $(TS_SRC) -type f -name *.ts | xargs`
+	$(TYPESCRIPT) -p .
 
 	@echo Bundling .js files
 	$(REQUIREJS) -o config/requirejs/release.js

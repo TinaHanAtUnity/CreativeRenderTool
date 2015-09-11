@@ -1,10 +1,10 @@
 /// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
 declare var OverlayTemplate: string;
 
-import View = require('Views/View');
-import Template = require('Utilities/Template');
+import View from 'Views/View';
+import Template from 'Utilities/Template';
 
-class Overlay extends View {
+export default class Overlay extends View {
 
     constructor() {
         super('overlay');
@@ -15,38 +15,36 @@ class Overlay extends View {
 
         this._bindings = [
             {
-                selector: '.play-button',
                 event: 'click',
-                listener: this.onPlay.bind(this)
+                listener: this.onPlay.bind(this),
+                selector: '.play-button'
             },
             {
-                selector: '.pause-button',
                 event: 'click',
-                listener: this.onPause.bind(this)
+                listener: this.onPause.bind(this),
+                selector: '.pause-button'
             },
             {
-                selector: '.skip-button',
                 event: 'click',
-                listener: this.onSkip.bind(this)
+                listener: this.onSkip.bind(this),
+                selector: '.skip-button'
             }
         ];
     }
 
-    private onPlay(event) {
+    private onPlay(event: Event): void {
         event.preventDefault();
         this.trigger(this._id, 'play');
     }
 
-    private onPause(event) {
+    private onPause(event: Event): void {
         event.preventDefault();
         this.trigger(this._id, 'pause');
     }
 
-    private onSkip(event) {
+    private onSkip(event: Event): void {
         event.preventDefault();
         this.trigger(this._id, 'skip');
     }
 
 }
-
-export = Overlay;

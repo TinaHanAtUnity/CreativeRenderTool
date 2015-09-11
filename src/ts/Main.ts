@@ -1,39 +1,13 @@
-import NativeBridge = require('NativeBridge');
-import WebView = require('WebView');
+import 'Workarounds';
 
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function(oThis) {
-        if (typeof this !== 'function') {
-            // closest thing possible to the ECMAScript 5
-            // internal IsCallable function
-            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-        }
+import NativeBridge from 'NativeBridge';
+import WebView from 'WebView';
 
-        var aArgs   = Array.prototype.slice.call(arguments, 1),
-            fToBind = this,
-            fNOP    = function() {},
-            fBound  = function() {
-                return fToBind.apply(this instanceof fNOP
-                        ? this
-                        : oThis,
-                    aArgs.concat(Array.prototype.slice.call(arguments)));
-            };
-
-        if (this.prototype) {
-            // native functions don't have a prototype
-            fNOP.prototype = this.prototype;
-        }
-        fBound.prototype = new fNOP();
-
-        return fBound;
-    };
-}
-
-let resizeHandler = () => {
-    let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
-    let newOrientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-    if(currentOrientation) {
-        if(currentOrientation !== newOrientation) {
+let resizeHandler: EventListener = (event: Event) => {
+    let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+    let newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+    if (currentOrientation) {
+        if (currentOrientation !== newOrientation) {
             document.body.classList.remove(currentOrientation);
             document.body.classList.add(newOrientation);
         }
@@ -41,11 +15,17 @@ let resizeHandler = () => {
         document.body.classList.add(newOrientation);
     }
 };
-resizeHandler();
+resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
-let nativeBridge = new NativeBridge();
-window['nativebridge'] = nativeBridge;
+/* tslint:disable:interface-name */
+interface Window {
+    nativebridge: NativeBridge;
+    webview: WebView;
+}
 
-let webView = new WebView(nativeBridge);
-window['webview'] = webView;
+let nativeBridge: NativeBridge = new NativeBridge();
+window.nativebridge = nativeBridge;
+
+let webView: WebView = new WebView(nativeBridge);
+window.webview = webView;

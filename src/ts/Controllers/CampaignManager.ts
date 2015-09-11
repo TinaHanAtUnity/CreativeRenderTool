@@ -1,68 +1,60 @@
-import NativeBridge = require('NativeBridge');
-import Observable = require('Utilities/Observable');
+import NativeBridge from 'NativeBridge';
+import Observable from 'Utilities/Observable';
 
-import DeviceInfo = require('Device/Info');
-import Url = require('Utilities/Url');
+import DeviceInfo from 'Device/Info';
+import Url from 'Utilities/Url';
 
-import Campaign = require('Models/Campaign');
+import Campaign from 'Models/Campaign';
 
-class CampaignController extends Observable {
+export default class CampaignManager extends Observable {
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
+
+    private _eventBindings: Object = {
+        'COMPLETE': this.onComplete
+    };
 
     constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
         super();
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
-        this._nativeBridge.subscribe("URL", this.onUrlEvent.bind(this));
+        this._nativeBridge.subscribe('URL', this.onUrlEvent.bind(this));
     }
 
-    private createRequestUrl(zoneId: string) {
-        let url = Url.addParameters("http://impact.applifier.com/mobile/campaigns", {
-            platform: 'android',
-            zoneId: zoneId,
-            sdkVersion: 2000,
-            gameId: '14851',
-            limitAdTracking: 0,
+    public request(zoneId: string): void {
+        this._nativeBridge.invoke('Url', 'get', [this.createRequestUrl(zoneId), []]);
+    }
+
+    private createRequestUrl(zoneId: string): string {
+        let url: string = Url.addParameters('http://impact.applifier.com/mobile/campaigns', {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
-            softwareVersion: this._deviceInfo.getSoftwareVersion(),
+            gameId: '14851',
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
-            screenSize: this._deviceInfo.getScreenLayout(),
+            limitAdTracking: 0,
+            networkType: 'wifi',
             screenDensity: this._deviceInfo.getScreenDensity(),
+            screenSize: this._deviceInfo.getScreenLayout(),
+            sdkVersion: 2000,
+            softwareVersion: this._deviceInfo.getSoftwareVersion(),
             wifi: 1,
-            networkType: "wifi"
+            zoneId: zoneId
         });
         return url;
     }
 
-    request(zoneId: string) {
-        this._nativeBridge.invoke("Url", "get", [this.createRequestUrl(zoneId), []], (status) => {});
-    }
-
-    private onComplete(url: string, response: string) {
-        let campaignJson = JSON.parse(response);
-        let campaign = new Campaign(campaignJson.data.campaigns[0]);
+    private onComplete(url: string, response: string): void {
+        let campaignJson: any = JSON.parse(response);
+        let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
         this.trigger('campaign', 'new', campaign);
     }
 
-    private onFailed() {
-
-    }
-
-    private _eventBindings = {
-        "COMPLETE": this.onComplete,
-        "FAILED": this.onFailed
-    };
-
-    private onUrlEvent(id: string, ...parameters) {
-        let handler = this._eventBindings[id];
+    private onUrlEvent(id: string, ...parameters: any[]): void {
+        let handler: Function = this._eventBindings[id];
         if(handler) {
             handler.apply(this, parameters);
         }
     }
 
 }
-
-export = CampaignController;

@@ -1,35 +1,33 @@
-import Observer = require('Observer');
+import { IObserver } from 'Observer';
 
-class Observable {
+export default class Observable {
 
-    private _observers = {};
+    private _observers: Object = {};
 
-    subscribe(category: string, observer: Observer) {
+    public subscribe(category: string, observer: IObserver): void {
         if(!this._observers[category]) {
             this._observers[category] = [];
         }
         this._observers[category].push(observer);
     }
 
-    unsubscribe(category: string, observer: Observer) {
-        let observers = this._observers[category];
+    public unsubscribe(category: string, observer: IObserver): void {
+        let observers: IObserver[] = this._observers[category];
         if(observers) {
-            let index = observers.indexOf(observer);
-            if(index != -1) {
+            let index: number = observers.indexOf(observer);
+            if(index !== -1) {
                 observers.splice(index, 1);
             }
         }
     }
 
-    protected trigger(category: string, id: string, ...parameters) {
-        let observers = this._observers[category];
+    protected trigger(category: string, id: string, ...parameters: any[]): void {
+        let observers: IObserver[] = this._observers[category];
         if(observers) {
             parameters.unshift(id);
-            observers.forEach((observer: Observer) => {
+            observers.forEach((observer: IObserver) => {
                 observer.apply(observer, parameters);
             });
         }
     }
 }
-
-export = Observable;

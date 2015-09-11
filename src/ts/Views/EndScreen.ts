@@ -1,12 +1,12 @@
-/// <amd-dependency path="text!html/EndScreen.html" name="EndScreenTemplate" />
+/// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
 declare var EndScreenTemplate: string;
 
-import View = require('Views/View');
-import Template = require('Utilities/Template');
+import View from 'Views/View';
+import Template from 'Utilities/Template';
 
-import Campaign = require('Models/Campaign');
+import Campaign from 'Models/Campaign';
 
-class EndScreen extends View {
+export default class EndScreen extends View {
 
     constructor(campaign: Campaign) {
         super('end-screen');
@@ -14,35 +14,33 @@ class EndScreen extends View {
         this._template = new Template(EndScreenTemplate);
 
         this._templateData = {
-            "gameName": campaign.getGameName(),
-            "gameIcon": campaign.getGameIcon(),
-            "endScreenPortrait": campaign.getPortraitUrl(),
+            'gameName': campaign.getGameName(),
+            'gameIcon': campaign.getGameIcon(),
+            'endScreenPortrait': campaign.getPortraitUrl()
         };
 
         this._bindings = [
             {
-                selector: '.btn-watch-again-region',
                 event: 'click',
-                listener: this.onReplay.bind(this)
+                listener: this.onReplay.bind(this),
+                selector: '.btn-watch-again-region'
             },
             {
-                selector: '.btn-close-region',
                 event: 'click',
-                listener: this.onClose.bind(this)
+                listener: this.onClose.bind(this),
+                selector: '.btn-close-region'
             }
         ];
     }
 
-    private onReplay(event) {
+    private onReplay(event: Event): void {
         event.preventDefault();
         this.trigger(this._id, 'replay');
     }
 
-    private onClose(event) {
+    private onClose(event: Event): void {
         event.preventDefault();
         this.trigger(this._id, 'close');
     }
 
 }
-
-export = EndScreen;

@@ -1,5 +1,3 @@
-interface Observer {
-    (id: string, ...parameters): void;
+export interface IObserver {
+    (id: string, ...parameters: any[]): void;
 }
-
-export = Observer;

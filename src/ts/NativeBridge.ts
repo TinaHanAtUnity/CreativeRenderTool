@@ -1,28 +1,52 @@
 /// <reference path="WebViewBridge.d.ts" />
 
-import Observable = require('Utilities/Observable');
+import Observable from 'Utilities/Observable';
 
-enum CallbackStatus {
+export const enum CallbackStatus {
     OK,
     ERROR
 }
 
-class NativeBridge extends Observable {
+export default class NativeBridge extends Observable {
 
-    private static _packageName = 'com.unity3d.unityads.api.';
+    private static _packageName: string = 'com.unity3d.unityads.api.';
 
-    private static _callbackId = 0;
-    private static _callbackTable = {};
+    private static _callbackId: number = 0;
+    private static _callbackTable: Object = {};
 
-    invoke(className: string, methodName: string, parameters?: any[], callback?: Function) {
-        var id = NativeBridge._callbackId++;
-        NativeBridge._callbackTable[id] = callback;
+    public invoke(className: string, methodName: string, parameters?: any[], callback?: Function): void {
+        let id: number = null;
+        if(callback) {
+            id = NativeBridge._callbackId++;
+            NativeBridge._callbackTable[id] = callback;
+        }
         if(window.webviewbridge) {
-            window.webviewbridge.handleInvocation(NativeBridge._packageName + className, methodName, JSON.stringify(parameters), id.toString());
+            let fullClassName: string = NativeBridge._packageName + className;
+            window.webviewbridge.handleInvocation(fullClassName, methodName, JSON.stringify(parameters), id ? id.toString() : null);
         }
     }
 
-    private invokeCallback(id: string, status: CallbackStatus, ...parameters) {
+    public handleEvent(category: string, id: string, ...parameters: any[]): void {
+        this.trigger.apply(this, [category, id].concat(parameters));
+    }
+
+    public handleCallback(id: string, status: string, ...parameters: any[]): void {
+        let callback: Function = NativeBridge._callbackTable[id];
+        if(callback) {
+            parameters.unshift(status);
+            callback.apply(window, parameters);
+            delete NativeBridge._callbackTable[id];
+        }
+    }
+
+    public handleInvocation(className: string, methodName: string, callback: string, ...parameters: any[]): void {
+        parameters.push((status: CallbackStatus, ...parameters: any[]) => {
+            this.invokeCallback(callback, status, parameters);
+        });
+        window[className][methodName].apply(window[className], parameters);
+    }
+
+    private invokeCallback(id: string, status: CallbackStatus, ...parameters: any[]): void {
         if(window.webviewbridge) {
             if(parameters.length > 0) {
                 window.webviewbridge.handleCallback(id, status.toString(), JSON.stringify(parameters));
@@ -32,30 +56,4 @@ class NativeBridge extends Observable {
         }
     }
 
-    handleEvent(category: string, id: string, ...parameters) {
-        this.trigger.apply(this, [category, id].concat(parameters));
-    }
-
-    handleCallback(id: string, status: string, ...parameters) {
-        let callback = NativeBridge._callbackTable[id];
-        if(callback) {
-            parameters.unshift(status);
-            callback.apply(window, parameters);
-            delete NativeBridge._callbackTable[id];
-        }
-    }
-
-    handleInvocation(className: string, methodName: string, callback: string, ...parameters) {
-        parameters.push((status: CallbackStatus, ...parameters) => {
-            this.invokeCallback(callback, status, parameters);
-        });
-        window[className][methodName].apply(window[className], parameters);
-    }
-
-    ping(callback) {
-        callback("OK");
-    }
-
 }
-
-export = NativeBridge;

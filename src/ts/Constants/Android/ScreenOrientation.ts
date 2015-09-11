@@ -1,4 +1,4 @@
-const enum AndroidScreenOrientation {
+export const enum ScreenOrientation {
     SCREEN_ORIENTATION_UNSPECIFIED = -1,
     SCREEN_ORIENTATION_LANDSCAPE = 0,
     SCREEN_ORIENTATION_PORTRAIT = 1,
@@ -16,5 +16,3 @@ const enum AndroidScreenOrientation {
     SCREEN_ORIENTATION_FULL_USER = 13,
     SCREEN_ORIENTATION_LOCKED = 14
 }
-
-export = AndroidScreenOrientation;

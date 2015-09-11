@@ -1,5 +1,3 @@
-const enum KeyCode {
+export const enum KeyCode {
     BACK = 4
 }
-
-export = KeyCode;

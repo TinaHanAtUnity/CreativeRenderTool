@@ -6,11 +6,15 @@ node_js:
 
 cache:
   directories:
-  - node_modules
+    - node_modules
 
 branches:
   only:
     - master
+
+install:
+  - npm install -g typescript tslint
+  - npm install
 
 script: make build
 

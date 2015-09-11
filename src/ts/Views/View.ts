@@ -1,13 +1,13 @@
-import Observable = require('Utilities/Observable');
-import Template = require('Utilities/Template');
+import Observable from 'Utilities/Observable';
+import Template from 'Utilities/Template';
 
-import ViewBinding = require('ViewBinding');
+import { IViewBinding } from 'ViewBinding';
 
-class View extends Observable {
+export default class View extends Observable {
 
     protected _template: Template;
     protected _templateData: { [key: string]: string; };
-    protected _bindings: ViewBinding[];
+    protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
 
     protected _id: string;
@@ -17,31 +17,29 @@ class View extends Observable {
         this._id = id;
     }
 
-    render() {
+    public render(): void {
         this._container = document.createElement('div');
         this._container.id = this._id;
         this._container.innerHTML = this._template.render(this._templateData);
 
-        for(let binding of this._bindings) {
-            let elements = this._container.querySelectorAll(binding.selector);
-            for(let i = 0; i < elements.length; ++i) {
-                let element = elements[i];
+        this._bindings.forEach((binding: IViewBinding) => {
+            let elements: NodeList = this._container.querySelectorAll(binding.selector);
+            for (let i: number = 0; i < elements.length; ++i) {
+                let element: Node = elements[i];
                 element.addEventListener(binding.event, binding.listener, false);
             }
-        }
+        });
     }
 
-    container() {
+    public container(): HTMLElement {
         return this._container;
     }
 
-    show() {
+    public show(): void {
         this._container.style.visibility = 'visible';
     }
 
-    hide() {
+    public hide(): void {
         this._container.style.visibility = 'hidden';
     }
 }
-
-export = View;
