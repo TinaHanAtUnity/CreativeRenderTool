@@ -12,13 +12,7 @@ HTML_SRC = src/prod-index.html
 # Targets
 BUILD_DIR = build
 
-clean:
-	rm -rf build
-
-lint:
-	$(TSLINT) -c tslint.json `find src/ts -name *.ts | xargs`
-
-build: clean
+build: clean lint
 	@echo Compiling .ts to .js
 	$(TYPESCRIPT) -p .
 
@@ -39,3 +33,9 @@ build: clean
 		var j=fs.readFileSync('$(BUILD_DIR)/main.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
+
+clean:
+	rm -rf build
+
+lint:
+	$(TSLINT) -c tslint.json `find src/ts -name *.ts | xargs`
