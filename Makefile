@@ -1,5 +1,6 @@
 # Binaries
 TYPESCRIPT = tsc
+TSLINT = tslint
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
@@ -13,6 +14,9 @@ BUILD_DIR = build
 
 clean:
 	rm -rf build
+
+lint:
+	$(TSLINT) -c tslint.json `find src/ts -name *.ts | xargs`
 
 build: clean
 	@echo Compiling .ts to .js

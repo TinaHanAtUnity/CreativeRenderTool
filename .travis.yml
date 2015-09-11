@@ -16,7 +16,7 @@ install:
   - npm install -g typescript tslint
   - npm install
 
-script: make build
+script: make lint build
 
 deploy:
   provider: s3
