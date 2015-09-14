@@ -12,16 +12,7 @@ HTML_SRC = src/prod-index.html
 # Targets
 BUILD_DIR = build
 
-build: clean lint
-	@echo Compiling .ts to .js
-	$(TYPESCRIPT) -p .
-
-	@echo Bundling .js files
-	$(REQUIREJS) -o config/requirejs/release.js
-
-	@echo Compiling .styl to .css
-	$(STYLUS) -o $(BUILD_DIR)/main.css -c $(STYL_SRC)
-
+build: clean lint build-ts build-js build-css
 	@echo Copying production index.html to build
 	cp $(HTML_SRC) $(BUILD_DIR)/index.html
 
@@ -33,6 +24,18 @@ build: clean lint
 		var j=fs.readFileSync('$(BUILD_DIR)/main.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
+
+build-ts:
+	@echo Compiling .ts to .js
+	$(TYPESCRIPT) -p .
+
+build-js:
+	@echo Bundling .js files
+	$(REQUIREJS) -o config/requirejs/release.js
+
+build-css:
+	@echo Compiling .styl to .css
+	$(STYLUS) -o $(BUILD_DIR)/main.css -c $(STYL_SRC)
 
 clean:
 	rm -rf build
