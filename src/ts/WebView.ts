@@ -83,7 +83,6 @@ export default class WebView {
                 this._campaignController.request('test');
             });
 
-
             this._nativeBridge.invoke('AdUnit', 'initComplete', [], (status) => {
                 console.log('initCompleteCallback: ' + status);
                 this._overlay.show();

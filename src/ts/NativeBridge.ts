@@ -11,7 +11,7 @@ export default class NativeBridge extends Observable {
 
     private static _packageName: string = 'com.unity3d.unityads.api.';
 
-    private static _callbackId: number = 0;
+    private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
 
     public invoke(className: string, methodName: string, parameters?: any[], callback?: Function): void {

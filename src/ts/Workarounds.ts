@@ -2,9 +2,6 @@
 
 if(!Function.prototype.bind) {
     Function.prototype.bind = function (self: Object): Function {
-        if (typeof this !== 'function') {
-            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-        }
         let args: any[] = Array.prototype.slice.call(arguments, 1);
         let toBind: any = this;
         let noop: any = function() {};

@@ -16,6 +16,7 @@ export default class EndScreen extends View {
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon(),
+            'endScreenLandscape': campaign.getLandscapeUrl(),
             'endScreenPortrait': campaign.getPortraitUrl()
         };
 

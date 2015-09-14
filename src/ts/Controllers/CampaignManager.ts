@@ -34,6 +34,7 @@ export default class CampaignManager extends Observable {
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
             limitAdTracking: 0,
             networkType: 'wifi',
+            platform: 'android',
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: 2000,
