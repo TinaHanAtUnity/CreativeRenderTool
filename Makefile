@@ -20,7 +20,7 @@ build: clean lint build-ts build-js build-css
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
-		var s=fs.readFileSync('$(BUILD_DIR)/main.css', o);\
+		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
 		var j=fs.readFileSync('$(BUILD_DIR)/main.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
@@ -35,7 +35,8 @@ build-js:
 
 build-css:
 	@echo Compiling .styl to .css
-	$(STYLUS) -o $(BUILD_DIR)/main.css -c $(STYL_SRC)
+	mkdir -p $(BUILD_DIR)/css
+	$(STYLUS) -o $(BUILD_DIR)/css -c `find $(STYL_SRC) -name *.styl | xargs`
 
 clean:
 	rm -rf build
