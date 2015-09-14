@@ -17,7 +17,7 @@ export default class CacheManager {
 
     public cache(url: string, callback: (url: string, fileUrl: string) => void): void {
         this._urlCallbacks[url] = callback;
-        this._nativeBridge.invoke('Cache', 'download', [url]);
+        this._nativeBridge.invoke('Cache', 'download', [url, true]);
     }
 
     public cacheAll(urls: string[], callback: (fileUrls: Object) => void): void {

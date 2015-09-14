@@ -1,29 +1,35 @@
-import NativeBridge from 'NativeBridge';
 import Observable from 'Utilities/Observable';
 
 import DeviceInfo from 'Device/Info';
 import Url from 'Utilities/Url';
 
 import Campaign from 'Models/Campaign';
+import Zone from 'Models/Zone';
+import Request from 'Utilities/Request';
 
 export default class CampaignManager extends Observable {
 
-    private _nativeBridge: NativeBridge;
+    private _request: Request;
     private _deviceInfo: DeviceInfo;
 
-    private _eventBindings: Object = {
-        'COMPLETE': this.onComplete
-    };
-
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
+    constructor(request: Request, deviceInfo: DeviceInfo) {
         super();
-        this._nativeBridge = nativeBridge;
+        this._request = request;
         this._deviceInfo = deviceInfo;
-        this._nativeBridge.subscribe('URL', this.onUrlEvent.bind(this));
     }
 
-    public request(zoneId: string): void {
-        this._nativeBridge.invoke('Url', 'get', [this.createRequestUrl(zoneId), []]);
+    public request(zone: Zone): void {
+        let onComplete: (url: string, response: string) => void = (url: string, response: string) => {
+            let campaignJson: any = JSON.parse(response);
+            let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
+            zone.setCampaign(campaign);
+            this.trigger('campaign', 'new', zone);
+        };
+        let onError: (url: string, error: string) => void = (url: string, error: string) => {
+            zone.setCampaign(null);
+            this.trigger('campaign', 'error', zone);
+        };
+        this._request.get(this.createRequestUrl(zone.getId()), onComplete, onError);
     }
 
     private createRequestUrl(zoneId: string): string {
@@ -43,19 +49,6 @@ export default class CampaignManager extends Observable {
             zoneId: zoneId
         });
         return url;
-    }
-
-    private onComplete(url: string, response: string): void {
-        let campaignJson: any = JSON.parse(response);
-        let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
-        this.trigger('campaign', 'new', campaign);
-    }
-
-    private onUrlEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._eventBindings[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
     }
 
 }
