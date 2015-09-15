@@ -14,10 +14,10 @@
       <div class="store-container">
         <a class="store-button"></a>
         <div class="game-store-info">
-          <span class="game-rating"><span class="game-rating-mask">&#9733;&#9733;&#9733;&#9733;&#9733;</span>&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="game-rating"><span class="game-rating-mask" style="width: <%= data.rating %>%">&#9733;&#9733;&#9733;&#9733;&#9733;</span>&#9733;&#9733;&#9733;&#9733;&#9733;</span>
           <br class="game-rating-br">
           <span class="game-rating-count">
-            (<span class="game-rating-count-number">0</span><span class="game-rating-postfix"> Ratings</span>)
+            (<span class="game-rating-count-number"><%= data.ratingCount %></span><span class="game-rating-postfix"> Ratings</span>)
           </span>
         </div>
       </div>

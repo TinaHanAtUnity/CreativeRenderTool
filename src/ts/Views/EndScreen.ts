@@ -17,7 +17,9 @@ export default class EndScreen extends View {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon(),
             'endScreenLandscape': campaign.getLandscapeUrl(),
-            'endScreenPortrait': campaign.getPortraitUrl()
+            'endScreenPortrait': campaign.getPortraitUrl(),
+            'rating': campaign.getRating() * 20 - 2,
+            'ratingCount': campaign.getRatingCount()
         };
 
         this._bindings = [
