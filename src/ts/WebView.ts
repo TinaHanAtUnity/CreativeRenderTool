@@ -25,6 +25,8 @@ export default class WebView {
 
     private _nativeBridge: NativeBridge;
 
+    private _gameId: string = null;
+
     private _deviceInfo: DeviceInfo;
 
     private _request: Request;
@@ -75,8 +77,9 @@ export default class WebView {
             }
         });
 
-        this._nativeBridge.invoke('AdUnit', 'loadComplete', [], (status: string, config: string) => {
+        this._nativeBridge.invoke('AdUnit', 'loadComplete', [], (status: string, gameId: string, config: string) => {
             console.log('loadCompleteCallback: ' + status);
+            this._gameId = gameId;
 
             this._deviceInfo = new DeviceInfo(nativeBridge, () => {
                 this._zoneManager = new ZoneManager(config);
@@ -95,7 +98,7 @@ export default class WebView {
                 for(let zoneId in zones) {
                     if(zones.hasOwnProperty(zoneId)) {
                         if(zoneId !== 'webglZone') {
-                            this._campaignManager.request(zones[zoneId]);
+                            this._campaignManager.request(this._gameId, zones[zoneId]);
                         }
                     }
                 }
@@ -131,7 +134,7 @@ export default class WebView {
                 this._overlay.show();
                 this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
                 if(zoneId !== 'webglZone') {
-                    this._campaignManager.request(zone);
+                    this._campaignManager.request(this._gameId, zone);
                 }
             }
         });

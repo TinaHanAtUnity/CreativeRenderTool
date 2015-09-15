@@ -18,7 +18,7 @@ export default class CampaignManager extends Observable {
         this._deviceInfo = deviceInfo;
     }
 
-    public request(zone: Zone): void {
+    public request(gameId: string, zone: Zone): void {
         let onComplete: (url: string, response: string) => void = (url: string, response: string) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
@@ -29,14 +29,14 @@ export default class CampaignManager extends Observable {
             zone.setCampaign(null);
             this.trigger('campaign', 'error', zone);
         };
-        this._request.get(this.createRequestUrl(zone.getId()), onComplete, onError);
+        this._request.get(this.createRequestUrl(gameId, zone.getId()), onComplete, onError);
     }
 
-    private createRequestUrl(zoneId: string): string {
+    private createRequestUrl(gameId: string, zoneId: string): string {
         let url: string = Url.addParameters('http://impact.applifier.com/mobile/campaigns', {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
-            gameId: '14851',
+            gameId: gameId,
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
