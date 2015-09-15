@@ -94,7 +94,9 @@ export default class WebView {
 
                 for(let zoneId in zones) {
                     if(zones.hasOwnProperty(zoneId)) {
-                        this._campaignManager.request(zones[zoneId]);
+                        if(zoneId !== 'webglZone') {
+                            this._campaignManager.request(zones[zoneId]);
+                        }
                     }
                 }
 
@@ -128,7 +130,9 @@ export default class WebView {
                 this._endScreen = null;
                 this._overlay.show();
                 this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
-                this._campaignManager.request(zone);
+                if(zoneId !== 'webglZone') {
+                    this._campaignManager.request(zone);
+                }
             }
         });
 
@@ -158,8 +162,9 @@ export default class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]]);
-            this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
+            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]], (status: string) => {
+                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
+            });
         });
     }
 
