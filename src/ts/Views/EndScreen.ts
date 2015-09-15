@@ -13,13 +13,14 @@ export default class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate);
 
+        let adjustedRating: number = campaign.getRating() * 20 - 2;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon(),
             'endScreenLandscape': campaign.getLandscapeUrl(),
             'endScreenPortrait': campaign.getPortraitUrl(),
-            'rating': campaign.getRating() * 20 - 2,
-            'ratingCount': campaign.getRatingCount()
+            'rating': adjustedRating.toString(),
+            'ratingCount': campaign.getRatingCount().toString()
         };
 
         this._bindings = [
