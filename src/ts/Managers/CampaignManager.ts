@@ -38,14 +38,14 @@ export default class CampaignManager extends Observable {
             androidId: this._deviceInfo.getAndroidId(),
             gameId: '14851',
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
-            limitAdTracking: 0,
-            networkType: 'wifi',
+            limitAdTracking: this._deviceInfo.getLimitAdTracking(),
+            networkType: this._deviceInfo.getNetworkType(),
             platform: 'android',
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: 2000,
             softwareVersion: this._deviceInfo.getSoftwareVersion(),
-            wifi: 1,
+            wifi: this._deviceInfo.isWifi() ? 1 : 0,
             zoneId: zoneId
         });
         return url;
