@@ -60,6 +60,7 @@ export default class WebView {
 
         this._videoPlayer.subscribe('videoplayer', (id: string) => {
             if (id === 'completed') {
+                this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
                 this._overlay.hide();
                 this._endScreen.show();
             }
@@ -68,6 +69,7 @@ export default class WebView {
         this._overlay.subscribe('overlay', (id: string) => {
             if (id === 'skip') {
                 this._videoPlayer.pause();
+                this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
                 this._overlay.hide();
                 this._endScreen.show();
             } else if (id === 'play') {
@@ -122,6 +124,7 @@ export default class WebView {
 
         this._endScreen.subscribe('end-screen', (id: string) => {
             if (id === 'replay') {
+                this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
                 this._videoPlayer.seekTo(0, () => {
                     this._endScreen.hide();
                     this._overlay.show();
@@ -134,7 +137,6 @@ export default class WebView {
                     this._campaignManager.request(this._gameId, zone);
                 }
             } else if(id === 'download') {
-                this.hide();
                 this._nativeBridge.invoke('Intent', 'launch', [{
                     'action': 'android.intent.action.VIEW',
                     'uri': 'market://details?id=' + campaign.getStoreId()
