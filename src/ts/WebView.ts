@@ -129,13 +129,16 @@ export default class WebView {
                 });
             } else if (id === 'close') {
                 this.hide();
-                this._endScreen.container().parentElement.removeChild(this._endScreen.container());
-                this._endScreen = null;
-                this._overlay.show();
                 this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
                 if(zoneId !== 'webglZone') {
                     this._campaignManager.request(this._gameId, zone);
                 }
+            } else if(id === 'download') {
+                this.hide();
+                this._nativeBridge.invoke('Intent', 'launch', [{
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'market://details?id=' + campaign.getStoreId()
+                }]);
             }
         });
 
@@ -147,6 +150,9 @@ export default class WebView {
 
     public hide(): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
+        this._endScreen.container().parentElement.removeChild(this._endScreen.container());
+        this._endScreen = null;
+        this._overlay.show();
     }
 
     private onNewCampaign(zone: Zone): void {

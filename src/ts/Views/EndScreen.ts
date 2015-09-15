@@ -26,6 +26,11 @@ export default class EndScreen extends View {
         this._bindings = [
             {
                 event: 'click',
+                listener: this.onDownload.bind(this),
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+            },
+            {
+                event: 'click',
                 listener: this.onReplay.bind(this),
                 selector: '.btn-watch-again-region'
             },
@@ -35,6 +40,11 @@ export default class EndScreen extends View {
                 selector: '.btn-close-region'
             }
         ];
+    }
+
+    private onDownload(event: Event): void {
+        event.preventDefault();
+        this.trigger(this._id, 'download');
     }
 
     private onReplay(event: Event): void {
