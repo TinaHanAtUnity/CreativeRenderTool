@@ -45,6 +45,16 @@ export default class WebView {
         'new': this.onNewCampaign
     };
 
+    private _videoEventHandlers: Object = {
+        'prepared': this.onVideoPrepared,
+        'progress': this.onVideoProgress,
+        'completed': this.onVideoCompleted
+    };
+
+    private _overlayEventHandlers: Object = {
+        'skip': this.onSkip
+    };
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -57,27 +67,9 @@ export default class WebView {
         document.body.appendChild(this._overlay.container());
 
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
+        this._videoPlayer.subscribe('videoplayer', this.onVideoEvent.bind(this));
 
-        this._videoPlayer.subscribe('videoplayer', (id: string) => {
-            if (id === 'completed') {
-                this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-                this._overlay.hide();
-                this._endScreen.show();
-            }
-        });
-
-        this._overlay.subscribe('overlay', (id: string) => {
-            if (id === 'skip') {
-                this._videoPlayer.pause();
-                this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-                this._overlay.hide();
-                this._endScreen.show();
-            } else if (id === 'play') {
-                this._videoPlayer.play();
-            } else if (id === 'pause') {
-                this._videoPlayer.pause();
-            }
-        });
+        this._overlay.subscribe('overlay', this.onOverlayEvent.bind(this));
 
         this._nativeBridge.invoke('AdUnit', 'loadComplete', [], (status: string, gameId: string, config: string) => {
             console.log('loadCompleteCallback: ' + status);
@@ -144,7 +136,16 @@ export default class WebView {
             }
         });
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, [KeyCode.BACK]], (status: string): void => {
+        let keyEvents: any[] = [];
+        if(zone.isIncentivized()) {
+            keyEvents = [KeyCode.BACK];
+            this._overlay.setSkipEnabled(false);
+        } else {
+            this._overlay.setSkipEnabled(true);
+            this._overlay.setSkipDuration(zone.allowSkipInSeconds());
+        }
+
+        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, keyEvents], (status: string): void => {
             console.log('openCallback: ' + status);
             this._videoPlayer.prepare(campaign.getVideoUrl());
         });
@@ -179,8 +180,43 @@ export default class WebView {
         });
     }
 
+    private onVideoPrepared(duration: number, width: number, height: number): void {
+        this._overlay.setVideoDuration(duration);
+    }
+
+    private onVideoProgress(position: number): void {
+        this._overlay.setVideoProgress(position);
+    }
+
+    private onVideoCompleted(url: string): void {
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
+        this._overlay.hide();
+        this._endScreen.show();
+    }
+
+    private onSkip(): void {
+        this._videoPlayer.pause();
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
+        this._overlay.hide();
+        this._endScreen.show();
+    }
+
     private onCampaignEvent(id: string, ...parameters: any[]): void {
         let handler: Function = this._campaignEventHandlers[id];
+        if(handler) {
+            handler.apply(this, parameters);
+        }
+    }
+
+    private onVideoEvent(id: string, ...parameters: any[]): void {
+        let handler: Function = this._videoEventHandlers[id];
+        if(handler) {
+            handler.apply(this, parameters);
+        }
+    }
+
+    private onOverlayEvent(id: string, ...parameters: any[]): void {
+        let handler: Function = this._overlayEventHandlers[id];
         if(handler) {
             handler.apply(this, parameters);
         }

@@ -6,6 +6,16 @@ import Template from 'Utilities/Template';
 
 export default class Overlay extends View {
 
+    private _skipEnabled: boolean;
+    private _skipDuration: number;
+
+    private _videoDuration: number;
+    private _videoProgress: number;
+
+    private _skipElement: HTMLElement;
+    private _skipDurationElement: HTMLElement;
+    private _videoDurationElement: HTMLElement;
+
     constructor() {
         super('overlay');
 
@@ -16,35 +26,51 @@ export default class Overlay extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: this.onPlay.bind(this),
-                selector: '.play-button'
-            },
-            {
-                event: 'click',
-                listener: this.onPause.bind(this),
-                selector: '.pause-button'
-            },
-            {
-                event: 'click',
                 listener: this.onSkip.bind(this),
                 selector: '.skip-button'
             }
         ];
     }
 
-    private onPlay(event: Event): void {
-        event.preventDefault();
-        this.trigger(this._id, 'play');
+    public render(): void {
+        super.render();
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
+        this._skipDurationElement = <HTMLElement>this._container.querySelector('.skip-duration');
+        this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration');
     }
 
-    private onPause(event: Event): void {
-        event.preventDefault();
-        this.trigger(this._id, 'pause');
+    public setSkipEnabled(value: boolean): void {
+        this._skipEnabled = value;
+        this._skipElement.style.display = value ? 'block' : 'none';
+    }
+
+    public setSkipDuration(value: number): void {
+        this._skipDuration = value * 1000;
+        this._skipDurationElement.innerHTML = value.toString();
+    }
+
+    public setVideoDuration(value: number): void {
+        this._videoDuration = value;
+    }
+
+    public setVideoProgress(value: number): void {
+        this._videoProgress = value;
+        if(this._skipEnabled) {
+            let skipRemaining: number = Math.round((this._skipDuration - value) / 1000);
+            if(skipRemaining < 0) {
+                this._skipElement.innerHTML = 'Skip Video';
+            } else {
+                this._skipDurationElement.innerHTML = skipRemaining.toString();
+            }
+        }
+        this._videoDurationElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
     }
 
     private onSkip(event: Event): void {
         event.preventDefault();
-        this.trigger(this._id, 'skip');
+        if(this._videoProgress > this._skipDuration) {
+            this.trigger(this._id, 'skip');
+        }
     }
 
 }
