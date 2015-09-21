@@ -16,7 +16,7 @@ install:
   - npm install -g typescript tslint
   - npm install
 
-script: make lint build
+script: make clean lint build generate-config
 
 deploy:
   provider: s3
@@ -27,4 +27,4 @@ deploy:
   skip_cleanup: true
   acl: public_read
   local_dir: build
-  upload-dir: build
+  upload-dir: webview

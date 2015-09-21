@@ -8,11 +8,12 @@ STYLUS = node_modules/.bin/stylus
 TS_SRC = src/ts
 STYL_SRC = src/styl
 HTML_SRC = src/prod-index.html
+CONFIG_SRC = src/config.json
 
 # Targets
 BUILD_DIR = build
 
-build: clean lint build-ts build-js build-css
+build: build-ts build-js build-css
 	@echo Copying production index.html to build
 	cp $(HTML_SRC) $(BUILD_DIR)/index.html
 
@@ -37,6 +38,16 @@ build-css:
 	@echo Compiling .styl to .css
 	mkdir -p $(BUILD_DIR)/css
 	$(STYLUS) -o $(BUILD_DIR)/css -c `find $(STYL_SRC) -name *.styl | xargs`
+
+generate-config:
+	@echo Copying production config.json to build
+	cp $(CONFIG_SRC) $(BUILD_DIR)/config.json
+	@echo Calculating build hash to config
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
+		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256`'), o);"
 
 clean:
 	rm -rf build
