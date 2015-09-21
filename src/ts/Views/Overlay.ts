@@ -57,7 +57,7 @@ export default class Overlay extends View {
         this._videoProgress = value;
         if(this._skipEnabled) {
             let skipRemaining: number = Math.round((this._skipDuration - value) / 1000);
-            if(skipRemaining < 0) {
+            if(skipRemaining <= 0) {
                 this._skipElement.innerHTML = 'Skip Video';
             } else {
                 this._skipDurationElement.innerHTML = skipRemaining.toString();

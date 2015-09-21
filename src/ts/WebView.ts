@@ -26,6 +26,7 @@ export default class WebView {
     private _nativeBridge: NativeBridge;
 
     private _gameId: string = null;
+    private _testMode: boolean = null;
 
     private _deviceInfo: DeviceInfo;
 
@@ -55,25 +56,25 @@ export default class WebView {
         'skip': this.onSkip
     };
 
+    private _endscreenEventHandlers: Object = {
+        'replay': this.onReplay,
+        'download': this.onDownload,
+        'close': this.onClose
+    };
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
 
-        this._overlay = new Overlay();
-        this._overlay.render();
-        this._overlay.hide();
-        document.body.appendChild(this._overlay.container());
-
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
         this._videoPlayer.subscribe('videoplayer', this.onVideoEvent.bind(this));
-
-        this._overlay.subscribe('overlay', this.onOverlayEvent.bind(this));
 
         this._nativeBridge.invoke('Sdk', 'loadComplete', [], (status: string, gameId: string, testMode: boolean) => {
             console.log('loadCompleteCallback: ' + status);
             this._gameId = gameId;
+            this._testMode = testMode;
 
             this._deviceInfo = new DeviceInfo(nativeBridge, () => {
                 this._zoneManager = new ZoneManager({
@@ -141,32 +142,16 @@ export default class WebView {
         let zone: Zone = this._zoneManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
-        this._endScreen = new EndScreen(campaign);
+        this._overlay = new Overlay();
+        this._overlay.render();
+        document.body.appendChild(this._overlay.container());
+        this._overlay.subscribe('overlay', this.onOverlayEvent.bind(this));
+
+        this._endScreen = new EndScreen(zone, campaign);
         this._endScreen.render();
         this._endScreen.hide();
         document.body.appendChild(this._endScreen.container());
-
-        this._endScreen.subscribe('end-screen', (id: string) => {
-            if (id === 'replay') {
-                this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
-                this._videoPlayer.seekTo(0, () => {
-                    this._endScreen.hide();
-                    this._overlay.show();
-                    this._videoPlayer.play();
-                });
-            } else if (id === 'close') {
-                this.hide();
-                this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
-                if(zoneId !== 'webglZone') {
-                    this._campaignManager.request(this._gameId, zone);
-                }
-            } else if(id === 'download') {
-                this._nativeBridge.invoke('Intent', 'launch', [{
-                    'action': 'android.intent.action.VIEW',
-                    'uri': 'market://details?id=' + campaign.getStoreId()
-                }]);
-            }
-        });
+        this._endScreen.subscribe('end-screen', this.onEndscreenEvent.bind(this));
 
         let keyEvents: any[] = [];
         if(zone.isIncentivized()) {
@@ -185,9 +170,10 @@ export default class WebView {
 
     public hide(): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
+        this._overlay.container().parentElement.removeChild(this._overlay.container());
+        this._overlay = null;
         this._endScreen.container().parentElement.removeChild(this._endScreen.container());
         this._endScreen = null;
-        this._overlay.show();
     }
 
     private onNewCampaign(zone: Zone): void {
@@ -233,6 +219,31 @@ export default class WebView {
         this._endScreen.show();
     }
 
+    private onReplay(zone: Zone, campaign: Campaign): void {
+        this._overlay.setSkipDuration(0);
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
+        this._videoPlayer.seekTo(0, () => {
+            this._endScreen.hide();
+            this._overlay.show();
+            this._videoPlayer.play();
+        });
+    }
+
+    private onDownload(zone: Zone, campaign: Campaign): void {
+        this._nativeBridge.invoke('Intent', 'launch', [{
+            'action': 'android.intent.action.VIEW',
+            'uri': 'market://details?id=' + campaign.getStoreId()
+        }]);
+    }
+
+    private onClose(zone: Zone, campaign: Campaign): void {
+        this.hide();
+        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
+        if(zone.getId() !== 'webglZone') {
+            this._campaignManager.request(this._gameId, zone);
+        }
+    }
+
     private onCampaignEvent(id: string, ...parameters: any[]): void {
         let handler: Function = this._campaignEventHandlers[id];
         if(handler) {
@@ -249,6 +260,13 @@ export default class WebView {
 
     private onOverlayEvent(id: string, ...parameters: any[]): void {
         let handler: Function = this._overlayEventHandlers[id];
+        if(handler) {
+            handler.apply(this, parameters);
+        }
+    }
+
+    private onEndscreenEvent(id: string, ...parameters: any[]): void {
+        let handler: Function = this._endscreenEventHandlers[id];
         if(handler) {
             handler.apply(this, parameters);
         }
