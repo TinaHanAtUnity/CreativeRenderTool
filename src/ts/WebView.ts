@@ -71,12 +71,44 @@ export default class WebView {
 
         this._overlay.subscribe('overlay', this.onOverlayEvent.bind(this));
 
-        this._nativeBridge.invoke('AdUnit', 'loadComplete', [], (status: string, gameId: string, config: string) => {
+        this._nativeBridge.invoke('Sdk', 'loadComplete', [], (status: string, gameId: string, testMode: boolean) => {
             console.log('loadCompleteCallback: ' + status);
             this._gameId = gameId;
 
             this._deviceInfo = new DeviceInfo(nativeBridge, () => {
-                this._zoneManager = new ZoneManager(config);
+                this._zoneManager = new ZoneManager({
+                    'enabled': true,
+                    'webViewUrl': 'http://unityads-webview.s3.amazonaws.com/build/index.html',
+                    'webViewHash': '1234',
+                    'zones': [
+                        {
+                            'id': 'defaultVideoAndPictureZone',
+                            'name': 'Video ad placement',
+                            'enabled': true,
+                            'default': true,
+                            'incentivised': false,
+                            'allowSkipVideoInSeconds': 5,
+                            'disableBackButtonForSeconds': 30,
+                            'muteVideoSounds': false,
+                            'useDeviceOrientationForVideo': false
+                        },
+                        {
+                            'id': 'incentivizedZone',
+                            'name': 'Incentivized placement',
+                            'enabled': true,
+                            'default': false,
+                            'incentivized': true,
+                            'allowSkipVideoInSeconds': -1,
+                            'disableBackButtonForSeconds': 30,
+                            'openAnimated': false,
+                            'useDeviceOrientationForVideo': false
+                        },
+                        {
+                            'id': 'webglZone'
+                        }
+                    ]
+                });
+
                 this._campaignManager = new CampaignManager(this._request, this._deviceInfo);
 
                 this._campaignManager.subscribe('campaign', this.onCampaignEvent.bind(this));
@@ -97,7 +129,7 @@ export default class WebView {
                     }
                 }
 
-                this._nativeBridge.invoke('AdUnit', 'initComplete', [], (status: string): void => {
+                this._nativeBridge.invoke('Sdk', 'initComplete', [], (status: string): void => {
                     console.log('initCompleteCallback: ' + status);
                     this._overlay.show();
                 });
