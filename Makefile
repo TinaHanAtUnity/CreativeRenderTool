@@ -39,7 +39,7 @@ build-css:
 	mkdir -p $(BUILD_DIR)/css
 	$(STYLUS) -o $(BUILD_DIR)/css -c `find $(STYL_SRC) -name *.styl | xargs`
 
-generate-config:
+config:
 	@echo Copying production config.json to build
 	cp $(CONFIG_SRC) $(BUILD_DIR)/config.json
 	@echo Calculating build hash to config

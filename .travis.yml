@@ -16,7 +16,7 @@ install:
   - npm install -g typescript tslint
   - npm install
 
-script: make clean lint build generate-config
+script: make clean lint build config
 
 deploy:
   provider: s3
