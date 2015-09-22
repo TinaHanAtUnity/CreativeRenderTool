@@ -1,6 +1,6 @@
 import NativeBridge from 'NativeBridge';
 
-import VideoPlayer from 'Video/VideoPlayer';
+import { VideoPlayer } from 'Video/VideoPlayer';
 
 export default class NativeVideoPlayer extends VideoPlayer {
 

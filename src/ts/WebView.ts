@@ -3,7 +3,7 @@ import NativeBridge from 'NativeBridge';
 import EndScreen from 'Views/EndScreen';
 import Overlay from 'Views/Overlay';
 
-import VideoPlayer from 'Video/VideoPlayer';
+import { VideoPlayer } from 'Video/VideoPlayer';
 import NativeVideoPlayer from 'Video/NativeVideoPlayer';
 
 import DeviceInfo from 'Device/Info';
