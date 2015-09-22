@@ -26,6 +26,16 @@ build: build-ts build-js build-css
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
+	@echo Copying production config.json to build
+	cp $(CONFIG_SRC) $(BUILD_DIR)/config.json
+
+	@echo Calculating build hash to config
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
+		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`'), o);"
+
 build-ts:
 	@echo Compiling .ts to .js
 	$(TYPESCRIPT) -p .
@@ -38,16 +48,6 @@ build-css:
 	@echo Compiling .styl to .css
 	mkdir -p $(BUILD_DIR)/css
 	$(STYLUS) -o $(BUILD_DIR)/css -c `find $(STYL_SRC) -name *.styl | xargs`
-
-config:
-	@echo Copying production config.json to build
-	cp $(CONFIG_SRC) $(BUILD_DIR)/config.json
-	@echo Calculating build hash to config
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`'), o);"
 
 clean:
 	rm -rf build
