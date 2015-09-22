@@ -1,7 +1,7 @@
 import Observable from 'Utilities/Observable';
 import Template from 'Utilities/Template';
 
-import { IViewBinding } from 'ViewBinding';
+import { IViewBinding } from 'IViewBinding';
 
 export default class View extends Observable {
 

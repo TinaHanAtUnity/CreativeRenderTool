@@ -1,4 +1,4 @@
-import { IObserver } from 'Observer';
+import { IObserver } from 'IObserver';
 
 export default class Observable {
 
