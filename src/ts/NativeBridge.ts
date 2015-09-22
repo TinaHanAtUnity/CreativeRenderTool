@@ -35,8 +35,7 @@ export default class NativeBridge extends Observable {
         }
     }
 
-    public handleEvent(id: string, ...parameters: any[]): void {
-        parameters.unshift(id);
+    public handleEvent(...parameters: any[]): void {
         this.trigger.apply(this, parameters);
     }
 
