@@ -1,4 +1,4 @@
-import NativeBridge from 'NativeBridge';
+import { NativeBridge, Callback } from 'NativeBridge';
 
 export default class CacheManager {
 
@@ -20,13 +20,13 @@ export default class CacheManager {
             this._urlCallbacks[url] = [callback];
         }
 
-        let onError: Function = (message: string) => {
+        let onError: Callback = (message: string) => {
             switch(message) {
                 case 'FILE_ALREADY_IN_QUEUE':
                     break;
 
                 case 'FILE_ALREADY_IN_CACHE':
-                    this.getFileUrl(url, (status: string, fileUrl: string) => {
+                    this.getFileUrl(url, (fileUrl: string) => {
                         callback(url, fileUrl);
                     });
                     break;
@@ -36,17 +36,11 @@ export default class CacheManager {
             }
         };
 
-        let onComplete: Function = () => {
+        let onComplete: Callback = () => {
             console.log('Caching ' + url);
         };
 
-        this._nativeBridge.invoke('Cache', 'download', [url, false], (status: string, ...parameters: any[]) => {
-            if(status === 'OK') {
-                onComplete.apply(this, parameters);
-            } else {
-                onError.apply(this, parameters);
-            }
-        });
+        this._nativeBridge.invoke('Cache', 'download', [url, false], onComplete, onError);
     }
 
     public cacheAll(urls: string[], callback: (fileUrls: Object) => void): void {
@@ -65,12 +59,12 @@ export default class CacheManager {
         });
     }
 
-    public getFileUrl(url: string, callback: (status: string, fileUrl: string) => void): void {
+    public getFileUrl(url: string, callback: (fileUrl: string) => void): void {
         this._nativeBridge.invoke('Cache', 'getFileUrl', [url], callback);
     }
 
     private onDownloadEnd(url: string, size: number, duration: number): void {
-        this.getFileUrl(url, (status: string, fileUrl: string): void => {
+        this.getFileUrl(url, (fileUrl: string): void => {
             let urlCallbacks: Function[] = this._urlCallbacks[url];
             if(urlCallbacks) {
                 urlCallbacks.forEach((callback: Function) => {

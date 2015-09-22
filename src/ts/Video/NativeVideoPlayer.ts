@@ -1,4 +1,4 @@
-import NativeBridge from 'NativeBridge';
+import { Callback, NativeBridge } from 'NativeBridge';
 
 import { VideoPlayer } from 'Video/VideoPlayer';
 
@@ -28,7 +28,7 @@ export default class NativeVideoPlayer extends VideoPlayer {
         this._nativeBridge.invoke('VideoPlayer', 'pause', []);
     }
 
-    public seekTo(time: number, callback: Function): void {
+    public seekTo(time: number, callback: Callback): void {
         this._nativeBridge.invoke('VideoPlayer', 'seekTo', [time], callback);
     }
 

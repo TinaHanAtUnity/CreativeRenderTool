@@ -2,23 +2,28 @@
 
 import Observable from 'Utilities/Observable';
 
-export const enum CallbackStatus {
+export enum CallbackStatus {
     OK,
     ERROR
 }
 
-export default class NativeBridge extends Observable {
+export type Callback = (...parameters: any[]) => void;
+
+export class NativeBridge extends Observable {
 
     private static _packageName: string = 'com.unity3d.unityads.api.';
 
     private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
 
-    public invoke(className: string, methodName: string, parameters?: any[], callback?: Function): void {
+    public invoke(className: string, methodName: string, parameters?: any[], callback?: Callback, error?: Callback): void {
         let id: number = null;
         if(callback) {
             id = NativeBridge._callbackId++;
-            NativeBridge._callbackTable[id] = callback;
+            let callbackObject: Object = {};
+            callbackObject[CallbackStatus.OK] = callback;
+            callbackObject[CallbackStatus.ERROR] = error;
+            NativeBridge._callbackTable[id] = callbackObject;
         }
         if(window.webviewbridge) {
             let fullClassName: string = NativeBridge._packageName + className;
@@ -27,10 +32,22 @@ export default class NativeBridge extends Observable {
     }
 
     public handleCallback(id: string, status: string, ...parameters: any[]): void {
-        let callback: Function = NativeBridge._callbackTable[id];
-        if(callback) {
-            parameters.unshift(status);
-            callback.apply(window, parameters);
+        let callbackObject: Function = NativeBridge._callbackTable[id];
+        if(callbackObject) {
+            let callback: Callback = callbackObject[CallbackStatus.OK];
+            let error: Callback = callbackObject[CallbackStatus.ERROR];
+            switch(status) {
+                case CallbackStatus[CallbackStatus.OK]:
+                    callback.apply(this, parameters);
+                    break;
+
+                case CallbackStatus[CallbackStatus.ERROR]:
+                    error.apply(this, parameters);
+                    break;
+
+                default:
+                    break;
+            }
             delete NativeBridge._callbackTable[id];
         }
     }

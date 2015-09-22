@@ -1,4 +1,4 @@
-import NativeBridge from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 import EndScreen from 'Views/EndScreen';
 import Overlay from 'Views/Overlay';
@@ -55,8 +55,7 @@ export default class WebView {
             'completed': this.onVideoCompleted.bind(this)
         });
 
-        this._nativeBridge.invoke('Sdk', 'loadComplete', [], (status: string, gameId: string, testMode: boolean) => {
-            console.log('loadCompleteCallback: ' + status);
+        this._nativeBridge.invoke('Sdk', 'loadComplete', [], (gameId: string, testMode: boolean) => {
             this._gameId = gameId;
             this._testMode = testMode;
 
@@ -113,9 +112,7 @@ export default class WebView {
                     }
                 }
 
-                this._nativeBridge.invoke('Sdk', 'initComplete', [], (status: string): void => {
-                    console.log('initCompleteCallback: ' + status);
-                });
+                this._nativeBridge.invoke('Sdk', 'initComplete', []);
             });
         });
     }
@@ -150,7 +147,7 @@ export default class WebView {
             this._overlay.setSkipDuration(zone.allowSkipInSeconds());
         }
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, keyEvents], (status: string): void => {
+        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, keyEvents], (): void => {
             console.log('openCallback: ' + status);
             this._videoPlayer.prepare(campaign.getVideoUrl());
         });
@@ -180,7 +177,7 @@ export default class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]], (status: string) => {
+            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]], () => {
                 this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
             });
         });

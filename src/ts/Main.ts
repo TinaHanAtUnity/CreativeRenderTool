@@ -1,6 +1,6 @@
 import 'Workarounds';
 
-import NativeBridge from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 import WebView from 'WebView';
 
 let resizeHandler: EventListener = (event: Event) => {

@@ -1,4 +1,4 @@
-import NativeBridge from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 export const enum RequestStatus {
     COMPLETE,

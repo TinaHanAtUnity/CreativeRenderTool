@@ -1,4 +1,4 @@
-import NativeBridge from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 export default class DeviceInfo {
 
@@ -14,7 +14,7 @@ export default class DeviceInfo {
     private _screenDensity: number;
     private _isWifi: boolean;
 
-    constructor(nativeBridge: NativeBridge, callback: (status: string) => void) {
+    constructor(nativeBridge: NativeBridge, callback: () => void) {
         this._nativeBridge = nativeBridge;
 
         let deviceInfoCalls: any = [
@@ -33,14 +33,14 @@ export default class DeviceInfo {
         let callbacks: number = deviceInfoCalls.length;
         let checkCallback: (c: number, callback: any) => void = (callbacks: number, callback: any): void => {
             if (callbacks === 0) {
-                callback('OK');
+                callback();
             }
         };
 
         deviceInfoCalls.forEach((entry: any): void => {
             let nativeCall: string = entry[0];
             let dataField: any = entry[1];
-            this._nativeBridge.invoke('DeviceInfo', nativeCall, [], (status: string, value: any): void => {
+            this._nativeBridge.invoke('DeviceInfo', nativeCall, [], (value: any): void => {
                 this[dataField] = value;
                 callbacks--;
                 checkCallback(callbacks, callback);
