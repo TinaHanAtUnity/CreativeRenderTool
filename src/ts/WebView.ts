@@ -132,7 +132,6 @@ export default class WebView {
 
                 this._nativeBridge.invoke('Sdk', 'initComplete', [], (status: string): void => {
                     console.log('initCompleteCallback: ' + status);
-                    this._overlay.show();
                 });
             });
         });
