@@ -42,26 +42,6 @@ export default class WebView {
 
     private _cacheManager: CacheManager;
 
-    private _campaignEventHandlers: Object = {
-        'new': this.onNewCampaign
-    };
-
-    private _videoEventHandlers: Object = {
-        'prepared': this.onVideoPrepared,
-        'progress': this.onVideoProgress,
-        'completed': this.onVideoCompleted
-    };
-
-    private _overlayEventHandlers: Object = {
-        'skip': this.onSkip
-    };
-
-    private _endscreenEventHandlers: Object = {
-        'replay': this.onReplay,
-        'download': this.onDownload,
-        'close': this.onClose
-    };
-
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -69,7 +49,11 @@ export default class WebView {
         this._request = new Request(nativeBridge);
 
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
-        this._videoPlayer.subscribe('videoplayer', this.onVideoEvent.bind(this));
+        this._videoPlayer.subscribe({
+            'prepared': this.onVideoPrepared.bind(this),
+            'progress': this.onVideoProgress.bind(this),
+            'completed': this.onVideoCompleted.bind(this)
+        });
 
         this._nativeBridge.invoke('Sdk', 'loadComplete', [], (status: string, gameId: string, testMode: boolean) => {
             console.log('loadCompleteCallback: ' + status);
@@ -79,8 +63,6 @@ export default class WebView {
             this._deviceInfo = new DeviceInfo(nativeBridge, () => {
                 this._zoneManager = new ZoneManager({
                     'enabled': true,
-                    'webViewUrl': 'http://unityads-webview.s3.amazonaws.com/build/index.html',
-                    'webViewHash': '1234',
                     'zones': [
                         {
                             'id': 'defaultVideoAndPictureZone',
@@ -111,8 +93,9 @@ export default class WebView {
                 });
 
                 this._campaignManager = new CampaignManager(this._request, this._deviceInfo);
-
-                this._campaignManager.subscribe('campaign', this.onCampaignEvent.bind(this));
+                this._campaignManager.subscribe({
+                    'new': this.onNewCampaign.bind(this)
+                });
 
                 let zones: Object = this._zoneManager.getZones();
                 for(let zoneId in zones) {
@@ -144,13 +127,19 @@ export default class WebView {
         this._overlay = new Overlay();
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
-        this._overlay.subscribe('overlay', this.onOverlayEvent.bind(this));
+        this._overlay.subscribe({
+            'skip': this.onSkip.bind(this)
+        });
 
         this._endScreen = new EndScreen(zone, campaign);
         this._endScreen.render();
         this._endScreen.hide();
         document.body.appendChild(this._endScreen.container());
-        this._endScreen.subscribe('end-screen', this.onEndscreenEvent.bind(this));
+        this._endScreen.subscribe({
+            'replay': this.onReplay.bind(this),
+            'download': this.onDownload.bind(this),
+            'close': this.onClose.bind(this)
+        });
 
         let keyEvents: any[] = [];
         if(zone.isIncentivized()) {
@@ -240,34 +229,6 @@ export default class WebView {
         this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
         if(zone.getId() !== 'webglZone') {
             this._campaignManager.request(this._gameId, zone);
-        }
-    }
-
-    private onCampaignEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._campaignEventHandlers[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
-    }
-
-    private onVideoEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._videoEventHandlers[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
-    }
-
-    private onOverlayEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._overlayEventHandlers[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
-    }
-
-    private onEndscreenEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._endscreenEventHandlers[id];
-        if(handler) {
-            handler.apply(this, parameters);
         }
     }
 

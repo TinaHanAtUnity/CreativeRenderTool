@@ -6,18 +6,14 @@ export default class NativeVideoPlayer extends VideoPlayer {
 
     private _nativeBridge: NativeBridge;
 
-    private _duration: number;
-
-    private _eventBindings: Object = {
-        'PREPARED': this.onPrepared,
-        'PROGRESS': this.onProgress,
-        'COMPLETED': this.onComplete
-    };
-
     constructor(nativeBridge: NativeBridge) {
         super();
         this._nativeBridge = nativeBridge;
-        nativeBridge.subscribe('VIDEOPLAYER', this.onVideoEvent.bind(this));
+        nativeBridge.subscribe({
+            'VIDEOPLAYER_PREPARED': this.onPrepared.bind(this),
+            'VIDEOPLAYER_PROGRESS': this.onProgress.bind(this),
+            'VIDEOPLAYER_COMPLETED': this.onComplete.bind(this)
+        });
     }
 
     public prepare(url: string): void {
@@ -37,29 +33,16 @@ export default class NativeVideoPlayer extends VideoPlayer {
     }
 
     private onPrepared(duration: number, width: number, height: number): void {
-        this._duration = duration;
-        console.log('Duration: ' + duration);
-        console.log('Width: ' + width);
-        console.log('Height: ' + height);
-        this.trigger('videoplayer', 'prepared', duration, width, height);
+        this.trigger('prepared', duration, width, height);
         this.play();
     }
 
     private onProgress(progress: number): void {
-        this.trigger('videoplayer', 'progress', progress);
-        console.log('Progress: ' + Math.round((progress / this._duration) * 100) + '%');
+        this.trigger('progress', progress);
     }
 
     private onComplete(url: string): void {
-        this.trigger('videoplayer', 'completed', url);
-        console.log('Completed');
-    }
-
-    private onVideoEvent(id: string, ...parameters: any[]): void {
-        let eventHandler: Function = this._eventBindings[id];
-        if(eventHandler) {
-            eventHandler.apply(this, parameters);
-        }
+        this.trigger('completed', url);
     }
 
 }

@@ -69,7 +69,7 @@ export default class Overlay extends View {
     private onSkip(event: Event): void {
         event.preventDefault();
         if(this._videoProgress > this._skipDuration) {
-            this.trigger(this._id, 'skip');
+            this.trigger('skip');
         }
     }
 

@@ -23,11 +23,11 @@ export default class CampaignManager extends Observable {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
             zone.setCampaign(campaign);
-            this.trigger('campaign', 'new', zone);
+            this.trigger('new', zone);
         };
         let onError: (url: string, error: string) => void = (url: string, error: string) => {
             zone.setCampaign(null);
-            this.trigger('campaign', 'error', zone);
+            this.trigger('error', zone);
         };
         this._request.get(this.createRequestUrl(gameId, zone.getId()), onComplete, onError);
     }

@@ -11,14 +11,12 @@ export default class Request {
 
     private _urlCallbacks: Object = {};
 
-    private _eventBindings: Object = {
-        'COMPLETE': this.onComplete,
-        'FAILED': this.onFailed
-    };
-
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.subscribe('URL', this.onUrlEvent.bind(this));
+        this._nativeBridge.subscribe({
+            'URL_COMPLETE': this.onComplete.bind(this),
+            'URL_FAILED': this.onFailed.bind(this)
+        });
     }
 
     public get(url: string, complete: (url: string, response: string) => void, error: (url: string, error: string) => void): void {
@@ -38,13 +36,6 @@ export default class Request {
         let callback: Function = this._urlCallbacks[url][RequestStatus.FAILED];
         callback(url, error);
         delete this._urlCallbacks[url];
-    }
-
-    private onUrlEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._eventBindings[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
     }
 
 }

@@ -51,17 +51,17 @@ export default class EndScreen extends View {
 
     private onDownload(event: Event): void {
         event.preventDefault();
-        this.trigger(this._id, 'download', this._zone, this._campaign);
+        this.trigger('download', this._zone, this._campaign);
     }
 
     private onReplay(event: Event): void {
         event.preventDefault();
-        this.trigger(this._id, 'replay', this._zone, this._campaign);
+        this.trigger('replay', this._zone, this._campaign);
     }
 
     private onClose(event: Event): void {
         event.preventDefault();
-        this.trigger(this._id, 'close', this._zone, this._campaign);
+        this.trigger('close', this._zone, this._campaign);
     }
 
 }

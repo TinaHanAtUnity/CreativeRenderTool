@@ -3,17 +3,14 @@ import NativeBridge from 'NativeBridge';
 export default class CacheManager {
 
     private _nativeBridge: NativeBridge;
+    private _urlCallbacks: Object = {};
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        nativeBridge.subscribe('CACHE', this.onCacheEvent.bind(this));
+        nativeBridge.subscribe({
+            'CACHE_DOWNLOAD_END': this.onDownloadEnd.bind(this)
+        });
     }
-
-    private _urlCallbacks: Object = {};
-
-    private _eventHandlers: Object = {
-        'DOWNLOAD_END': this.onDownloadEnd
-    };
 
     public cache(url: string, callback: (url: string, fileUrl: string) => void): void {
         let callbackList: Function[] = this._urlCallbacks[url];
@@ -82,13 +79,6 @@ export default class CacheManager {
                 delete this._urlCallbacks[url];
             }
         });
-    }
-
-    private onCacheEvent(id: string, ...parameters: any[]): void {
-        let handler: Function = this._eventHandlers[id];
-        if(handler) {
-            handler.apply(this, parameters);
-        }
     }
 
 }

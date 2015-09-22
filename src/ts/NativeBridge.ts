@@ -26,10 +26,6 @@ export default class NativeBridge extends Observable {
         }
     }
 
-    public handleEvent(category: string, id: string, ...parameters: any[]): void {
-        this.trigger.apply(this, [category, id].concat(parameters));
-    }
-
     public handleCallback(id: string, status: string, ...parameters: any[]): void {
         let callback: Function = NativeBridge._callbackTable[id];
         if(callback) {
@@ -37,6 +33,10 @@ export default class NativeBridge extends Observable {
             callback.apply(window, parameters);
             delete NativeBridge._callbackTable[id];
         }
+    }
+
+    public handleEvent(category: string, id: string, ...parameters: any[]): void {
+        this.trigger.apply(this, [category + '_' + id].concat(parameters));
     }
 
     public handleInvocation(className: string, methodName: string, callback: string, ...parameters: any[]): void {
