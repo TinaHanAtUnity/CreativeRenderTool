@@ -38,7 +38,7 @@ build: build-ts build-js build-css
 
 build-ts:
 	@echo Compiling .ts to .js
-	$(TYPESCRIPT) -p .
+	$(TYPESCRIPT) -p . --noEmitHelpers
 
 build-js:
 	@echo Bundling .js files
