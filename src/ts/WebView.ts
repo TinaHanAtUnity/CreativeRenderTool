@@ -84,9 +84,6 @@ export default class WebView {
                             'disableBackButtonForSeconds': 30,
                             'openAnimated': false,
                             'useDeviceOrientationForVideo': false
-                        },
-                        {
-                            'id': 'webglZone'
                         }
                     ]
                 });
@@ -106,9 +103,7 @@ export default class WebView {
 
                 for(let zoneId in zones) {
                     if(zones.hasOwnProperty(zoneId)) {
-                        if(zoneId !== 'webglZone') {
-                            this._campaignManager.request(this._gameId, zones[zoneId]);
-                        }
+                        this._campaignManager.request(this._gameId, zones[zoneId]);
                     }
                 }
 
@@ -224,9 +219,7 @@ export default class WebView {
     private onClose(zone: Zone, campaign: Campaign): void {
         this.hide();
         this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
-        if(zone.getId() !== 'webglZone') {
-            this._campaignManager.request(this._gameId, zone);
-        }
+        this._campaignManager.request(this._gameId, zone);
     }
 
 }
