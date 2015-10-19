@@ -47,7 +47,7 @@ build-js:
 build-css:
 	@echo Compiling .styl to .css
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c `find $(STYL_SRC) -name *.styl | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
 
 clean:
 	rm -rf build
