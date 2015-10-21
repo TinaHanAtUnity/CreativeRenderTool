@@ -6,7 +6,7 @@ import { IViewBinding } from 'IViewBinding';
 export default class View extends Observable {
 
     protected _template: Template;
-    protected _templateData: { [key: string]: string; };
+    protected _templateData: { [key: string]: any; };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
 

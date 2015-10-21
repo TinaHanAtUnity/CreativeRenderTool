@@ -1,6 +1,7 @@
 import { Callback, NativeBridge } from 'NativeBridge';
 
 import { VideoPlayer } from 'Video/VideoPlayer';
+import Double from 'Utilities/Double';
 
 export default class NativeVideoPlayer extends VideoPlayer {
 
@@ -16,15 +17,15 @@ export default class NativeVideoPlayer extends VideoPlayer {
         });
     }
 
-    public prepare(url: string): void {
-        this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, 0.5]);
+    public prepare(url: string, volume: Double, callback?: Callback): void {
+        this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, volume]);
     }
 
-    public play(): void {
-        this._nativeBridge.invoke('VideoPlayer', 'play', []);
+    public play(callback?: Callback): void {
+        this._nativeBridge.invoke('VideoPlayer', 'play', [], callback);
     }
 
-    public pause(): void {
+    public pause(callback?: Callback): void {
         this._nativeBridge.invoke('VideoPlayer', 'pause', []);
     }
 
@@ -32,9 +33,16 @@ export default class NativeVideoPlayer extends VideoPlayer {
         this._nativeBridge.invoke('VideoPlayer', 'seekTo', [time], callback);
     }
 
+    public getVolume(callback: Callback): void {
+        this._nativeBridge.invoke('VideoPlayer', 'getVolume', [], callback);
+    }
+
+    public setVolume(volume: Double, callback: Callback): void {
+        this._nativeBridge.invoke('VideoPlayer', 'setVolume', [volume], callback);
+    }
+
     private onPrepared(duration: number, width: number, height: number): void {
         this.trigger('prepared', duration, width, height);
-        this.play();
     }
 
     private onProgress(progress: number): void {

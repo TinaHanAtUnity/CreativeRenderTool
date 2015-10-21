@@ -20,6 +20,7 @@ import CacheManager from 'Managers/CacheManager';
 import Zone from 'Models/Zone';
 import Request from 'Utilities/Request';
 import { ZoneState } from 'Models/Zone';
+import Double from 'Utilities/Double';
 
 export default class WebView {
 
@@ -82,7 +83,7 @@ export default class WebView {
                             'incentivized': true,
                             'allowSkipVideoInSeconds': -1,
                             'disableBackButtonForSeconds': 30,
-                            'openAnimated': false,
+                            'muteVideoSounds': true,
                             'useDeviceOrientationForVideo': false
                         }
                     ]
@@ -112,15 +113,20 @@ export default class WebView {
         });
     }
 
+    /*
+     PUBLIC API EVENT HANDLERS
+     */
+
     public show(zoneId: string): void {
         let zone: Zone = this._zoneManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
-        this._overlay = new Overlay();
+        this._overlay = new Overlay(zone.muteVideoSounds());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
         this._overlay.subscribe({
-            'skip': this.onSkip.bind(this)
+            'skip': this.onSkip.bind(this),
+            'mute': this.onMute.bind(this)
         });
 
         this._endScreen = new EndScreen(zone, campaign);
@@ -144,7 +150,7 @@ export default class WebView {
 
         this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, keyEvents], (): void => {
             console.log('openCallback: ' + status);
-            this._videoPlayer.prepare(campaign.getVideoUrl());
+            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideoSounds() ? 0.0 : 1.0));
         });
     }
 
@@ -155,6 +161,10 @@ export default class WebView {
         this._endScreen.container().parentElement.removeChild(this._endScreen.container());
         this._endScreen = null;
     }
+
+    /*
+     CAMPAIGN EVENT HANDLERS
+     */
 
     private onNewCampaign(zone: Zone): void {
         let campaign: Campaign = zone.getCampaign();
@@ -178,8 +188,19 @@ export default class WebView {
         });
     }
 
+    /*
+     VIDEO EVENT HANDLERS
+     */
+
     private onVideoPrepared(duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
+        if(this._overlay.isMuted()) {
+            this._videoPlayer.setVolume(new Double(0.0), () => {
+                this._videoPlayer.play();
+            });
+        } else {
+            this._videoPlayer.play();
+        }
     }
 
     private onVideoProgress(position: number): void {
@@ -192,6 +213,10 @@ export default class WebView {
         this._endScreen.show();
     }
 
+    /*
+    OVERLAY EVENT HANDLERS
+     */
+
     private onSkip(): void {
         this._videoPlayer.pause();
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
@@ -199,13 +224,20 @@ export default class WebView {
         this._endScreen.show();
     }
 
+    private onMute(muted: boolean): void {
+        this._videoPlayer.setVolume(muted ? new Double(0.0) : new Double(1.0));
+    }
+
+    /*
+     ENDSCREEN EVENT HANDLERS
+     */
+
     private onReplay(zone: Zone, campaign: Campaign): void {
         this._overlay.setSkipDuration(0);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
         this._videoPlayer.seekTo(0, () => {
             this._endScreen.hide();
             this._overlay.show();
-            this._videoPlayer.play();
+            this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
         });
     }
 

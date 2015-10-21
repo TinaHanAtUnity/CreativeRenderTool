@@ -17,6 +17,7 @@ export default class Zone {
     private _allowSkipVideoInSeconds: number;
     private _disableBackButtonForSeconds: number;
     private _useDeviceOrientationForVideo: boolean;
+    private _muteVideoSounds: boolean;
 
     private _campaign: Campaign;
 
@@ -29,6 +30,7 @@ export default class Zone {
         this._allowSkipVideoInSeconds = data.allowSkipVideoInSeconds;
         this._disableBackButtonForSeconds = data.disableBackButtonForSeconds;
         this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
+        this._muteVideoSounds = data.muteVideoSounds;
     }
 
     public getId(): string {
@@ -57,6 +59,10 @@ export default class Zone {
 
     public useDeviceOrientationForVideo(): boolean {
         return this._useDeviceOrientationForVideo;
+    }
+
+    public muteVideoSounds(): boolean {
+        return this._muteVideoSounds;
     }
 
     public getCampaign(): Campaign {
