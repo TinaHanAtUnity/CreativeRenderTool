@@ -17,7 +17,7 @@ export default class NativeVideoPlayer extends VideoPlayer {
     }
 
     public prepare(url: string): void {
-        this._nativeBridge.invoke('VideoPlayer', 'prepare', [url]);
+        this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, 0.5]);
     }
 
     public play(): void {
