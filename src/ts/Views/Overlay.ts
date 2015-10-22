@@ -12,22 +12,34 @@ export default class Overlay extends View {
     private _videoDuration: number;
     private _videoProgress: number;
 
+    private _muted: boolean;
+
     private _skipElement: HTMLElement;
     private _skipDurationElement: HTMLElement;
     private _videoDurationElement: HTMLElement;
+    private _muteButtonElement: HTMLElement;
 
-    constructor() {
+    constructor(muted: boolean) {
         super('overlay');
 
         this._template = new Template(OverlayTemplate);
 
-        this._templateData = {};
+        this._muted = muted;
+
+        this._templateData = {
+            muted: this._muted
+        };
 
         this._bindings = [
             {
                 event: 'click',
                 listener: this.onSkip.bind(this),
                 selector: '.skip-button'
+            },
+            {
+                event: 'click',
+                listener: this.onMute.bind(this),
+                selector: '.mute-button'
             }
         ];
     }
@@ -37,6 +49,7 @@ export default class Overlay extends View {
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
         this._skipDurationElement = <HTMLElement>this._container.querySelector('.skip-duration');
         this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration');
+        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
     }
 
     public setSkipEnabled(value: boolean): void {
@@ -66,11 +79,27 @@ export default class Overlay extends View {
         this._videoDurationElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
     }
 
+    public isMuted(): boolean {
+        return this._muted;
+    }
+
     private onSkip(event: Event): void {
         event.preventDefault();
         if(this._videoProgress > this._skipDuration) {
             this.trigger('skip');
         }
+    }
+
+    private onMute(event: Event): void {
+        event.preventDefault();
+        if(this._muted) {
+            this._muteButtonElement.classList.remove('muted');
+            this._muted = false;
+        } else {
+            this._muteButtonElement.classList.add('muted');
+            this._muted = true;
+        }
+        this.trigger('mute', this._muted);
     }
 
 }

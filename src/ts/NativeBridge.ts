@@ -16,6 +16,8 @@ export class NativeBridge extends Observable {
     private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
 
+    private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
+
     public invoke(className: string, methodName: string, parameters?: any[], callback?: Callback, error?: Callback): void {
         let id: number = null;
         if(callback) {
@@ -27,7 +29,8 @@ export class NativeBridge extends Observable {
         }
         if(window.webviewbridge) {
             let fullClassName: string = NativeBridge._packageName + className;
-            window.webviewbridge.handleInvocation(fullClassName, methodName, JSON.stringify(parameters), id ? id.toString() : null);
+            let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
+            window.webviewbridge.handleInvocation(fullClassName, methodName, jsonParameters, id ? id.toString() : null);
         }
     }
 

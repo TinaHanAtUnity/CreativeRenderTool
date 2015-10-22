@@ -9,12 +9,30 @@
     position: absolute
     top: 10px
     left: 10px
+
     .skip-duration
       font-weight: bold
+
+  .mute-button
+    position: absolute
+    left: 10px
+    bottom: 10px
+    font-size: 25px
+
+    .unmute-icon
+      display: none
+
+    &.muted
+      .mute-icon
+        display: none
+
+      .unmute-icon
+        display: inline
 
   .video-duration-text
     position: absolute
     bottom: 10px
     right: 10px
+
     .video-duration
       font-weight: bold
