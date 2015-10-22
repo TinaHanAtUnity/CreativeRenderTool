@@ -51,6 +51,7 @@ build-css:
 
 clean:
 	rm -rf build
+	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
 lint:
-	$(TSLINT) -c tslint.json `find src/ts -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
