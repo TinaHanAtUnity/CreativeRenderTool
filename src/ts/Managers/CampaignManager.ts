@@ -11,11 +11,13 @@ export default class CampaignManager extends Observable {
 
     private _request: Request;
     private _deviceInfo: DeviceInfo;
+    private _testMode: boolean;
 
-    constructor(request: Request, deviceInfo: DeviceInfo) {
+    constructor(request: Request, deviceInfo: DeviceInfo, testMode: boolean) {
         super();
         this._request = request;
         this._deviceInfo = deviceInfo;
+        this._testMode = testMode;
     }
 
     public request(gameId: string, zone: Zone): void {
@@ -29,10 +31,10 @@ export default class CampaignManager extends Observable {
             zone.setCampaign(null);
             this.trigger('error', zone);
         };
-        this._request.get(this.createRequestUrl(gameId, zone.getId()), onComplete, onError);
+        this._request.get(this.createRequestUrl(gameId, zone.getId(), this._testMode), onComplete, onError);
     }
 
-    private createRequestUrl(gameId: string, zoneId: string): string {
+    private createRequestUrl(gameId: string, zoneId: string, testMode: boolean): string {
         let url: string = Url.addParameters('http://impact.applifier.com/mobile/campaigns', {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
@@ -45,6 +47,7 @@ export default class CampaignManager extends Observable {
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: 2000,
             softwareVersion: this._deviceInfo.getSoftwareVersion(),
+            test: testMode,
             wifi: this._deviceInfo.isWifi() ? 1 : 0,
             zoneId: zoneId
         });

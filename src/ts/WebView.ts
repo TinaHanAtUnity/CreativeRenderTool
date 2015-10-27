@@ -89,7 +89,7 @@ export default class WebView {
                     ]
                 });
 
-                this._campaignManager = new CampaignManager(this._request, this._deviceInfo);
+                this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
                 this._campaignManager.subscribe({
                     'new': this.onNewCampaign.bind(this)
                 });
