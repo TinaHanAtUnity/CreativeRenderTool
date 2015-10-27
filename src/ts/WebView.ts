@@ -73,7 +73,7 @@ export default class WebView {
                             'allowSkipVideoInSeconds': 5,
                             'disableBackButtonForSeconds': 30,
                             'muteVideoSounds': false,
-                            'useDeviceOrientationForVideo': false
+                            'useDeviceOrientationForVideo': true
                         },
                         {
                             'id': 'incentivizedZone',
@@ -139,6 +139,11 @@ export default class WebView {
             'close': this.onClose.bind(this)
         });
 
+        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
+        if(!zone.useDeviceOrientationForVideo()) {
+            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        }
+
         let keyEvents: any[] = [];
         if(zone.isIncentivized()) {
             keyEvents = [KeyCode.BACK];
@@ -148,7 +153,7 @@ export default class WebView {
             this._overlay.setSkipDuration(zone.allowSkipInSeconds());
         }
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, keyEvents], (): void => {
+        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents], (): void => {
             console.log('openCallback: ' + status);
             this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideoSounds() ? 0.0 : 1.0));
         });
@@ -194,13 +199,9 @@ export default class WebView {
 
     private onVideoPrepared(duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
-        if(this._overlay.isMuted()) {
-            this._videoPlayer.setVolume(new Double(0.0), () => {
-                this._videoPlayer.play();
-            });
-        } else {
+        this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0), () => {
             this._videoPlayer.play();
-        }
+        });
     }
 
     private onVideoProgress(position: number): void {
@@ -225,7 +226,7 @@ export default class WebView {
     }
 
     private onMute(muted: boolean): void {
-        this._videoPlayer.setVolume(muted ? new Double(0.0) : new Double(1.0));
+        this._videoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
     }
 
     /*
@@ -233,6 +234,7 @@ export default class WebView {
      */
 
     private onReplay(zone: Zone, campaign: Campaign): void {
+        this._overlay.setSkipEnabled(true);
         this._overlay.setSkipDuration(0);
         this._videoPlayer.seekTo(0, () => {
             this._endScreen.hide();
