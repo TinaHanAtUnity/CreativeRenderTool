@@ -9,6 +9,9 @@ export enum CallbackStatus {
 
 export type Callback = (...parameters: any[]) => void;
 
+export type PackedCall = [string, string, any[], Callback, Callback];
+export type PackedResult = [string, string, any[]];
+
 export class NativeBridge extends Observable {
 
     private static _packageName: string = 'com.unity3d.unityads.api.';
@@ -16,16 +19,15 @@ export class NativeBridge extends Observable {
     private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
 
+    private static _batchCallbackId: number = 1;
+    private static _batchCallbackTable: {[key: number]: Callback} = {};
+
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     public invoke(className: string, methodName: string, parameters?: any[], callback?: Callback, error?: Callback): void {
         let id: number = null;
         if(callback) {
-            id = NativeBridge._callbackId++;
-            let callbackObject: Object = {};
-            callbackObject[CallbackStatus.OK] = callback;
-            callbackObject[CallbackStatus.ERROR] = error;
-            NativeBridge._callbackTable[id] = callbackObject;
+            id = this.createCallback(callback, error);
         }
         if(window.webviewbridge) {
             let fullClassName: string = NativeBridge._packageName + className;
@@ -34,7 +36,27 @@ export class NativeBridge extends Observable {
         }
     }
 
-    public handleCallback(id: string, status: string, ...parameters: any[]): void {
+    public invokeBatch(calls: PackedCall[], callback?: Callback): void {
+        let batch: PackedRawCall[] = [];
+        calls.forEach((call: PackedCall): void => {
+            let [className, methodName, parameters, callback, error]: PackedCall = call;
+            let id: number = this.createCallback(callback, error);
+            let fullClassName: string = NativeBridge._packageName + className;
+            let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
+            batch.push([fullClassName, methodName, jsonParameters, id.toString()]);
+        });
+
+        let id: number = null;
+        if(callback) {
+            id = this.createBatchCallback(callback);
+        }
+
+        let jsonBatch: string = JSON.stringify(batch).replace(NativeBridge._doubleRegExp, '$1');
+        window.webviewbridge.handleBatchInvocation(id ? id.toString() : null, jsonBatch);
+    }
+
+    public handleCallback(rawId: string, status: string, ...parameters: any[]): void {
+        let id: number = parseInt(rawId, 10);
         let callbackObject: Function = NativeBridge._callbackTable[id];
         if(callbackObject) {
             let callback: Callback = callbackObject[CallbackStatus.OK];
@@ -55,6 +77,20 @@ export class NativeBridge extends Observable {
         }
     }
 
+    public handleBatchCallback(rawId: string, results: PackedResult[]): void {
+        let id: number = parseInt(rawId, 10);
+        results.forEach((result: PackedResult): void => {
+            let [id, status, parameters]: PackedResult = result;
+            this.handleCallback(id, status, parameters);
+        });
+
+        let callback: Callback = NativeBridge._batchCallbackTable[id];
+        if(callback) {
+            callback();
+            delete NativeBridge._batchCallbackTable[id];
+        }
+    }
+
     public handleEvent(...parameters: any[]): void {
         this.trigger.apply(this, parameters);
     }
@@ -64,6 +100,21 @@ export class NativeBridge extends Observable {
             this.invokeCallback(callback, status, parameters);
         });
         window[className][methodName].apply(window[className], parameters);
+    }
+
+    private createCallback(callback: Callback, error: Callback): number {
+        let id: number = NativeBridge._callbackId++;
+        let callbackObject: Object = {};
+        callbackObject[CallbackStatus.OK] = callback;
+        callbackObject[CallbackStatus.ERROR] = error;
+        NativeBridge._callbackTable[id] = callbackObject;
+        return id;
+    }
+
+    private createBatchCallback(callback: Callback): number {
+        let id: number = NativeBridge._batchCallbackId++;
+        NativeBridge._batchCallbackTable[id] = callback;
+        return id;
     }
 
     private invokeCallback(id: string, status: CallbackStatus, ...parameters: any[]): void {

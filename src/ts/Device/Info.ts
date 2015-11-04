@@ -1,4 +1,4 @@
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge, Callback, PackedCall } from 'NativeBridge';
 
 export default class DeviceInfo {
 
@@ -14,38 +14,23 @@ export default class DeviceInfo {
     private _screenDensity: number;
     private _isWifi: boolean;
 
-    constructor(nativeBridge: NativeBridge, callback: () => void) {
+    constructor(nativeBridge: NativeBridge, callback: Callback) {
         this._nativeBridge = nativeBridge;
 
-        let deviceInfoCalls: any = [
-            ['getAndroidId', '_androidId'],
-            ['getAdvertisingTrackingId', '_advertisingIdentifier'],
-            ['getLimitAdTrackingFlag', '_limitAdTracking'],
-            ['getSoftwareVersion', '_softwareVersion'],
-            ['getHardwareVersion', '_hardwareVersion'],
-            ['getNetworkType', '_networkType'],
-            ['getScreenLayout', '_screenLayout'],
-            ['getScreenDensity', '_screenDensity'],
-            ['isWifi', '_isWifi']
+        let className: string = 'DeviceInfo';
+        let batch: PackedCall[] = [
+            [className, 'getAndroidId',             [], (androidId: string)             => { this._androidId             = androidId; },             null],
+            [className, 'getAdvertisingTrackingId', [], (advertisingIdentifier: string) => { this._advertisingIdentifier = advertisingIdentifier; }, null],
+            [className, 'getLimitAdTrackingFlag',   [], (limitAdTracking: boolean)      => { this._limitAdTracking       = limitAdTracking; },       null],
+            [className, 'getSoftwareVersion',       [], (softwareVersion: string)       => { this._softwareVersion       = softwareVersion; },       null],
+            [className, 'getHardwareVersion',       [], (hardwareVersion: string)       => { this._hardwareVersion       = hardwareVersion; },       null],
+            [className, 'getNetworkType',           [], (networkType: string)           => { this._networkType           = networkType; },           null],
+            [className, 'getScreenLayout',          [], (screenLayout: number)          => { this._screenLayout          = screenLayout; },          null],
+            [className, 'getScreenDensity',         [], (screenDensity: number)         => { this._screenDensity         = screenDensity; },         null],
+            [className, 'isWifi',                   [], (isWifi: boolean)               => { this._isWifi                = isWifi; },                null]
         ];
 
-        // temporary before bundled API calls
-        let callbacks: number = deviceInfoCalls.length;
-        let checkCallback: (c: number, callback: any) => void = (callbacks: number, callback: any): void => {
-            if (callbacks === 0) {
-                callback();
-            }
-        };
-
-        deviceInfoCalls.forEach((entry: any): void => {
-            let nativeCall: string = entry[0];
-            let dataField: any = entry[1];
-            this._nativeBridge.invoke('DeviceInfo', nativeCall, [], (value: any): void => {
-                this[dataField] = value;
-                callbacks--;
-                checkCallback(callbacks, callback);
-            });
-        });
+        this._nativeBridge.invokeBatch(batch, callback);
     }
 
     public getAndroidId(): string {
