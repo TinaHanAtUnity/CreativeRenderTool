@@ -1,8 +1,9 @@
 {
-    "compilerOptions": {
-        "module": "amd",
-        "target": "es5",
-        "rootDir": "src/ts",
-        "outDir": "build/js"
-    }
+  "compilerOptions": {
+    "module": "amd",
+    "target": "es5"
+  },
+  "exclude": [
+    "test"
+  ]
 }

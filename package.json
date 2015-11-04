@@ -13,5 +13,9 @@
     "requirejs": "^2.1.20",
     "requirejs-text": "^2.0.12",
     "stylus": "^0.52.0"
+  },
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3"
   }
 }

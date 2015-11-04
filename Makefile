@@ -3,15 +3,19 @@ TYPESCRIPT = tsc
 TSLINT = tslint
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
+MOCHA = node_modules/.bin/mocha
 
 # Sources
 TS_SRC = src/ts
 STYL_SRC = src/styl
 HTML_SRC = src/prod-index.html
 CONFIG_SRC = src/config.json
+TEST_SRC = test
 
 # Targets
 BUILD_DIR = build
+
+.PHONY: build build-ts build-js build-css clean lint test
 
 build: build-ts build-js build-css
 	@echo Copying production index.html to build
@@ -38,7 +42,7 @@ build: build-ts build-js build-css
 
 build-ts:
 	@echo Compiling .ts to .js
-	$(TYPESCRIPT) -p . --noEmitHelpers
+	$(TYPESCRIPT) --project . --rootDir src/ts --outDir build/js --noEmitHelpers
 
 build-js:
 	@echo Bundling .js files
@@ -52,6 +56,11 @@ build-css:
 clean:
 	rm -rf build
 	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
+	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
 lint:
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+
+test:
+	$(TYPESCRIPT) --project test
+	$(MOCHA) --recursive
