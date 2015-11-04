@@ -37,7 +37,7 @@ export class NativeBridge extends Observable {
     }
 
     public invokeBatch(calls: PackedCall[], callback?: Callback): void {
-        let batch: PackedRawCall[] = [];
+        let batch: [string, string, string, string][] = [];
         calls.forEach((call: PackedCall): void => {
             let [className, methodName, parameters, callback, error]: PackedCall = call;
             let id: number = this.createCallback(callback, error);

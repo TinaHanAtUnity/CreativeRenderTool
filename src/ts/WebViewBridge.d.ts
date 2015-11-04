@@ -1,9 +1,7 @@
-declare type PackedRawCall = [string, string, string, string];
-
 interface IWebViewBridge {
-    handleInvocation(className: String, methodName: String, parameters?: String, callback?: String): void;
-    handleBatchInvocation(id: string, calls: PackedRawCall[]): void;
-    handleCallback(id: String, status: String, parameters?: String): void;
+    handleInvocation(className: string, methodName: string, parameters?: string, callback?: string): void;
+    handleBatchInvocation(id: string, calls: string): void;
+    handleCallback(id: string, status: string, parameters?: string): void;
 }
 
 /* tslint:disable:interface-name */
