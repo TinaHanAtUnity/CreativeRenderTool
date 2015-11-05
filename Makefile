@@ -3,7 +3,9 @@ TYPESCRIPT = tsc
 TSLINT = tslint
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
-MOCHA = node_modules/.bin/mocha
+
+MOCHA = node_modules/.bin/_mocha
+ISTANBUL = node_modules/.bin/istanbul
 
 # Sources
 TS_SRC = src/ts
@@ -17,7 +19,7 @@ BUILD_DIR = build
 
 .PHONY: build build-ts build-js build-css clean lint test
 
-build: build-ts build-js build-css
+build: clean build-ts build-js build-css
 	@echo Copying production index.html to build
 	cp $(HTML_SRC) $(BUILD_DIR)/index.html
 
@@ -61,6 +63,7 @@ clean:
 lint:
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
-test:
-	$(TYPESCRIPT) --project test
-	$(MOCHA) --recursive
+test: clean
+	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --module commonjs --moduleResolution classic
+	$(TYPESCRIPT) --project test --moduleResolution classic
+	NODE_PATH=. $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)

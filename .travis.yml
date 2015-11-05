@@ -13,10 +13,11 @@ branches:
     - master
 
 install:
-  - npm install -g typescript tslint
+  - npm install -g typescript tslint tsd
   - npm install
+  - tsd install
 
-script: make clean lint build
+script: make clean lint test build
 
 deploy:
   provider: s3
