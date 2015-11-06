@@ -66,4 +66,4 @@ lint:
 test: clean
 	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --module commonjs --moduleResolution classic
 	$(TYPESCRIPT) --project test --moduleResolution classic
-	NODE_PATH=. $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
+	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
