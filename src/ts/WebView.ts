@@ -46,6 +46,8 @@ export default class WebView {
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
+        this._deviceInfo = new DeviceInfo(nativeBridge);
+
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
 
@@ -60,7 +62,7 @@ export default class WebView {
             this._gameId = gameId;
             this._testMode = testMode;
 
-            this._deviceInfo = new DeviceInfo(nativeBridge, () => {
+            this._deviceInfo.fetch(() => {
                 this._zoneManager = new ZoneManager({
                     'enabled': true,
                     'zones': [

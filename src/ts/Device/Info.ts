@@ -14,9 +14,11 @@ export default class DeviceInfo {
     private _screenDensity: number;
     private _isWifi: boolean;
 
-    constructor(nativeBridge: NativeBridge, callback: Callback) {
+    constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
+    }
 
+    public fetch(callback: Callback): void {
         let className: string = 'DeviceInfo';
         let batch: PackedCall[] = [
             [className, 'getAndroidId',             [], (androidId: string)             => { this._androidId             = androidId; },             null],
@@ -29,7 +31,6 @@ export default class DeviceInfo {
             [className, 'getScreenDensity',         [], (screenDensity: number)         => { this._screenDensity         = screenDensity; },         null],
             [className, 'isWifi',                   [], (isWifi: boolean)               => { this._isWifi                = isWifi; },                null]
         ];
-
         this._nativeBridge.invokeBatch(batch, callback);
     }
 
