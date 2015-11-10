@@ -57,7 +57,7 @@ export default class WebViewBridge implements IWebViewBridge {
     }
 
     private initComplete(): any[] {
-        return;
+        return ['OK'];
     }
 
     private getAndroidId(): any[] {

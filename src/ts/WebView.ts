@@ -1,4 +1,4 @@
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge, Callback } from 'NativeBridge';
 
 import EndScreen from 'Views/EndScreen';
 import Overlay from 'Views/Overlay';
@@ -57,7 +57,9 @@ export default class WebView {
             'progress': this.onVideoProgress.bind(this),
             'completed': this.onVideoCompleted.bind(this)
         });
+    }
 
+    public initialize(callback: Callback): void {
         this._nativeBridge.invoke('Sdk', 'loadComplete', [], (gameId: string, testMode: boolean) => {
             this._gameId = gameId;
             this._testMode = testMode;
@@ -110,7 +112,7 @@ export default class WebView {
                     }
                 }
 
-                this._nativeBridge.invoke('Sdk', 'initComplete', []);
+                this._nativeBridge.invoke('Sdk', 'initComplete', [], callback);
             });
         });
     }

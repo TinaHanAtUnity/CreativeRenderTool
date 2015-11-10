@@ -15,7 +15,10 @@ describe('WebViewTest', () => {
         window['nativebridge'] = new NativeBridge();
     });
 
-    it('should init', () => {
+    it('should init', (done: MochaDone) => {
         let webView: WebView = new WebView(window['nativebridge']);
+        webView.initialize(() => {
+            done();
+        });
     });
 });
