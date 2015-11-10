@@ -37,13 +37,12 @@ export class NativeBridge extends Observable {
     }
 
     public invokeBatch(calls: PackedCall[], callback?: Callback): void {
-        let batch: [string, string, string, string][] = [];
+        let batch: [string, string, any[], string][] = [];
         calls.forEach((call: PackedCall): void => {
             let [className, methodName, parameters, callback, error]: PackedCall = call;
             let id: number = this.createCallback(callback, error);
             let fullClassName: string = NativeBridge._packageName + className;
-            let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
-            batch.push([fullClassName, methodName, jsonParameters, id.toString()]);
+            batch.push([fullClassName, methodName, parameters, id.toString()]);
         });
 
         let id: number = null;
