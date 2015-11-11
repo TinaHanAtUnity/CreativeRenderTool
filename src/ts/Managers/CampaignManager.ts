@@ -47,10 +47,14 @@ export default class CampaignManager extends Observable {
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: 2000,
             softwareVersion: this._deviceInfo.getSoftwareVersion(),
-            test: testMode,
             wifi: this._deviceInfo.isWifi() ? 1 : 0,
             zoneId: zoneId
         });
+
+        if(testMode) {
+            url = Url.addParameters(url, {test: true});
+        }
+
         return url;
     }
 
