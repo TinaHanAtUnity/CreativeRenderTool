@@ -24,3 +24,4 @@ window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView(nativeBridge);
 window['webview'] = webView;
+webView.initialize();

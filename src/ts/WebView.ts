@@ -59,7 +59,7 @@ export default class WebView {
         });
     }
 
-    public initialize(callback: Callback): void {
+    public initialize(callback?: Callback): void {
         this._nativeBridge.invoke('Sdk', 'loadComplete', [], (gameId: string, testMode: boolean) => {
             this._gameId = gameId;
             this._testMode = testMode;
