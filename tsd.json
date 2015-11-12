@@ -17,10 +17,7 @@
     "node/node.d.ts": {
       "commit": "8c4ec896ab619e7cb6572f82423e6e1eece70f5a"
     },
-    "request/request.d.ts": {
-      "commit": "8c4ec896ab619e7cb6572f82423e6e1eece70f5a"
-    },
-    "form-data/form-data.d.ts": {
+    "sinon/sinon.d.ts": {
       "commit": "8c4ec896ab619e7cb6572f82423e6e1eece70f5a"
     }
   }

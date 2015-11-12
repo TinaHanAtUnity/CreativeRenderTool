@@ -1,9 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../src/ts/WebViewBridge.d.ts" />
 
-import * as request from 'request';
-import * as http from 'http';
-
 export default class WebViewBridge implements IWebViewBridge {
 
     private _invocationMap: {} = {
@@ -22,7 +19,12 @@ export default class WebViewBridge implements IWebViewBridge {
 
         'com.unity3d.unityads.api.Zone.setZoneState': this.setZoneState,
 
-        'com.unity3d.unityads.api.Url.get': this.urlGet
+        'com.unity3d.unityads.api.Url.get': this.urlGet,
+
+        'com.unity3d.unityads.api.Cache.download': this.download,
+        'com.unity3d.unityads.api.Cache.getFileUrl': this.getFileUrl,
+
+        'com.unity3d.unityads.api.Listener.sendReadyEvent': this.sendReadyEvent
     };
 
     public handleInvocation(className: string, methodName: string, jsonParameters?: string, callback?: string): void {
@@ -52,63 +54,95 @@ export default class WebViewBridge implements IWebViewBridge {
         console.log(id, status, parameters);
     }
 
-    private loadComplete(): any[] {
+    protected loadComplete(): any[] {
         return ['OK', 12345, true];
     }
 
-    private initComplete(): any[] {
+    protected initComplete(): any[] {
         return ['OK'];
     }
 
-    private getAndroidId(): any[] {
+    protected getAndroidId(): any[] {
         return ['OK', '6ea99dfb2436dc8f'];
     }
 
-    private getAdvertisingTrackingId(): any[] {
+    protected getAdvertisingTrackingId(): any[] {
         return ['OK', '4649c6ec-09c8-4bd0-87e0-67f24c914c8e'];
     }
 
-    private getLimitAdTrackingFlag(): any[] {
+    protected getLimitAdTrackingFlag(): any[] {
         return ['OK', false];
     }
 
-    private getSoftwareVersion(): any[] {
+    protected getSoftwareVersion(): any[] {
         return ['OK', '23'];
     }
 
-    private getHardwareVersion(): any[] {
+    protected getHardwareVersion(): any[] {
         return ['OK', 'LGE Nexus 5'];
     }
 
-    private getNetworkType(): any[] {
+    protected getNetworkType(): any[] {
         return ['OK', 0];
     }
 
-    private getScreenLayout(): any[] {
+    protected getScreenLayout(): any[] {
         return ['OK', 268435794];
     }
 
-    private getScreenDensity(): any[] {
+    protected getScreenDensity(): any[] {
         return ['OK', 480];
     }
 
-    private isWifi(): any[] {
+    protected isWifi(): any[] {
         return ['OK', true];
     }
 
-    private setZoneState(zoneId: string, zoneState: string): any[] {
+    protected setZoneState(zoneId: string, zoneState: string): any[] {
+        return ['OK'];
+    }
+
+    protected urlGet(url: string, headers: [string, string][]): any[] {
+        let campaignResponse: {} = {
+            'data': {
+                'campaigns': [{
+                    'id': '000000000000000000000000',
+                    'gameId': 11017,
+                    'gameName': 'Test Game (android)',
+                    'tagLine': 'Unity Ads test campaign',
+                    'clickUrl': 'http://impact.applifier.com/mobile/campaigns/000000000000000000000000/click/50507b163822f20000000001?test=true&platform=android&gameId=12345',
+                    'customClickUrl': '',
+                    'bypassAppSheet': false,
+                    'rating': '4.5',
+                    'ratingCount': 10000,
+                    'cacheVideo': true,
+                    'allowCache': true,
+                    'gameIcon': 'http://static.applifier.com/impact/11017/test_game_icon.png',
+                    'picture': 'http://static.applifier.com/impact/11017/test_game_icon.png',
+                    'endScreen': 'http://static.applifier.com/impact/11017/test_endscreen_landscape.png',
+                    'endScreenPortrait': 'http://static.applifier.com/impact/11017/test_endscreen_portrait.png',
+                    'trailerDownloadable': 'http://static.applifier.com/impact/11017/blue_test_trailer.mp4',
+                    'trailerStreaming': 'http://static.applifier.com/impact/11017/blue_test_trailer.mp4',
+                    'trailerSize': 1445875,
+                    'iTunesId': 'com.iUnity.angryBots',
+                    'network': 'mobile_android'
+                }]
+            }
+        };
+        window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []);
         return;
     }
 
-    private urlGet(url: string, headers: [string, string][]): any[] {
-        let headerObject: {} = {};
-        headers.forEach((entry: [string, string]): void => {
-            let [key, value]: [string, string] = entry;
-            headerObject[key] = value;
-        });
-        request.get(url, {headers: headerObject}, (error: any, response: http.IncomingMessage, body: any) => {
-            window['nativebridge'].handleEvent('URL_COMPLETE', url, body, 200, []);
-        });
+    protected download(url: string, overwrite: boolean): any[] {
+        window['nativebridge'].handleEvent('CACHE_DOWNLOAD_END', url);
+        return ['OK'];
+    }
+
+    protected getFileUrl(url: string): any[] {
+        return ['OK', url];
+    }
+
+    protected sendReadyEvent(zone: string): any[] {
         return;
     }
 }
