@@ -52,11 +52,6 @@ export default class WebView {
         this._request = new Request(nativeBridge);
 
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
-        this._videoPlayer.subscribe({
-            'prepared': this.onVideoPrepared.bind(this),
-            'progress': this.onVideoProgress.bind(this),
-            'completed': this.onVideoCompleted.bind(this)
-        });
     }
 
     public initialize(callback?: Callback): void {
@@ -125,12 +120,18 @@ export default class WebView {
         let zone: Zone = this._zoneManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
+        this._videoPlayer.subscribe({
+            'prepared': this.onVideoPrepared.bind(this, zone),
+            'progress': this.onVideoProgress.bind(this, zone),
+            'completed': this.onVideoCompleted.bind(this, zone)
+        });
+
         this._overlay = new Overlay(zone.muteVideoSounds());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
         this._overlay.subscribe({
-            'skip': this.onSkip.bind(this),
-            'mute': this.onMute.bind(this)
+            'skip': this.onSkip.bind(this, zone),
+            'mute': this.onMute.bind(this, zone)
         });
 
         this._endScreen = new EndScreen(zone, campaign);
@@ -201,18 +202,19 @@ export default class WebView {
      VIDEO EVENT HANDLERS
      */
 
-    private onVideoPrepared(duration: number, width: number, height: number): void {
+    private onVideoPrepared(zone: Zone, duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
         this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0), () => {
             this._videoPlayer.play();
         });
     }
 
-    private onVideoProgress(position: number): void {
+    private onVideoProgress(zone: Zone, position: number): void {
         this._overlay.setVideoProgress(position);
     }
 
-    private onVideoCompleted(url: string): void {
+    private onVideoCompleted(zone: Zone, url: string): void {
+        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), 'COMPLETED']);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
@@ -222,14 +224,15 @@ export default class WebView {
     OVERLAY EVENT HANDLERS
      */
 
-    private onSkip(): void {
+    private onSkip(zone: Zone): void {
         this._videoPlayer.pause();
+        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), 'SKIPPED']);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
     }
 
-    private onMute(muted: boolean): void {
+    private onMute(zone: Zone, muted: boolean): void {
         this._videoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
     }
 
