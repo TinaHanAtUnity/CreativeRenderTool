@@ -7,17 +7,18 @@ import * as mocha from 'mocha';
 import WebView from '../src/ts/WebView';
 import WebViewBridge from '../test/WebViewBridge';
 import { NativeBridge } from '../src/ts/NativeBridge';
-import Zone from '../src/ts/Models/Zone';
 
 describe('WebViewTest', () => {
 
     before(() => {
         /* tslint:disable:no-string-literal */
-        global['window'] = global;
+        if(typeof global !== "undefined") {
+            global['window'] = global;
+        }
         window['nativebridge'] = new NativeBridge();
     });
 
-    it('should init', function(done: MochaDone) {
+    it('should init', function(done: MochaDone): void {
 
         let counter: number = 0;
 

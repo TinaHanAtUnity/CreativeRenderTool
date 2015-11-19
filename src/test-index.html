@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Unity Ads WebView</title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <script>
+    var origin = location.search.split('?origin=')[1];
+    if(!origin) {
+      origin = 'http://localhost:8000/';
+    } else {
+      var parser = document.createElement('a');
+      parser.href = origin;
+      origin = 'http://' + parser.host + '/';
+    }
+
+    var require = {
+      baseUrl: origin + 'src/ts/',
+      paths: {
+        mocha: '../../node_modules/mocha/mocha',
+        chai: '../../node_modules/chai/chai',
+        text: '../../node_modules/requirejs-text/text',
+        html: '../html'
+      },
+      shim: {
+        mocha: {
+          init: function() {
+            this.mocha.setup('bdd');
+            this.mocha.suite.emit('pre-require', window, null, this.mocha);
+            return this.mocha;
+          }
+        }
+      },
+      config: {
+        text: {
+          useXhr: function () {
+            return true;
+          }
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var requirejs = document.createElement('script');
+      requirejs.src = origin + 'node_modules/requirejs/require.js';
+      requirejs.setAttribute('data-main', '../../Mocha');
+
+      var style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = origin + 'src/styl/main.css';
+
+      var head = document.getElementsByTagName('head')[0];
+      head.appendChild(style);
+      head.appendChild(requirejs);
+    }, false);
+  </script>
+</head>
+<body class="android">
+  <div id="mocha"></div>
+</body>
+</html>
