@@ -1,7 +1,6 @@
 define([
-    'mocha',
-    '../../test/UrlTest',
-    '../../test/WebViewTest'
+    './js/test/UrlTest',
+    './js/test/WebViewTest'
 ], function() {
     mocha.run();
 });

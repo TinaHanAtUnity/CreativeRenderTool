@@ -20,13 +20,13 @@
     }
 
     var require = {
-      baseUrl: origin + 'src/ts/',
+      baseUrl: origin + 'js/src/ts/',
       paths: {
-        mocha: '../../node_modules/mocha/mocha',
-        chai: '../../node_modules/chai/chai',
-        sinon: '../../node_modules/sinon/lib/sinon',
-        text: '../../node_modules/requirejs-text/text',
-        html: '../html'
+        mocha: '../../vendor/mocha',
+        chai: '../../vendor/chai',
+        sinon: '../../vendor/sinon',
+        text: '../../vendor/text',
+        html: '../../../html'
       },
       shim: {
         mocha: {
@@ -48,12 +48,12 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       var requirejs = document.createElement('script');
-      requirejs.src = origin + 'node_modules/requirejs/require.js';
-      requirejs.setAttribute('data-main', '../../Mocha');
+      requirejs.src = origin + 'js/vendor/require.js';
+      requirejs.setAttribute('data-main', '../../../Mocha');
 
       var style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = origin + 'src/styl/main.css';
+      style.href = origin + 'css/main.css';
 
       var head = document.getElementsByTagName('head')[0];
       head.appendChild(style);
