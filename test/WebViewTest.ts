@@ -1,8 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-import * as sinon from 'sinon';
+import 'sinon';
 import { assert } from 'chai';
-import * as mocha from 'mocha';
+import 'mocha';
 
 import WebView from '../src/ts/WebView';
 import WebViewBridge from '../test/WebViewBridge';

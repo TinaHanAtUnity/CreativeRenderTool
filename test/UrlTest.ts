@@ -1,5 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 
+import 'mocha';
 import { assert } from 'chai';
 
 import Url from '../src/ts/Utilities/Url';

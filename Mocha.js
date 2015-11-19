@@ -1,4 +1,4 @@
-require([
+define([
     'mocha',
     '../../test/UrlTest',
     '../../test/WebViewTest'
