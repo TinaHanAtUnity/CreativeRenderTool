@@ -1,6 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../src/ts/WebViewBridge.d.ts" />
 
-import 'sinon';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 import 'mocha';
 
@@ -12,29 +13,41 @@ describe('WebViewTest', () => {
 
     before(() => {
         /* tslint:disable:no-string-literal */
-        if(typeof global !== "undefined") {
+        if(typeof global !== 'undefined') {
             global['window'] = global;
+            window['webviewbridge'] = new WebViewBridge();
         }
-        window['nativebridge'] = new NativeBridge();
     });
 
     it('should init', function(done: MochaDone): void {
+        this.slow(10000);
 
-        let counter: number = 0;
+        class FakeWebViewBridge implements IWebViewBridge {
 
-        class FakeWebViewBridge extends WebViewBridge {
+            private _counter: number = 0;
 
-            protected sendReadyEvent(zoneId: string): any[] {
-                ++counter;
-                if(counter >= 2) {
-                    done();
+            public handleInvocation(className: string, methodName: string, parameters?: string, callback?: string): void {
+                window['webviewbridge'].handleInvocation(className, methodName, parameters, callback);
+                if(className === 'com.unity3d.unityads.api.Listener' && methodName === 'sendReadyEvent') {
+                    ++this._counter;
+                    if(this._counter === 2) {
+                        done();
+                    }
                 }
-                return super.sendReadyEvent(zoneId);
+            }
+
+            public handleBatchInvocation(id: string, calls: string): void {
+                window['webviewbridge'].handleBatchInvocation(id, calls);
+            }
+
+            public handleCallback(id: string, status: string, parameters?: string): void {
+                window['webviewbridge'].handleCallback(id, status, parameters);
             }
 
         }
 
-        window['webviewbridge'] = new FakeWebViewBridge();
+        let fakeWebViewBridge: FakeWebViewBridge = new FakeWebViewBridge();
+        window['nativebridge'] = new NativeBridge(fakeWebViewBridge);
 
         let webView: WebView = new WebView(window['nativebridge']);
         webView.initialize();

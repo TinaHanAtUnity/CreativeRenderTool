@@ -26,12 +26,20 @@
         chai: '../../vendor/chai',
         sinon: '../../vendor/sinon',
         text: '../../vendor/text',
+        reporter: '../../vendor/reporter',
         html: '../../../html'
       },
       shim: {
         mocha: {
-          init: function() {
-            this.mocha.setup('bdd');
+          deps: ['reporter'],
+          init: function(reporter) {
+            this.mocha.setup({
+              ui: 'bdd',
+              checkLeaks: true,
+              fullTrace: true,
+              globals: ['nativebridge', 'webviewbridge'],
+              reporter: reporter
+            });
             this.mocha.suite.emit('pre-require', window, null, this.mocha);
             return this.mocha;
           }
@@ -61,7 +69,5 @@
     }, false);
   </script>
 </head>
-<body class="android">
-  <div id="mocha"></div>
-</body>
+<body class="android"></body>
 </html>

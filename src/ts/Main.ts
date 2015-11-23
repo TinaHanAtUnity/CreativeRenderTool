@@ -19,7 +19,7 @@ resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
 /* tslint:disable:no-string-literal */
-let nativeBridge: NativeBridge = new NativeBridge();
+let nativeBridge: NativeBridge = new NativeBridge(window.webviewbridge);
 window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView(nativeBridge);

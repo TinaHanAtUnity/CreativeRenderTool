@@ -24,16 +24,21 @@ export class NativeBridge extends Observable {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
+    private _backend: IWebViewBridge;
+
+    constructor(backend: IWebViewBridge) {
+        super();
+        this._backend = backend;
+    }
+
     public invoke(className: string, methodName: string, parameters?: any[], callback?: Callback, error?: Callback): void {
         let id: number = null;
         if(callback) {
             id = this.createCallback(callback, error);
         }
-        if(window.webviewbridge) {
-            let fullClassName: string = NativeBridge._packageName + className;
-            let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
-            window.webviewbridge.handleInvocation(fullClassName, methodName, jsonParameters, id ? id.toString() : null);
-        }
+        let fullClassName: string = NativeBridge._packageName + className;
+        let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
+        this._backend.handleInvocation(fullClassName, methodName, jsonParameters, id ? id.toString() : null);
     }
 
     public invokeBatch(calls: PackedCall[], callback?: Callback): void {
@@ -51,7 +56,7 @@ export class NativeBridge extends Observable {
         }
 
         let jsonBatch: string = JSON.stringify(batch).replace(NativeBridge._doubleRegExp, '$1');
-        window.webviewbridge.handleBatchInvocation(id ? id.toString() : null, jsonBatch);
+        this._backend.handleBatchInvocation(id ? id.toString() : null, jsonBatch);
     }
 
     public handleCallback(rawId: string, status: string, ...parameters: any[]): void {
@@ -117,12 +122,10 @@ export class NativeBridge extends Observable {
     }
 
     private invokeCallback(id: string, status: CallbackStatus, ...parameters: any[]): void {
-        if(window.webviewbridge) {
-            if(parameters.length > 0) {
-                window.webviewbridge.handleCallback(id, status.toString(), JSON.stringify(parameters));
-            } else {
-                window.webviewbridge.handleCallback(id, status.toString());
-            }
+        if(parameters.length > 0) {
+            this._backend.handleCallback(id, status.toString(), JSON.stringify(parameters));
+        } else {
+            this._backend.handleCallback(id, status.toString());
         }
     }
 

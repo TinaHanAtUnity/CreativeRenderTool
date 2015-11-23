@@ -60,7 +60,7 @@ build-html:
 	cp -r src/html $(BUILD_DIR)
 
 clean:
-	rm -rf build
+	rm -rf build/*
 	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
@@ -78,7 +78,10 @@ test-build: clean build-css build-html
 
 	@echo Copying vendor libraries to build
 	mkdir -p build/js/vendor
-	cp node_modules/requirejs/require.js node_modules/mocha/mocha.js node_modules/chai/chai.js node_modules/sinon/pkg/sinon.js node_modules/requirejs-text/text.js build/js/vendor/
+	cp node_modules/requirejs/require.js node_modules/mocha/mocha.js node_modules/chai/chai.js node_modules/sinon/pkg/sinon.js node_modules/requirejs-text/text.js test-utils/reporter.js build/js/vendor/
+
+	@echo Copying test config to build
+	cp src/test-config.json build/config.json
 
 	@echo Generating test runner
 	cp Mocha.js build
