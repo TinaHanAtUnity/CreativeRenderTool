@@ -83,7 +83,14 @@ test-build: clean build-css build-html
 	@echo Copying test config to build
 	cp src/test-config.json build/config.json
 
-	@echo Generating test runner
-	cp Mocha.js build
-
+	@echo Transpiling test files
 	$(TYPESCRIPT) --project test --module amd --outDir build/js
+
+	@echo Generating test runner
+	cp test-utils/runner.js build
+	node -e "\
+		var fs = require('fs');\
+		var testList = JSON.stringify(fs.readdirSync('test').filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return './js/test/' + file.replace('.ts', '.js'); }));\
+		var o = {encoding:'utf-8'};\
+		var f = fs.readFileSync('build/runner.js', o);\
+		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
