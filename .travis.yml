@@ -19,6 +19,8 @@ install:
 
 script: make clean lint test build
 
+before_deploy: cp -R coverage build
+
 deploy:
   provider: s3
   access_key_id: AKIAI5V7ATZVXQHBGHYA

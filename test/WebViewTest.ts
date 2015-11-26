@@ -20,7 +20,7 @@ describe('WebViewTest', () => {
     });
 
     it('should init', function(done: MochaDone): void {
-        this.slow(10000);
+        this.timeout(10000);
 
         class FakeWebViewBridge implements IWebViewBridge {
 

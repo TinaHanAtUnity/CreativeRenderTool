@@ -10,18 +10,20 @@ ISTANBUL = node_modules/.bin/istanbul
 # Sources
 TS_SRC = src/ts
 STYL_SRC = src/styl
-HTML_SRC = src/prod-index.html
-CONFIG_SRC = src/config.json
+PROD_INDEX_SRC = src/prod-index.html
+TEST_INDEX_SRC = src/test-index.html
+PROD_CONFIG_SRC = src/config.json
+TEST_CONFIG_SRC = src/test-config.json
 TEST_SRC = test
 
 # Targets
 BUILD_DIR = build
 
-.PHONY: build build-ts build-js build-css build-html clean lint test test-build
+.PHONY: build build-ts build-js build-css build-html clean lint test
 
-build: clean build-ts build-js build-css
+build: clean build-ts build-js build-css build-html
 	@echo Copying production index.html to build
-	cp $(HTML_SRC) $(BUILD_DIR)/index.html
+	cp $(PROD_INDEX_SRC) $(BUILD_DIR)/index.html
 
 	@echo Inlining CSS and JS
 	node -e "\
@@ -33,14 +35,36 @@ build: clean build-ts build-js build-css
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
 	@echo Copying production config.json to build
-	cp $(CONFIG_SRC) $(BUILD_DIR)/config.json
+	cp $(PROD_CONFIG_SRC) $(BUILD_DIR)/config.json
 
-	@echo Calculating build hash to config
+	@echo Calculating build hash to production config
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`'), o);"
+
+	@echo Copying test index.html to build
+	cp $(TEST_INDEX_SRC) build/test-index.html
+
+	@echo Copying vendor libraries to build
+	mkdir -p build/js/vendor
+	cp node_modules/requirejs/require.js node_modules/mocha/mocha.js node_modules/chai/chai.js node_modules/sinon/pkg/sinon.js node_modules/requirejs-text/text.js test-utils/reporter.js build/js/vendor/
+
+	@echo Copying test config to build
+	cp $(TEST_CONFIG_SRC) build/test-config.json
+
+	@echo Transpiling test files
+	$(TYPESCRIPT) --project test --module amd --outDir build/js --rootDir .
+
+	@echo Generating test runner
+	cp test-utils/runner.js build
+	node -e "\
+		var fs = require('fs');\
+		var testList = JSON.stringify(fs.readdirSync('test').filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return 'test/' + file.replace('.ts', ''); }));\
+		var o = {encoding:'utf-8'};\
+		var f = fs.readFileSync('build/runner.js', o);\
+		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
 
 build-ts:
 	@echo Compiling .ts to .js
@@ -70,27 +94,4 @@ lint:
 test: clean
 	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --module commonjs --moduleResolution classic
 	$(TYPESCRIPT) --project test --moduleResolution classic
-	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
-
-test-build: clean build-css build-html
-	@echo Copying test index.html to build
-	cp src/test-index.html build/index.html
-
-	@echo Copying vendor libraries to build
-	mkdir -p build/js/vendor
-	cp node_modules/requirejs/require.js node_modules/mocha/mocha.js node_modules/chai/chai.js node_modules/sinon/pkg/sinon.js node_modules/requirejs-text/text.js test-utils/reporter.js build/js/vendor/
-
-	@echo Copying test config to build
-	cp src/test-config.json build/config.json
-
-	@echo Transpiling test files
-	$(TYPESCRIPT) --project test --module amd --outDir build/js
-
-	@echo Generating test runner
-	cp test-utils/runner.js build
-	node -e "\
-		var fs = require('fs');\
-		var testList = JSON.stringify(fs.readdirSync('test').filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return './js/test/' + file.replace('.ts', '.js'); }));\
-		var o = {encoding:'utf-8'};\
-		var f = fs.readFileSync('build/runner.js', o);\
-		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
+	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir coverage $(MOCHA)

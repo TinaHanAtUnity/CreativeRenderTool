@@ -22,6 +22,8 @@
     var require = {
       baseUrl: origin + 'js/src/ts/',
       paths: {
+        'src/ts': '../../src/ts',
+        test: '../../test',
         mocha: '../../vendor/mocha',
         chai: '../../vendor/chai',
         sinon: '../../vendor/sinon',
@@ -57,7 +59,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       var requirejs = document.createElement('script');
       requirejs.src = origin + 'js/vendor/require.js';
-      requirejs.setAttribute('data-main', '../../../runner');
+      requirejs.setAttribute('data-main', origin + 'runner.js');
 
       var style = document.createElement('link');
       style.rel = 'stylesheet';
