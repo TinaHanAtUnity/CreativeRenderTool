@@ -1,6 +1,7 @@
 # Binaries
 TYPESCRIPT = tsc
 TSLINT = tslint
+BABEL = babel
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
@@ -68,10 +69,11 @@ build: clean build-ts build-js build-css build-html
 
 build-ts:
 	@echo Compiling .ts to .js
-	$(TYPESCRIPT) --project . --rootDir src/ts --outDir build/js --noEmitHelpers
+	$(TYPESCRIPT) --project . --rootDir src/ts --outDir build/js
 
 build-js:
 	@echo Bundling .js files
+	$(BABEL) -d build/js build/js
 	$(REQUIREJS) -o config/requirejs/release.js
 
 build-css:
