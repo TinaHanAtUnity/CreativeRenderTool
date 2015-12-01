@@ -57,6 +57,7 @@ build: clean build-ts build-js build-css build-html
 
 	@echo Transpiling test files
 	$(TYPESCRIPT) --project test --module amd --outDir build/js --rootDir .
+	BABEL_ENV=production $(BABEL) -d build/js/test build/js/test
 
 	@echo Generating test runner
 	cp test-utils/runner.js build
@@ -73,7 +74,7 @@ build-ts:
 
 build-js:
 	@echo Bundling .js files
-	$(BABEL) -d build/js build/js
+	BABEL_ENV=production $(BABEL) -d build/js build/js
 	$(REQUIREJS) -o config/requirejs/release.js
 
 build-css:
@@ -94,6 +95,8 @@ lint:
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
 test: clean
-	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --module commonjs --moduleResolution classic
+	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --moduleResolution classic
 	$(TYPESCRIPT) --project test --moduleResolution classic
+	BABEL_ENV=test $(BABEL) -d $(TS_SRC) $(TS_SRC)
+	BABEL_ENV=test $(BABEL) -d test test
 	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir coverage $(MOCHA)

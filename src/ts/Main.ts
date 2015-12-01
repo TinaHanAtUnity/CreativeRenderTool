@@ -32,13 +32,13 @@ async function printDelayed(elements: string[]) {
     }
 }
 
-async function delay(milliseconds: number) {
+function delay(milliseconds: number) {
     return new Promise<void>(resolve => {
         setTimeout(resolve, milliseconds);
     });
 }
 
-printDelayed(["Hello", "beautiful", "asynchronous", "world"]).then(() => {
-    console.log();
+(async () => {
+    await printDelayed(["Hello", "beautiful", "asynchronous", "world"]);
     console.log("Printed every element!");
-});
+})();
