@@ -47,7 +47,7 @@ export default class WebViewBridge implements IWebViewBridge {
             let [result, resultParameters]: any[] = call.apply(this, parameters);
             return [callback, result, resultParameters];
         });
-        window['nativebridge'].handleBatchCallback(id, results);
+        window['nativebridge'].handleBatchCallback(id, 'OK', results);
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
