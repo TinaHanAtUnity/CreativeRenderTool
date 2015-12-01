@@ -1,17 +1,11 @@
 ({
   name: 'Main',
   baseUrl: '../../build/js/',
+  deps: ['../../node_modules/babel-polyfill/dist/polyfill'],
   paths: {
-    'babel-runtime/regenerator': '../../node_modules/babel-runtime/regenerator/runtime',
-    'babel-runtime/core-js': '../../node_modules/babel-runtime/core-js',
-    'babel-runtime/helpers': '../../node_modules/babel-runtime/helpers',
-    'core-js/library/fn/symbol': '../../node_modules/core-js/library/fn/symbol/index',
-    'core-js': '../../node_modules/core-js',
     text: '../../node_modules/requirejs-text/text',
     html: '../../src/html'
   },
-  cjsTranslate: true,
-  findNestedDependencies: true,
   config: {
     text: {
       useXhr: function() {
