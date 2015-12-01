@@ -1,5 +1,3 @@
-import 'Workarounds';
-
 import { NativeBridge } from 'NativeBridge';
 import WebView from 'WebView';
 
@@ -24,6 +22,7 @@ window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView(nativeBridge);
 window['webview'] = webView;
+webView.initialize();
 
 async function printDelayed(elements: string[]) {
     for (const element of elements) {
