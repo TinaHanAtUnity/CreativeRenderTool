@@ -81,7 +81,7 @@ export class NativeBridge extends Observable {
         }
     }
 
-    public handleBatchCallback(rawId: string, results: PackedResult[]): void {
+    public handleBatchCallback(rawId: string, status: string, results: PackedResult[]): void {
         let id: number = parseInt(rawId, 10);
         results.forEach((result: PackedResult): void => {
             let [id, status, parameters]: PackedResult = result;
