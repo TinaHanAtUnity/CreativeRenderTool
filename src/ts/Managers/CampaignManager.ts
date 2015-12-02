@@ -1,13 +1,13 @@
-import Observable from 'Utilities/Observable';
+import { Observable } from 'Utilities/Observable';
 
-import DeviceInfo from 'Device/Info';
-import Url from 'Utilities/Url';
+import { DeviceInfo } from 'Device/Info';
+import { Url } from 'Utilities/Url';
 
-import Campaign from 'Models/Campaign';
-import Zone from 'Models/Zone';
-import Request from 'Utilities/Request';
+import { Campaign } from 'Models/Campaign';
+import { Zone } from 'Models/Zone';
+import { Request } from 'Utilities/Request';
 
-export default class CampaignManager extends Observable {
+export class CampaignManager extends Observable {
 
     private _request: Request;
     private _deviceInfo: DeviceInfo;

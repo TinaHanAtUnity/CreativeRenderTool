@@ -5,7 +5,7 @@ export const enum RequestStatus {
     FAILED
 }
 
-export default class Request {
+export class Request {
 
     private _nativeBridge: NativeBridge;
 

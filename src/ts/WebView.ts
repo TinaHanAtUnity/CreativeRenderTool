@@ -1,28 +1,27 @@
 import { NativeBridge, Callback } from 'NativeBridge';
 
-import EndScreen from 'Views/EndScreen';
-import Overlay from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { Overlay } from 'Views/Overlay';
 
 import { VideoPlayer } from 'Video/VideoPlayer';
-import NativeVideoPlayer from 'Video/NativeVideoPlayer';
+import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
 
-import DeviceInfo from 'Device/Info';
+import { DeviceInfo } from 'Device/Info';
 
-import ZoneManager from 'Managers/ZoneManager';
-import CampaignManager from 'Managers/CampaignManager';
+import { ZoneManager } from 'Managers/ZoneManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 
-import Campaign from 'Models/Campaign';
+import { Campaign } from 'Models/Campaign';
 
-import CacheManager from 'Managers/CacheManager';
-import Zone from 'Models/Zone';
-import Request from 'Utilities/Request';
-import { ZoneState } from 'Models/Zone';
-import Double from 'Utilities/Double';
+import { CacheManager } from 'Managers/CacheManager';
+import { Zone, ZoneState } from 'Models/Zone';
+import { Request } from 'Utilities/Request';
+import { Double } from 'Utilities/Double';
 
-export default class WebView {
+export class WebView {
 
     private _nativeBridge: NativeBridge;
 

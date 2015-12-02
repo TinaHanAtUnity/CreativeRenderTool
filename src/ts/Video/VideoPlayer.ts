@@ -1,7 +1,5 @@
-// disable no-empty until we have abstract classes
-/* tslint:disable:no-empty */
-import Observable from 'Utilities/Observable';
-import Double from 'Utilities/Double';
+import { Observable } from 'Utilities/Observable';
+import { Double } from 'Utilities/Double';
 
 export abstract class VideoPlayer extends Observable {
     public abstract prepare(url: string, volume: Double, callback?: Function): void;

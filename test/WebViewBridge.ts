@@ -1,7 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../src/ts/WebViewBridge.d.ts" />
 
-export default class WebViewBridge implements IWebViewBridge {
+/* tslint:disable:no-string-literal */
+
+export class WebViewBridge implements IWebViewBridge {
 
     private _invocationMap: {} = {
         'com.unity3d.unityads.api.Sdk.loadComplete': this.loadComplete,

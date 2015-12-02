@@ -1,4 +1,4 @@
-export default class Campaign {
+export class Campaign {
 
     private _id: string;
     private _storeId: string;

@@ -1,4 +1,4 @@
-import Campaign from 'Campaign';
+import { Campaign } from 'Campaign';
 
 export enum ZoneState {
     READY,
@@ -7,7 +7,7 @@ export enum ZoneState {
     NETWORK_PROBLEM
 }
 
-export default class Zone {
+export class Zone {
 
     private _id: string;
     private _name: string;

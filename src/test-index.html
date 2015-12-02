@@ -18,7 +18,7 @@
     }
 
     var require = {
-      baseUrl: origin + 'js/src/ts/',
+      baseUrl: origin + 'src/ts/',
       paths: {
         'src/ts': '../../src/ts',
         test: '../../test',
@@ -27,7 +27,7 @@
         sinon: '../../vendor/sinon',
         text: '../../vendor/text',
         reporter: '../../vendor/reporter',
-        html: '../../../html'
+        html: '../../html'
       },
       shim: {
         mocha: {
@@ -56,7 +56,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       var requirejs = document.createElement('script');
-      requirejs.src = origin + 'js/vendor/require.js';
+      requirejs.src = origin + 'vendor/require.js';
       requirejs.setAttribute('data-main', origin + 'runner.js');
 
       var style = document.createElement('link');

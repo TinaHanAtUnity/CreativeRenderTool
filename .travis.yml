@@ -9,18 +9,24 @@ cache:
     - node_modules
     - typings
 
-branches:
-  only:
-    - master
-
 install:
-  - npm install -g typescript tslint tsd
+  - npm install -g typescript tslint tsd babel-cli
   - npm install
   - tsd install
 
-script: make clean lint test build
+script:
+  - make lint
+  - make test
+  - make build-test
+  - make build-release
 
-before_deploy: cp -R coverage build
+notifications:
+  slack:
+    rooms:
+      - unity:PLPHkrYyAyDCW5umUmcUDIZZ
+    on_success: change
+    on_failure: always
+    on_start: never
 
 deploy:
   provider: s3

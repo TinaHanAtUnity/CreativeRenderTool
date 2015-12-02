@@ -1,4 +1,4 @@
-export default class Double {
+export class Double {
 
     private _value: number;
 

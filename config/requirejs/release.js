@@ -1,9 +1,10 @@
 ({
   name: 'Main',
-  baseUrl: '../../build/js/',
+  baseUrl: '../../build/release/js/',
+  deps: ['../../../node_modules/babel-polyfill/dist/polyfill.min'],
   paths: {
-    text: '../../node_modules/requirejs-text/text',
-    html: '../../src/html'
+    text: '../../../node_modules/requirejs-text/text',
+    html: '../../../src/html'
   },
   config: {
     text: {
@@ -12,7 +13,7 @@
       }
     }
   },
-  out: '../../build/main.js',
+  out: '../../build/release/main.js',
   optimize: 'uglify2',
   uglify2: {
     output: {

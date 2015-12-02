@@ -1,7 +1,5 @@
-import 'Workarounds';
-
 import { NativeBridge } from 'NativeBridge';
-import WebView from 'WebView';
+import { WebView } from 'WebView';
 
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;

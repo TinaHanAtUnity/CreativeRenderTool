@@ -3,7 +3,7 @@ import { IObserver } from 'IObserver';
 type StoredObservers = { [event: string]: IObserver[] };
 type Observers = { [event: string]: IObserver };
 
-export default class Observable {
+export class Observable {
 
     private _observers: StoredObservers = {};
 

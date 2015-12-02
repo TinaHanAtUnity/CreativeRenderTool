@@ -1,6 +1,6 @@
-import Zone from 'Models/Zone';
+import { Zone } from 'Models/Zone';
 
-export default class ZoneManager {
+export class ZoneManager {
 
     private _zones: Object = {};
 

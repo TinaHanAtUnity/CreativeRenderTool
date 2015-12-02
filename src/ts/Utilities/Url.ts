@@ -1,4 +1,4 @@
-export default class Url {
+export class Url {
 
     public static addParameters(url: string, parameters: {}): string {
         let newUrl: string = url.toString();

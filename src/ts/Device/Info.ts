@@ -1,6 +1,6 @@
 import { NativeBridge, Callback, PackedCall } from 'NativeBridge';
 
-export default class DeviceInfo {
+export class DeviceInfo {
 
     private _nativeBridge: NativeBridge;
 

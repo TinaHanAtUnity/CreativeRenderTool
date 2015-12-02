@@ -1,13 +1,13 @@
 /// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
 declare var EndScreenTemplate: string;
 
-import View from 'Views/View';
-import Template from 'Utilities/Template';
+import { View } from 'Views/View';
+import { Template } from 'Utilities/Template';
 
-import Zone from 'Models/Zone';
-import Campaign from 'Models/Campaign';
+import { Zone } from 'Models/Zone';
+import { Campaign } from 'Models/Campaign';
 
-export default class EndScreen extends View {
+export class EndScreen extends View {
 
     private _zone: Zone = null;
     private _campaign: Campaign = null;

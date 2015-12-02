@@ -1,10 +1,10 @@
 /// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
 declare var OverlayTemplate: string;
 
-import View from 'Views/View';
-import Template from 'Utilities/Template';
+import { View } from 'Views/View';
+import { Template } from 'Utilities/Template';
 
-export default class Overlay extends View {
+export class Overlay extends View {
 
     private _skipEnabled: boolean;
     private _skipDuration: number;

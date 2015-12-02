@@ -1,9 +1,9 @@
-import Observable from 'Utilities/Observable';
-import Template from 'Utilities/Template';
+import { Observable } from 'Utilities/Observable';
+import { Template } from 'Utilities/Template';
 
 import { IViewBinding } from 'IViewBinding';
 
-export default class View extends Observable {
+export class View extends Observable {
 
     protected _template: Template;
     protected _templateData: { [key: string]: any; };

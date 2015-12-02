@@ -1,6 +1,6 @@
 import { NativeBridge, Callback } from 'NativeBridge';
 
-export default class CacheManager {
+export class CacheManager {
 
     private _nativeBridge: NativeBridge;
     private _urlCallbacks: Object = {};

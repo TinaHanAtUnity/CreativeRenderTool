@@ -1,6 +1,7 @@
 # Binaries
 TYPESCRIPT = tsc
 TSLINT = tslint
+BABEL = babel
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
@@ -19,13 +20,20 @@ TEST_SRC = test
 # Targets
 BUILD_DIR = build
 
-.PHONY: build build-ts build-js build-css build-html clean lint test
+.PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
 
-build: clean build-ts build-js build-css build-html
-	@echo Copying production index.html to build
+build-release: BUILD_DIR = build/release
+build-release: clean build-dirs build-ts build-js build-css
+	@echo
+	@echo Copying release index.html to build
+	@echo
+
 	cp $(PROD_INDEX_SRC) $(BUILD_DIR)/index.html
 
+	@echo
 	@echo Inlining CSS and JS
+	@echo
+
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
@@ -34,64 +42,140 @@ build: clean build-ts build-js build-css build-html
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
-	@echo Copying production config.json to build
+	@echo
+	@echo Cleaning release build
+	@echo
+
+	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/main.js
+
+	@echo
+	@echo Copying release config.json to build
+	@echo
+
 	cp $(PROD_CONFIG_SRC) $(BUILD_DIR)/config.json
 
-	@echo Calculating build hash to production config
+	@echo
+	@echo Calculating build hash to release config
+	@echo
+
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`'), o);"
 
-	@echo Copying test index.html to build
-	cp $(TEST_INDEX_SRC) build/test-index.html
+build-test: BUILD_DIR = build/test
+build-test: clean build-dirs build-css build-html
+	@echo
+	@echo Transpiling .ts to .js for remote tests
+	@echo
 
-	@echo Copying vendor libraries to build
-	mkdir -p build/js/vendor
-	cp node_modules/requirejs/require.js node_modules/mocha/mocha.js node_modules/chai/chai.js node_modules/sinon/pkg/sinon.js node_modules/requirejs-text/text.js test-utils/reporter.js build/js/vendor/
+	$(TYPESCRIPT) --project test --module amd --outDir $(BUILD_DIR)
+	$(BABEL) -d $(BUILD_DIR) $(BUILD_DIR)
 
-	@echo Copying test config to build
-	cp $(TEST_CONFIG_SRC) build/test-config.json
-
-	@echo Transpiling test files
-	$(TYPESCRIPT) --project test --module amd --outDir build/js --rootDir .
-
+	@echo
 	@echo Generating test runner
-	cp test-utils/runner.js build
+	@echo
+
+	cp test-utils/runner.js $(BUILD_DIR)
 	node -e "\
 		var fs = require('fs');\
 		var testList = JSON.stringify(fs.readdirSync('test').filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return 'test/' + file.replace('.ts', ''); }));\
 		var o = {encoding:'utf-8'};\
-		var f = fs.readFileSync('build/runner.js', o);\
+		var f = fs.readFileSync('$(BUILD_DIR)/runner.js', o);\
 		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
 
+	@echo
+	@echo Copying test index.html to build
+	@echo
+
+	cp $(TEST_INDEX_SRC) $(BUILD_DIR)/index.html
+
+	@echo
+	@echo Copying vendor libraries to build
+	@echo
+
+	mkdir -p $(BUILD_DIR)/vendor
+	cp \
+		node_modules/requirejs/require.js \
+		node_modules/mocha/mocha.js \
+		node_modules/chai/chai.js \
+		node_modules/sinon/pkg/sinon.js \
+		node_modules/requirejs-text/text.js \
+		test-utils/reporter.js \
+		$(BUILD_DIR)/vendor
+
+	@echo
+	@echo Copying test config to build
+	@echo
+
+	cp $(TEST_CONFIG_SRC) $(BUILD_DIR)/config.json
+
+build-dir:
+	@echo
+	@echo Creating build directory
+	@echo
+
+	mkdir -p $(BUILD_DIR)
+
 build-ts:
-	@echo Compiling .ts to .js
-	$(TYPESCRIPT) --project . --rootDir src/ts --outDir build/js --noEmitHelpers
+	@echo
+	@echo Transpiling .ts to .js
+	@echo
+
+	$(TYPESCRIPT) --rootDir src/ts --outDir $(BUILD_DIR)/js
+	$(BABEL) -d $(BUILD_DIR)/js $(BUILD_DIR)/js
 
 build-js:
+	@echo
 	@echo Bundling .js files
+	@echo
+
 	$(REQUIREJS) -o config/requirejs/release.js
 
 build-css:
-	@echo Compiling .styl to .css
+	@echo
+	@echo Transpiling .styl to .css
+	@echo
+
 	mkdir -p $(BUILD_DIR)/css
 	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
 
 build-html:
-	@echo Copying .html to build
+	@echo
+	@echo Copying templates to build
+	@echo
+
 	cp -r src/html $(BUILD_DIR)
 
 clean:
-	rm -rf build/*
+	@echo
+	@echo Cleaning $(BUILD_DIR)
+	@echo
+
+	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
 lint:
-	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	@echo
+	@echo Running linter
+	@echo
 
-test: clean
-	$(TYPESCRIPT) --project . --rootDir $(TS_SRC) --module commonjs --moduleResolution classic
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
+
+test:
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
 	$(TYPESCRIPT) --project test --moduleResolution classic
-	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir coverage $(MOCHA)
+	$(BABEL) -d $(TS_SRC) $(TS_SRC)
+	$(BABEL) -d test test
+
+	@echo
+	@echo Running local tests with coverage
+	@echo
+
+	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
