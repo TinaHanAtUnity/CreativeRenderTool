@@ -20,6 +20,14 @@ script:
   - make build-test
   - make build-release
 
+notifications:
+  slack:
+    rooms:
+      - unity:PLPHkrYyAyDCW5umUmcUDIZZ
+    on_success: change
+    on_failure: always
+    on_start: never
+
 deploy:
   provider: s3
   access_key_id: AKIAI5V7ATZVXQHBGHYA
