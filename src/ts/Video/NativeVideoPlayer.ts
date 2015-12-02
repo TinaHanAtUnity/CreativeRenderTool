@@ -1,9 +1,9 @@
 import { Callback, NativeBridge } from 'NativeBridge';
 
 import { VideoPlayer } from 'Video/VideoPlayer';
-import Double from 'Utilities/Double';
+import { Double } from 'Utilities/Double';
 
-export default class NativeVideoPlayer extends VideoPlayer {
+export class NativeVideoPlayer extends VideoPlayer {
 
     private _nativeBridge: NativeBridge;
 

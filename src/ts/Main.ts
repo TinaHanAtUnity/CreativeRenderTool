@@ -1,5 +1,5 @@
 import { NativeBridge } from 'NativeBridge';
-import WebView from 'WebView';
+import { WebView } from 'WebView';
 
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -23,21 +23,3 @@ window['nativebridge'] = nativeBridge;
 let webView: WebView = new WebView(nativeBridge);
 window['webview'] = webView;
 webView.initialize();
-
-async function printDelayed(elements: string[]) {
-    for (const element of elements) {
-        await delay(200);
-        console.log(element);
-    }
-}
-
-function delay(milliseconds: number) {
-    return new Promise<void>(resolve => {
-        setTimeout(resolve, milliseconds);
-    });
-}
-
-(async () => {
-    await printDelayed(["Hello", "beautiful", "asynchronous", "world"]);
-    console.log("Printed every element!");
-})();

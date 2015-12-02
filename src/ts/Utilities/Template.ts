@@ -1,7 +1,7 @@
 /* tslint:disable:quotemark */
 // based on underscore.js templates
 
-export default class Template {
+export class Template {
 
     private static _matcher: RegExp = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
 

@@ -16,8 +16,5 @@ src/**/*.css
 test/**/*.js
 test/**/*.js.map
 
-# Coverage
-coverage
-
 # Typings
 typings

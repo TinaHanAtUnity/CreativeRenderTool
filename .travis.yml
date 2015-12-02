@@ -18,9 +18,11 @@ install:
   - npm install
   - tsd install
 
-script: make clean lint test build
-
-before_deploy: cp -R coverage build
+script:
+  - make lint
+  - make test
+  - make build-test
+  - make build-release
 
 deploy:
   provider: s3

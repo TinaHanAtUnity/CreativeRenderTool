@@ -17,12 +17,15 @@ PROD_CONFIG_SRC = src/config.json
 TEST_CONFIG_SRC = src/test-config.json
 TEST_SRC = test
 
+# Targets
+BUILD_DIR = build
+
 .PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
 
 build-release: BUILD_DIR = build/release
-build-release: clean build-dirs build-ts build-js build-css build-html
+build-release: clean build-dirs build-ts build-js build-css
 	@echo
-	@echo Copying production index.html to build
+	@echo Copying release index.html to build
 	@echo
 
 	cp $(PROD_INDEX_SRC) $(BUILD_DIR)/index.html
@@ -43,7 +46,7 @@ build-release: clean build-dirs build-ts build-js build-css build-html
 	@echo Cleaning release build
 	@echo
 
-	#rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/main.js
+	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/main.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -64,11 +67,11 @@ build-release: clean build-dirs build-ts build-js build-css build-html
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
 	@echo
-	@echo Transpiling test files
+	@echo Transpiling .ts to .js for remote tests
 	@echo
 
-	$(TYPESCRIPT) --project test --outDir $(BUILD_DIR)
-	BABEL_ENV=production $(BABEL) -d $(BUILD_DIR) $(BUILD_DIR)
+	$(TYPESCRIPT) --project test --module amd --outDir $(BUILD_DIR)
+	$(BABEL) -d $(BUILD_DIR) $(BUILD_DIR)
 
 	@echo
 	@echo Generating test runner
@@ -121,7 +124,7 @@ build-ts:
 	@echo
 
 	$(TYPESCRIPT) --rootDir src/ts --outDir $(BUILD_DIR)/js
-	BABEL_ENV=production $(BABEL) -d $(BUILD_DIR)/js $(BUILD_DIR)/js
+	$(BABEL) -d $(BUILD_DIR)/js $(BUILD_DIR)/js
 
 build-js:
 	@echo
@@ -142,19 +145,37 @@ build-html:
 	@echo
 	@echo Copying templates to build
 	@echo
+
 	cp -r src/html $(BUILD_DIR)
 
 clean:
+	@echo
+	@echo Cleaning $(BUILD_DIR)
+	@echo
+
 	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
 lint:
-	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	@echo
+	@echo Running linter
+	@echo
 
-test: clean
-	$(TYPESCRIPT) --moduleResolution classic
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
+
+test:
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
 	$(TYPESCRIPT) --project test --moduleResolution classic
-	BABEL_ENV=test $(BABEL) -d $(TS_SRC) $(TS_SRC)
-	BABEL_ENV=test $(BABEL) -d test test
-	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir coverage $(MOCHA)
+	$(BABEL) -d $(TS_SRC) $(TS_SRC)
+	$(BABEL) -d test test
+
+	@echo
+	@echo Running local tests with coverage
+	@echo
+
+	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)

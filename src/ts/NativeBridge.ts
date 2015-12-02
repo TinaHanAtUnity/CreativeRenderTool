@@ -1,6 +1,6 @@
 /// <reference path="WebViewBridge.d.ts" />
 
-import Observable from 'Utilities/Observable';
+import { Observable } from 'Utilities/Observable';
 
 export enum CallbackStatus {
     OK,

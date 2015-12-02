@@ -1,18 +1,15 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../src/ts/WebViewBridge.d.ts" />
 
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-import 'mocha';
+/* tslint:disable:no-string-literal */
 
-import WebView from '../src/ts/WebView';
-import WebViewBridge from '../test/WebViewBridge';
+import { WebView } from '../src/ts/WebView';
+import { WebViewBridge } from '../test/WebViewBridge';
 import { NativeBridge } from '../src/ts/NativeBridge';
 
 describe('WebViewTest', () => {
 
     before(() => {
-        /* tslint:disable:no-string-literal */
         if(typeof global !== 'undefined') {
             global['window'] = global;
             window['webviewbridge'] = new WebViewBridge();
