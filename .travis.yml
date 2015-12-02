@@ -9,10 +9,6 @@ cache:
     - node_modules
     - typings
 
-branches:
-  only:
-    - master
-
 install:
   - npm install -g typescript tslint tsd
   - npm install
