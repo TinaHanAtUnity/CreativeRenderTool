@@ -22,6 +22,11 @@ BUILD_DIR = build
 
 .PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
 
+build-dev: BUILD_DIR = build/dev
+build-dev: build-ts build-css build-html
+	cp src/dev-config.json $(BUILD_DIR)/config.json
+	cp src/index.html $(BUILD_DIR)/index.html
+
 build-release: BUILD_DIR = build/release
 build-release: clean build-dirs build-ts build-js build-css
 	@echo
