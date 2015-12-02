@@ -3,6 +3,8 @@
 
 /* tslint:disable:no-string-literal */
 
+import 'mocha';
+
 import { WebView } from '../src/ts/WebView';
 import { WebViewBridge } from '../test/WebViewBridge';
 import { NativeBridge } from '../src/ts/NativeBridge';
