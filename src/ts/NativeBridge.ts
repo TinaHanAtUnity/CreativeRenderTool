@@ -14,7 +14,7 @@ export type PackedResult = [string, string, any[]];
 
 export class NativeBridge extends Observable {
 
-    private static _packageName: string = 'com.unity3d.unityads.api.';
+    private static _packageName: string = 'com.unity3d.ads.api.';
 
     private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
