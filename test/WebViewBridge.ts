@@ -3,34 +3,37 @@
 
 /* tslint:disable:no-string-literal */
 
+import { NativeBridge } from '../src/ts/NativeBridge';
+
 export class WebViewBridge implements IWebViewBridge {
 
     private _invocationMap: {} = {
-        'com.unity3d.unityads.api.Sdk.loadComplete': this.loadComplete,
-        'com.unity3d.unityads.api.Sdk.initComplete': this.initComplete,
+        'Sdk.loadComplete': this.loadComplete,
+        'Sdk.initComplete': this.initComplete,
 
-        'com.unity3d.unityads.api.DeviceInfo.getAndroidId': this.getAndroidId,
-        'com.unity3d.unityads.api.DeviceInfo.getAdvertisingTrackingId': this.getAdvertisingTrackingId,
-        'com.unity3d.unityads.api.DeviceInfo.getLimitAdTrackingFlag': this.getLimitAdTrackingFlag,
-        'com.unity3d.unityads.api.DeviceInfo.getSoftwareVersion': this.getSoftwareVersion,
-        'com.unity3d.unityads.api.DeviceInfo.getHardwareVersion': this.getHardwareVersion,
-        'com.unity3d.unityads.api.DeviceInfo.getNetworkType': this.getNetworkType,
-        'com.unity3d.unityads.api.DeviceInfo.getScreenLayout': this.getScreenLayout,
-        'com.unity3d.unityads.api.DeviceInfo.getScreenDensity': this.getScreenDensity,
-        'com.unity3d.unityads.api.DeviceInfo.isWifi': this.isWifi,
+        'DeviceInfo.getAndroidId': this.getAndroidId,
+        'DeviceInfo.getAdvertisingTrackingId': this.getAdvertisingTrackingId,
+        'DeviceInfo.getLimitAdTrackingFlag': this.getLimitAdTrackingFlag,
+        'DeviceInfo.getSoftwareVersion': this.getSoftwareVersion,
+        'DeviceInfo.getHardwareVersion': this.getHardwareVersion,
+        'DeviceInfo.getNetworkType': this.getNetworkType,
+        'DeviceInfo.getScreenLayout': this.getScreenLayout,
+        'DeviceInfo.getScreenDensity': this.getScreenDensity,
+        'DeviceInfo.isWifi': this.isWifi,
 
-        'com.unity3d.unityads.api.Zone.setZoneState': this.setZoneState,
+        'Zone.setZoneState': this.setZoneState,
 
-        'com.unity3d.unityads.api.Url.get': this.urlGet,
+        'Url.get': this.urlGet,
 
-        'com.unity3d.unityads.api.Cache.download': this.download,
-        'com.unity3d.unityads.api.Cache.getFileUrl': this.getFileUrl,
+        'Cache.download': this.download,
+        'Cache.getFileUrl': this.getFileUrl,
 
-        'com.unity3d.unityads.api.Listener.sendReadyEvent': this.sendReadyEvent
+        'Listener.sendReadyEvent': this.sendReadyEvent
     };
 
     public handleInvocation(className: string, methodName: string, jsonParameters?: string, callback?: string): void {
         console.log(className, methodName, jsonParameters, callback);
+        className = className.split(NativeBridge.PackageName)[1];
         let call: Function = this._invocationMap[className + '.' + methodName];
         let parameters: any[] = JSON.parse(jsonParameters);
         let result: any[] = call.apply(this, parameters);
@@ -45,6 +48,7 @@ export class WebViewBridge implements IWebViewBridge {
         let calls: [string, string, any[], string][] = JSON.parse(jsonCalls);
         let results: any[][] = calls.map((value: [string, string, any[], string]): any[] => {
             let [className, methodName, parameters, callback]: [string, string, any[], string] = value;
+            className = className.split(NativeBridge.PackageName)[1];
             let call: Function = this._invocationMap[className + '.' + methodName];
             let [result, resultParameters]: any[] = call.apply(this, parameters);
             return [callback, result, resultParameters];

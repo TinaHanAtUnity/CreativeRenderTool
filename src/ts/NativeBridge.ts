@@ -14,7 +14,7 @@ export type PackedResult = [string, string, any[]];
 
 export class NativeBridge extends Observable {
 
-    private static _packageName: string = 'com.unity3d.ads.api.';
+    public static PackageName: string = 'com.unity3d.ads.api.';
 
     private static _callbackId: number = 1;
     private static _callbackTable: Object = {};
@@ -36,7 +36,7 @@ export class NativeBridge extends Observable {
         if(callback) {
             id = this.createCallback(callback, error);
         }
-        let fullClassName: string = NativeBridge._packageName + className;
+        let fullClassName: string = NativeBridge.PackageName + className;
         let jsonParameters: string = JSON.stringify(parameters).replace(NativeBridge._doubleRegExp, '$1');
         this._backend.handleInvocation(fullClassName, methodName, jsonParameters, id ? id.toString() : null);
     }
@@ -46,7 +46,7 @@ export class NativeBridge extends Observable {
         calls.forEach((call: PackedCall): void => {
             let [className, methodName, parameters, callback, error]: PackedCall = call;
             let id: number = this.createCallback(callback, error);
-            let fullClassName: string = NativeBridge._packageName + className;
+            let fullClassName: string = NativeBridge.PackageName + className;
             batch.push([fullClassName, methodName, parameters, id.toString()]);
         });
 

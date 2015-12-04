@@ -27,7 +27,7 @@ describe('WebViewTest', () => {
 
             public handleInvocation(className: string, methodName: string, parameters?: string, callback?: string): void {
                 window['webviewbridge'].handleInvocation(className, methodName, parameters, callback);
-                if(className === 'com.unity3d.unityads.api.Listener' && methodName === 'sendReadyEvent') {
+                if(className === NativeBridge.PackageName + 'Listener' && methodName === 'sendReadyEvent') {
                     ++this._counter;
                     if(this._counter === 2) {
                         done();
