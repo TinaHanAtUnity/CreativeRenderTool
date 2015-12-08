@@ -1,7 +1,7 @@
 ({
   name: 'Main',
   baseUrl: '../../build/release/js/',
-  deps: ['../../../node_modules/babel-polyfill/dist/polyfill.min'],
+  deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
   paths: {
     text: '../../../node_modules/requirejs-text/text',
     html: '../../../src/html'
