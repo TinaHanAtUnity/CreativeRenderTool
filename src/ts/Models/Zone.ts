@@ -2,9 +2,10 @@ import { Campaign } from 'Campaign';
 
 export enum ZoneState {
     READY,
-    INVALID_ZONE,
-    NOT_INITIALIZED,
-    NETWORK_PROBLEM
+    NOT_AVAILABLE,
+    DISABLED,
+    WAITING,
+    NO_FILL
 }
 
 export class Zone {

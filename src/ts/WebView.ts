@@ -96,7 +96,7 @@ export class WebView {
                 for(let zoneId in zones) {
                     if(zones.hasOwnProperty(zoneId)) {
                         let zone: Zone = zones[zoneId];
-                        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
+                        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
                     }
                 }
 
@@ -258,7 +258,7 @@ export class WebView {
 
     private onClose(zone: Zone, campaign: Campaign): void {
         this.hide();
-        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_INITIALIZED]]);
+        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.WAITING]]);
         this._campaignManager.request(this._gameId, zone);
     }
 
