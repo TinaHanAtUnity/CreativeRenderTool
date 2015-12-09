@@ -1,4 +1,4 @@
-import { Callback, NativeBridge } from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 import { VideoPlayer } from 'Video/VideoPlayer';
 import { Double } from 'Utilities/Double';
@@ -17,28 +17,28 @@ export class NativeVideoPlayer extends VideoPlayer {
         });
     }
 
-    public prepare(url: string, volume: Double, callback?: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, volume]);
+    public prepare(url: string, volume: Double): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, volume]);
     }
 
-    public play(callback?: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'play', [], callback);
+    public play(): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'play', []);
     }
 
-    public pause(callback?: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'pause', []);
+    public pause(): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'pause', []);
     }
 
-    public seekTo(time: number, callback: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'seekTo', [time], callback);
+    public seekTo(time: number): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'seekTo', [time]);
     }
 
-    public getVolume(callback: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'getVolume', [], callback);
+    public getVolume(): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'getVolume', []);
     }
 
-    public setVolume(volume: Double, callback: Callback): void {
-        this._nativeBridge.invoke('VideoPlayer', 'setVolume', [volume], callback);
+    public setVolume(volume: Double): Promise<any[]> {
+        return this._nativeBridge.invoke('VideoPlayer', 'setVolume', [volume]);
     }
 
     private onPrepared(duration: number, width: number, height: number): void {

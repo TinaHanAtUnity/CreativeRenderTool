@@ -7,6 +7,8 @@ import { NativeBridge } from '../src/ts/NativeBridge';
 
 export class WebViewBridge implements IWebViewBridge {
 
+    private static _cacheQueue: string[] = [];
+
     private _invocationMap: {} = {
         'Sdk.loadComplete': this.loadComplete,
         'Sdk.initComplete': this.initComplete,
@@ -31,29 +33,19 @@ export class WebViewBridge implements IWebViewBridge {
         'Listener.sendReadyEvent': this.sendReadyEvent
     };
 
-    public handleInvocation(className: string, methodName: string, jsonParameters?: string, callback?: string): void {
-        console.log(className, methodName, jsonParameters, callback);
-        className = className.split(NativeBridge.PackageName)[1];
-        let call: Function = this._invocationMap[className + '.' + methodName];
-        let parameters: any[] = JSON.parse(jsonParameters);
-        let result: any[] = call.apply(this, parameters);
-        if(callback) {
-            result.unshift(callback);
-            window['nativebridge'].handleCallback.apply(window, result);
-        }
-    }
-
-    public handleBatchInvocation(id: string, jsonCalls: string): void {
-        console.log(id, jsonCalls);
-        let calls: [string, string, any[], string][] = JSON.parse(jsonCalls);
+    public handleInvocation(invocations: string): void {
+        let calls: [string, string, any[], string][] = JSON.parse(invocations);
+        console.dir(calls);
         let results: any[][] = calls.map((value: [string, string, any[], string]): any[] => {
             let [className, methodName, parameters, callback]: [string, string, any[], string] = value;
             className = className.split(NativeBridge.PackageName)[1];
             let call: Function = this._invocationMap[className + '.' + methodName];
-            let [result, resultParameters]: any[] = call.apply(this, parameters);
-            return [callback, result, resultParameters];
+            let result: any[] = call.apply(this, parameters);
+            result.unshift(callback);
+            return result;
         });
-        window['nativebridge'].handleBatchCallback(id, 'OK', results);
+        console.dir(results);
+        window['nativebridge'].handleCallback(results);
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
@@ -135,20 +127,30 @@ export class WebViewBridge implements IWebViewBridge {
                 }]
             }
         };
-        window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []);
-        return;
-    }
-
-    protected download(url: string, overwrite: boolean): any[] {
-        window['nativebridge'].handleEvent('CACHE_DOWNLOAD_END', url);
+        setTimeout(() => {
+            window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []);
+        }, 0);
         return ['OK'];
     }
 
+    protected download(url: string, overwrite: boolean): any[] {
+        if(WebViewBridge._cacheQueue.some(cacheUrl => cacheUrl === url)) {
+            return ['ERROR', 'FILE_ALREADY_IN_QUEUE', url];
+        } else {
+            WebViewBridge._cacheQueue.push(url);
+            setTimeout(() => {
+                WebViewBridge._cacheQueue = WebViewBridge._cacheQueue.filter(cacheUrl => cacheUrl !== url);
+                window['nativebridge'].handleEvent('CACHE_DOWNLOAD_END', url);
+            }, 0);
+            return ['OK'];
+        }
+    }
+
     protected getFileUrl(url: string): any[] {
-        return ['OK', url];
+        return ['OK', url.replace('http', 'file')];
     }
 
     protected sendReadyEvent(zone: string): any[] {
-        return;
+        return ['OK'];
     }
 }

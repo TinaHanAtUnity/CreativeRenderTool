@@ -23,7 +23,11 @@ export class Observable {
         let observers: IObserver[] = this._observers[event];
         if(observers) {
             observers.forEach((observer: IObserver) => {
-                observer.apply(observer, parameters);
+                try {
+                    observer.apply(observer, parameters);
+                } catch(error) {
+                    console.log(error);
+                }
             });
         }
     }

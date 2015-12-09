@@ -1,6 +1,6 @@
 import { Observable } from 'Utilities/Observable';
 
-import { DeviceInfo } from 'Device/Info';
+import { DeviceInfo } from '../Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 
 import { Campaign } from 'Models/Campaign';

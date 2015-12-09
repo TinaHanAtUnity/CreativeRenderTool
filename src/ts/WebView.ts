@@ -1,4 +1,4 @@
-import { NativeBridge, Callback } from 'NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -6,7 +6,7 @@ import { Overlay } from 'Views/Overlay';
 import { VideoPlayer } from 'Video/VideoPlayer';
 import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
 
-import { DeviceInfo } from 'Device/Info';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 import { ZoneManager } from 'Managers/ZoneManager';
 import { CampaignManager } from 'Managers/CampaignManager';
@@ -53,61 +53,60 @@ export class WebView {
         this._videoPlayer = new NativeVideoPlayer(nativeBridge);
     }
 
-    public initialize(callback?: Callback): void {
-        this._nativeBridge.invoke('Sdk', 'loadComplete', [], (gameId: string, testMode: boolean) => {
+    public initialize(): Promise<any[]> {
+        return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode]) => {
             this._gameId = gameId;
             this._testMode = testMode;
-
-            this._deviceInfo.fetch(() => {
-                this._zoneManager = new ZoneManager({
-                    'enabled': true,
-                    'zones': [
-                        {
-                            'id': 'defaultVideoAndPictureZone',
-                            'name': 'Video ad placement',
-                            'enabled': true,
-                            'default': true,
-                            'incentivised': false,
-                            'allowSkipVideoInSeconds': 5,
-                            'disableBackButtonForSeconds': 30,
-                            'muteVideoSounds': false,
-                            'useDeviceOrientationForVideo': true
-                        },
-                        {
-                            'id': 'incentivizedZone',
-                            'name': 'Incentivized placement',
-                            'enabled': true,
-                            'default': false,
-                            'incentivized': true,
-                            'allowSkipVideoInSeconds': -1,
-                            'disableBackButtonForSeconds': 30,
-                            'muteVideoSounds': true,
-                            'useDeviceOrientationForVideo': false
-                        }
-                    ]
-                });
-
-                this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
-                this._campaignManager.subscribe({
-                    'new': this.onNewCampaign.bind(this)
-                });
-
-                let zones: Object = this._zoneManager.getZones();
-                for(let zoneId in zones) {
-                    if(zones.hasOwnProperty(zoneId)) {
-                        let zone: Zone = zones[zoneId];
-                        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
+            return this._deviceInfo.fetch(this._nativeBridge);
+        }).then(() => {
+            this._zoneManager = new ZoneManager({
+                'enabled': true,
+                'zones': [
+                    {
+                        'id': 'defaultVideoAndPictureZone',
+                        'name': 'Video ad placement',
+                        'enabled': true,
+                        'default': true,
+                        'incentivised': false,
+                        'allowSkipVideoInSeconds': 5,
+                        'disableBackButtonForSeconds': 30,
+                        'muteVideoSounds': false,
+                        'useDeviceOrientationForVideo': true
+                    },
+                    {
+                        'id': 'incentivizedZone',
+                        'name': 'Incentivized placement',
+                        'enabled': true,
+                        'default': false,
+                        'incentivized': true,
+                        'allowSkipVideoInSeconds': -1,
+                        'disableBackButtonForSeconds': 30,
+                        'muteVideoSounds': true,
+                        'useDeviceOrientationForVideo': false
                     }
-                }
-
-                for(let zoneId in zones) {
-                    if(zones.hasOwnProperty(zoneId)) {
-                        this._campaignManager.request(this._gameId, zones[zoneId]);
-                    }
-                }
-
-                this._nativeBridge.invoke('Sdk', 'initComplete', [], callback);
+                ]
             });
+
+            this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
+            this._campaignManager.subscribe({
+                'new': this.onNewCampaign.bind(this)
+            });
+
+            let zones: Object = this._zoneManager.getZones();
+            for(let zoneId in zones) {
+                if(zones.hasOwnProperty(zoneId)) {
+                    let zone: Zone = zones[zoneId];
+                    this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
+                }
+            }
+
+            for(let zoneId in zones) {
+                if(zones.hasOwnProperty(zoneId)) {
+                    this._campaignManager.request(this._gameId, zones[zoneId]);
+                }
+            }
+
+            return this._nativeBridge.invoke('Sdk', 'initComplete');
         });
     }
 
@@ -157,8 +156,7 @@ export class WebView {
             this._overlay.setSkipDuration(zone.allowSkipInSeconds());
         }
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents], (): void => {
-            console.log('openCallback: ' + status);
+        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]).then(() => {
             this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideoSounds() ? 0.0 : 1.0));
         });
     }
@@ -185,13 +183,13 @@ export class WebView {
             campaign.getVideoUrl()
         ];
 
-        this._cacheManager.cacheAll(cacheableAssets, (fileUrls: { [key: string]: string }) => {
+        this._cacheManager.cacheAll(cacheableAssets).then((fileUrls) => {
             campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
             campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]], () => {
+            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]]).then(() => {
                 this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
             });
         });
@@ -203,7 +201,7 @@ export class WebView {
 
     private onVideoPrepared(zone: Zone, duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
-        this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0), () => {
+        this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             this._videoPlayer.play();
         });
     }
@@ -242,7 +240,7 @@ export class WebView {
     private onReplay(zone: Zone, campaign: Campaign): void {
         this._overlay.setSkipEnabled(true);
         this._overlay.setSkipDuration(0);
-        this._videoPlayer.seekTo(0, () => {
+        this._videoPlayer.seekTo(0).then(() => {
             this._endScreen.hide();
             this._overlay.show();
             this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);

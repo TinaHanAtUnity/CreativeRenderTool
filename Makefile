@@ -1,7 +1,6 @@
 # Binaries
 TYPESCRIPT = tsc
 TSLINT = tslint
-BABEL = babel
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
 
@@ -76,7 +75,6 @@ build-test: clean build-dirs build-css build-html
 	@echo
 
 	$(TYPESCRIPT) --project test --module amd --outDir $(BUILD_DIR)
-	$(BABEL) -d $(BUILD_DIR) $(BUILD_DIR)
 
 	@echo
 	@echo Generating test runner
@@ -102,6 +100,7 @@ build-test: clean build-dirs build-css build-html
 
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
+		node_modules/es6-promise/dist/es6-promise.js \
 		node_modules/requirejs/require.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
@@ -129,7 +128,6 @@ build-ts:
 	@echo
 
 	$(TYPESCRIPT) --rootDir src/ts --outDir $(BUILD_DIR)/js
-	$(BABEL) -d $(BUILD_DIR)/js $(BUILD_DIR)/js
 
 build-js:
 	@echo
@@ -175,9 +173,7 @@ test:
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project test --moduleResolution classic
-	$(BABEL) -d $(TS_SRC) $(TS_SRC)
-	$(BABEL) -d test test
+	$(TYPESCRIPT) --project test
 
 	@echo
 	@echo Running local tests with coverage

@@ -19,10 +19,11 @@
 
     var require = {
       baseUrl: origin + 'src/ts/',
-      deps: ['mocha'],
+      deps: ['es6-promise', 'mocha'],
       paths: {
         'src/ts': '../../src/ts',
         test: '../../test',
+        'es6-promise': '../../vendor/es6-promise',
         mocha: '../../vendor/mocha',
         chai: '../../vendor/chai',
         sinon: '../../vendor/sinon',

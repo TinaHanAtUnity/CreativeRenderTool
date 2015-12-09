@@ -25,18 +25,14 @@ describe('WebViewTest', () => {
 
             private _counter: number = 0;
 
-            public handleInvocation(className: string, methodName: string, parameters?: string, callback?: string): void {
-                window['webviewbridge'].handleInvocation(className, methodName, parameters, callback);
-                if(className === NativeBridge.PackageName + 'Listener' && methodName === 'sendReadyEvent') {
+            public handleInvocation(invocations: string): void {
+                window['webviewbridge'].handleInvocation(invocations);
+                if(invocations.indexOf('sendReadyEvent') !== -1) {
                     ++this._counter;
                     if(this._counter === 2) {
                         done();
                     }
                 }
-            }
-
-            public handleBatchInvocation(id: string, calls: string): void {
-                window['webviewbridge'].handleBatchInvocation(id, calls);
             }
 
             public handleCallback(id: string, status: string, parameters?: string): void {
