@@ -7,7 +7,6 @@ enum CallbackStatus {
     ERROR
 }
 
-type NativeResult = [string, string, any[]];
 type NativeInvocation = [string, string, any[], string];
 
 export class BatchInvocation {
@@ -71,15 +70,16 @@ export class NativeBridge extends Observable {
         return Promise.all(batch.getPromises());
     }
 
-    public handleCallback(results: NativeResult[]): void {
-        results.forEach((result: NativeResult): void => {
-            let [rawId, status, parameters] = result;
-            let id: number = parseInt(rawId, 10);
+    public handleCallback(results: any[][]): void {
+        results.forEach((result: any[]): void => {
+            let id: number = parseInt(result.shift(), 10);
+            let status: string = result.shift();
+            let parameters = result;
             let callbackObject: Object = NativeBridge._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
-            callbackObject[CallbackStatus[status]].call(null, parameters);
+            callbackObject[CallbackStatus[status]](parameters);
             delete NativeBridge._callbackTable[id];
         });
     }

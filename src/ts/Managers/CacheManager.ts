@@ -40,7 +40,8 @@ export class CacheManager {
             return batch.queue('Cache', 'download', [url, false]).then(() => {
                 return this.registerCallback(url);
             }).catch((error) => {
-                switch(error) {
+                let errorCode = error.shift();
+                switch(errorCode) {
                     case 'FILE_ALREADY_IN_CACHE':
                         return this.getFileUrl(url);
 
@@ -63,7 +64,7 @@ export class CacheManager {
     }
 
     public getFileUrl(url: string): Promise<any[]> {
-        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]);
+        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([[fileUrl]]) => [url, fileUrl]);
     }
 
     private registerCallback(url): Promise<any[]> {
@@ -82,7 +83,7 @@ export class CacheManager {
     }
 
     private onDownloadEnd(url: string, size: number, duration: number): void {
-        this.getFileUrl(url).then(([fileUrl]) => {
+        this.getFileUrl(url).then(([url, fileUrl]) => {
             let urlCallbacks: Function[] = this._urlCallbacks[url];
             if(urlCallbacks) {
                 urlCallbacks.forEach((callbackObject: Object) => {
