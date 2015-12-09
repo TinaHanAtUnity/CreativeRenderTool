@@ -7,8 +7,33 @@ enum CallbackStatus {
     ERROR
 }
 
-export type PackedCall = [string, string, any[]];
-export type PackedResult = [string, string, any[]];
+type NativeResult = [string, string, any[]];
+type NativeInvocation = [string, string, any[], string];
+
+export class BatchInvocation {
+
+    private _batch: NativeInvocation[] = [];
+    private _promises: Promise<any[]>[] = [];
+
+    public queue(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
+        let promise = new Promise<any[]>((resolve, reject): void => {
+            let id = NativeBridge.RegisterCallback(resolve, reject);
+            className = NativeBridge.PackageName + className;
+            this._batch.push([className, methodName, parameters ? parameters : [], id.toString()]);
+        });
+        this._promises.push(promise);
+        return promise;
+    }
+
+    public getBatch(): NativeInvocation[] {
+        return this._batch;
+    }
+
+    public getPromises(): Promise<any[]>[] {
+        return this._promises;
+    }
+
+}
 
 export class NativeBridge extends Observable {
 
@@ -21,35 +46,33 @@ export class NativeBridge extends Observable {
 
     private _backend: IWebViewBridge;
 
+    public static RegisterCallback(resolve, reject): number {
+        let id: number = NativeBridge._callbackId++;
+        let callbackObject: Object = {};
+        callbackObject[CallbackStatus.OK] = resolve;
+        callbackObject[CallbackStatus.ERROR] = reject;
+        NativeBridge._callbackTable[id] = callbackObject;
+        return id;
+    }
+
     constructor(backend: IWebViewBridge) {
         super();
         this._backend = backend;
     }
 
     public invoke(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
-        return this.invokeBatch([[className, methodName, parameters]]);
+        let batch: BatchInvocation = new BatchInvocation();
+        batch.queue(className, methodName, parameters);
+        return this.invokeBatch(batch);
     }
 
-    public invokeBatch(invocations: PackedCall[]): Promise<any[]> {
-        let batch: [string, string, any[], string][] = [];
-        let promises: Promise<any[]>[] = invocations.map((invocation: PackedCall): Promise<any[]> => {
-            return new Promise<any[]>((resolve, reject): void => {
-                let id: number = NativeBridge._callbackId++;
-                let callbackObject: Object = {};
-                callbackObject[CallbackStatus.OK] = resolve;
-                callbackObject[CallbackStatus.ERROR] = reject;
-                NativeBridge._callbackTable[id] = callbackObject;
-                let [className, methodName, parameters] = invocation;
-                className = NativeBridge.PackageName + className;
-                batch.push([className, methodName, parameters, id.toString()]);
-            });
-        });
-        this._backend.handleInvocation(JSON.stringify(batch).replace(NativeBridge._doubleRegExp, '$1'));
-        return Promise.all(promises);
+    public invokeBatch(batch: BatchInvocation): Promise<any[]> {
+        this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
+        return Promise.all(batch.getPromises());
     }
 
-    public handleCallback(results: PackedResult[]): void {
-        results.forEach((result: PackedResult): void => {
+    public handleCallback(results: NativeResult[]): void {
+        results.forEach((result: NativeResult): void => {
             let [rawId, status, parameters] = result;
             let id: number = parseInt(rawId, 10);
             let callbackObject: Object = NativeBridge._callbackTable[id];
@@ -62,7 +85,6 @@ export class NativeBridge extends Observable {
     }
 
     public handleEvent(...parameters: any[]): void {
-        console.dir(parameters);
         this.trigger.apply(this, parameters);
     }
 

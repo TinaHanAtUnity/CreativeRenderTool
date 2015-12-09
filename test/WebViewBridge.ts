@@ -147,7 +147,7 @@ export class WebViewBridge implements IWebViewBridge {
     }
 
     protected getFileUrl(url: string): any[] {
-        return ['OK', url];
+        return ['OK', url.replace('http', 'file')];
     }
 
     protected sendReadyEvent(zone: string): any[] {

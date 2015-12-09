@@ -1,6 +1,6 @@
 /// <reference path="../../../typings/tsd.d.ts" />
 
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge, BatchInvocation } from 'NativeBridge';
 
 export class DeviceInfo {
 
@@ -26,40 +26,19 @@ export class DeviceInfo {
         this._isWifi = data.isWifi;
     }
 
-    public static fetch(nativeBridge: NativeBridge): Promise<DeviceInfo> {
+    public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
-
-        return nativeBridge.invokeBatch([
-            [className, 'getAndroidId', []],
-            [className, 'getAdvertisingTrackingId', []],
-            [className, 'getLimitAdTrackingFlag', []],
-            [className, 'getSoftwareVersion', []],
-            [className, 'getHardwareVersion', []],
-            [className, 'getNetworkType', []],
-            [className, 'getScreenLayout', []],
-            [className, 'getScreenDensity', []],
-            [className, 'isWifi', []]
-        ]).then(([androidId,
-            advertisingTrackingId,
-            limitAdTracking,
-            softwareVersion,
-            hardwareVersion,
-            networkType,
-            screenLayout,
-            screenDensity,
-            isWifi]) => {
-            return new DeviceInfo({
-                androidId,
-                advertisingTrackingId,
-                limitAdTracking,
-                softwareVersion,
-                hardwareVersion,
-                networkType,
-                screenLayout,
-                screenDensity,
-                isWifi
-            });
-        });
+        let batch: BatchInvocation = new BatchInvocation();
+        batch.queue(className, 'getAndroidId').then(([androidId]) => this._androidId = androidId);
+        batch.queue(className, 'getAdvertisingTrackingId').then(([advertisingIdentifier]) => this._advertisingIdentifier = advertisingIdentifier);
+        batch.queue(className, 'getLimitAdTrackingFlag').then(([limitAdTracking]) => this._limitAdTracking = limitAdTracking);
+        batch.queue(className, 'getSoftwareVersion').then(([softwareVersion]) => this._softwareVersion = softwareVersion);
+        batch.queue(className, 'getHardwareVersion').then(([hardwareVersion]) => this._hardwareVersion = hardwareVersion);
+        batch.queue(className, 'getNetworkType').then(([networkType]) => this._networkType = networkType);
+        batch.queue(className, 'getScreenLayout').then(([screenLayout]) => this._screenLayout = screenLayout);
+        batch.queue(className, 'getScreenDensity').then(([screenDensity]) => this._screenDensity = screenDensity);
+        batch.queue(className, 'isWifi').then(([isWifi]) => this._isWifi = isWifi);
+        return nativeBridge.invokeBatch(batch);
     }
 
     public getAndroidId(): string {

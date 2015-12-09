@@ -1,4 +1,4 @@
-import { NativeBridge, PackedCall } from 'NativeBridge';
+import { NativeBridge, BatchInvocation } from 'NativeBridge';
 
 enum CacheStatus {
     OK,
@@ -35,50 +35,58 @@ export class CacheManager {
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
+        let batch = new BatchInvocation();
         let promises = urls.map((url: string) => {
-            return new Promise<any[]>((resolve, reject) => {
-                let callbackObject = {};
-                callbackObject[CacheStatus.OK] = resolve;
-                callbackObject[CacheStatus.ERROR] = reject;
-
-                let callbackList: Function[] = this._urlCallbacks[url];
-                if(callbackList) {
-                    this._urlCallbacks[url].push(callbackObject);
-                } else {
-                    this._urlCallbacks[url] = [callbackObject];
-                }
-            }).catch((error, ...parameters: any[]) => {
-                console.log('lol');
+            return batch.queue('Cache', 'download', [url, false]).then(() => {
+                return this.registerCallback(url);
+            }).catch((error) => {
                 switch(error) {
-                    case 'FILE_ALREADY_IN_QUEUE':
-                        console.log('WTFWTFWTFWTFWTF');
-                        break;
-
                     case 'FILE_ALREADY_IN_CACHE':
                         return this.getFileUrl(url);
-                        break;
+
+                    case 'FILE_ALREADY_IN_QUEUE':
+                        return this.registerCallback(url);
 
                     default:
-                        break;
+                        return Promise.reject(error);
                 }
             });
         });
-        this._nativeBridge.invokeBatch(urls.map((url: string): PackedCall => {
-            return ['Cache', 'download', [url, false]];
-        }));
-        return Promise.all(promises);
+        this._nativeBridge.invokeBatch(batch);
+        return Promise.all(promises).then((urlPairs) => {
+            let urlMap = {};
+            urlPairs.forEach(([url, fileUrl]) => {
+                urlMap[url] = fileUrl;
+            });
+            return urlMap;
+        });
     }
 
     public getFileUrl(url: string): Promise<any[]> {
         return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]);
     }
 
+    private registerCallback(url): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let callbackObject = {};
+            callbackObject[CacheStatus.OK] = resolve;
+            callbackObject[CacheStatus.ERROR] = reject;
+
+            let callbackList: Function[] = this._urlCallbacks[url];
+            if(callbackList) {
+                this._urlCallbacks[url].push(callbackObject);
+            } else {
+                this._urlCallbacks[url] = [callbackObject];
+            }
+        });
+    }
+
     private onDownloadEnd(url: string, size: number, duration: number): void {
-        this.getFileUrl(url).then((fileUrl) => {
+        this.getFileUrl(url).then(([fileUrl]) => {
             let urlCallbacks: Function[] = this._urlCallbacks[url];
             if(urlCallbacks) {
                 urlCallbacks.forEach((callbackObject: Object) => {
-                    callbackObject[CacheStatus.OK](url, fileUrl);
+                    callbackObject[CacheStatus.OK]([url, fileUrl]);
                 });
                 delete this._urlCallbacks[url];
             }

@@ -57,9 +57,8 @@ export class WebView {
         return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode]) => {
             this._gameId = gameId;
             this._testMode = testMode;
-            return DeviceInfo.fetch(this._nativeBridge);
-        }).then((deviceInfo: DeviceInfo) => {
-            this._deviceInfo = deviceInfo;
+            return this._deviceInfo.fetch(this._nativeBridge);
+        }).then(() => {
             this._zoneManager = new ZoneManager({
                 'enabled': true,
                 'zones': [
