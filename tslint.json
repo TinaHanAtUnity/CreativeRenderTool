@@ -3,7 +3,6 @@
     "align": [
       true,
       "parameters",
-      "arguments",
       "statements"
     ],
     "ban": false,
@@ -14,7 +13,6 @@
       "check-lowercase"
     ],
     "curly": true,
-    "eofline": true,
     "forin": true,
     "indent": [
       true,

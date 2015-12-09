@@ -7,6 +7,8 @@ import { NativeBridge } from '../src/ts/NativeBridge';
 
 export class WebViewBridge implements IWebViewBridge {
 
+    private static _cacheQueue: string[] = [];
+
     private _invocationMap: {} = {
         'Sdk.loadComplete': this.loadComplete,
         'Sdk.initComplete': this.initComplete,
@@ -30,8 +32,6 @@ export class WebViewBridge implements IWebViewBridge {
 
         'Listener.sendReadyEvent': this.sendReadyEvent
     };
-
-    private static _cacheQueue: string[] = [];
 
     public handleInvocation(invocations: string): void {
         let calls: [string, string, any[], string][] = JSON.parse(invocations);
