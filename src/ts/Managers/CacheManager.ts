@@ -64,7 +64,7 @@ export class CacheManager {
     }
 
     public getFileUrl(url: string): Promise<any[]> {
-        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([[fileUrl]]) => [url, fileUrl]);
+        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([fileUrl]) => [url, fileUrl]);
     }
 
     private registerCallback(url): Promise<any[]> {

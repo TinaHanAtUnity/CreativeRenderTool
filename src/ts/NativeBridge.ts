@@ -61,11 +61,12 @@ export class NativeBridge extends Observable {
 
     public invoke(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let batch: BatchInvocation = new BatchInvocation();
-        batch.queue(className, methodName, parameters);
-        return this.invokeBatch(batch);
+        let promise = batch.queue(className, methodName, parameters);
+        this.invokeBatch(batch);
+        return promise;
     }
 
-    public invokeBatch(batch: BatchInvocation): Promise<any[]> {
+    public invokeBatch(batch: BatchInvocation): Promise<any[][]> {
         this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
         return Promise.all(batch.getPromises());
     }
