@@ -49,8 +49,6 @@ export class WebView {
 
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
-
-        this._videoPlayer = new NativeVideoPlayer(nativeBridge);
     }
 
     public initialize(): Promise<any[]> {
@@ -118,6 +116,7 @@ export class WebView {
         let zone: Zone = this._zoneManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
+        this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
         this._videoPlayer.subscribe({
             'prepared': this.onVideoPrepared.bind(this, zone),
             'progress': this.onVideoProgress.bind(this, zone),
@@ -163,6 +162,7 @@ export class WebView {
 
     public hide(): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
+        this._videoPlayer = null;
         this._overlay.container().parentElement.removeChild(this._overlay.container());
         this._overlay = null;
         this._endScreen.container().parentElement.removeChild(this._endScreen.container());
