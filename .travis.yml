@@ -10,7 +10,7 @@ cache:
     - typings
 
 install:
-  - npm install -g typescript tslint tsd babel-cli
+  - npm install -g typescript tslint tsd
   - npm install
   - tsd install
 
