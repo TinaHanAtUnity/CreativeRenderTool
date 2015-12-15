@@ -35,7 +35,7 @@ export class CacheManager {
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
-        let batch = new BatchInvocation();
+        let batch = new BatchInvocation(this._nativeBridge);
         let promises = urls.map((url: string) => {
             return batch.queue('Cache', 'download', [url, false]).then(() => {
                 return this.registerCallback(url);

@@ -26,7 +26,7 @@ export class DeviceInfo {
 
     public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
-        let batch: BatchInvocation = new BatchInvocation();
+        let batch: BatchInvocation = new BatchInvocation(nativeBridge);
         batch.queue(className, 'getAndroidId').then(([androidId]) => this._androidId = androidId);
         batch.queue(className, 'getAdvertisingTrackingId').then(([advertisingIdentifier]) => this._advertisingIdentifier = advertisingIdentifier);
         batch.queue(className, 'getLimitAdTrackingFlag').then(([limitAdTracking]) => this._limitAdTracking = limitAdTracking);

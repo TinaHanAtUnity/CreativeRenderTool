@@ -11,12 +11,17 @@ type NativeInvocation = [string, string, any[], string];
 
 export class BatchInvocation {
 
+    private _nativeBridge: NativeBridge;
     private _batch: NativeInvocation[] = [];
     private _promises: Promise<any[]>[] = [];
 
+    constructor(nativeBridge: NativeBridge) {
+        this._nativeBridge = nativeBridge;
+    }
+
     public queue(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let promise = new Promise<any[]>((resolve, reject): void => {
-            let id = NativeBridge.RegisterCallback(resolve, reject);
+            let id = this._nativeBridge.registerCallback(resolve, reject);
             className = NativeBridge.PackageName + className;
             this._batch.push([className, methodName, parameters ? parameters : [], id.toString()]);
         });
@@ -38,19 +43,19 @@ export class NativeBridge extends Observable {
 
     public static PackageName: string = 'com.unity3d.ads.api.';
 
-    private static _callbackId: number = 1;
-    private static _callbackTable: {[key: number]: Object} = {};
-
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
+
+    private _callbackId: number = 1;
+    private _callbackTable: {[key: number]: Object} = {};
 
     private _backend: IWebViewBridge;
 
-    public static RegisterCallback(resolve, reject): number {
-        let id: number = NativeBridge._callbackId++;
+    public registerCallback(resolve, reject): number {
+        let id: number = this._callbackId++;
         let callbackObject: Object = {};
         callbackObject[CallbackStatus.OK] = resolve;
         callbackObject[CallbackStatus.ERROR] = reject;
-        NativeBridge._callbackTable[id] = callbackObject;
+        this._callbackTable[id] = callbackObject;
         return id;
     }
 
@@ -60,7 +65,7 @@ export class NativeBridge extends Observable {
     }
 
     public invoke(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
-        let batch: BatchInvocation = new BatchInvocation();
+        let batch: BatchInvocation = new BatchInvocation(this);
         let promise = batch.queue(className, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
@@ -76,12 +81,12 @@ export class NativeBridge extends Observable {
             let id: number = parseInt(result.shift(), 10);
             let status: string = result.shift();
             let parameters = result;
-            let callbackObject: Object = NativeBridge._callbackTable[id];
+            let callbackObject: Object = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             callbackObject[CallbackStatus[status]](parameters);
-            delete NativeBridge._callbackTable[id];
+            delete this._callbackTable[id];
         });
     }
 
