@@ -90,7 +90,7 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
             this._campaignManager.subscribe({
-                'new': this.onNewCampaign.bind(this)
+                'campaign': this.onCampaign.bind(this)
             });
 
             let zones: Object = this._zoneManager.getZones();
@@ -176,9 +176,7 @@ export class WebView {
      CAMPAIGN EVENT HANDLERS
      */
 
-    private onNewCampaign(zone: Zone): void {
-        let campaign: Campaign = zone.getCampaign();
-
+    private onCampaign(zone: Zone, campaign: Campaign): void {
         let cacheableAssets: string[] = [
             campaign.getGameIcon(),
             campaign.getLandscapeUrl(),

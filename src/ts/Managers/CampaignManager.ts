@@ -1,6 +1,6 @@
 import { Observable } from 'Utilities/Observable';
 
-import { DeviceInfo } from '../Models/DeviceInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 
 import { Campaign } from 'Models/Campaign';
@@ -21,17 +21,15 @@ export class CampaignManager extends Observable {
     }
 
     public request(gameId: string, zone: Zone): void {
-        let onComplete: (url: string, response: string) => void = (url: string, response: string) => {
+        this._request.get(this.createRequestUrl(gameId, zone.getId(), this._testMode)).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
             zone.setCampaign(campaign);
-            this.trigger('new', zone);
-        };
-        let onError: (url: string, error: string) => void = (url: string, error: string) => {
+            this.trigger('campaign', zone, campaign);
+        }).catch((error) => {
             zone.setCampaign(null);
-            this.trigger('error', zone);
-        };
-        this._request.get(this.createRequestUrl(gameId, zone.getId(), this._testMode), onComplete, onError);
+            this.trigger('error', error);
+        });
     }
 
     private createRequestUrl(gameId: string, zoneId: string, testMode: boolean): string {

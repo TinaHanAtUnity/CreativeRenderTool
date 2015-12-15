@@ -1,6 +1,6 @@
 import { NativeBridge } from 'NativeBridge';
 
-export const enum RequestStatus {
+const enum RequestStatus {
     COMPLETE,
     FAILED
 }
@@ -19,23 +19,45 @@ export class Request {
         });
     }
 
-    public get(url: string, complete: (url: string, response: string) => void, error: (url: string, error: string) => void): void {
-        this._urlCallbacks[url] = {};
-        this._urlCallbacks[url][RequestStatus.COMPLETE] = complete;
-        this._urlCallbacks[url][RequestStatus.FAILED] = error;
+    public get(url: string): Promise<any[]> {
+        let promise = this.registerCallback(url);
         this._nativeBridge.invoke('Url', 'get', [url, []]);
+        return promise;
+    }
+
+    private registerCallback(url): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let callbackObject = {};
+            callbackObject[RequestStatus.COMPLETE] = resolve;
+            callbackObject[RequestStatus.FAILED] = reject;
+
+            let callbackList: Function[] = this._urlCallbacks[url];
+            if(callbackList) {
+                this._urlCallbacks[url].push(callbackObject);
+            } else {
+                this._urlCallbacks[url] = [callbackObject];
+            }
+        });
     }
 
     private onComplete(url: string, response: string): void {
-        let callback: Function = this._urlCallbacks[url][RequestStatus.COMPLETE];
-        callback(url, response);
-        delete this._urlCallbacks[url];
+        let urlCallbacks: Function[] = this._urlCallbacks[url];
+        if(urlCallbacks) {
+            urlCallbacks.forEach((callbackObject: Object) => {
+                callbackObject[RequestStatus.COMPLETE]([response]);
+            });
+            delete this._urlCallbacks[url];
+        }
     }
 
     private onFailed(url: string, error: string): void {
-        let callback: Function = this._urlCallbacks[url][RequestStatus.FAILED];
-        callback(url, error);
-        delete this._urlCallbacks[url];
+        let urlCallbacks: Function[] = this._urlCallbacks[url];
+        if(urlCallbacks) {
+            urlCallbacks.forEach((callbackObject: Object) => {
+                callbackObject[RequestStatus.COMPLETE]([error]);
+            });
+            delete this._urlCallbacks[url];
+        }
     }
 
 }
