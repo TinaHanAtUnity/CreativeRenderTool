@@ -1,3 +1,5 @@
+/* tslint:disable:no-string-literal */
+
 export class Url {
 
     public get(url: string, headers: [string, string][]): any[] {

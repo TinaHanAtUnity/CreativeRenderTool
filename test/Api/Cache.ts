@@ -1,3 +1,5 @@
+/* tslint:disable:no-string-literal */
+
 export class Cache {
 
     private static _cacheQueue: string[] = [];
