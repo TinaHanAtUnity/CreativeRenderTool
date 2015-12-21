@@ -12,18 +12,6 @@ export class DeviceInfo {
     private _screenDensity: number;
     private _isWifi: boolean;
 
-    constructor(data: any) {
-        this._androidId = data.androidId;
-        this._advertisingIdentifier = data.advertisingIdentifier;
-        this._limitAdTracking = data.limitAdTracking;
-        this._softwareVersion = data.softwareVersion;
-        this._hardwareVersion = data.hardwareVersion;
-        this._networkType = data.networkType;
-        this._screenLayout = data.screenLayout;
-        this._screenDensity = data.screenDensity;
-        this._isWifi = data.isWifi;
-    }
-
     public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
         let batch: BatchInvocation = new BatchInvocation(nativeBridge);

@@ -20,6 +20,8 @@ import { CacheManager } from 'Managers/CacheManager';
 import { Zone, ZoneState } from 'Models/Zone';
 import { Request } from 'Utilities/Request';
 import { Double } from 'Utilities/Double';
+import { SessionManager } from 'Managers/SessionManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class WebView {
 
@@ -29,6 +31,7 @@ export class WebView {
     private _testMode: boolean = null;
 
     private _deviceInfo: DeviceInfo;
+    private _clientInfo: ClientInfo;
 
     private _request: Request;
 
@@ -42,13 +45,18 @@ export class WebView {
 
     private _cacheManager: CacheManager;
 
+    private _sessionManager: SessionManager;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
-        this._deviceInfo = new DeviceInfo(nativeBridge);
+        this._deviceInfo = new DeviceInfo();
+        this._clientInfo = new ClientInfo();
 
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
+
+        this._sessionManager = new SessionManager(nativeBridge);
     }
 
     public initialize(): Promise<any[]> {
@@ -60,6 +68,12 @@ export class WebView {
 
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
+            return this._clientInfo.fetch(this._nativeBridge);
+        }).then(() => {
+            return this._sessionManager.create();
+        }).then(() => {
+            console.log('Session ID: ' + this._sessionManager.getSession().getId());
+
             this._zoneManager = new ZoneManager({
                 'enabled': true,
                 'zones': [
