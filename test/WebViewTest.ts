@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../src/ts/WebViewBridge.d.ts" />
 
 /* tslint:disable:no-string-literal */
