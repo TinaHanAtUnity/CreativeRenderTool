@@ -13,6 +13,10 @@ export class StorageManager {
         this._nativeBridge = nativeBridge;
     }
 
+    public init(type: StorageType, object: Object): Promise<any[]> {
+        return this._nativeBridge.invoke('Storage', 'init', [StorageType[type], object]);
+    }
+
     public read(type: StorageType): Promise<any[]> {
         return this._nativeBridge.invoke('Storage', 'read', [StorageType[type]]);
     }

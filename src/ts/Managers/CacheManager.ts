@@ -12,9 +12,7 @@ export class CacheManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        nativeBridge.subscribe({
-            'CACHE_DOWNLOAD_END': this.onDownloadEnd.bind(this)
-        });
+        nativeBridge.subscribe('CACHE_DOWNLOAD_END', this, 'onDownloadEnd');
     }
 
     public cache(url: string): Promise<string> {
@@ -82,6 +80,7 @@ export class CacheManager {
         });
     }
 
+    /* tslint:disable:no-unused-variable */
     private onDownloadEnd(url: string, size: number, duration: number): void {
         this.getFileUrl(url).then(([url, fileUrl]) => {
             let urlCallbacks: Function[] = this._urlCallbacks[url];
@@ -93,5 +92,6 @@ export class CacheManager {
             }
         });
     }
+    /* tslint:enable:no-unused-variable */
 
 }

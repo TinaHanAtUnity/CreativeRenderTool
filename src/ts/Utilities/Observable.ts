@@ -1,33 +1,42 @@
-import { IObserver } from 'IObserver';
-
-type StoredObservers = { [event: string]: IObserver[] };
-type Observers = { [event: string]: IObserver };
+type Observers = { [event: string]: { [observer: string]: [Object, any[]][] } };
 
 export class Observable {
 
-    private _observers: StoredObservers = {};
+    private _observers: Observers = {};
 
-    public subscribe(observers: Observers): void {
-        for(let event in observers) {
-            if(observers.hasOwnProperty(event)) {
-                let observer: IObserver = observers[event];
-                if(!this._observers[event]) {
-                    this._observers[event] = [];
-                }
-                this._observers[event].push(observer);
+    public subscribe(event: string, self: Object, observer: string, ...parameters: any[]): void {
+        let observers = this._observers[event];
+        if(!observers) {
+            this._observers[event] = {};
+        }
+        let objects = this._observers[event][observer];
+        if(!objects) {
+            this._observers[event][observer] = [];
+        }
+        this._observers[event][observer].push([self, parameters]);
+    }
+
+    public unsubscribe(event: string, self: Object, observer: string): void {
+        let observers = this._observers[event];
+        if(observers) {
+            let objects = this._observers[event][observer];
+            if(objects) {
+                this._observers[event][observer] = objects.filter(pair => pair[0] !== self);
             }
         }
     }
 
     protected trigger(event: string, ...parameters: any[]): void {
-        let observers: IObserver[] = this._observers[event];
+        let observers = this._observers[event];
         if(observers) {
-            observers.forEach((observer: IObserver) => {
-                try {
-                    observer.apply(observer, parameters);
-                } catch(error) {
-                    console.log(error);
-                }
+            Object.keys(observers).forEach(observer => {
+                observers[observer].forEach(([self, storedParameters]) => {
+                    try {
+                        self[observer].apply(self, storedParameters.concat(parameters));
+                    } catch(error) {
+                        console.log(error);
+                    }
+                });
             });
         }
     }
