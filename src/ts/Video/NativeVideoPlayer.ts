@@ -18,9 +18,9 @@ export class NativeVideoPlayer extends VideoPlayer {
 
     public prepare(url: string, volume: Double): Promise<any[]> {
         this.resetEvents();
-        this._nativeBridge.subscribe('VIDEOPLAYER_PREPARED', this, 'onPrepared');
-        this._nativeBridge.subscribe('VIDEOPLAYER_PROGRESS', this, 'onProgress');
-        this._nativeBridge.subscribe('VIDEOPLAYER_COMPLETED', this, 'onComplete');
+        this._nativeBridge.subscribe('VIDEOPLAYER_PREPARED', this.onPrepared.bind(this));
+        this._nativeBridge.subscribe('VIDEOPLAYER_PROGRESS', this.onProgress.bind(this));
+        this._nativeBridge.subscribe('VIDEOPLAYER_COMPLETED', this.onComplete.bind(this));
         return this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, volume]);
     }
 
@@ -45,7 +45,6 @@ export class NativeVideoPlayer extends VideoPlayer {
         return this._nativeBridge.invoke('VideoPlayer', 'setVolume', [volume]);
     }
 
-    /* tslint:disable:no-unused-variable */
     private onPrepared(duration: number, width: number, height: number): void {
         this._duration = duration;
         this.trigger('prepared', duration, width, height);
@@ -64,12 +63,8 @@ export class NativeVideoPlayer extends VideoPlayer {
     }
 
     private onComplete(url: string): void {
-        this._nativeBridge.unsubscribe('VIDEOPLAYER_PREPARED', this, 'onPrepared');
-        this._nativeBridge.unsubscribe('VIDEOPLAYER_PROGRESS', this, 'onProgress');
-        this._nativeBridge.unsubscribe('VIDEOPLAYER_COMPLETED', this, 'onComplete');
         this.trigger('completed', url);
     }
-    /* tslint:enable:no-unused-variable */
 
     private resetEvents() {
         this._events = [

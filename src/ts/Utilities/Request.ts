@@ -13,8 +13,8 @@ export class Request {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.subscribe('URL_COMPLETE', this, 'onComplete');
-        this._nativeBridge.subscribe('URL_FAILED', this, 'onFailed');
+        this._nativeBridge.subscribe('URL_COMPLETE', this.onComplete.bind(this));
+        this._nativeBridge.subscribe('URL_FAILED', this.onFailed.bind(this));
     }
 
     public get(url: string): Promise<any[]> {
@@ -38,7 +38,6 @@ export class Request {
         });
     }
 
-    /* tslint:disable:no-unused-variable */
     private onComplete(url: string, response: string): void {
         let urlCallbacks: Function[] = this._urlCallbacks[url];
         if(urlCallbacks) {
@@ -58,6 +57,5 @@ export class Request {
             delete this._urlCallbacks[url];
         }
     }
-    /* tslint:enable:no-unused-variable */
 
 }

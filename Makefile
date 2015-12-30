@@ -176,7 +176,20 @@ test:
 	$(TYPESCRIPT) --project test
 
 	@echo
+	@echo Running local tests
+	@echo
+
+	NODE_PATH=$(TS_SRC) $(MOCHA)
+
+test-coverage:
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project test
+
+	@echo
 	@echo Running local tests with coverage
 	@echo
 
-	NODE_PATH=src/ts $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
+	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)

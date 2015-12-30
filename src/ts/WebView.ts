@@ -103,7 +103,7 @@ export class WebView {
             });
 
             this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
-            this._campaignManager.subscribe('campaign', this, 'onCampaign');
+            this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
             let zones: Object = this._zoneManager.getZones();
             for(let zoneId in zones) {
@@ -132,24 +132,24 @@ export class WebView {
         let campaign: Campaign = zone.getCampaign();
 
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
-        this._videoPlayer.subscribe('prepared', this, 'onVideoPrepared', zone);
-        this._videoPlayer.subscribe('progress', this, 'onVideoProgress', zone);
-        this._videoPlayer.subscribe('start', this, 'onVideoStart', zone);
-        this._videoPlayer.subscribe('completed', this, 'onVideoCompleted', zone);
+        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone));
+        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, zone));
+        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, zone));
+        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, zone));
 
         this._overlay = new Overlay(zone.muteVideoSounds());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
-        this._overlay.subscribe('skip', this, 'onSkip', zone);
-        this._overlay.subscribe('mute', this, 'onMute', zone);
+        this._overlay.subscribe('skip', this.onSkip.bind(this, zone));
+        this._overlay.subscribe('mute', this.onMute.bind(this, zone));
 
         this._endScreen = new EndScreen(zone, campaign);
         this._endScreen.render();
         this._endScreen.hide();
         document.body.appendChild(this._endScreen.container());
-        this._endScreen.subscribe('replay', this, 'onReplay');
-        this._endScreen.subscribe('download', this, 'onDownload');
-        this._endScreen.subscribe('close', this, 'onClose');
+        this._endScreen.subscribe('replay', this.onReplay.bind(this));
+        this._endScreen.subscribe('download', this.onDownload.bind(this));
+        this._endScreen.subscribe('close', this.onClose.bind(this));
 
         let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
         if(!zone.useDeviceOrientationForVideo()) {
@@ -183,7 +183,6 @@ export class WebView {
      CAMPAIGN EVENT HANDLERS
      */
 
-    /* tslint:disable:no-unused-variable */
     private onCampaign(zone: Zone, campaign: Campaign): void {
         let cacheableAssets: string[] = [
             campaign.getGameIcon(),
@@ -272,6 +271,5 @@ export class WebView {
         this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.WAITING]]);
         this._campaignManager.request(this._gameId, zone);
     }
-    /* tslint:enable:no-unused-variable */
 
 }

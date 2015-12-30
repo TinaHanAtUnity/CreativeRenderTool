@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 import { NativeBridge } from 'NativeBridge';
 import { WebView } from 'WebView';
 

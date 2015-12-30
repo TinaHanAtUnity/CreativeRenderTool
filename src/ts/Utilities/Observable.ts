@@ -1,42 +1,33 @@
-type Observers = { [event: string]: { [observer: string]: [Object, any[]][] } };
+import { IObserver } from 'IObserver';
+
+type Observers = { [event: string]: IObserver[] };
 
 export class Observable {
 
     private _observers: Observers = {};
 
-    public subscribe(event: string, self: Object, observer: string, ...parameters: any[]): void {
-        let observers = this._observers[event];
-        if(!observers) {
-            this._observers[event] = {};
+    public subscribe(event: string, observer: IObserver): IObserver {
+        if(!this._observers[event]) {
+            this._observers[event] = [];
         }
-        let objects = this._observers[event][observer];
-        if(!objects) {
-            this._observers[event][observer] = [];
-        }
-        this._observers[event][observer].push([self, parameters]);
+        this._observers[event].push(observer);
+        return observer;
     }
 
-    public unsubscribe(event: string, self: Object, observer: string): void {
-        let observers = this._observers[event];
-        if(observers) {
-            let objects = this._observers[event][observer];
-            if(objects) {
-                this._observers[event][observer] = objects.filter(pair => pair[0] !== self);
-            }
+    public unsubscribe(event: string, observer: IObserver): void {
+        if(this._observers[event]) {
+            this._observers[event] = this._observers[event].filter(storedObserver => storedObserver !== observer);
         }
     }
 
     protected trigger(event: string, ...parameters: any[]): void {
-        let observers = this._observers[event];
-        if(observers) {
-            Object.keys(observers).forEach(observer => {
-                observers[observer].forEach(([self, storedParameters]) => {
-                    try {
-                        self[observer].apply(self, storedParameters.concat(parameters));
-                    } catch(error) {
-                        console.log(error);
-                    }
-                });
+        if(this._observers[event]) {
+            this._observers[event].forEach(observer => {
+                try {
+                    observer.apply(undefined, parameters);
+                } catch(error) {
+                    console.log(error);
+                }
             });
         }
     }

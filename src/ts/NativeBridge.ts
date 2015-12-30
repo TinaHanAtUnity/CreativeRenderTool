@@ -1,3 +1,4 @@
+/// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="WebViewBridge.d.ts" />
 
 import { Observable } from 'Utilities/Observable';
