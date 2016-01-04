@@ -22,9 +22,6 @@ export class NativeVideoPlayer extends VideoPlayer {
 
     public prepare(url: string, volume: Double): Promise<any[]> {
         this.reset();
-        this._preparedObserver = this._nativeBridge.subscribe('VIDEOPLAYER_PREPARED', this.onPrepared.bind(this));
-        this._progressObserver = this._nativeBridge.subscribe('VIDEOPLAYER_PROGRESS', this.onProgress.bind(this));
-        this._completedObserver = this._nativeBridge.subscribe('VIDEOPLAYER_COMPLETED', this.onComplete.bind(this));
         return this._nativeBridge.invoke('VideoPlayer', 'prepare', [url, volume]);
     }
 
@@ -64,6 +61,9 @@ export class NativeVideoPlayer extends VideoPlayer {
         this._nativeBridge.unsubscribe('VIDEOPLAYER_PREPARED', this._preparedObserver);
         this._nativeBridge.unsubscribe('VIDEOPLAYER_PROGRESS', this._progressObserver);
         this._nativeBridge.unsubscribe('VIDEOPLAYER_COMPLETED', this._completedObserver);
+        this._preparedObserver = this._nativeBridge.subscribe('VIDEOPLAYER_PREPARED', this.onPrepared.bind(this));
+        this._progressObserver = this._nativeBridge.subscribe('VIDEOPLAYER_PROGRESS', this.onProgress.bind(this));
+        this._completedObserver = this._nativeBridge.subscribe('VIDEOPLAYER_COMPLETED', this.onComplete.bind(this));
         return;
     }
 
