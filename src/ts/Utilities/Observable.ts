@@ -14,9 +14,15 @@ export class Observable {
         return observer;
     }
 
-    public unsubscribe(event: string, observer: IObserver): void {
-        if(this._observers[event]) {
-            this._observers[event] = this._observers[event].filter(storedObserver => storedObserver !== observer);
+    public unsubscribe(event?: string, observer?: IObserver): void {
+        if(typeof event === 'undefined') {
+            this._observers = {};
+        } else if(this._observers[event]) {
+            if(typeof observer !== 'undefined') {
+                this._observers[event] = this._observers[event].filter(storedObserver => storedObserver !== observer);
+            } else {
+                delete this._observers[event];
+            }
         }
     }
 

@@ -174,6 +174,7 @@ export class WebView {
         this._nativeBridge.invoke('AdUnit', 'close', []);
         this._videoPlayer.stop();
         this._videoPlayer.reset();
+        this._videoPlayer.unsubscribe();
         this._videoPlayer = null;
         this._overlay.container().parentElement.removeChild(this._overlay.container());
         this._overlay = null;
