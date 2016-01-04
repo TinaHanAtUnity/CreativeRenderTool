@@ -6,6 +6,8 @@ export abstract class VideoPlayer extends Observable {
     public abstract play(): Promise<any[]>;
     public abstract pause(): Promise<any[]>;
     public abstract seekTo(time: number): Promise<any[]>;
+    public abstract stop(): Promise<any[]>;
+    public abstract reset(): Promise<any[]>;
     public abstract getVolume(): Promise<any[]>;
     public abstract setVolume(volume: Double): Promise<any[]>;
 }
