@@ -263,6 +263,7 @@ export class WebView {
     }
 
     private onDownload(zone: Zone, campaign: Campaign): void {
+        this._nativeBridge.invoke('Listener', 'sendClickEvent', [zone.getId()]);
         this._nativeBridge.invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
             'uri': 'market://details?id=' + campaign.getStoreId()
