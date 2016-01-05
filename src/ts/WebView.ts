@@ -23,6 +23,12 @@ import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
+enum FinishState {
+    COMPLETED,
+    SKIPPED,
+    ERROR
+}
+
 export class WebView {
 
     private _nativeBridge: NativeBridge;
@@ -47,6 +53,8 @@ export class WebView {
 
     private _sessionManager: SessionManager;
 
+    private _finishState: FinishState;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -57,6 +65,8 @@ export class WebView {
         this._request = new Request(nativeBridge);
 
         this._sessionManager = new SessionManager(nativeBridge);
+
+        this._finishState = null;
     }
 
     public initialize(): Promise<any[]> {
@@ -123,6 +133,12 @@ export class WebView {
         });
     }
 
+    public setFinishState(state: FinishState): void {
+        if(this._finishState !== FinishState.COMPLETED) {
+            this._finishState = state;
+        }
+    }
+
     /*
      PUBLIC API EVENT HANDLERS
      */
@@ -170,8 +186,9 @@ export class WebView {
         });
     }
 
-    public hide(): void {
+    public hide(zone: Zone, campaign: Campaign): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
+        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), FinishState[this._finishState]]);
         this._videoPlayer.stop();
         this._videoPlayer.reset();
         this._videoPlayer.unsubscribe();
@@ -226,7 +243,7 @@ export class WebView {
     }
 
     private onVideoCompleted(zone: Zone, url: string): void {
-        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), 'COMPLETED']);
+        this.setFinishState(FinishState.COMPLETED);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
@@ -238,7 +255,7 @@ export class WebView {
 
     private onSkip(zone: Zone): void {
         this._videoPlayer.pause();
-        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), 'SKIPPED']);
+        this.setFinishState(FinishState.SKIPPED);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
@@ -271,7 +288,7 @@ export class WebView {
     }
 
     private onClose(zone: Zone, campaign: Campaign): void {
-        this.hide();
+        this.hide(zone, campaign);
         this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.WAITING]]);
         this._campaignManager.request(this._gameId, zone);
     }
