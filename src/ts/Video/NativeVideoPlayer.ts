@@ -77,7 +77,6 @@ export class NativeVideoPlayer extends VideoPlayer {
         let percentage = progress / this._duration;
         let event = this._events.shift();
         if(percentage >= event.time) {
-            console.log('videoEvent: ' + event.type);
             this.trigger(event.type);
         } else {
             this._events.unshift(event);

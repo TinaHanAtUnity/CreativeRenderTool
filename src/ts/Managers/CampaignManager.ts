@@ -6,22 +6,23 @@ import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { Zone } from 'Models/Zone';
 import { Request } from 'Utilities/Request';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class CampaignManager extends Observable {
 
     private _request: Request;
+    private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _testMode: boolean;
 
-    constructor(request: Request, deviceInfo: DeviceInfo, testMode: boolean) {
+    constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         super();
         this._request = request;
+        this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._testMode = testMode;
     }
 
-    public request(gameId: string, zone: Zone): void {
-        this._request.get(this.createRequestUrl(gameId, zone.getId(), this._testMode)).then(([response]) => {
+    public request(zone: Zone): void {
+        this._request.get(this.createRequestUrl(zone.getId())).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
             zone.setCampaign(campaign);
@@ -32,11 +33,11 @@ export class CampaignManager extends Observable {
         });
     }
 
-    private createRequestUrl(gameId: string, zoneId: string, testMode: boolean): string {
+    private createRequestUrl(zoneId: string): string {
         let url: string = Url.addParameters('http://impact.applifier.com/mobile/campaigns', {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
-            gameId: gameId,
+            gameId: this._clientInfo.getGameId(),
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
@@ -49,7 +50,7 @@ export class CampaignManager extends Observable {
             zoneId: zoneId
         });
 
-        if(testMode) {
+        if(this._clientInfo.getTestMode()) {
             url = Url.addParameters(url, {test: true});
         }
 

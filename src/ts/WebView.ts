@@ -8,7 +8,7 @@ import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
 
 import { DeviceInfo } from 'Models/DeviceInfo';
 
-import { ZoneManager } from 'Managers/ZoneManager';
+import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
@@ -33,15 +33,12 @@ export class WebView {
 
     private _nativeBridge: NativeBridge;
 
-    private _gameId: string = null;
-    private _testMode: boolean = null;
-
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
 
     private _request: Request;
 
-    private _zoneManager: ZoneManager;
+    private _configManager: ConfigManager;
     private _campaignManager: CampaignManager;
 
     private _videoPlayer: VideoPlayer;
@@ -59,77 +56,41 @@ export class WebView {
         this._nativeBridge = nativeBridge;
 
         this._deviceInfo = new DeviceInfo();
-        this._clientInfo = new ClientInfo();
 
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
 
-        this._sessionManager = new SessionManager(nativeBridge);
-
         this._finishState = null;
     }
 
-    public initialize(): Promise<any[]> {
+    public initialize(): Promise<void> {
         return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode]) => {
-            this._gameId = gameId;
-            this._testMode = testMode;
-
-            console.log('Load Complete - gameId: ' + this._gameId + ' - testMode: ' + this._testMode);
-
-            return this._deviceInfo.fetch(this._nativeBridge);
-        }).then(() => {
+            this._clientInfo = new ClientInfo(gameId, testMode);
             return this._clientInfo.fetch(this._nativeBridge);
         }).then(() => {
+            return this._deviceInfo.fetch(this._nativeBridge);
+        }).then(() => {
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             return this._sessionManager.create();
         }).then(() => {
-            console.log('Session ID: ' + this._sessionManager.getSession().getId());
-
-            this._zoneManager = new ZoneManager({
-                'enabled': true,
-                'zones': [
-                    {
-                        'id': 'defaultVideoAndPictureZone',
-                        'name': 'Video ad placement',
-                        'enabled': true,
-                        'default': true,
-                        'incentivised': false,
-                        'allowSkipVideoInSeconds': 5,
-                        'disableBackButtonForSeconds': 30,
-                        'muteVideoSounds': false,
-                        'useDeviceOrientationForVideo': true
-                    },
-                    {
-                        'id': 'incentivizedZone',
-                        'name': 'Incentivized placement',
-                        'enabled': true,
-                        'default': false,
-                        'incentivized': true,
-                        'allowSkipVideoInSeconds': -1,
-                        'disableBackButtonForSeconds': 30,
-                        'muteVideoSounds': true,
-                        'useDeviceOrientationForVideo': false
-                    }
-                ]
-            });
-
-            this._campaignManager = new CampaignManager(this._request, this._deviceInfo, this._testMode);
+            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
+            return this._configManager.fetch();
+        }).then(() => {
+            this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
-            let zones: Object = this._zoneManager.getZones();
+            let zones: Object = this._configManager.getZones();
             for(let zoneId in zones) {
                 if(zones.hasOwnProperty(zoneId)) {
                     let zone: Zone = zones[zoneId];
                     this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
-                }
-            }
-
-            for(let zoneId in zones) {
-                if(zones.hasOwnProperty(zoneId)) {
-                    this._campaignManager.request(this._gameId, zones[zoneId]);
+                    this._campaignManager.request(zones[zoneId]);
                 }
             }
 
             return this._nativeBridge.invoke('Sdk', 'initComplete');
+        }).catch(error => {
+            console.log(error);
         });
     }
 
@@ -144,7 +105,7 @@ export class WebView {
      */
 
     public show(zoneId: string): void {
-        let zone: Zone = this._zoneManager.getZone(zoneId);
+        let zone: Zone = this._configManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
@@ -290,7 +251,7 @@ export class WebView {
     private onClose(zone: Zone, campaign: Campaign): void {
         this.hide(zone, campaign);
         this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.WAITING]]);
-        this._campaignManager.request(this._gameId, zone);
+        this._campaignManager.request(zone);
     }
 
 }
