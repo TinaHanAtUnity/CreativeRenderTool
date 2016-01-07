@@ -33,6 +33,7 @@ export class Request {
         if(typeof headers === 'undefined') {
             headers = [];
         }
+        headers.push(['Content-Type', 'application/json']);
         let promise = this.registerCallback(url);
         this._nativeBridge.invoke('Url', 'post', [url, JSON.stringify(data), headers]);
         return promise;
