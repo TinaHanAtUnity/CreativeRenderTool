@@ -26,7 +26,9 @@ export class Url {
                     'trailerSize': 1445875,
                     'iTunesId': 'com.iUnity.angryBots',
                     'network': 'mobile_android'
-                }]
+                }],
+                'gamerId': '000000000000000000000000',
+                'ab_group': 0
             }
         };
         setTimeout(() => {

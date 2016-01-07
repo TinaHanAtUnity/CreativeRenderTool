@@ -17,9 +17,24 @@ export class Request {
         this._nativeBridge.subscribe('URL_FAILED', this.onFailed.bind(this));
     }
 
-    public get(url: string): Promise<any[]> {
+    public get(url: string, headers?: [string, string][]): Promise<any[]> {
+        if(typeof headers === 'undefined') {
+            headers = [];
+        }
         let promise = this.registerCallback(url);
-        this._nativeBridge.invoke('Url', 'get', [url, []]);
+        this._nativeBridge.invoke('Url', 'get', [url, headers]);
+        return promise;
+    }
+
+    public post(url: string, data?: {}, headers?: [string, string][]): Promise<any[]> {
+        if(typeof data === 'undefined') {
+            data = {};
+        }
+        if(typeof headers === 'undefined') {
+            headers = [];
+        }
+        let promise = this.registerCallback(url);
+        this._nativeBridge.invoke('Url', 'post', [url, JSON.stringify(data), headers]);
         return promise;
     }
 

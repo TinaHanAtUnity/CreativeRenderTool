@@ -22,6 +22,10 @@ export class Campaign {
         this._video = data.trailerDownloadable;
     }
 
+    public getId(): string {
+        return this._id;
+    }
+
     public getStoreId(): string {
         return this._storeId;
     }

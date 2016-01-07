@@ -70,11 +70,11 @@ export class WebView {
         }).then(() => {
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
-            return this._sessionManager.create();
-        }).then(() => {
             this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
+        }).then(() => {
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._configManager.getGamerInfo());
+            return this._sessionManager.create();
         }).then(() => {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
@@ -108,17 +108,19 @@ export class WebView {
         let zone: Zone = this._configManager.getZone(zoneId);
         let campaign: Campaign = zone.getCampaign();
 
+        this._sessionManager.sendShow(zone, campaign);
+
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
-        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone));
-        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, zone));
-        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, zone));
-        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, zone));
+        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone, campaign));
+        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, zone, campaign));
+        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, zone, campaign));
+        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, zone, campaign));
 
         this._overlay = new Overlay(zone.muteVideoSounds());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
-        this._overlay.subscribe('skip', this.onSkip.bind(this, zone));
-        this._overlay.subscribe('mute', this.onMute.bind(this, zone));
+        this._overlay.subscribe('skip', this.onSkip.bind(this, zone, campaign));
+        this._overlay.subscribe('mute', this.onMute.bind(this, zone, campaign));
 
         this._endScreen = new EndScreen(zone, campaign);
         this._endScreen.render();
@@ -188,23 +190,25 @@ export class WebView {
      VIDEO EVENT HANDLERS
      */
 
-    private onVideoPrepared(zone: Zone, duration: number, width: number, height: number): void {
+    private onVideoPrepared(zone: Zone, campaign: Campaign, duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
         this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             this._videoPlayer.play();
         });
     }
 
-    private onVideoProgress(zone: Zone, position: number): void {
+    private onVideoProgress(zone: Zone, campaign: Campaign, position: number): void {
         this._overlay.setVideoProgress(position);
     }
 
-    private onVideoStart(zone: Zone): void {
+    private onVideoStart(zone: Zone, campaign: Campaign): void {
+        this._sessionManager.sendStart(zone, campaign);
         this._nativeBridge.invoke('Listener', 'sendStartEvent', [zone.getId()]);
     }
 
-    private onVideoCompleted(zone: Zone, url: string): void {
+    private onVideoCompleted(zone: Zone, campaign: Campaign, url: string): void {
         this.setFinishState(FinishState.COMPLETED);
+        this._sessionManager.sendView(zone, campaign);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
@@ -214,15 +218,16 @@ export class WebView {
     OVERLAY EVENT HANDLERS
      */
 
-    private onSkip(zone: Zone): void {
+    private onSkip(zone: Zone, campaign: Campaign): void {
         this._videoPlayer.pause();
         this.setFinishState(FinishState.SKIPPED);
+        this._sessionManager.sendSkip(zone, campaign);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
     }
 
-    private onMute(zone: Zone, muted: boolean): void {
+    private onMute(zone: Zone, campaign: Campaign, muted: boolean): void {
         this._videoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
     }
 
@@ -241,6 +246,7 @@ export class WebView {
     }
 
     private onDownload(zone: Zone, campaign: Campaign): void {
+        this._sessionManager.sendClick(zone, campaign);
         this._nativeBridge.invoke('Listener', 'sendClickEvent', [zone.getId()]);
         this._nativeBridge.invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
