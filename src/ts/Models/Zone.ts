@@ -46,6 +46,10 @@ export class Zone {
         return this._enabled;
     }
 
+    public isDefault(): boolean {
+        return this._default;
+    }
+
     public isIncentivized(): boolean {
         return this._incentivized;
     }
@@ -73,5 +77,4 @@ export class Zone {
     public setCampaign(campaign: Campaign): void {
         this._campaign = campaign;
     }
-
 }

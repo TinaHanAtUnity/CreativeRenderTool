@@ -101,6 +101,11 @@ export class WebView {
                 }
             }
 
+            let defaultZone = this._zoneManager.getDefaultZone();
+            this._nativeBridge.invoke('Zone', 'setDefaultZone', [defaultZone.getId()]).then(() => {
+                console.log('set default zone: ' + defaultZone.getId());
+            });
+
             for(let zoneId in zones) {
                 if(zones.hasOwnProperty(zoneId)) {
                     this._campaignManager.request(this._gameId, zones[zoneId]);
