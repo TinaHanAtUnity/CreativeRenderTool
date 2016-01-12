@@ -104,7 +104,7 @@ export class WebViewBridge implements IWebViewBridge {
     protected setDefaultZone(zoneId: string): any[] {
         return ['OK'];
     }
-    
+
     protected urlGet(url: string, headers: [string, string][]): any[] {
         let campaignResponse: {} = {
             'data': {
