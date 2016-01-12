@@ -24,6 +24,7 @@ export class WebViewBridge implements IWebViewBridge {
         'DeviceInfo.isWifi': this.isWifi,
 
         'Zone.setZoneState': this.setZoneState,
+        'Zone.setDefaultZone': this.setDefaultZone,
 
         'Url.get': this.urlGet,
 
@@ -100,6 +101,10 @@ export class WebViewBridge implements IWebViewBridge {
         return ['OK'];
     }
 
+    protected setDefaultZone(zoneId: string): any[] {
+        return ['OK'];
+    }
+    
     protected urlGet(url: string, headers: [string, string][]): any[] {
         let campaignResponse: {} = {
             'data': {
