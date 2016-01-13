@@ -4,4 +4,8 @@ export class Zone {
         return ['OK'];
     }
 
+    public setDefaultZone(zoneId: string): any[] {
+        return ['OK'];
+    }
+
 }

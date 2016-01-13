@@ -79,6 +79,9 @@ export class WebView {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
+            let defaultZone = this._configManager.getDefaultZone();
+            this._nativeBridge.invoke('Zone', 'setDefaultZone', [defaultZone.getId()]);
+
             let zones: Object = this._configManager.getZones();
             for(let zoneId in zones) {
                 if(zones.hasOwnProperty(zoneId)) {

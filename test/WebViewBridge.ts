@@ -44,5 +44,4 @@ export class WebViewBridge implements IWebViewBridge {
     public handleCallback(id: string, status: string, parameters?: string): void {
         console.log(id, status, parameters);
     }
-
 }

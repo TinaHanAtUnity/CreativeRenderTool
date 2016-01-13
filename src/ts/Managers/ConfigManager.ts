@@ -15,6 +15,7 @@ export class ConfigManager {
     private _gamerInfo: GamerInfo;
 
     private _zones: Object = {};
+    private _defaultZone: Zone = null;
 
     constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._request = request;
@@ -55,6 +56,9 @@ export class ConfigManager {
             zones.forEach((rawZone: any): void => {
                 let zone: Zone = new Zone(rawZone);
                 this._zones[zone.getId()] = zone;
+                if(zone.isDefault()) {
+                    this._defaultZone = zone;
+                }
             });
         });
     }
@@ -69,6 +73,10 @@ export class ConfigManager {
 
     public getZones(): Object {
         return this._zones;
+    }
+
+    public getDefaultZone(): Zone {
+        return this._defaultZone;
     }
 
     private createConfigUrl(): string {
