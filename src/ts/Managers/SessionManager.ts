@@ -39,86 +39,41 @@ export class SessionManager {
 
     public sendShow(zone: Zone, campaign: Campaign): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            return this._request.post(SessionManager.SessionUrl + '/show', {
-                'uuid': id,
-                'gamer_id': this._gamerInfo.getGamerId(),
-                'campaign_id': campaign.getId(),
-                'zone_id': zone.getId(),
-                'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-                'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-                'software_version': this._deviceInfo.getSoftwareVersion(),
-                'device_type': this._deviceInfo.getHardwareVersion(),
-                'connection_type': this._deviceInfo.getNetworkType(),
-                'sid': 'rikshot'
-            });
+            let infoJson = this.getInfoJson(zone, campaign);
+            infoJson.uuid = id;
+            return this._request.post(SessionManager.SessionUrl + '/show', infoJson);
         });
     }
 
     public sendStart(zone: Zone, campaign: Campaign): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            return this._request.post(SessionManager.SessionUrl + '/start', {
-                'uuid': id,
-                'gamer_id': this._gamerInfo.getGamerId(),
-                'campaign_id': campaign.getId(),
-                'zone_id': zone.getId(),
-                'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-                'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-                'software_version': this._deviceInfo.getSoftwareVersion(),
-                'device_type': this._deviceInfo.getHardwareVersion(),
-                'connection_type': this._deviceInfo.getNetworkType(),
-                'sid': 'rikshot'
-            });
+            let infoJson = this.getInfoJson(zone, campaign);
+            infoJson.uuid = id;
+            return this._request.post(SessionManager.SessionUrl + '/start', infoJson);
         });
     }
 
     public sendSkip(zone: Zone, campaign: Campaign): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            return this._request.post(SessionManager.SessionUrl + '/skip', {
-                'uuid': id,
-                'gamer_id': this._gamerInfo.getGamerId(),
-                'campaign_id': campaign.getId(),
-                'zone_id': zone.getId(),
-                'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-                'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-                'software_version': this._deviceInfo.getSoftwareVersion(),
-                'device_type': this._deviceInfo.getHardwareVersion(),
-                'connection_type': this._deviceInfo.getNetworkType(),
-                'sid': 'rikshot'
-            });
+            let infoJson = this.getInfoJson(zone, campaign);
+            infoJson.uuid = id;
+            return this._request.post(SessionManager.SessionUrl + '/skip', infoJson);
         });
     }
 
     public sendView(zone: Zone, campaign: Campaign): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            return this._request.post(SessionManager.SessionUrl + '/view', {
-                'uuid': id,
-                'gamer_id': this._gamerInfo.getGamerId(),
-                'campaign_id': campaign.getId(),
-                'zone_id': zone.getId(),
-                'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-                'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-                'software_version': this._deviceInfo.getSoftwareVersion(),
-                'device_type': this._deviceInfo.getHardwareVersion(),
-                'connection_type': this._deviceInfo.getNetworkType(),
-                'sid': 'rikshot'
-            });
+            let infoJson = this.getInfoJson(zone, campaign);
+            infoJson.uuid = id;
+            return this._request.post(SessionManager.SessionUrl + '/view', infoJson);
         });
     }
 
     public sendClick(zone: Zone, campaign: Campaign): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            return this._request.post(SessionManager.SessionUrl + '/click', {
-                'uuid': id,
-                'gamer_id': this._gamerInfo.getGamerId(),
-                'campaign_id': campaign.getId(),
-                'zone_id': zone.getId(),
-                'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-                'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-                'software_version': this._deviceInfo.getSoftwareVersion(),
-                'device_type': this._deviceInfo.getHardwareVersion(),
-                'connection_type': this._deviceInfo.getNetworkType(),
-                'sid': 'rikshot'
-            });
+            let infoJson = this.getInfoJson(zone, campaign);
+            infoJson.uuid = id;
+            return this._request.post(SessionManager.SessionUrl + '/click', infoJson);
         });
     }
 
@@ -127,4 +82,19 @@ export class SessionManager {
             return id;
         });
     }
+
+    private getInfoJson(zone: Zone, campaign: Campaign): any {
+        return {
+            'gamer_id': this._gamerInfo.getGamerId(),
+            'campaign_id': campaign.getId(),
+            'zone_id': zone.getId(),
+            'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
+            'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
+            'software_version': this._deviceInfo.getSoftwareVersion(),
+            'device_type': this._deviceInfo.getHardwareVersion(),
+            'connection_type': this._deviceInfo.getNetworkType(),
+            'sid': 'rikshot'
+        };
+    }
+
 }
