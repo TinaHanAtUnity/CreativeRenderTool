@@ -59,14 +59,16 @@ build-release: clean build-dirs build-ts build-js build-css
 	cp $(PROD_CONFIG_SRC) $(BUILD_DIR)/config.json
 
 	@echo
-	@echo Calculating build hash to release config
+	@echo Computing build details to release config
 	@echo
 
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`'), o);"
+		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
+		c=c.replace('{BRANCH}', '`git symbolic-ref --short HEAD`');\
+		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
@@ -114,6 +116,17 @@ build-test: clean build-dirs build-css build-html
 	@echo
 
 	cp $(TEST_CONFIG_SRC) $(BUILD_DIR)/config.json
+
+	@echo
+	@echo Computing build details to test config
+	@echo
+
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
+		c=c.replace('{BRANCH}', '`git symbolic-ref --short HEAD`');\
+		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
 build-dir:
 	@echo
