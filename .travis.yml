@@ -35,6 +35,7 @@ deploy:
     secure: cIr1MP27jfW0ilgbR8nSQ4BJHt7ErCnlSKk5tk6mh49rOd0VksJ0CKY2ZMkJ0MaFge2wNP/b+mEt/X/NJEbgMCz3ktwRGXDpSjjK2r5kpMwKEhpXzsQHI1UOjyDjBiuRc9hbFsCyZ8tjfjYYL7LBbZMnoBtlEUtWNHGnMQ3IOA79pRknWApSzyC+cJPZDdm7Gq89PGlmB76HgmZSrWFA8AURWdBUjL+/gHYT01+9aBeEq0d7XMhEmdZo1mTTGEN1P6fTqgzYNHdk3T+1MWVVF5lyjY1Kgmo+u8eYFI+LGFgZ83kvwZOt/sL4NViAblRRUPtg4YYtfJx8/hBnr1rXIl2EMT353Bs5uMuDMaaJFngaSN0DQJ6GT76zZ64fp2F/MfTQ+jPBpZRjYpfzpjLRgeEo5CDkChR2m2IetVzR5Lbk/R2+lCeuIWQPgVnmQRLMtUb8onAZmgt+3mi3JOa1Y6EO/uiDpZ5lyb56GtGa6phDNTUTFnHaDDbnhbUKgey4kvpoSH9HFSW/Fob2Y/nLslTpe8+XyRoaY4WzFJjtBsTkVBWsvs3HUkeQUX7girxaL1l/X0yphhPZBypbu5k4tbgrVo+1Y8eGca47uzGQAwSZUCIaFAWhDBDNZA+XN3iuicEXvmPXjwt0s3CtUhi5kpI1mneE/QuwLF5FdxQLpnw=
   bucket: unityads-cdn-origin
   skip_cleanup: true
+  all_branches: true
   acl: public_read
   local_dir: build
-  upload-dir: webview
+  upload-dir: webview/$TRAVIS_BRANCH
