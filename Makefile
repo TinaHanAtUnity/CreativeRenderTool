@@ -16,15 +16,15 @@ PROD_CONFIG_SRC = src/config.json
 TEST_CONFIG_SRC = src/test-config.json
 TEST_SRC = test
 
-# Targets
-BUILD_DIR = build
-
 # Branch
 ifeq ($(TRAVIS), true)
     BRANCH = $(TRAVIS_BRANCH)
 else
     BRANCH = $(shell git symbolic-ref --short HEAD)
 endif
+
+# Targets
+BUILD_DIR = build/$(BRANCH)
 
 .PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
 
