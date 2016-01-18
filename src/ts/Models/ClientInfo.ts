@@ -1,5 +1,3 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
-
 export class ClientInfo {
 
     private _gameId: string;
@@ -8,16 +6,14 @@ export class ClientInfo {
     private _applicationVersion: string;
     private _sdkVersion: string;
 
-    constructor(gameId: string, testMode: boolean) {
+    private _platform: string;
+
+    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string) {
         this._gameId = gameId;
         this._testMode = testMode;
-    }
-
-    public fetch(nativeBridge: NativeBridge): Promise<any[]> {
-        let batch: BatchInvocation = new BatchInvocation(nativeBridge);
-        batch.queue('Client', 'getApplicationVersion').then(([applicationVersion]) => this._applicationVersion = applicationVersion);
-        batch.queue('Sdk', 'getSdkVersion').then(([sdkVersion]) => this._sdkVersion = sdkVersion);
-        return nativeBridge.invokeBatch(batch);
+        this._applicationVersion = applicationVersion;
+        this._sdkVersion = sdkVersion;
+        this._platform = platform;
     }
 
     public getGameId(): string {
@@ -34,6 +30,10 @@ export class ClientInfo {
 
     public getSdkVersion(): string {
         return this._sdkVersion;
+    }
+
+    public getPlatform(): string {
+        return this._platform;
     }
 
 }

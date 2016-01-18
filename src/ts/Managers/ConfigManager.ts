@@ -87,10 +87,10 @@ export class ConfigManager {
             hardwareVersion: this._deviceInfo.getHardwareVersion(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
-            platform: 'android',
+            platform: this._clientInfo.getPlatform(),
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
-            sdkVersion: 2000,
+            sdkVersion: this._clientInfo.getSdkVersion(),
             softwareVersion: this._deviceInfo.getSoftwareVersion(),
             wifi: this._deviceInfo.isWifi() ? 1 : 0
         });

@@ -9,13 +9,11 @@ import { Zone } from './Api/Zone';
 import { Url } from './Api/Url';
 import { Cache } from './Api/Cache';
 import { Listener } from './Api/Listener';
-import { Client } from './Api/Client';
 import { Storage } from './Api/Storage';
 
 export class WebViewBridge implements IWebViewBridge {
 
     private _apiMap: {} = {
-        'Client': new Client(),
         'Sdk': new Sdk(),
         'DeviceInfo': new DeviceInfo(),
         'Zone': new Zone(),

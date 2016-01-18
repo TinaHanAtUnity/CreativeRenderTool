@@ -19,9 +19,9 @@
 
     var require = {
       baseUrl: origin + 'js/',
-      deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
+      deps: ['../../../../node_modules/es6-promise/dist/es6-promise'],
       paths: {
-        text: '../../../node_modules/requirejs-text/text',
+        text: '../../../../node_modules/requirejs-text/text',
         html: '../html'
       },
       config: {
@@ -35,7 +35,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       var requirejs = document.createElement('script');
-      requirejs.src = origin + '../../../node_modules/requirejs/require.js';
+      requirejs.src = origin + '../../../../node_modules/requirejs/require.js';
       requirejs.setAttribute('data-main', 'Main.js');
 
       var style = document.createElement('link');
