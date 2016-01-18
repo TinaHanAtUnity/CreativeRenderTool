@@ -1,10 +1,9 @@
 ({
   name: 'Main',
-  baseUrl: '../../build/release/js/',
-  deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
+  deps: ['../../../../node_modules/es6-promise/dist/es6-promise'],
   paths: {
-    text: '../../../node_modules/requirejs-text/text',
-    html: '../../../src/html'
+    text: '../../../../node_modules/requirejs-text/text',
+    html: '../../../../src/html'
   },
   config: {
     text: {
@@ -13,7 +12,6 @@
       }
     }
   },
-  out: '../../build/release/main.js',
   optimize: 'uglify2',
   uglify2: {
     output: {

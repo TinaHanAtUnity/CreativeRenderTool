@@ -37,6 +37,6 @@ deploy:
   skip_cleanup: true
   acl: public_read
   local_dir: build
-  upload-dir: webview/$TRAVIS_BRANCH
+  upload-dir: webview
   on:
     all_branches: true
