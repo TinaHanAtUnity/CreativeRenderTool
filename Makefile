@@ -33,6 +33,17 @@ build-dev: build-ts build-css build-html
 	cp src/dev-config.json $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
+	@echo
+	@echo Computing build details to dev config
+	@echo
+
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
+		c=c.replace('{BRANCH}', '$(BRANCH)');\
+		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+
 build-release: BUILD_DIR = build/$(BRANCH)/release
 build-release: clean build-dirs build-ts build-js build-css
 	@echo
