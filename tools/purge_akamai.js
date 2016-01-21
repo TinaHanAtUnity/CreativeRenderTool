@@ -29,14 +29,8 @@ var paths = getBuildPaths('build').map(function(path) {
     return cdnHost + cdnRoot + path.replace('build', '');
 });
 
-console.dir(paths);
-console.dir(paths.length);
-
-/*akamai.purge(akamaiUser, akamaiPass, paths, {action: 'invalidate'}).then(function(response) {
+akamai.purge(akamaiUser, akamaiPass, paths, {action: 'invalidate'}).then(function(response) {
     console.dir(response);
 }).catch(function(error) {
     console.dir(error);
-});*/
-
-2016-01-21T15:46:06Z
-2016-01-21T15:51:14Z
+});
