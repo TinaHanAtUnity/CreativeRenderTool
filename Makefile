@@ -24,11 +24,11 @@ else
 endif
 
 # Targets
-BUILD_DIR = build/$(BRANCH)
+BUILD_DIR = build
 
 .PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
 
-build-dev: BUILD_DIR = build/$(BRANCH)/dev
+build-dev: BUILD_DIR = build/dev
 build-dev: build-ts build-css build-html
 	cp src/dev-config.json $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
@@ -44,7 +44,7 @@ build-dev: build-ts build-css build-html
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
-build-release: BUILD_DIR = build/$(BRANCH)/release
+build-release: BUILD_DIR = build/release
 build-release: clean build-dirs build-ts build-js build-css
 	@echo
 	@echo Copying release index.html to build
@@ -88,7 +88,7 @@ build-release: clean build-dirs build-ts build-js build-css
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
-build-test: BUILD_DIR = build/$(BRANCH)/test
+build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
 	@echo
 	@echo Transpiling .ts to .js for remote tests

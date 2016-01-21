@@ -1,9 +1,9 @@
 ({
   name: 'Main',
-  deps: ['../../../../node_modules/es6-promise/dist/es6-promise'],
+  deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
   paths: {
-    text: '../../../../node_modules/requirejs-text/text',
-    html: '../../../../src/html'
+    text: '../../../node_modules/requirejs-text/text',
+    html: '../../../src/html'
   },
   config: {
     text: {
