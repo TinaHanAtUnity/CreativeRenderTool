@@ -9,6 +9,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "akamai": "^0.10.1",
     "amdclean": "^2.7.0",
     "es6-promise": "^3.0.2",
     "requirejs": "^2.1.20",
