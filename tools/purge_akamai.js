@@ -8,6 +8,9 @@ var akamaiUser = process.env.AKAMAI_USERNAME;
 var akamaiPass = process.env.AKAMAI_PASSWORD;
 
 var branch = process.env.TRAVIS_BRANCH;
+if(!branch) {
+    throw new Error('Invalid branch: ' + branch);
+}
 
 var getBuildPaths = function(root) {
     var paths = [];
@@ -29,8 +32,24 @@ var paths = getBuildPaths('build').map(function(path) {
     return cdnHost + cdnRoot + path.replace('build', '');
 });
 
+console.log('Starting Akamai purge of: ');
+console.dir(paths);
 akamai.purge(akamaiUser, akamaiPass, paths, {action: 'invalidate'}).then(function(response) {
-    console.dir(response);
+    console.log('Progress URI: ' + response.progressUri);
+    console.log('Estimated seconds until completion: ' + response.estimatedSeconds);
+    var pingStatus = function() {
+        response.status().then(function(status) {
+            if(!status.completionTime) {
+                console.log('Status: ' + status.purgeStatus);
+                setTimeout(pingStatus, status.pingAfterSeconds * 1000);
+            } else {
+                console.log('Purge complete, took ' + (new Date(status.completionTime) - new Date(status.submissionTime)) / 1000 + ' seconds.');
+            }
+        }).catch(function(error) {
+            console.dir(error);
+        });
+    };
+    pingStatus();
 }).catch(function(error) {
     console.dir(error);
 });
