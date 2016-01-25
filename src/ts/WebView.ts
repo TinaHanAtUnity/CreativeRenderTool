@@ -137,8 +137,11 @@ export class WebView {
         }
 
         let keyEvents: any[] = [];
-        if(!zone.allowSkip()) {
+        if(zone.disableBackButton()) {
             keyEvents = [KeyCode.BACK];
+        }
+
+        if(!zone.allowSkip()) {
             this._overlay.setSkipEnabled(false);
         } else {
             this._overlay.setSkipEnabled(true);
