@@ -10,6 +10,8 @@ export class ConfigManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
 
+    private _enabled: boolean;
+    private _country: string;
     private _zones: { [id: string]: Zone } = {};
     private _defaultZone: Zone = null;
 
@@ -22,6 +24,9 @@ export class ConfigManager {
         return this._request.get(this.createConfigUrl()).then(([response]) => {
             let configJson = JSON.parse(response);
 
+            this._enabled = configJson.enabled;
+            this._country = configJson.country;
+
             let zones = configJson.placements;
 
             zones.forEach((rawZone: any): void => {
@@ -32,6 +37,14 @@ export class ConfigManager {
                 }
             });
         });
+    }
+
+    public isEnabled(): boolean {
+        return this._enabled;
+    }
+
+    public getCountry(): string {
+        return this._country;
     }
 
     public getZone(zoneId: string): Zone {
