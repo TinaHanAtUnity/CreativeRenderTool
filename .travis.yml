@@ -40,3 +40,6 @@ deploy:
   upload-dir: webview/$TRAVIS_BRANCH
   on:
     all_branches: true
+
+after_deploy:
+- node tools/purge_akamai.js

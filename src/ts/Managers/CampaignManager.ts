@@ -10,7 +10,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 
 export class CampaignManager extends Observable {
 
-    private static CampaignUrl = 'http://impact.applifier.com/mobile/campaigns';
+    private static CampaignBaseUrl = 'https://impact.applifier.com/mobile/campaigns';
 
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -36,7 +36,7 @@ export class CampaignManager extends Observable {
     }
 
     private createRequestUrl(zoneId: string): string {
-        let url: string = Url.addParameters(CampaignManager.CampaignUrl, {
+        let url: string = Url.addParameters(CampaignManager.CampaignBaseUrl, {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
             gameId: this._clientInfo.getGameId(),

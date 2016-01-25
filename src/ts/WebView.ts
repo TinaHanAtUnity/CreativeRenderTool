@@ -65,10 +65,10 @@ export class WebView {
             this._clientInfo = new ClientInfo(gameId, testMode, appVersion, sdkVersion, platform);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
-            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
+            this._configManager = new ConfigManager(this._request, this._clientInfo);
             return this._configManager.fetch();
         }).then(() => {
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._configManager.getGamerInfo());
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             return this._sessionManager.create();
         }).then(() => {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
@@ -115,7 +115,7 @@ export class WebView {
         this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, zone, campaign));
         this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, zone, campaign));
 
-        this._overlay = new Overlay(zone.muteVideoSounds());
+        this._overlay = new Overlay(zone.muteVideo());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
         this._overlay.subscribe('skip', this.onSkip.bind(this, zone, campaign));
@@ -135,8 +135,11 @@ export class WebView {
         }
 
         let keyEvents: any[] = [];
-        if(zone.isIncentivized()) {
+        if(zone.disableBackButton()) {
             keyEvents = [KeyCode.BACK];
+        }
+
+        if(!zone.allowSkip()) {
             this._overlay.setSkipEnabled(false);
         } else {
             this._overlay.setSkipEnabled(true);
@@ -144,7 +147,7 @@ export class WebView {
         }
 
         this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]).then(() => {
-            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideoSounds() ? 0.0 : 1.0));
+            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideo() ? 0.0 : 1.0));
         });
     }
 
