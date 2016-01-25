@@ -22,12 +22,8 @@ import { Request } from 'Utilities/Request';
 import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
-
-enum FinishState {
-    COMPLETED,
-    SKIPPED,
-    ERROR
-}
+import { AdUnitManager } from 'Managers/AdUnitManager';
+import { FinishState } from 'Models/AdUnit';
 
 export class WebView {
 
@@ -50,7 +46,8 @@ export class WebView {
 
     private _sessionManager: SessionManager;
 
-    private _finishState: FinishState;
+    private _adUnitManager: AdUnitManager;
+
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -60,7 +57,7 @@ export class WebView {
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
 
-        this._finishState = null;
+        this._adUnitManager = new AdUnitManager(nativeBridge);
     }
 
     public initialize(): Promise<void> {
@@ -96,9 +93,7 @@ export class WebView {
     }
 
     public setFinishState(state: FinishState): void {
-        if(this._finishState !== FinishState.COMPLETED) {
-            this._finishState = state;
-        }
+        this._adUnitManager.setFinishState(state);
     }
 
     /*
@@ -110,6 +105,9 @@ export class WebView {
         let campaign: Campaign = zone.getCampaign();
 
         this._sessionManager.sendShow(zone, campaign);
+
+        this._adUnitManager.startAdUnit(zone, campaign);
+        this._adUnitManager.subscribe('close', this.onClose.bind(this));
 
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
         this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone, campaign));
@@ -152,7 +150,9 @@ export class WebView {
 
     public hide(zone: Zone, campaign: Campaign): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
-        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), FinishState[this._finishState]]);
+        this._adUnitManager.hideAdUnit();
+        this._adUnitManager.unsubscribe();
+        // this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), FinishState[this._finishState]]);
         this._videoPlayer.stop();
         this._videoPlayer.reset();
         this._videoPlayer.unsubscribe();
