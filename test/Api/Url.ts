@@ -36,7 +36,7 @@ export class Url {
                 window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []);
             }, 0);
             return ['OK'];
-        } else if(url.indexOf('https://impact.applifier.com/games')) {
+        } else if(url.indexOf('https://impact.applifier.com/games') !== -1) {
             let configResponse: {} = {
                 country: 'FI',
                 enabled: true,
