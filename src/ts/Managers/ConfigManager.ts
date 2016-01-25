@@ -5,7 +5,7 @@ import { Url } from 'Utilities/Url';
 
 export class ConfigManager {
 
-    private static ConfigBaseUrl = 'http://impact.applifier.com/games/';
+    private static ConfigBaseUrl = 'https://impact.applifier.com/games/';
 
     private _request: Request;
     private _clientInfo: ClientInfo;
