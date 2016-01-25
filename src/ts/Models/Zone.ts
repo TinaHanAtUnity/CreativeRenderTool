@@ -12,26 +12,30 @@ export class Zone {
 
     private _id: string;
     private _name: string;
-    private _enabled: boolean;
     private _default: boolean;
-    private _incentivized: boolean;
-    private _allowSkipVideoInSeconds: number;
-    private _disableBackButtonForSeconds: number;
+
+    private _allowSkip: boolean;
+    private _skipInSeconds: number;
+
+    private _disableBackButton: boolean;
+
     private _useDeviceOrientationForVideo: boolean;
-    private _muteVideoSounds: boolean;
+    private _muteVideo: boolean;
 
     private _campaign: Campaign;
 
     constructor(data: any) {
         this._id = data.id;
         this._name = data.name;
-        this._enabled = data.enabled;
         this._default = data.default;
-        this._incentivized = data.incentivized;
-        this._allowSkipVideoInSeconds = data.allowSkipVideoInSeconds;
-        this._disableBackButtonForSeconds = data.disableBackButtonForSeconds;
+
+        this._allowSkip = data.allowSkip;
+        this._skipInSeconds = data.skipInSeconds;
+
+        this._disableBackButton = data.disableBackButton;
+
         this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
-        this._muteVideoSounds = data.muteVideoSounds;
+        this._muteVideo = data.muteVideo;
     }
 
     public getId(): string {
@@ -42,32 +46,28 @@ export class Zone {
         return this._name;
     }
 
-    public isEnabled(): boolean {
-        return this._enabled;
-    }
-
     public isDefault(): boolean {
         return this._default;
     }
 
-    public isIncentivized(): boolean {
-        return this._incentivized;
+    public allowSkip(): boolean {
+        return this._allowSkip;
     }
 
     public allowSkipInSeconds(): number {
-        return this._allowSkipVideoInSeconds;
+        return this._skipInSeconds;
     }
 
-    public disableBackButtonForSeconds(): number {
-        return this._disableBackButtonForSeconds;
+    public disableBackButton(): boolean {
+        return this._disableBackButton;
     }
 
     public useDeviceOrientationForVideo(): boolean {
         return this._useDeviceOrientationForVideo;
     }
 
-    public muteVideoSounds(): boolean {
-        return this._muteVideoSounds;
+    public muteVideo(): boolean {
+        return this._muteVideo;
     }
 
     public getCampaign(): Campaign {

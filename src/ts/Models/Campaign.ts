@@ -10,6 +10,9 @@ export class Campaign {
     private _landscape: string;
     private _video: string;
 
+    private _gamerId: string;
+    private _abGroup: number;
+
     constructor(data: any) {
         this._id = data._id;
         this._storeId = data.iTunesId;
@@ -20,6 +23,9 @@ export class Campaign {
         this._portrait = data.endScreenPortrait;
         this._landscape = data.endScreen;
         this._video = data.trailerDownloadable;
+
+        this._gamerId = data.gamerId;
+        this._abGroup = data.abGroup;
     }
 
     public getId(): string {
@@ -72,6 +78,14 @@ export class Campaign {
 
     public setVideoUrl(videoUrl: string): void {
         this._video = videoUrl;
+    }
+
+    public getGamerId(): string {
+        return this._gamerId;
+    }
+
+    public getAbGroup(): number {
+        return this._abGroup;
     }
 
 }

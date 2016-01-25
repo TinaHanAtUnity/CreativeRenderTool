@@ -3,7 +3,6 @@ import { Session } from 'Models/Session';
 import { Request } from 'Utilities/Request';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { GamerInfo } from 'Models/GamerInfo';
 import { Campaign } from 'Models/Campaign';
 import { Zone } from 'Models/Zone';
 
@@ -15,16 +14,14 @@ export class SessionManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _gamerInfo: GamerInfo;
 
     private _currentSession: Session;
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, gamerInfo: GamerInfo) {
+    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._gamerInfo = gamerInfo;
     }
 
     public create(): Promise<void> {
@@ -85,7 +82,7 @@ export class SessionManager {
 
     private getInfoJson(zone: Zone, campaign: Campaign): any {
         return {
-            'gamer_id': this._gamerInfo.getGamerId(),
+            'gamer_id': campaign.getGamerId(),
             'campaign_id': campaign.getId(),
             'zone_id': zone.getId(),
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
