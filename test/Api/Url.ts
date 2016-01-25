@@ -28,7 +28,7 @@ export class Url {
                     'network': 'mobile_android'
                 }],
                 'gamerId': '000000000000000000000000',
-                'ab_group': 0
+                'abGroup': 0
             }
         };
         setTimeout(() => {

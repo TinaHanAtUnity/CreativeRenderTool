@@ -71,7 +71,7 @@ export class WebView {
             this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
         }).then(() => {
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._configManager.getGamerInfo());
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             return this._sessionManager.create();
         }).then(() => {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);

@@ -1,5 +1,4 @@
 import { Zone } from 'Models/Zone';
-import { GamerInfo } from 'Models/GamerInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -12,7 +11,6 @@ export class ConfigManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _gamerInfo: GamerInfo;
 
     private _zones: Object = {};
     private _defaultZone: Zone = null;
@@ -26,7 +24,6 @@ export class ConfigManager {
     public fetch(): Promise<void> {
         return this._request.get(this.createConfigUrl()).then(([response]) => {
             let configJson = JSON.parse(response);
-            this._gamerInfo = new GamerInfo(configJson.data.gamerId, configJson.data.ab_group);
 
             let zones = [
                 {
@@ -61,10 +58,6 @@ export class ConfigManager {
                 }
             });
         });
-    }
-
-    public getGamerInfo(): GamerInfo {
-        return this._gamerInfo;
     }
 
     public getZone(zoneId: string): Zone {
