@@ -62,7 +62,7 @@ export class ConfigManager {
     private createConfigUrl(): string {
         let configUrl: string = ConfigManager.ConfigBaseUrl + this._clientInfo.getGameId() + '/configuration';
         configUrl = Url.addParameters(configUrl, {
-            encrypted: false
+            encrypted: !this._clientInfo.isDebuggable()
         });
         return configUrl;
     }
