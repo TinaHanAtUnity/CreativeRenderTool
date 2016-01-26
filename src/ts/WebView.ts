@@ -106,8 +106,6 @@ export class WebView {
 
         this._sessionManager.sendShow(zone, campaign);
 
-        this._adUnitManager.startAdUnit(zone, campaign);
-        this._adUnitManager.subscribe('close', this.onClose.bind(this));
 
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
         this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone, campaign));
@@ -146,16 +144,15 @@ export class WebView {
             this._overlay.setSkipDuration(zone.allowSkipInSeconds());
         }
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]).then(() => {
+        this._adUnitManager.start(zone, campaign, orientation, keyEvents).then(() => {
             this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideo() ? 0.0 : 1.0));
         });
+        this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
 
     public hide(zone: Zone, campaign: Campaign): void {
-        this._nativeBridge.invoke('AdUnit', 'close', []);
-        this._adUnitManager.hideAdUnit();
+        this._adUnitManager.hide();
         this._adUnitManager.unsubscribe();
-        // this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), FinishState[this._finishState]]);
         this._videoPlayer.stop();
         this._videoPlayer.reset();
         this._videoPlayer.unsubscribe();

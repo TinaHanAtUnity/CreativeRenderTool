@@ -1,8 +1,9 @@
-import {NativeBridge} from 'NativeBridge';
-import {AdUnit, FinishState} from 'Models/AdUnit';
-import {Campaign} from 'Models/Campaign';
-import {Zone} from 'Models/Zone';
-import {Observable} from 'Utilities/Observable';
+import { NativeBridge } from 'NativeBridge';
+import { AdUnit, FinishState } from 'Models/AdUnit';
+import { Campaign } from 'Models/Campaign';
+import { Zone } from 'Models/Zone';
+import { Observable } from 'Utilities/Observable';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 
 export class AdUnitManager extends Observable {
     private _nativeBridge: NativeBridge;
@@ -16,13 +17,15 @@ export class AdUnitManager extends Observable {
         this._nativeBridge.subscribe('ADUNIT_ON_DESTROY', this.onDestroy.bind(this));
     }
 
-    public startAdUnit(zone: Zone, campaign: Campaign): void {
+    public start(zone: Zone, campaign: Campaign, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
         this._showing = true;
         this._adUnit = new AdUnit(zone, campaign);
 
+        return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]);
     }
 
-    public hideAdUnit(): void {
+    public hide(): void {
+        this._nativeBridge.invoke('AdUnit', 'close', []);
         this._nativeBridge.invoke('Listener', 'sendFinishEvent', [this._adUnit.getZone().getId(), FinishState[this._adUnit.getFinishState()]]);
         this._showing = false;
         this._adUnit = null;
