@@ -3,8 +3,7 @@ import { Session } from 'Models/Session';
 import { Request } from 'Utilities/Request';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { Campaign } from 'Models/Campaign';
-import { Zone } from 'Models/Zone';
+import { AdUnit } from 'Models/AdUnit';
 
 export class SessionManager {
 
@@ -34,41 +33,41 @@ export class SessionManager {
         return this._currentSession;
     }
 
-    public sendShow(zone: Zone, campaign: Campaign): Promise<any[]> {
+    public sendShow(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(zone, campaign);
+            let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
             return this._request.post(SessionManager.SessionUrl + '/show', infoJson);
         });
     }
 
-    public sendStart(zone: Zone, campaign: Campaign): Promise<any[]> {
+    public sendStart(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(zone, campaign);
+            let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
             return this._request.post(SessionManager.SessionUrl + '/start', infoJson);
         });
     }
 
-    public sendSkip(zone: Zone, campaign: Campaign): Promise<any[]> {
+    public sendSkip(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(zone, campaign);
+            let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
             return this._request.post(SessionManager.SessionUrl + '/skip', infoJson);
         });
     }
 
-    public sendView(zone: Zone, campaign: Campaign): Promise<any[]> {
+    public sendView(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(zone, campaign);
+            let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
             return this._request.post(SessionManager.SessionUrl + '/view', infoJson);
         });
     }
 
-    public sendClick(zone: Zone, campaign: Campaign): Promise<any[]> {
+    public sendClick(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(zone, campaign);
+            let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
             return this._request.post(SessionManager.SessionUrl + '/click', infoJson);
         });
@@ -80,11 +79,11 @@ export class SessionManager {
         });
     }
 
-    private getInfoJson(zone: Zone, campaign: Campaign): any {
+    private getInfoJson(adUnit: AdUnit): any {
         return {
-            'gamer_id': campaign.getGamerId(),
-            'campaign_id': campaign.getId(),
-            'zone_id': zone.getId(),
+            'gamer_id': adUnit.getCampaign().getGamerId(),
+            'campaign_id': adUnit.getCampaign().getId(),
+            'zone_id': adUnit.getZone().getId(),
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'software_version': this._deviceInfo.getSoftwareVersion(),

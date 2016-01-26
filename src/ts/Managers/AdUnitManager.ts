@@ -1,7 +1,5 @@
 import { NativeBridge } from 'NativeBridge';
 import { AdUnit, FinishState } from 'Models/AdUnit';
-import { Campaign } from 'Models/Campaign';
-import { Zone } from 'Models/Zone';
 import { Observable } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 
@@ -17,9 +15,9 @@ export class AdUnitManager extends Observable {
         this._nativeBridge.subscribe('ADUNIT_ON_DESTROY', this.onDestroy.bind(this));
     }
 
-    public start(zone: Zone, campaign: Campaign, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
+    public start(adUnit: AdUnit, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
         this._showing = true;
-        this._adUnit = new AdUnit(zone, campaign);
+        this._adUnit = adUnit;
 
         return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]);
     }
