@@ -65,6 +65,28 @@ export class WebView {
 
     public initialize(): Promise<void> {
         return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode, appVersion, sdkVersion, platform, debuggable]) => {
+
+            let common = {
+                'common': {
+                    'idfa': 'itse_perkele',
+                    'joku_avain': false,
+                    'numero': 1234
+                }
+            };
+
+            let messages = [];
+            messages.push({
+                'type': 'ads.sdk2.test',
+                'msg': {
+                    'tyyppi': 'no_johan_inittas'
+                }
+            });
+
+            messages.unshift(common);
+
+            let rawData = messages.map(message => JSON.stringify(message)).join('\n');
+            this._request.post('http://httpkafka.unityads.unity3d.com/v1/events', rawData);
+
             this._clientInfo = new ClientInfo(gameId, testMode, appVersion, sdkVersion, platform, debuggable);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
