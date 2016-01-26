@@ -16,6 +16,7 @@ export class AdUnitManager extends Observable {
     }
 
     public start(adUnit: AdUnit, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
+        // TODO: This needs proper error handling and show lifecycle handling
         this._showing = true;
         this._adUnit = adUnit;
 
