@@ -35,7 +35,7 @@ export class Request {
         }
         headers.push(['Content-Type', 'application/json']);
         let promise = this.registerCallback(url);
-        this._nativeBridge.invoke('Url', 'post', [url, JSON.stringify(data), headers]);
+        this._nativeBridge.invoke('Url', 'post', [url, data, headers]);
         return promise;
     }
 
