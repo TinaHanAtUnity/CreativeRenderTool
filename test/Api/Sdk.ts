@@ -1,7 +1,7 @@
 export class Sdk {
 
     public loadComplete(): any[] {
-        return ['OK', 12345, true, '2.0.0-alpha1', '2.0.0-alpha1', 'android'];
+        return ['OK', 12345, true, '2.0.0-alpha1', '2.0.0-alpha1', 'android', true];
     }
 
     public initComplete(): any[] {
