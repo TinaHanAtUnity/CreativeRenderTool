@@ -6,6 +6,7 @@ STYLUS = node_modules/.bin/stylus
 
 MOCHA = node_modules/.bin/_mocha
 ISTANBUL = node_modules/.bin/istanbul
+REMAP_ISTANBUL = node_modules/.bin/remap-istanbul
 
 # Sources
 TS_SRC = src/ts
@@ -223,4 +224,5 @@ test-coverage:
 	@echo Running local tests with coverage
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources -dir $(BUILD_DIR)/coverage $(MOCHA)
+	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA)
+	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
