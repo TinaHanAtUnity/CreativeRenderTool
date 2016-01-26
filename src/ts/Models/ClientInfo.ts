@@ -8,12 +8,15 @@ export class ClientInfo {
 
     private _platform: string;
 
-    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string) {
+    private _debuggable: boolean;
+
+    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string, debuggable: boolean) {
         this._gameId = gameId;
         this._testMode = testMode;
         this._applicationVersion = applicationVersion;
         this._sdkVersion = sdkVersion;
         this._platform = platform;
+        this._debuggable = debuggable;
     }
 
     public getGameId(): string {
@@ -34,6 +37,10 @@ export class ClientInfo {
 
     public getPlatform(): string {
         return this._platform;
+    }
+
+    public isDebuggable(): boolean {
+        return this._debuggable;
     }
 
 }

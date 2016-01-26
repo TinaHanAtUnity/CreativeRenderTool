@@ -61,8 +61,8 @@ export class WebView {
     }
 
     public initialize(): Promise<void> {
-        return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode, appVersion, sdkVersion, platform]) => {
-            this._clientInfo = new ClientInfo(gameId, testMode, appVersion, sdkVersion, platform);
+        return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode, appVersion, sdkVersion, platform, debuggable]) => {
+            this._clientInfo = new ClientInfo(gameId, testMode, appVersion, sdkVersion, platform, debuggable);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
             this._configManager = new ConfigManager(this._request, this._clientInfo);
