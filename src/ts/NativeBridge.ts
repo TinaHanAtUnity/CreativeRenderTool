@@ -91,7 +91,7 @@ export class NativeBridge extends Observable {
         });
     }
 
-    public handleEvent(...parameters: any[]): void {
+    public handleEvent(parameters: any[]): void {
         this.trigger.apply(this, parameters);
     }
 
