@@ -95,7 +95,10 @@ export class NativeBridge extends Observable {
         this.trigger.apply(this, parameters);
     }
 
-    public handleInvocation(className: string, methodName: string, callback: string, ...parameters: any[]): void {
+    public handleInvocation(parameters: any[]): void {
+        let className: string = parameters.shift();
+        let methodName: string = parameters.shift();
+        let callback: string = parameters.shift();
         parameters.push((status: CallbackStatus, ...parameters: any[]) => {
             this.invokeCallback(callback, status, parameters);
         });
