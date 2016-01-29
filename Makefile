@@ -32,7 +32,7 @@ BUILD_DIR = build
 
 build-dev: BUILD_DIR = build/dev
 build-dev: build-ts build-css build-html
-	cp src/dev-config.json $(BUILD_DIR)/config.json
+	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
 	@echo
