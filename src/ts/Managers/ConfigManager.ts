@@ -5,7 +5,7 @@ import { Url } from 'Utilities/Url';
 
 export class ConfigManager {
 
-    private static ConfigBaseUrl = 'https://impact.applifier.com/games/';
+    private static ConfigBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -60,11 +60,15 @@ export class ConfigManager {
     }
 
     private createConfigUrl(): string {
-        let configUrl: string = ConfigManager.ConfigBaseUrl + this._clientInfo.getGameId() + '/configuration';
-        configUrl = Url.addParameters(configUrl, {
+        let url: string = [
+            ConfigManager.ConfigBaseUrl,
+            this._clientInfo.getGameId(),
+            'configuration'
+        ].join('/');
+
+        return Url.addParameters(url, {
             encrypted: !this._clientInfo.isDebuggable()
         });
-        return configUrl;
     }
 
 }
