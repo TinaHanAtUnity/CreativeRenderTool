@@ -24,7 +24,7 @@ export class Url {
                 'abGroup': 0
             };
             setTimeout(() => {
-                window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []);
+                window['nativebridge'].handleEvent(['URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/configuration') !== -1) {
@@ -54,7 +54,7 @@ export class Url {
                 ]
             };
             setTimeout(() => {
-                window['nativebridge'].handleEvent('URL_COMPLETE', url, JSON.stringify(configResponse), 200, []);
+                window['nativebridge'].handleEvent(['URL_COMPLETE', url, JSON.stringify(configResponse), 200, []]);
             }, 0);
             return ['OK'];
         }

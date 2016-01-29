@@ -3,6 +3,7 @@ TYPESCRIPT = tsc
 TSLINT = tslint
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
+BABEL = node_modules/.bin/babel
 
 MOCHA = node_modules/.bin/_mocha
 ISTANBUL = node_modules/.bin/istanbul
@@ -129,6 +130,12 @@ build-test: clean build-dirs build-css build-html
 		node_modules/requirejs-text/text.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
+
+	@echo
+	@echo Running through babel for ES3 compatibility
+	@echo
+
+	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
 
 	@echo
 	@echo Copying test config to build
