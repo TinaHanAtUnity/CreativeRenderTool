@@ -251,7 +251,7 @@ export class WebView {
         this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getZone().getId()]);
         this._nativeBridge.invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
-            'uri': 'market://details?id=' + adUnit.getCampaign().getStoreId()
+            'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
         }]);
     }
 

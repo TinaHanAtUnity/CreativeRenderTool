@@ -10,7 +10,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 
 export class CampaignManager extends Observable {
 
-    private static CampaignBaseUrl = 'https://impact.applifier.com/mobile/campaigns';
+    private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -26,7 +26,7 @@ export class CampaignManager extends Observable {
     public request(zone: Zone): void {
         this._request.get(this.createRequestUrl(zone.getId())).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
-            let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
+            let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
             zone.setCampaign(campaign);
             this.trigger('campaign', zone, campaign);
         }).catch((error) => {
@@ -36,7 +36,15 @@ export class CampaignManager extends Observable {
     }
 
     private createRequestUrl(zoneId: string): string {
-        let url: string = Url.addParameters(CampaignManager.CampaignBaseUrl, {
+        let url: string = [
+            CampaignManager.CampaignBaseUrl,
+            this._clientInfo.getGameId(),
+            'placements',
+            zoneId,
+            'fill'
+        ].join('/');
+
+        url = Url.addParameters(url, {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
             gameId: this._clientInfo.getGameId(),
