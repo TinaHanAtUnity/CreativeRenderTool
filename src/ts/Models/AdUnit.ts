@@ -1,4 +1,4 @@
-import { Zone } from 'Zone';
+import { Placement } from 'Placement';
 import { Campaign } from 'Campaign';
 
 export enum FinishState {
@@ -8,17 +8,17 @@ export enum FinishState {
 }
 
 export class AdUnit {
-    private _zone: Zone;
+    private _placement: Placement;
     private _campaign: Campaign;
     private _finishState: FinishState;
 
-    constructor(zone: Zone, campaign: Campaign) {
-        this._zone = zone;
+    constructor(placement: Placement, campaign: Campaign) {
+        this._placement = placement;
         this._campaign = campaign;
     }
 
-    public getZone(): Zone {
-        return this._zone;
+    public getPlacement(): Placement {
+        return this._placement;
     }
 
     public getCampaign(): Campaign {

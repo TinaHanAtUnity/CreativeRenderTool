@@ -4,7 +4,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 
 import { Campaign } from 'Models/Campaign';
-import { Zone } from 'Models/Zone';
+import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 
@@ -23,24 +23,24 @@ export class CampaignManager extends Observable {
         this._deviceInfo = deviceInfo;
     }
 
-    public request(zone: Zone): void {
-        this._request.get(this.createRequestUrl(zone.getId())).then(([response]) => {
+    public request(placement: Placement): void {
+        this._request.get(this.createRequestUrl(placement.getId())).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-            zone.setCampaign(campaign);
-            this.trigger('campaign', zone, campaign);
+            placement.setCampaign(campaign);
+            this.trigger('campaign', placement, campaign);
         }).catch((error) => {
-            zone.setCampaign(null);
+            placement.setCampaign(null);
             this.trigger('error', error);
         });
     }
 
-    private createRequestUrl(zoneId: string): string {
+    private createRequestUrl(placementId: string): string {
         let url: string = [
             CampaignManager.CampaignBaseUrl,
             this._clientInfo.getGameId(),
             'placements',
-            zoneId,
+            placementId,
             'fill'
         ].join('/');
 
@@ -57,7 +57,7 @@ export class CampaignManager extends Observable {
             sdkVersion: this._clientInfo.getSdkVersion(),
             softwareVersion: this._deviceInfo.getSoftwareVersion(),
             wifi: this._deviceInfo.isWifi() ? 1 : 0,
-            zoneId: zoneId
+            placementId: placementId
         });
 
         if(this._clientInfo.getTestMode()) {

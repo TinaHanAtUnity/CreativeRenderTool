@@ -1,4 +1,4 @@
-import { Zone } from 'Models/Zone';
+import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
@@ -12,8 +12,8 @@ export class ConfigManager {
 
     private _enabled: boolean;
     private _country: string;
-    private _zones: { [id: string]: Zone } = {};
-    private _defaultZone: Zone = null;
+    private _placements: { [id: string]: Placement } = {};
+    private _defaultPlacement: Placement = null;
 
     constructor(request: Request, clientInfo: ClientInfo) {
         this._request = request;
@@ -27,13 +27,13 @@ export class ConfigManager {
             this._enabled = configJson.enabled;
             this._country = configJson.country;
 
-            let zones = configJson.placements;
+            let placements = configJson.placements;
 
-            zones.forEach((rawZone: any): void => {
-                let zone: Zone = new Zone(rawZone);
-                this._zones[zone.getId()] = zone;
-                if(zone.isDefault()) {
-                    this._defaultZone = zone;
+            placements.forEach((rawPlacement: any): void => {
+                let placement: Placement = new Placement(rawPlacement);
+                this._placements[placement.getId()] = placement;
+                if(placement.isDefault()) {
+                    this._defaultPlacement = placement;
                 }
             });
         });
@@ -47,16 +47,16 @@ export class ConfigManager {
         return this._country;
     }
 
-    public getZone(zoneId: string): Zone {
-        return this._zones[zoneId];
+    public getPlacement(placementId: string): Placement {
+        return this._placements[placementId];
     }
 
-    public getZones(): Object {
-        return this._zones;
+    public getPlacements(): Object {
+        return this._placements;
     }
 
-    public getDefaultZone(): Zone {
-        return this._defaultZone;
+    public getDefaultPlacement(): Placement {
+        return this._defaultPlacement;
     }
 
     private createConfigUrl(): string {

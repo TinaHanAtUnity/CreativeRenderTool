@@ -1,6 +1,6 @@
 import { Campaign } from 'Campaign';
 
-export enum ZoneState {
+export enum PlacementState {
     READY,
     NOT_AVAILABLE,
     DISABLED,
@@ -8,7 +8,7 @@ export enum ZoneState {
     NO_FILL
 }
 
-export class Zone {
+export class Placement {
 
     private _id: string;
     private _name: string;
