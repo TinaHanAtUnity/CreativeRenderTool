@@ -40,7 +40,7 @@ export enum CallbackStatus {
     ERROR
 }
 
-export interface NativeCallback {
+export interface INativeCallback {
     (status: CallbackStatus, ...parameters: any[]): void;
 }
 
