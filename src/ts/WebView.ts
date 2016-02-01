@@ -1,4 +1,4 @@
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge, BatchInvocation } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -101,6 +101,16 @@ export class WebView {
      */
 
     public show(placementId: string): void {
+        if(this._adUnitManager.isShowing()) {
+            // show invocations will always trigger finish callback except in this case
+            // this allows simple state machines to be built on top of show invocations and finish callbacks
+            let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
+            batch.queue('Sdk', 'logError', ['Show invocation failed: Can\'t open new ad unit while ad unit is already active']);
+            batch.queue('Listener', 'sendErrorEvent', ['SHOW_ERROR', 'Can\'t open new ad unit while ad unit is already active']);
+            this._nativeBridge.invokeBatch(batch);
+            return;
+        }
+
         let placement: Placement = this._configManager.getPlacement(placementId);
         let campaign: Campaign = placement.getCampaign();
         let adUnit: AdUnit = new AdUnit(placement, campaign);
