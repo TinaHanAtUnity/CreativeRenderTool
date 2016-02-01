@@ -1,4 +1,4 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
+import { NativeBridge, NativeCallback, CallbackStatus, BatchInvocation } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -100,7 +100,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string): void {
+    public show(placementId: string, callback: NativeCallback): void {
         if(this._adUnitManager.isShowing()) {
             // show invocations will always trigger finish callback except in this case
             // this allows simple state machines to be built on top of show invocations and finish callbacks
@@ -158,6 +158,8 @@ export class WebView {
             this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(placement.muteVideo() ? 0.0 : 1.0));
         });
         this._adUnitManager.subscribe('close', this.onClose.bind(this));
+
+        callback(CallbackStatus.OK);
     }
 
     public hide(): void {
