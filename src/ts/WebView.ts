@@ -17,7 +17,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { Campaign } from 'Models/Campaign';
 
 import { CacheManager } from 'Managers/CacheManager';
-import { Zone, ZoneState } from 'Models/Zone';
+import { Placement, PlacementState } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
@@ -74,15 +74,15 @@ export class WebView {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
-            let defaultZone = this._configManager.getDefaultZone();
-            this._nativeBridge.invoke('Zone', 'setDefaultZone', [defaultZone.getId()]);
+            let defaultPlacement = this._configManager.getDefaultPlacement();
+            this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
 
-            let zones: Object = this._configManager.getZones();
-            for(let zoneId in zones) {
-                if(zones.hasOwnProperty(zoneId)) {
-                    let zone: Zone = zones[zoneId];
-                    this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
-                    this._campaignManager.request(zones[zoneId]);
+            let placements: Object = this._configManager.getPlacements();
+            for(let placementId in placements) {
+                if(placements.hasOwnProperty(placementId)) {
+                    let placement: Placement = placements[placementId];
+                    this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
+                    this._campaignManager.request(placements[placementId]);
                 }
             }
 
@@ -100,10 +100,10 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(zoneId: string): void {
-        let zone: Zone = this._configManager.getZone(zoneId);
-        let campaign: Campaign = zone.getCampaign();
-        let adUnit: AdUnit = new AdUnit(zone, campaign);
+    public show(placementId: string): void {
+        let placement: Placement = this._configManager.getPlacement(placementId);
+        let campaign: Campaign = placement.getCampaign();
+        let adUnit: AdUnit = new AdUnit(placement, campaign);
 
         this._sessionManager.sendShow(adUnit);
 
@@ -113,7 +113,7 @@ export class WebView {
         this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, adUnit));
         this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, adUnit));
 
-        this._overlay = new Overlay(zone.muteVideo());
+        this._overlay = new Overlay(placement.muteVideo());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
         this._overlay.subscribe('skip', this.onSkip.bind(this, adUnit));
@@ -128,24 +128,24 @@ export class WebView {
         this._endScreen.subscribe('close', this.onClose.bind(this));
 
         let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
-        if(!zone.useDeviceOrientationForVideo()) {
+        if(!placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }
 
         let keyEvents: any[] = [];
-        if(zone.disableBackButton()) {
+        if(placement.disableBackButton()) {
             keyEvents = [KeyCode.BACK];
         }
 
-        if(!zone.allowSkip()) {
+        if(!placement.allowSkip()) {
             this._overlay.setSkipEnabled(false);
         } else {
             this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(zone.allowSkipInSeconds());
+            this._overlay.setSkipDuration(placement.allowSkipInSeconds());
         }
 
         this._adUnitManager.start(adUnit, orientation, keyEvents).then(() => {
-            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideo() ? 0.0 : 1.0));
+            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(placement.muteVideo() ? 0.0 : 1.0));
         });
         this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
@@ -167,7 +167,7 @@ export class WebView {
      CAMPAIGN EVENT HANDLERS
      */
 
-    private onCampaign(zone: Zone, campaign: Campaign): void {
+    private onCampaign(placement: Placement, campaign: Campaign): void {
         let cacheableAssets: string[] = [
             campaign.getGameIcon(),
             campaign.getLandscapeUrl(),
@@ -181,8 +181,8 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]]).then(() => {
-                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
+                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
             });
         });
     }
@@ -204,7 +204,7 @@ export class WebView {
 
     private onVideoStart(adUnit: AdUnit): void {
         this._sessionManager.sendStart(adUnit);
-        this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getZone().getId()]);
+        this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
     }
 
     private onVideoCompleted(adUnit: AdUnit, url: string): void {
@@ -248,7 +248,7 @@ export class WebView {
 
     private onDownload(adUnit: AdUnit): void {
         this._sessionManager.sendClick(adUnit);
-        this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getZone().getId()]);
+        this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getPlacement().getId()]);
         this._nativeBridge.invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
             'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
@@ -257,8 +257,8 @@ export class WebView {
 
     private onClose(adUnit: AdUnit): void {
         this.hide();
-        this._nativeBridge.invoke('Zone', 'setZoneState', [adUnit.getZone().getId(), ZoneState[ZoneState.WAITING]]);
-        this._campaignManager.request(adUnit.getZone());
+        this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+        this._campaignManager.request(adUnit.getPlacement());
     }
 
 }

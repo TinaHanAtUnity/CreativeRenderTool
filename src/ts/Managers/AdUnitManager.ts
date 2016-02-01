@@ -25,7 +25,7 @@ export class AdUnitManager extends Observable {
 
     public hide(): void {
         this._nativeBridge.invoke('AdUnit', 'close', []);
-        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [this._adUnit.getZone().getId(), FinishState[this._adUnit.getFinishState()]]);
+        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [this._adUnit.getPlacement().getId(), FinishState[this._adUnit.getFinishState()]]);
         this._showing = false;
         this._adUnit = null;
     }
@@ -45,14 +45,14 @@ export class AdUnitManager extends Observable {
     private onPause(finishing: boolean): void {
         if(finishing && this._showing) {
             this._adUnit.setFinishState(FinishState.SKIPPED);
-            this.trigger('close', this._adUnit.getZone(), this._adUnit.getCampaign());
+            this.trigger('close', this._adUnit.getPlacement(), this._adUnit.getCampaign());
         }
     }
 
     private onDestroy(finishing: boolean): void {
         if(finishing && this._showing) {
             this._adUnit.setFinishState(FinishState.SKIPPED);
-            this.trigger('close', this._adUnit.getZone(), this._adUnit.getCampaign());
+            this.trigger('close', this._adUnit.getPlacement(), this._adUnit.getCampaign());
         }
     }
 }

@@ -33,7 +33,7 @@ export class Url {
                 enabled: true,
                 placements: [
                     {
-                        id: 'incentivizedZone',
+                        id: 'incentivizedPlacement',
                         name: 'Incentivized placement',
                         default: false,
                         allowSkip: false,
@@ -42,7 +42,7 @@ export class Url {
                         useDeviceOrientationForVideo: false
                     },
                     {
-                        id: 'defaultVideoAndPictureZone',
+                        id: 'defaultVideoAndPicturePlacement',
                         name: 'Video ad placement',
                         default: true,
                         allowSkip: true,

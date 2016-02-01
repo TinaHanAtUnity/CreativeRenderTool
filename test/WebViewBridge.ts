@@ -5,7 +5,7 @@
 import { NativeBridge } from '../src/ts/NativeBridge';
 import { Sdk } from './Api/Sdk';
 import { DeviceInfo } from './Api/DeviceInfo';
-import { Zone } from './Api/Zone';
+import { Placement } from './Api/Placement';
 import { Url } from './Api/Url';
 import { Cache } from './Api/Cache';
 import { Listener } from './Api/Listener';
@@ -16,7 +16,7 @@ export class WebViewBridge implements IWebViewBridge {
     private _apiMap: {} = {
         'Sdk': new Sdk(),
         'DeviceInfo': new DeviceInfo(),
-        'Zone': new Zone(),
+        'Placement': new Placement(),
         'Url': new Url(),
         'Cache': new Cache(),
         'Listener': new Listener(),

@@ -83,7 +83,7 @@ export class SessionManager {
         return {
             'gamer_id': adUnit.getCampaign().getGamerId(),
             'campaign_id': adUnit.getCampaign().getId(),
-            'zone_id': adUnit.getZone().getId(),
+            'placement_id': adUnit.getPlacement().getId(),
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'software_version': this._deviceInfo.getSoftwareVersion(),
