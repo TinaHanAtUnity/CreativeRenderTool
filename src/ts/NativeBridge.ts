@@ -3,11 +3,6 @@
 
 import { Observable } from 'Utilities/Observable';
 
-enum CallbackStatus {
-    OK,
-    ERROR
-}
-
 type NativeInvocation = [string, string, any[], string];
 
 export class BatchInvocation {
@@ -38,6 +33,15 @@ export class BatchInvocation {
         return this._promises;
     }
 
+}
+
+export enum CallbackStatus {
+    OK,
+    ERROR
+}
+
+export interface INativeCallback {
+    (status: CallbackStatus, ...parameters: any[]): void;
 }
 
 export class NativeBridge extends Observable {
@@ -99,18 +103,14 @@ export class NativeBridge extends Observable {
         let className: string = parameters.shift();
         let methodName: string = parameters.shift();
         let callback: string = parameters.shift();
-        parameters.push((status: CallbackStatus, ...parameters: any[]) => {
-            this.invokeCallback(callback, status, parameters);
+        parameters.push((status: CallbackStatus, ...callbackParameters: any[]) => {
+            this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
         window[className][methodName].apply(window[className], parameters);
     }
 
-    private invokeCallback(id: string, status: CallbackStatus, ...parameters: any[]): void {
-        if(parameters.length > 0) {
-            this._backend.handleCallback(id, status.toString(), JSON.stringify(parameters));
-        } else {
-            this._backend.handleCallback(id, status.toString());
-        }
+    private invokeCallback(id: string, status: string, ...parameters: any[]): void {
+        this._backend.handleCallback(id, status, JSON.stringify(parameters));
     }
 
 }

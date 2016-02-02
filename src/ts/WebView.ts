@@ -1,4 +1,4 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
+import { NativeBridge, INativeCallback, CallbackStatus, BatchInvocation } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -100,7 +100,9 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string): void {
+    public show(placementId: string, callback: INativeCallback): void {
+        callback(CallbackStatus.OK);
+
         if(this._adUnitManager.isShowing()) {
             // show invocations will always trigger finish callback except in this case
             // this allows simple state machines to be built on top of show invocations and finish callbacks
