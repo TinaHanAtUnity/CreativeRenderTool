@@ -114,7 +114,17 @@ export class WebView {
         }
 
         let placement: Placement = this._configManager.getPlacement(placementId);
+        if(placement === null) {
+            this.showError(placementId, 'No such placement: ' + placementId);
+            return;
+        }
+
         let campaign: Campaign = placement.getCampaign();
+        if(campaign === null) {
+            this.showError(placementId, 'Campaign not found');
+            return;
+        }
+
         let adUnit: AdUnit = new AdUnit(placement, campaign);
 
         this._sessionManager.sendShow(adUnit);
@@ -160,6 +170,14 @@ export class WebView {
             this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(placement.muteVideo() ? 0.0 : 1.0));
         });
         this._adUnitManager.subscribe('close', this.onClose.bind(this));
+    }
+
+    private showError(placementId: string, errorMsg: string): void {
+        let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
+        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
+        batch.queue('Listener', 'sendErrorEvent', ['SHOW_ERROR', errorMsg]);
+        batch.queue('Listener', 'sendFinishEvent', ['ERROR', placementId]);
+        this._nativeBridge.invokeBatch(batch);
     }
 
     public hide(): void {
