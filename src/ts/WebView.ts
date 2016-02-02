@@ -225,6 +225,7 @@ export class WebView {
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
+        window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.integration.WebViewIntegrationTestActivity', 'onVideoCompleted', [adUnit.getPlacement().getId()], 'null']]));
     }
 
     /*
