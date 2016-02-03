@@ -16,10 +16,14 @@ export class BatchInvocation {
     }
 
     public queue(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
+        return this.rawQueue(NativeBridge.ApiPackageName, className, methodName, parameters);
+    }
+
+    public rawQueue(packageName: string, className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let promise = new Promise<any[]>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
-            className = NativeBridge.PackageName + className;
-            this._batch.push([className, methodName, parameters ? parameters : [], id.toString()]);
+            let fullClassName = packageName + '.' + className;
+            this._batch.push([fullClassName, methodName, parameters ? parameters : [], id.toString()]);
         });
         this._promises.push(promise);
         return promise;
@@ -46,7 +50,7 @@ export interface INativeCallback {
 
 export class NativeBridge extends Observable {
 
-    public static PackageName: string = 'com.unity3d.ads.api.';
+    public static ApiPackageName: string = 'com.unity3d.ads.api';
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
@@ -72,6 +76,13 @@ export class NativeBridge extends Observable {
     public invoke(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let batch: BatchInvocation = new BatchInvocation(this);
         let promise = batch.queue(className, methodName, parameters);
+        this.invokeBatch(batch);
+        return promise;
+    }
+
+    public rawInvoke(packageName: string, className: string, methodName: string, parameters?: any[]) {
+        let batch: BatchInvocation = new BatchInvocation(this);
+        let promise = batch.rawQueue(packageName, className, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
     }
