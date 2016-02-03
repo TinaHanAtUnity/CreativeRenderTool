@@ -20,7 +20,8 @@ export class AdUnitManager extends Observable {
         this._showing = true;
         this._adUnit = adUnit;
 
-        return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]);
+        // last argument is View.SYSTEM_UI_FLAG_LOW_PROFILE, hides software navigation until user touches screen
+        return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents, 1]);
     }
 
     public hide(): void {
