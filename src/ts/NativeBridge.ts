@@ -40,6 +40,19 @@ export enum CallbackStatus {
     ERROR
 }
 
+export enum UnityAdsError {
+    NOT_INITIALIZED,
+    INITIALIZE_FAILED,
+    INVALID_ARGUMENT,
+    VIDEO_PLAYER_ERROR,
+    INIT_SANITY_CHECK_FAIL,
+    AD_BLOCKER_DETECTED,
+    FILE_IO_ERROR,
+    DEVICE_ID_ERROR,
+    SHOW_ERROR,
+    INTERNAL_ERROR
+}
+
 export interface INativeCallback {
     (status: CallbackStatus, ...parameters: any[]): void;
 }

@@ -1,4 +1,4 @@
-import { NativeBridge, INativeCallback, CallbackStatus, BatchInvocation } from 'NativeBridge';
+import { NativeBridge, INativeCallback, CallbackStatus, BatchInvocation, UnityAdsError } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -104,17 +104,23 @@ export class WebView {
         callback(CallbackStatus.OK);
 
         if(this._adUnitManager.isShowing()) {
-            // show invocations will always trigger finish callback except in this case
-            // this allows simple state machines to be built on top of show invocations and finish callbacks
-            let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
-            batch.queue('Sdk', 'logError', ['Show invocation failed: Can\'t open new ad unit while ad unit is already active']);
-            batch.queue('Listener', 'sendErrorEvent', ['SHOW_ERROR', 'Can\'t open new ad unit while ad unit is already active']);
-            this._nativeBridge.invokeBatch(batch);
+            // finish event is not sent here to avoid confusing simple state machines
+            this.showError(false, placementId, 'Can\'t open new ad unit while ad unit is already active');
             return;
         }
 
         let placement: Placement = this._configManager.getPlacement(placementId);
+        if(!placement) {
+            this.showError(true, placementId, 'No such placement: ' + placementId);
+            return;
+        }
+
         let campaign: Campaign = placement.getCampaign();
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
+
         let adUnit: AdUnit = new AdUnit(placement, campaign);
 
         this._sessionManager.sendShow(adUnit);
@@ -273,4 +279,17 @@ export class WebView {
         this._campaignManager.request(adUnit.getPlacement());
     }
 
+    /*
+     ERROR HANDLING HELPER METHODS
+     */
+
+    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
+        let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
+        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
+        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
+        if(sendFinish) {
+            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
+        }
+        this._nativeBridge.invokeBatch(batch);
+    }
 }
