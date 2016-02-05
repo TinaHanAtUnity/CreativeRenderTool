@@ -156,9 +156,9 @@ export class WebView {
             this._overlay.setSkipDuration(placement.allowSkipInSeconds());
         }
 
-        this._adUnitManager.start(adUnit, orientation, keyEvents).then(() => {
-            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(placement.muteVideo() ? 0.0 : 1.0));
-        });
+        this._adUnitManager.start(adUnit, orientation, keyEvents);
+        this._adUnitManager.subscribe('newadunit', this.onNewAdUnit.bind(this));
+        this._adUnitManager.subscribe('recreateadunit', this.onRecreateAdUnit.bind(this));
         this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
 
@@ -200,17 +200,38 @@ export class WebView {
     }
 
     /*
+     AD UNIT EVENT HANDLERS
+     */
+
+    private onNewAdUnit(adUnit: AdUnit): void {
+        this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+    }
+
+    private onRecreateAdUnit(adUnit: AdUnit): void {
+        this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+    }
+
+    /*
      VIDEO EVENT HANDLERS
      */
 
     private onVideoPrepared(adUnit: AdUnit, duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
         this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0)).then(() => {
-            this._videoPlayer.play();
+            if(this._adUnitManager.getVideoPosition() > 0) {
+                this._videoPlayer.seekTo(this._adUnitManager.getVideoPosition()).then(() => {
+                    this._videoPlayer.play();
+                });
+            } else {
+                this._videoPlayer.play();
+            }
         });
     }
 
     private onVideoProgress(adUnit: AdUnit, position: number): void {
+        if(position > 0) {
+            this._adUnitManager.setVideoPosition(position);
+        }
         this._overlay.setVideoProgress(position);
     }
 
@@ -220,6 +241,7 @@ export class WebView {
     }
 
     private onVideoCompleted(adUnit: AdUnit, url: string): void {
+        this._adUnitManager.setVideoActive(false);
         this.setFinishState(FinishState.COMPLETED);
         this._sessionManager.sendView(adUnit);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
@@ -233,6 +255,7 @@ export class WebView {
 
     private onSkip(adUnit: AdUnit): void {
         this._videoPlayer.pause();
+        this._adUnitManager.setVideoActive(false);
         this.setFinishState(FinishState.SKIPPED);
         this._sessionManager.sendSkip(adUnit);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
@@ -249,6 +272,8 @@ export class WebView {
      */
 
     private onReplay(adUnit: AdUnit): void {
+        this._adUnitManager.setVideoActive(true);
+        this._adUnitManager.setVideoPosition(0);
         this._overlay.setSkipEnabled(true);
         this._overlay.setSkipDuration(0);
         this._videoPlayer.seekTo(0).then(() => {
