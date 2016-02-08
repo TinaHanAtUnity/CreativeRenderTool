@@ -226,7 +226,7 @@ export class WebView {
         this._overlay.hide();
         this._endScreen.show();
         if(this._clientInfo.getTestMode()) {
-            this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'WebViewIntegrationTestActivity', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            this._nativeBridge.rawInvoke('com.unity3d.ads.test.api', 'Listener', 'sendVideoCompletedEvent', [adUnit.getPlacement().getId()]);
         }
     }
 
