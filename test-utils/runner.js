@@ -85,6 +85,6 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
 
 define({TEST_LIST}, function() {
     mocha.run(function(failures) {
-        window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'testResult', [failures], "null"]]));
+        window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], "null"]]));
     });
 });
