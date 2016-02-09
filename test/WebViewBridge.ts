@@ -28,7 +28,7 @@ export class WebViewBridge implements IWebViewBridge {
         console.dir(calls);
         let results: any[][] = calls.map((value: [string, string, any[], string]): any[] => {
             let [className, methodName, parameters, callback]: [string, string, any[], string] = value;
-            className = className.split(NativeBridge.PackageName)[1];
+            className = className.split(NativeBridge.ApiPackageName + '.')[1];
             let apiClass: Object = this._apiMap[className];
             let apiMethod: Function = apiClass[methodName];
             let result: any[] = apiMethod.apply(apiClass, parameters);
