@@ -24,6 +24,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnitManager } from 'Managers/AdUnitManager';
 import { AdUnit, FinishState } from 'Models/AdUnit';
+import { StorageManager, StorageType } from 'Managers/StorageManager';
 
 export class WebView {
 
@@ -44,6 +45,7 @@ export class WebView {
 
     private _cacheManager: CacheManager;
 
+    private _storageManager: StorageManager;
     private _sessionManager: SessionManager;
 
     private _adUnitManager: AdUnitManager;
@@ -58,6 +60,8 @@ export class WebView {
         this._request = new Request(nativeBridge);
 
         this._adUnitManager = new AdUnitManager(nativeBridge);
+
+        this._storageManager = new StorageManager(nativeBridge);
     }
 
     public initialize(): Promise<void> {
@@ -225,9 +229,11 @@ export class WebView {
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
-        if(this._clientInfo.getTestMode()) {
-            this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
-        }
+        this._storageManager.get<boolean>(StorageType.PUBLIC, 'integration_test').then(integrationTest => {
+            if(integrationTest) {
+                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            }
+        });
     }
 
     /*
