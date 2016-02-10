@@ -17,7 +17,6 @@ export class AdUnitManager extends Observable {
     }
 
     public start(adUnit: AdUnit, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
-        // this needs proper error handling and show lifecycle handling TODO
         this._showing = true;
         this._adUnit = adUnit;
         this._adUnit.setVideoActive(true);
