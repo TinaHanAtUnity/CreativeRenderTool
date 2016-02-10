@@ -205,9 +205,6 @@ export class WebView {
     private onAdUnitResume(adUnit: AdUnit): void {
         if(adUnit.isVideoActive()) {
             this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-        } else {
-            this._overlay.hide();
-            this._endScreen.show();
         }
     }
 
