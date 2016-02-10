@@ -2,6 +2,7 @@ import { NativeBridge } from 'NativeBridge';
 import { AdUnit, FinishState } from 'Models/AdUnit';
 import { Observable } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 
 export class AdUnitManager extends Observable {
     private _nativeBridge: NativeBridge;
@@ -21,7 +22,7 @@ export class AdUnitManager extends Observable {
         this._adUnit = adUnit;
         this._adUnit.setVideoActive(true);
 
-        return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]);
+        return this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE]);
     }
 
     public hide(): void {
