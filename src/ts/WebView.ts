@@ -157,8 +157,7 @@ export class WebView {
         }
 
         this._adUnitManager.start(adUnit, orientation, keyEvents);
-        this._adUnitManager.subscribe('newadunit', this.onNewAdUnit.bind(this));
-        this._adUnitManager.subscribe('recreateadunit', this.onRecreateAdUnit.bind(this));
+        this._adUnitManager.subscribe('resumeadunit', this.onAdUnitResume.bind(this));
         this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
 
@@ -203,12 +202,13 @@ export class WebView {
      AD UNIT EVENT HANDLERS
      */
 
-    private onNewAdUnit(adUnit: AdUnit): void {
-        this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-    }
-
-    private onRecreateAdUnit(adUnit: AdUnit): void {
-        this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+    private onAdUnitResume(adUnit: AdUnit): void {
+        if(adUnit.isVideoActive()) {
+            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+        } else {
+            this._overlay.hide();
+            this._endScreen.show();
+        }
     }
 
     /*
@@ -276,10 +276,10 @@ export class WebView {
         this._adUnitManager.setVideoPosition(0);
         this._overlay.setSkipEnabled(true);
         this._overlay.setSkipDuration(0);
-        this._videoPlayer.seekTo(0).then(() => {
-            this._endScreen.hide();
-            this._overlay.show();
-            this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
+        this._endScreen.hide();
+        this._overlay.show();
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
+            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }
 
@@ -297,5 +297,4 @@ export class WebView {
         this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
         this._campaignManager.request(adUnit.getPlacement());
     }
-
 }
