@@ -235,7 +235,7 @@ export class WebView {
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
-        this._storageManager.get<boolean>(StorageType.PUBLIC, 'integration_test').then(integrationTest => {
+        this._storageManager.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if(integrationTest) {
                 this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
             }
