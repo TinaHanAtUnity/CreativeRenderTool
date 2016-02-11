@@ -244,7 +244,13 @@ export class WebView {
 
     private onVideoStart(adUnit: AdUnit): void {
         this._sessionManager.sendStart(adUnit);
-        this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
+
+        if(this._adUnitManager.getWatches() === 0) {
+            // send start callback only for first watch, never for rewatches
+            this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
+        }
+
+        this._adUnitManager.newWatch();
     }
 
     private onVideoCompleted(adUnit: AdUnit, url: string): void {

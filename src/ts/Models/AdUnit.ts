@@ -13,11 +13,13 @@ export class AdUnit {
     private _finishState: FinishState;
     private _videoPosition: number;
     private _videoActive: boolean;
+    private _watches: number;
 
     constructor(placement: Placement, campaign: Campaign) {
         this._placement = placement;
         this._campaign = campaign;
         this._videoPosition = 0;
+        this._watches = 0;
     }
 
     public getPlacement(): Placement {
@@ -52,5 +54,13 @@ export class AdUnit {
 
     public setVideoActive(active: boolean): void {
         this._videoActive = active;
+    }
+
+    public getWatches(): number {
+        return this._watches;
+    }
+
+    public setWatches(watches: number): void {
+        this._watches = watches;
     }
 }

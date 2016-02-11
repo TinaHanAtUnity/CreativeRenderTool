@@ -56,6 +56,14 @@ export class AdUnitManager extends Observable {
         return this._adUnit.isVideoActive();
     }
 
+    public newWatch() {
+        this._adUnit.setWatches(this._adUnit.getWatches() + 1);
+    }
+
+    public getWatches(): number {
+        return this._adUnit.getWatches();
+    }
+
     /*
      ANDROID ACTIVITY LIFECYCLE EVENTS
      */
