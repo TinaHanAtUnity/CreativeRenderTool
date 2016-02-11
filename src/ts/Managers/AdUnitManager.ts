@@ -77,14 +77,14 @@ export class AdUnitManager extends Observable {
     private onPause(finishing: boolean): void {
         if(finishing && this._showing) {
             this._adUnit.setFinishState(FinishState.SKIPPED);
-            this.trigger('close', this._adUnit.getPlacement(), this._adUnit.getCampaign());
+            this.trigger('close', this._adUnit);
         }
     }
 
     private onDestroy(finishing: boolean): void {
         if(this._showing && finishing) {
             this._adUnit.setFinishState(FinishState.SKIPPED);
-            this.trigger('close', this._adUnit.getPlacement(), this._adUnit.getCampaign());
+            this.trigger('close', this._adUnit);
         }
     }
 }
