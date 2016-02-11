@@ -172,10 +172,13 @@ export class WebView {
     }
 
     public hide(): void {
+        if(this._adUnitManager.isVideoActive()) {
+            this._videoPlayer.stop();
+            this._videoPlayer.reset();
+        }
+
         this._adUnitManager.hide();
         this._adUnitManager.unsubscribe();
-        this._videoPlayer.stop();
-        this._videoPlayer.reset();
         this._videoPlayer.unsubscribe();
         this._videoPlayer = null;
         this._overlay.container().parentElement.removeChild(this._overlay.container());
