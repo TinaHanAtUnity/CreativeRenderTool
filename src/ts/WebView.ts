@@ -24,6 +24,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnitManager } from 'Managers/AdUnitManager';
 import { AdUnit, FinishState } from 'Models/AdUnit';
+import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager, StorageType } from 'Managers/StorageManager';
 
 export class WebView {
@@ -125,7 +126,7 @@ export class WebView {
             return;
         }
 
-        let adUnit: AdUnit = new AdUnit(placement, campaign);
+        let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign);
 
         this._sessionManager.sendShow(adUnit);
 
@@ -215,7 +216,7 @@ export class WebView {
      AD UNIT EVENT HANDLERS
      */
 
-    private onAdUnitResume(adUnit: AdUnit): void {
+    private onAdUnitResume(adUnit: VideoAdUnit): void {
         if(adUnit.isVideoActive()) {
             this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         }

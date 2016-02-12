@@ -1,12 +1,14 @@
 import { NativeBridge } from 'NativeBridge';
-import { AdUnit, FinishState } from 'Models/AdUnit';
+import { FinishState } from 'Models/AdUnit';
+import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { Observable } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 
+// currently this class is hardcoded for video ads, this should be refactored for generic support for different ad units TODO
 export class AdUnitManager extends Observable {
     private _nativeBridge: NativeBridge;
-    private _adUnit: AdUnit;
+    private _adUnit: VideoAdUnit;
     private _showing: boolean = false;
 
     constructor(nativeBridge: NativeBridge) {
@@ -17,7 +19,7 @@ export class AdUnitManager extends Observable {
         this._nativeBridge.subscribe('ADUNIT_ON_DESTROY', this.onDestroy.bind(this));
     }
 
-    public start(adUnit: AdUnit, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
+    public start(adUnit: VideoAdUnit, orientation: ScreenOrientation, keyEvents: any[]): Promise<any[]> {
         this._showing = true;
         this._adUnit = adUnit;
         this._adUnit.setVideoActive(true);
