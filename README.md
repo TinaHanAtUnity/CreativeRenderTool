@@ -2,15 +2,15 @@
 
 ## Requirements
 
-- Node (brew install node)
-- TypeScript (npm install -g typescript)
-- TSLint (npm install -g tslint)
-- TSD (npm install -g tsd)
+- Node (`brew install node`)
+- TypeScript (`npm install -g typescript`)
+- TSLint (`npm install -g tslint`)
+- TSD (`npm install -g tsd`)
 
 ### Optional
 
-- Python (brew install python3)
-- Watch (brew install watch)
+- Python (`brew install python3`)
+- Watch (`brew install watch`)
 
 ## IDE
 
@@ -35,16 +35,16 @@
 
 ### Dependencies
 
-- npm install
-- tsd install
+- `npm install`
+- `tsd install`
 
 ### Development Build
 
-- make build-dev
+- `make build-dev`
 
 To build continuously (every 2s), use:
 
-- watch make build-dev
+- `watch make build-dev`
 
 ### Running development builds
 
@@ -56,18 +56,18 @@ To build continuously (every 2s), use:
 
 ### Local tests
 
-- make test
+- `make test`
 
 ### Hybrid tests
 
 - Change SDK configuration URL to point to local build (http://LOCAL_IP:LOCAL_PORT/build/test/config.json)
 - Change webview development config to point to local build (http://LOCAL_IP:LOCAL_PORT/build/test/index.html)
-- make build-test
+- `make build-test`
 - Run hybrid test suite from the SDK
 
 ### Integration tests
 
 - Change SDK configuration URL to point to local build (http://LOCAL_IP:LOCAL_PORT/build/release/config.json)
 - Change webview development config to point to local build (http://LOCAL_IP:LOCAL_PORT/build/release/index.html)
-- make build-release
+- `make build-release`
 - Run integration test suite from the SDK
