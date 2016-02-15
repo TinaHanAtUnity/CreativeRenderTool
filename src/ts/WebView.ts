@@ -29,6 +29,9 @@ import { StorageManager, StorageType } from 'Managers/StorageManager';
 
 export class WebView {
 
+    private _initTimestamp: number;
+    private _reinitDelay: number = 86400000; // one day in milliseconds
+
     private _nativeBridge: NativeBridge;
 
     private _deviceInfo: DeviceInfo;
@@ -91,6 +94,8 @@ export class WebView {
                 }
             }
 
+            this._initTimestamp = Date.now();
+            setTimeout(() => { this.reinitialize(); }, this._reinitDelay);
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
@@ -186,6 +191,16 @@ export class WebView {
         this._overlay = null;
         this._endScreen.container().parentElement.removeChild(this._endScreen.container());
         this._endScreen = null;
+    }
+
+    /*
+     REINITIALIZE LOGIC
+     */
+
+    public reinitialize() {
+        if(!this._adUnitManager.isShowing()) {
+            this._nativeBridge.invoke('Sdk', 'reinitialize');
+        }
     }
 
     /*
@@ -317,7 +332,11 @@ export class WebView {
     private onClose(adUnit: AdUnit): void {
         this.hide();
         this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
-        this._campaignManager.request(adUnit.getPlacement());
+        if((Date.now() - this._initTimestamp) > this._reinitDelay) {
+            this.reinitialize();
+        } else {
+            this._campaignManager.request(adUnit.getPlacement());
+        }
     }
 
     /*
