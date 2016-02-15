@@ -95,7 +95,6 @@ export class WebView {
             }
 
             this._initTimestamp = Date.now();
-            setTimeout(() => { this.reinitialize(); }, this._reinitDelay);
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
@@ -331,10 +330,10 @@ export class WebView {
 
     private onClose(adUnit: AdUnit): void {
         this.hide();
-        this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
         if((Date.now() - this._initTimestamp) > this._reinitDelay) {
             this.reinitialize();
         } else {
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
             this._campaignManager.request(adUnit.getPlacement());
         }
     }
