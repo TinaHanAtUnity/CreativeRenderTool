@@ -12,12 +12,20 @@ export class DeviceInfo {
         return ['OK', false];
     }
 
-    public getSoftwareVersion(): any[] {
-        return ['OK', '23'];
+    public getApiLevel(): any[] {
+        return ['OK', 23];
     }
 
-    public getHardwareVersion(): any[] {
-        return ['OK', 'LGE Nexus 5'];
+    public getOsVersion(): any[] {
+        return ['OK', '6.0.1'];
+    }
+
+    public getManufacturer(): any[] {
+        return ['OK', 'LGE'];
+    }
+
+    public getModel(): any[] {
+        return ['OK', 'Nexus 5'];
     }
 
     public getNetworkType(): any[] {
@@ -32,14 +40,8 @@ export class DeviceInfo {
         return ['OK', 480];
     }
 
-    public isWifi(): any[] {
-        return ['OK', true];
-    }
-
     public getUniqueEventId(): any[] {
-        let asd: any[] = ['OK', this.generateRandomUUID()];
-        console.dir(asd);
-        return asd;
+        return ['OK', this.generateRandomUUID()];
     }
 
     private generateRandomUUID(): string {

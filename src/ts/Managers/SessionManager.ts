@@ -86,8 +86,7 @@ export class SessionManager {
             'placement_id': adUnit.getPlacement().getId(),
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-            'software_version': this._deviceInfo.getSoftwareVersion(),
-            'device_type': this._deviceInfo.getHardwareVersion(),
+            'os_version': this._deviceInfo.getOsVersion(),
             'connection_type': this._deviceInfo.getNetworkType(),
             'sid': 'rikshot'
         };
