@@ -26,6 +26,7 @@ import { AdUnitManager } from 'Managers/AdUnitManager';
 import { AdUnit, FinishState } from 'Models/AdUnit';
 import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { ConnectivityManager } from 'Managers/ConnectivityManager';
 
 export class WebView {
 
@@ -54,6 +55,7 @@ export class WebView {
 
     private _adUnitManager: AdUnitManager;
 
+    private _connectivityManager: ConnectivityManager;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -66,6 +68,8 @@ export class WebView {
         this._adUnitManager = new AdUnitManager(nativeBridge);
 
         this._storageManager = new StorageManager(nativeBridge);
+
+        this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
     public initialize(): Promise<void> {
