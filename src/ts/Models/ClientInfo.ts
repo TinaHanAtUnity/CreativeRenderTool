@@ -10,13 +10,20 @@ export class ClientInfo {
 
     private _debuggable: boolean;
 
-    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string, debuggable: boolean) {
+    private _configUrl: string;
+    private _webviewUrl: string;
+    private _webviewHash: string;
+
+    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string, debuggable: boolean, configUrl: string, webviewUrl: string, webviewHash: string) {
         this._gameId = gameId;
         this._testMode = testMode;
         this._applicationVersion = applicationVersion;
         this._sdkVersion = sdkVersion;
         this._platform = platform;
         this._debuggable = debuggable;
+        this._configUrl = configUrl;
+        this._webviewUrl = webviewUrl;
+        this._webviewHash = webviewHash;
     }
 
     public getGameId(): string {
