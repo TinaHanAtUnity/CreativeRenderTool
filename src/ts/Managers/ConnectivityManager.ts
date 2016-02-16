@@ -10,6 +10,10 @@ export class ConnectivityManager extends Observable {
         this._nativeBridge.subscribe('CONNECTIVITY_CONNECTED', this.onConnected.bind(this));
     }
 
+    public setListeningStatus(status: boolean) {
+        this._nativeBridge.invoke('DeviceInfo', 'setConnectionMonitoring', [status]);
+    }
+
     private onConnected(wifi: boolean, networkType: number): void {
         this.trigger('connected', wifi, networkType);
     }

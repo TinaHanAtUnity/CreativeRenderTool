@@ -50,4 +50,15 @@ export class ClientInfo {
         return this._debuggable;
     }
 
+    public getConfigUrl(): string {
+        return this._configUrl;
+    }
+
+    public getWebviewUrl(): string {
+        return this._webviewUrl;
+    }
+
+    public getWebviewHash(): string {
+        return this._webviewHash;
+    }
 }
