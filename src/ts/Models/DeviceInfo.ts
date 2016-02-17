@@ -24,7 +24,6 @@ export class DeviceInfo {
     private _screenWidth: number;
     private _screenHeight: number;
     private _networkOperator: string;
-    private _orientation: number;
     private _headset: boolean;
     private _ringerMode: RingerMode;
     private _language: string;
@@ -56,8 +55,7 @@ export class DeviceInfo {
         batch.queue(className, 'getScreenWidth').then(([screenWidth]) => this._screenWidth = screenWidth);
         batch.queue(className, 'getScreenHeight').then(([screenHeight]) => this._screenHeight = screenHeight);
         batch.queue(className, 'getNetworkOperatorName').then(([networkOperator]) => this._networkOperator = networkOperator);
-        batch.queue(className, 'getApplicationOrientation').then(([orientation]) => this._orientation = orientation);
-        batch.queue(className, 'isWiredHeadsetOn').then(([headset]) => this._headset = headset);
+        batch.queue(className, 'getHeadset').then(([headset]) => this._headset = headset);
         batch.queue(className, 'getRingerMode').then(([ringerMode]) => this._ringerMode = ringerMode);
         batch.queue(className, 'getSystemLanguage').then(([language]) => this._language = language);
         batch.queue(className, 'getDeviceVolume', [StreamType.STREAM_SYSTEM]).then(([volume]) => this._volume = volume);
