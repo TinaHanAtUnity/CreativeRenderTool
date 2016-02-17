@@ -3,6 +3,7 @@ export class ClientInfo {
     private _gameId: string;
     private _testMode: boolean;
 
+    private _applicationName: string;
     private _applicationVersion: string;
     private _sdkVersion: string;
 
@@ -17,6 +18,7 @@ export class ClientInfo {
     constructor(data: any[]) {
         this._gameId = data.shift();
         this._testMode = data.shift();
+        this._applicationName = data.shift();
         this._applicationVersion = data.shift();
         this._sdkVersion = data.shift();
         this._platform = data.shift();
