@@ -2,7 +2,7 @@ import { RingerMode } from '../../src/ts/Constants/Android/RingerMode';
 import { BatteryStatus } from '../../src/ts/Constants/Android/BatteryStatus';
 
 export class DeviceInfo {
-    
+
     private _androidId: string = 'de88c6a5d783745b';
     private _advertisingIdentifier: string = '2fad0db3-e775-4d3e-80a5-85281d4ad733';
     private _limitAdTracking: boolean = false;
@@ -56,7 +56,7 @@ export class DeviceInfo {
     public getModel(): any[] {
         return ['OK', this._model];
     }
-    
+
     public getConnectionType(): any[] {
         return ['OK', this._connectionType];
     }
