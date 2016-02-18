@@ -26,6 +26,7 @@ import { AdUnitManager } from 'Managers/AdUnitManager';
 import { AdUnit, FinishState } from 'Models/AdUnit';
 import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { ConnectivityManager } from 'Managers/ConnectivityManager';
 
 export class WebView {
 
@@ -51,6 +52,11 @@ export class WebView {
 
     private _adUnitManager: AdUnitManager;
 
+    private _connectivityManager: ConnectivityManager;
+
+    private _initializedAt: number;
+    private _mustReinitialize: boolean = false;
+    private _configJsonCheckedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -63,6 +69,8 @@ export class WebView {
         this._adUnitManager = new AdUnitManager(nativeBridge);
 
         this._storageManager = new StorageManager(nativeBridge);
+
+        this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
     public initialize(): Promise<void> {
@@ -90,6 +98,10 @@ export class WebView {
                     this._campaignManager.request(placements[placementId]);
                 }
             }
+
+            this._initializedAt = this._configJsonCheckedAt = Date.now();
+            this._connectivityManager.setListeningStatus(true);
+            this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
@@ -125,6 +137,10 @@ export class WebView {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
+
+        this.shouldReinitialize().then((reinitialize) => {
+            this._mustReinitialize = reinitialize;
+        });
 
         let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign);
 
@@ -316,8 +332,30 @@ export class WebView {
 
     private onClose(adUnit: AdUnit): void {
         this.hide();
-        this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
-        this._campaignManager.request(adUnit.getPlacement());
+        if(this._mustReinitialize) {
+            this.reinitialize();
+        } else {
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+            this._campaignManager.request(adUnit.getPlacement());
+        }
+    }
+
+    /*
+     CONNECTIVITY EVENT HANDLERS
+     */
+
+    private onConnected(wifi: boolean, networkType: number) {
+        if(!this._adUnitManager.isShowing()) {
+            this.shouldReinitialize().then((reinitialize) => {
+                if(reinitialize) {
+                    if(this._adUnitManager.isShowing()) {
+                        this._mustReinitialize = true;
+                    } else {
+                        this.reinitialize();
+                    }
+                }
+            });
+        }
     }
 
     /*
@@ -332,5 +370,34 @@ export class WebView {
             batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
         }
         this._nativeBridge.invokeBatch(batch);
+    }
+
+    /*
+     REINITIALIZE LOGIC
+     */
+
+    private reinitialize() {
+        // todo: make sure session data and other similar things are saved before issuing reinit
+        this._nativeBridge.invoke('Sdk', 'reinitialize');
+    }
+
+    private getConfigJson(): Promise<any[]> {
+        return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
+    }
+
+    private shouldReinitialize(): Promise<boolean> {
+        if(!this._clientInfo.getWebviewHash()) {
+            return Promise.resolve(false);
+        }
+        if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
+            return Promise.resolve(false);
+        }
+        return this.getConfigJson().then(([response]) => {
+            this._configJsonCheckedAt = Date.now();
+            let configJson = JSON.parse(response);
+            return configJson.hash === this._clientInfo.getWebviewHash();
+        }).catch((error) => {
+            return false;
+        });
     }
 }
