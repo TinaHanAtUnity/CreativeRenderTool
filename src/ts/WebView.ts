@@ -54,8 +54,9 @@ export class WebView {
 
     private _connectivityManager: ConnectivityManager;
 
+    private _initializedAt: number;
     private _mustReinitialize: boolean = false;
-    private _previousConnectedEvent: number;
+    private _configJsonCheckedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -98,7 +99,7 @@ export class WebView {
                 }
             }
 
-            this._previousConnectedEvent = Date.now();
+            this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._connectivityManager.setListeningStatus(true);
             this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
@@ -136,6 +137,10 @@ export class WebView {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
+
+        this.shouldReinitialize().then((reinitialize) => {
+            this._mustReinitialize = reinitialize;
+        });
 
         let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign);
 
@@ -266,10 +271,6 @@ export class WebView {
         }
 
         this._adUnitManager.newWatch();
-
-        this.shouldReinitialize().then((reinit) => {
-            this._mustReinitialize = reinit;
-        });
     }
 
     private onVideoCompleted(adUnit: AdUnit, url: string): void {
@@ -343,17 +344,10 @@ export class WebView {
      CONNECTIVITY EVENT HANDLERS
      */
 
-
     private onConnected(wifi: boolean, networkType: number) {
-        if(Date.now() - this._previousConnectedEvent < 3600000) {
-            // for purposes of reinitilization logic, ignore connection events less than one hour apart
-            return;
-        }
-        this._previousConnectedEvent = Date.now();
-
         if(!this._adUnitManager.isShowing()) {
-            this.shouldReinitialize().then((reinit) => {
-                if(reinit) {
+            this.shouldReinitialize().then((reinitialize) => {
+                if(reinitialize) {
                     if(this._adUnitManager.isShowing()) {
                         this._mustReinitialize = true;
                     } else {
@@ -392,22 +386,18 @@ export class WebView {
     }
 
     private shouldReinitialize(): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            if(!this._clientInfo.getWebviewHash()) {
-                // development versions might have no hash so it makes no sense to get remote config.json
-                resolve(false);
-            } else {
-                this.getConfigJson().then(([response]) => {
-                    let configJson = JSON.parse(response);
-                    if (configJson.hash === this._clientInfo.getWebviewHash()) {
-                        resolve(false);
-                    } else {
-                        resolve(true);
-                    }
-                }).catch((error) => {
-                    resolve(false);
-                });
-            }
+        if(!this._clientInfo.getWebviewHash()) {
+            return Promise.resolve(false);
+        }
+        if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
+            return Promise.resolve(false);
+        }
+        return this.getConfigJson().then(([response]) => {
+            this._configJsonCheckedAt = Date.now();
+            let configJson = JSON.parse(response);
+            return configJson.hash === this._clientInfo.getWebviewHash();
+        }).catch((error) => {
+            return false;
         });
     }
 }
