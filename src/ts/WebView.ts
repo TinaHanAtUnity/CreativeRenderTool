@@ -117,7 +117,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string, callback: INativeCallback): void {
+    public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         if(this._adUnitManager.isShowing()) {
@@ -166,7 +166,7 @@ export class WebView {
         this._endScreen.subscribe('download', this.onDownload.bind(this));
         this._endScreen.subscribe('close', this.onClose.bind(this));
 
-        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
+        let orientation: ScreenOrientation = requestedOrientation;
         if(!placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }

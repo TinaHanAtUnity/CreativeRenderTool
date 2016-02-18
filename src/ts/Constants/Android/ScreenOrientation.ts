@@ -1,4 +1,4 @@
-export const enum ScreenOrientation {
+export enum ScreenOrientation {
     SCREEN_ORIENTATION_UNSPECIFIED = -1,
     SCREEN_ORIENTATION_LANDSCAPE = 0,
     SCREEN_ORIENTATION_PORTRAIT = 1,
