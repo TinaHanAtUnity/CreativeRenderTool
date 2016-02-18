@@ -17,6 +17,10 @@ export class Request {
         this._nativeBridge.subscribe('URL_FAILED', this.onFailed.bind(this));
     }
 
+    public resolve(host: string): Promise<any[]> {
+        return this._nativeBridge.invoke('Url', 'resolve', [host]);
+    }
+
     public get(url: string, headers?: [string, string][]): Promise<any[]> {
         if(typeof headers === 'undefined') {
             headers = [];
