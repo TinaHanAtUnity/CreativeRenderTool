@@ -13,6 +13,9 @@ describe('WebViewTest', () => {
     before(() => {
         if(typeof global !== 'undefined') {
             global['window'] = global;
+            window['addEventListener'] = (event: string, handler: any, capture: boolean) => {
+                console.log(event, handler, capture); // fix this TODO
+            };
             window['webviewbridge'] = new WebViewBridge();
         }
     });
