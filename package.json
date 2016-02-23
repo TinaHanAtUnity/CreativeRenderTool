@@ -17,10 +17,13 @@
     "stylus": "^0.52.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-plugin-transform-es3-member-expression-literals": "^6.3.13",
+    "babel-plugin-transform-es3-property-literals": "^6.3.13",
     "chai": "^3.4.0",
     "istanbul": "^0.4.0",
-    "remap-istanbul": "^0.5.1",
     "mocha": "^2.3.3",
+    "remap-istanbul": "^0.5.1",
     "sinon": "^1.17.2"
   }
 }

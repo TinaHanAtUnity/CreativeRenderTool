@@ -1,39 +1,53 @@
 export class Campaign {
 
     private _id: string;
-    private _storeId: string;
+    private _appStoreId: string;
+    private _gameId: number;
     private _gameName: string;
     private _gameIcon: string;
     private _rating: number;
     private _ratingCount: number;
-    private _portrait: string;
-    private _landscape: string;
+    private _landscapeImage: string;
+    private _portraitImage: string;
     private _video: string;
+    private _videoSize: number;
+    private _streamingVideo: string;
+    private _clickAttributionUrl: string;
+    private _bypassAppSheet: boolean;
 
     private _gamerId: string;
     private _abGroup: number;
 
-    constructor(data: any) {
-        this._id = data._id;
-        this._storeId = data.iTunesId;
-        this._gameName = data.gameName;
-        this._gameIcon = data.gameIcon;
-        this._rating = data.rating;
-        this._ratingCount = data.ratingCount;
-        this._portrait = data.endScreenPortrait;
-        this._landscape = data.endScreen;
-        this._video = data.trailerDownloadable;
+    constructor(campaign: any, gamerId: string, abGroup: number) {
+        this._id = campaign.id;
+        this._appStoreId = campaign.appStoreId;
+        this._gameId = campaign.gameId;
+        this._gameName = campaign.gameName;
+        this._gameIcon = campaign.gameIcon;
+        this._rating = campaign.rating;
+        this._ratingCount = campaign.ratingCount;
+        this._landscapeImage = campaign.endScreenLandscape;
+        this._portraitImage = campaign.endScreenPortrait;
+        this._video = campaign.trailerDownloadable;
+        this._videoSize = campaign.trailerDownloadableSize;
+        this._streamingVideo = campaign.trailerStreaming;
+        this._clickAttributionUrl = campaign.clickAttributionUrl;
+        this._bypassAppSheet = campaign.bypassAppSheet;
 
-        this._gamerId = data.gamerId;
-        this._abGroup = data.abGroup;
+        this._gamerId = gamerId;
+        this._abGroup = abGroup;
     }
 
     public getId(): string {
         return this._id;
     }
 
-    public getStoreId(): string {
-        return this._storeId;
+    public getAppStoreId(): string {
+        return this._appStoreId;
+    }
+
+    public getGameId(): number {
+        return this._gameId;
     }
 
     public getGameName(): string {
@@ -57,19 +71,19 @@ export class Campaign {
     }
 
     public getPortraitUrl(): string {
-        return this._portrait;
+        return this._portraitImage;
     }
 
     public setPortraitUrl(portraitUrl: string): void {
-        this._portrait = portraitUrl;
+        this._portraitImage = portraitUrl;
     }
 
     public getLandscapeUrl(): string {
-        return this._landscape;
+        return this._landscapeImage;
     }
 
     public setLandscapeUrl(landscapeUrl: string): void {
-        this._landscape = landscapeUrl;
+        this._landscapeImage = landscapeUrl;
     }
 
     public getVideoUrl(): string {
@@ -78,6 +92,10 @@ export class Campaign {
 
     public setVideoUrl(videoUrl: string): void {
         this._video = videoUrl;
+    }
+
+    public getClickAttributionUrl(): string {
+        return this._clickAttributionUrl;
     }
 
     public getGamerId(): string {

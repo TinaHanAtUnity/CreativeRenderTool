@@ -4,30 +4,27 @@ declare var EndScreenTemplate: string;
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
-import { Zone } from 'Models/Zone';
-import { Campaign } from 'Models/Campaign';
+import { AdUnit } from 'Models/AdUnit';
 
 export class EndScreen extends View {
 
-    private _zone: Zone = null;
-    private _campaign: Campaign = null;
+    private _adUnit: AdUnit;
 
-    constructor(zone: Zone, campaign: Campaign) {
+    constructor(adUnit: AdUnit) {
         super('end-screen');
 
-        this._zone = zone;
-        this._campaign = campaign;
+        this._adUnit = adUnit;
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = campaign.getRating() * 20 - 2;
+        let adjustedRating: number = adUnit.getCampaign().getRating() * 20 - 2;
         this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon(),
-            'endScreenLandscape': campaign.getLandscapeUrl(),
-            'endScreenPortrait': campaign.getPortraitUrl(),
+            'gameName': adUnit.getCampaign().getGameName(),
+            'gameIcon': adUnit.getCampaign().getGameIcon(),
+            'endScreenLandscape': adUnit.getCampaign().getLandscapeUrl(),
+            'endScreenPortrait': adUnit.getCampaign().getPortraitUrl(),
             'rating': adjustedRating.toString(),
-            'ratingCount': campaign.getRatingCount().toString()
+            'ratingCount': adUnit.getCampaign().getRatingCount().toString()
         };
 
         this._bindings = [
@@ -51,17 +48,17 @@ export class EndScreen extends View {
 
     private onDownload(event: Event): void {
         event.preventDefault();
-        this.trigger('download', this._zone, this._campaign);
+        this.trigger('download', this._adUnit);
     }
 
     private onReplay(event: Event): void {
         event.preventDefault();
-        this.trigger('replay', this._zone, this._campaign);
+        this.trigger('replay', this._adUnit);
     }
 
     private onClose(event: Event): void {
         event.preventDefault();
-        this.trigger('close', this._zone, this._campaign);
+        this.trigger('close', this._adUnit);
     }
 
 }

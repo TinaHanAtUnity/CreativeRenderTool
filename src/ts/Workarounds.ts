@@ -1,3 +1,5 @@
+/* tslint:disable:no-bitwise no-unused-expression no-empty */
+
 if(!Function.prototype.bind) {
     Function.prototype.bind = function(oThis) {
         if (typeof this !== 'function') {
@@ -6,7 +8,7 @@ if(!Function.prototype.bind) {
             throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
         }
 
-        var aArgs   = Array.prototype.slice.call(arguments, 1),
+        let aArgs   = Array.prototype.slice.call(arguments, 1),
             fToBind = this,
             fNOP    = function() {},
             fBound  = function() {
@@ -31,8 +33,8 @@ if(!Array.prototype.forEach) {
         if(typeof(callback) !== 'function') {
             throw new TypeError(callback + ' is not a function!');
         }
-        var len = this.length;
-        for(var i = 0; i < len; i++) {
+        let len = this.length;
+        for(let i = 0; i < len; i++) {
             callback.call(thisArg, this[i], i, this);
         }
     };
@@ -41,16 +43,16 @@ if(!Array.prototype.forEach) {
 if(!('classList' in document.documentElement) && Object.defineProperty && typeof HTMLElement !== 'undefined') {
     Object.defineProperty(HTMLElement.prototype, 'classList', {
         get: function() {
-            var self = this;
+            let self = this;
             function update(fn) {
                 return function(value) {
-                    var classes = self.className.split(/\s+/), index = classes.indexOf(value);
+                    let classes = self.className.split(/\s+/), index = classes.indexOf(value);
                     fn(classes, index, value);
                     self.className = classes.join(' ');
                 };
             }
 
-            var ret = {
+            let ret = {
                 add: update(function(classes, index, value) {
                     ~index || classes.push(value);
                 }),
@@ -82,9 +84,3 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
         }
     });
 }
-
-define({TEST_LIST}, function() {
-    mocha.run(function(failures) {
-        window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], "null"]]));
-    });
-});

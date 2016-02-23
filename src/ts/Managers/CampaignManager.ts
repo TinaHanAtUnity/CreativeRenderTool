@@ -4,13 +4,13 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 
 import { Campaign } from 'Models/Campaign';
-import { Zone } from 'Models/Zone';
+import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 
 export class CampaignManager extends Observable {
 
-    private static CampaignBaseUrl = 'https://impact.applifier.com/mobile/campaigns';
+    private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -23,33 +23,40 @@ export class CampaignManager extends Observable {
         this._deviceInfo = deviceInfo;
     }
 
-    public request(zone: Zone): void {
-        this._request.get(this.createRequestUrl(zone.getId())).then(([response]) => {
+    public request(placement: Placement): void {
+        this._request.get(this.createRequestUrl(placement.getId())).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
-            let campaign: Campaign = new Campaign(campaignJson.data.campaigns[0]);
-            zone.setCampaign(campaign);
-            this.trigger('campaign', zone, campaign);
+            let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+            placement.setCampaign(campaign);
+            this.trigger('campaign', placement, campaign);
         }).catch((error) => {
-            zone.setCampaign(null);
+            placement.setCampaign(null);
             this.trigger('error', error);
         });
     }
 
-    private createRequestUrl(zoneId: string): string {
-        let url: string = Url.addParameters(CampaignManager.CampaignBaseUrl, {
+    private createRequestUrl(placementId: string): string {
+        let url: string = [
+            CampaignManager.CampaignBaseUrl,
+            this._clientInfo.getGameId(),
+            'placements',
+            placementId,
+            'fill'
+        ].join('/');
+
+        url = Url.addParameters(url, {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
             gameId: this._clientInfo.getGameId(),
-            hardwareVersion: this._deviceInfo.getHardwareVersion(),
+            hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
             platform: this._clientInfo.getPlatform(),
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: this._clientInfo.getSdkVersion(),
-            softwareVersion: this._deviceInfo.getSoftwareVersion(),
-            wifi: this._deviceInfo.isWifi() ? 1 : 0,
-            zoneId: zoneId
+            softwareVersion: this._deviceInfo.getApiLevel(),
+            placementId: placementId
         });
 
         if(this._clientInfo.getTestMode()) {

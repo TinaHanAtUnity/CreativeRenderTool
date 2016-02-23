@@ -3,6 +3,7 @@ TYPESCRIPT = tsc
 TSLINT = tslint
 REQUIREJS = node_modules/.bin/r.js
 STYLUS = node_modules/.bin/stylus
+BABEL = node_modules/.bin/babel
 
 MOCHA = node_modules/.bin/_mocha
 ISTANBUL = node_modules/.bin/istanbul
@@ -31,7 +32,7 @@ BUILD_DIR = build
 
 build-dev: BUILD_DIR = build/dev
 build-dev: build-ts build-css build-html
-	cp src/dev-config.json $(BUILD_DIR)/config.json
+	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
 	@echo
@@ -129,6 +130,12 @@ build-test: clean build-dirs build-css build-html
 		node_modules/requirejs-text/text.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
+
+	@echo
+	@echo Running through babel for ES3 compatibility
+	@echo
+
+	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
 
 	@echo
 	@echo Copying test config to build

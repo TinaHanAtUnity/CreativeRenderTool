@@ -1,6 +1,6 @@
 export class Listener {
 
-    public sendReadyEvent(zone: string): any[] {
+    public sendReadyEvent(placement: string): any[] {
         return ['OK'];
     }
 

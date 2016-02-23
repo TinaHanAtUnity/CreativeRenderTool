@@ -5,7 +5,7 @@
 import { NativeBridge } from '../src/ts/NativeBridge';
 import { Sdk } from './Api/Sdk';
 import { DeviceInfo } from './Api/DeviceInfo';
-import { Zone } from './Api/Zone';
+import { Placement } from './Api/Placement';
 import { Url } from './Api/Url';
 import { Cache } from './Api/Cache';
 import { Listener } from './Api/Listener';
@@ -16,7 +16,7 @@ export class WebViewBridge implements IWebViewBridge {
     private _apiMap: {} = {
         'Sdk': new Sdk(),
         'DeviceInfo': new DeviceInfo(),
-        'Zone': new Zone(),
+        'Placement': new Placement(),
         'Url': new Url(),
         'Cache': new Cache(),
         'Listener': new Listener(),
@@ -28,9 +28,12 @@ export class WebViewBridge implements IWebViewBridge {
         console.dir(calls);
         let results: any[][] = calls.map((value: [string, string, any[], string]): any[] => {
             let [className, methodName, parameters, callback]: [string, string, any[], string] = value;
-            className = className.split(NativeBridge.PackageName)[1];
+            className = className.split(NativeBridge.ApiPackageName + '.')[1];
             let apiClass: Object = this._apiMap[className];
             let apiMethod: Function = apiClass[methodName];
+            if(!apiMethod) {
+                throw new Error(className + '.' + methodName + ' is not implemented');
+            }
             let result: any[] = apiMethod.apply(apiClass, parameters);
             result.unshift(callback);
             return result;

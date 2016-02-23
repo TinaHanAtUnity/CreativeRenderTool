@@ -3,6 +3,7 @@ export class ClientInfo {
     private _gameId: string;
     private _testMode: boolean;
 
+    private _applicationName: string;
     private _applicationVersion: string;
     private _sdkVersion: string;
 
@@ -10,13 +11,21 @@ export class ClientInfo {
 
     private _debuggable: boolean;
 
-    constructor(gameId: string, testMode: boolean, applicationVersion: string, sdkVersion: string, platform: string, debuggable: boolean) {
-        this._gameId = gameId;
-        this._testMode = testMode;
-        this._applicationVersion = applicationVersion;
-        this._sdkVersion = sdkVersion;
-        this._platform = platform;
-        this._debuggable = debuggable;
+    private _configUrl: string;
+    private _webviewUrl: string;
+    private _webviewHash: string;
+
+    constructor(data: any[]) {
+        this._gameId = data.shift();
+        this._testMode = data.shift();
+        this._applicationName = data.shift();
+        this._applicationVersion = data.shift();
+        this._sdkVersion = data.shift();
+        this._platform = data.shift();
+        this._debuggable = data.shift();
+        this._configUrl = data.shift();
+        this._webviewUrl = data.shift();
+        this._webviewHash = data.shift();
     }
 
     public getGameId(): string {
@@ -43,4 +52,15 @@ export class ClientInfo {
         return this._debuggable;
     }
 
+    public getConfigUrl(): string {
+        return this._configUrl;
+    }
+
+    public getWebviewUrl(): string {
+        return this._webviewUrl;
+    }
+
+    public getWebviewHash(): string {
+        return this._webviewHash;
+    }
 }

@@ -3,11 +3,6 @@
 
 import { Observable } from 'Utilities/Observable';
 
-enum CallbackStatus {
-    OK,
-    ERROR
-}
-
 type NativeInvocation = [string, string, any[], string];
 
 export class BatchInvocation {
@@ -21,10 +16,14 @@ export class BatchInvocation {
     }
 
     public queue(className: string, methodName: string, parameters?: any[]): Promise<any[]> {
+        return this.rawQueue(NativeBridge.ApiPackageName, className, methodName, parameters);
+    }
+
+    public rawQueue(packageName: string, className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let promise = new Promise<any[]>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
-            className = NativeBridge.PackageName + className;
-            this._batch.push([className, methodName, parameters ? parameters : [], id.toString()]);
+            let fullClassName = packageName + '.' + className;
+            this._batch.push([fullClassName, methodName, parameters ? parameters : [], id.toString()]);
         });
         this._promises.push(promise);
         return promise;
@@ -40,9 +39,31 @@ export class BatchInvocation {
 
 }
 
+export enum CallbackStatus {
+    OK,
+    ERROR
+}
+
+export enum UnityAdsError {
+    NOT_INITIALIZED,
+    INITIALIZE_FAILED,
+    INVALID_ARGUMENT,
+    VIDEO_PLAYER_ERROR,
+    INIT_SANITY_CHECK_FAIL,
+    AD_BLOCKER_DETECTED,
+    FILE_IO_ERROR,
+    DEVICE_ID_ERROR,
+    SHOW_ERROR,
+    INTERNAL_ERROR
+}
+
+export interface INativeCallback {
+    (status: CallbackStatus, ...parameters: any[]): void;
+}
+
 export class NativeBridge extends Observable {
 
-    public static PackageName: string = 'com.unity3d.ads.api.';
+    public static ApiPackageName: string = 'com.unity3d.ads.api';
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
@@ -72,6 +93,13 @@ export class NativeBridge extends Observable {
         return promise;
     }
 
+    public rawInvoke(packageName: string, className: string, methodName: string, parameters?: any[]) {
+        let batch: BatchInvocation = new BatchInvocation(this);
+        let promise = batch.rawQueue(packageName, className, methodName, parameters);
+        this.invokeBatch(batch);
+        return promise;
+    }
+
     public invokeBatch(batch: BatchInvocation): Promise<any[][]> {
         this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
         return Promise.all(batch.getPromises());
@@ -91,23 +119,22 @@ export class NativeBridge extends Observable {
         });
     }
 
-    public handleEvent(...parameters: any[]): void {
+    public handleEvent(parameters: any[]): void {
         this.trigger.apply(this, parameters);
     }
 
-    public handleInvocation(className: string, methodName: string, callback: string, ...parameters: any[]): void {
-        parameters.push((status: CallbackStatus, ...parameters: any[]) => {
-            this.invokeCallback(callback, status, parameters);
+    public handleInvocation(parameters: any[]): void {
+        let className: string = parameters.shift();
+        let methodName: string = parameters.shift();
+        let callback: string = parameters.shift();
+        parameters.push((status: CallbackStatus, ...callbackParameters: any[]) => {
+            this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
         window[className][methodName].apply(window[className], parameters);
     }
 
-    private invokeCallback(id: string, status: CallbackStatus, ...parameters: any[]): void {
-        if(parameters.length > 0) {
-            this._backend.handleCallback(id, status.toString(), JSON.stringify(parameters));
-        } else {
-            this._backend.handleCallback(id, status.toString());
-        }
+    private invokeCallback(id: string, status: string, ...parameters: any[]): void {
+        this._backend.handleCallback(id, status, JSON.stringify(parameters));
     }
 
 }

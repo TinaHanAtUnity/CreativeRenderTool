@@ -15,7 +15,7 @@ export class Cache {
             setTimeout(() => {
                 Cache._cacheQueue = Cache._cacheQueue.filter(cacheUrl => cacheUrl !== url);
                 Cache._cache[url] = url.replace('http', 'file');
-                window['nativebridge'].handleEvent('CACHE_DOWNLOAD_END', url);
+                window['nativebridge'].handleEvent(['CACHE_DOWNLOAD_END', url]);
             }, 0);
             return ['OK'];
         }

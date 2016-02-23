@@ -1,5 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
+import 'Workarounds';
+
 import { NativeBridge } from 'NativeBridge';
 import { WebView } from 'WebView';
 

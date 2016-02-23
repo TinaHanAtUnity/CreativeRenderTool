@@ -1,4 +1,4 @@
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge, INativeCallback, CallbackStatus, BatchInvocation, UnityAdsError } from 'NativeBridge';
 
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
@@ -17,17 +17,16 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { Campaign } from 'Models/Campaign';
 
 import { CacheManager } from 'Managers/CacheManager';
-import { Zone, ZoneState } from 'Models/Zone';
+import { Placement, PlacementState } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
-
-enum FinishState {
-    COMPLETED,
-    SKIPPED,
-    ERROR
-}
+import { AdUnitManager } from 'Managers/AdUnitManager';
+import { AdUnit, FinishState } from 'Models/AdUnit';
+import { VideoAdUnit } from 'Models/VideoAdUnit';
+import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { ConnectivityManager } from 'Managers/ConnectivityManager';
 
 export class WebView {
 
@@ -48,9 +47,16 @@ export class WebView {
 
     private _cacheManager: CacheManager;
 
+    private _storageManager: StorageManager;
     private _sessionManager: SessionManager;
 
-    private _finishState: FinishState;
+    private _adUnitManager: AdUnitManager;
+
+    private _connectivityManager: ConnectivityManager;
+
+    private _initializedAt: number;
+    private _mustReinitialize: boolean = false;
+    private _configJsonCheckedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -60,34 +66,16 @@ export class WebView {
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
 
-        this._finishState = null;
+        this._adUnitManager = new AdUnitManager(nativeBridge);
+
+        this._storageManager = new StorageManager(nativeBridge);
+
+        this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
     public initialize(): Promise<void> {
-        return this._nativeBridge.invoke('Sdk', 'loadComplete').then(([gameId, testMode, appVersion, sdkVersion, platform, debuggable]) => {
-
-            let common = {
-                'common': {
-                    'idfa': 'itse_perkele',
-                    'joku_avain': false,
-                    'numero': 1234
-                }
-            };
-
-            let messages = [];
-            messages.push({
-                'type': 'ads.sdk2.test',
-                'msg': {
-                    'tyyppi': 'no_johan_inittas'
-                }
-            });
-
-            messages.unshift(common);
-
-            let rawData = messages.map(message => JSON.stringify(message)).join('\n');
-            this._request.post('http://httpkafka.unityads.unity3d.com/v1/events', rawData);
-
-            this._clientInfo = new ClientInfo(gameId, testMode, appVersion, sdkVersion, platform, debuggable);
+        return this._nativeBridge.invoke('Sdk', 'loadComplete').then((data) => {
+            this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
             this._configManager = new ConfigManager(this._request, this._clientInfo);
@@ -99,17 +87,21 @@ export class WebView {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
-            let defaultZone = this._configManager.getDefaultZone();
-            this._nativeBridge.invoke('Zone', 'setDefaultZone', [defaultZone.getId()]);
+            let defaultPlacement = this._configManager.getDefaultPlacement();
+            this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
 
-            let zones: Object = this._configManager.getZones();
-            for(let zoneId in zones) {
-                if(zones.hasOwnProperty(zoneId)) {
-                    let zone: Zone = zones[zoneId];
-                    this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.NOT_AVAILABLE]]);
-                    this._campaignManager.request(zones[zoneId]);
+            let placements: Object = this._configManager.getPlacements();
+            for(let placementId in placements) {
+                if(placements.hasOwnProperty(placementId)) {
+                    let placement: Placement = placements[placementId];
+                    this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
+                    this._campaignManager.request(placements[placementId]);
                 }
             }
+
+            this._initializedAt = this._configJsonCheckedAt = Date.now();
+            this._connectivityManager.setListeningStatus(true);
+            this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
@@ -118,34 +110,55 @@ export class WebView {
     }
 
     public setFinishState(state: FinishState): void {
-        if(this._finishState !== FinishState.COMPLETED) {
-            this._finishState = state;
-        }
+        this._adUnitManager.setFinishState(state);
     }
 
     /*
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(zoneId: string): void {
-        let zone: Zone = this._configManager.getZone(zoneId);
-        let campaign: Campaign = zone.getCampaign();
+    public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
+        callback(CallbackStatus.OK);
 
-        this._sessionManager.sendShow(zone, campaign);
+        if(this._adUnitManager.isShowing()) {
+            // finish event is not sent here to avoid confusing simple state machines
+            this.showError(false, placementId, 'Can\'t open new ad unit while ad unit is already active');
+            return;
+        }
+
+        let placement: Placement = this._configManager.getPlacement(placementId);
+        if(!placement) {
+            this.showError(true, placementId, 'No such placement: ' + placementId);
+            return;
+        }
+
+        let campaign: Campaign = placement.getCampaign();
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
+
+        this.shouldReinitialize().then((reinitialize) => {
+            this._mustReinitialize = reinitialize;
+        });
+
+        let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign);
+
+        this._sessionManager.sendShow(adUnit);
 
         this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
-        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, zone, campaign));
-        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, zone, campaign));
-        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, zone, campaign));
-        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, zone, campaign));
+        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, adUnit));
+        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, adUnit));
+        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, adUnit));
+        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, adUnit));
 
-        this._overlay = new Overlay(zone.muteVideo());
+        this._overlay = new Overlay(placement.muteVideo());
         this._overlay.render();
         document.body.appendChild(this._overlay.container());
-        this._overlay.subscribe('skip', this.onSkip.bind(this, zone, campaign));
-        this._overlay.subscribe('mute', this.onMute.bind(this, zone, campaign));
+        this._overlay.subscribe('skip', this.onSkip.bind(this, adUnit));
+        this._overlay.subscribe('mute', this.onMute.bind(this, adUnit));
 
-        this._endScreen = new EndScreen(zone, campaign);
+        this._endScreen = new EndScreen(adUnit);
         this._endScreen.render();
         this._endScreen.hide();
         document.body.appendChild(this._endScreen.container());
@@ -153,33 +166,36 @@ export class WebView {
         this._endScreen.subscribe('download', this.onDownload.bind(this));
         this._endScreen.subscribe('close', this.onClose.bind(this));
 
-        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
-        if(!zone.useDeviceOrientationForVideo()) {
+        let orientation: ScreenOrientation = requestedOrientation;
+        if(!placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }
 
         let keyEvents: any[] = [];
-        if(zone.disableBackButton()) {
+        if(placement.disableBackButton()) {
             keyEvents = [KeyCode.BACK];
         }
 
-        if(!zone.allowSkip()) {
+        if(!placement.allowSkip()) {
             this._overlay.setSkipEnabled(false);
         } else {
             this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(zone.allowSkipInSeconds());
+            this._overlay.setSkipDuration(placement.allowSkipInSeconds());
         }
 
-        this._nativeBridge.invoke('AdUnit', 'open', [['videoplayer', 'webview'], orientation, keyEvents]).then(() => {
-            this._videoPlayer.prepare(campaign.getVideoUrl(), new Double(zone.muteVideo() ? 0.0 : 1.0));
-        });
+        this._adUnitManager.start(adUnit, orientation, keyEvents);
+        this._adUnitManager.subscribe('resumeadunit', this.onAdUnitResume.bind(this));
+        this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
 
-    public hide(zone: Zone, campaign: Campaign): void {
-        this._nativeBridge.invoke('AdUnit', 'close', []);
-        this._nativeBridge.invoke('Listener', 'sendFinishEvent', [zone.getId(), FinishState[this._finishState]]);
-        this._videoPlayer.stop();
-        this._videoPlayer.reset();
+    public hide(): void {
+        if(this._adUnitManager.isVideoActive()) {
+            this._videoPlayer.stop();
+            this._videoPlayer.reset();
+        }
+
+        this._adUnitManager.hide();
+        this._adUnitManager.unsubscribe();
         this._videoPlayer.unsubscribe();
         this._videoPlayer = null;
         this._overlay.container().parentElement.removeChild(this._overlay.container());
@@ -192,7 +208,7 @@ export class WebView {
      CAMPAIGN EVENT HANDLERS
      */
 
-    private onCampaign(zone: Zone, campaign: Campaign): void {
+    private onCampaign(placement: Placement, campaign: Campaign): void {
         let cacheableAssets: string[] = [
             campaign.getGameIcon(),
             campaign.getLandscapeUrl(),
@@ -206,54 +222,86 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.READY]]).then(() => {
-                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [zone.getId()]);
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
+                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
             });
         });
+    }
+
+    /*
+     AD UNIT EVENT HANDLERS
+     */
+
+    private onAdUnitResume(adUnit: VideoAdUnit): void {
+        if(adUnit.isVideoActive()) {
+            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+        }
     }
 
     /*
      VIDEO EVENT HANDLERS
      */
 
-    private onVideoPrepared(zone: Zone, campaign: Campaign, duration: number, width: number, height: number): void {
+    private onVideoPrepared(adUnit: AdUnit, duration: number, width: number, height: number): void {
         this._overlay.setVideoDuration(duration);
         this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0)).then(() => {
-            this._videoPlayer.play();
+            if(this._adUnitManager.getVideoPosition() > 0) {
+                this._videoPlayer.seekTo(this._adUnitManager.getVideoPosition()).then(() => {
+                    this._videoPlayer.play();
+                });
+            } else {
+                this._videoPlayer.play();
+            }
         });
     }
 
-    private onVideoProgress(zone: Zone, campaign: Campaign, position: number): void {
+    private onVideoProgress(adUnit: AdUnit, position: number): void {
+        if(position > 0) {
+            this._adUnitManager.setVideoPosition(position);
+        }
         this._overlay.setVideoProgress(position);
     }
 
-    private onVideoStart(zone: Zone, campaign: Campaign): void {
-        this._sessionManager.sendStart(zone, campaign);
-        this._nativeBridge.invoke('Listener', 'sendStartEvent', [zone.getId()]);
+    private onVideoStart(adUnit: AdUnit): void {
+        this._sessionManager.sendStart(adUnit);
+
+        if(this._adUnitManager.getWatches() === 0) {
+            // send start callback only for first watch, never for rewatches
+            this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
+        }
+
+        this._adUnitManager.newWatch();
     }
 
-    private onVideoCompleted(zone: Zone, campaign: Campaign, url: string): void {
+    private onVideoCompleted(adUnit: AdUnit, url: string): void {
+        this._adUnitManager.setVideoActive(false);
         this.setFinishState(FinishState.COMPLETED);
-        this._sessionManager.sendView(zone, campaign);
+        this._sessionManager.sendView(adUnit);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
+        this._storageManager.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
+            if(integrationTest) {
+                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            }
+        });
     }
 
     /*
     OVERLAY EVENT HANDLERS
      */
 
-    private onSkip(zone: Zone, campaign: Campaign): void {
+    private onSkip(adUnit: AdUnit): void {
         this._videoPlayer.pause();
+        this._adUnitManager.setVideoActive(false);
         this.setFinishState(FinishState.SKIPPED);
-        this._sessionManager.sendSkip(zone, campaign);
+        this._sessionManager.sendSkip(adUnit);
         this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
         this._overlay.hide();
         this._endScreen.show();
     }
 
-    private onMute(zone: Zone, campaign: Campaign, muted: boolean): void {
+    private onMute(adUnit: AdUnit, muted: boolean): void {
         this._videoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
     }
 
@@ -261,29 +309,95 @@ export class WebView {
      ENDSCREEN EVENT HANDLERS
      */
 
-    private onReplay(zone: Zone, campaign: Campaign): void {
+    private onReplay(adUnit: AdUnit): void {
+        this._adUnitManager.setVideoActive(true);
+        this._adUnitManager.setVideoPosition(0);
         this._overlay.setSkipEnabled(true);
         this._overlay.setSkipDuration(0);
-        this._videoPlayer.seekTo(0).then(() => {
-            this._endScreen.hide();
-            this._overlay.show();
-            this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]);
+        this._endScreen.hide();
+        this._overlay.show();
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
+            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }
 
-    private onDownload(zone: Zone, campaign: Campaign): void {
-        this._sessionManager.sendClick(zone, campaign);
-        this._nativeBridge.invoke('Listener', 'sendClickEvent', [zone.getId()]);
+    private onDownload(adUnit: AdUnit): void {
+        this._sessionManager.sendClick(adUnit);
+        this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getPlacement().getId()]);
         this._nativeBridge.invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
-            'uri': 'market://details?id=' + campaign.getStoreId()
+            'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
         }]);
     }
 
-    private onClose(zone: Zone, campaign: Campaign): void {
-        this.hide(zone, campaign);
-        this._nativeBridge.invoke('Zone', 'setZoneState', [zone.getId(), ZoneState[ZoneState.WAITING]]);
-        this._campaignManager.request(zone);
+    private onClose(adUnit: AdUnit): void {
+        this.hide();
+        if(this._mustReinitialize) {
+            this.reinitialize();
+        } else {
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+            this._campaignManager.request(adUnit.getPlacement());
+        }
     }
 
+    /*
+     CONNECTIVITY EVENT HANDLERS
+     */
+
+    private onConnected(wifi: boolean, networkType: number) {
+        if(!this._adUnitManager.isShowing()) {
+            this.shouldReinitialize().then((reinitialize) => {
+                if(reinitialize) {
+                    if(this._adUnitManager.isShowing()) {
+                        this._mustReinitialize = true;
+                    } else {
+                        this.reinitialize();
+                    }
+                }
+            });
+        }
+    }
+
+    /*
+     ERROR HANDLING HELPER METHODS
+     */
+
+    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
+        let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
+        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
+        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
+        if(sendFinish) {
+            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
+        }
+        this._nativeBridge.invokeBatch(batch);
+    }
+
+    /*
+     REINITIALIZE LOGIC
+     */
+
+    private reinitialize() {
+        // todo: make sure session data and other similar things are saved before issuing reinit
+        this._nativeBridge.invoke('Sdk', 'reinitialize');
+    }
+
+    private getConfigJson(): Promise<any[]> {
+        return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
+    }
+
+    private shouldReinitialize(): Promise<boolean> {
+        if(!this._clientInfo.getWebviewHash()) {
+            return Promise.resolve(false);
+        }
+        if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
+            return Promise.resolve(false);
+        }
+        return this.getConfigJson().then(([response]) => {
+            this._configJsonCheckedAt = Date.now();
+            let configJson = JSON.parse(response);
+            return configJson.hash === this._clientInfo.getWebviewHash();
+        }).catch((error) => {
+            return false;
+        });
+    }
 }
