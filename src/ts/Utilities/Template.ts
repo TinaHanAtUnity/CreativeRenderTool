@@ -16,11 +16,11 @@ export class Template {
 
     private static _escapeRegExp: RegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
+    private _templateFunction: (data: any) => string;
+
     private static _escapeChar: (substring: string, ...args: any[]) => string = (match: string): string => {
         return '\\' + Template._escapes[match];
     };
-
-    private _templateFunction: (data: any) => string;
 
     constructor(templateString: string) {
         let index: number = 0;
