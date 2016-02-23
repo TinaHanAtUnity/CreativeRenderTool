@@ -121,8 +121,6 @@ export class WebView {
      */
 
     public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
-        eval('throw new Error("OMG");');
-
         callback(CallbackStatus.OK);
 
         if(this._adUnitManager.isShowing()) {
