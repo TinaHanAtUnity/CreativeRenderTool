@@ -4,7 +4,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 
 export class Diagnostics {
 
-    private static DiagnosticsBaseUrl = 'http://httpkafka.unityads.unity3d.com/v1/events';
+    private static DiagnosticsBaseUrl = 'https://httpkafka.unityads.unity3d.com/v1/events';
 
     public static trigger(request: Request, data: any, deviceInfo?: DeviceInfo, clientInfo?: ClientInfo): Promise<any[]> {
         let messages = [];
