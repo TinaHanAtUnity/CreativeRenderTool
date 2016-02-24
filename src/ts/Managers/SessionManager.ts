@@ -4,10 +4,13 @@ import { Request } from 'Utilities/Request';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnit } from 'Models/AdUnit';
+import { Url } from 'Utilities/Url';
 
 export class SessionManager {
 
-    private static SessionUrl = 'http://impact.applifier.com/session';
+    private static SessionUrl = 'https://adserver.unityads.unity3d.com';
+    private static VideoEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/gamers';
+    private static ClickEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
     private _nativeBridge: NativeBridge;
     private _request: Request;
@@ -45,7 +48,7 @@ export class SessionManager {
         return this.getUniqueEventId().then(id => {
             let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/start', infoJson);
+            return this._request.post(this.createVideoEventUrl(adUnit, 'video_start'), infoJson);
         });
     }
 
@@ -61,7 +64,7 @@ export class SessionManager {
         return this.getUniqueEventId().then(id => {
             let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/view', infoJson);
+            return this._request.post(this.createVideoEventUrl(adUnit, 'video_end'), infoJson);
         });
     }
 
@@ -69,13 +72,45 @@ export class SessionManager {
         return this.getUniqueEventId().then(id => {
             let infoJson = this.getInfoJson(adUnit);
             infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/click', infoJson);
+
+            let campaign = adUnit.getCampaign();
+            if(campaign.getClickAttributionUrl()) {
+                this._request.get(campaign.getClickAttributionUrl());
+            }
+
+            return this._request.get(this.createClickEventUrl(adUnit));
         });
     }
 
     private getUniqueEventId(): Promise<string> {
         return this._nativeBridge.invoke('DeviceInfo', 'getUniqueEventId').then(([id]) => {
             return id;
+        });
+    }
+
+    private createVideoEventUrl(adUnit: AdUnit, type: string): string {
+        let campaign = adUnit.getCampaign();
+        return [
+            SessionManager.VideoEventBaseUrl,
+            campaign.getGamerId(),
+            'video',
+            type,
+            campaign.getId(),
+            this._clientInfo.getGameId()
+        ].join('/');
+    }
+
+    private createClickEventUrl(adUnit: AdUnit): string {
+        let campaign = adUnit.getCampaign();
+        let url = [
+            SessionManager.ClickEventBaseUrl,
+            campaign.getId(),
+            'click',
+            campaign.getGamerId()
+        ].join('/');
+        return Url.addParameters(url, {
+            gameId: this._clientInfo.getGameId(),
+            redirect: false
         });
     }
 
@@ -86,8 +121,7 @@ export class SessionManager {
             'placement_id': adUnit.getPlacement().getId(),
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-            'software_version': this._deviceInfo.getSoftwareVersion(),
-            'device_type': this._deviceInfo.getHardwareVersion(),
+            'os_version': this._deviceInfo.getOsVersion(),
             'connection_type': this._deviceInfo.getNetworkType(),
             'sid': 'rikshot'
         };

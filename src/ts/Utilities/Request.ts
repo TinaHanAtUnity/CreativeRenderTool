@@ -72,7 +72,7 @@ export class Request {
         let urlCallbacks: Function[] = this._urlCallbacks[url];
         if(urlCallbacks) {
             urlCallbacks.forEach((callbackObject: Object) => {
-                callbackObject[RequestStatus.COMPLETE]([error]);
+                callbackObject[RequestStatus.FAILED]([error]);
             });
             delete this._urlCallbacks[url];
         }

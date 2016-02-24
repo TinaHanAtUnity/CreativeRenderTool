@@ -48,15 +48,14 @@ export class CampaignManager extends Observable {
             advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
             androidId: this._deviceInfo.getAndroidId(),
             gameId: this._clientInfo.getGameId(),
-            hardwareVersion: this._deviceInfo.getHardwareVersion(),
+            hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
             platform: this._clientInfo.getPlatform(),
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: this._clientInfo.getSdkVersion(),
-            softwareVersion: this._deviceInfo.getSoftwareVersion(),
-            wifi: this._deviceInfo.isWifi() ? 1 : 0,
+            softwareVersion: this._deviceInfo.getApiLevel(),
             placementId: placementId
         });
 

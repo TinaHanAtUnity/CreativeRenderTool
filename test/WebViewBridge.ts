@@ -31,6 +31,9 @@ export class WebViewBridge implements IWebViewBridge {
             className = className.split(NativeBridge.ApiPackageName + '.')[1];
             let apiClass: Object = this._apiMap[className];
             let apiMethod: Function = apiClass[methodName];
+            if(!apiMethod) {
+                throw new Error(className + '.' + methodName + ' is not implemented');
+            }
             let result: any[] = apiMethod.apply(apiClass, parameters);
             result.unshift(callback);
             return result;

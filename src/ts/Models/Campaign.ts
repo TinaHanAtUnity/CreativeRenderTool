@@ -94,6 +94,10 @@ export class Campaign {
         this._video = videoUrl;
     }
 
+    public getClickAttributionUrl(): string {
+        return this._clickAttributionUrl;
+    }
+
     public getGamerId(): string {
         return this._gamerId;
     }
