@@ -2,17 +2,18 @@ import { NativeBridge, BatchInvocation } from 'NativeBridge';
 import { StreamType } from 'Constants/Android/StreamType';
 import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { RingerMode } from 'Constants/Android/RingerMode';
+import { Model } from 'Models/Model';
 
 enum StorageType {
     EXTERNAL,
     INTERNAL
 }
 
-export class DeviceInfo {
+export class DeviceInfo extends Model {
 
-    private _androidId: string = null;
-    private _advertisingIdentifier: string = null;
-    private _limitAdTracking: boolean = false;
+    private _androidId: string;
+    private _advertisingIdentifier: string;
+    private _limitAdTracking: boolean;
     private _apiLevel: number;
     private _osVersion: string;
     private _manufacturer: string;
@@ -109,6 +110,38 @@ export class DeviceInfo {
 
     public getScreenDensity(): number {
         return this._screenDensity;
+    }
+
+    public getDTO() {
+        return {
+            'android_id': this._androidId,
+            'advertising_id': this._advertisingIdentifier,
+            'tracking_enabled': this._limitAdTracking,
+            'api_level': this._apiLevel,
+            'os_version': this._osVersion,
+            'manufacturer': this._manufacturer,
+            'model': this._model,
+            'connection_type': this._connectionType,
+            'network_type': this._networkType,
+            'screen_layout': this._screenLayout,
+            'screen_density': this._screenDensity,
+            'screen_width': this._screenWidth,
+            'screen_height': this._screenHeight,
+            'network_operator': this._networkOperator,
+            'headset': this._headset,
+            'ringer_mode': this._ringerMode,
+            'language': this._language,
+            'device_volume': this._volume,
+            'screen_brightness': this._screenBrightness,
+            'free_space_internal': this._freeInternalSpace,
+            'total_space_internal': this._totalInternalSpace,
+            'free_space_external': this._freeExternalSpace,
+            'total_space_external': this._totalExternalSpace,
+            'battery_level': this._batteryLevel,
+            'battery_status': this._batteryStatus,
+            'free_memory': this._freeMemory,
+            'total_memory': this._totalMemory
+        };
     }
 
 }

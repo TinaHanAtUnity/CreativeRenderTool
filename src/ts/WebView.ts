@@ -27,6 +27,7 @@ import { AdUnit, FinishState } from 'Models/AdUnit';
 import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager, StorageType } from 'Managers/StorageManager';
 import { ConnectivityManager } from 'Managers/ConnectivityManager';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class WebView {
 
@@ -59,6 +60,10 @@ export class WebView {
     private _configJsonCheckedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
+        if(window && window.addEventListener) {
+            window.addEventListener('error', this.onError.bind(this), false);
+        }
+
         this._nativeBridge = nativeBridge;
 
         this._deviceInfo = new DeviceInfo();
@@ -370,6 +375,21 @@ export class WebView {
             batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
         }
         this._nativeBridge.invokeBatch(batch);
+    }
+
+    /*
+     GENERIC ONERROR HANDLER
+     */
+    private onError(event: ErrorEvent): boolean {
+        Diagnostics.trigger(this._request, {
+            'type': 'js_error',
+            'message': event.message,
+            'url': event.filename,
+            'line': event.lineno,
+            'column': event.colno,
+            'object': event.error
+        }, this._deviceInfo, this._clientInfo);
+        return true; // returning true from window.onerror will suppress the error (in theory)
     }
 
     /*
