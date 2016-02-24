@@ -2,7 +2,6 @@
 
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
 import { Request } from '../src/ts/Utilities/Request';
 import { Diagnostics } from '../src/ts/Utilities/Diagnostics';
