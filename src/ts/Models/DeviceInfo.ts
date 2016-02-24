@@ -11,9 +11,9 @@ enum StorageType {
 
 export class DeviceInfo extends Model {
 
-    private _androidId: string = null;
-    private _advertisingIdentifier: string = null;
-    private _limitAdTracking: boolean = false;
+    private _androidId: string;
+    private _advertisingIdentifier: string;
+    private _limitAdTracking: boolean;
     private _apiLevel: number;
     private _osVersion: string;
     private _manufacturer: string;
