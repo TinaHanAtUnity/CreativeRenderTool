@@ -60,7 +60,9 @@ export class WebView {
     private _configJsonCheckedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
-        window.addEventListener('error', this.onError.bind(this), false);
+        if(window && window.addEventListener) {
+            window.addEventListener('error', this.onError.bind(this), false);
+        }
 
         this._nativeBridge = nativeBridge;
 
@@ -387,7 +389,7 @@ export class WebView {
             'column': event.colno,
             'object': event.error
         }, this._deviceInfo, this._clientInfo);
-        return false;
+        return true; // returning true from window.onerror will suppress the error (in theory)
     }
 
     /*
