@@ -2,6 +2,10 @@
 
 export class Url {
 
+    public resolve(host: string): any[] {
+        return ['OK', host, '8.8.8.8'];
+    }
+
     public get(url: string, headers: [string, string][]): any[] {
         if(url.indexOf('/fill') !== -1) {
             let campaignResponse: {} = {
