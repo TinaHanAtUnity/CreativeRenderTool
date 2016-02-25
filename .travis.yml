@@ -10,9 +10,9 @@ cache:
     - typings
 
 install:
-  - npm install -g typescript tslint tsd
+  - npm install -g typescript tslint typings
   - npm install
-  - tsd install
+  - typings install --ambient
 
 script:
   - make lint
