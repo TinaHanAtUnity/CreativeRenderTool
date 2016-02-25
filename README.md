@@ -5,7 +5,7 @@
 - Node (`brew install node`)
 - TypeScript (`npm install -g typescript`)
 - TSLint (`npm install -g tslint`)
-- TSD (`npm install -g tsd`)
+- Typings (`npm install -g typings`)
 
 ### Optional
 
@@ -36,7 +36,7 @@
 ### Dependencies
 
 - `npm install`
-- `tsd install`
+- `typings install --ambient`
 
 ### Development Build
 
