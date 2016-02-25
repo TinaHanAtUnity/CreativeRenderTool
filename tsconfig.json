@@ -6,5 +6,7 @@
   },
   "exclude": [
     "test"
+    "typings/browser.d.ts",
+    "typings/browser"
   ]
 }
