@@ -1,9 +1,9 @@
-/// <reference path="../typings/main.d.ts" />
+/// <reference path="../../typings/main.d.ts" />
 
 import 'mocha';
 import { assert } from 'chai';
 
-import { Observable } from '../src/ts/Utilities/Observable';
+import { Observable } from '../../src/ts/Utilities/Observable';
 
 describe('ObservableTest', () => {
     it('should unsubscribe', () => {

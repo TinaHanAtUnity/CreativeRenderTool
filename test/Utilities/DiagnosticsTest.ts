@@ -1,13 +1,13 @@
-/// <reference path="../typings/main.d.ts" />
+/// <reference path="../../typings/main.d.ts" />
 
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { Request } from '../src/ts/Utilities/Request';
-import { Diagnostics } from '../src/ts/Utilities/Diagnostics';
-import { NativeBridge } from '../src/ts/NativeBridge';
-import { DeviceInfo } from '../src/ts/Models/DeviceInfo';
-import { ClientInfo } from '../src/ts/Models/ClientInfo';
+import { Request } from '../../src/ts/Utilities/Request';
+import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
+import { NativeBridge } from '../../src/ts/NativeBridge';
+import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
+import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 
 describe('DiagnosticsTest', () => {
     it('should generate proper request', () => {
