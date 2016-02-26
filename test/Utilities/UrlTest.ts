@@ -1,9 +1,9 @@
-/// <reference path="../typings/main.d.ts" />
+/// <reference path="../../typings/main.d.ts" />
 
 import 'mocha';
 import { assert } from 'chai';
 
-import { Url } from '../src/ts/Utilities/Url';
+import { Url } from '../../src/ts/Utilities/Url';
 
 describe('UrlTest', () => {
     it('should add URL parameters correctly', () => {
