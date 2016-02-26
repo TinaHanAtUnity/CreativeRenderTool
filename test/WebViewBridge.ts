@@ -11,7 +11,6 @@ import { Url } from './Api/Url';
 import { Cache } from './Api/Cache';
 import { Listener } from './Api/Listener';
 import { Storage } from './Api/Storage';
-import { TestApi } from "./Api/TestApi";
 
 export class WebViewBridge implements IWebViewBridge {
     private _nativeBridge: INativeBridge;

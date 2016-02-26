@@ -1,6 +1,6 @@
 import { INativeBridge } from '../../src/ts/INativeBridge';
 
-export class TestApi {
+export abstract class TestApi {
     private _nativeBridge: INativeBridge;
 
     public setNativeBridge(nativeBridge: INativeBridge): void {
