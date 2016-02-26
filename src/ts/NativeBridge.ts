@@ -2,6 +2,7 @@
 /// <reference path="WebViewBridge.d.ts" />
 
 import { Observable } from 'Utilities/Observable';
+import { INativeBridge } from 'INativeBridge';
 
 type NativeInvocation = [string, string, any[], string];
 
@@ -61,7 +62,7 @@ export interface INativeCallback {
     (status: CallbackStatus, ...parameters: any[]): void;
 }
 
-export class NativeBridge extends Observable {
+export class NativeBridge extends Observable implements INativeBridge {
 
     public static ApiPackageName: string = 'com.unity3d.ads.api';
 
