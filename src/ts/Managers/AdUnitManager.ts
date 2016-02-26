@@ -4,18 +4,16 @@ import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { Observable } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import {AdUnit} from '../Models/AdUnit';
-import {Placement} from '../Models/Placement';
-import {Campaign} from '../Models/Campaign';
-import {NativeVideoPlayer} from '../Video/NativeVideoPlayer';
-import {Overlay} from '../Views/Overlay';
-import {BatchInvocation} from '../NativeBridge';
-import {UnityAdsError} from '../NativeBridge';
-import {KeyCode} from '../Constants/Android/KeyCode';
-import {Double} from '../Utilities/Double';
-import {StorageType} from './StorageManager';
-import {SessionManager} from './SessionManager';
-import {StorageManager} from './StorageManager';
+import { AdUnit } from 'Models/AdUnit';
+import { Placement } from 'Models/Placement';
+import { Campaign } from 'Models/Campaign';
+import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
+import { Overlay } from 'Views/Overlay';
+import { BatchInvocation, UnityAdsError } from 'NativeBridge';
+import { KeyCode } from 'Constants/Android/KeyCode';
+import { Double } from 'Utilities/Double';
+import { StorageManager, StorageType } from 'StorageManager';
+import { SessionManager } from 'SessionManager';
 
 // currently this class is hardcoded for video ads, this should be refactored for generic support for different ad units TODO
 export class AdUnitManager extends Observable {

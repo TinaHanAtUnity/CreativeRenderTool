@@ -1,14 +1,9 @@
 import { NativeBridge, INativeCallback, CallbackStatus } from 'NativeBridge';
-
 import { DeviceInfo } from 'Models/DeviceInfo';
-
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
-
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-
 import { Campaign } from 'Models/Campaign';
-
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request } from 'Utilities/Request';

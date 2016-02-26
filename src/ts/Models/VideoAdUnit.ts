@@ -1,11 +1,11 @@
 import { AdUnit } from 'Models/AdUnit';
 import { Placement } from 'Placement';
 import { Campaign } from 'Campaign';
-import { NativeVideoPlayer } from '../Video/NativeVideoPlayer';
-import { Overlay } from '../Views/Overlay';
-import { EndScreen } from '../Views/EndScreen';
-import { SessionManager } from '../Managers/SessionManager';
-import { StorageManager } from '../Managers/StorageManager';
+import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
+import { Overlay } from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { SessionManager } from 'Managers/SessionManager';
+import { StorageManager } from 'Managers/StorageManager';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;

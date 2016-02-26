@@ -1,7 +1,7 @@
 import { Placement } from 'Placement';
 import { Campaign } from 'Campaign';
-import { SessionManager } from '../Managers/SessionManager';
-import { StorageManager } from '../Managers/StorageManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { StorageManager } from 'Managers/StorageManager';
 
 export enum FinishState {
     COMPLETED,
