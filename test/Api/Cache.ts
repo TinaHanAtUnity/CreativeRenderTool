@@ -1,6 +1,6 @@
-/* tslint:disable:no-string-literal */
+import { TestApi } from './TestApi';
 
-export class Cache {
+export class Cache extends TestApi {
 
     private static _cacheQueue: string[] = [];
     private static _cache: { [key: string]: string } = {};
@@ -15,7 +15,7 @@ export class Cache {
             setTimeout(() => {
                 Cache._cacheQueue = Cache._cacheQueue.filter(cacheUrl => cacheUrl !== url);
                 Cache._cache[url] = url.replace('http', 'file');
-                window['nativebridge'].handleEvent(['CACHE_DOWNLOAD_END', url]);
+                this.getNativeBridge().handleEvent(['CACHE_DOWNLOAD_END', url]);
             }, 0);
             return ['OK'];
         }
