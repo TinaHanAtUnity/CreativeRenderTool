@@ -1,10 +1,4 @@
-import { NativeBridge, INativeCallback, CallbackStatus, BatchInvocation, UnityAdsError } from 'NativeBridge';
-
-import { EndScreen } from 'Views/EndScreen';
-import { Overlay } from 'Views/Overlay';
-
-import { VideoPlayer } from 'Video/VideoPlayer';
-import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
+import { NativeBridge, INativeCallback, CallbackStatus } from 'NativeBridge';
 
 import { DeviceInfo } from 'Models/DeviceInfo';
 
@@ -12,20 +6,18 @@ import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Constants/Android/KeyCode';
 
 import { Campaign } from 'Models/Campaign';
 
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
-import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnitManager } from 'Managers/AdUnitManager';
 import { AdUnit, FinishState } from 'Models/AdUnit';
 import { VideoAdUnit } from 'Models/VideoAdUnit';
-import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { StorageManager } from 'Managers/StorageManager';
 import { ConnectivityManager } from 'Managers/ConnectivityManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
@@ -40,11 +32,6 @@ export class WebView {
 
     private _configManager: ConfigManager;
     private _campaignManager: CampaignManager;
-
-    private _videoPlayer: VideoPlayer;
-
-    private _endScreen: EndScreen;
-    private _overlay: Overlay;
 
     private _cacheManager: CacheManager;
 
@@ -65,16 +52,11 @@ export class WebView {
         }
 
         this._nativeBridge = nativeBridge;
-
         this._deviceInfo = new DeviceInfo();
-
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
-
-        this._adUnitManager = new AdUnitManager(nativeBridge);
-
         this._storageManager = new StorageManager(nativeBridge);
-
+        this._adUnitManager = new AdUnitManager(nativeBridge, this._sessionManager, this._storageManager);
         this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
@@ -125,88 +107,26 @@ export class WebView {
     public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
-        if(this._adUnitManager.isShowing()) {
-            // finish event is not sent here to avoid confusing simple state machines
-            this.showError(false, placementId, 'Can\'t open new ad unit while ad unit is already active');
-            return;
-        }
-
-        let placement: Placement = this._configManager.getPlacement(placementId);
-        if(!placement) {
-            this.showError(true, placementId, 'No such placement: ' + placementId);
-            return;
-        }
-
-        let campaign: Campaign = placement.getCampaign();
-        if(!campaign) {
-            this.showError(true, placementId, 'Campaign not found');
-            return;
-        }
-
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
         });
 
-        let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign);
+        let placement: Placement = this._configManager.getPlacement(placementId);
+        if(!placement) {
+            // this.showError(true, placementId, 'No such placement: ' + placementId); // todo: fix me
+            return;
+        }
+
+        let adUnit = this._adUnitManager.create(placement, requestedOrientation);
+        (<VideoAdUnit>adUnit).getEndScreen().subscribe('close', this.onClose.bind(this)); // todo: clean me up
+        this._adUnitManager.subscribe('close', this.onClose.bind(this));
 
         this._sessionManager.sendShow(adUnit);
 
-        this._videoPlayer = new NativeVideoPlayer(this._nativeBridge);
-        this._videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, adUnit));
-        this._videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, adUnit));
-        this._videoPlayer.subscribe('start', this.onVideoStart.bind(this, adUnit));
-        this._videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, adUnit));
-
-        this._overlay = new Overlay(placement.muteVideo());
-        this._overlay.render();
-        document.body.appendChild(this._overlay.container());
-        this._overlay.subscribe('skip', this.onSkip.bind(this, adUnit));
-        this._overlay.subscribe('mute', this.onMute.bind(this, adUnit));
-
-        this._endScreen = new EndScreen(adUnit);
-        this._endScreen.render();
-        this._endScreen.hide();
-        document.body.appendChild(this._endScreen.container());
-        this._endScreen.subscribe('replay', this.onReplay.bind(this));
-        this._endScreen.subscribe('download', this.onDownload.bind(this));
-        this._endScreen.subscribe('close', this.onClose.bind(this));
-
-        let orientation: ScreenOrientation = requestedOrientation;
-        if(!placement.useDeviceOrientationForVideo()) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-        }
-
-        let keyEvents: any[] = [];
-        if(placement.disableBackButton()) {
-            keyEvents = [KeyCode.BACK];
-        }
-
-        if(!placement.allowSkip()) {
-            this._overlay.setSkipEnabled(false);
-        } else {
-            this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(placement.allowSkipInSeconds());
-        }
-
-        this._adUnitManager.start(adUnit, orientation, keyEvents);
-        this._adUnitManager.subscribe('resumeadunit', this.onAdUnitResume.bind(this));
-        this._adUnitManager.subscribe('close', this.onClose.bind(this));
     }
 
     public hide(): void {
-        if(this._adUnitManager.isVideoActive()) {
-            this._videoPlayer.stop();
-            this._videoPlayer.reset();
-        }
-
         this._adUnitManager.hide();
-        this._adUnitManager.unsubscribe();
-        this._videoPlayer.unsubscribe();
-        this._videoPlayer = null;
-        this._overlay.container().parentElement.removeChild(this._overlay.container());
-        this._overlay = null;
-        this._endScreen.container().parentElement.removeChild(this._endScreen.container());
-        this._endScreen = null;
     }
 
     /*
@@ -231,108 +151,6 @@ export class WebView {
                 this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
             });
         });
-    }
-
-    /*
-     AD UNIT EVENT HANDLERS
-     */
-
-    private onAdUnitResume(adUnit: VideoAdUnit): void {
-        if(adUnit.isVideoActive()) {
-            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-        }
-    }
-
-    /*
-     VIDEO EVENT HANDLERS
-     */
-
-    private onVideoPrepared(adUnit: AdUnit, duration: number, width: number, height: number): void {
-        this._overlay.setVideoDuration(duration);
-        this._videoPlayer.setVolume(new Double(this._overlay.isMuted() ? 0.0 : 1.0)).then(() => {
-            if(this._adUnitManager.getVideoPosition() > 0) {
-                this._videoPlayer.seekTo(this._adUnitManager.getVideoPosition()).then(() => {
-                    this._videoPlayer.play();
-                });
-            } else {
-                this._videoPlayer.play();
-            }
-        });
-    }
-
-    private onVideoProgress(adUnit: AdUnit, position: number): void {
-        if(position > 0) {
-            this._adUnitManager.setVideoPosition(position);
-        }
-        this._overlay.setVideoProgress(position);
-    }
-
-    private onVideoStart(adUnit: AdUnit): void {
-        this._sessionManager.sendStart(adUnit);
-
-        if(this._adUnitManager.getWatches() === 0) {
-            // send start callback only for first watch, never for rewatches
-            this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
-        }
-
-        this._adUnitManager.newWatch();
-    }
-
-    private onVideoCompleted(adUnit: AdUnit, url: string): void {
-        this._adUnitManager.setVideoActive(false);
-        this.setFinishState(FinishState.COMPLETED);
-        this._sessionManager.sendView(adUnit);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-        this._overlay.hide();
-        this._endScreen.show();
-        this._storageManager.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if(integrationTest) {
-                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
-            }
-        });
-    }
-
-    /*
-    OVERLAY EVENT HANDLERS
-     */
-
-    private onSkip(adUnit: AdUnit): void {
-        this._videoPlayer.pause();
-        this._adUnitManager.setVideoActive(false);
-        this.setFinishState(FinishState.SKIPPED);
-        this._sessionManager.sendSkip(adUnit);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-        this._overlay.hide();
-        this._endScreen.show();
-    }
-
-    private onMute(adUnit: AdUnit, muted: boolean): void {
-        this._videoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-    }
-
-    /*
-     ENDSCREEN EVENT HANDLERS
-     */
-
-    private onReplay(adUnit: AdUnit): void {
-        this._adUnitManager.setVideoActive(true);
-        this._adUnitManager.setVideoPosition(0);
-        this._overlay.setSkipEnabled(true);
-        this._overlay.setSkipDuration(0);
-        this._endScreen.hide();
-        this._overlay.show();
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
-            this._videoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-        });
-    }
-
-    private onDownload(adUnit: AdUnit): void {
-        this._sessionManager.sendClick(adUnit);
-        this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getPlacement().getId()]);
-        this._nativeBridge.invoke('Intent', 'launch', [{
-            'action': 'android.intent.action.VIEW',
-            'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
-        }]);
     }
 
     private onClose(adUnit: AdUnit): void {
@@ -361,20 +179,6 @@ export class WebView {
                 }
             });
         }
-    }
-
-    /*
-     ERROR HANDLING HELPER METHODS
-     */
-
-    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
-        let batch: BatchInvocation = new BatchInvocation(this._nativeBridge);
-        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
-        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
-        if(sendFinish) {
-            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
-        }
-        this._nativeBridge.invokeBatch(batch);
     }
 
     /*
