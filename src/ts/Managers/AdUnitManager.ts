@@ -12,8 +12,8 @@ import { Overlay } from 'Views/Overlay';
 import { BatchInvocation, UnityAdsError } from 'NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Double } from 'Utilities/Double';
-import { StorageManager, StorageType } from 'StorageManager';
-import { SessionManager } from 'SessionManager';
+import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { SessionManager } from 'Managers/SessionManager';
 
 // currently this class is hardcoded for video ads, this should be refactored for generic support for different ad units TODO
 export class AdUnitManager extends Observable {
