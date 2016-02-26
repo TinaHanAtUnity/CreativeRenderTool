@@ -5,6 +5,8 @@
     "inlineSourceMap": true
   },
   "exclude": [
-    "test"
+    "test",
+    "typings/browser.d.ts",
+    "typings/browser"
   ]
 }

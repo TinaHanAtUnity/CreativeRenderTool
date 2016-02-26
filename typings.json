@@ -1,0 +1,11 @@
+{
+  "name": "unity-ads-webview",
+  "ambientDependencies": {
+    "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#0dd29bf8253536ae24e61c109524e924ea510046",
+    "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#0dd29bf8253536ae24e61c109524e924ea510046",
+    "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#0dd29bf8253536ae24e61c109524e924ea510046",
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#8c4ec896ab619e7cb6572f82423e6e1eece70f5a",
+    "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#8c4ec896ab619e7cb6572f82423e6e1eece70f5a",
+    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts#5c3e47967affa3c4128a3875d1664ba206ae1b0f"
+  }
+}
