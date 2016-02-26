@@ -28,8 +28,7 @@ export class WebViewBridge implements IWebViewBridge {
     public setNativeBridge(nativeBridge: INativeBridge): void {
         this._nativeBridge = nativeBridge;
 
-        let api: string;
-        for(api in this._apiMap) {
+        for(let api in this._apiMap) {
             if(this._apiMap.hasOwnProperty(api)) {
                 this._apiMap[api].setNativeBridge(nativeBridge);
             }
