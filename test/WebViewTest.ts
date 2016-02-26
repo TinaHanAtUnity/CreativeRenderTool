@@ -13,7 +13,6 @@ describe('WebViewTest', () => {
     before(() => {
         if(typeof global !== 'undefined') {
             global['window'] = global;
-            window['webviewbridge'] = new WebViewBridge();
         }
     });
 
@@ -41,9 +40,14 @@ describe('WebViewTest', () => {
         }
 
         let fakeWebViewBridge: FakeWebViewBridge = new FakeWebViewBridge();
-        window['nativebridge'] = new NativeBridge(fakeWebViewBridge);
+        let nativeBridge: NativeBridge = new NativeBridge(fakeWebViewBridge);
+        let webViewBridge: WebViewBridge = new WebViewBridge();
+        webViewBridge.setNativeBridge(nativeBridge);
 
-        let webView: WebView = new WebView(window['nativebridge']);
+        window['nativebridge'] = nativeBridge;
+        window['webviewbridge'] = webViewBridge;
+
+        let webView: WebView = new WebView(nativeBridge);
         webView.initialize();
     });
 });

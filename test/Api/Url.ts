@@ -1,6 +1,6 @@
-/* tslint:disable:no-string-literal */
+import { TestApi } from './TestApi';
 
-export class Url {
+export class Url extends TestApi {
 
     public resolve(host: string): any[] {
         return ['OK', host, '8.8.8.8'];
@@ -28,7 +28,7 @@ export class Url {
                 'abGroup': 0
             };
             setTimeout(() => {
-                window['nativebridge'].handleEvent(['URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/configuration') !== -1) {
@@ -58,7 +58,7 @@ export class Url {
                 ]
             };
             setTimeout(() => {
-                window['nativebridge'].handleEvent(['URL_COMPLETE', url, JSON.stringify(configResponse), 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, JSON.stringify(configResponse), 200, []]);
             }, 0);
             return ['OK'];
         }
