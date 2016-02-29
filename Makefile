@@ -105,7 +105,9 @@ build-test: clean build-dirs build-css build-html
 	cp test-utils/runner.js $(BUILD_DIR)
 	node -e "\
 		var fs = require('fs');\
-		var testList = JSON.stringify(fs.readdirSync('test').filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return 'test/' + file.replace('.ts', ''); }));\
+		function getTsFromFolder(folder) { return fs.readdirSync(folder).filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return folder + '/' + file.replace('.ts', ''); }); }\
+		var testList = JSON.stringify(getTsFromFolder('test').concat(getTsFromFolder('test/Utilities')));\
+        console.log(testList);\
 		var o = {encoding:'utf-8'};\
 		var f = fs.readFileSync('$(BUILD_DIR)/runner.js', o);\
 		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
@@ -218,7 +220,7 @@ test:
 	@echo Running local tests
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(MOCHA)
+	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive
 
 test-coverage:
 	@echo

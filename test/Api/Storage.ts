@@ -1,4 +1,6 @@
-export class Storage {
+import { TestApi } from './TestApi';
+
+export class Storage extends TestApi {
 
     public read(): any[] {
         return ['OK'];
