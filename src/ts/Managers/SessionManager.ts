@@ -38,46 +38,38 @@ export class SessionManager {
 
     public sendShow(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/show', infoJson);
+            let infoJson = this.getInfoJson(adUnit, id);
+            return this._request.post(SessionManager.SessionUrl + '/show', JSON.stringify(infoJson));
         });
     }
 
     public sendStart(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(this.createVideoEventUrl(adUnit, 'video_start'), infoJson);
+            let infoJson = this.getInfoJson(adUnit, id);
+            return this._request.post(this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         });
     }
 
     public sendSkip(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/skip', infoJson);
+            let infoJson = this.getInfoJson(adUnit, id);
+            return this._request.post(SessionManager.SessionUrl + '/skip', JSON.stringify(infoJson));
         });
     }
 
     public sendView(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(this.createVideoEventUrl(adUnit, 'video_end'), infoJson);
+            let infoJson = this.getInfoJson(adUnit, id);
+            return this._request.post(this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
         });
     }
 
     public sendClick(adUnit: AdUnit): Promise<any[]> {
         return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-
             let campaign = adUnit.getCampaign();
             if(campaign.getClickAttributionUrl()) {
                 this._request.get(campaign.getClickAttributionUrl());
             }
-
             return this._request.get(this.createClickEventUrl(adUnit));
         });
     }
@@ -114,8 +106,9 @@ export class SessionManager {
         });
     }
 
-    private getInfoJson(adUnit: AdUnit): any {
+    private getInfoJson(adUnit: AdUnit, id: string): { [key: string]: any } {
         return {
+            'uuid': id,
             'gamer_id': adUnit.getCampaign().getGamerId(),
             'campaign_id': adUnit.getCampaign().getId(),
             'placement_id': adUnit.getPlacement().getId(),
