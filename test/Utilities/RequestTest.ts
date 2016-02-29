@@ -18,7 +18,7 @@ describe('RequestTest', () => {
         request.get(successUrl).then(([response]) => {
             assert.equal(successMessage, response, 'Did not receive correct response');
             done();
-        }, ([error]) => {
+        }).catch(([error]) => {
             done(new Error('Get without headers failed: ' + error));
         });
     });
@@ -34,7 +34,7 @@ describe('RequestTest', () => {
 
         request.get(failUrl).then(([response]) => {
             done(new Error('Request should have failed but got response: ' + response));
-        }, ([error]) => {
+        }).catch(([error]) => {
             assert.equal(failMessage, error, 'Did not receive correct error message');
             done();
         });
@@ -53,7 +53,7 @@ describe('RequestTest', () => {
         request.get(headerUrl, [[headerField, headerMessage]]).then(([response]) => {
             assert.equal(headerMessage, response, 'Did not get correctly forwarded header response');
             done();
-        }, ([error]) => {
+        }).catch(([error]) => {
             done(new Error('Get with header forwarding failed: ' + error));
         });
     });
@@ -70,7 +70,7 @@ describe('RequestTest', () => {
         request.post(successUrl, 'Test').then(([response]) => {
             assert.equal(successMessage, response, 'Did not receive correct response');
             done();
-        }, ([error]) => {
+        }).catch(([error]) => {
             done(new Error('Post without headers failed: ' + error));
         });
     });
@@ -86,7 +86,7 @@ describe('RequestTest', () => {
 
         request.post(failUrl, 'Test').then(([response]) => {
             done(new Error('Request should have failed but got response: ' + response));
-        }, ([error]) => {
+        }).catch(([error]) => {
             assert.equal(failMessage, error, 'Did not receive correct error message');
             done();
         });
@@ -105,7 +105,7 @@ describe('RequestTest', () => {
         request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(([response]) => {
             assert.equal(headerMessage, response, 'Did not get correctly forwarded header response');
             done();
-        }, ([error]) => {
+        }).catch(([error]) => {
             done(new Error('Post with header forwarding failed: ' + error));
         });
     });
@@ -122,7 +122,7 @@ describe('RequestTest', () => {
         request.post(testUrl, bodyMessage).then(([response]) => {
             assert.equal(bodyMessage, response, 'Did not get correctly forwarded body');
             done();
-        }, ([error]) => {
+        }).catch(([error]) => {
             done(new Error('Post with body forwarding failed: ' + error));
         });
     });
