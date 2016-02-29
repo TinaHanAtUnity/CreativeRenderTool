@@ -1,8 +1,8 @@
-import { Placement } from 'Placement';
-import { Campaign } from 'Campaign';
+import { Placement } from 'Models/Placement';
+import { Campaign } from 'Models/Campaign';
 import { SessionManager } from 'Managers/SessionManager';
 import { StorageManager } from 'Managers/StorageManager';
-import {NativeBridge} from '../NativeBridge';
+import { NativeBridge } from 'NativeBridge';
 
 export enum FinishState {
     COMPLETED,

@@ -51,7 +51,6 @@ export class WebView {
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
         this._storageManager = new StorageManager(nativeBridge);
-        this._adUnitManager = new AdUnitManager(nativeBridge, this._sessionManager, this._storageManager);
         this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
@@ -66,6 +65,8 @@ export class WebView {
             this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             return this._sessionManager.create();
         }).then(() => {
+            this._adUnitManager = new AdUnitManager(this._nativeBridge, this._sessionManager, this._storageManager);
+
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
 
