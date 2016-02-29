@@ -2,6 +2,7 @@ import { Placement } from 'Placement';
 import { Campaign } from 'Campaign';
 import { SessionManager } from 'Managers/SessionManager';
 import { StorageManager } from 'Managers/StorageManager';
+import {NativeBridge} from '../NativeBridge';
 
 export enum FinishState {
     COMPLETED,
@@ -10,15 +11,17 @@ export enum FinishState {
 }
 
 export class AdUnit {
-    private _placement: Placement;
+    protected _placement: Placement;
+    protected _nativeBridge: NativeBridge;
     private _campaign: Campaign;
     private _finishState: FinishState;
     private _sessionManager: SessionManager;
     private _storageManager: StorageManager;
 
-    constructor(placement: Placement, campaign: Campaign, sessionManager: SessionManager, storageManager: StorageManager) {
+    constructor(placement: Placement, campaign: Campaign, nativeBridge: NativeBridge, sessionManager: SessionManager, storageManager: StorageManager) {
         this._placement = placement;
         this._campaign = campaign;
+        this._nativeBridge = nativeBridge;
         this._sessionManager = sessionManager;
         this._storageManager = storageManager;
     }

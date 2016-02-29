@@ -7,12 +7,10 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { AdUnit } from 'Models/AdUnit';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
-import { Overlay } from 'Views/Overlay';
 import { BatchInvocation, UnityAdsError } from 'NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Double } from 'Utilities/Double';
-import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { StorageManager } from 'Managers/StorageManager';
 import { SessionManager } from 'Managers/SessionManager';
 
 // currently this class is hardcoded for video ads, this should be refactored for generic support for different ad units TODO
@@ -85,27 +83,7 @@ export class AdUnitManager extends Observable {
             return;
         }
 
-        let videoPlayer = new NativeVideoPlayer(this._nativeBridge);
-        let overlay = new Overlay(placement.muteVideo());
-
-        let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign, videoPlayer, overlay, this._sessionManager, this._storageManager);
-
-        videoPlayer.subscribe('prepared', this.onVideoPrepared.bind(this, adUnit));
-        videoPlayer.subscribe('progress', this.onVideoProgress.bind(this, adUnit));
-        videoPlayer.subscribe('start', this.onVideoStart.bind(this, adUnit));
-        videoPlayer.subscribe('completed', this.onVideoCompleted.bind(this, adUnit));
-
-        overlay.render();
-        document.body.appendChild(overlay.container());
-        overlay.subscribe('skip', this.onSkip.bind(this, adUnit));
-        overlay.subscribe('mute', this.onMute.bind(this, adUnit));
-
-        let endScreen = adUnit.getEndScreen();
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-        endScreen.subscribe('replay', this.onReplay.bind(this));
-        endScreen.subscribe('download', this.onDownload.bind(this));
+        let adUnit: VideoAdUnit = new VideoAdUnit(placement, campaign, this._nativeBridge, this._sessionManager, this._storageManager);
 
         let orientation: ScreenOrientation = requestedOrientation;
         if(!placement.useDeviceOrientationForVideo()) {
@@ -115,13 +93,6 @@ export class AdUnitManager extends Observable {
         let keyEvents: any[] = [];
         if(placement.disableBackButton()) {
             keyEvents = [KeyCode.BACK];
-        }
-
-        if(!placement.allowSkip()) {
-            overlay.setSkipEnabled(false);
-        } else {
-            overlay.setSkipEnabled(true);
-            overlay.setSkipDuration(placement.allowSkipInSeconds());
         }
 
         this.start(adUnit, orientation, keyEvents);
@@ -168,7 +139,6 @@ export class AdUnitManager extends Observable {
         }
     }
 
-
     /*
      AD UNIT EVENT HANDLERS
      */
@@ -178,98 +148,4 @@ export class AdUnitManager extends Observable {
             adUnit.getVideoPlayer().prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
-
-    /*
-     VIDEO EVENT HANDLERS
-     */
-
-    private onVideoPrepared(adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
-        let videoPlayer = adUnit.getVideoPlayer();
-        adUnit.getOverlay().setVideoDuration(duration);
-        videoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
-            if(adUnit.getVideoPosition() > 0) {
-                videoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
-                    videoPlayer.play();
-                });
-            } else {
-                videoPlayer.play();
-            }
-        });
-    }
-
-    private onVideoProgress(adUnit: VideoAdUnit, position: number): void {
-        if(position > 0) {
-            adUnit.setVideoPosition(position);
-        }
-        adUnit.getOverlay().setVideoProgress(position);
-    }
-
-    private onVideoStart(adUnit: VideoAdUnit): void {
-        adUnit.getSessionManager().sendStart(adUnit);
-
-        if(adUnit.getWatches() === 0) {
-            // send start callback only for first watch, never for rewatches
-            this._nativeBridge.invoke('Listener', 'sendStartEvent', [adUnit.getPlacement().getId()]);
-        }
-
-        adUnit.newWatch();
-    }
-
-    private onVideoCompleted(adUnit: VideoAdUnit, url: string): void {
-        adUnit.setVideoActive(false);
-        adUnit.setFinishState(FinishState.COMPLETED);
-        adUnit.getSessionManager().sendView(adUnit);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-        adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
-        adUnit.getStorageManager().get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if(integrationTest) {
-                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
-            }
-        });
-    }
-
-    /*
-     OVERLAY EVENT HANDLERS
-     */
-
-    private onSkip(adUnit: VideoAdUnit): void {
-        adUnit.getVideoPlayer().pause();
-        adUnit.setVideoActive(false);
-        adUnit.setFinishState(FinishState.SKIPPED);
-        adUnit.getSessionManager().sendSkip(adUnit);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-        adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
-    }
-
-    private onMute(adUnit: VideoAdUnit, muted: boolean): void {
-        adUnit.getVideoPlayer().setVolume(new Double(muted ? 0.0 : 1.0));
-    }
-
-    /*
-     ENDSCREEN EVENT HANDLERS
-     */
-
-    private onReplay(adUnit: VideoAdUnit): void {
-        adUnit.setVideoActive(true);
-        adUnit.setVideoPosition(0);
-        adUnit.getOverlay().setSkipEnabled(true);
-        adUnit.getOverlay().setSkipDuration(0);
-        adUnit.getEndScreen().hide();
-        adUnit.getOverlay().show();
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
-            adUnit.getVideoPlayer().prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-        });
-    }
-
-    private onDownload(adUnit: AdUnit): void {
-        adUnit.getSessionManager().sendClick(adUnit);
-        this._nativeBridge.invoke('Listener', 'sendClickEvent', [adUnit.getPlacement().getId()]);
-        this._nativeBridge.invoke('Intent', 'launch', [{
-            'action': 'android.intent.action.VIEW',
-            'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
-        }]);
-    }
-
 }
