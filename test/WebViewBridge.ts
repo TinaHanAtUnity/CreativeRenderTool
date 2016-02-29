@@ -51,7 +51,7 @@ export class WebViewBridge implements IWebViewBridge {
             return result;
         });
         console.dir(results);
-        window['nativebridge'].handleCallback(results);
+        this._nativeBridge.handleCallback(results);
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
