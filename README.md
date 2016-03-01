@@ -10,7 +10,7 @@
 ### Optional
 
 - Python (`brew install python3`)
-- Watch (`brew install watch`)
+- Watchman (`brew install watchman`)
 
 ## IDE
 
@@ -42,9 +42,9 @@
 
 - `make build-dev`
 
-To build continuously (every 2s), use:
+To build and test continuously (on file changes), use:
 
-- `watch make build-dev`
+- `watchman-make -p 'src/ts/**/*.ts' -t build-dev -p 'test/**/*.ts' -t test`
 
 ### Running development builds
 
