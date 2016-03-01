@@ -35,9 +35,9 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data?: {}, headers?: [string, string][]): Promise<any[]> {
+    public post(url: string, data?: string, headers?: [string, string][]): Promise<any[]> {
         if(typeof data === 'undefined') {
-            data = {};
+            data = '';
         }
         if(typeof headers === 'undefined') {
             headers = [];
