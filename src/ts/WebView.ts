@@ -69,6 +69,7 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
+            this._campaignManager.subscribe('error', this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configManager.getDefaultPlacement();
             this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
@@ -86,9 +87,14 @@ export class WebView {
             this._connectivityManager.setListeningStatus(true);
             this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
-            return this._nativeBridge.invoke('Sdk', 'initComplete');
+            this._nativeBridge.invoke('Sdk', 'initComplete');
+            return Promise.reject(new Error('error object'));
         }).catch(error => {
             console.log(error);
+            Diagnostics.trigger(this._request, {
+                'type': 'unhandled_initialization_error',
+                'error': error
+            }, this._deviceInfo, this._clientInfo);
         });
     }
 
@@ -147,6 +153,18 @@ export class WebView {
                 this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
             });
         });
+    }
+
+    private onCampaignError(error: any) {
+        console.log(error);
+        if(error instanceof Error) {
+            error = {'message': error.message, 'name': error.name};
+        }
+        Diagnostics.trigger(this._request, {
+            'type': 'campaign_request_failed',
+            'error': error
+        }, this._deviceInfo, this._clientInfo);
+        // todo: implement retry logic
     }
 
     private onClose(adUnit: AdUnit): void {
