@@ -13,25 +13,20 @@ export class EventHandler {
         this._storageManager = storageManager;
     }
 
-    public operativeEvent(event: string, sessionId: string, url: string, data: any): void {
-        this.getUniqueEventId().then(id => {
-            this._nativeBridge.invoke('Sdk', 'logInfo', ['Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')']);
+    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): void {
+        this._nativeBridge.invoke('Sdk', 'logInfo', ['Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')']);
 
-            data.uuid = id;
+        let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
+        let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
-            let urlKey: string = 'session.' + sessionId + '.operative.' + id + '.url';
-            let dataKey: string = 'session.' + sessionId + '.operative.' + id + '.data';
+        this._storageManager.set(StorageType.PRIVATE, urlKey, url);
+        this._storageManager.set(StorageType.PRIVATE, dataKey, data);
+        this._storageManager.write(StorageType.PRIVATE);
 
-            this._storageManager.set(StorageType.PRIVATE, urlKey, url);
-            this._storageManager.set(StorageType.PRIVATE, dataKey, data);
+        this._request.post(url, data).then(() => {
+            this._storageManager.delete(StorageType.PRIVATE, urlKey);
+            this._storageManager.delete(StorageType.PRIVATE, dataKey);
             this._storageManager.write(StorageType.PRIVATE);
-
-            this._request.post(url, data).then(() => {
-                this._nativeBridge.invoke('Sdk', 'logInfo', ['Unity Ads operative event: ' + event + ' event successfully sent!']);
-                this._storageManager.delete(StorageType.PRIVATE, urlKey);
-                this._storageManager.delete(StorageType.PRIVATE, dataKey);
-                this._storageManager.write(StorageType.PRIVATE);
-            });
         });
     }
 

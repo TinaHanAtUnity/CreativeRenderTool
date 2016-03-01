@@ -34,19 +34,27 @@ export class SessionManager {
     }
 
     public sendShow(adUnit: AdUnit): void {
-        this._eventHandler.operativeEvent('show', this._currentSession.getId(), SessionManager.SessionUrl + '/show', this.getInfoJson(adUnit));
+        this._eventHandler.getUniqueEventId().then(id => {
+            this._eventHandler.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
+        });
     }
 
     public sendStart(adUnit: AdUnit): void {
-        this._eventHandler.operativeEvent('start', this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), this.getInfoJson(adUnit));
+        this._eventHandler.getUniqueEventId().then(id => {
+            this._eventHandler.operativeEvent('start', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(this.getInfoJson(adUnit, id)));
+        });
     }
 
     public sendSkip(adUnit: AdUnit): void {
-        this._eventHandler.operativeEvent('skip', this._currentSession.getId(), SessionManager.SessionUrl + '/skip', this.getInfoJson(adUnit));
+        this._eventHandler.getUniqueEventId().then(id => {
+            this._eventHandler.operativeEvent('skip', id, this._currentSession.getId(), SessionManager.SessionUrl + '/skip', JSON.stringify(this.getInfoJson(adUnit, id)));
+        });
     }
 
     public sendView(adUnit: AdUnit): void {
-        this._eventHandler.operativeEvent('view', this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), this.getInfoJson(adUnit));
+        this._eventHandler.getUniqueEventId().then(id => {
+            this._eventHandler.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(this.getInfoJson(adUnit, id)));
+        });
     }
 
     public sendClick(adUnit: AdUnit): void {
@@ -55,7 +63,9 @@ export class SessionManager {
             this._eventHandler.thirdPartyEvent('click attribution', this._currentSession.getId(), campaign.getClickAttributionUrl());
         }
 
-        this._eventHandler.operativeEvent('click', this._currentSession.getId(), this.createClickEventUrl(adUnit), this.getInfoJson(adUnit));
+        this._eventHandler.getUniqueEventId().then(id => {
+            this._eventHandler.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
+        });
     }
 
     private createVideoEventUrl(adUnit: AdUnit, type: string): string {
@@ -84,8 +94,9 @@ export class SessionManager {
         });
     }
 
-    private getInfoJson(adUnit: AdUnit): any {
+    private getInfoJson(adUnit: AdUnit, id: string): { [key: string]: any } {
         return {
+            'uuid': id,
             'gamer_id': adUnit.getCampaign().getGamerId(),
             'campaign_id': adUnit.getCampaign().getId(),
             'placement_id': adUnit.getPlacement().getId(),
