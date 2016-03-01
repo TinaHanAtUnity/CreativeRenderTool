@@ -3,6 +3,7 @@
 /* tslint:disable:no-string-literal */
 
 import { NativeBridge } from '../src/ts/NativeBridge';
+import { INativeBridge } from '../src/ts/INativeBridge';
 import { Sdk } from './Api/Sdk';
 import { DeviceInfo } from './Api/DeviceInfo';
 import { Placement } from './Api/Placement';
@@ -12,6 +13,7 @@ import { Listener } from './Api/Listener';
 import { Storage } from './Api/Storage';
 
 export class WebViewBridge implements IWebViewBridge {
+    private _nativeBridge: INativeBridge;
 
     private _apiMap: {} = {
         'Sdk': new Sdk(),
@@ -22,6 +24,16 @@ export class WebViewBridge implements IWebViewBridge {
         'Listener': new Listener(),
         'Storage': new Storage(),
     };
+
+    public setNativeBridge(nativeBridge: INativeBridge): void {
+        this._nativeBridge = nativeBridge;
+
+        for(let api in this._apiMap) {
+            if(this._apiMap.hasOwnProperty(api)) {
+                this._apiMap[api].setNativeBridge(nativeBridge);
+            }
+        }
+    }
 
     public handleInvocation(invocations: string): void {
         let calls: [string, string, any[], string][] = JSON.parse(invocations);
@@ -39,7 +51,7 @@ export class WebViewBridge implements IWebViewBridge {
             return result;
         });
         console.dir(results);
-        window['nativebridge'].handleCallback(results);
+        this._nativeBridge.handleCallback(results);
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
