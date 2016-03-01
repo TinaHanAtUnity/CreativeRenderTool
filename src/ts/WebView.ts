@@ -15,6 +15,7 @@ import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager } from 'Managers/StorageManager';
 import { ConnectivityManager } from 'Managers/ConnectivityManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { EventHandler } from 'Utilities/EventHandler';
 
 export class WebView {
 
@@ -62,7 +63,7 @@ export class WebView {
             this._configManager = new ConfigManager(this._request, this._clientInfo);
             return this._configManager.fetch();
         }).then(() => {
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, new EventHandler(this._nativeBridge, this._request, this._storageManager));
             return this._sessionManager.create();
         }).then(() => {
             this._adUnitManager = new AdUnitManager(this._nativeBridge, this._sessionManager, this._storageManager);

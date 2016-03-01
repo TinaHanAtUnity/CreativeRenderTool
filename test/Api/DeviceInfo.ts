@@ -135,6 +135,8 @@ export class DeviceInfo extends TestApi {
         return ['OK', this.generateRandomUUID()];
     }
 
+    // 52537970-362d-419a-b67a-f76ddab8c5e8
+    // 12345678-abcd-1234-abcd-1234abcd1234
     private generateRandomUUID(): string {
         let s4 = function() {
             return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);

@@ -1,10 +1,9 @@
-import { NativeBridge } from 'NativeBridge';
 import { Session } from 'Models/Session';
-import { Request } from 'Utilities/Request';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnit } from 'Models/AdUnit';
 import { Url } from 'Utilities/Url';
+import { EventHandler } from 'Utilities/EventHandler';
 
 export class SessionManager {
 
@@ -12,22 +11,20 @@ export class SessionManager {
     private static VideoEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _eventHandler: EventHandler;
 
     private _currentSession: Session;
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
-        this._nativeBridge = nativeBridge;
-        this._request = request;
+    constructor(clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventHandler: EventHandler) {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._eventHandler = eventHandler;
     }
 
     public create(): Promise<void> {
-        return this.getUniqueEventId().then(id => {
+        return this._eventHandler.getUniqueEventId().then(id => {
             this._currentSession = new Session(id);
         });
     }
@@ -36,56 +33,29 @@ export class SessionManager {
         return this._currentSession;
     }
 
-    public sendShow(adUnit: AdUnit): Promise<any[]> {
-        return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/show', infoJson);
-        });
+    public sendShow(adUnit: AdUnit): void {
+        this._eventHandler.operativeEvent('show', this._currentSession.getId(), SessionManager.SessionUrl + '/show', this.getInfoJson(adUnit));
     }
 
-    public sendStart(adUnit: AdUnit): Promise<any[]> {
-        return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(this.createVideoEventUrl(adUnit, 'video_start'), infoJson);
-        });
+    public sendStart(adUnit: AdUnit): void {
+        this._eventHandler.operativeEvent('start', this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), this.getInfoJson(adUnit));
     }
 
-    public sendSkip(adUnit: AdUnit): Promise<any[]> {
-        return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(SessionManager.SessionUrl + '/skip', infoJson);
-        });
+    public sendSkip(adUnit: AdUnit): void {
+        this._eventHandler.operativeEvent('skip', this._currentSession.getId(), SessionManager.SessionUrl + '/skip', this.getInfoJson(adUnit));
     }
 
-    public sendView(adUnit: AdUnit): Promise<any[]> {
-        return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
-            return this._request.post(this.createVideoEventUrl(adUnit, 'video_end'), infoJson);
-        });
+    public sendView(adUnit: AdUnit): void {
+        this._eventHandler.operativeEvent('view', this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), this.getInfoJson(adUnit));
     }
 
-    public sendClick(adUnit: AdUnit): Promise<any[]> {
-        return this.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit);
-            infoJson.uuid = id;
+    public sendClick(adUnit: AdUnit): void {
+        let campaign = adUnit.getCampaign();
+        if(campaign.getClickAttributionUrl()) {
+            this._eventHandler.thirdPartyEvent('click attribution', this._currentSession.getId(), campaign.getClickAttributionUrl());
+        }
 
-            let campaign = adUnit.getCampaign();
-            if(campaign.getClickAttributionUrl()) {
-                this._request.get(campaign.getClickAttributionUrl());
-            }
-
-            return this._request.get(this.createClickEventUrl(adUnit));
-        });
-    }
-
-    private getUniqueEventId(): Promise<string> {
-        return this._nativeBridge.invoke('DeviceInfo', 'getUniqueEventId').then(([id]) => {
-            return id;
-        });
+        this._eventHandler.operativeEvent('click', this._currentSession.getId(), this.createClickEventUrl(adUnit), this.getInfoJson(adUnit));
     }
 
     private createVideoEventUrl(adUnit: AdUnit, type: string): string {
