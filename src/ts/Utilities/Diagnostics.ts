@@ -6,23 +6,23 @@ export class Diagnostics {
 
     private static DiagnosticsBaseUrl = 'https://httpkafka.unityads.unity3d.com/v1/events';
 
-    public static trigger(request: Request, data: any, deviceInfo?: DeviceInfo, clientInfo?: ClientInfo): Promise<any[]> {
+    public static trigger(request: Request, data: any, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any[]> {
         let messages = [];
         messages.push({
             'type': 'ads.sdk2.diagnostics',
             'msg': data
         });
-        messages.unshift(Diagnostics.createCommonObject(deviceInfo, clientInfo));
+        messages.unshift(Diagnostics.createCommonObject(clientInfo, deviceInfo));
 
         let rawData = messages.map(message => JSON.stringify(message)).join('\n');
         return request.post(Diagnostics.DiagnosticsBaseUrl, rawData);
     }
 
-    private static createCommonObject(deviceInfo?: DeviceInfo, clientInfo?: ClientInfo) {
+    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo) {
         return {
             'common': {
-                'device': deviceInfo ? deviceInfo.getDTO() : null,
-                'client': clientInfo ? clientInfo.getDTO() : null
+                'client': clientInfo ? clientInfo.getDTO() : null,
+                'device': deviceInfo ? deviceInfo.getDTO() : null
              }
         };
     }

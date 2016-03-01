@@ -59,7 +59,7 @@ export class WebView {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
-            this._configManager = new ConfigManager(this._request, this._clientInfo);
+            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
         }).then(() => {
             this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
@@ -88,13 +88,15 @@ export class WebView {
             this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
             this._nativeBridge.invoke('Sdk', 'initComplete');
-            return Promise.reject(new Error('error object'));
         }).catch(error => {
             console.log(error);
+            if(error instanceof Error) {
+                error = {'message': error.message, 'name': error.name};
+            }
             Diagnostics.trigger(this._request, {
                 'type': 'unhandled_initialization_error',
                 'error': error
-            }, this._deviceInfo, this._clientInfo);
+            }, this._clientInfo, this._deviceInfo);
         });
     }
 
@@ -111,6 +113,9 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
+            JSON.parse('asdads');
+        }).catch(error => {
+            console.dir(error);
         });
 
         let placement: Placement = this._configManager.getPlacement(placementId);
@@ -163,7 +168,7 @@ export class WebView {
         Diagnostics.trigger(this._request, {
             'type': 'campaign_request_failed',
             'error': error
-        }, this._deviceInfo, this._clientInfo);
+        }, this._clientInfo, this._deviceInfo);
         // todo: implement retry logic
     }
 
@@ -206,7 +211,7 @@ export class WebView {
             'line': event.lineno,
             'column': event.colno,
             'object': event.error
-        }, this._deviceInfo, this._clientInfo);
+        }, this._clientInfo, this._deviceInfo);
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
 

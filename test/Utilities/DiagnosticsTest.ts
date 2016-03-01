@@ -14,7 +14,7 @@ describe('DiagnosticsTest', () => {
         let nativeBridge = new NativeBridge(null);
         let request = new Request(nativeBridge);
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"device":null,"client":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
         Diagnostics.trigger(request, {'test': true});
         mockRequest.verify();
     });
@@ -38,8 +38,8 @@ describe('DiagnosticsTest', () => {
         ]);
 
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"device":{},"client":{"game_id":"12345","test_mode":false,"application_name":"com.unity3d.ads.example","application_version":"2.0.0-test2","sdk_version":"2.0.0-alpha2","platform":"android","encrypted":false,"config_url":"http://example.com/config.json","webview_url":"http://example.com/index.html","webview_hash":null}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-        Diagnostics.trigger(request, {'test': true}, deviceInfo, clientInfo);
+        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"game_id":"12345","test_mode":false,"application_name":"com.unity3d.ads.example","application_version":"2.0.0-test2","sdk_version":"2.0.0-alpha2","platform":"android","encrypted":false,"config_url":"http://example.com/config.json","webview_url":"http://example.com/index.html","webview_hash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        Diagnostics.trigger(request, {'test': true}, clientInfo, deviceInfo);
         mockRequest.verify();
     });
 });

@@ -2,6 +2,8 @@ import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class ConfigManager {
 
@@ -9,15 +11,17 @@ export class ConfigManager {
 
     private _request: Request;
     private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
 
     private _enabled: boolean;
     private _country: string;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement = null;
 
-    constructor(request: Request, clientInfo: ClientInfo) {
+    constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._request = request;
         this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
     }
 
     public fetch(): Promise<void> {
@@ -36,6 +40,15 @@ export class ConfigManager {
                     this._defaultPlacement = placement;
                 }
             });
+        }).catch(error => {
+            console.dir(error);
+            if(error instanceof Error) {
+                error = {'message': error.message, 'name': error.name};
+            }
+            Diagnostics.trigger(this._request, {
+                'type': 'config_request_failed',
+                'error': error
+            }, this._clientInfo, this._deviceInfo);
         });
     }
 
