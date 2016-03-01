@@ -1,18 +1,34 @@
 import { AdUnit } from 'Models/AdUnit';
 import { Placement } from 'Placement';
 import { Campaign } from 'Campaign';
+import { NativeVideoPlayer } from 'Video/NativeVideoPlayer';
+import { Overlay } from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { SessionManager } from 'Managers/SessionManager';
+import { StorageManager } from 'Managers/StorageManager';
+import { NativeBridge } from 'NativeBridge';
+import { FinishState } from 'Models/AdUnit';
+import { Double } from 'Utilities/Double';
+import { StorageType } from 'Managers/StorageManager';
 
 export class VideoAdUnit extends AdUnit {
+    private _videoPlayer: NativeVideoPlayer;
+    private _overlay: Overlay;
+    private _endScreen: EndScreen;
     private _videoPosition: number;
     private _videoActive: boolean;
     private _watches: number;
 
-    constructor(placement: Placement, campaign: Campaign) {
-        super(placement, campaign);
+    constructor(placement: Placement, campaign: Campaign, nativeBridge: NativeBridge, sessionManager: SessionManager, storageManager: StorageManager) {
+        super(placement, campaign, nativeBridge, sessionManager, storageManager);
 
         this._videoPosition = 0;
         this._videoActive = true;
         this._watches = 0;
+
+        this.prepareVideoPlayer();
+        this.prepareOverlay();
+        this.prepareEndScreen();
     }
 
     public getVideoPosition(): number {
@@ -38,4 +54,164 @@ export class VideoAdUnit extends AdUnit {
     public setWatches(watches: number): void {
         this._watches = watches;
     }
+
+    public getVideoPlayer(): NativeVideoPlayer {
+        return this._videoPlayer;
+    }
+
+    public getOverlay(): Overlay {
+        return this._overlay;
+    }
+
+    public getEndScreen(): EndScreen {
+        return this._endScreen;
+    }
+
+    public newWatch() {
+        this._watches += 1;
+    }
+
+    public unsetReferences() {
+        this._endScreen = null;
+        this._videoPlayer = null;
+        this._overlay = null;
+    }
+
+    /*
+     VIDEO EVENT HANDLERS
+     */
+
+    public onVideoPrepared(duration: number, width: number, height: number): void {
+        let videoPlayer = this.getVideoPlayer();
+        this.getOverlay().setVideoDuration(duration);
+        videoPlayer.setVolume(new Double(this.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
+            if(this.getVideoPosition() > 0) {
+                videoPlayer.seekTo(this.getVideoPosition()).then(() => {
+                    videoPlayer.play();
+                });
+            } else {
+                videoPlayer.play();
+            }
+        });
+    }
+
+    public onVideoProgress(position: number): void {
+        if(position > 0) {
+            this.setVideoPosition(position);
+        }
+        this.getOverlay().setVideoProgress(position);
+    }
+
+    public onVideoStart(): void {
+        this.getSessionManager().sendStart(this);
+
+        if(this.getWatches() === 0) {
+            // send start callback only for first watch, never for rewatches
+            this._nativeBridge.invoke('Listener', 'sendStartEvent', [this.getPlacement().getId()]);
+        }
+
+        this.newWatch();
+    }
+
+    public onVideoCompleted(url: string): void {
+        this.setVideoActive(false);
+        this.setFinishState(FinishState.COMPLETED);
+        this.getSessionManager().sendView(this);
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
+        this.getOverlay().hide();
+        this.getEndScreen().show();
+        this.getStorageManager().get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
+            if(integrationTest) {
+                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [this.getPlacement().getId()]);
+            }
+        });
+    }
+
+    /*
+     OVERLAY EVENT HANDLERS
+     */
+
+    public onSkip(): void {
+        this.getVideoPlayer().pause();
+        this.setVideoActive(false);
+        this.setFinishState(FinishState.SKIPPED);
+        this.getSessionManager().sendSkip(this);
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
+        this.getOverlay().hide();
+        this.getEndScreen().show();
+    }
+
+    public onMute(muted: boolean): void {
+        this.getVideoPlayer().setVolume(new Double(muted ? 0.0 : 1.0));
+    }
+
+    /*
+     ENDSCREEN EVENT HANDLERS
+     */
+
+    public onReplay(): void {
+        this.setVideoActive(true);
+        this.setVideoPosition(0);
+        this.getOverlay().setSkipEnabled(true);
+        this.getOverlay().setSkipDuration(0);
+        this.getEndScreen().hide();
+        this.getOverlay().show();
+        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
+            this.getVideoPlayer().prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+        });
+    }
+
+    public onDownload(): void {
+        this.getSessionManager().sendClick(this);
+        this._nativeBridge.invoke('Listener', 'sendClickEvent', [this.getPlacement().getId()]);
+        this._nativeBridge.invoke('Intent', 'launch', [{
+            'action': 'android.intent.action.VIEW',
+            'uri': 'market://details?id=' + this.getCampaign().getAppStoreId()
+        }]);
+    }
+
+    /*
+     PRIVATES
+     */
+    private prepareVideoPlayer() {
+        let videoPlayer = new NativeVideoPlayer(this._nativeBridge);
+
+        videoPlayer.subscribe('prepared', (duration, width, height) => this.onVideoPrepared(duration, width, height));
+        videoPlayer.subscribe('progress', (position) => this.onVideoProgress(position));
+        videoPlayer.subscribe('start', () => this.onVideoStart());
+        videoPlayer.subscribe('completed', (url) => this.onVideoCompleted(url));
+
+        this._videoPlayer = videoPlayer;
+    }
+
+    private prepareOverlay() {
+        let overlay = new Overlay(this._placement.muteVideo());
+
+        overlay.render();
+        document.body.appendChild(overlay.container());
+        overlay.subscribe('skip', () => this.onSkip());
+        overlay.subscribe('mute', (muted) => this.onMute(muted));
+
+        if(!this._placement.allowSkip()) {
+            overlay.setSkipEnabled(false);
+        } else {
+            overlay.setSkipEnabled(true);
+            overlay.setSkipDuration(this._placement.allowSkipInSeconds());
+        }
+
+        this._overlay = overlay;
+    }
+
+    private prepareEndScreen() {
+        let endScreen = new EndScreen(this);
+
+        endScreen.render();
+        endScreen.hide();
+        document.body.appendChild(endScreen.container());
+        endScreen.subscribe('replay', () => this.onReplay());
+        endScreen.subscribe('download', () => this.onDownload());
+
+        this._endScreen = endScreen;
+    }
+
 }
