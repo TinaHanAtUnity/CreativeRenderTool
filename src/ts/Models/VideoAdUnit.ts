@@ -9,7 +9,7 @@ import { StorageManager } from 'Managers/StorageManager';
 import { NativeBridge } from 'NativeBridge';
 import { FinishState } from 'Models/AdUnit';
 import { Double } from 'Utilities/Double';
-import { StorageType } from 'Managers/StorageManager';
+import { VideoAdEventHandlers } from 'EventHandlers/VideoAdEventHandlers';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;
@@ -78,56 +78,6 @@ export class VideoAdUnit extends AdUnit {
     }
 
     /*
-     VIDEO EVENT HANDLERS
-     */
-
-    public onVideoPrepared(duration: number, width: number, height: number): void {
-        let videoPlayer = this.getVideoPlayer();
-        this.getOverlay().setVideoDuration(duration);
-        videoPlayer.setVolume(new Double(this.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
-            if(this.getVideoPosition() > 0) {
-                videoPlayer.seekTo(this.getVideoPosition()).then(() => {
-                    videoPlayer.play();
-                });
-            } else {
-                videoPlayer.play();
-            }
-        });
-    }
-
-    public onVideoProgress(position: number): void {
-        if(position > 0) {
-            this.setVideoPosition(position);
-        }
-        this.getOverlay().setVideoProgress(position);
-    }
-
-    public onVideoStart(): void {
-        this.getSessionManager().sendStart(this);
-
-        if(this.getWatches() === 0) {
-            // send start callback only for first watch, never for rewatches
-            this._nativeBridge.invoke('Listener', 'sendStartEvent', [this.getPlacement().getId()]);
-        }
-
-        this.newWatch();
-    }
-
-    public onVideoCompleted(url: string): void {
-        this.setVideoActive(false);
-        this.setFinishState(FinishState.COMPLETED);
-        this.getSessionManager().sendView(this);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
-        this.getOverlay().hide();
-        this.getEndScreen().show();
-        this.getStorageManager().get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if(integrationTest) {
-                this._nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [this.getPlacement().getId()]);
-            }
-        });
-    }
-
-    /*
      OVERLAY EVENT HANDLERS
      */
 
@@ -136,7 +86,7 @@ export class VideoAdUnit extends AdUnit {
         this.setVideoActive(false);
         this.setFinishState(FinishState.SKIPPED);
         this.getSessionManager().sendSkip(this);
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['webview']]);
+        this.getNativeBridge().invoke('AdUnit', 'setViews', [['webview']]);
         this.getOverlay().hide();
         this.getEndScreen().show();
     }
@@ -156,15 +106,15 @@ export class VideoAdUnit extends AdUnit {
         this.getOverlay().setSkipDuration(0);
         this.getEndScreen().hide();
         this.getOverlay().show();
-        this._nativeBridge.invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
+        this.getNativeBridge().invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
             this.getVideoPlayer().prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }
 
     public onDownload(): void {
         this.getSessionManager().sendClick(this);
-        this._nativeBridge.invoke('Listener', 'sendClickEvent', [this.getPlacement().getId()]);
-        this._nativeBridge.invoke('Intent', 'launch', [{
+        this.getNativeBridge().invoke('Listener', 'sendClickEvent', [this.getPlacement().getId()]);
+        this.getNativeBridge().invoke('Intent', 'launch', [{
             'action': 'android.intent.action.VIEW',
             'uri': 'market://details?id=' + this.getCampaign().getAppStoreId()
         }]);
@@ -176,10 +126,10 @@ export class VideoAdUnit extends AdUnit {
     private prepareVideoPlayer() {
         let videoPlayer = new NativeVideoPlayer(this._nativeBridge);
 
-        videoPlayer.subscribe('prepared', (duration, width, height) => this.onVideoPrepared(duration, width, height));
-        videoPlayer.subscribe('progress', (position) => this.onVideoProgress(position));
-        videoPlayer.subscribe('start', () => this.onVideoStart());
-        videoPlayer.subscribe('completed', (url) => this.onVideoCompleted(url));
+        videoPlayer.subscribe('prepared', (duration, width, height) => VideoAdEventHandlers.onVideoPrepared(this, duration, width, height));
+        videoPlayer.subscribe('progress', (position) => VideoAdEventHandlers.onVideoProgress(this, position));
+        videoPlayer.subscribe('start', () => VideoAdEventHandlers.onVideoStart(this));
+        videoPlayer.subscribe('completed', (url) => VideoAdEventHandlers.onVideoCompleted(this, url));
 
         this._videoPlayer = videoPlayer;
     }
