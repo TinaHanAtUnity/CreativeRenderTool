@@ -209,7 +209,7 @@ lint:
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
 
-test:
+test: clean
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -222,7 +222,7 @@ test:
 
 	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive
 
-test-coverage:
+test-coverage: clean
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -233,5 +233,5 @@ test-coverage:
 	@echo Running local tests with coverage
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA)
+	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
