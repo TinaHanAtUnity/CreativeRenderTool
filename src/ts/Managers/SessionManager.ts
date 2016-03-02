@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdUnit } from 'Models/AdUnit';
 import { Url } from 'Utilities/Url';
-import { EventHandler } from 'Utilities/EventHandler';
+import { EventManager } from 'EventManager';
 
 export class SessionManager {
 
@@ -13,18 +13,18 @@ export class SessionManager {
 
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _eventHandler: EventHandler;
+    private _eventManager: EventManager;
 
     private _currentSession: Session;
 
-    constructor(clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventHandler: EventHandler) {
+    constructor(clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._eventHandler = eventHandler;
+        this._eventManager = eventManager;
     }
 
     public create(): Promise<void> {
-        return this._eventHandler.getUniqueEventId().then(id => {
+        return this._eventManager.getUniqueEventId().then(id => {
             this._currentSession = new Session(id);
         });
     }
@@ -34,37 +34,37 @@ export class SessionManager {
     }
 
     public sendShow(adUnit: AdUnit): void {
-        this._eventHandler.getUniqueEventId().then(id => {
-            this._eventHandler.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
+        this._eventManager.getUniqueEventId().then(id => {
+            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
     public sendStart(adUnit: AdUnit): void {
-        this._eventHandler.getUniqueEventId().then(id => {
-            this._eventHandler.operativeEvent('start', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(this.getInfoJson(adUnit, id)));
+        this._eventManager.getUniqueEventId().then(id => {
+            this._eventManager.operativeEvent('start', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
     public sendSkip(adUnit: AdUnit): void {
-        this._eventHandler.getUniqueEventId().then(id => {
-            this._eventHandler.operativeEvent('skip', id, this._currentSession.getId(), SessionManager.SessionUrl + '/skip', JSON.stringify(this.getInfoJson(adUnit, id)));
+        this._eventManager.getUniqueEventId().then(id => {
+            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), SessionManager.SessionUrl + '/skip', JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
     public sendView(adUnit: AdUnit): void {
-        this._eventHandler.getUniqueEventId().then(id => {
-            this._eventHandler.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(this.getInfoJson(adUnit, id)));
+        this._eventManager.getUniqueEventId().then(id => {
+            this._eventManager.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
     public sendClick(adUnit: AdUnit): void {
         let campaign = adUnit.getCampaign();
         if(campaign.getClickAttributionUrl()) {
-            this._eventHandler.thirdPartyEvent('click attribution', this._currentSession.getId(), campaign.getClickAttributionUrl());
+            this._eventManager.thirdPartyEvent('click attribution', this._currentSession.getId(), campaign.getClickAttributionUrl());
         }
 
-        this._eventHandler.getUniqueEventId().then(id => {
-            this._eventHandler.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
+        this._eventManager.getUniqueEventId().then(id => {
+            this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
@@ -104,7 +104,7 @@ export class SessionManager {
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'os_version': this._deviceInfo.getOsVersion(),
             'connection_type': this._deviceInfo.getNetworkType(),
-            'sid': 'rikshot'
+            'sid': 'rikshot' // todo: fix this
         };
     }
 
