@@ -15,6 +15,7 @@ import { VideoAdUnit } from 'Models/VideoAdUnit';
 import { StorageManager } from 'Managers/StorageManager';
 import { ConnectivityManager } from 'Managers/ConnectivityManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { EventManager } from 'Managers/EventManager';
 
 export class WebView {
 
@@ -32,6 +33,7 @@ export class WebView {
 
     private _storageManager: StorageManager;
     private _sessionManager: SessionManager;
+    private _eventManager: EventManager;
 
     private _adUnitManager: AdUnitManager;
 
@@ -51,6 +53,7 @@ export class WebView {
         this._cacheManager = new CacheManager(nativeBridge);
         this._request = new Request(nativeBridge);
         this._storageManager = new StorageManager(nativeBridge);
+        this._eventManager = new EventManager(nativeBridge, this._request, this._storageManager);
         this._connectivityManager = new ConnectivityManager(nativeBridge);
     }
 
@@ -62,7 +65,7 @@ export class WebView {
             this._configManager = new ConfigManager(this._request, this._clientInfo);
             return this._configManager.fetch();
         }).then(() => {
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
             this._adUnitManager = new AdUnitManager(this._nativeBridge, this._sessionManager, this._storageManager);
@@ -181,7 +184,7 @@ export class WebView {
      GENERIC ONERROR HANDLER
      */
     private onError(event: ErrorEvent): boolean {
-        Diagnostics.trigger(this._request, {
+        Diagnostics.trigger(this._eventManager, {
             'type': 'js_error',
             'message': event.message,
             'url': event.filename,
