@@ -91,7 +91,7 @@ export class WebView {
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
-                error = {'message': error.message, 'name': error.name};
+                error = {'message': error.message, 'name': error.name, 'stack': error.stack};
             }
             Diagnostics.trigger(this._request, {
                 'type': 'unhandled_initialization_error',
@@ -113,7 +113,6 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
-            JSON.parse('asdads');
         }).catch(error => {
             console.dir(error);
         });
@@ -163,7 +162,7 @@ export class WebView {
     private onCampaignError(error: any) {
         console.log(error);
         if(error instanceof Error) {
-            error = {'message': error.message, 'name': error.name};
+            error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
         Diagnostics.trigger(this._request, {
             'type': 'campaign_request_failed',
