@@ -165,7 +165,7 @@ describe('EventManagerTest', () => {
         let eventManager: EventManager = new EventManager(nativeBridge, request, storageManager);
 
         let url: string = 'https://www.example.net/diagnostic_event';
-        let data: string = 'Test Data;'
+        let data: string = 'Test Data';
 
         let requestSpy = sinon.spy(request, 'post');
 
