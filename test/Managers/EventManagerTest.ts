@@ -103,7 +103,7 @@ describe('EventManagerTest', () => {
             assert.equal(null, storageManager.directGet(urlKey), 'Successful operative event url should be deleted');
             assert.equal(null, storageManager.directGet(dataKey), 'Successful operative event data should be deleted');
             done();
-        }).catch(([error]) => {
+        }).catch((error) => {
             done(new Error('Send succesful operative event failed: ' + error));
         });
     });
@@ -130,10 +130,10 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            assert.equal(url, storageManager.directGet(urlKey), 'Failed operative event url was not correctly stored');
+            assert.equal(data, storageManager.directGet(urlKey), 'Failed operative event url was not correctly stored');
             assert.equal(data, storageManager.directGet(dataKey), 'Failed operative event data was not correctly stored');
             done();
-        }).catch(([error]) => {
+        }).catch((error) => {
             done(new Error('Send failed operative event failed: ' + error));
         });
     });
@@ -153,7 +153,7 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce);
             assert.equal(url, requestSpy.getCall(0).args[0], 'Third party event url does not match');
             done();
-        }).catch(([error]) => {
+        }).catch((error) => {
             done(new Error('Send failed operative event failed: ' + error));
         });
     });
@@ -174,7 +174,7 @@ describe('EventManagerTest', () => {
             assert.equal(url, requestSpy.getCall(0).args[0], 'Diagnostic event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Diagnostic event data does not match');
             done();
-        }).catch(([error]) => {
+        }).catch((error) => {
             done(new Error('Send failed operative event failed: ' + error));
       });
     });
