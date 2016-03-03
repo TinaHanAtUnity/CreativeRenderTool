@@ -40,15 +40,6 @@ export class ConfigManager {
                     this._defaultPlacement = placement;
                 }
             });
-        }).catch(error => {
-            console.dir(error);
-            if(error instanceof Error) {
-                error = {'message': error.message, 'name': error.name};
-            }
-            Diagnostics.trigger(this._request, {
-                'type': 'config_request_failed',
-                'error': error
-            }, this._clientInfo, this._deviceInfo);
         });
     }
 

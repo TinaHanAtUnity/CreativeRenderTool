@@ -209,7 +209,7 @@ lint:
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
 
-test:
+test: clean
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -222,11 +222,12 @@ test:
 
 	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive
 
-test-coverage:
+test-coverage: clean
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
+	$(TYPESCRIPT) --project .
 	$(TYPESCRIPT) --project test
 
 	@echo
