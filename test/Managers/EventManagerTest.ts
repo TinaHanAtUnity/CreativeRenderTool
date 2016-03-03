@@ -130,7 +130,7 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            assert.equal(data, storageManager.directGet(urlKey), 'Failed operative event url was not correctly stored');
+            assert.equal(url, storageManager.directGet(urlKey), 'Failed operative event url was not correctly stored');
             assert.equal(data, storageManager.directGet(dataKey), 'Failed operative event data was not correctly stored');
             done();
         }).catch((error) => {
