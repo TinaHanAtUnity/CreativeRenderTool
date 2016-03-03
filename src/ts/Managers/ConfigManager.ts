@@ -2,7 +2,6 @@ import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class ConfigManager {

@@ -62,10 +62,10 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue(className, 'getSystemLanguage').then(([language]) => this._language = language));
         promises.push(batch.queue(className, 'getDeviceVolume', [StreamType.STREAM_SYSTEM]).then(([volume]) => this._volume = volume));
         promises.push(batch.queue(className, 'getScreenBrightness').then(([screenBrightness]) => this._screenBrightness = screenBrightness));
-        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.EXTERNAL]]).then(([freeExternalSpace]) => this._freeExternalSpace = freeExternalSpace).catch(([error]) => this._freeExternalSpace = undefined));
-        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.EXTERNAL]]).then(([totalExternalSpace]) => this._totalExternalSpace = totalExternalSpace).catch(([error]) => this._totalExternalSpace = undefined));
-        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.INTERNAL]]).then(([freeInternalSpace]) => this._freeInternalSpace = freeInternalSpace).catch(([error]) => this._freeInternalSpace = undefined));
-        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.INTERNAL]]).then(([totalInternalSpace]) => this._totalInternalSpace = totalInternalSpace).catch(([error]) => this._totalInternalSpace = undefined));
+        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.EXTERNAL]]).then(([freeExternalSpace]) => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined));
+        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.EXTERNAL]]).then(([totalExternalSpace]) => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined));
+        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.INTERNAL]]).then(([freeInternalSpace]) => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined));
+        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.INTERNAL]]).then(([totalInternalSpace]) => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined));
         promises.push(batch.queue(className, 'getBatteryLevel').then(([batteryLevel]) => this._batteryLevel = batteryLevel));
         promises.push(batch.queue(className, 'getBatteryStatus').then(([batteryStatus]) => this._batteryStatus = batteryStatus));
         promises.push(batch.queue(className, 'getFreeMemory').then(([freeMemory]) => this._freeMemory = freeMemory));

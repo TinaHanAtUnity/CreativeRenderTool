@@ -32,7 +32,7 @@ export class SessionManager {
     public getSession(): Session {
         return this._currentSession;
     }
-    
+
     public sendShow(adUnit: AdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
             this._eventManager.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
