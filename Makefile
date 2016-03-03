@@ -36,12 +36,6 @@ build-dev: build-ts build-css build-html
 	cp src/index.html $(BUILD_DIR)/index.html
 
 	@echo
-	@echo Running through babel for ES3 compatibility
-	@echo
-
-	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
-
-	@echo
 	@echo Computing build details to dev config
 	@echo
 
