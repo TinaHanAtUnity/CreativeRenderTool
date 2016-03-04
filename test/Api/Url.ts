@@ -2,11 +2,11 @@ import { TestApi } from './TestApi';
 
 export class Url extends TestApi {
 
-    public resolve(host: string): any[] {
-        return ['OK', host, '8.8.8.8'];
+    public resolve(id: string, host: string): any[] {
+        return ['OK', id, host, '8.8.8.8'];
     }
 
-    public get(url: string, headers: [string, string][]): any[] {
+    public get(id: string, url: string, headers: [string, string][]): any[] {
         if(url.indexOf('/fill') !== -1) {
             let campaignResponse: {} = {
                 'campaign': {
@@ -28,7 +28,7 @@ export class Url extends TestApi {
                 'abGroup': 0
             };
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, JSON.stringify(campaignResponse), 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, JSON.stringify(campaignResponse), 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/configuration') !== -1) {
@@ -58,58 +58,58 @@ export class Url extends TestApi {
                 ]
             };
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, JSON.stringify(configResponse), 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, JSON.stringify(configResponse), 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/success') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, 'Success response', 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, 'Success response', 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_FAILED', url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'Fail response']);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/forwardheader') !== -1) {
             if(headers[0][0] === 'X-Test') {
                 setTimeout(() => {
-                    this.getNativeBridge().handleEvent(['URL_COMPLETE', url, headers[0][1], 200, []]);
+                    this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, headers[0][1], 200, []]);
                 }, 0);
             } else {
                 setTimeout(() => {
-                    this.getNativeBridge().handleEvent(['URL_FAILED', url, 'No X-Test header found']);
+                    this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'No X-Test header found']);
                 }, 0);
             }
             return ['OK'];
         }
     }
 
-    public post(url: string, body: string, headers: [string, string][]): any[] {
+    public post(id: string, url: string, body: string, headers: [string, string][]): any[] {
         if(url.indexOf('/success') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, 'Success response', 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, 'Success response', 200, []]);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_FAILED', url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'Fail response']);
             }, 0);
             return ['OK'];
         } else if(url.indexOf('/forwardheader') !== -1) {
             if(headers[0][0] === 'X-Test') {
                 setTimeout(() => {
-                    this.getNativeBridge().handleEvent(['URL_COMPLETE', url, headers[0][1], 200, []]);
+                    this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, headers[0][1], 200, []]);
                 }, 0);
             } else {
                 setTimeout(() => {
-                    this.getNativeBridge().handleEvent(['URL_FAILED', url, 'No X-Test header found']);
+                    this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'No X-Test header found']);
                 }, 0);
             }
             return ['OK'];
         } else if(url.indexOf('/forwardbody') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', url, body, 200, []]);
+                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, body, 200, []]);
             }, 0);
             return ['OK'];
         }
