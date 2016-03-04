@@ -90,7 +90,7 @@ export class WebView {
             this._connectivityManager.setListeningStatus(true);
             this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
-            this._nativeBridge.invoke('Sdk', 'initComplete');
+            return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
