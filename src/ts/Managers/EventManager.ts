@@ -23,7 +23,7 @@ export class EventManager {
         this._storageManager.set(StorageType.PRIVATE, dataKey, data);
         this._storageManager.write(StorageType.PRIVATE);
 
-        return this._request.post(url, data).then(() => {
+        return this._request.post(url, data, [], 5, 5000).then(() => {
             return this._storageManager.delete(StorageType.PRIVATE, urlKey);
         }).then(() => {
             return this._storageManager.delete(StorageType.PRIVATE, dataKey);
