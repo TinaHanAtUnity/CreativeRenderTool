@@ -142,7 +142,7 @@ describe('EventManagerTest', () => {
             assert.equal(url, requestSpy.getCall(0).args[0], 'Third party event url does not match');
             done();
         }).catch((error) => {
-            done(new Error('Send failed operative event failed: ' + error));
+            done(new Error('Send third party event failed: ' + error));
         });
     });
 
@@ -163,7 +163,7 @@ describe('EventManagerTest', () => {
             assert.equal(data, requestSpy.getCall(0).args[1], 'Diagnostic event data does not match');
             done();
         }).catch((error) => {
-            done(new Error('Send failed operative event failed: ' + error));
+            done(new Error('Send diagnostic event failed: ' + error));
       });
     });
 });
