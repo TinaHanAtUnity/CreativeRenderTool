@@ -12,6 +12,8 @@ export class Request {
     private _urlCallbacks: Object = {};
     private _resolveCallbacks: Object = {};
 
+    private _requestId: number = 1;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
         this._nativeBridge.subscribe('URL_COMPLETE', this.onUrlComplete.bind(this));
@@ -21,8 +23,9 @@ export class Request {
     }
 
     public resolve(host: string): Promise<any[]> {
-        let promise = this.registerCallback(this._resolveCallbacks, host);
-        this._nativeBridge.invoke('Url', 'resolve', [host]);
+        let id: string = this.getRequestId();
+        let promise = this.registerCallback(this._resolveCallbacks, id);
+        this._nativeBridge.invoke('Url', 'resolve', [id, host]);
         return promise;
     }
 
@@ -30,8 +33,9 @@ export class Request {
         if(typeof headers === 'undefined') {
             headers = [];
         }
-        let promise = this.registerCallback(this._urlCallbacks, url);
-        this._nativeBridge.invoke('Url', 'get', [url, headers]);
+        let id: string = this.getRequestId();
+        let promise = this.registerCallback(this._urlCallbacks, id);
+        this._nativeBridge.invoke('Url', 'get', [id, url, headers]);
         return promise;
     }
 
@@ -43,64 +47,71 @@ export class Request {
             headers = [];
         }
         headers.push(['Content-Type', 'application/json']);
-        let promise = this.registerCallback(this._urlCallbacks, url);
-        this._nativeBridge.invoke('Url', 'post', [url, data, headers]);
+
+        let id: string = this.getRequestId();
+        let promise = this.registerCallback(this._urlCallbacks, id);
+        this._nativeBridge.invoke('Url', 'post', [id, url, data, headers]);
         return promise;
     }
 
-    private registerCallback(callbacks, url): Promise<any[]> {
+    private registerCallback(callbacks, id): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             let callbackObject = {};
             callbackObject[RequestStatus.COMPLETE] = resolve;
             callbackObject[RequestStatus.FAILED] = reject;
 
-            let callbackList: Function[] = callbacks[url];
+            let callbackList: Function[] = callbacks[id];
             if(callbackList) {
-                callbacks[url].push(callbackObject);
+                callbacks[id].push(callbackObject);
             } else {
-                callbacks[url] = [callbackObject];
+                callbacks[id] = [callbackObject];
             }
         });
     }
 
-    private onUrlComplete(url: string, response: string): void {
-        let callbacks: Function[] = this._urlCallbacks[url];
+    private onUrlComplete(id: string, url: string, response: string): void {
+        let callbacks: Function[] = this._urlCallbacks[id];
         if(callbacks) {
             callbacks.forEach((callbackObject: Object) => {
                 callbackObject[RequestStatus.COMPLETE]([response]);
             });
-            delete this._urlCallbacks[url];
+            delete this._urlCallbacks[id];
         }
     }
 
-    private onUrlFailed(url: string, error: string): void {
-        let callbacks: Function[] = this._urlCallbacks[url];
+    private onUrlFailed(id: string, url: string, error: string): void {
+        let callbacks: Function[] = this._urlCallbacks[id];
         if(callbacks) {
             callbacks.forEach((callbackObject: Object) => {
                 callbackObject[RequestStatus.FAILED]([error]);
             });
-            delete this._urlCallbacks[url];
+            delete this._urlCallbacks[id];
         }
     }
 
-    private onResolveComplete(host: string, ip: string): void {
-        let callbacks: Function[] = this._resolveCallbacks[host];
+    private onResolveComplete(id: string, host: string, ip: string): void {
+        let callbacks: Function[] = this._resolveCallbacks[id];
         if(callbacks) {
             callbacks.forEach((callbackObject: Object) => {
                 callbackObject[RequestStatus.COMPLETE]([host, ip]);
             });
-            delete this._resolveCallbacks[host];
+            delete this._resolveCallbacks[id];
         }
     }
 
-    private onResolveFailed(host: string, error: string, message: string): void {
-        let callbacks: Function[] = this._resolveCallbacks[host];
+    private onResolveFailed(id: string, host: string, error: string, message: string): void {
+        let callbacks: Function[] = this._resolveCallbacks[id];
         if(callbacks) {
             callbacks.forEach((callbackObject: Object) => {
                 callbackObject[RequestStatus.FAILED]([error, message]);
             });
-            delete this._resolveCallbacks[host];
+            delete this._resolveCallbacks[id];
         }
     }
 
+    private getRequestId(): string {
+        let id: string = String(this._requestId);
+        this._requestId++;
+        return id;
+    }
 }
