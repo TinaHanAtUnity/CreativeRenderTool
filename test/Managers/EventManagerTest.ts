@@ -10,21 +10,9 @@ import * as sinon from 'sinon';
 class MockStorageManager extends StorageManager {
     private _storage = {};
 
-    public read(type: StorageType): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            resolve();
-        });
-    }
-
     public write(type: StorageType): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             resolve();
-        });
-    }
-
-    public get<T>(type: StorageType, key: string): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            resolve(this._storage[key]);
         });
     }
 
