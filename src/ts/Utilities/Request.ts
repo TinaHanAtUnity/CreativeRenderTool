@@ -110,7 +110,7 @@ export class Request {
     }
 
     private getRequestId(): string {
-        let id: string = String(this._requestId);
+        let id: string = this._requestId.toString();
         this._requestId++;
         return id;
     }
