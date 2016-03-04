@@ -62,7 +62,7 @@ export class WebView {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
-            this._configManager = new ConfigManager(this._request, this._clientInfo);
+            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
         }).then(() => {
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
@@ -72,6 +72,7 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
+            this._campaignManager.subscribe('error', this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configManager.getDefaultPlacement();
             this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
@@ -92,6 +93,13 @@ export class WebView {
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
+            if(error instanceof Error) {
+                error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+            }
+            Diagnostics.trigger(this._eventManager, {
+                'type': 'unhandled_initialization_error',
+                'error': error
+            }, this._clientInfo, this._deviceInfo);
         });
     }
 
@@ -108,6 +116,8 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
+        }).catch(error => {
+            console.dir(error);
         });
 
         let placement: Placement = this._configManager.getPlacement(placementId);
@@ -152,6 +162,18 @@ export class WebView {
         });
     }
 
+    private onCampaignError(error: any) {
+        console.log(error);
+        if(error instanceof Error) {
+            error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+        }
+        Diagnostics.trigger(this._eventManager, {
+            'type': 'campaign_request_failed',
+            'error': error
+        }, this._clientInfo, this._deviceInfo);
+        // todo: implement retry logic
+    }
+
     private onClose(adUnit: AdUnit): void {
         this.hide();
         if(this._mustReinitialize) {
@@ -191,7 +213,7 @@ export class WebView {
             'line': event.lineno,
             'column': event.colno,
             'object': event.error
-        }, this._deviceInfo, this._clientInfo);
+        }, this._clientInfo, this._deviceInfo);
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
 

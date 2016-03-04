@@ -10,7 +10,6 @@ export class BatchInvocation {
 
     private _nativeBridge: NativeBridge;
     private _batch: NativeInvocation[] = [];
-    private _promises: Promise<any[]>[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -21,21 +20,15 @@ export class BatchInvocation {
     }
 
     public rawQueue(packageName: string, className: string, methodName: string, parameters?: any[]): Promise<any[]> {
-        let promise = new Promise<any[]>((resolve, reject): void => {
+        return new Promise<any[]>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
             let fullClassName = packageName + '.' + className;
             this._batch.push([fullClassName, methodName, parameters ? parameters : [], id.toString()]);
         });
-        this._promises.push(promise);
-        return promise;
     }
 
     public getBatch(): NativeInvocation[] {
         return this._batch;
-    }
-
-    public getPromises(): Promise<any[]>[] {
-        return this._promises;
     }
 
 }
@@ -94,16 +87,15 @@ export class NativeBridge extends Observable implements INativeBridge {
         return promise;
     }
 
-    public rawInvoke(packageName: string, className: string, methodName: string, parameters?: any[]) {
+    public rawInvoke(packageName: string, className: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let batch: BatchInvocation = new BatchInvocation(this);
         let promise = batch.rawQueue(packageName, className, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
     }
 
-    public invokeBatch(batch: BatchInvocation): Promise<any[][]> {
+    public invokeBatch(batch: BatchInvocation): void {
         this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
-        return Promise.all(batch.getPromises());
     }
 
     public handleCallback(results: any[][]): void {
