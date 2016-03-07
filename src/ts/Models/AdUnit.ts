@@ -39,7 +39,7 @@ export class AdUnit {
     }
 
     public setFinishState(finishState: FinishState): void {
-        if(this._finishState !== FinishState.COMPLETED) {
+        if (this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
         }
     }
@@ -50,6 +50,10 @@ export class AdUnit {
 
     public getSessionManager() {
         return this._sessionManager;
+    }
+
+    public getNativeBridge() {
+        return this._nativeBridge;
     }
 
 }
