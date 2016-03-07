@@ -1,6 +1,4 @@
 import { Request } from '../../src/ts/Utilities/Request';
-import { WebViewBridge } from '../WebViewBridge';
-import { NativeBridge } from '../../src/ts/NativeBridge';
 import { TestBridge, TestBridgeApi } from '../TestBridge';
 
 import 'mocha';
