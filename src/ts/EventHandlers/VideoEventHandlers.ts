@@ -3,7 +3,7 @@ import { Double } from 'Utilities/Double';
 import { FinishState } from 'Models/AdUnit';
 import { StorageType } from 'Managers/StorageManager';
 
-export class VideoAdEventHandlers {
+export class VideoEventHandlers {
 
     public static onVideoPrepared(adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
         let videoPlayer = adUnit.getVideoPlayer();

@@ -9,7 +9,7 @@ import { StorageManager } from 'Managers/StorageManager';
 import { NativeBridge } from 'NativeBridge';
 import { FinishState } from 'Models/AdUnit';
 import { Double } from 'Utilities/Double';
-import { VideoAdEventHandlers } from 'EventHandlers/VideoAdEventHandlers';
+import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;
@@ -126,10 +126,10 @@ export class VideoAdUnit extends AdUnit {
     private prepareVideoPlayer() {
         let videoPlayer = new NativeVideoPlayer(this._nativeBridge);
 
-        videoPlayer.subscribe('prepared', (duration, width, height) => VideoAdEventHandlers.onVideoPrepared(this, duration, width, height));
-        videoPlayer.subscribe('progress', (position) => VideoAdEventHandlers.onVideoProgress(this, position));
-        videoPlayer.subscribe('start', () => VideoAdEventHandlers.onVideoStart(this));
-        videoPlayer.subscribe('completed', (url) => VideoAdEventHandlers.onVideoCompleted(this, url));
+        videoPlayer.subscribe('prepared', (duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
+        videoPlayer.subscribe('progress', (position) => VideoEventHandlers.onVideoProgress(this, position));
+        videoPlayer.subscribe('start', () => VideoEventHandlers.onVideoStart(this));
+        videoPlayer.subscribe('completed', (url) => VideoEventHandlers.onVideoCompleted(this, url));
 
         this._videoPlayer = videoPlayer;
     }
