@@ -25,6 +25,8 @@ export class DeviceInfo extends Model {
     private _screenWidth: number;
     private _screenHeight: number;
     private _networkOperator: string;
+    private _networkOperatorName: string;
+    private _timeZone: string;
     private _headset: boolean;
     private _ringerMode: RingerMode;
     private _language: string;
@@ -38,6 +40,7 @@ export class DeviceInfo extends Model {
     private _batteryStatus: BatteryStatus;
     private _freeMemory: number;
     private _totalMemory: number;
+    private _rooted: boolean;
 
     public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
@@ -56,8 +59,10 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue(className, 'getScreenDensity').then(([screenDensity]) => this._screenDensity = screenDensity));
         promises.push(batch.queue(className, 'getScreenWidth').then(([screenWidth]) => this._screenWidth = screenWidth));
         promises.push(batch.queue(className, 'getScreenHeight').then(([screenHeight]) => this._screenHeight = screenHeight));
-        promises.push(batch.queue(className, 'getNetworkOperatorName').then(([networkOperator]) => this._networkOperator = networkOperator));
+        promises.push(batch.queue(className, 'getNetworkOperator').then(([networkOperator]) => this._networkOperator = networkOperator));
+        promises.push(batch.queue(className, 'getNetworkOperatorName').then(([networkOperatorName]) => this._networkOperatorName = networkOperatorName));
         promises.push(batch.queue(className, 'getHeadset').then(([headset]) => this._headset = headset));
+        promises.push(batch.queue(className, 'getTimeZone', [false]).then(([timeZone]) => this._timeZone = timeZone));
         promises.push(batch.queue(className, 'getRingerMode').then(([ringerMode]) => this._ringerMode = ringerMode));
         promises.push(batch.queue(className, 'getSystemLanguage').then(([language]) => this._language = language));
         promises.push(batch.queue(className, 'getDeviceVolume', [StreamType.STREAM_SYSTEM]).then(([volume]) => this._volume = volume));
@@ -70,6 +75,7 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue(className, 'getBatteryStatus').then(([batteryStatus]) => this._batteryStatus = batteryStatus));
         promises.push(batch.queue(className, 'getFreeMemory').then(([freeMemory]) => this._freeMemory = freeMemory));
         promises.push(batch.queue(className, 'getTotalMemory').then(([totalMemory]) => this._totalMemory = totalMemory));
+        promises.push(batch.queue(className, 'isRooted').then(([rooted]) => this._rooted = rooted));
         nativeBridge.invokeBatch(batch);
         return Promise.all(promises);
     }
@@ -130,6 +136,8 @@ export class DeviceInfo extends Model {
             'screen_width': this._screenWidth,
             'screen_height': this._screenHeight,
             'network_operator': this._networkOperator,
+            'network_operator_name': this._networkOperatorName,
+            'timezone': this._timeZone,
             'headset': this._headset,
             'ringer_mode': this._ringerMode,
             'language': this._language,
@@ -142,7 +150,8 @@ export class DeviceInfo extends Model {
             'battery_level': this._batteryLevel,
             'battery_status': this._batteryStatus,
             'free_memory': this._freeMemory,
-            'total_memory': this._totalMemory
+            'total_memory': this._totalMemory,
+            'rooted': this._rooted
         };
     }
 
