@@ -40,6 +40,7 @@ export class DeviceInfo extends Model {
     private _batteryStatus: BatteryStatus;
     private _freeMemory: number;
     private _totalMemory: number;
+    private _rooted: boolean;
 
     public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
@@ -74,6 +75,7 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue(className, 'getBatteryStatus').then(([batteryStatus]) => this._batteryStatus = batteryStatus));
         promises.push(batch.queue(className, 'getFreeMemory').then(([freeMemory]) => this._freeMemory = freeMemory));
         promises.push(batch.queue(className, 'getTotalMemory').then(([totalMemory]) => this._totalMemory = totalMemory));
+        promises.push(batch.queue(className, 'isRooted').then(([rooted]) => this._rooted = rooted));
         nativeBridge.invokeBatch(batch);
         return Promise.all(promises);
     }
@@ -148,7 +150,8 @@ export class DeviceInfo extends Model {
             'battery_level': this._batteryLevel,
             'battery_status': this._batteryStatus,
             'free_memory': this._freeMemory,
-            'total_memory': this._totalMemory
+            'total_memory': this._totalMemory,
+            'rooted': this._rooted
         };
     }
 
