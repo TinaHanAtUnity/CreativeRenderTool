@@ -1,38 +1,33 @@
-/// <reference path="../src/ts/WebViewBridge.d.ts" />
-
-/* tslint:disable:no-string-literal */
-
 import { NativeBridge } from '../src/ts/NativeBridge';
-import { INativeBridge } from '../src/ts/INativeBridge';
-import { Sdk } from './Api/Sdk';
-import { DeviceInfo } from './Api/DeviceInfo';
-import { Placement } from './Api/Placement';
-import { Url } from './Api/Url';
-import { Cache } from './Api/Cache';
-import { Listener } from './Api/Listener';
-import { Storage } from './Api/Storage';
 
-export class WebViewBridge implements IWebViewBridge {
-    private _nativeBridge: INativeBridge;
+export abstract class TestBridgeApi {
+    private _nativeBridge: NativeBridge;
 
-    private _apiMap: {} = {
-        'Sdk': new Sdk(),
-        'DeviceInfo': new DeviceInfo(),
-        'Placement': new Placement(),
-        'Url': new Url(),
-        'Cache': new Cache(),
-        'Listener': new Listener(),
-        'Storage': new Storage(),
-    };
-
-    public setNativeBridge(nativeBridge: INativeBridge): void {
+    public setNativeBridge(nativeBridge: NativeBridge): void {
         this._nativeBridge = nativeBridge;
+    }
 
-        for(let api in this._apiMap) {
-            if(this._apiMap.hasOwnProperty(api)) {
-                this._apiMap[api].setNativeBridge(nativeBridge);
-            }
-        }
+    public getNativeBridge(): NativeBridge {
+        return this._nativeBridge;
+    }
+}
+
+export class TestBridge implements IWebViewBridge {
+    private _nativeBridge: NativeBridge;
+
+    private _apiMap: {} = {};
+
+    constructor() {
+        this._nativeBridge = new NativeBridge(this);
+    }
+
+    public getNativeBridge(): NativeBridge {
+        return this._nativeBridge;
+    }
+
+    public setApi(className: string, apiClass: TestBridgeApi) {
+        this._apiMap[className] = apiClass;
+        this._apiMap[className].setNativeBridge(this._nativeBridge);
     }
 
     public handleInvocation(invocations: string): void {
