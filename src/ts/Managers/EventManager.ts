@@ -50,7 +50,6 @@ export class EventManager {
                     }));
                 });
             });
-            console.dir(promises);
             return Promise.all(promises);
         });
     }
