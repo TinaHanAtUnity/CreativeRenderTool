@@ -41,27 +41,17 @@ export class EventManager {
         return this._request.post(url, data);
     }
 
-    public sendUnsentSessions(): void {
-        this.getUnsentSessions().then((sessions: string[]) => {
-            sessions.forEach(sessionId => {
-                this.getUnsentOperativeEvents(sessionId).then((events: string[]) => {
-                    events.forEach(eventId => {
-                        this.resendEvent(sessionId, eventId);
-                    });
+    public sendUnsentSessions(): Promise<any[]> {
+        return this.getUnsentSessions().then((sessions: string[]) => {
+            let promises = sessions.map(sessionId => {
+                return this.getUnsentOperativeEvents(sessionId).then((events: string[]) => {
+                    return Promise.all(events.map(eventId => {
+                        return this.resendEvent(sessionId, eventId);
+                    }));
                 });
             });
-        });
-    }
-
-    public getUnsentSessions(): Promise<any[]> {
-        return this._storageManager.getKeys(StorageType.PRIVATE, 'session', false).then(data => {
-            return data[0].toString().split(',');
-        });
-    }
-
-    public getUnsentOperativeEvents(sessionId: string): Promise<any[]> {
-        return this._storageManager.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false).then(data => {
-            return data[0].toString().split(',');
+            console.dir(promises);
+            return Promise.all(promises);
         });
     }
 
@@ -71,7 +61,19 @@ export class EventManager {
         });
     }
 
-    private resendEvent(sessionId: string, eventId: string) {
+    private getUnsentSessions(): Promise<any[]> {
+        return this._storageManager.getKeys(StorageType.PRIVATE, 'session', false).then(data => {
+            return data[0].toString().split(',');
+        });
+    }
+
+    private getUnsentOperativeEvents(sessionId: string): Promise<any[]> {
+        return this._storageManager.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false).then(data => {
+            return data[0].toString().split(',');
+        });
+    }
+
+    private resendEvent(sessionId: string, eventId: string): Promise<any[]> {
         let urlKey: string = this.getUrlKey(sessionId, eventId);
         let dataKey: string = this.getDataKey(sessionId, eventId);
 
@@ -88,11 +90,7 @@ export class EventManager {
     }
 
     private getStoredOperativeEvent(sessionId: string, eventId: string): Promise<any[]> {
-        return this._storageManager.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)).then(url => {
-            return this._storageManager.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId)).then(data => {
-                return [url, data];
-            });
-        });
+        return Promise.all([this._storageManager.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)), this._storageManager.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId))]);
     }
 
     private getUrlKey(sessionId: string, eventId: string): string {

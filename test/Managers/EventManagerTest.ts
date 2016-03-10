@@ -9,6 +9,7 @@ import * as sinon from 'sinon';
 
 class MockStorageManager extends StorageManager {
     private _storage = {};
+    private _keys = {};
 
     public write(type: StorageType): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
@@ -23,11 +24,31 @@ class MockStorageManager extends StorageManager {
         });
     }
 
+    public get<T>(type: StorageType, key: string): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            resolve(this._storage[key]);
+        });
+    }
+
     public delete(type: StorageType, key: string): Promise<any[]> {
         delete this._storage[key];
         return new Promise<any[]>((resolve, reject) => {
             resolve();
         });
+    }
+
+    public getKeys(type: StorageType, key: string, recursive: boolean): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            resolve([this._keys[key]]);
+        });
+    }
+
+    public directSetKeys(key: string, value: string): void {
+        this._keys[key] = value;
+    }
+
+    public directSet(key: string, value: string): void {
+        this._storage[key] = value;
     }
 
     public directGet(key: string): any {
@@ -165,5 +186,33 @@ describe('EventManagerTest', () => {
         }).catch((error) => {
             done(new Error('Send diagnostic event failed: ' + error));
       });
+    });
+
+    it('Retry failed event', function(done: MochaDone) {
+        let nativeBridge: NativeBridge = new NativeBridge(new MockBridge());
+        let request: MockRequest = new MockRequest(nativeBridge);
+        let storageManager: MockStorageManager = new MockStorageManager(nativeBridge);
+        let eventManager: EventManager = new EventManager(nativeBridge, request, storageManager);
+
+        let url: string = 'https://www.example.net/retry_event';
+        let data: string = 'Retry test';
+        let sessionId: string = 'abcd-1234';
+        let eventId: string = '5678-efgh';
+
+        storageManager.directSet('session.' + sessionId + '.operative.' + eventId + '.url', url);
+        storageManager.directSet('session.' + sessionId + '.operative.' + eventId + '.data', data);
+        storageManager.directSetKeys('session', sessionId);
+        storageManager.directSetKeys('session.' + sessionId + '.operative', eventId);
+
+        let requestSpy = sinon.spy(request, 'post');
+
+        eventManager.sendUnsentSessions().then(() => {
+            assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
+            assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
+            assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
+            done();
+        }).catch((error) => {
+            done(new Error('Retry failed event failed: ' + error));
+        });
     });
 });
