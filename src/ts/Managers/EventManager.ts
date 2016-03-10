@@ -61,15 +61,11 @@ export class EventManager {
     }
 
     private getUnsentSessions(): Promise<any[]> {
-        return this._storageManager.getKeys(StorageType.PRIVATE, 'session', false).then(data => {
-            return data[0].toString().split(',');
-        });
+        return this._storageManager.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
     private getUnsentOperativeEvents(sessionId: string): Promise<any[]> {
-        return this._storageManager.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false).then(data => {
-            return data[0].toString().split(',');
-        });
+        return this._storageManager.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
     private resendEvent(sessionId: string, eventId: string): Promise<any[]> {
@@ -89,7 +85,10 @@ export class EventManager {
     }
 
     private getStoredOperativeEvent(sessionId: string, eventId: string): Promise<any[]> {
-        return Promise.all([this._storageManager.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)), this._storageManager.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId))]);
+        return Promise.all([
+            this._storageManager.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)),
+            this._storageManager.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId))
+        ]);
     }
 
     private getUrlKey(sessionId: string, eventId: string): string {
