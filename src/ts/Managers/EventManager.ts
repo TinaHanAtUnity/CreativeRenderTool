@@ -42,9 +42,9 @@ export class EventManager {
     }
 
     public sendUnsentSessions(): Promise<any[]> {
-        return this.getUnsentSessions().then((sessions: string[]) => {
+        return this.getUnsentSessions().then(([sessions]) => {
             let promises = sessions.map(sessionId => {
-                return this.getUnsentOperativeEvents(sessionId).then((events: string[]) => {
+                return this.getUnsentOperativeEvents(sessionId).then(([events]) => {
                     return Promise.all(events.map(eventId => {
                         return this.resendEvent(sessionId, eventId);
                     }));
