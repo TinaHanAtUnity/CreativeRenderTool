@@ -39,4 +39,7 @@ export class StorageManager {
         return this._nativeBridge.invoke('Storage', 'clear', [StorageType[type]]);
     }
 
+    public getKeys(type: StorageType, key: string, recursive: boolean): Promise<any[]> {
+        return this._nativeBridge.invoke('Storage', 'getKeys', [StorageType[type], key, recursive]);
+    }
 }

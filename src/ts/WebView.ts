@@ -90,6 +90,8 @@ export class WebView {
             this._connectivityManager.setListeningStatus(true);
             this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
 
+            this._eventManager.sendUnsentSessions();
+
             return this._nativeBridge.invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
@@ -197,6 +199,8 @@ export class WebView {
                     } else {
                         this.reinitialize();
                     }
+                } else {
+                    this._eventManager.sendUnsentSessions();
                 }
             });
         }
