@@ -12,35 +12,25 @@ class MockStorageManager extends StorageManager {
     private _keys = {};
 
     public write(type: StorageType): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     public set<T>(type: StorageType, key: string, value: T): Promise<any[]> {
         this._storage[key] = value;
-        return new Promise<any[]>((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     public get<T>(type: StorageType, key: string): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            resolve(this._storage[key]);
-        });
+        return Promise.resolve(this._storage[key]);
     }
 
     public delete(type: StorageType, key: string): Promise<any[]> {
         delete this._storage[key];
-        return new Promise<any[]>((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     public getKeys(type: StorageType, key: string, recursive: boolean): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            resolve([this._keys[key]]);
-        });
+        return Promise.resolve([[this._keys[key]]]);
     }
 
     public directSetKeys(key: string, value: string): void {
@@ -58,23 +48,19 @@ class MockStorageManager extends StorageManager {
 
 class MockRequest extends Request {
     public get(url: string, headers?: [string, string][]): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            if(url.indexOf('/fail') !== -1) {
-                reject();
-            } else {
-                resolve();
-            }
-        });
+        if(url.indexOf('/fail') !== -1) {
+            return Promise.reject([]);
+        } else {
+            return Promise.resolve([]);
+        }
     }
 
     public post(url: string, data?: string, headers?: [string, string][]): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            if(url.indexOf('/fail') !== -1) {
-                reject();
-            } else {
-                resolve();
-            }
-        });
+        if(url.indexOf('/fail') !== -1) {
+            return Promise.reject([]);
+        } else {
+            return Promise.resolve([]);
+        }
     }
 }
 
