@@ -241,4 +241,4 @@ test-coverage: clean
 test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
 
-	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS)
+	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
