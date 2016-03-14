@@ -4,6 +4,7 @@ import 'Workarounds';
 
 import { NativeBridge } from 'NativeBridge';
 import { WebView } from 'WebView';
+import { IosWebViewBridge } from 'IosWebViewBridge';
 
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -21,7 +22,12 @@ resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
 /* tslint:disable:no-string-literal */
-let nativeBridge: NativeBridge = new NativeBridge(window.webviewbridge);
+let nativeBridge: NativeBridge = null;
+if(window && window.webviewbridge) {
+    nativeBridge = new NativeBridge(window.webviewbridge);
+} else {
+    nativeBridge = new NativeBridge(new IosWebViewBridge());
+}
 window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView(nativeBridge);
