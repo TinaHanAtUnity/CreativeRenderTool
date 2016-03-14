@@ -16,7 +16,7 @@ install:
 
 script:
   - make lint
-  - make test-coverage
+  - make test-coveralls
   - make build-test
   - make build-release
 

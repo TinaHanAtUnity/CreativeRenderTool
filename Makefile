@@ -8,6 +8,7 @@ BABEL = node_modules/.bin/babel
 MOCHA = node_modules/.bin/_mocha
 ISTANBUL = node_modules/.bin/istanbul
 REMAP_ISTANBUL = node_modules/.bin/remap-istanbul
+COVERALLS = node_modules/coveralls/bin/coveralls.js
 
 # Sources
 TS_SRC = src/ts
@@ -236,3 +237,8 @@ test-coverage: clean
 
 	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
+
+test-coveralls: test-coverage
+	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
+
+	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose

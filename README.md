@@ -1,4 +1,5 @@
 # Unity Ads Webview
+[![Coverage Status](https://coveralls.io/repos/github/Applifier/unity-ads-webview/badge.svg?branch=add-coveralls&t=bvxjyR)](https://coveralls.io/github/Applifier/unity-ads-webview?branch=add-coveralls)
 
 ## Requirements
 
