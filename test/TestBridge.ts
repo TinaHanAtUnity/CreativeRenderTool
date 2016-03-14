@@ -32,7 +32,6 @@ export class TestBridge implements IWebViewBridge {
 
     public handleInvocation(invocations: string): void {
         let calls: [string, string, any[], string][] = JSON.parse(invocations);
-        console.dir(calls);
         let results: any[][] = calls.map((value: [string, string, any[], string]): any[] => {
             let [className, methodName, parameters, callback]: [string, string, any[], string] = value;
             className = className.split(NativeBridge.ApiPackageName + '.')[1];
@@ -45,11 +44,10 @@ export class TestBridge implements IWebViewBridge {
             result.unshift(callback);
             return result;
         });
-        console.dir(results);
         this._nativeBridge.handleCallback(results);
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
-        console.log(id, status, parameters);
+        // this functionality is currently not used
     }
 }
