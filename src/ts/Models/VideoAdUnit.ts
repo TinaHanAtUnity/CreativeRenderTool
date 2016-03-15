@@ -10,7 +10,7 @@ import { NativeBridge } from 'NativeBridge';
 import { FinishState } from 'Models/AdUnit';
 import { Double } from 'Utilities/Double';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
-import {EndScreenEventHandlers} from '../EventHandlers/EndScreenEventHandlers';
+import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;
