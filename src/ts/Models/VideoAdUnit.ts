@@ -10,6 +10,7 @@ import { NativeBridge } from 'NativeBridge';
 import { FinishState } from 'Models/AdUnit';
 import { Double } from 'Utilities/Double';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
+import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;
@@ -96,31 +97,6 @@ export class VideoAdUnit extends AdUnit {
     }
 
     /*
-     ENDSCREEN EVENT HANDLERS
-     */
-
-    public onReplay(): void {
-        this.setVideoActive(true);
-        this.setVideoPosition(0);
-        this.getOverlay().setSkipEnabled(true);
-        this.getOverlay().setSkipDuration(0);
-        this.getEndScreen().hide();
-        this.getOverlay().show();
-        this.getNativeBridge().invoke('AdUnit', 'setViews', [['videoplayer', 'webview']]).then(() => {
-            this.getVideoPlayer().prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
-        });
-    }
-
-    public onDownload(): void {
-        this.getSessionManager().sendClick(this);
-        this.getNativeBridge().invoke('Listener', 'sendClickEvent', [this.getPlacement().getId()]);
-        this.getNativeBridge().invoke('Intent', 'launch', [{
-            'action': 'android.intent.action.VIEW',
-            'uri': 'market://details?id=' + this.getCampaign().getAppStoreId()
-        }]);
-    }
-
-    /*
      PRIVATES
      */
     private prepareVideoPlayer() {
@@ -158,8 +134,8 @@ export class VideoAdUnit extends AdUnit {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.subscribe('replay', () => this.onReplay());
-        endScreen.subscribe('download', () => this.onDownload());
+        endScreen.subscribe('replay', () => EndScreenEventHandlers.onReplay(this));
+        endScreen.subscribe('download', () => EndScreenEventHandlers.onDownload(this));
 
         this._endScreen = endScreen;
     }
