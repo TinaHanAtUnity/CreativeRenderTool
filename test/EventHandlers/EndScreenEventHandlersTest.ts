@@ -33,7 +33,7 @@ describe('EndScreenEventHandlersTest', () => {
             assert.isOk(nativeInvoke.calledWith('Listener', 'sendClickEvent', [123]));
         });
 
-        it('should send a click with session manager', () => {
+        it('should send a launch intent for market link', () => {
             assert.isOk(nativeInvoke.calledWith('Intent', 'launch', [{'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}]));
         });
 
