@@ -173,7 +173,6 @@ export class WebView {
             'type': 'campaign_request_failed',
             'error': error
         }, this._clientInfo, this._deviceInfo);
-        // todo: implement retry logic
     }
 
     private onClose(adUnit: AdUnit): void {
@@ -200,6 +199,15 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
+                    let placements: Object = this._configManager.getPlacements();
+                    for(let placementId in placements) {
+                        if(placements.hasOwnProperty(placementId)) {
+                            if(placements[placementId].isCampaignRefreshNeeded()) {
+                                this._campaignManager.request(placements[placementId]);
+                            }
+                        }
+                    }
+
                     this._eventManager.sendUnsentSessions();
                 }
             });

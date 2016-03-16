@@ -23,6 +23,7 @@ export class Placement {
     private _muteVideo: boolean;
 
     private _campaign: Campaign;
+    private _campaignRefreshNeeded: boolean;
 
     constructor(data: any) {
         this._id = data.id;
@@ -36,6 +37,8 @@ export class Placement {
 
         this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
         this._muteVideo = data.muteVideo;
+
+        this._campaignRefreshNeeded = true;
     }
 
     public getId(): string {
@@ -76,5 +79,13 @@ export class Placement {
 
     public setCampaign(campaign: Campaign): void {
         this._campaign = campaign;
+    }
+
+    public isCampaignRefreshNeeded(): boolean {
+        return this._campaignRefreshNeeded;
+    }
+
+    public setCampaignRefreshNeeded(refresh: boolean): void {
+        this._campaignRefreshNeeded = refresh;
     }
 }

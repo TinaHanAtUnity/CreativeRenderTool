@@ -24,13 +24,15 @@ export class CampaignManager extends Observable {
     }
 
     public request(placement: Placement): void {
-        this._request.get(this.createRequestUrl(placement.getId())).then(([response]) => {
+        placement.setCampaignRefreshNeeded(false);
+        this._request.get(this.createRequestUrl(placement.getId()), [], 5, 5000).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
             placement.setCampaign(campaign);
             this.trigger('campaign', placement, campaign);
         }).catch((error) => {
             placement.setCampaign(null);
+            placement.setCampaignRefreshNeeded(true);
             this.trigger('error', error);
         });
     }
