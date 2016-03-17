@@ -16,15 +16,15 @@ enum VideoPlayerEvent {
 
 export class VideoPlayer {
 
-    public static onError: Observable3<number, number, string>;
-    public static onProgress: Observable1<number>;
-    public static onInfo: Observable3<number, number, string>;
-    public static onCompleted: Observable1<string>;
-    public static onPrepared: Observable4<number, number, number, string>;
-    public static onPlay: Observable1<string>;
-    public static onPause: Observable1<string>;
-    public static onSeek: Observable1<string>;
-    public static onStop: Observable1<string>;
+    public static onError: Observable3<number, number, string> = new Observable3();
+    public static onProgress: Observable1<number> = new Observable1();
+    public static onInfo: Observable3<number, number, string> = new Observable3();
+    public static onCompleted: Observable1<string> = new Observable1();
+    public static onPrepared: Observable4<number, number, number, string> = new Observable4();
+    public static onPlay: Observable1<string> = new Observable1();
+    public static onPause: Observable1<string> = new Observable1();
+    public static onSeek: Observable1<string> = new Observable1();
+    public static onStop: Observable1<string> = new Observable1();
 
     private static ApiClass = 'VideoPlayer';
 

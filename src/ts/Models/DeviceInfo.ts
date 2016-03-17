@@ -43,10 +43,10 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
 
-    public fetch(nativeBridge: NativeBridge): Promise<any[]> {
+    public fetch(): Promise<any[]> {
         let className: string = 'DeviceInfo';
         let promises = [];
-        let batch: BatchInvocation = new BatchInvocation(nativeBridge);
+        let batch: BatchInvocation = new BatchInvocation(NativeBridge.getInstance());
         promises.push(batch.queue<string>(className, 'getAndroidId').then(androidId => this._androidId = androidId));
         promises.push(batch.queue<string>(className, 'getAdvertisingTrackingId').then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier));
         promises.push(batch.queue<boolean>(className, 'getLimitAdTrackingFlag').then(limitAdTracking => this._limitAdTracking = limitAdTracking));
@@ -77,7 +77,7 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue<number>(className, 'getFreeMemory').then(freeMemory => this._freeMemory = freeMemory));
         promises.push(batch.queue<number>(className, 'getTotalMemory').then(totalMemory => this._totalMemory = totalMemory));
         promises.push(batch.queue<boolean>(className, 'isRooted').then(rooted => this._rooted = rooted));
-        nativeBridge.invokeBatch(batch);
+        NativeBridge.getInstance().invokeBatch(batch);
         return Promise.all(promises);
     }
 

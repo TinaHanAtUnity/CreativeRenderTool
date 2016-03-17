@@ -12,8 +12,8 @@ export class CampaignManager {
 
     private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
-    public onCampaign: Observable2<Placement, Campaign>;
-    public onError: Observable1<Error>;
+    public onCampaign: Observable2<Placement, Campaign> = new Observable2();
+    public onError: Observable1<Error> = new Observable1();
 
     private _request: Request;
     private _clientInfo: ClientInfo;

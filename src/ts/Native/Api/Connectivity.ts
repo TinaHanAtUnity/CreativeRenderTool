@@ -9,7 +9,7 @@ enum ConnectivityEvent {
 
 export class Connectivity {
 
-    public static onConnected: Observable2<boolean, string>;
+    public static onConnected: Observable2<boolean, string> = new Observable2();
 
     private static ApiClass = 'Connectivity';
 

@@ -17,14 +17,14 @@ enum AdUnitEvent {
 
 export class AdUnit {
 
-    public static onStart: Observable0;
-    public static onCreate: Observable0;
-    public static onResume: Observable0;
-    public static onDestroy: Observable1<boolean>;
-    public static onPause: Observable1<boolean>;
-    public static onKeyDown: Observable4<number, number, number, number>;
-    public static onRestore: Observable0;
-    public static onStop: Observable0;
+    public static onStart: Observable0 = new Observable0();
+    public static onCreate: Observable0 = new Observable0();
+    public static onResume: Observable0 = new Observable0();
+    public static onDestroy: Observable1<boolean> = new Observable1();
+    public static onPause: Observable1<boolean> = new Observable1();
+    public static onKeyDown: Observable4<number, number, number, number> = new Observable4();
+    public static onRestore: Observable0 = new Observable0();
+    public static onStop: Observable0 = new Observable0();
 
     private static ApiClass = 'AdUnit';
 

@@ -14,10 +14,9 @@ import { EventManager } from 'Managers/EventManager';
 import {FinishState} from "./Constants/FinishState";
 import {VideoAdUnit} from "./AdUnits/VideoAdUnit";
 import {Connectivity} from "./Native/Api/Connectivity";
+import {Listener} from "./Native/Api/Listener";
 
 export class WebView {
-
-    private _nativeBridge: NativeBridge;
 
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
@@ -48,9 +47,9 @@ export class WebView {
     }
 
     public initialize(): Promise<void> {
-        return this._nativeBridge.invoke<any[]>('Sdk', 'loadComplete').then((data) => {
+        return NativeBridge.getInstance().invoke<any[]>('Sdk', 'loadComplete').then((data) => {
             this._clientInfo = new ClientInfo(data);
-            return this._deviceInfo.fetch(this._nativeBridge);
+            return this._deviceInfo.fetch();
         }).then(() => {
             this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
@@ -63,13 +62,13 @@ export class WebView {
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configManager.getDefaultPlacement();
-            this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
+            NativeBridge.getInstance().invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
 
             let placements: Object = this._configManager.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
-                    this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
+                    NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
                     this._campaignManager.request(placements[placementId]);
                 }
             }
@@ -80,7 +79,7 @@ export class WebView {
 
             this._eventManager.sendUnsentSessions();
 
-            return this._nativeBridge.invoke('Sdk', 'initComplete');
+            return NativeBridge.getInstance().invoke('Sdk', 'initComplete');
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
@@ -141,8 +140,8 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
-                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
+            NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
+                Listener.sendReadyEvent(placement.getId());
             });
         });
     }
@@ -164,7 +163,7 @@ export class WebView {
         if(this._mustReinitialize) {
             this.reinitialize();
         } else {
-            this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.WAITING]]);
+            NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.WAITING]]);
             this._campaignManager.request(placement);
         }
     }
@@ -214,7 +213,7 @@ export class WebView {
 
     private reinitialize() {
         // todo: make sure session data and other similar things are saved before issuing reinit
-        this._nativeBridge.invoke('Sdk', 'reinitialize');
+        NativeBridge.getInstance().invoke('Sdk', 'reinitialize');
     }
 
     private getConfigJson(): Promise<NativeResponse> {

@@ -2,22 +2,22 @@ import {NativeBridge} from "../NativeBridge";
 import {Observable5, Observable4, Observable3} from "../../Utilities/Observable";
 
 export enum UrlEvent {
-    ON_COMPLETE,
-    ON_FAILED
+    COMPLETE,
+    FAILED
 }
 
 export enum ResolveEvent {
-    ON_COMPLETE,
-    ON_FAILED
+    COMPLETE,
+    FAILED
 }
 
 export class Url {
 
-    public static onUrlComplete: Observable5<string, string, string, number, [string, string][]>;
-    public static onUrlFailed: Observable3<string, string, string>;
+    public static onUrlComplete: Observable5<string, string, string, number, [string, string][]> = new Observable5();
+    public static onUrlFailed: Observable3<string, string, string> = new Observable3();
 
-    public static onResolveComplete: Observable3<string, string, string>;
-    public static onResolveFailed: Observable4<string, string, string, string>;
+    public static onResolveComplete: Observable3<string, string, string> = new Observable3();
+    public static onResolveFailed: Observable4<string, string, string, string> = new Observable4();
 
     private static ApiClass = 'Url';
 
@@ -49,21 +49,21 @@ export class Url {
         return NativeBridge.getInstance().invoke<number>(Url.ApiClass, 'getReadTimeout');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public static handleEvent(event: string, parameters: any[]): void {
         switch(event) {
-            case UrlEvent[UrlEvent.ON_COMPLETE]:
+            case UrlEvent[UrlEvent.COMPLETE]:
                 Url.onUrlComplete.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
-            case UrlEvent[UrlEvent.ON_FAILED]:
+            case UrlEvent[UrlEvent.FAILED]:
                 Url.onUrlFailed.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
-            case ResolveEvent[ResolveEvent.ON_COMPLETE]:
+            case ResolveEvent[ResolveEvent.COMPLETE]:
                 Url.onResolveComplete.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
-            case ResolveEvent[ResolveEvent.ON_FAILED]:
+            case ResolveEvent[ResolveEvent.FAILED]:
                 Url.onResolveFailed.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
                 break;
 

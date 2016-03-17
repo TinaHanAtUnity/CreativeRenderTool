@@ -2,7 +2,7 @@ import {NativeBridge} from 'Native/NativeBridge';
 import {Observable5} from "../../Utilities/Observable";
 export class Cache {
 
-    public static onDownloadEnd: Observable5<string, number, number, number, [string, string][]>;
+    public static onDownloadEnd: Observable5<string, number, number, number, [string, string][]> = new Observable5();
 
     private static ApiClass = 'Cache';
 
@@ -56,6 +56,10 @@ export class Cache {
 
     public static getTotalSpace(): Promise<number> {
         return NativeBridge.getInstance().invoke<number>(Cache.ApiClass, 'getTotalSpace');
+    }
+
+    public static handleEvent(event: string, parameters: any[]): void {
+        
     }
 
 }

@@ -4,6 +4,10 @@
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { AdUnit } from 'Native/Api/AdUnit';
+import {Cache} from "./Api/Cache";
+import {Connectivity} from "./Api/Connectivity";
+import {Url} from "./Api/Url";
+import {VideoPlayer} from "./Api/VideoPlayer";
 
 export enum CallbackStatus {
     OK,
@@ -86,6 +90,26 @@ export class NativeBridge implements INativeBridge {
         switch(category) {
             case 'ADUNIT':
                 AdUnit.handleEvent(event, parameters);
+                break;
+
+            case 'CACHE':
+                Cache.handleEvent(event, parameters);
+                break;
+
+            case 'CONNECTIVITY':
+                Connectivity.handleEvent(event, parameters);
+                break;
+
+            case 'URL':
+                Url.handleEvent(event, parameters);
+                break;
+
+            case 'RESOLVE':
+                Url.handleEvent(event, parameters);
+                break;
+
+            case 'VIDEOPLAYER':
+                VideoPlayer.handleEvent(event, parameters);
                 break;
 
             default:
