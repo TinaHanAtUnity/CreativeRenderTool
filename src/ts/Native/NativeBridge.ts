@@ -8,6 +8,7 @@ import {Cache} from "./Api/Cache";
 import {Connectivity} from "./Api/Connectivity";
 import {Url} from "./Api/Url";
 import {VideoPlayer} from "./Api/VideoPlayer";
+import {EventCategory} from "../Constants/EventCategory";
 
 export enum CallbackStatus {
     OK,
@@ -88,27 +89,27 @@ export class NativeBridge implements INativeBridge {
         let category: string = parameters.shift();
         let event: string = parameters.shift();
         switch(category) {
-            case 'ADUNIT':
+            case EventCategory[EventCategory.ADUNIT]:
                 AdUnit.handleEvent(event, parameters);
                 break;
 
-            case 'CACHE':
+            case EventCategory[EventCategory.CACHE]:
                 Cache.handleEvent(event, parameters);
                 break;
 
-            case 'CONNECTIVITY':
+            case EventCategory[EventCategory.CONNECTIVITY]:
                 Connectivity.handleEvent(event, parameters);
                 break;
 
-            case 'URL':
+            case EventCategory[EventCategory.URL]:
                 Url.handleEvent(event, parameters);
                 break;
 
-            case 'RESOLVE':
+            case EventCategory[EventCategory.RESOLVE]:
                 Url.handleEvent(event, parameters);
                 break;
 
-            case 'VIDEOPLAYER':
+            case EventCategory[EventCategory.VIDEOPLAYER]:
                 VideoPlayer.handleEvent(event, parameters);
                 break;
 

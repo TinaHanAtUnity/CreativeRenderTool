@@ -1,5 +1,17 @@
 import {NativeBridge} from 'Native/NativeBridge';
 import {Observable5} from "../../Utilities/Observable";
+
+enum CacheEvent {
+    COULDNT_CREATE_TARGET_FILE,
+    COULDNT_REQUEST_STREAM,
+    COULDNT_CLOSE_OUTPUT_FILE,
+    DOWNLOAD_STARTED,
+    DOWNLOAD_RESUMED,
+    DOWNLOAD_END,
+    DOWNLOAD_STOPPED,
+    DOWNLOAD_NO_INTERNET
+}
+
 export class Cache {
 
     public static onDownloadEnd: Observable5<string, number, number, number, [string, string][]> = new Observable5();
@@ -59,7 +71,14 @@ export class Cache {
     }
 
     public static handleEvent(event: string, parameters: any[]): void {
-        
+        switch(event) {
+            case CacheEvent[CacheEvent.DOWNLOAD_END]:
+                Cache.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                break;
+
+            default:
+                throw new Error('Cache event ' + event + ' does not have an observable');
+        }
     }
 
 }
