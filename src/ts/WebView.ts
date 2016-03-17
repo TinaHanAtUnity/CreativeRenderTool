@@ -112,6 +112,7 @@ export class WebView {
         }
 
         let videoAdUnit = new VideoAdUnit(placement, placement.getCampaign());
+        videoAdUnit.create(placement, requestedOrientation);
         videoAdUnit.getEndScreen().onClose.subscribe(this.onClose.bind(this)); // todo: clean me up
         //this._adUnitManager.subscribe('close', this.onClose.bind(this));
 

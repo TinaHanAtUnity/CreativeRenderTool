@@ -102,9 +102,6 @@ export class NativeBridge implements INativeBridge {
                 break;
 
             case EventCategory[EventCategory.URL]:
-                Url.handleEvent(event, parameters);
-                break;
-
             case EventCategory[EventCategory.RESOLVE]:
                 Url.handleEvent(event, parameters);
                 break;

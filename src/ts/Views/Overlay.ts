@@ -7,8 +7,8 @@ import { Template } from 'Utilities/Template';
 
 export class Overlay extends View {
 
-    public onSkip: Observable0;
-    public onMute: Observable1<boolean>;
+    public onSkip: Observable0 = new Observable0();
+    public onMute: Observable1<boolean> = new Observable1();
 
     private _skipEnabled: boolean;
     private _skipDuration: number;

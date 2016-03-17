@@ -1,5 +1,5 @@
 import {NativeBridge} from 'Native/NativeBridge';
-import {Observable5} from "../../Utilities/Observable";
+import {Observable5, Observable1} from "../../Utilities/Observable";
 
 enum CacheEvent {
     COULDNT_CREATE_TARGET_FILE,
@@ -14,6 +14,7 @@ enum CacheEvent {
 
 export class Cache {
 
+    public static onDownloadStarted: Observable1<string> = new Observable1();
     public static onDownloadEnd: Observable5<string, number, number, number, [string, string][]> = new Observable5();
 
     private static ApiClass = 'Cache';
@@ -72,6 +73,10 @@ export class Cache {
 
     public static handleEvent(event: string, parameters: any[]): void {
         switch(event) {
+            case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
+                Cache.onDownloadStarted.trigger(parameters[0]);
+                break;
+
             case CacheEvent[CacheEvent.DOWNLOAD_END]:
                 Cache.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;

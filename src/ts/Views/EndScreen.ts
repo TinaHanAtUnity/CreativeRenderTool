@@ -9,9 +9,9 @@ import {Campaign} from "../Models/Campaign";
 
 export class EndScreen extends View {
 
-    public onDownload: Observable0;
-    public onReplay: Observable0;
-    public onClose: Observable0;
+    public onDownload: Observable0 = new Observable0();
+    public onReplay: Observable0 = new Observable0();
+    public onClose: Observable0 = new Observable0();
 
     constructor(campaign: Campaign) {
         super('end-screen');
