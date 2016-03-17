@@ -24,8 +24,8 @@ export class ConfigManager {
     }
 
     public fetch(): Promise<void> {
-        return this._request.get(this.createConfigUrl()).then(([response]) => {
-            let configJson = JSON.parse(response);
+        return this._request.get(this.createConfigUrl()).then(response => {
+            let configJson = JSON.parse(response.response);
 
             this._enabled = configJson.enabled;
             this._country = configJson.country;

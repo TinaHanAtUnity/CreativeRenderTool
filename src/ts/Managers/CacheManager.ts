@@ -1,4 +1,6 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
+import { NativeBridge } from '../Native/NativeBridge';
+import {BatchInvocation} from "../Native/BatchInvocation";
+import {Cache} from "../Native/Api/Cache";
 
 enum CacheStatus {
     OK,
@@ -7,12 +9,10 @@ enum CacheStatus {
 
 export class CacheManager {
 
-    private _nativeBridge: NativeBridge;
     private _urlCallbacks: Object = {};
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
-        nativeBridge.subscribe('CACHE_DOWNLOAD_END', this.onDownloadEnd.bind(this));
+    constructor() {
+        Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
 
     public cache(url: string): Promise<string> {
@@ -28,12 +28,12 @@ export class CacheManager {
                 this._urlCallbacks[url] = [callbackObject];
             }
 
-            this._nativeBridge.invoke('Cache', 'download', [url, false]);
+            Cache.download(url, false);
         });
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
-        let batch = new BatchInvocation(this._nativeBridge);
+        let batch = new BatchInvocation(NativeBridge.getInstance());
         let promises = urls.map((url: string) => {
             return batch.queue('Cache', 'download', [url, false]).then(() => {
                 return this.registerCallback(url);
@@ -51,7 +51,7 @@ export class CacheManager {
                 }
             });
         });
-        this._nativeBridge.invokeBatch(batch);
+        NativeBridge.getInstance().invokeBatch(batch);
         return Promise.all(promises).then((urlPairs) => {
             let urlMap = {};
             urlPairs.forEach(([url, fileUrl]) => {
@@ -62,7 +62,7 @@ export class CacheManager {
     }
 
     public getFileUrl(url: string): Promise<any[]> {
-        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([fileUrl]) => [url, fileUrl]);
+        return Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
     }
 
     private registerCallback(url): Promise<any[]> {

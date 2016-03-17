@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 
 import { Request } from '../../src/ts/Utilities/Request';
 import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
-import { NativeBridge } from '../../src/ts/NativeBridge';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { StorageManager } from '../../src/ts/Managers/StorageManager';

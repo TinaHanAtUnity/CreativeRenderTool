@@ -1,4 +1,4 @@
-import { NativeBridge } from '../src/ts/NativeBridge';
+import { NativeBridge } from '../src/ts/Native/NativeBridge';
 
 export abstract class TestBridgeApi {
     private _nativeBridge: NativeBridge;

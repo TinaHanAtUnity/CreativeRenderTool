@@ -1,64 +1,65 @@
 /// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
+import {Observable0} from 'Utilities/Observable';
 declare var EndScreenTemplate: string;
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
-import { AdUnit } from 'Models/AdUnit';
+import {Campaign} from "../Models/Campaign";
 
 export class EndScreen extends View {
 
-    private _adUnit: AdUnit;
+    public onDownload: Observable0;
+    public onReplay: Observable0;
+    public onClose: Observable0;
 
-    constructor(adUnit: AdUnit) {
+    constructor(campaign: Campaign) {
         super('end-screen');
-
-        this._adUnit = adUnit;
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = adUnit.getCampaign().getRating() * 20 - 2;
+        let adjustedRating: number = campaign.getRating() * 20 - 2;
         this._templateData = {
-            'gameName': adUnit.getCampaign().getGameName(),
-            'gameIcon': adUnit.getCampaign().getGameIcon(),
-            'endScreenLandscape': adUnit.getCampaign().getLandscapeUrl(),
-            'endScreenPortrait': adUnit.getCampaign().getPortraitUrl(),
+            'gameName': campaign.getGameName(),
+            'gameIcon': campaign.getGameIcon(),
+            'endScreenLandscape': campaign.getLandscapeUrl(),
+            'endScreenPortrait': campaign.getPortraitUrl(),
             'rating': adjustedRating.toString(),
-            'ratingCount': adUnit.getCampaign().getRatingCount().toString()
+            'ratingCount': campaign.getRatingCount().toString()
         };
 
         this._bindings = [
             {
                 event: 'click',
-                listener: this.onDownload.bind(this),
+                listener: this.onDownloadEvent.bind(this),
                 selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
-                listener: this.onReplay.bind(this),
+                listener: this.onReplayEvent.bind(this),
                 selector: '.btn-watch-again-region'
             },
             {
                 event: 'click',
-                listener: this.onClose.bind(this),
+                listener: this.onCloseEvent.bind(this),
                 selector: '.btn-close-region'
             }
         ];
     }
 
-    private onDownload(event: Event): void {
+    private onDownloadEvent(event: Event): void {
         event.preventDefault();
-        this.trigger('download', this._adUnit);
+        this.onDownload.trigger();
     }
 
-    private onReplay(event: Event): void {
+    private onReplayEvent(event: Event): void {
         event.preventDefault();
-        this.trigger('replay', this._adUnit);
+        this.onReplay.trigger();
     }
 
-    private onClose(event: Event): void {
+    private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.trigger('close', this._adUnit);
+        this.onClose.trigger();
     }
 
 }

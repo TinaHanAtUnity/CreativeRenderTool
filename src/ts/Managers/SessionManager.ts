@@ -1,7 +1,6 @@
 import { Session } from 'Models/Session';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { AdUnit } from 'Models/AdUnit';
 import { Url } from 'Utilities/Url';
 import { EventManager } from 'EventManager';
 
@@ -33,7 +32,7 @@ export class SessionManager {
         return this._currentSession;
     }
 
-    public sendShow(adUnit: AdUnit): void {
+    /*public sendShow(adUnit: AdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
             this._eventManager.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
         });
@@ -106,6 +105,6 @@ export class SessionManager {
             'connection_type': this._deviceInfo.getNetworkType(),
             'sid': 'rikshot' // todo: fix this
         };
-    }
+    }*/
 
 }

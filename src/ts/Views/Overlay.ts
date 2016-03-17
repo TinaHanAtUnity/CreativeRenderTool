@@ -1,10 +1,14 @@
 /// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
+import {Observable0, Observable1} from 'Utilities/Observable';
 declare var OverlayTemplate: string;
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
 export class Overlay extends View {
+
+    public onSkip: Observable0;
+    public onMute: Observable1<boolean>;
 
     private _skipEnabled: boolean;
     private _skipDuration: number;
@@ -34,12 +38,12 @@ export class Overlay extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: this.onSkip.bind(this),
+                listener: this.onSkipEvent.bind(this),
                 selector: '.skip-button'
             },
             {
                 event: 'click',
-                listener: this.onMute.bind(this),
+                listener: this.onMuteEvent.bind(this),
                 selector: '.mute-button'
             }
         ];
@@ -89,14 +93,14 @@ export class Overlay extends View {
         }
     }
 
-    private onSkip(event: Event): void {
+    private onSkipEvent(event: Event): void {
         event.preventDefault();
         if(this._skipEnabled && this._videoProgress > this._skipDuration) {
-            this.trigger('skip');
+            this.onSkip.trigger();
         }
     }
 
-    private onMute(event: Event): void {
+    private onMuteEvent(event: Event): void {
         event.preventDefault();
         if(this._muted) {
             this._muteButtonElement.classList.remove('muted');
@@ -105,7 +109,7 @@ export class Overlay extends View {
             this._muteButtonElement.classList.add('muted');
             this._muted = true;
         }
-        this.trigger('mute', this._muted);
+        this.onMute.trigger(this._muted);
     }
 
 }
