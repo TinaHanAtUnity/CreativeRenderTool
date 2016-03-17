@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "amd",
     "target": "es5",
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "moduleResolution": "classic"
   },
   "exclude": [
     "test",
