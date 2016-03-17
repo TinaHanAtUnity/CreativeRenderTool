@@ -7,10 +7,9 @@ import { EndScreen } from 'Views/EndScreen';
 import { SessionManager } from 'Managers/SessionManager';
 import { StorageManager } from 'Managers/StorageManager';
 import { NativeBridge } from 'NativeBridge';
-import { FinishState } from 'Models/AdUnit';
-import { Double } from 'Utilities/Double';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 
 export class VideoAdUnit extends AdUnit {
     private _videoPlayer: NativeVideoPlayer;
@@ -79,24 +78,6 @@ export class VideoAdUnit extends AdUnit {
     }
 
     /*
-     OVERLAY EVENT HANDLERS
-     */
-
-    public onSkip(): void {
-        this.getVideoPlayer().pause();
-        this.setVideoActive(false);
-        this.setFinishState(FinishState.SKIPPED);
-        this.getSessionManager().sendSkip(this);
-        this.getNativeBridge().invoke('AdUnit', 'setViews', [['webview']]);
-        this.getOverlay().hide();
-        this.getEndScreen().show();
-    }
-
-    public onMute(muted: boolean): void {
-        this.getVideoPlayer().setVolume(new Double(muted ? 0.0 : 1.0));
-    }
-
-    /*
      PRIVATES
      */
     private prepareVideoPlayer() {
@@ -115,8 +96,8 @@ export class VideoAdUnit extends AdUnit {
 
         overlay.render();
         document.body.appendChild(overlay.container());
-        overlay.subscribe('skip', () => this.onSkip());
-        overlay.subscribe('mute', (muted) => this.onMute(muted));
+        overlay.subscribe('skip', () => OverlayEventHandlers.onSkip(this));
+        overlay.subscribe('mute', (muted) => OverlayEventHandlers.onMute(this, muted));
 
         if(!this._placement.allowSkip()) {
             overlay.setSkipEnabled(false);
