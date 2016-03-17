@@ -74,15 +74,26 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.invoke('Cache', 'getFiles').then(([files]) => {
-            // clean files older than three weeks
-            let cleanThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
-            let deleteFiles: string[] = [];
+            // clean files older than three weeks and limit cache size to 50 megabytes
+            let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
+            let sizeThreshold: number = 50 * 1024 * 1024;
 
-            files.forEach((file: IFileInfo) => {
-                if(file.mtime < cleanThreshold) {
+            let deleteFiles: string[] = [];
+            let totalSize: number = 0;
+
+            // sort files from newest to oldest
+            files.sort((n1: IFileInfo, n2: IFileInfo) => {
+                return n2.mtime - n1.mtime;
+            });
+
+            for(let i: number = 0; i < files.length; i++) {
+                let file: IFileInfo = files[i];
+                totalSize += file.size;
+
+                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
-            });
+            }
 
             if(deleteFiles.length > 0) {
                 let promises = [];
