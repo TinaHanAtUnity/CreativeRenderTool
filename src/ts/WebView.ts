@@ -15,6 +15,10 @@ import {FinishState} from "./Constants/FinishState";
 import {VideoAdUnit} from "./AdUnits/VideoAdUnit";
 import {Connectivity} from "./Native/Api/Connectivity";
 import {Listener} from "./Native/Api/Listener";
+import {AbstractAdUnit} from "./AdUnits/AbstractAdUnit";
+import {KeyCode} from "./Constants/Android/KeyCode";
+import {BatchInvocation} from "./Native/BatchInvocation";
+import {UnityAdsError} from "./Constants/UnityAdsError";
 
 export class WebView {
 
@@ -101,26 +105,45 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
-        }).catch(error => {
-            console.dir(error);
         });
 
         let placement: Placement = this._configManager.getPlacement(placementId);
         if(!placement) {
-            // this.showError(true, placementId, 'No such placement: ' + placementId); // todo: fix me
+            this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
         }
 
-        let videoAdUnit = new VideoAdUnit(placement, placement.getCampaign());
-        videoAdUnit.create(placement, requestedOrientation);
-        videoAdUnit.getEndScreen().onClose.subscribe(this.onClose.bind(this)); // todo: clean me up
-        //this._adUnitManager.subscribe('close', this.onClose.bind(this));
+        let campaign: Campaign = placement.getCampaign();
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
 
-        //this._sessionManager.sendShow(adUnit);
+        let orientation: ScreenOrientation = requestedOrientation;
+        if(!placement.useDeviceOrientationForVideo()) {
+            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        }
+
+        let keyEvents: any[] = [];
+        if(placement.disableBackButton()) {
+            keyEvents = [KeyCode.BACK];
+        }
+
+        let adUnit: AbstractAdUnit = new VideoAdUnit(placement, placement.getCampaign()); // todo: select ad unit based on placement
+        adUnit.onClose.subscribe(this.onClose.bind(this));
+        adUnit.show(orientation, keyEvents).then(() => {
+            // this._sessionManager.sendShow(adUnit);
+        });
     }
 
-    public hide(): void {
-        //this._adUnitManager.hide();
+    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
+        let batch: BatchInvocation = new BatchInvocation(NativeBridge.getInstance());
+        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
+        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
+        if(sendFinish) {
+            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
+        }
+        NativeBridge.getInstance().invokeBatch(batch);
     }
 
     /*
@@ -160,7 +183,6 @@ export class WebView {
     }
 
     private onClose(placement: Placement): void {
-        this.hide();
         if(this._mustReinitialize) {
             this.reinitialize();
         } else {

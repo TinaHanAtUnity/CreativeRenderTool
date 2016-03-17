@@ -41,13 +41,13 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.prepareEndScreen();
     }
 
-    public start(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
+    public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
         return AdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
     }
 
-    public hide(): void {
+    public hide(): Promise<void> {
         if(this.isVideoActive()) {
             VideoPlayer.stop();
         }
@@ -56,10 +56,10 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
 
-
-        AdUnit.close();
         Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
-        this._showing = false;
+        return AdUnit.close().then(() => {
+            this._showing = false;
+        });
     }
 
     public isShowing(): boolean {
@@ -68,32 +68,6 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     public getWatches(): number {
         return this._watches;
-    }
-
-    public create(placement: Placement, requestedOrientation: ScreenOrientation) {
-        if(this.isShowing()) {
-            // finish event is not sent here to avoid confusing simple state machines
-            this.showError(false, placement.getId(), 'Can\'t open new ad unit while ad unit is already active');
-            return;
-        }
-
-        let campaign: Campaign = placement.getCampaign();
-        if(!campaign) {
-            this.showError(true, placement.getId(), 'Campaign not found');
-            return;
-        }
-
-        let orientation: ScreenOrientation = requestedOrientation;
-        if(!placement.useDeviceOrientationForVideo()) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-        }
-
-        let keyEvents: any[] = [];
-        if(placement.disableBackButton()) {
-            keyEvents = [KeyCode.BACK];
-        }
-
-        this.start(orientation, keyEvents);
     }
 
     public getVideoPosition(): number {
@@ -131,20 +105,6 @@ export class VideoAdUnit extends AbstractAdUnit {
     public unsetReferences() {
         this._endScreen = null;
         this._overlay = null;
-    }
-
-    /*
-     ERROR HANDLING HELPER METHODS
-     */
-
-    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
-        let batch: BatchInvocation = new BatchInvocation(NativeBridge.getInstance());
-        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
-        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
-        if(sendFinish) {
-            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
-        }
-        NativeBridge.getInstance().invokeBatch(batch);
     }
 
     /*
