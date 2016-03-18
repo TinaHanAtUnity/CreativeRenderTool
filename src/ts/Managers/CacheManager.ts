@@ -5,6 +5,13 @@ enum CacheStatus {
     ERROR
 }
 
+interface IFileInfo {
+    id: string;
+    found: boolean;
+    size: number;
+    mtime: number;
+}
+
 export class CacheManager {
 
     private _nativeBridge: NativeBridge;
@@ -63,6 +70,46 @@ export class CacheManager {
 
     public getFileUrl(url: string): Promise<any[]> {
         return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([fileUrl]) => [url, fileUrl]);
+    }
+
+    public cleanCache(): Promise<any[]> {
+        return this._nativeBridge.invoke('Cache', 'getFiles').then(([files]) => {
+            // clean files older than three weeks and limit cache size to 50 megabytes
+            let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
+            let sizeThreshold: number = 50 * 1024 * 1024;
+
+            let deleteFiles: string[] = [];
+            let totalSize: number = 0;
+
+            // sort files from newest to oldest
+            files.sort((n1: IFileInfo, n2: IFileInfo) => {
+                return n2.mtime - n1.mtime;
+            });
+
+            for(let i: number = 0; i < files.length; i++) {
+                let file: IFileInfo = files[i];
+                totalSize += file.size;
+
+                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                    deleteFiles.push(file.id);
+                }
+            }
+
+            if(deleteFiles.length > 0) {
+                let promises = [];
+                let deleteBatch: BatchInvocation = new BatchInvocation(this._nativeBridge);
+                promises.push(deleteBatch.queue('Sdk', 'logInfo', ['Unity Ads cache: Deleting ' + deleteFiles.length + ' old files']));
+
+                deleteFiles.forEach((file: string) => {
+                    promises.push(deleteBatch.queue('Cache', 'deleteFile', [file]));
+                });
+
+                this._nativeBridge.invokeBatch(deleteBatch);
+                return Promise.all(promises);
+            } else {
+                return Promise.resolve();
+            }
+        });
     }
 
     private registerCallback(url): Promise<any[]> {

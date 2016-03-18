@@ -62,6 +62,8 @@ export class WebView {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
+            return this._cacheManager.cleanCache();
+        }).then(() => {
             this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return this._configManager.fetch();
         }).then(() => {
