@@ -15,16 +15,21 @@ export class CampaignManager extends Observable {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _failedPlacements: string[];
 
     constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         super();
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._failedPlacements = [];
     }
 
     public request(placement: Placement): void {
-        placement.setCampaignRefreshNeeded(false);
+        if(this._failedPlacements.indexOf(placement.getId()) > -1) {
+            delete this._failedPlacements[this._failedPlacements.indexOf(placement.getId())];
+        }
+
         this._request.get(this.createRequestUrl(placement.getId()), [], 5, 5000).then(([response]) => {
             let campaignJson: any = JSON.parse(response);
             let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
@@ -32,9 +37,19 @@ export class CampaignManager extends Observable {
             this.trigger('campaign', placement, campaign);
         }).catch((error) => {
             placement.setCampaign(null);
-            placement.setCampaignRefreshNeeded(true);
+            this._failedPlacements.push(placement.getId());
             this.trigger('error', error);
         });
+    }
+
+    public retryFailedPlacements(placements: { [id: string]: Placement }) {
+        for(let placementId in placements) {
+            if(placements.hasOwnProperty(placementId)) {
+                if(this._failedPlacements.indexOf(placementId) > -1) {
+                    this.request(placements[placementId]);
+                }
+            }
+        }
     }
 
     private createRequestUrl(placementId: string): string {

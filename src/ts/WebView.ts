@@ -77,7 +77,7 @@ export class WebView {
             let defaultPlacement = this._configManager.getDefaultPlacement();
             this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
 
-            let placements: Object = this._configManager.getPlacements();
+            let placements: { [id: string]: Placement } = this._configManager.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
@@ -199,15 +199,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    let placements: Object = this._configManager.getPlacements();
-                    for(let placementId in placements) {
-                        if(placements.hasOwnProperty(placementId)) {
-                            if(placements[placementId].isCampaignRefreshNeeded()) {
-                                this._campaignManager.request(placements[placementId]);
-                            }
-                        }
-                    }
-
+                    this._campaignManager.retryFailedPlacements(this._configManager.getPlacements());
                     this._eventManager.sendUnsentSessions();
                 }
             });
