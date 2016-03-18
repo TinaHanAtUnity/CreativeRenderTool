@@ -6,14 +6,14 @@ export interface IntentExtra {
 }
 
 export interface IntentData {
-    className: string;
-    packageName: string;
-    action: string;
-    uri: string;
-    mimeType: string;
-    categories: string[];
-    flags: number;
-    extras: IntentExtra[];
+    className?: string;
+    packageName?: string;
+    action?: string;
+    uri?: string;
+    mimeType?: string;
+    categories?: string[];
+    flags?: number;
+    extras?: IntentExtra[];
 }
 
 export class IntentApi {

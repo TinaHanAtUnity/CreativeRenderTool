@@ -1,11 +1,11 @@
 import { Request } from '../../src/ts/Utilities/Request';
-import { StorageManager, StorageType } from '../../src/ts/Managers/StorageManager';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { TestBridge, TestBridgeApi } from '../TestBridge';
 
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
+import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 
 class Storage extends TestBridgeApi {
     private _storage = {};
@@ -124,11 +124,11 @@ class Url extends TestBridgeApi {
     public get(id: string, url: string, headers?: [string, string][]): any[] {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['URL', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, 'Success response', 200, headers]);
+                this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
 
@@ -138,11 +138,11 @@ class Url extends TestBridgeApi {
     public post(id: string, url: string, body?: string, headers?: [string, string][]): any[] {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_FAILED', id, url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['URL', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, 'Success response', 200, headers]);
+                this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
 
@@ -161,7 +161,6 @@ describe('EventManagerTest', () => {
     let storageApi: Storage;
     let urlApi: Url;
     let request: Request;
-    let storageManager: StorageManager;
     let eventManager: EventManager;
 
     beforeEach(() => {
@@ -171,9 +170,8 @@ describe('EventManagerTest', () => {
         testBridge.setApi('Url', urlApi);
         testBridge.setApi('Storage', storageApi);
         testBridge.setApi('Sdk', new Sdk());
-        request = new Request(testBridge.getNativeBridge());
-        storageManager = new StorageManager(testBridge.getNativeBridge());
-        eventManager = new EventManager(testBridge.getNativeBridge(), request, storageManager);
+        request = new Request();
+        eventManager = new EventManager(request);
     });
 
     it('Send successful operative event', function(done: MochaDone) {
@@ -270,8 +268,8 @@ describe('EventManagerTest', () => {
         let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
         let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
-        storageManager.set(StorageType.PRIVATE, urlKey, url);
-        storageManager.set(StorageType.PRIVATE, dataKey, data);
+        StorageApi.set(StorageType.PRIVATE, urlKey, url);
+        StorageApi.set(StorageType.PRIVATE, dataKey, data);
 
         let requestSpy = sinon.spy(request, 'post');
 

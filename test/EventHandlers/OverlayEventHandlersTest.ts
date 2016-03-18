@@ -5,8 +5,8 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { OverlayEventHandlers } from '../../src/ts/EventHandlers/OverlayEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
-import { VideoAdUnit } from '../../src/ts/Models/VideoAdUnit';
-import { FinishState } from '../../src/ts/Models/AdUnit';
+import { VideoAdUnit} from '../../src/ts/AdUnits/VideoAdUnit';
+import { FinishState} from '../../src/ts/Constants/FinishState';
 
 describe('OverlayEventHandlersTest', () => {
 

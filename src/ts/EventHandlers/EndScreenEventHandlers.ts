@@ -2,6 +2,8 @@ import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AdUnitApi } from 'Native/Api/AdUnit';
 import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
+import { IntentApi } from 'Native/Api/Intent';
+import { ListenerApi } from 'Native/Api/Listener';
 
 export class EndScreenEventHandlers {
 
@@ -17,13 +19,13 @@ export class EndScreenEventHandlers {
         });
     }
 
-    /*public static onDownload(adUnit: VideoAdUnit): void {
-        adUnit.getSessionManager().sendClick(adUnit);
-        Listener.sendClickEvent(adUnit.getPlacement().getId());
-        adUnit.getNativeBridge().invoke('Intent', 'launch', [{
+    public static onDownload(adUnit: VideoAdUnit): void {
+        // adUnit.getSessionManager().sendClick(adUnit);
+        ListenerApi.sendClickEvent(adUnit.getPlacement().getId());
+        IntentApi.launch({
             'action': 'android.intent.action.VIEW',
             'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
-        }]);
-    }*/
+        });
+    }
 
 }

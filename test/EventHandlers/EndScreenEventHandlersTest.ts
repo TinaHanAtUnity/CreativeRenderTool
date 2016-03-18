@@ -5,18 +5,41 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
+import {NativeBridge} from "../../src/ts/Native/NativeBridge";
+import {TestBridge, TestBridgeApi} from "../TestBridge";
 
 describe('EndScreenEventHandlersTest', () => {
 
     describe('with onDownload', () => {
         let adUnitMock, nativeInvoke, sessionManagerSendClick;
+        let listenerSpy, intentSpy;
+
+        class Listener extends TestBridgeApi {
+            public sendClickEvent() {
+                return ['OK'];
+            }
+        }
+
+        class Intent extends TestBridgeApi {
+            public launch() {
+                return ['OK'];
+            }
+        }
 
         beforeEach(() => {
             nativeInvoke = sinon.spy();
             sessionManagerSendClick = sinon.spy();
 
+            let testBridge = new TestBridge();
+            let listener = new Listener();
+            let intent = new Intent();
+            testBridge.setApi('Listener', listener);
+            testBridge.setApi('Intent', intent);
+
+            listenerSpy = sinon.spy(listener, 'sendClickEvent');
+            intentSpy = sinon.spy(intent, 'launch');
+
             adUnitMock = {
-                getNativeBridge: () => ({ invoke: nativeInvoke }),
                 getSessionManager: () => ({ sendClick: sessionManagerSendClick }),
                 getPlacement: () => ({ getId: () => 123 }),
                 getCampaign: () => ({ getAppStoreId: () => 'foomarketid'})
@@ -30,11 +53,11 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with event with native bridge', () => {
-            assert.isOk(nativeInvoke.calledWith('Listener', 'sendClickEvent', [123]));
+            assert.isOk(listenerSpy.calledWith(123));
         });
 
         it('should send a launch intent for market link', () => {
-            assert.isOk(nativeInvoke.calledWith('Intent', 'launch', [{'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}]));
+            assert.isOk(intentSpy.calledWith({'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}));
         });
 
     });

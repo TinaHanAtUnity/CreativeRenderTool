@@ -32,12 +32,8 @@ export class NativeBridge implements INativeBridge {
     private static _instance: NativeBridge = null;
 
     constructor(backend: IWebViewBridge) {
-        if(!NativeBridge._instance) {
-            NativeBridge._backend = backend;
-            NativeBridge._instance = this;
-        } else {
-            throw new Error('NativeBridge already initialized');
-        }
+        NativeBridge._backend = backend;
+        NativeBridge._instance = this;
     }
 
     public static getInstance() {
