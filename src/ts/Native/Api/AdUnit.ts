@@ -15,7 +15,7 @@ enum AdUnitEvent {
     ON_STOP
 }
 
-export class AdUnit {
+export class AdUnitApi {
 
     public static onStart: Observable0 = new Observable0();
     public static onCreate: Observable0 = new Observable0();
@@ -35,73 +35,73 @@ export class AdUnit {
         if(typeof systemUiVisibility === 'undefined') {
             systemUiVisibility = 0;
         }
-        return NativeBridge.getInstance().invoke<void>(AdUnit.ApiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
+        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
     }
 
     public static close(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnit.ApiClass, 'close');
+        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'close');
     }
 
     public static setViews(views: string[]): Promise<string[]> {
-        return NativeBridge.getInstance().invoke<string[]>(AdUnit.ApiClass, 'setViews', [views]);
+        return NativeBridge.getInstance().invoke<string[]>(AdUnitApi.ApiClass, 'setViews', [views]);
     }
 
     public static getViews(): Promise<string[]> {
-        return NativeBridge.getInstance().invoke<string[]>(AdUnit.ApiClass, 'getViews');
+        return NativeBridge.getInstance().invoke<string[]>(AdUnitApi.ApiClass, 'getViews');
     }
 
     public static setOrientation(orientation: ScreenOrientation): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnit.ApiClass, 'setOrientation', [orientation]);
+        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'setOrientation', [orientation]);
     }
 
     public static getOrientation(): Promise<ScreenOrientation> {
-        return NativeBridge.getInstance().invoke<ScreenOrientation>(AdUnit.ApiClass, 'getOrientation');
+        return NativeBridge.getInstance().invoke<ScreenOrientation>(AdUnitApi.ApiClass, 'getOrientation');
     }
 
     public static setKeepScreenOn(screenOn: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnit.ApiClass, 'setKeepScreenOn', [screenOn]);
+        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'setKeepScreenOn', [screenOn]);
     }
 
     public static setSystemUiVisibility(systemUiVisibility: SystemUiVisibility): Promise<SystemUiVisibility> {
-        return NativeBridge.getInstance().invoke<SystemUiVisibility>(AdUnit.ApiClass, 'setSystemUiVisibility', [systemUiVisibility]);
+        return NativeBridge.getInstance().invoke<SystemUiVisibility>(AdUnitApi.ApiClass, 'setSystemUiVisibility', [systemUiVisibility]);
     }
 
     public static setKeyEventList(keyEventList: KeyCode[]): Promise<KeyCode[]> {
-        return NativeBridge.getInstance().invoke<KeyCode[]>(AdUnit.ApiClass, 'setKeyEventList', [keyEventList]);
+        return NativeBridge.getInstance().invoke<KeyCode[]>(AdUnitApi.ApiClass, 'setKeyEventList', [keyEventList]);
     }
 
     public static handleEvent(event: string, ...parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
-                AdUnit.onStart.trigger();
+                AdUnitApi.onStart.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_CREATE]:
-                AdUnit.onCreate.trigger();
+                AdUnitApi.onCreate.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESUME]:
-                AdUnit.onResume.trigger();
+                AdUnitApi.onResume.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
-                AdUnit.onDestroy.trigger(parameters[0]);
+                AdUnitApi.onDestroy.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
-                AdUnit.onPause.trigger(parameters[0]);
+                AdUnitApi.onPause.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.KEY_DOWN]:
-                AdUnit.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                AdUnitApi.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESTORE]:
-                AdUnit.onRestore.trigger();
+                AdUnitApi.onRestore.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
-                AdUnit.onStop.trigger();
+                AdUnitApi.onStop.trigger();
                 break;
 
             default:

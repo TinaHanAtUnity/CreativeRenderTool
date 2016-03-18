@@ -1,7 +1,7 @@
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventManager } from 'Managers/EventManager';
-import {NativeResponse} from "./Request";
+import { NativeResponse } from 'Utilities/Request';
 
 export class Diagnostics {
 

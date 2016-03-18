@@ -1,11 +1,10 @@
 /// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
-import {Observable0} from 'Utilities/Observable';
 declare var EndScreenTemplate: string;
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-
-import {Campaign} from "../Models/Campaign";
+import { Observable0 } from 'Utilities/Observable';
+import { Campaign } from 'Models/Campaign';
 
 export class EndScreen extends View {
 

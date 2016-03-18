@@ -1,6 +1,6 @@
-import { NativeBridge } from '../Native/NativeBridge';
-import {BatchInvocation} from "../Native/BatchInvocation";
-import {Cache} from "../Native/Api/Cache";
+import { NativeBridge } from 'Native/NativeBridge';
+import { BatchInvocation } from 'Native/BatchInvocation';
+import { CacheApi } from 'Native/Api/Cache';
 
 enum CacheStatus {
     OK,
@@ -12,7 +12,7 @@ export class CacheManager {
     private _urlCallbacks: Object = {};
 
     constructor() {
-        Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
+        CacheApi.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
 
     public cache(url: string): Promise<string> {
@@ -28,7 +28,7 @@ export class CacheManager {
                 this._urlCallbacks[url] = [callbackObject];
             }
 
-            Cache.download(url, false);
+            CacheApi.download(url, false);
         });
     }
 
@@ -62,7 +62,7 @@ export class CacheManager {
     }
 
     public getFileUrl(url: string): Promise<any[]> {
-        return Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
+        return CacheApi.getFileUrl(url).then(fileUrl => [url, fileUrl]);
     }
 
     private registerCallback(url): Promise<any[]> {

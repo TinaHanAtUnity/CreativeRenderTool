@@ -1,5 +1,5 @@
-import {Observable2} from "../../Utilities/Observable";
-import {NativeBridge} from "../NativeBridge";
+import { Observable2 } from 'Utilities/Observable';
+import { NativeBridge } from 'Native/NativeBridge';
 
 enum ConnectivityEvent {
     ON_CONNECTED,
@@ -7,20 +7,20 @@ enum ConnectivityEvent {
     ON_NETWORK_CHANGE
 }
 
-export class Connectivity {
+export class ConnectivityApi {
 
     public static onConnected: Observable2<boolean, string> = new Observable2();
 
     private static ApiClass = 'Connectivity';
 
     public static setListeningStatus(status: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(Connectivity.ApiClass, 'setConnectionMonitoring', [status]);
+        return NativeBridge.getInstance().invoke<void>(ConnectivityApi.ApiClass, 'setConnectionMonitoring', [status]);
     }
 
     public static handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case ConnectivityEvent[ConnectivityEvent.ON_CONNECTED]:
-                Connectivity.onConnected.trigger(parameters[0], parameters[1]);
+                ConnectivityApi.onConnected.trigger(parameters[0], parameters[1]);
                 break;
 
             default:

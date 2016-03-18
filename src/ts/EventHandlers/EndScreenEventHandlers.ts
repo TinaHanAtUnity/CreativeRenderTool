@@ -1,8 +1,7 @@
 import { Double } from 'Utilities/Double';
-import { VideoAdUnit } from '../AdUnits/VideoAdUnit';
-import {AdUnit} from "../Native/Api/AdUnit";
-import {Listener} from "../Native/Api/Listener";
-import {VideoPlayer} from "../Native/Api/VideoPlayer";
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AdUnitApi } from 'Native/Api/AdUnit';
+import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
 
 export class EndScreenEventHandlers {
 
@@ -13,8 +12,8 @@ export class EndScreenEventHandlers {
         adUnit.getOverlay().setSkipDuration(0);
         adUnit.getEndScreen().hide();
         adUnit.getOverlay().show();
-        AdUnit.setViews(['videoplayer', 'webview']).then(() => {
-            VideoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
+        AdUnitApi.setViews(['videoplayer', 'webview']).then(() => {
+            VideoPlayerApi.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }
 

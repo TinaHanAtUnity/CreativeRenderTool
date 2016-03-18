@@ -1,6 +1,4 @@
-import { Observable } from 'Utilities/Observable';
 import { Template } from 'Utilities/Template';
-
 import { IViewBinding } from 'IViewBinding';
 
 export class View {

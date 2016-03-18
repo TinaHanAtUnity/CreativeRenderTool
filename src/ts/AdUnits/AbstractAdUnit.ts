@@ -1,9 +1,9 @@
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { FinishState } from 'Constants/FinishState';
-import {Observable0} from "../Utilities/Observable";
-import {ScreenOrientation} from "../Constants/Android/ScreenOrientation";
-import {KeyCode} from "../Constants/Android/KeyCode";
+import { Observable0 } from 'Utilities/Observable';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export abstract class AbstractAdUnit {
 
@@ -21,7 +21,7 @@ export abstract class AbstractAdUnit {
         this._placement = placement;
         this._campaign = campaign;
     }
-    
+
     public abstract show(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
     public abstract hide(): Promise<void>;
 

@@ -3,12 +3,12 @@
 
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
-import { AdUnit } from 'Native/Api/AdUnit';
-import {Cache} from "./Api/Cache";
-import {Connectivity} from "./Api/Connectivity";
-import {Url} from "./Api/Url";
-import {VideoPlayer} from "./Api/VideoPlayer";
-import {EventCategory} from "../Constants/EventCategory";
+import { AdUnitApi } from 'Native/Api/AdUnit';
+import { CacheApi } from 'Native/Api/Cache';
+import { ConnectivityApi } from 'Native/Api/Connectivity';
+import { UrlApi } from 'Native/Api/Url';
+import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
+import {EventCategory} from 'Constants/EventCategory';
 
 export enum CallbackStatus {
     OK,
@@ -90,24 +90,24 @@ export class NativeBridge implements INativeBridge {
         let event: string = parameters.shift();
         switch(category) {
             case EventCategory[EventCategory.ADUNIT]:
-                AdUnit.handleEvent(event, parameters);
+                AdUnitApi.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.CACHE]:
-                Cache.handleEvent(event, parameters);
+                CacheApi.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.CONNECTIVITY]:
-                Connectivity.handleEvent(event, parameters);
+                ConnectivityApi.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.URL]:
             case EventCategory[EventCategory.RESOLVE]:
-                Url.handleEvent(event, parameters);
+                UrlApi.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.VIDEOPLAYER]:
-                VideoPlayer.handleEvent(event, parameters);
+                VideoPlayerApi.handleEvent(event, parameters);
                 break;
 
             default:

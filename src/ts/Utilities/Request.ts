@@ -1,5 +1,4 @@
-import { NativeBridge } from '../Native/NativeBridge';
-import {Url} from "../Native/Api/Url";
+import { UrlApi } from 'Native/Api/Url';
 
 const enum RequestStatus {
     COMPLETE,
@@ -34,16 +33,16 @@ export class Request {
     private _requestId: number = 1;
 
     constructor() {
-        Url.onUrlComplete.subscribe(this.onUrlComplete.bind(this));
-        Url.onUrlFailed.subscribe(this.onUrlFailed.bind(this));
-        Url.onResolveComplete.subscribe(this.onResolveComplete.bind(this));
-        Url.onResolveFailed.subscribe(this.onResolveFailed.bind(this));
+        UrlApi.onUrlComplete.subscribe(this.onUrlComplete.bind(this));
+        UrlApi.onUrlFailed.subscribe(this.onUrlFailed.bind(this));
+        UrlApi.onResolveComplete.subscribe(this.onResolveComplete.bind(this));
+        UrlApi.onResolveFailed.subscribe(this.onResolveFailed.bind(this));
     }
 
     public resolve(host: string): Promise<void> {
         let id: string = this.getRequestId();
         let promise = this.registerCallback(this._resolveCallbacks, id);
-        Url.resolve(id, host);
+        UrlApi.resolve(id, host);
         return promise;
     }
 
@@ -98,7 +97,7 @@ export class Request {
         nativeRequest.id = id;
         nativeRequest.method = 'post';
         nativeRequest.url = url;
-        nativeRequest.data = data
+        nativeRequest.data = data;
         nativeRequest.headers = headers;
         nativeRequest.retries = retries;
         nativeRequest.retryDelay = retryDelay;
@@ -156,9 +155,9 @@ export class Request {
 
     private invokeRequest(nativeRequest: NativeRequest): Promise<string> {
         if(nativeRequest.method === 'get') {
-            return Url.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
+            return UrlApi.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
         } else if(nativeRequest.method === 'post') {
-            return Url.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
+            return UrlApi.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
         }
     }
 

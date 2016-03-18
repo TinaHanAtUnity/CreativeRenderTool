@@ -1,6 +1,7 @@
-import { NativeBridge } from '../Native/NativeBridge';
-import {Request, NativeResponse} from 'Utilities/Request';
-import {Storage, StorageType} from "../Native/Api/Storage";
+import { NativeBridge } from 'Native/NativeBridge';
+import { Request, NativeResponse } from 'Utilities/Request';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { SdkApi } from 'Native/Api/Sdk';
 
 export class EventManager {
     private _request: Request;
@@ -10,26 +11,26 @@ export class EventManager {
     }
 
     public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void> {
-        NativeBridge.getInstance().invoke('Sdk', 'logInfo', ['Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')']);
+        SdkApi.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
 
         let urlKey: string = this.getUrlKey(sessionId, eventId);
         let dataKey: string = this.getDataKey(sessionId, eventId);
 
-        Storage.set(StorageType.PRIVATE, urlKey, url);
-        Storage.set(StorageType.PRIVATE, dataKey, data);
-        Storage.write(StorageType.PRIVATE);
+        StorageApi.set(StorageType.PRIVATE, urlKey, url);
+        StorageApi.set(StorageType.PRIVATE, dataKey, data);
+        StorageApi.write(StorageType.PRIVATE);
 
         return this._request.post(url, data, [], 5, 5000).then(() => {
-            return Storage.delete(StorageType.PRIVATE, urlKey);
+            return StorageApi.delete(StorageType.PRIVATE, urlKey);
         }).then(() => {
-            return Storage.delete(StorageType.PRIVATE, dataKey);
+            return StorageApi.delete(StorageType.PRIVATE, dataKey);
         }).then(() => {
-            return Storage.write(StorageType.PRIVATE);
+            return StorageApi.write(StorageType.PRIVATE);
         });
     }
 
     public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<NativeResponse> {
-        NativeBridge.getInstance().invoke('Sdk', 'logInfo', ['Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')']);
+        SdkApi.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
         return this._request.get(url);
     }
 
@@ -55,11 +56,11 @@ export class EventManager {
     }
 
     private getUnsentSessions(): Promise<any[]> {
-        return Storage.getKeys(StorageType.PRIVATE, 'session', false);
+        return StorageApi.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
     private getUnsentOperativeEvents(sessionId: string): Promise<any[]> {
-        return Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
+        return StorageApi.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
     private resendEvent(sessionId: string, eventId: string): Promise<void> {
@@ -67,21 +68,21 @@ export class EventManager {
         let dataKey: string = this.getDataKey(sessionId, eventId);
 
         return this.getStoredOperativeEvent(sessionId, eventId).then(([url, data]) => {
-            NativeBridge.getInstance().invoke('Sdk', 'logInfo', ['Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event + ' + eventId + ')']);
+            SdkApi.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event + ' + eventId + ')');
             return this._request.post(url, data, [], 5, 5000);
         }).then(() => {
-            return Storage.delete(StorageType.PRIVATE, urlKey);
+            return StorageApi.delete(StorageType.PRIVATE, urlKey);
         }).then(() => {
-            return Storage.delete(StorageType.PRIVATE, dataKey);
+            return StorageApi.delete(StorageType.PRIVATE, dataKey);
         }).then(() => {
-            return Storage.write(StorageType.PRIVATE);
+            return StorageApi.write(StorageType.PRIVATE);
         });
     }
 
     private getStoredOperativeEvent(sessionId: string, eventId: string): Promise<[string, string]> {
         return Promise.all([
-            Storage.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)),
-            Storage.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId))
+            StorageApi.get(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId)),
+            StorageApi.get(StorageType.PRIVATE, this.getDataKey(sessionId, eventId))
         ]);
     }
 

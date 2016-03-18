@@ -2,16 +2,12 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { KeyCode } from 'Constants/Android/KeyCode';
-import { BatchInvocation } from 'Native/BatchInvocation';
-import { UnityAdsError } from 'Constants/UnityAdsError';
-import { AdUnit } from 'Native/Api/AdUnit';
-import { Listener } from 'Native/Api/Listener';
+import { AdUnitApi } from 'Native/Api/AdUnit';
+import { ListenerApi} from 'Native/Api/Listener';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
-import { VideoPlayer } from 'Native/Api/VideoPlayer';
+import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
 import { FinishState } from 'Constants/FinishState';
-import { NativeBridge } from 'Native/NativeBridge';
 import { VideoEventHandlers} from 'EventHandlers/VideoEventHandlers';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
@@ -28,9 +24,9 @@ export class VideoAdUnit extends AbstractAdUnit {
     constructor(placement: Placement, campaign: Campaign) {
         super(placement, campaign);
 
-        AdUnit.onResume.subscribe(this.onResume.bind(this));
-        AdUnit.onPause.subscribe(this.onPause.bind(this));
-        AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
+        AdUnitApi.onResume.subscribe(this.onResume.bind(this));
+        AdUnitApi.onPause.subscribe(this.onPause.bind(this));
+        AdUnitApi.onDestroy.subscribe(this.onDestroy.bind(this));
 
         this._videoPosition = 0;
         this._videoActive = true;
@@ -44,20 +40,20 @@ export class VideoAdUnit extends AbstractAdUnit {
     public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
-        return AdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+        return AdUnitApi.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
     }
 
     public hide(): Promise<void> {
         if(this.isVideoActive()) {
-            VideoPlayer.stop();
+            VideoPlayerApi.stop();
         }
 
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
 
-        Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
-        return AdUnit.close().then(() => {
+        ListenerApi.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
+        return AdUnitApi.close().then(() => {
             this._showing = false;
         });
     }
@@ -145,10 +141,10 @@ export class VideoAdUnit extends AbstractAdUnit {
      PRIVATES
      */
     private prepareVideoPlayer() {
-        VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
-        VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this, position));
-        VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this));
-        VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this, url));
+        VideoPlayerApi.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
+        VideoPlayerApi.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this, position));
+        VideoPlayerApi.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this));
+        VideoPlayerApi.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this, url));
     }
 
     private prepareOverlay() {

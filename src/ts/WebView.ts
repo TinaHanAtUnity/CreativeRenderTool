@@ -6,19 +6,21 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
-import {Request, NativeResponse} from 'Utilities/Request';
+import { Request, NativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
-import {FinishState} from "./Constants/FinishState";
-import {VideoAdUnit} from "./AdUnits/VideoAdUnit";
-import {Connectivity} from "./Native/Api/Connectivity";
-import {Listener} from "./Native/Api/Listener";
-import {AbstractAdUnit} from "./AdUnits/AbstractAdUnit";
-import {KeyCode} from "./Constants/Android/KeyCode";
-import {BatchInvocation} from "./Native/BatchInvocation";
-import {UnityAdsError} from "./Constants/UnityAdsError";
+import { FinishState } from 'Constants/FinishState';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { ListenerApi } from 'Native/Api/Listener';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { KeyCode } from 'Constants/Android/KeyCode';
+import { BatchInvocation } from 'Native/BatchInvocation';
+import { UnityAdsError } from 'Constants/UnityAdsError';
+import { SdkApi } from 'Native/Api/Sdk';
+import { PlacementApi } from 'Native/Api/Placement';
+import { ConnectivityApi } from 'Native/Api/Connectivity';
 
 export class WebView {
 
@@ -51,7 +53,7 @@ export class WebView {
     }
 
     public initialize(): Promise<void> {
-        return NativeBridge.getInstance().invoke<any[]>('Sdk', 'loadComplete').then((data) => {
+        return SdkApi.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -66,24 +68,24 @@ export class WebView {
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configManager.getDefaultPlacement();
-            NativeBridge.getInstance().invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
+            PlacementApi.setDefaultPlacement(defaultPlacement.getId());
 
             let placements: Object = this._configManager.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
-                    NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
+                    PlacementApi.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                     this._campaignManager.request(placements[placementId]);
                 }
             }
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
-            Connectivity.setListeningStatus(true);
-            Connectivity.onConnected.subscribe(this.onConnected.bind(this));
+            ConnectivityApi.setListeningStatus(true);
+            ConnectivityApi.onConnected.subscribe(this.onConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
-            return NativeBridge.getInstance().invoke('Sdk', 'initComplete');
+            return SdkApi.initComplete();
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
@@ -164,8 +166,8 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
-                Listener.sendReadyEvent(placement.getId());
+            PlacementApi.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
+                ListenerApi.sendReadyEvent(placement.getId());
             });
         });
     }
@@ -186,7 +188,7 @@ export class WebView {
         if(this._mustReinitialize) {
             this.reinitialize();
         } else {
-            NativeBridge.getInstance().invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.WAITING]]);
+            PlacementApi.setPlacementState(placement.getId(), PlacementState.WAITING);
             this._campaignManager.request(placement);
         }
     }
@@ -236,7 +238,7 @@ export class WebView {
 
     private reinitialize() {
         // todo: make sure session data and other similar things are saved before issuing reinit
-        NativeBridge.getInstance().invoke('Sdk', 'reinitialize');
+        SdkApi.reinitialize();
     }
 
     private getConfigJson(): Promise<NativeResponse> {

@@ -5,7 +5,7 @@ export enum StorageType {
     PUBLIC
 }
 
-export class Storage {
+export class StorageApi {
 
     public static read(type: StorageType): Promise<void> {
         return NativeBridge.getInstance().invoke<void>('Storage', 'read', [StorageType[type]]);
