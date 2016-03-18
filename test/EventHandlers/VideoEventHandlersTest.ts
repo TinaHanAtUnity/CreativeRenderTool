@@ -5,8 +5,8 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { VideoEventHandlers } from '../../src/ts/EventHandlers/VideoEventHandlers';
 import { VideoAdUnit } from '../../src/ts/Models/VideoAdUnit';
-import {FinishState} from '../../src/ts/Models/AdUnit';
-import {Double} from '../../src/ts/Utilities/Double';
+import { FinishState } from '../../src/ts/Models/AdUnit';
+import { Double } from '../../src/ts/Utilities/Double';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -145,24 +145,22 @@ describe('VideoEventHandlersTest', () => {
             assert.isOk(endscreenShow.called);
         });
 
-        it('should not call rawinvoke, if integration testing is disabled', (done) => {
+        it('should not call rawinvoke, if integration testing is disabled', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            prom.then(() => {
+            return prom.then(() => {
                 assert.isOk(rawInvoke.notCalled);
-                done();
             });
         });
 
-        it('should call rawinvoke, if integration testing is enabled', (done) => {
+        it('should call rawinvoke, if integration testing is enabled', () => {
             prom = Promise.resolve(true);
             storageManagerGet = sinon.mock().returns(prom);
 
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            prom.then(() => {
+            return prom.then(() => {
                 assert.isOk(rawInvoke.calledWith('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [1]));
-                done();
             });
         });
 
@@ -210,24 +208,22 @@ describe('VideoEventHandlersTest', () => {
             assert.isOk(setVolume.calledWith(new Double(0.0)));
         });
 
-        it('should just play when video position is set to 0', (done) => {
+        it('should just play when video position is set to 0', () => {
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
 
-            volumeResolved.then(() => {
+            return volumeResolved.then(() => {
                 assert.isOk(play.called);
                 assert.isOk(seekTo.notCalled);
-                done();
             });
         });
 
-        it('should seek and play when video position is set to greater than 0', (done) => {
+        it('should seek and play when video position is set to greater than 0', () => {
             adUnitMock.getVideoPosition = sinon.mock().twice().returns(123);
 
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
-            Promise.all([volumeResolved, seekResolved]).then(() => {
+            return Promise.all([volumeResolved, seekResolved]).then(() => {
                 assert.isOk(seekTo.calledWith(123));
                 assert.isOk(play.called);
-                done();
             });
         });
 

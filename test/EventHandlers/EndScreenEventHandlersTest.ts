@@ -102,13 +102,11 @@ describe('EndScreenEventHandlersTest', () => {
             assert.isOk(nativeInvoke.calledWith('AdUnit', 'setViews', [['videoplayer', 'webview']]));
         });
 
-        it('should prepare video', (done) => {
+        it('should prepare video', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            invokePromise.then(() => {
+            return invokePromise.then(() => {
                 assert.isOk(videoPrepare.calledWith('fake url', new Double(1.0)));
-
-                done();
             });
         });
     });
