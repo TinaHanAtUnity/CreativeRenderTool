@@ -77,7 +77,7 @@ export class WebView {
             let defaultPlacement = this._configManager.getDefaultPlacement();
             this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
 
-            let placements: Object = this._configManager.getPlacements();
+            let placements: { [id: string]: Placement } = this._configManager.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
@@ -173,7 +173,6 @@ export class WebView {
             'type': 'campaign_request_failed',
             'error': error
         }, this._clientInfo, this._deviceInfo);
-        // todo: implement retry logic
     }
 
     private onClose(adUnit: AdUnit): void {
@@ -200,6 +199,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
+                    this._campaignManager.retryFailedPlacements(this._configManager.getPlacements());
                     this._eventManager.sendUnsentSessions();
                 }
             });
