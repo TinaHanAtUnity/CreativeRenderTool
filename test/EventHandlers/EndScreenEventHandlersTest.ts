@@ -1,7 +1,6 @@
 /// <reference path="../../typings/main.d.ts" />
 
 import 'mocha';
-import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
@@ -26,15 +25,15 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            assert.isOk(sessionManagerSendClick.called);
+            sinon.assert.called(sessionManagerSendClick);
         });
 
         it('should send a click with event with native bridge', () => {
-            assert.isOk(nativeInvoke.calledWith('Listener', 'sendClickEvent', [123]));
+            sinon.assert.calledWith(nativeInvoke, 'Listener', 'sendClickEvent', [123]);
         });
 
         it('should send a launch intent for market link', () => {
-            assert.isOk(nativeInvoke.calledWith('Intent', 'launch', [{'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}]));
+            sinon.assert.calledWith(nativeInvoke, 'Intent', 'launch', [{'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}]);
         });
 
     });
@@ -68,45 +67,45 @@ describe('EndScreenEventHandlersTest', () => {
         it('should activate video', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            assert.isOk(adUnitMock.setVideoActive.calledWith(true));
+            sinon.assert.calledWith(adUnitMock.setVideoActive, true);
         });
 
         it('should set video position to start', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            assert.isOk(adUnitMock.setVideoPosition.calledWith(0));
+            sinon.assert.calledWith(adUnitMock.setVideoPosition, 0);
         });
 
         it('should setup skipping', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            assert.isOk(setSkipEnabled.calledWith(true));
-            assert.isOk(setSkipDuration.calledWith(0));
+            sinon.assert.calledWith(setSkipEnabled, true);
+            sinon.assert.calledWith(setSkipDuration, 0);
         });
 
         it('should hide endscreen', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            assert.isOk(endScreenHide.called);
+            sinon.assert.called(endScreenHide);
         });
 
         it('should show overlay', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
-            assert.isOk(overlayShow.called);
+            sinon.assert.called(overlayShow);
         });
 
         it('should call native for views', () => {
             EndScreenEventHandlers.onReplay((adUnitMock));
 
-            assert.isOk(nativeInvoke.calledWith('AdUnit', 'setViews', [['videoplayer', 'webview']]));
+            sinon.assert.calledWith(nativeInvoke, 'AdUnit', 'setViews', [['videoplayer', 'webview']]);
         });
 
         it('should prepare video', () => {
             EndScreenEventHandlers.onReplay(adUnitMock);
 
             return invokePromise.then(() => {
-                assert.isOk(videoPrepare.calledWith('fake url', new Double(1.0)));
+                sinon.assert.calledWith(videoPrepare, 'fake url', new Double(1.0));
             });
         });
     });
