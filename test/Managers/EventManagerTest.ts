@@ -150,6 +150,18 @@ class Url extends TestBridgeApi {
     }
 }
 
+class DeviceInfo extends TestBridgeApi {
+    private _testId: string;
+
+    public getUniqueEventId(): any[] {
+        return ['OK', this._testId];
+    }
+
+    public setTestId(testId: string) {
+        this._testId = testId;
+    }
+}
+
 class Sdk extends TestBridgeApi {
     public logInfo(message: string) {
         return ['OK'];
@@ -194,8 +206,6 @@ describe('EventManagerTest', () => {
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Successful operative event url should be deleted');
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Successful operative event data should be deleted');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after successful operative event');
-        }).catch((error) => {
-            assert.fail('Send succesful operative event failed' + error);
         });
     });
 
@@ -221,8 +231,6 @@ describe('EventManagerTest', () => {
             assert.equal(url, storageApi.get('PRIVATE', urlKey)[1], 'Failed operative event url was not correctly stored');
             assert.equal(data, storageApi.get('PRIVATE', dataKey)[1], 'Failed operative event data was not correctly stored');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
-        }).catch((error) => {
-            assert.fail('Send failed operative event failed: ' + error);
         });
         clock.tick(30000);
         clock.restore();
@@ -238,8 +246,6 @@ describe('EventManagerTest', () => {
         return eventManager.thirdPartyEvent('Test event', sessionId, url).then(() => {
             assert(requestSpy.calledOnce, 'Third party event did not try sending GET request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Third party event url does not match');
-        }).catch((error) => {
-            assert.fail('Send third party event failed: ' + error);
         });
     });
 
@@ -253,8 +259,6 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Diagnostic event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Diagnostic event data does not match');
-        }).catch((error) => {
-            assert.fail('Send diagnostic event failed: ' + error);
         });
     });
 
@@ -279,8 +283,17 @@ describe('EventManagerTest', () => {
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Retried event url should be deleted');
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Retried event data should be deleted');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
-        }).catch((error) => {
-            assert.fail('Retry failed event failed: ' + error);
+        });
+    });
+
+    it('Get unique event id', () => {
+        let testId: string = '1234-5678';
+        let deviceInfoApi: DeviceInfo = new DeviceInfo();
+        testBridge.setApi('DeviceInfo', deviceInfoApi);
+        deviceInfoApi.setTestId(testId);
+
+        return eventManager.getUniqueEventId().then(uniqueId => {
+            assert.equal(testId, uniqueId, 'Unique id does not match what native API returned');
         });
     });
 });
