@@ -39,7 +39,10 @@ export class CacheApi {
     }
 
     public static getFiles(urls?: string[]): Promise<IFileInfo[]> {
-        return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles', [urls]);
+        if(urls && urls.length) {
+            return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles', [urls]);
+        }
+        return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles');
     }
 
     public static getFileInfo(url: string): Promise<IFileInfo> {
