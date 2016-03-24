@@ -22,23 +22,6 @@ export class CacheManager {
         nativeBridge.subscribe('CACHE_DOWNLOAD_END', this.onDownloadEnd.bind(this));
     }
 
-    public cache(url: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            let callbackObject = {};
-            callbackObject[CacheStatus.OK] = resolve;
-            callbackObject[CacheStatus.ERROR] = reject;
-
-            let callbackList: Function[] = this._urlCallbacks[url];
-            if(callbackList) {
-                this._urlCallbacks[url].push(callbackObject);
-            } else {
-                this._urlCallbacks[url] = [callbackObject];
-            }
-
-            this._nativeBridge.invoke('Cache', 'download', [url, false]);
-        });
-    }
-
     public cacheAll(urls: string[]): Promise<any[]> {
         let batch = new BatchInvocation(this._nativeBridge);
         let promises = urls.map((url: string) => {
