@@ -1,4 +1,5 @@
-import { UrlApi } from 'Native/Api/Url';
+import { RequestApi } from '../Native/Api/Request';
+import {ResolveApi} from "../Native/Api/Resolve";
 
 const enum RequestStatus {
     COMPLETE,
@@ -33,16 +34,16 @@ export class Request {
     private _requestId: number = 1;
 
     constructor() {
-        UrlApi.onUrlComplete.subscribe(this.onUrlComplete.bind(this));
-        UrlApi.onUrlFailed.subscribe(this.onUrlFailed.bind(this));
-        UrlApi.onResolveComplete.subscribe(this.onResolveComplete.bind(this));
-        UrlApi.onResolveFailed.subscribe(this.onResolveFailed.bind(this));
+        RequestApi.onComplete.subscribe(this.onUrlComplete.bind(this));
+        RequestApi.onFailed.subscribe(this.onUrlFailed.bind(this));
+        ResolveApi.onComplete.subscribe(this.onResolveComplete.bind(this));
+        ResolveApi.onFailed.subscribe(this.onResolveFailed.bind(this));
     }
 
     public resolve(host: string): Promise<[string, string, string]> {
         let id: string = this.getRequestId();
         let promise = this.registerCallback(this._resolveCallbacks, id);
-        UrlApi.resolve(id, host);
+        ResolveApi.resolve(id, host);
         return promise;
     }
 
@@ -155,9 +156,9 @@ export class Request {
 
     private invokeRequest(nativeRequest: NativeRequest): Promise<string> {
         if(nativeRequest.method === 'get') {
-            return UrlApi.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
+            return RequestApi.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
         } else if(nativeRequest.method === 'post') {
-            return UrlApi.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
+            return RequestApi.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
         }
     }
 

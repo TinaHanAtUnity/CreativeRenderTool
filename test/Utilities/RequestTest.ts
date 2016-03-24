@@ -4,7 +4,7 @@ import { TestBridge, TestBridgeApi } from '../TestBridge';
 import 'mocha';
 import { assert } from 'chai';
 
-class Url extends TestBridgeApi {
+class RequestApi extends TestBridgeApi {
     private _retryCount: number = 0;
 
     public get(id: string, url: string, headers: [string, string][]): any[] {
@@ -57,6 +57,17 @@ class Url extends TestBridgeApi {
         return ['OK'];
     }
 
+    private sendSuccessResponse(id: string, url: string, body: string, headers: [string, string][]) {
+        setTimeout(() => { this.getNativeBridge().handleEvent(['REQUEST', 'COMPLETE', id, url, body, 200, headers]); }, 0);
+    }
+
+    private sendFailResponse(id: string, url: string, message: string) {
+        setTimeout(() => { this.getNativeBridge().handleEvent(['REQUEST', 'FAILED', id, url, message]); }, 0);
+    }
+}
+
+class ResolveApi extends TestBridgeApi {
+
     public resolve(id: string, host: string): any[] {
         if(host.indexOf('fail') !== -1) {
             setTimeout(() => {
@@ -71,13 +82,6 @@ class Url extends TestBridgeApi {
         return ['OK', id];
     }
 
-    private sendSuccessResponse(id: string, url: string, body: string, headers: [string, string][]) {
-        setTimeout(() => { this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, body, 200, headers]); }, 0);
-    }
-
-    private sendFailResponse(id: string, url: string, message: string) {
-        setTimeout(() => { this.getNativeBridge().handleEvent(['URL', 'FAILED', id, url, message]); }, 0);
-    }
 }
 
 describe('RequestTest', () => {
@@ -86,7 +90,7 @@ describe('RequestTest', () => {
         let successMessage: string = 'Success response';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.get(successUrl).then((response) => {
@@ -102,7 +106,7 @@ describe('RequestTest', () => {
         let failMessage: string = 'Fail response';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.get(failUrl).then(response => {
@@ -119,7 +123,7 @@ describe('RequestTest', () => {
         let headerMessage: string = 'Header message';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
@@ -137,7 +141,7 @@ describe('RequestTest', () => {
         let retryDelay: number = 10;
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.get(retryUrl, [], retryAttempts, retryDelay).then(response => {
@@ -153,7 +157,7 @@ describe('RequestTest', () => {
         let successMessage: string = 'Success response';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.post(successUrl, 'Test').then(response => {
@@ -169,7 +173,7 @@ describe('RequestTest', () => {
         let failMessage: string = 'Fail response';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.post(failUrl, 'Test').then(response => {
@@ -186,7 +190,7 @@ describe('RequestTest', () => {
         let headerMessage: string = 'Header message';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
@@ -202,7 +206,7 @@ describe('RequestTest', () => {
         let bodyMessage: string = 'Body message';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.post(testUrl, bodyMessage).then(response => {
@@ -220,7 +224,7 @@ describe('RequestTest', () => {
         let retryDelay: number = 10;
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Request', new RequestApi());
         let request: Request = new Request();
 
         request.post(retryUrl, 'Test', [], retryAttempts, retryDelay).then(response => {
@@ -236,7 +240,7 @@ describe('RequestTest', () => {
         let testIp: string = '1.2.3.4';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Resolve', new ResolveApi());
         let request: Request = new Request();
 
         return request.resolve(testHost).then(([id, host, ip]) => {
@@ -251,7 +255,7 @@ describe('RequestTest', () => {
         let expectedErrorMsg: string = 'Error message';
 
         let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
+        testBridge.setApi('Resolve', new ResolveApi());
         let request: Request = new Request();
 
         return request.resolve(failHost).then(() => {

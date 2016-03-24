@@ -4,7 +4,6 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
-import {NativeBridge} from "../../src/ts/Native/NativeBridge";
 import {TestBridge, TestBridgeApi} from "../TestBridge";
 
 describe('EndScreenEventHandlersTest', () => {
