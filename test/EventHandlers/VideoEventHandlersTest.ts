@@ -1,12 +1,12 @@
 /// <reference path="../../typings/main.d.ts" />
 
 import 'mocha';
-import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { VideoEventHandlers } from '../../src/ts/EventHandlers/VideoEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
 import { FinishState } from '../../src/ts/Constants/FinishState';
+
 
 describe('VideoEventHandlersTest', () => {
 
@@ -27,14 +27,16 @@ describe('VideoEventHandlersTest', () => {
 
         it('with positive position, should set video position and video progress', () => {
             VideoEventHandlers.onVideoProgress(<VideoAdUnit> <any> adUnitMock, 5);
-            assert.isOk(adUnitMock.setVideoPosition.calledWith(5));
-            assert.isOk(overlay.setVideoProgress.calledWith(5));
+
+            sinon.assert.calledWith(adUnitMock.setVideoPosition, 5);
+            sinon.assert.calledWith(overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
             VideoEventHandlers.onVideoProgress(<VideoAdUnit> <any> adUnitMock, -5);
-            assert.isOk(adUnitMock.setVideoPosition.notCalled);
-            assert.isOk(overlay.setVideoProgress.calledWith(-5));
+
+            sinon.assert.notCalled(adUnitMock.setVideoPosition);
+            sinon.assert.calledWith(overlay.setVideoProgress, -5);
         });
     });
 
@@ -58,27 +60,27 @@ describe('VideoEventHandlersTest', () => {
         it('should send start event with SessionManager', () => {
             VideoEventHandlers.onVideoStart(<VideoAdUnit> <any> adUnitMock);
 
-            assert.isOk(sendStart.calledWith(adUnitMock));
+            sinon.assert.calledWith(sendStart, adUnitMock);
         });
 
         it('should call newWatch', () => {
             VideoEventHandlers.onVideoStart(<VideoAdUnit> <any> adUnitMock);
 
-            assert.isOk(adUnitMock.newWatch.called);
+            sinon.assert.called(adUnitMock.newWatch);
         });
 
         it('on first watch, should call sendStartEvent callback', () => {
             adUnitMock.getWatches.returns(0);
             VideoEventHandlers.onVideoStart(<VideoAdUnit> <any> adUnitMock);
 
-            assert.isOk(invoke.calledWith('Listener', 'sendStartEvent', [1]));
+            sinon.assert.calledWith(invoke, 'Listener', 'sendStartEvent', [1]);
         });
 
         it('on second watch, should not call sendStartEvent', () => {
             adUnitMock.getWatches.returns(1);
             VideoEventHandlers.onVideoStart(<VideoAdUnit> <any> adUnitMock);
 
-            assert.isOk(invoke.notCalled);
+            sinon.assert.notCalled(invoke);
         });
 
     });
@@ -118,51 +120,49 @@ describe('VideoEventHandlersTest', () => {
         it('should set video to inactive', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            assert.isOk(adUnitMock.setVideoActive.calledWith(false));
+            sinon.assert.calledWith(adUnitMock.setVideoActive, false);
         });
 
         it('should set finnish state to COMPLETED', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            assert.isOk(adUnitMock.setFinishState.calledWith(FinishState.COMPLETED));
+            sinon.assert.calledWith(adUnitMock.setFinishState, FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            assert.isOk(sendView.calledWith(adUnitMock));
+            sinon.assert.calledWith(sendView, adUnitMock);
         });
 
         it('should hide overlay', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            assert.isOk(overlayHide.called);
+            sinon.assert.called(overlayHide);
         });
 
         it('should show endscreen', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            assert.isOk(endscreenShow.called);
+            sinon.assert.called(endscreenShow);
         });
 
-        it('should not call rawinvoke, if integration testing is disabled', (done) => {
+        it('should not call rawinvoke, if integration testing is disabled', () => {
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            prom.then(() => {
-                assert.isOk(rawInvoke.notCalled);
-                done();
+            return prom.then(() => {
+                sinon.assert.notCalled(rawInvoke);
             });
         });
 
-        it('should call rawinvoke, if integration testing is enabled', (done) => {
+        it('should call rawinvoke, if integration testing is enabled', () => {
             prom = Promise.resolve(true);
             storageManagerGet = sinon.mock().returns(prom);
 
             VideoEventHandlers.onVideoCompleted(<VideoAdUnit> <any> adUnitMock, 'foo_url');
 
-            prom.then(() => {
-                assert.isOk(rawInvoke.calledWith('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [1]));
-                done();
+            return prom.then(() => {
+                sinon.assert.calledWith(rawInvoke, 'com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [1]);
             });
         });
 
@@ -194,40 +194,38 @@ describe('VideoEventHandlersTest', () => {
         it('should set video duration for overlay', () => {
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
 
-            assert.isOk(setVideoDuration.calledWith(10));
+            sinon.assert.calledWith(setVideoDuration, 10);
         });
 
         it('should set video volume to 1.0 by default', () => {
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
 
-            assert.isOk(setVolume.calledWith(new Double(1.0)));
+            sinon.assert.calledWith(setVolume, new Double(1.0));
         });
 
         it('should set video volume to 0.0 when overlay says it is muted', () => {
             isMuted = sinon.mock().returns(true);
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
 
-            assert.isOk(setVolume.calledWith(new Double(0.0)));
+            sinon.assert.calledWith(setVolume, new Double(0.0));
         });
 
-        it('should just play when video position is set to 0', (done) => {
+        it('should just play when video position is set to 0', () => {
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
 
-            volumeResolved.then(() => {
-                assert.isOk(play.called);
-                assert.isOk(seekTo.notCalled);
-                done();
+            return volumeResolved.then(() => {
+                sinon.assert.called(play);
+                sinon.assert.notCalled(seekTo);
             });
         });
 
-        it('should seek and play when video position is set to greater than 0', (done) => {
+        it('should seek and play when video position is set to greater than 0', () => {
             adUnitMock.getVideoPosition = sinon.mock().twice().returns(123);
 
             VideoEventHandlers.onVideoPrepared(<VideoAdUnit> <any> adUnitMock, 10, 200, 300);
-            Promise.all([volumeResolved, seekResolved]).then(() => {
-                assert.isOk(seekTo.calledWith(123));
-                assert.isOk(play.called);
-                done();
+            return Promise.all([volumeResolved, seekResolved]).then(() => {
+                sinon.assert.calledWith(seekTo, 123);
+                sinon.assert.called(play);
             });
         });
 

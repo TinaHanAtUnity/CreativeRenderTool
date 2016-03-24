@@ -54,7 +54,7 @@ export class ConfigManager {
         return this._placements[placementId];
     }
 
-    public getPlacements(): Object {
+    public getPlacements(): { [id: string]: Placement } {
         return this._placements;
     }
 

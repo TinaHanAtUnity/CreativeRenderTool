@@ -150,6 +150,18 @@ class Url extends TestBridgeApi {
     }
 }
 
+class DeviceInfo extends TestBridgeApi {
+    private _testId: string;
+
+    public getUniqueEventId(): any[] {
+        return ['OK', this._testId];
+    }
+
+    public setTestId(testId: string) {
+        this._testId = testId;
+    }
+}
+
 class Sdk extends TestBridgeApi {
     public logInfo(message: string) {
         return ['OK'];
@@ -174,7 +186,7 @@ describe('EventManagerTest', () => {
         eventManager = new EventManager(request);
     });
 
-    it('Send successful operative event', function(done: MochaDone) {
+    it('Send successful operative event', () => {
         let eventId: string = '1234';
         let sessionId: string = '5678';
         let url: string = 'https://www.example.net/operative_event';
@@ -182,7 +194,7 @@ describe('EventManagerTest', () => {
 
         let requestSpy = sinon.spy(request, 'post');
 
-        eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
+        return eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert(requestSpy.calledOnce, 'Operative event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
@@ -192,13 +204,10 @@ describe('EventManagerTest', () => {
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Successful operative event url should be deleted');
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Successful operative event data should be deleted');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after successful operative event');
-            done();
-        }).catch((error) => {
-            done(new Error('Send succesful operative event failed: ' + error));
         });
     });
 
-    it('Send failed operative event', function(done: MochaDone) {
+    it('Send failed operative event', () => {
         let clock = sinon.useFakeTimers();
 
         let eventId: string = '1234';
@@ -208,8 +217,8 @@ describe('EventManagerTest', () => {
 
         let requestSpy = sinon.spy(request, 'post');
 
-        eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
-            done(new Error('Send failed operative event failed to fail'));
+        let event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
+            assert.fail('Send failed operative event failed to fail');
         }, () => {
             assert(requestSpy.calledOnce, 'Failed operative event did not try sending POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
@@ -220,46 +229,38 @@ describe('EventManagerTest', () => {
             assert.equal(url, storageApi.get('PRIVATE', urlKey)[1], 'Failed operative event url was not correctly stored');
             assert.equal(data, storageApi.get('PRIVATE', dataKey)[1], 'Failed operative event data was not correctly stored');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
-            done();
-        }).catch((error) => {
-            done(new Error('Send failed operative event failed: ' + error));
         });
         clock.tick(30000);
         clock.restore();
+        return event;
     });
 
-    it('Send third party event', function(done: MochaDone) {
+    it('Send third party event', () => {
         let sessionId: string = '1234';
         let url: string = 'https://www.example.net/third_party_event';
 
         let requestSpy = sinon.spy(request, 'get');
 
-        eventManager.thirdPartyEvent('Test event', sessionId, url).then(() => {
+        return eventManager.thirdPartyEvent('Test event', sessionId, url).then(() => {
             assert(requestSpy.calledOnce, 'Third party event did not try sending GET request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Third party event url does not match');
-            done();
-        }).catch((error) => {
-            done(new Error('Send third party event failed: ' + error));
         });
     });
 
-    it('Send diagnostic event', function(done: MochaDone) {
+    it('Send diagnostic event', () => {
         let url: string = 'https://www.example.net/diagnostic_event';
         let data: string = 'Test Data';
 
         let requestSpy = sinon.spy(request, 'post');
 
-        eventManager.diagnosticEvent(url, data).then(() => {
+        return eventManager.diagnosticEvent(url, data).then(() => {
             assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Diagnostic event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Diagnostic event data does not match');
-            done();
-        }).catch((error) => {
-            done(new Error('Send diagnostic event failed: ' + error));
         });
     });
 
-    it('Retry failed event', function(done: MochaDone) {
+    it('Retry failed event', () => {
         let url: string = 'https://www.example.net/retry_event';
         let data: string = 'Retry test';
         let sessionId: string = 'abcd-1234';
@@ -273,16 +274,24 @@ describe('EventManagerTest', () => {
 
         let requestSpy = sinon.spy(request, 'post');
 
-        eventManager.sendUnsentSessions().then(() => {
+        return eventManager.sendUnsentSessions().then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Retried event url should be deleted');
             assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Retried event data should be deleted');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
-            done();
-        }).catch((error) => {
-            done(new Error('Retry failed event failed: ' + error));
+        });
+    });
+
+    it('Get unique event id', () => {
+        let testId: string = '1234-5678';
+        let deviceInfoApi: DeviceInfo = new DeviceInfo();
+        testBridge.setApi('DeviceInfo', deviceInfoApi);
+        deviceInfoApi.setTestId(testId);
+
+        return eventManager.getUniqueEventId().then(uniqueId => {
+            assert.equal(testId, uniqueId, 'Unique id does not match what native API returned');
         });
     });
 });

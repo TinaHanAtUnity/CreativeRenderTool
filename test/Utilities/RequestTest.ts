@@ -57,6 +57,20 @@ class Url extends TestBridgeApi {
         return ['OK'];
     }
 
+    public resolve(id: string, host: string): any[] {
+        if(host.indexOf('fail') !== -1) {
+            setTimeout(() => {
+                this.getNativeBridge().handleEvent(['RESOLVE', 'FAILED', id, host, 'Error', 'Error message']);
+            }, 0);
+        } else {
+            setTimeout(() => {
+                this.getNativeBridge().handleEvent(['RESOLVE', 'COMPLETE', id, host, '1.2.3.4']);
+            }, 0);
+        }
+
+        return ['OK', id];
+    }
+
     private sendSuccessResponse(id: string, url: string, body: string, headers: [string, string][]) {
         setTimeout(() => { this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, body, 200, headers]); }, 0);
     }
@@ -214,6 +228,37 @@ describe('RequestTest', () => {
             done();
         }).catch((error) => {
             done(new Error('Post with retrying failed: ' + error));
+        });
+    });
+
+    it('Resolve host with success', () => {
+        let testHost: string = 'www.example.net';
+        let testIp: string = '1.2.3.4';
+
+        let testBridge: TestBridge = new TestBridge();
+        testBridge.setApi('Url', new Url());
+        let request: Request = new Request();
+
+        return request.resolve(testHost).then(([id, host, ip]) => {
+            assert.equal(testHost, host, 'Hostname does not match the request');
+            assert.equal(testIp, ip, 'IP address was not successfully resolved');
+        });
+    });
+
+    it('Resolve host with failure', () => {
+        let failHost: string = 'www.fail.com';
+        let expectedError: string = 'Error';
+        let expectedErrorMsg: string = 'Error message';
+
+        let testBridge: TestBridge = new TestBridge();
+        testBridge.setApi('Url', new Url());
+        let request: Request = new Request();
+
+        return request.resolve(failHost).then(() => {
+            assert.fail('Failed resolve must not be successful');
+        }, ([error, errorMsg]) => {
+            assert.equal(expectedError, error, 'Failed resolve error does not match');
+            assert.equal(expectedErrorMsg, errorMsg, 'Failed resolve error message does not match');
         });
     });
 });

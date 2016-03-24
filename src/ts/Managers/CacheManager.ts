@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
-import { CacheApi } from 'Native/Api/Cache';
+import {CacheApi, IFileInfo} from 'Native/Api/Cache';
 
 enum CacheStatus {
     OK,
@@ -14,24 +14,7 @@ export class CacheManager {
     constructor() {
         CacheApi.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
-
-    public cache(url: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            let callbackObject = {};
-            callbackObject[CacheStatus.OK] = resolve;
-            callbackObject[CacheStatus.ERROR] = reject;
-
-            let callbackList: Function[] = this._urlCallbacks[url];
-            if(callbackList) {
-                this._urlCallbacks[url].push(callbackObject);
-            } else {
-                this._urlCallbacks[url] = [callbackObject];
-            }
-
-            CacheApi.download(url, false);
-        });
-    }
-
+    
     public cacheAll(urls: string[]): Promise<any[]> {
         let batch = new BatchInvocation(NativeBridge.getInstance());
         let promises = urls.map((url: string) => {
@@ -63,6 +46,46 @@ export class CacheManager {
 
     public getFileUrl(url: string): Promise<any[]> {
         return CacheApi.getFileUrl(url).then(fileUrl => [url, fileUrl]);
+    }
+
+    public cleanCache(): Promise<any[]> {
+        return CacheApi.getFiles().then(files => {
+            // clean files older than three weeks and limit cache size to 50 megabytes
+            let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
+            let sizeThreshold: number = 50 * 1024 * 1024;
+
+            let deleteFiles: string[] = [];
+            let totalSize: number = 0;
+
+            // sort files from newest to oldest
+            files.sort((n1: IFileInfo, n2: IFileInfo) => {
+                return n2.mtime - n1.mtime;
+            });
+
+            for(let i: number = 0; i < files.length; i++) {
+                let file: IFileInfo = files[i];
+                totalSize += file.size;
+
+                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                    deleteFiles.push(file.id);
+                }
+            }
+
+            if(deleteFiles.length > 0) {
+                let promises = [];
+                let deleteBatch: BatchInvocation = new BatchInvocation(NativeBridge.getInstance());
+                promises.push(deleteBatch.queue('Sdk', 'logInfo', ['Unity Ads cache: Deleting ' + deleteFiles.length + ' old files']));
+
+                deleteFiles.forEach((file: string) => {
+                    promises.push(deleteBatch.queue('Cache', 'deleteFile', [file]));
+                });
+
+                NativeBridge.getInstance().invokeBatch(deleteBatch);
+                return Promise.all(promises);
+            } else {
+                return Promise.resolve();
+            }
+        });
     }
 
     private registerCallback(url): Promise<any[]> {

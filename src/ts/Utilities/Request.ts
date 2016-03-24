@@ -39,7 +39,7 @@ export class Request {
         UrlApi.onResolveFailed.subscribe(this.onResolveFailed.bind(this));
     }
 
-    public resolve(host: string): Promise<void> {
+    public resolve(host: string): Promise<[string, string, string]> {
         let id: string = this.getRequestId();
         let promise = this.registerCallback(this._resolveCallbacks, id);
         UrlApi.resolve(id, host);
@@ -107,8 +107,8 @@ export class Request {
         return promise;
     }
 
-    private registerCallback(callbacks, id): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    private registerCallback(callbacks, id): Promise<[string, string, string]> {
+        return new Promise<[string, string, string]>((resolve, reject) => {
             let callbackObject = {};
             callbackObject[RequestStatus.COMPLETE] = resolve;
             callbackObject[RequestStatus.FAILED] = reject;

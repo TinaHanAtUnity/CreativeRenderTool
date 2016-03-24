@@ -12,6 +12,13 @@ enum CacheEvent {
     DOWNLOAD_NO_INTERNET
 }
 
+export interface IFileInfo {
+    id: string;
+    found: boolean;
+    size: number;
+    mtime: number;
+}
+
 export class CacheApi {
 
     public static onDownloadStarted: Observable1<string> = new Observable1();
@@ -31,15 +38,15 @@ export class CacheApi {
         return NativeBridge.getInstance().invoke<void>(CacheApi.ApiClass, 'cancelAllDownloads');
     }
 
-    public static getFiles(urls?: string[]): Promise<Object[]> {
+    public static getFiles(urls?: string[]): Promise<IFileInfo[]> {
         return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles', [urls]);
     }
 
-    public static getFileInfo(url: string): Promise<Object> {
+    public static getFileInfo(url: string): Promise<IFileInfo> {
         return NativeBridge.getInstance().invoke<Object>(CacheApi.ApiClass, 'getFileInfo', [url]);
     }
 
-    public static getFileIdFileInfo(fileId: string): Promise<Object> {
+    public static getFileIdFileInfo(fileId: string): Promise<IFileInfo> {
         return NativeBridge.getInstance().invoke<Object>(CacheApi.ApiClass, 'getFileIdFileInfo', [fileId]);
     }
 
