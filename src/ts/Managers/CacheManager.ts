@@ -57,6 +57,10 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.invoke('Cache', 'getFiles').then(([files]) => {
+            if(!files) {
+                return Promise.resolve();
+            }
+
             // clean files older than three weeks and limit cache size to 50 megabytes
             let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
             let sizeThreshold: number = 50 * 1024 * 1024;
