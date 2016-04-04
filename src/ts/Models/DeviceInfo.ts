@@ -3,6 +3,7 @@ import { StreamType } from 'Constants/Android/StreamType';
 import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { Model } from 'Models/Model';
+import { Platform } from 'Constants/Platform';
 
 enum StorageType {
     EXTERNAL,
@@ -42,11 +43,16 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
 
-    public fetch(nativeBridge: NativeBridge): Promise<any[]> {
+    public fetch(platform: Platform, nativeBridge: NativeBridge): Promise<any[]> {
         let className: string = 'DeviceInfo';
         let promises = [];
         let batch: BatchInvocation = new BatchInvocation(nativeBridge);
-        promises.push(batch.queue(className, 'getAndroidId').then(([androidId]) => this._androidId = androidId));
+
+        if(platform === Platform.ANDROID) {
+            promises.push(batch.queue(className, 'getAndroidId').then(([androidId]) => this._androidId = androidId));
+            promises.push(batch.queue(className, 'getScreenLayout').then(([screenLayout]) => this._screenLayout = screenLayout));
+        }
+
         promises.push(batch.queue(className, 'getAdvertisingTrackingId').then(([advertisingIdentifier]) => this._advertisingIdentifier = advertisingIdentifier));
         promises.push(batch.queue(className, 'getLimitAdTrackingFlag').then(([limitAdTracking]) => this._limitAdTracking = limitAdTracking));
         promises.push(batch.queue(className, 'getApiLevel').then(([apiLevel]) => this._apiLevel = apiLevel));
@@ -55,7 +61,6 @@ export class DeviceInfo extends Model {
         promises.push(batch.queue(className, 'getModel').then(([model]) => this._model = model));
         promises.push(batch.queue(className, 'getConnectionType').then(([connectionType]) => this._connectionType = connectionType));
         promises.push(batch.queue(className, 'getNetworkType').then(([networkType]) => this._networkType = networkType));
-        promises.push(batch.queue(className, 'getScreenLayout').then(([screenLayout]) => this._screenLayout = screenLayout));
         promises.push(batch.queue(className, 'getScreenDensity').then(([screenDensity]) => this._screenDensity = screenDensity));
         promises.push(batch.queue(className, 'getScreenWidth').then(([screenWidth]) => this._screenWidth = screenWidth));
         promises.push(batch.queue(className, 'getScreenHeight').then(([screenHeight]) => this._screenHeight = screenHeight));

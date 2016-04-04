@@ -60,7 +60,7 @@ export class WebView {
     public initialize(): Promise<void> {
         return this._nativeBridge.invoke('Sdk', 'loadComplete').then((data) => {
             this._clientInfo = new ClientInfo(data);
-            return this._deviceInfo.fetch(this._nativeBridge);
+            return this._deviceInfo.fetch(this._clientInfo.getPlatform(), this._nativeBridge);
         }).then(() => {
             return this._cacheManager.cleanCache();
         }).then(() => {
