@@ -7,7 +7,6 @@ import { EventManager } from 'EventManager';
 
 export class SessionManager {
 
-    private static SessionUrl = 'https://adserver.unityads.unity3d.com';
     private static VideoEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
