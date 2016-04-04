@@ -47,7 +47,7 @@ export class SessionManager {
 
     public sendSkip(adUnit: AdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), SessionManager.SessionUrl + '/skip', JSON.stringify(this.getInfoJson(adUnit, id)));
+            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
