@@ -136,6 +136,8 @@ export class WebView {
 
         this._sessionManager.sendShow(adUnit);
 
+        this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+        this._campaignManager.request(adUnit.getPlacement());
     }
 
     public hide(): void {
@@ -181,9 +183,6 @@ export class WebView {
         this.hide();
         if(this._mustReinitialize) {
             this.reinitialize();
-        } else {
-            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
-            this._campaignManager.request(adUnit.getPlacement());
         }
     }
 
