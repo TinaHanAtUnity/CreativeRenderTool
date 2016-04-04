@@ -35,7 +35,7 @@ export class SessionManager {
 
     public sendShow(adUnit: AdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), SessionManager.SessionUrl + '/show', JSON.stringify(this.getInfoJson(adUnit, id)));
+            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), this.createShowEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
     }
 
@@ -66,6 +66,17 @@ export class SessionManager {
         this._eventManager.getUniqueEventId().then(id => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
         });
+    }
+
+    private createShowEventUrl(adUnit: AdUnit): string {
+        let campaign = adUnit.getCampaign();
+        return [
+            SessionManager.VideoEventBaseUrl,
+            campaign.getGamerId(),
+            'show',
+            campaign.getId(),
+            this._clientInfo.getGameId()
+        ].join('/');
     }
 
     private createVideoEventUrl(adUnit: AdUnit, type: string): string {
