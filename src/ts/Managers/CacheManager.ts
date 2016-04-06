@@ -35,16 +35,16 @@ export class CacheManager {
             });
         });
         NativeBridge.getInstance().invokeBatch(batch);
-        return Promise.all(promises).then((urlPairs) => {
+        return Promise.all(promises).then(urlPairs => {
             let urlMap = {};
             urlPairs.forEach(([url, fileUrl]) => {
-                urlMap[url] = fileUrl;
+                urlMap[url] = fileUrl[0];
             });
             return urlMap;
         });
     }
 
-    public getFileUrl(url: string): Promise<any[]> {
+    public getFileUrl(url: string): Promise<[string, string]> {
         return CacheApi.getFileUrl(url).then(fileUrl => [url, fileUrl]);
     }
 

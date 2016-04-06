@@ -12,6 +12,7 @@ import { VideoEventHandlers} from 'EventHandlers/VideoEventHandlers';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Double } from 'Utilities/Double';
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -108,34 +109,24 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onResume(): void {
-        if(this._showing) {
-            // this.trigger('resumeadunit', this._adUnit);
+        if(this._showing && this.isVideoActive()) {
+            VideoPlayerApi.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
     private onPause(finishing: boolean): void {
         if(finishing && this._showing) {
             this.setFinishState(FinishState.SKIPPED);
-            // this.trigger('close', this._adUnit);
+            this.hide();
         }
     }
 
     private onDestroy(finishing: boolean): void {
         if(this._showing && finishing) {
             this.setFinishState(FinishState.SKIPPED);
-            // this.trigger('close', this._adUnit);
+            this.hide();
         }
     }
-
-    /*
-     AD UNIT EVENT HANDLERS
-     */
-
-    /*private onAdUnitResume(adUnit: VideoAdUnit): void {
-        if(adUnit.isVideoActive()) {
-            VideoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-        }
-    }*/
 
     /*
      PRIVATES
@@ -172,7 +163,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(this));
-        // endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this));
+        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this));
 
         this._endScreen = endScreen;
     }

@@ -165,7 +165,7 @@ export class WebView {
             campaign.getVideoUrl()
         ];
 
-        this._cacheManager.cacheAll(cacheableAssets).then((fileUrls) => {
+        this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
             campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);

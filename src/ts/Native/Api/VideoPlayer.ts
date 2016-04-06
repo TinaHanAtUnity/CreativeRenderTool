@@ -4,14 +4,14 @@ import { Observable3, Observable1, Observable4 } from 'Utilities/Observable';
 
 enum VideoPlayerEvent {
     ON_ERROR,
-    ON_PROGRESS,
-    ON_INFO,
-    ON_COMPLETED,
-    ON_PREPARED,
-    ON_PLAY,
-    ON_PAUSE,
-    ON_SEEK,
-    ON_STOP
+    PROGRESS,
+    INFO,
+    COMPLETED,
+    PREPARED,
+    PLAY,
+    PAUSE,
+    SEEKTO,
+    STOP
 }
 
 export class VideoPlayerApi {
@@ -78,40 +78,40 @@ export class VideoPlayerApi {
                 VideoPlayerApi.onError.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_PROGRESS]:
+            case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
                 VideoPlayerApi.onProgress.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_INFO]:
+            case VideoPlayerEvent[VideoPlayerEvent.INFO]:
                 VideoPlayerApi.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_COMPLETED]:
+            case VideoPlayerEvent[VideoPlayerEvent.COMPLETED]:
                 VideoPlayerApi.onCompleted.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_PREPARED]:
+            case VideoPlayerEvent[VideoPlayerEvent.PREPARED]:
                 VideoPlayerApi.onPrepared.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_PLAY]:
+            case VideoPlayerEvent[VideoPlayerEvent.PLAY]:
                 VideoPlayerApi.onPlay.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_PAUSE]:
+            case VideoPlayerEvent[VideoPlayerEvent.PAUSE]:
                 VideoPlayerApi.onPause.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_SEEK]:
+            case VideoPlayerEvent[VideoPlayerEvent.SEEKTO]:
                 VideoPlayerApi.onSeek.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ON_STOP]:
+            case VideoPlayerEvent[VideoPlayerEvent.STOP]:
                 VideoPlayerApi.onStop.trigger(parameters[0]);
                 break;
 
             default:
-                throw new Error('AdUnit event ' + event + ' does not have an observable');
+                throw new Error('VideoPlayer event ' + event + ' does not have an observable');
         }
     }
 
