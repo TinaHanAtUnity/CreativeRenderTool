@@ -22,6 +22,11 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoActive: boolean;
     private _watches: number;
 
+    private _onPreparedObserver;
+    private _onProgressObserver;
+    private _onPlayObserver;
+    private _onCompletedObserver;
+
     constructor(placement: Placement, campaign: Campaign) {
         super(placement, campaign);
 
@@ -53,9 +58,15 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
 
+        VideoPlayerApi.onPrepared.unsubscribe(this._onPreparedObserver);
+        VideoPlayerApi.onProgress.unsubscribe(this._onProgressObserver);
+        VideoPlayerApi.onPlay.unsubscribe(this._onPlayObserver);
+        VideoPlayerApi.onCompleted.unsubscribe(this._onCompletedObserver);
+
         ListenerApi.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
         return AdUnitApi.close().then(() => {
             this._showing = false;
+            this.onClose.trigger();
         });
     }
 
@@ -132,10 +143,10 @@ export class VideoAdUnit extends AbstractAdUnit {
      PRIVATES
      */
     private prepareVideoPlayer() {
-        VideoPlayerApi.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
-        VideoPlayerApi.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this, position));
-        VideoPlayerApi.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this));
-        VideoPlayerApi.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this, url));
+        this._onPreparedObserver = VideoPlayerApi.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
+        this._onProgressObserver = VideoPlayerApi.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this, position));
+        this._onPlayObserver = VideoPlayerApi.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this));
+        this._onCompletedObserver = VideoPlayerApi.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this, url));
     }
 
     private prepareOverlay() {
@@ -164,6 +175,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         document.body.appendChild(endScreen.container());
         endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(this));
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this));
+        endScreen.onClose.subscribe(() => this.hide());
 
         this._endScreen = endScreen;
     }
