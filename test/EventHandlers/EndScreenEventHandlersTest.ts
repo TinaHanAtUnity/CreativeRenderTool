@@ -4,7 +4,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
-import {TestBridge, TestBridgeApi} from "../TestBridge";
+import { TestBridge, TestBridgeApi } from '../TestBridge';
 
 describe('EndScreenEventHandlersTest', () => {
 

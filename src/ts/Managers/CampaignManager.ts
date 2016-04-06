@@ -7,6 +7,7 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
+import { Platform } from 'Constants/Platform';
 
 export class CampaignManager {
 
@@ -70,7 +71,7 @@ export class CampaignManager {
             hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
-            platform: this._clientInfo.getPlatform(),
+            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenSize: this._deviceInfo.getScreenLayout(),
             sdkVersion: this._clientInfo.getSdkVersion(),

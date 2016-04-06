@@ -55,7 +55,7 @@ export class WebView {
     public initialize(): Promise<void> {
         return SdkApi.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
-            return this._deviceInfo.fetch();
+            return this._deviceInfo.fetch(this._clientInfo.getPlatform());
         }).then(() => {
             return this._cacheManager.cleanCache();
         }).then(() => {
@@ -138,6 +138,9 @@ export class WebView {
         adUnit.show(orientation, keyEvents).then(() => {
             // this._sessionManager.sendShow(adUnit);
         });
+
+        PlacementApi.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
+        this._campaignManager.request(adUnit.getPlacement());
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
@@ -188,9 +191,6 @@ export class WebView {
     private onClose(placement: Placement): void {
         if(this._mustReinitialize) {
             this.reinitialize();
-        } else {
-            PlacementApi.setPlacementState(placement.getId(), PlacementState.WAITING);
-            this._campaignManager.request(placement);
         }
     }
 

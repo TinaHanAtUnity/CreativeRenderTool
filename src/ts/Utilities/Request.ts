@@ -1,5 +1,5 @@
-import { RequestApi } from '../Native/Api/Request';
-import {ResolveApi} from "../Native/Api/Resolve";
+import { RequestApi } from 'Native/Api/Request';
+import { ResolveApi } from 'Native/Api/Resolve';
 
 const enum RequestStatus {
     COMPLETE,

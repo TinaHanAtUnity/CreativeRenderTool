@@ -8,8 +8,8 @@ import { CacheApi } from 'Native/Api/Cache';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
 import { RequestApi } from 'Native/Api/Request';
 import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
-import {EventCategory} from 'Constants/EventCategory';
-import {ResolveApi} from "./Api/Resolve";
+import { EventCategory } from 'Constants/EventCategory';
+import { ResolveApi } from 'Native/Api/Resolve';
 
 export enum CallbackStatus {
     OK,
@@ -101,7 +101,7 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.REQUEST]:
                 RequestApi.handleEvent(event, parameters);
                 break;
-            
+
             case EventCategory[EventCategory.RESOLVE]:
                 ResolveApi.handleEvent(event, parameters);
                 break;

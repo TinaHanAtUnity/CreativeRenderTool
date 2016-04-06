@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
-import {CacheApi, IFileInfo} from 'Native/Api/Cache';
+import { CacheApi, IFileInfo } from 'Native/Api/Cache';
 
 enum CacheStatus {
     OK,
@@ -14,7 +14,7 @@ export class CacheManager {
     constructor() {
         CacheApi.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
-    
+
     public cacheAll(urls: string[]): Promise<any[]> {
         let batch = new BatchInvocation(NativeBridge.getInstance());
         let promises = urls.map((url: string) => {
@@ -50,6 +50,10 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return CacheApi.getFiles().then(files => {
+            if(!files) {
+                return Promise.resolve();
+            }
+
             // clean files older than three weeks and limit cache size to 50 megabytes
             let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
             let sizeThreshold: number = 50 * 1024 * 1024;

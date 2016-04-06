@@ -244,6 +244,7 @@ describe('RequestTest', () => {
         let request: Request = new Request();
 
         return request.resolve(testHost).then(([id, host, ip]) => {
+            assert.isNotNull(id, 'ID was null');
             assert.equal(testHost, host, 'Hostname does not match the request');
             assert.equal(testIp, ip, 'IP address was not successfully resolved');
         });

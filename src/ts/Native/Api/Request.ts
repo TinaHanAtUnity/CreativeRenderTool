@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable5, Observable4, Observable3 } from 'Utilities/Observable';
+import { Observable5, Observable3 } from 'Utilities/Observable';
 
 export enum RequestEvent {
     COMPLETE,
