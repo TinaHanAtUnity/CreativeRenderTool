@@ -2,9 +2,9 @@ import { Observable2 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 
 enum ConnectivityEvent {
-    ON_CONNECTED,
-    ON_DISCONNECTED,
-    ON_NETWORK_CHANGE
+    CONNECTED,
+    DISCONNECTED,
+    NETWORK_CHANGE
 }
 
 export class ConnectivityApi {
@@ -19,7 +19,7 @@ export class ConnectivityApi {
 
     public static handleEvent(event: string, parameters: any[]): void {
         switch(event) {
-            case ConnectivityEvent[ConnectivityEvent.ON_CONNECTED]:
+            case ConnectivityEvent[ConnectivityEvent.CONNECTED]:
                 ConnectivityApi.onConnected.trigger(parameters[0], parameters[1]);
                 break;
 

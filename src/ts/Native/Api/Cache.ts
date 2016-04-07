@@ -40,17 +40,17 @@ export class CacheApi {
 
     public static getFiles(urls?: string[]): Promise<IFileInfo[]> {
         if(urls && urls.length) {
-            return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles', [urls]);
+            return NativeBridge.getInstance().invoke<IFileInfo[]>(CacheApi.ApiClass, 'getFiles', [urls]);
         }
-        return NativeBridge.getInstance().invoke<Object[]>(CacheApi.ApiClass, 'getFiles');
+        return NativeBridge.getInstance().invoke<IFileInfo[]>(CacheApi.ApiClass, 'getFiles');
     }
 
     public static getFileInfo(url: string): Promise<IFileInfo> {
-        return NativeBridge.getInstance().invoke<Object>(CacheApi.ApiClass, 'getFileInfo', [url]);
+        return NativeBridge.getInstance().invoke<IFileInfo>(CacheApi.ApiClass, 'getFileInfo', [url]);
     }
 
     public static getFileIdFileInfo(fileId: string): Promise<IFileInfo> {
-        return NativeBridge.getInstance().invoke<Object>(CacheApi.ApiClass, 'getFileIdFileInfo', [fileId]);
+        return NativeBridge.getInstance().invoke<IFileInfo>(CacheApi.ApiClass, 'getFileIdFileInfo', [fileId]);
     }
 
     public static getFileUrl(url: string): Promise<string> {

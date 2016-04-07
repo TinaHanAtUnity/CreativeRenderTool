@@ -19,6 +19,7 @@ export class TestBridge implements IWebViewBridge {
 
     constructor() {
         this._nativeBridge = new NativeBridge(this);
+        NativeBridge.setInstance(this._nativeBridge);
     }
 
     public getNativeBridge(): NativeBridge {

@@ -38,7 +38,7 @@ describe('EndScreenEventHandlersTest', () => {
             intentSpy = sinon.spy(intent, 'launch');
 
             adUnitMock = {
-                getSessionManager: () => ({ sendClick: sessionManagerSendClick }),
+                getSession: () => ({ sendClick: sessionManagerSendClick }),
                 getPlacement: () => ({ getId: () => 123 }),
                 getCampaign: () => ({ getAppStoreId: () => 'foomarketid'})
             };
@@ -51,26 +51,36 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with event with native bridge', () => {
-            sinon.assert.calledWith(nativeInvoke, 'Listener', 'sendClickEvent', [123]);
+            sinon.assert.calledWith(listenerSpy, 123);
         });
 
         it('should send a launch intent for market link', () => {
-            sinon.assert.calledWith(nativeInvoke, 'Intent', 'launch', [{'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'}]);
+            sinon.assert.calledWith(intentSpy, {'action': 'android.intent.action.VIEW', 'uri': 'market://details?id=foomarketid'});
         });
 
     });
 
     describe('with onReplay', () => {
-        let adUnitMock, setSkipEnabled, setSkipDuration, videoPrepare, overlayShow, getVideoPosition;
-        let endScreenHide, nativeInvoke, invokePromise;
+        let adUnitMock, mockAdUnitApi, setSkipEnabled, setSkipDuration, videoPrepare, overlayShow, getVideoPosition;
+        let endScreenHide, invokePromise, testBridge;
 
         beforeEach(() => {
+            testBridge = new TestBridge();
+
+            let adUnitApi = new class MockAdUnit extends TestBridgeApi {
+                public setViews() {
+                    return ['OK'];
+                }
+            };
+
+            testBridge.setApi('AdUnit', adUnitApi);
+
             invokePromise = Promise.resolve(true);
             setSkipEnabled = sinon.spy();
             overlayShow = sinon.spy();
             setSkipDuration = sinon.spy();
             endScreenHide = sinon.spy();
-            nativeInvoke = sinon.mock().returns(invokePromise);
+            mockAdUnitApi = sinon.mock(adUnitApi);
             videoPrepare = sinon.spy();
 
             adUnitMock = {
@@ -80,7 +90,6 @@ describe('EndScreenEventHandlersTest', () => {
                 getEndScreen: () => ({ hide: endScreenHide }),
                 getVideoPosition: getVideoPosition,
                 setVideoPosition: sinon.spy(),
-                getNativeBridge: () => ({ invoke: nativeInvoke }),
                 getCampaign: () => ({ getVideoUrl: () => 'fake url' }),
                 getPlacement: () => ({ muteVideo: () => false }),
             };
@@ -118,9 +127,9 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should call native for views', () => {
-            EndScreenEventHandlers.onReplay((adUnitMock));
-
-            sinon.assert.calledWith(nativeInvoke, 'AdUnit', 'setViews', [['videoplayer', 'webview']]);
+            mockAdUnitApi.expects('setViews').withArgs(['videoplayer', 'webview']);
+            EndScreenEventHandlers.onReplay(adUnitMock);
+            mockAdUnitApi.verify();
         });
 
         it('should prepare video', () => {

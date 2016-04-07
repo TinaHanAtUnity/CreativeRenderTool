@@ -26,27 +26,31 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    private static _callbackId: number = 1;
-    private static _callbackTable: {[key: number]: Object} = {};
-
-    private static _backend: IWebViewBridge;
     private static _instance: NativeBridge = null;
 
+    private _callbackId: number = 1;
+    private _callbackTable: {[key: number]: Object} = {};
+
+    private _backend: IWebViewBridge;
+
     constructor(backend: IWebViewBridge) {
-        NativeBridge._backend = backend;
-        NativeBridge._instance = this;
+        this._backend = backend;
     }
 
     public static getInstance() {
         return NativeBridge._instance;
     }
 
+    public static setInstance(instance: NativeBridge) {
+        NativeBridge._instance = instance;
+    }
+
     public registerCallback(resolve, reject): number {
-        let id: number = NativeBridge._callbackId++;
+        let id: number = this._callbackId++;
         let callbackObject: Object = {};
         callbackObject[CallbackStatus.OK] = resolve;
         callbackObject[CallbackStatus.ERROR] = reject;
-        NativeBridge._callbackTable[id] = callbackObject;
+        this._callbackTable[id] = callbackObject;
         return id;
     }
 
@@ -65,7 +69,7 @@ export class NativeBridge implements INativeBridge {
     }
 
     public invokeBatch(batch: BatchInvocation): void {
-        NativeBridge._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
+        this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
     }
 
     public handleCallback(results: any[][]): void {
@@ -73,12 +77,12 @@ export class NativeBridge implements INativeBridge {
             let id: number = parseInt(result.shift(), 10);
             let status: string = result.shift();
             let parameters = result;
-            let callbackObject: Object = NativeBridge._callbackTable[id];
+            let callbackObject: Object = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             callbackObject[CallbackStatus[status]](parameters);
-            delete NativeBridge._callbackTable[id];
+            delete this._callbackTable[id];
         });
     }
 
@@ -126,7 +130,7 @@ export class NativeBridge implements INativeBridge {
     }
 
     private invokeCallback(id: string, status: string, ...parameters: any[]): void {
-        NativeBridge._backend.handleCallback(id, status, JSON.stringify(parameters));
+        this._backend.handleCallback(id, status, JSON.stringify(parameters));
     }
 
 }
