@@ -133,10 +133,10 @@ export class WebView {
             keyEvents = [KeyCode.BACK];
         }
 
-        let adUnit: AbstractAdUnit = new VideoAdUnit(placement, placement.getCampaign()); // todo: select ad unit based on placement
+        let adUnit: AbstractAdUnit = new VideoAdUnit(this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
         adUnit.onClose.subscribe(this.onClose.bind(this));
         adUnit.show(orientation, keyEvents).then(() => {
-            // this._sessionManager.sendShow(adUnit);
+            this._sessionManager.sendShow(adUnit);
         });
 
         PlacementApi.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);

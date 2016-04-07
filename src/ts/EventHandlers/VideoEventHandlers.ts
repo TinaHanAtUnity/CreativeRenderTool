@@ -4,6 +4,8 @@ import { FinishState } from 'Constants/FinishState';
 import { AdUnitApi } from 'Native/Api/AdUnit';
 import { ListenerApi } from 'Native/Api/Listener';
 import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export class VideoEventHandlers {
 
@@ -28,7 +30,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoStart(adUnit: VideoAdUnit): void {
-        // adUnit.getSessionManager().sendStart(adUnit);
+        adUnit.getSession().sendStart(adUnit);
 
         if (adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
@@ -41,15 +43,15 @@ export class VideoEventHandlers {
     public static onVideoCompleted(adUnit: VideoAdUnit, url: string): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        // adUnit.getSessionManager().sendView(adUnit);
+        adUnit.getSession().sendView(adUnit);
         AdUnitApi.setViews(['webview']);
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
-        /*adUnit.getStorageManager().get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
+        StorageApi.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if (integrationTest) {
-                adUnit.getNativeBridge().rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+                NativeBridge.getInstance().rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
             }
-        });*/
+        });
     }
 
 }

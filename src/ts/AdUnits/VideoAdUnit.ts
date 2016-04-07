@@ -13,6 +13,7 @@ import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -27,8 +28,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPlayObserver;
     private _onCompletedObserver;
 
-    constructor(placement: Placement, campaign: Campaign) {
-        super(placement, campaign);
+    constructor(session: SessionManager, placement: Placement, campaign: Campaign) {
+        super(session, placement, campaign);
 
         AdUnitApi.onResume.subscribe(this.onResume.bind(this));
         AdUnitApi.onPause.subscribe(this.onPause.bind(this));

@@ -10,7 +10,7 @@ export class OverlayEventHandlers {
       VideoPlayerApi.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
-      // adUnit.getSessionManager().sendSkip(adUnit);
+      adUnit.getSession().sendSkip(adUnit);
       AdUnitApi.setViews(['webview']);
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();

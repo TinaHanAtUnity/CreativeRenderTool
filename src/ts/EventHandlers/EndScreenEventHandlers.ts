@@ -20,7 +20,7 @@ export class EndScreenEventHandlers {
     }
 
     public static onDownload(adUnit: VideoAdUnit): void {
-        // adUnit.getSessionManager().sendClick(adUnit);
+        adUnit.getSession().sendClick(adUnit);
         ListenerApi.sendClickEvent(adUnit.getPlacement().getId());
         IntentApi.launch({
             'action': 'android.intent.action.VIEW',
