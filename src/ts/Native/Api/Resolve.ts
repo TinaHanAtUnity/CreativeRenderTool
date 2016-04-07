@@ -18,8 +18,6 @@ export class ResolveApi {
     }
 
     public static handleEvent(event: string, parameters: any[]): void {
-        console.dir(event);
-        console.dir(parameters);
         switch(event) {
             case ResolveEvent[ResolveEvent.COMPLETE]:
                 ResolveApi.onComplete.trigger(parameters[0], parameters[1], parameters[2]);

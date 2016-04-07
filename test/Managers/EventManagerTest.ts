@@ -124,11 +124,11 @@ class Url extends TestBridgeApi {
     public get(id: string, url: string, headers?: [string, string][]): any[] {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL', 'FAILED', id, url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, 'Success response', 200, headers]);
+                this.getNativeBridge().handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
 
@@ -138,11 +138,11 @@ class Url extends TestBridgeApi {
     public post(id: string, url: string, body?: string, headers?: [string, string][]): any[] {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL', 'FAILED', id, url, 'Fail response']);
+                this.getNativeBridge().handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['URL', 'COMPLETE', id, url, 'Success response', 200, headers]);
+                this.getNativeBridge().handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
 
@@ -179,7 +179,7 @@ describe('EventManagerTest', () => {
         testBridge = new TestBridge();
         storageApi = new Storage();
         urlApi = new Url();
-        testBridge.setApi('Url', urlApi);
+        testBridge.setApi('Request', urlApi);
         testBridge.setApi('Storage', storageApi);
         testBridge.setApi('Sdk', new Sdk());
         request = new Request();
