@@ -6,21 +6,21 @@ import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
 import { ConnectivityApi } from '../../../src/ts/Native/Api/Connectivity';
 
 describe('ConnectivityApi', () => {
-    let webViewBridge: IWebViewBridge = {
-        handleInvocation: function() {},
-        handleCallback: function() {}
-    };
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
 
     before(() => {
-        NativeBridge.setInstance(new NativeBridge(webViewBridge));
+        NativeBridge.setInstance(new NativeBridge({
+            handleInvocation: handleInvocation,
+            handleCallback: handleCallback
+        }));
     });
 
     describe('when calling setListeningStatus', () => {
 
         it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
-            let spy = sinon.spy(webViewBridge, 'handleInvocation');
             ConnectivityApi.setListeningStatus(true);
-            sinon.assert.calledWith(spy, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
+            sinon.assert.calledWith(handleInvocation, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
         });
 
     });
