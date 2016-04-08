@@ -21,6 +21,7 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { SdkApi } from 'Native/Api/Sdk';
 import { PlacementApi } from 'Native/Api/Placement';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
+import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 
 export class WebView {
 
@@ -133,14 +134,18 @@ export class WebView {
             keyEvents = [KeyCode.BACK];
         }
 
-        let adUnit: AbstractAdUnit = new VideoAdUnit(this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
-        adUnit.onClose.subscribe(this.onClose.bind(this));
-        adUnit.show(orientation, keyEvents).then(() => {
-            this._sessionManager.sendShow(adUnit);
-        });
+        PlayerMetaData.getSid().then(sid => {
+            this._sessionManager.setGamerSid(sid);
 
-        PlacementApi.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
-        this._campaignManager.request(adUnit.getPlacement());
+            let adUnit: AbstractAdUnit = new VideoAdUnit(this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
+            adUnit.onClose.subscribe(this.onClose.bind(this));
+            adUnit.show(orientation, keyEvents).then(() => {
+                this._sessionManager.sendShow(adUnit);
+            });
+
+            PlacementApi.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
+            this._campaignManager.request(adUnit.getPlacement());
+        });
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {

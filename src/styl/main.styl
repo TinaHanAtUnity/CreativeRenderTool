@@ -39,107 +39,6 @@ body.android
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, hsl(0, 0, 100%)), color-stop(0%, hsl(0, 0, 75%)))
     background: -webkit-linear-gradient(top, hsl(0, 0, 100%), hsl(0, 0, 75%))
 
-  /************************
-  *
-  * START SCREEN
-  *
-  ************************/
-
-  .none-screen
-    display: none
-
-  .campaigns-container
-    position: absolute
-    top: 0
-    bottom: 0
-    width: 100%
-    margin: auto
-
-  .header-container
-    width: 100%
-    overflow: hidden
-    .item-container
-      width: 100%
-      opacity: 0
-      float: left
-      .item-image
-        float: left
-      .item-text-small
-        color: #007aff
-
-  .video-container
-    overflow: hidden
-    #scroller-container
-      position: relative  /* On older OS versions "position" and "z-index" must be defined, */
-      z-index: 1          /* it seems that recent webkit is less picky and works anyway. */
-      overflow: visible !important
-      margin: 0 auto
-      #scroller
-        float: left
-        ul
-          list-style: none
-          li
-            box-sizing: border-box
-            display: block
-            float: left
-            background-repeat: no-repeat
-            background-position: top
-
-  .btn-play-bg
-    display: block
-    position: relative
-
-  .btn-play
-    display: block
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0,0,0,0.25)), color-stop(100%, rgba(0,0,0,1)))
-    background: -webkit-linear-gradient(top, rgba(0,0,0,0.25), rgba(0,0,0,1))
-    text-align: center
-    position: absolute
-    top: 0
-    left: 0
-    bottom: 0
-    right: 0
-    margin: auto
-
-  .btn-play span
-    color: #fff
-
-  #navigation-container
-    text-align: center
-    #indicator
-      display: inline-block
-      list-style: none
-      li
-        float: left
-        list-style: none
-        background-color: rgba(0,0,0,0.4)
-      li.active
-        background-color: #007aff
-
-  #game-info
-    display: block
-    list-style: none
-    li
-      text-align: center
-      display: none
-      .description
-        color: #007aff
-    li.active
-      display:block
-
-  .btn-watch-now
-    color: #fff
-    display: block
-    text-align: center
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
-    background: -webkit-linear-gradient(top, #4aaef0, #016add)
-
-  .btn-watch-now.disabled
-    -webkit-box-shadow: none
-    opacity: 0.25
-
-  .btn-watch-now:active
-    opacity: 0.5
 
   /************************
   *
@@ -164,7 +63,7 @@ body.android
     z-index: 1
     position: absolute
     background-color: rgba(255, 255, 255, 0.5);
-    color: #007aff
+    color: #222c37
     text-align: center
 
   a.btn-watch-again
@@ -185,8 +84,7 @@ body.android
     bottom: 0
     width: 100%
     height: 47%
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(100%, hsl(0, 0, 100%)), color-stop(0%, hsl(0, 0, 75%)))
-    background: -webkit-linear-gradient(top, hsl(0, 0, 100%), hsl(0, 0, 75%))
+    background-color: #fafafa
 
   .name-container
     color: #1f1e1e
@@ -200,7 +98,7 @@ body.android
     float: left
 
   .game-rating
-    color: #fff
+    color: #e6e6e6
     display: inline-block
     position: relative
 
@@ -229,17 +127,11 @@ body.android
   .btn-download
     color: #ffffff
     display: block
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
-    background: -webkit-linear-gradient(top, #4aaef0, #016add)
-    text-shadow: 0 -1px #217fea
+    background-image: #167dfb
+    background: #167dfb
+
     left: 0px
     right: 0px
-
-    .icon-download
-      -webkit-transform: rotate(90deg)
-      display: block
-      float: left
-      background-color: rgba(0, 0, 0, 0.15)
 
   .download-text-alt
     display: none
@@ -256,7 +148,7 @@ body.android
   .download-explanation
     display: none
 
-  .everyplay-gameads-logo
+  .unityads-logo
     background-image: url('../img/unityads.png')
     background-position: center
     background-size: cover
@@ -264,6 +156,15 @@ body.android
     position: absolute
     left: 0px
     right: 0px
+
+  .privacy-button
+    position: absolute
+    bottom: 10px
+    left: 15px
+    color: #DDD
+    display: block;
+    text-decoration: none
+    font-size: 22px
 
   .download-explanation-fresh
     display: none
@@ -286,18 +187,6 @@ body.android
       width: 47%
       height: 100%
       right: 0
-
-  &.landscape
-    .game-background-portrait
-      display: none
-    .game-background-landscape
-      display: block
-
-  &.portrait
-    .game-background-portrait
-      display: block
-    .game-background-landscape
-      display: none
 
   /************************
   *
@@ -354,15 +243,32 @@ body.android
   *************************/
 
   .error-container
+  .privacy-container
     display: inline-block
     text-align: center
     background-color: #000
     color: #FFF
 
+    .privacy-simple-text
+      display: none
+
+    &.simple
+      .privacy-text
+        display: none
+      .privacy-simple-text
+        display: block
+
   .btn-ok
+  .btn-cancel
     display: block
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
     background: -webkit-linear-gradient(top, #4aaef0, #016add)
+
+// Only show privacy button on Android
+body.iphone
+body.ipad
+  .privacy-button
+    display: none
 
 /************************
 * DEVICE AND GAME SPECIFICS
