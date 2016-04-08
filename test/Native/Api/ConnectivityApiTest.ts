@@ -13,7 +13,7 @@ describe('ConnectivityApi', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        });
+        }, false);
     });
 
     describe('when calling setListeningStatus', () => {

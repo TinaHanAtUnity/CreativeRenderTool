@@ -15,7 +15,6 @@ import { FinishState } from 'Constants/FinishState';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
-import { BatchInvocation } from 'Native/BatchInvocation';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 
@@ -145,13 +144,11 @@ export class WebView {
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
-        let batch: BatchInvocation = new BatchInvocation(NativeBridge.getInstance());
-        batch.queue('Sdk', 'logError', ['Show invocation failed: ' + errorMsg]);
-        batch.queue('Listener', 'sendErrorEvent', [UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg]);
+        NativeBridge.Sdk.logError('Show invocation failed: ' + errorMsg);
+        NativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
         if(sendFinish) {
-            batch.queue('Listener', 'sendFinishEvent', [placementId, FinishState[FinishState.ERROR]]);
+            NativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
         }
-        NativeBridge.getInstance().invokeBatch(batch);
     }
 
     /*

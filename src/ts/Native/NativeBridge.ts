@@ -52,7 +52,17 @@ export class NativeBridge implements INativeBridge {
 
     private _backend: IWebViewBridge;
 
-    constructor(backend: IWebViewBridge) {
+    private _autoBatchEnabled: boolean;
+    private _autoBatch: BatchInvocation;
+    private _autoBatchTimer;
+    private _autoBatchInterval = 50;
+
+    constructor(backend: IWebViewBridge, autoBatch?: boolean) {
+        if(typeof autoBatch === 'undefined') {
+            autoBatch = true;
+        }
+        this._autoBatchEnabled = autoBatch;
+
         this._backend = backend;
         NativeBridge.AdUnit = new AdUnitApi(this);
         NativeBridge.Cache = new CacheApi(this);
@@ -83,9 +93,22 @@ export class NativeBridge implements INativeBridge {
     }
 
     public invoke<T>(className: string, methodName: string, parameters?: any[]): Promise<T> {
-        let batch: BatchInvocation = new BatchInvocation(this);
-        let promise = batch.queue(className, methodName, parameters);
-        this.invokeBatch(batch);
+        if(!this._autoBatch) {
+            this._autoBatch = new BatchInvocation(this);
+        }
+        let promise = this._autoBatch.queue(className, methodName, parameters);
+        if(this._autoBatchEnabled) {
+            if(!this._autoBatchTimer) {
+                this._autoBatchTimer = setTimeout(() => {
+                    this.invokeBatch(this._autoBatch);
+                    this._autoBatch = null;
+                    this._autoBatchTimer = null;
+                }, this._autoBatchInterval);
+            }
+        } else {
+            this.invokeBatch(this._autoBatch);
+            this._autoBatch = null;
+        }
         return promise;
     }
 
@@ -94,10 +117,6 @@ export class NativeBridge implements INativeBridge {
         let promise = batch.rawQueue(packageName, className, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
-    }
-
-    public invokeBatch(batch: BatchInvocation): void {
-        this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
     }
 
     public handleCallback(results: any[][]): void {
@@ -155,6 +174,10 @@ export class NativeBridge implements INativeBridge {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
         window[className][methodName].apply(window[className], parameters);
+    }
+
+    private invokeBatch(batch: BatchInvocation): void {
+        this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
     }
 
     private invokeCallback(id: string, status: string, ...parameters: any[]): void {
