@@ -25,7 +25,7 @@ class TestStorageApi extends StorageApi {
         if(!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
-        return retValue;
+        return Promise.resolve(retValue);
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
@@ -216,6 +216,8 @@ describe('EventManagerTest', () => {
     });
 
     it('Send failed operative event', () => {
+        let clock = sinon.useFakeTimers();
+
         let eventId: string = '1234';
         let sessionId: string = '5678';
         let url: string = 'https://www.example.net/fail';
@@ -225,7 +227,7 @@ describe('EventManagerTest', () => {
 
         let event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
-        }, () => {
+        }).catch(() => {
             assert(requestSpy.calledOnce, 'Failed operative event did not try sending POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
@@ -235,12 +237,15 @@ describe('EventManagerTest', () => {
             storageApi.get<string>(StorageType.PRIVATE, urlKey).then(data => {
                 assert.equal(url, data[1], 'Failed operative event url was not correctly stored');
             }).then(() => {
-                return storageApi.get(StorageType.PRIVATE, dataKey);
+                return storageApi.get<string>(StorageType.PRIVATE, dataKey);
             }).then(data => {
                 assert.equal(data, data[1], 'Failed operative event data was not correctly stored');
                 assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
             });
         });
+        clock.tick(30000);
+        clock.restore();
+        return event;
     });
 
     it('Send third party event', () => {
