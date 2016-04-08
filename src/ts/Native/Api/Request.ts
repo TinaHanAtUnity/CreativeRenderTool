@@ -1,54 +1,57 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable5, Observable3 } from 'Utilities/Observable';
+import { NativeApi } from 'Native/NativeApi';
 
 export enum RequestEvent {
     COMPLETE,
     FAILED
 }
 
-export class RequestApi {
+export class RequestApi extends NativeApi {
 
-    public static onComplete: Observable5<string, string, string, number, [string, string][]> = new Observable5();
-    public static onFailed: Observable3<string, string, string> = new Observable3();
+    public onComplete: Observable5<string, string, string, number, [string, string][]> = new Observable5();
+    public onFailed: Observable3<string, string, string> = new Observable3();
 
-    private static ApiClass = 'Request';
-
-    public static get(id: string, url: string, headers: [string, string][]): Promise<string> {
-        return NativeBridge.getInstance().invoke<string>(RequestApi.ApiClass, 'get', [id, url, headers]);
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Request');
     }
 
-    public static post(id: string, url: string, requestBody: string, headers: [string, string][]): Promise<string> {
-        return NativeBridge.getInstance().invoke<string>(RequestApi.ApiClass, 'post', [id, url, requestBody, headers]);
+    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers]);
     }
 
-    public static setConnectTimeout(connectTimeout: number): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(RequestApi.ApiClass, 'setConnectTimeout', [connectTimeout]);
+    public post(id: string, url: string, requestBody: string, headers: [string, string][]): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers]);
     }
 
-    public static getConnectTimeout(): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(RequestApi.ApiClass, 'getConnectTimeout');
+    public setConnectTimeout(connectTimeout: number): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'setConnectTimeout', [connectTimeout]);
     }
 
-    public static setReadTimeout(readTimeout: number): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(RequestApi.ApiClass, 'setReadTimeout', [readTimeout]);
+    public getConnectTimeout(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getConnectTimeout');
     }
 
-    public static getReadTimeout(): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(RequestApi.ApiClass, 'getReadTimeout');
+    public setReadTimeout(readTimeout: number): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'setReadTimeout', [readTimeout]);
     }
 
-    public static handleEvent(event: string, parameters: any[]): void {
+    public getReadTimeout(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getReadTimeout');
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case RequestEvent[RequestEvent.COMPLETE]:
-                RequestApi.onComplete.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                this.onComplete.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
             case RequestEvent[RequestEvent.FAILED]:
-                RequestApi.onFailed.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onFailed.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             default:
-                throw new Error('Request event ' + event + ' does not have an observable');
+                super.handleEvent(event, parameters);
         }
     }
 

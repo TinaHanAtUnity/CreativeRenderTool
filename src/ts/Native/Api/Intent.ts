@@ -1,4 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { NativeApi } from 'Native/NativeApi';
 
 export interface IntentExtra {
     key: string;
@@ -16,12 +17,14 @@ export interface IntentData {
     extras?: IntentExtra[];
 }
 
-export class IntentApi {
+export class IntentApi extends NativeApi {
 
-    private static ApiClass = 'Intent';
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Intent');
+    }
 
-    public static launch(intentData: IntentData): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(IntentApi.ApiClass, 'launch', [intentData]);
+    public launch(intentData: IntentData): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'launch', [intentData]);
     }
 
 }

@@ -1,49 +1,52 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { NativeApi } from 'Native/NativeApi';
 
 export type ClientInfoData = [number, boolean, string, string, string, string, boolean, string, string, string];
 
-export class SdkApi {
+export class SdkApi extends NativeApi {
 
-    private static ApiClass = 'Sdk';
-
-    public static loadComplete(): Promise<ClientInfoData> {
-        return NativeBridge.getInstance().invoke<ClientInfoData>(SdkApi.ApiClass, 'loadComplete');
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Sdk');
     }
 
-    public static initComplete(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'initComplete');
+    public loadComplete(): Promise<ClientInfoData> {
+        return this._nativeBridge.invoke<ClientInfoData>(this._apiClass, 'loadComplete');
     }
 
-    public static setDebugMode(debugMode: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'setDebugMode', [debugMode]);
+    public initComplete(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'initComplete');
     }
 
-    public static getDebugMode(): Promise<boolean> {
-        return NativeBridge.getInstance().invoke<boolean>(SdkApi.ApiClass, 'getDebugMode');
+    public setDebugMode(debugMode: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDebugMode', [debugMode]);
     }
 
-    public static logError(message: string) {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'logError', [message]);
+    public getDebugMode(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getDebugMode');
     }
 
-    public static logWarning(message: string) {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'logWarning', [message]);
+    public logError(message: string) {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'logError', [message]);
     }
 
-    public static logInfo(message: string) {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'logInfo', [message]);
+    public logWarning(message: string) {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'logWarning', [message]);
     }
 
-    public static logDebug(message: string) {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'logDebug', [message]);
+    public logInfo(message: string) {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'logInfo', [message]);
     }
 
-    public static setShowTimeout(timeout: number): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'setShowTimeout', [timeout]);
+    public logDebug(message: string) {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'logDebug', [message]);
     }
 
-    public static reinitialize(): void {
-        NativeBridge.getInstance().invoke<void>(SdkApi.ApiClass, 'reinitialize');
+    public setShowTimeout(timeout: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setShowTimeout', [timeout]);
+    }
+
+    public reinitialize(): void {
+        this._nativeBridge.invoke<void>(this._apiClass, 'reinitialize');
     }
 
 

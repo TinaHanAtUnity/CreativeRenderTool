@@ -1,5 +1,6 @@
 import { Observable2 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
+import { NativeApi } from 'Native/NativeApi';
 
 enum ConnectivityEvent {
     CONNECTED,
@@ -7,24 +8,26 @@ enum ConnectivityEvent {
     NETWORK_CHANGE
 }
 
-export class ConnectivityApi {
+export class ConnectivityApi extends NativeApi {
 
-    public static onConnected: Observable2<boolean, string> = new Observable2();
+    public onConnected: Observable2<boolean, string> = new Observable2();
 
-    private static ApiClass = 'Connectivity';
-
-    public static setListeningStatus(status: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ConnectivityApi.ApiClass, 'setConnectionMonitoring', [status]);
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Connectivity');
     }
 
-    public static handleEvent(event: string, parameters: any[]): void {
+    public setListeningStatus(status: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setConnectionMonitoring', [status]);
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case ConnectivityEvent[ConnectivityEvent.CONNECTED]:
-                ConnectivityApi.onConnected.trigger(parameters[0], parameters[1]);
+                this.onConnected.trigger(parameters[0], parameters[1]);
                 break;
 
             default:
-                throw new Error('Connectivity event ' + event + ' does not have an observable');
+                super.handleEvent(event, parameters);
         }
     }
 }

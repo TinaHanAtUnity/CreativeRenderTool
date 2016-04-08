@@ -1,20 +1,23 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { PlacementState } from 'Models/Placement';
+import { NativeApi } from 'Native/NativeApi';
 
-export class PlacementApi {
+export class PlacementApi extends NativeApi {
 
-    private static ApiClass = 'Placement';
-
-    public static setDefaultPlacement(placementId: string): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(PlacementApi.ApiClass, 'setDefaultPlacement', [placementId]);
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Placement');
     }
 
-    public static setPlacementState(placementId: string, placementState: PlacementState): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(PlacementApi.ApiClass, 'setPlacementState', [placementId, PlacementState[placementState]]);
+    public setDefaultPlacement(placementId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDefaultPlacement', [placementId]);
     }
 
-    public static setPlacementAnalytics(sendAnalytics: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(PlacementApi.ApiClass, 'setPlacementAnalytics', [sendAnalytics]);
+    public setPlacementState(placementId: string, placementState: PlacementState): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setPlacementState', [placementId, PlacementState[placementState]]);
+    }
+
+    public setPlacementAnalytics(sendAnalytics: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setPlacementAnalytics', [sendAnalytics]);
     }
 
 }

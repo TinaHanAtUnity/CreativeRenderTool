@@ -1,28 +1,31 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { FinishState } from 'Constants/FinishState';
+import { NativeApi } from 'Native/NativeApi';
 
-export class ListenerApi {
+export class ListenerApi extends NativeApi {
 
-    private static ApiClass = 'Listener';
-
-    public static sendReadyEvent(placementId: string): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ListenerApi.ApiClass, 'sendReadyEvent', [placementId]);
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'Listener');
     }
 
-    public static sendStartEvent(placementId: string): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ListenerApi.ApiClass, 'sendStartEvent', [placementId]);
+    public sendReadyEvent(placementId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendReadyEvent', [placementId]);
     }
 
-    public static sendFinishEvent(placementId, result: FinishState): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ListenerApi.ApiClass, 'sendFinishEvent', [placementId, FinishState[result]]);
+    public sendStartEvent(placementId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendStartEvent', [placementId]);
     }
 
-    public static sendErrorEvent(error: string, message: string): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ListenerApi.ApiClass, 'sendErrorEvent', [error, message]);
+    public sendFinishEvent(placementId, result: FinishState): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendFinishEvent', [placementId, FinishState[result]]);
     }
 
-    public static sendClickEvent(placementId): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(ListenerApi.ApiClass, 'sendClickEvent', [placementId]);
+    public sendErrorEvent(error: string, message: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendErrorEvent', [error, message]);
+    }
+
+    public sendClickEvent(placementId): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendClickEvent', [placementId]);
     }
 
 }

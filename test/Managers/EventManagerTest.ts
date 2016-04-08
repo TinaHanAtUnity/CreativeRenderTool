@@ -1,47 +1,46 @@
-import { Request } from '../../src/ts/Utilities/Request';
-import { EventManager } from '../../src/ts/Managers/EventManager';
-import { TestBridge, TestBridgeApi } from '../TestBridge';
-
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 
-class Storage extends TestBridgeApi {
+import { Request } from '../../src/ts/Utilities/Request';
+import { EventManager } from '../../src/ts/Managers/EventManager';
+import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
+import { RequestApi } from '../../src/ts/Native/Api/Request';
+import { DeviceInfoApi } from '../../src/ts/Native/Api/DeviceInfo';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+
+class TestStorageApi extends StorageApi {
+
     private _storage = {};
     private _dirty: boolean = false;
 
-    public set(storageType: string, key: string, value: any) {
+    public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
         this._dirty = true;
         this._storage = this.setInMemoryValue(this._storage, key, value);
-        return ['OK', key, value];
+        return;
     }
 
-    public get(storageType: string, key: string) {
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
         let retValue = this.getInMemoryValue(this._storage, key);
         if(!retValue) {
-            return ['ERROR', 'COULDNT_GET_VALUE', key];
+            return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
-        return ['OK', retValue];
+        return;
     }
 
-    public getKeys(storageType: string, key: string, recursive: boolean) {
-        let retValue: string[] = this.getInMemoryKeys(this._storage, key);
-        if(!retValue) {
-            return ['OK', []];
-        }
-        return ['OK', retValue];
+    public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        return Promise.resolve(this.getInMemoryKeys(this._storage, key));
     }
 
-    public write(storageType: string) {
+    public write(storageType: StorageType): Promise<void> {
         this._dirty = false;
-        return ['OK', storageType];
+        return;
     }
 
-    public delete(storageType: string, key: string) {
+    public delete(storageType: StorageType, key: string): Promise<void> {
         this._dirty = true;
         this._storage = this.deleteInMemoryValue(this._storage, key);
-        return ['OK', storageType];
+        return;
     }
 
     public isDirty(): boolean {
@@ -118,70 +117,71 @@ class Storage extends TestBridgeApi {
             return storage;
         }
     }
+
 }
 
-class Url extends TestBridgeApi {
-    public get(id: string, url: string, headers?: [string, string][]): any[] {
+class TestRequestApi extends RequestApi {
+
+    public get(id: string, url: string, headers?: [string, string][]): Promise<string> {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
+                this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
+                this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
-
-        return ['OK'];
+        return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body?: string, headers?: [string, string][]): any[] {
+    public post(id: string, url: string, body?: string, headers?: [string, string][]): Promise<string> {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
+                this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
             }, 0);
         } else {
             setTimeout(() => {
-                this.getNativeBridge().handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
+                this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
             }, 0);
         }
-
-        return ['OK'];
+        return Promise.resolve(id);
     }
+
 }
 
-class DeviceInfo extends TestBridgeApi {
+class TestDeviceInfoApi extends DeviceInfoApi {
+
     private _testId: string;
 
-    public getUniqueEventId(): any[] {
-        return ['OK', this._testId];
+    public getUniqueEventId(): Promise<string> {
+        return Promise.resolve(this._testId);
     }
 
     public setTestId(testId: string) {
         this._testId = testId;
     }
-}
 
-class Sdk extends TestBridgeApi {
-    public logInfo(message: string) {
-        return ['OK'];
-    }
 }
 
 describe('EventManagerTest', () => {
-    let testBridge: TestBridge;
-    let storageApi: Storage;
-    let urlApi: Url;
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
+    let nativeBridge;
+
+    let storageApi: TestStorageApi;
+    let requestApi: TestRequestApi;
     let request: Request;
     let eventManager: EventManager;
 
     beforeEach(() => {
-        testBridge = new TestBridge();
-        storageApi = new Storage();
-        urlApi = new Url();
-        testBridge.setApi('Request', urlApi);
-        testBridge.setApi('Storage', storageApi);
-        testBridge.setApi('Sdk', new Sdk());
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
+
+        storageApi = NativeBridge.Storage = new TestStorageApi(nativeBridge);
+        requestApi = NativeBridge.Request = new TestRequestApi(nativeBridge);
         request = new Request();
         eventManager = new EventManager(request);
     });
@@ -201,9 +201,17 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Successful operative event url should be deleted');
-            assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Successful operative event data should be deleted');
-            assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after successful operative event');
+            storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
+                let errorCode = error.shift();
+                assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event url should be deleted');
+            }).then(() => {
+                return storageApi.get(StorageType.PRIVATE, dataKey);
+            }).catch(error => {
+                let errorCode = error.shift();
+                assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event data should be deleted');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after successful operative event');
+            });
         });
     });
 
@@ -226,8 +234,8 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            assert.equal(url, storageApi.get('PRIVATE', urlKey)[1], 'Failed operative event url was not correctly stored');
-            assert.equal(data, storageApi.get('PRIVATE', dataKey)[1], 'Failed operative event data was not correctly stored');
+            assert.equal(url, storageApi.get(StorageType.PRIVATE, urlKey)[1], 'Failed operative event url was not correctly stored');
+            assert.equal(data, storageApi.get(StorageType.PRIVATE, dataKey)[1], 'Failed operative event data was not correctly stored');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
         });
         clock.tick(30000);
@@ -269,8 +277,8 @@ describe('EventManagerTest', () => {
         let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
         let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
-        StorageApi.set(StorageType.PRIVATE, urlKey, url);
-        StorageApi.set(StorageType.PRIVATE, dataKey, data);
+        storageApi.set(StorageType.PRIVATE, urlKey, url);
+        storageApi.set(StorageType.PRIVATE, dataKey, data);
 
         let requestSpy = sinon.spy(request, 'post');
 
@@ -278,16 +286,15 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
-            assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', urlKey)[1], 'Retried event url should be deleted');
-            assert.equal('COULDNT_GET_VALUE', storageApi.get('PRIVATE', dataKey)[1], 'Retried event data should be deleted');
+            assert.equal('COULDNT_GET_VALUE', storageApi.get(StorageType.PRIVATE, urlKey)[1], 'Retried event url should be deleted');
+            assert.equal('COULDNT_GET_VALUE', storageApi.get(StorageType.PRIVATE, dataKey)[1], 'Retried event data should be deleted');
             assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
         });
     });
 
     it('Get unique event id', () => {
         let testId: string = '1234-5678';
-        let deviceInfoApi: DeviceInfo = new DeviceInfo();
-        testBridge.setApi('DeviceInfo', deviceInfoApi);
+        let deviceInfoApi: TestDeviceInfoApi = NativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
         deviceInfoApi.setTestId(testId);
 
         return eventManager.getUniqueEventId().then(uniqueId => {

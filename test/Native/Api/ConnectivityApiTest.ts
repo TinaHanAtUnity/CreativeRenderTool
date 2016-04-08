@@ -3,23 +3,23 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { ConnectivityApi } from '../../../src/ts/Native/Api/Connectivity';
 
 describe('ConnectivityApi', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
+    let nativeBridge;
 
     before(() => {
-        NativeBridge.setInstance(new NativeBridge({
-            handleInvocation: handleInvocation,
-            handleCallback: handleCallback
-        }));
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
     });
 
     describe('when calling setListeningStatus', () => {
 
         it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
-            ConnectivityApi.setListeningStatus(true);
+            NativeBridge.Connectivity.setListeningStatus(true);
             sinon.assert.calledWith(handleInvocation, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
         });
 
@@ -29,8 +29,8 @@ describe('ConnectivityApi', () => {
 
         it('should trigger onConnected', () => {
             let spy = sinon.spy();
-            ConnectivityApi.onConnected.subscribe(spy);
-            ConnectivityApi.handleEvent('CONNECTED', [true, 0]);
+            NativeBridge.Connectivity.onConnected.subscribe(spy);
+            NativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
             sinon.assert.calledWith(spy, true, 0);
         });
 
@@ -40,7 +40,7 @@ describe('ConnectivityApi', () => {
 
         it('should throw', () => {
             assert.throws(() => {
-                ConnectivityApi.handleEvent('INVALID', []);
+                NativeBridge.Connectivity.handleEvent('INVALID', []);
             });
         });
 

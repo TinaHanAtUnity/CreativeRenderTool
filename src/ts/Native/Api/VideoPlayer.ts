@@ -1,6 +1,7 @@
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable3, Observable1, Observable4 } from 'Utilities/Observable';
+import { NativeApi } from 'Native/NativeApi';
 
 enum VideoPlayerEvent {
     ON_ERROR,
@@ -14,100 +15,102 @@ enum VideoPlayerEvent {
     STOP
 }
 
-export class VideoPlayerApi {
+export class VideoPlayerApi extends NativeApi {
 
-    public static onError: Observable3<number, number, string> = new Observable3();
-    public static onProgress: Observable1<number> = new Observable1();
-    public static onInfo: Observable3<number, number, string> = new Observable3();
-    public static onCompleted: Observable1<string> = new Observable1();
-    public static onPrepared: Observable4<number, number, number, string> = new Observable4();
-    public static onPlay: Observable1<string> = new Observable1();
-    public static onPause: Observable1<string> = new Observable1();
-    public static onSeek: Observable1<string> = new Observable1();
-    public static onStop: Observable1<string> = new Observable1();
+    public onError: Observable3<number, number, string> = new Observable3();
+    public onProgress: Observable1<number> = new Observable1();
+    public onInfo: Observable3<number, number, string> = new Observable3();
+    public onCompleted: Observable1<string> = new Observable1();
+    public onPrepared: Observable4<number, number, number, string> = new Observable4();
+    public onPlay: Observable1<string> = new Observable1();
+    public onPause: Observable1<string> = new Observable1();
+    public onSeek: Observable1<string> = new Observable1();
+    public onStop: Observable1<string> = new Observable1();
 
-    private static ApiClass = 'VideoPlayer';
-
-    public static setProgressEventInterval(milliseconds: number): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'setProgressEventInterval', [milliseconds]);
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'VideoPlayer');
     }
 
-    public static getProgressEventInterval(): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(VideoPlayerApi.ApiClass, 'getProgressEventInterval');
+    public setProgressEventInterval(milliseconds: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setProgressEventInterval', [milliseconds]);
     }
 
-    public static prepare(url: string, initialVolume: Double): Promise<string> {
-        return NativeBridge.getInstance().invoke<string>(VideoPlayerApi.ApiClass, 'prepare', [url, initialVolume]);
+    public getProgressEventInterval(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getProgressEventInterval');
     }
 
-    public static play(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'play');
+    public prepare(url: string, initialVolume: Double): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'prepare', [url, initialVolume]);
     }
 
-    public static pause(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'pause');
+    public play(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'play');
     }
 
-    public static stop(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'stop');
+    public pause(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'pause');
     }
 
-    public static seekTo(time: number): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'seekTo', [time]);
+    public stop(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'stop');
     }
 
-    public static getCurrentPosition(): Promise<number> {
-        return NativeBridge.getInstance().invoke<number>(VideoPlayerApi.ApiClass, 'getCurrentPosition');
+    public seekTo(time: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'seekTo', [time]);
     }
 
-    public static getVolume(): Promise<Double> {
-        return NativeBridge.getInstance().invoke<Double>(VideoPlayerApi.ApiClass, 'getVolume');
+    public getCurrentPosition(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getCurrentPosition');
     }
 
-    public static setVolume(volume: Double): Promise<Double> {
-        return NativeBridge.getInstance().invoke<Double>(VideoPlayerApi.ApiClass, 'setVolume', [volume]);
+    public getVolume(): Promise<Double> {
+        return this._nativeBridge.invoke<Double>(this._apiClass, 'getVolume');
     }
 
-    public static setInfoListenerEnabled(enabled: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(VideoPlayerApi.ApiClass, 'setInfoListenerEnabled', [enabled]);
+    public setVolume(volume: Double): Promise<Double> {
+        return this._nativeBridge.invoke<Double>(this._apiClass, 'setVolume', [volume]);
     }
 
-    public static handleEvent(event: string, parameters: any[]): void {
+    public setInfoListenerEnabled(enabled: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setInfoListenerEnabled', [enabled]);
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.ON_ERROR]:
-                VideoPlayerApi.onError.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onError.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
-                VideoPlayerApi.onProgress.trigger(parameters[0]);
+                this.onProgress.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.INFO]:
-                VideoPlayerApi.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.COMPLETED]:
-                VideoPlayerApi.onCompleted.trigger(parameters[0]);
+                this.onCompleted.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARED]:
-                VideoPlayerApi.onPrepared.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                this.onPrepared.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PLAY]:
-                VideoPlayerApi.onPlay.trigger(parameters[0]);
+                this.onPlay.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PAUSE]:
-                VideoPlayerApi.onPause.trigger(parameters[0]);
+                this.onPause.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.SEEKTO]:
-                VideoPlayerApi.onSeek.trigger(parameters[0]);
+                this.onSeek.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.STOP]:
-                VideoPlayerApi.onStop.trigger(parameters[0]);
+                this.onStop.trigger(parameters[0]);
                 break;
 
             default:

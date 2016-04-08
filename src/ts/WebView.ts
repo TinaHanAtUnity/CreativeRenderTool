@@ -13,14 +13,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
 import { FinishState } from 'Constants/FinishState';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { ListenerApi } from 'Native/Api/Listener';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { SdkApi } from 'Native/Api/Sdk';
-import { PlacementApi } from 'Native/Api/Placement';
-import { ConnectivityApi } from 'Native/Api/Connectivity';
 import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 
 export class WebView {
@@ -54,7 +50,7 @@ export class WebView {
     }
 
     public initialize(): Promise<void> {
-        return SdkApi.loadComplete().then((data) => {
+        return NativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._clientInfo.getPlatform());
         }).then(() => {
@@ -71,24 +67,24 @@ export class WebView {
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configManager.getDefaultPlacement();
-            PlacementApi.setDefaultPlacement(defaultPlacement.getId());
+            NativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             let placements: { [id: string]: Placement } = this._configManager.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
-                    PlacementApi.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
+                    NativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                     this._campaignManager.request(placements[placementId]);
                 }
             }
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
-            ConnectivityApi.setListeningStatus(true);
-            ConnectivityApi.onConnected.subscribe(this.onConnected.bind(this));
+            NativeBridge.Connectivity.setListeningStatus(true);
+            NativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
-            return SdkApi.initComplete();
+            return NativeBridge.Sdk.initComplete();
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
@@ -143,7 +139,7 @@ export class WebView {
                 this._sessionManager.sendShow(adUnit);
             });
 
-            PlacementApi.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
+            NativeBridge.Placement.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
             this._campaignManager.request(adUnit.getPlacement());
         });
     }
@@ -176,8 +172,8 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            PlacementApi.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
-                ListenerApi.sendReadyEvent(placement.getId());
+            NativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
+                NativeBridge.Listener.sendReadyEvent(placement.getId());
             });
         });
     }
@@ -245,7 +241,7 @@ export class WebView {
 
     private reinitialize() {
         // todo: make sure session data and other similar things are saved before issuing reinit
-        SdkApi.reinitialize();
+        NativeBridge.Sdk.reinitialize();
     }
 
     private getConfigJson(): Promise<NativeResponse> {

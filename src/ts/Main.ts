@@ -28,7 +28,6 @@ if(window && window.webviewbridge) {
 } else {
     nativeBridge = new NativeBridge(new IosWebViewBridge());
 }
-NativeBridge.setInstance(nativeBridge);
 window['nativebridge'] = nativeBridge;
 
 let webView: WebView = new WebView();

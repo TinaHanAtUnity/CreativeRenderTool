@@ -3,6 +3,7 @@ import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { NativeApi } from 'Native/NativeApi';
 
 enum AdUnitEvent {
     ON_START,
@@ -15,97 +16,99 @@ enum AdUnitEvent {
     ON_STOP
 }
 
-export class AdUnitApi {
+export class AdUnitApi extends NativeApi {
 
-    public static onStart: Observable0 = new Observable0();
-    public static onCreate: Observable0 = new Observable0();
-    public static onResume: Observable0 = new Observable0();
-    public static onDestroy: Observable1<boolean> = new Observable1();
-    public static onPause: Observable1<boolean> = new Observable1();
-    public static onKeyDown: Observable4<number, number, number, number> = new Observable4();
-    public static onRestore: Observable0 = new Observable0();
-    public static onStop: Observable0 = new Observable0();
+    public onStart: Observable0 = new Observable0();
+    public onCreate: Observable0 = new Observable0();
+    public onResume: Observable0 = new Observable0();
+    public onDestroy: Observable1<boolean> = new Observable1();
+    public onPause: Observable1<boolean> = new Observable1();
+    public onKeyDown: Observable4<number, number, number, number> = new Observable4();
+    public onRestore: Observable0 = new Observable0();
+    public onStop: Observable0 = new Observable0();
 
-    private static ApiClass = 'AdUnit';
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge, 'AdUnit');
+    }
 
-    public static open(views: string[], orientation: ScreenOrientation, keyEvents?: number[], systemUiVisibility?: SystemUiVisibility): Promise<void> {
+    public open(views: string[], orientation: ScreenOrientation, keyEvents?: number[], systemUiVisibility?: SystemUiVisibility): Promise<void> {
         if(typeof keyEvents === 'undefined') {
             keyEvents = null;
         }
         if(typeof systemUiVisibility === 'undefined') {
             systemUiVisibility = 0;
         }
-        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
     }
 
-    public static close(): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'close');
+    public close(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'close');
     }
 
-    public static setViews(views: string[]): Promise<string[]> {
-        return NativeBridge.getInstance().invoke<string[]>(AdUnitApi.ApiClass, 'setViews', [views]);
+    public setViews(views: string[]): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._apiClass, 'setViews', [views]);
     }
 
-    public static getViews(): Promise<string[]> {
-        return NativeBridge.getInstance().invoke<string[]>(AdUnitApi.ApiClass, 'getViews');
+    public getViews(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._apiClass, 'getViews');
     }
 
-    public static setOrientation(orientation: ScreenOrientation): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'setOrientation', [orientation]);
+    public setOrientation(orientation: ScreenOrientation): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setOrientation', [orientation]);
     }
 
-    public static getOrientation(): Promise<ScreenOrientation> {
-        return NativeBridge.getInstance().invoke<ScreenOrientation>(AdUnitApi.ApiClass, 'getOrientation');
+    public getOrientation(): Promise<ScreenOrientation> {
+        return this._nativeBridge.invoke<ScreenOrientation>(this._apiClass, 'getOrientation');
     }
 
-    public static setKeepScreenOn(screenOn: boolean): Promise<void> {
-        return NativeBridge.getInstance().invoke<void>(AdUnitApi.ApiClass, 'setKeepScreenOn', [screenOn]);
+    public setKeepScreenOn(screenOn: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setKeepScreenOn', [screenOn]);
     }
 
-    public static setSystemUiVisibility(systemUiVisibility: SystemUiVisibility): Promise<SystemUiVisibility> {
-        return NativeBridge.getInstance().invoke<SystemUiVisibility>(AdUnitApi.ApiClass, 'setSystemUiVisibility', [systemUiVisibility]);
+    public setSystemUiVisibility(systemUiVisibility: SystemUiVisibility): Promise<SystemUiVisibility> {
+        return this._nativeBridge.invoke<SystemUiVisibility>(this._apiClass, 'setSystemUiVisibility', [systemUiVisibility]);
     }
 
-    public static setKeyEventList(keyEventList: KeyCode[]): Promise<KeyCode[]> {
-        return NativeBridge.getInstance().invoke<KeyCode[]>(AdUnitApi.ApiClass, 'setKeyEventList', [keyEventList]);
+    public setKeyEventList(keyEventList: KeyCode[]): Promise<KeyCode[]> {
+        return this._nativeBridge.invoke<KeyCode[]>(this._apiClass, 'setKeyEventList', [keyEventList]);
     }
 
-    public static handleEvent(event: string, ...parameters: any[]): void {
+    public handleEvent(event: string, ...parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
-                AdUnitApi.onStart.trigger();
+                this.onStart.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_CREATE]:
-                AdUnitApi.onCreate.trigger();
+                this.onCreate.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESUME]:
-                AdUnitApi.onResume.trigger();
+                this.onResume.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
-                AdUnitApi.onDestroy.trigger(parameters[0]);
+                this.onDestroy.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
-                AdUnitApi.onPause.trigger(parameters[0]);
+                this.onPause.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.KEY_DOWN]:
-                AdUnitApi.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                this.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESTORE]:
-                AdUnitApi.onRestore.trigger();
+                this.onRestore.trigger();
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
-                AdUnitApi.onStop.trigger();
+                this.onStop.trigger();
                 break;
 
             default:
-                throw new Error('AdUnit event ' + event + ' does not have an observable');
+                super.handleEvent(event, parameters);
         }
     }
 

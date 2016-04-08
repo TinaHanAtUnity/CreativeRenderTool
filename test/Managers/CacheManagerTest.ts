@@ -3,10 +3,10 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { CacheManager } from '../../src/ts/Managers/CacheManager';
-import { TestBridge, TestBridgeApi } from '../TestBridge';
-import { IFileInfo } from '../../src/ts/Native/Api/Cache';
+import { IFileInfo, CacheApi } from '../../src/ts/Native/Api/Cache';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
-class Cache extends TestBridgeApi {
+class TestCacheApi extends CacheApi {
     private _mappings: {} = {};
     private _internet: boolean = true;
     private _files: IFileInfo[] = [];
@@ -14,41 +14,45 @@ class Cache extends TestBridgeApi {
     private _previouslyQueuedFiles: string[] = [];
     private _downloadedFiles: number = 0;
 
-    public download(url: string, overwrite: boolean): any[] {
+    constructor(nativeBridge: NativeBridge) {
+        super(nativeBridge);
+    }
+
+    public download(url: string, overwrite: boolean): Promise<void> {
         let byteCount: number = 12345;
         let duration: number = 6789;
         let responseCode: number = 200;
 
         if(this._previouslyDownloadedFiles.indexOf(url) !== -1) {
-            return ['ERROR', 'FILE_ALREADY_IN_CACHE'];
+            return Promise.reject(['FILE_ALREADY_IN_CACHE']);
         }
 
         if(this._previouslyQueuedFiles.indexOf(url) !== -1) {
-            return ['ERROR', 'FILE_ALREADY_IN_QUEUE'];
+            return Promise.reject(['FILE_ALREADY_IN_QUEUE']);
         }
 
         if(this._internet) {
             this._previouslyQueuedFiles.push(url);
             setTimeout(() => {
                 this._downloadedFiles++;
-                this.getNativeBridge().handleEvent(['CACHE', 'DOWNLOAD_END', url, byteCount, duration, responseCode, []]);
+                this._nativeBridge.handleEvent(['CACHE', 'DOWNLOAD_END', url, byteCount, duration, responseCode, []]);
             }, 1);
-            return ['OK'];
+            return Promise.resolve(void(0));
         } else {
-            return ['ERROR', 'NO_INTERNET'];
+            return Promise.reject(['NO_INTERNET']);
         }
     }
 
-    public getFileUrl(url: string): any[] {
-        return ['OK', this._mappings[url]];
+    public getFileUrl(url: string): Promise<string> {
+        return Promise.resolve(this._mappings[url]);
     }
 
-    public getFiles(): any[] {
-        return ['OK', this._files];
+    public getFiles(): Promise<IFileInfo[]> {
+        return Promise.resolve(this._files);
     }
 
-    public deleteFile(fileId: string): any[] {
-        return ['OK'];
+    public deleteFile(fileId: string): Promise<void> {
+        return;
     }
 
     public setFileMapping(source: string, target: string): void {
@@ -73,22 +77,21 @@ class Cache extends TestBridgeApi {
     }
 }
 
-class Sdk extends TestBridgeApi {
-    public logInfo(message: string) {
-        return ['OK'];
-    }
-}
-
 describe('CacheManagerTest', () => {
-    let testBridge: TestBridge;
-    let cacheApi: Cache;
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
+    let nativeBridge;
+
+    let cacheApi: TestCacheApi;
     let cacheManager: CacheManager;
 
     beforeEach(() => {
-        testBridge = new TestBridge();
-        cacheApi = new Cache();
-        testBridge.setApi('Cache', cacheApi);
-        testBridge.setApi('Sdk', new Sdk());
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
+
+        cacheApi = NativeBridge.Cache = new TestCacheApi(nativeBridge);
         cacheManager = new CacheManager();
     });
 
