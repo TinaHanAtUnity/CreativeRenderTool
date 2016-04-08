@@ -16,6 +16,8 @@ export class SessionManager {
 
     private _currentSession: Session;
 
+    private _gamerSid: string;
+
     constructor(clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
@@ -67,6 +69,10 @@ export class SessionManager {
         });
     }
 
+    public setGamerSid(sid: string): void {
+        this._gamerSid = sid;
+    }
+
     private createShowEventUrl(adUnit: AdUnit): string {
         let campaign = adUnit.getCampaign();
         return [
@@ -114,7 +120,7 @@ export class SessionManager {
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'os_version': this._deviceInfo.getOsVersion(),
             'connection_type': this._deviceInfo.getNetworkType(),
-            'sid': 'rikshot' // todo: fix this
+            'sid': this._gamerSid
         };
     }
 

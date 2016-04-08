@@ -16,6 +16,7 @@ import { StorageManager } from 'Managers/StorageManager';
 import { ConnectivityManager } from 'Managers/ConnectivityManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
+import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 
 export class WebView {
 
@@ -130,14 +131,18 @@ export class WebView {
             return;
         }
 
-        let adUnit = this._adUnitManager.create(placement, requestedOrientation);
-        (<VideoAdUnit>adUnit).getEndScreen().subscribe('close', this.onClose.bind(this)); // todo: clean me up
-        this._adUnitManager.subscribe('close', this.onClose.bind(this));
+        PlayerMetaData.getSid(this._storageManager).then(sid => {
+            this._sessionManager.setGamerSid(sid);
 
-        this._sessionManager.sendShow(adUnit);
+            let adUnit = this._adUnitManager.create(placement, requestedOrientation);
+            (<VideoAdUnit>adUnit).getEndScreen().subscribe('close', this.onClose.bind(this)); // todo: clean me up
+            this._adUnitManager.subscribe('close', this.onClose.bind(this));
 
-        this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
-        this._campaignManager.request(adUnit.getPlacement());
+            this._sessionManager.sendShow(adUnit);
+
+            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+            this._campaignManager.request(adUnit.getPlacement());
+        });
     }
 
     public hide(): void {
