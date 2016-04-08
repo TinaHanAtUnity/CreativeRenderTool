@@ -1,16 +1,10 @@
-import { CacheManager } from '../../src/ts/Managers/CacheManager';
-import { TestBridge, TestBridgeApi } from '../TestBridge';
-
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-interface IFileInfo {
-    id: string;
-    found: boolean;
-    size: number;
-    mtime: number;
-}
+import { CacheManager } from '../../src/ts/Managers/CacheManager';
+import { TestBridge, TestBridgeApi } from '../TestBridge';
+import { IFileInfo } from '../../src/ts/Native/Api/Cache';
 
 class Cache extends TestBridgeApi {
     private _mappings: {} = {};
