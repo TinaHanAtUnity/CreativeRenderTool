@@ -38,9 +38,9 @@ export class EventManager {
     }
 
     public sendUnsentSessions(): Promise<any[]> {
-        return this.getUnsentSessions().then(([sessions]) => {
+        return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
-                return this.getUnsentOperativeEvents(sessionId).then(([events]) => {
+                return this.getUnsentOperativeEvents(sessionId).then(events => {
                     return Promise.all(events.map(eventId => {
                         return this.resendEvent(sessionId, eventId);
                     }));
@@ -51,14 +51,14 @@ export class EventManager {
     }
 
     public getUniqueEventId(): Promise<string> {
-        return NativeBridge.getInstance().invoke<string>('DeviceInfo', 'getUniqueEventId');
+        return NativeBridge.DeviceInfo.getUniqueEventId();
     }
 
-    private getUnsentSessions(): Promise<any[]> {
+    private getUnsentSessions(): Promise<string[]> {
         return NativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
-    private getUnsentOperativeEvents(sessionId: string): Promise<any[]> {
+    private getUnsentOperativeEvents(sessionId: string): Promise<string[]> {
         return NativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 

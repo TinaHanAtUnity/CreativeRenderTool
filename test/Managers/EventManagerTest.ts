@@ -25,7 +25,7 @@ class TestStorageApi extends StorageApi {
         if(!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
-        return;
+        return retValue;
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
@@ -216,8 +216,6 @@ describe('EventManagerTest', () => {
     });
 
     it('Send failed operative event', () => {
-        let clock = sinon.useFakeTimers();
-
         let eventId: string = '1234';
         let sessionId: string = '5678';
         let url: string = 'https://www.example.net/fail';
@@ -234,13 +232,15 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            assert.equal(url, storageApi.get(StorageType.PRIVATE, urlKey)[1], 'Failed operative event url was not correctly stored');
-            assert.equal(data, storageApi.get(StorageType.PRIVATE, dataKey)[1], 'Failed operative event data was not correctly stored');
-            assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
+            storageApi.get<string>(StorageType.PRIVATE, urlKey).then(data => {
+                assert.equal(url, data[1], 'Failed operative event url was not correctly stored');
+            }).then(() => {
+                return storageApi.get(StorageType.PRIVATE, dataKey);
+            }).then(data => {
+                assert.equal(data, data[1], 'Failed operative event data was not correctly stored');
+                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
+            });
         });
-        clock.tick(30000);
-        clock.restore();
-        return event;
     });
 
     it('Send third party event', () => {
@@ -286,9 +286,17 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
-            assert.equal('COULDNT_GET_VALUE', storageApi.get(StorageType.PRIVATE, urlKey)[1], 'Retried event url should be deleted');
-            assert.equal('COULDNT_GET_VALUE', storageApi.get(StorageType.PRIVATE, dataKey)[1], 'Retried event data should be deleted');
-            assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
+            storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
+                let errorCode = error.shift();
+                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event url should be deleted');
+            }).then(() => {
+                return storageApi.get(StorageType.PRIVATE, dataKey);
+            }).catch(error => {
+                let errorCode = error.shift();
+                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event data should be deleted');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
+            });
         });
     });
 
