@@ -3,7 +3,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import {ConfigManager} from '../../src/ts/Managers/ConfigManager';
+import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
 
 describe('ConfigManagerTest', () => {
 
@@ -32,30 +32,9 @@ describe('ConfigManagerTest', () => {
             configManager.fetch();
         });
 
-        it('should have enabled parameter from configuration', () => {
+        it('should have configuration', () => {
             return configPromise.then(() => {
-                assert.isTrue(configManager.isEnabled());
-            });
-        });
-
-        it('should have country parameter from configuration', () => {
-            return configPromise.then(() => {
-                assert.equal(configManager.getCountry(), 'fi');
-            });
-        });
-
-        describe('parsing two placements', () => {
-            it('should get both placements', () => {
-                assert.property(configManager.getPlacements(), '1');
-                assert.property(configManager.getPlacements(), '2');
-            });
-
-            it('should pick default', () => {
-                assert.equal(configManager.getDefaultPlacement().getId(), '2');
-            });
-
-            it('should return placement by id', () => {
-                assert.equal(configManager.getPlacement('1').getName(), 'placementName1');
+                assert.isNotNull(configManager.getConfiguration());
             });
         });
 

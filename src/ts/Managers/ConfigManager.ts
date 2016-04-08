@@ -1,8 +1,8 @@
-import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Configuration } from 'Models/Configuration';
 
 export class ConfigManager {
 
@@ -10,11 +10,7 @@ export class ConfigManager {
 
     private _request: Request;
     private _clientInfo: ClientInfo;
-
-    private _enabled: boolean;
-    private _country: string;
-    private _placements: { [id: string]: Placement } = {};
-    private _defaultPlacement: Placement = null;
+    private _configuration: Configuration;
 
     constructor(request: Request, clientInfo: ClientInfo) {
         this._request = request;
@@ -24,40 +20,12 @@ export class ConfigManager {
     public fetch(): Promise<void> {
         return this._request.get(this.createConfigUrl()).then(([response]) => {
             let configJson = JSON.parse(response);
-
-            this._enabled = configJson.enabled;
-            this._country = configJson.country;
-
-            let placements = configJson.placements;
-
-            placements.forEach((rawPlacement: any): void => {
-                let placement: Placement = new Placement(rawPlacement);
-                this._placements[placement.getId()] = placement;
-                if(placement.isDefault()) {
-                    this._defaultPlacement = placement;
-                }
-            });
+            this._configuration = new Configuration(configJson);
         });
     }
 
-    public isEnabled(): boolean {
-        return this._enabled;
-    }
-
-    public getCountry(): string {
-        return this._country;
-    }
-
-    public getPlacement(placementId: string): Placement {
-        return this._placements[placementId];
-    }
-
-    public getPlacements(): { [id: string]: Placement } {
-        return this._placements;
-    }
-
-    public getDefaultPlacement(): Placement {
-        return this._defaultPlacement;
+    public getConfiguration(): Configuration {
+        return this._configuration;
     }
 
     private createConfigUrl(): string {
