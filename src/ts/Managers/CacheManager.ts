@@ -50,7 +50,7 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return CacheApi.getFiles().then(files => {
-            if(!files) {
+            if(!files || !files.length) {
                 return Promise.resolve();
             }
 

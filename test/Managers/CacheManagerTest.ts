@@ -192,6 +192,19 @@ describe('CacheManagerTest', () => {
         return cachePromise;
     });
 
+    it('Clean cache from current files', () => {
+        let currentFile: string = 'current';
+        let currentTime = new Date().getTime();
+
+        cacheApi.addFile(currentFile, currentTime, 1234);
+
+        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+
+        return cacheManager.cleanCache().then(() => {
+            assert(!cacheSpy.calledOnce, 'Clean cache tried to delete current files');
+        });
+    });
+
     it('Clean cache from old files', () => {
         let currentFile: string = 'current';
         let oldFile: string = 'old';
