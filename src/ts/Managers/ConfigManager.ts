@@ -10,17 +10,15 @@ export class ConfigManager {
 
     private _request: Request;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
 
     private _enabled: boolean;
     private _country: string;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement = null;
 
-    constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(request: Request, clientInfo: ClientInfo) {
         this._request = request;
         this._clientInfo = clientInfo;
-        this._deviceInfo = deviceInfo;
     }
 
     public fetch(): Promise<void> {

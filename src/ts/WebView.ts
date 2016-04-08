@@ -64,7 +64,7 @@ export class WebView {
         }).then(() => {
             return this._cacheManager.cleanCache();
         }).then(() => {
-            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
+            this._configManager = new ConfigManager(this._request, this._clientInfo);
             return this._configManager.fetch();
         }).then(() => {
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);

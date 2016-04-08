@@ -7,7 +7,7 @@ import {ConfigManager} from '../../src/ts/Managers/ConfigManager';
 
 describe('ConfigManagerTest', () => {
 
-    let requestMock, clientInfoMock, deviceInfoMock;
+    let requestMock, clientInfoMock;
     let configManager: ConfigManager;
     let configPromise;
 
@@ -23,11 +23,7 @@ describe('ConfigManagerTest', () => {
             isDebuggable: sinon.mock().returns(false),
         };
 
-        deviceInfoMock = {
-
-        };
-
-        configManager = new ConfigManager(requestMock, clientInfoMock, deviceInfoMock);
+        configManager = new ConfigManager(requestMock, clientInfoMock);
     });
 
     describe('after calling fetch', () => {
