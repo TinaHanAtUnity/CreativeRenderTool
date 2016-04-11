@@ -1,7 +1,6 @@
 import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { Configuration } from 'Models/Configuration';
 
 export class ConfigManager {
