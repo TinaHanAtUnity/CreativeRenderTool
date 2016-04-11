@@ -33,8 +33,8 @@ describe('ConfigManagerTest', () => {
         });
 
         it('should have configuration', () => {
-            return configPromise.then(() => {
-                assert.isNotNull(configManager.getConfiguration());
+            return configPromise.then((configuration) => {
+                assert.isNotNull(configuration);
             });
         });
 

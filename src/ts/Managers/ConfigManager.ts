@@ -17,10 +17,12 @@ export class ConfigManager {
         this._clientInfo = clientInfo;
     }
 
-    public fetch(): Promise<void> {
-        return this._request.get(this.createConfigUrl()).then(([response]) => {
-            let configJson = JSON.parse(response);
-            this._configuration = new Configuration(configJson);
+    public fetch(): Promise<Configuration> {
+        return new Promise((resolve, reject) => {
+            this._request.get(this.createConfigUrl()).then(([response]) => {
+                let configJson = JSON.parse(response);
+                resolve(new Configuration(configJson));
+            });
         });
     }
 
