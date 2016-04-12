@@ -12,32 +12,55 @@ describe('ConfigManagerTest', () => {
     let configPromise;
 
     beforeEach(() => {
-        configPromise = Promise.resolve(['{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }']);
-
-        requestMock = {
-            get: sinon.mock().returns(configPromise)
-        };
-
         clientInfoMock = {
             getGameId: sinon.mock().returns(123),
             isDebuggable: sinon.mock().returns(false),
         };
-
-        configManager = new ConfigManager(requestMock, clientInfoMock);
     });
 
-    describe('after calling fetch', () => {
+    describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            configManager.fetch();
+            configPromise = Promise.resolve(['{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }']);
+
+            requestMock = {
+                get: sinon.mock().returns(configPromise)
+            };
+
+            configManager = new ConfigManager(requestMock, clientInfoMock);
         });
 
-        it('should have configuration', () => {
+        it('calling fetch should return configuration', () => {
+            configManager.fetch();
+
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
             });
         });
-
     });
 
+
+    describe('with badly formed configuration json', () => {
+
+        beforeEach(() => {
+            configPromise = Promise.resolve(['{bad json here,']);
+
+            requestMock = {
+                get: sinon.mock().returns(configPromise)
+            };
+
+            configManager = new ConfigManager(requestMock, clientInfoMock);
+        });
+
+        it('calling fetch should return error', (done) => {
+            let config = configManager.fetch();
+            config.then(() => {
+                assert.fail('should not resolve');
+                done();
+            }, (e) => {
+                assert.instanceOf(e, Error);
+                done();
+            });
+        });
+    });
 });

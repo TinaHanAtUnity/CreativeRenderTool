@@ -11,7 +11,7 @@ export class ConfigManager {
     private _clientInfo: ClientInfo;
     private _configuration: Configuration;
 
-    constructor(request: Request, clientInfo: ClientInfo) {
+    constructor(request: Request, clientInfo: ClientInfo) {
         this._request = request;
         this._clientInfo = clientInfo;
     }
@@ -19,8 +19,12 @@ export class ConfigManager {
     public fetch(): Promise<Configuration> {
         return new Promise((resolve, reject) => {
             this._request.get(this.createConfigUrl()).then(([response]) => {
-                let configJson = JSON.parse(response);
-                resolve(new Configuration(configJson));
+                try {
+                    let configJson = JSON.parse(response);
+                    resolve(new Configuration(configJson));
+                } catch (e) {
+                    reject(e);
+                }
             });
         });
     }
