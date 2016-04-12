@@ -4,11 +4,7 @@ import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
-
-enum StorageType {
-    EXTERNAL,
-    INTERNAL
-}
+import { StorageType } from 'Native/Api/DeviceInfo';
 
 export class DeviceInfo extends Model {
 
@@ -70,10 +66,10 @@ export class DeviceInfo extends Model {
         NativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language);
         NativeBridge.DeviceInfo.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => this._volume = volume);
         NativeBridge.DeviceInfo.getScreenBrightness().then(screenBrightness => this._screenBrightness = screenBrightness);
-        // todo: NativeBridge.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then((freeExternalSpace) => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined);
-        // todo: NativeBridge.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined);
-        // todo: NativeBridge.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined);
-        // todo: NativeBridge.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined);
+        NativeBridge.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then(freeExternalSpace => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined);
+        NativeBridge.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined);
+        NativeBridge.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined);
+        NativeBridge.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined);
         NativeBridge.DeviceInfo.getBatteryLevel().then(batteryLevel => this._batteryLevel = batteryLevel);
         NativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => this._batteryStatus = batteryStatus);
         NativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => this._freeMemory = freeMemory);

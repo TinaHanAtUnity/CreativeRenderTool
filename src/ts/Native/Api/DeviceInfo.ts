@@ -1,7 +1,11 @@
 import { NativeApi } from 'Native/NativeApi';
 import { StreamType } from 'Constants/Android/StreamType';
-import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
+
+export enum StorageType {
+    EXTERNAL,
+    INTERNAL
+}
 
 export class DeviceInfoApi extends NativeApi {
 
