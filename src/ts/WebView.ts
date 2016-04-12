@@ -1,6 +1,7 @@
 import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
+import { Configuration } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
@@ -24,10 +25,9 @@ export class WebView {
     private _clientInfo: ClientInfo;
 
     private _request: Request;
+    private _configuration: Configuration;
 
-    private _configManager: ConfigManager;
     private _campaignManager: CampaignManager;
-
     private _cacheManager: CacheManager;
 
     private _sessionManager: SessionManager;
@@ -55,9 +55,10 @@ export class WebView {
         }).then(() => {
             return this._cacheManager.cleanCache();
         }).then(() => {
-            this._configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
-            return this._configManager.fetch();
-        }).then(() => {
+            let configManager = new ConfigManager(this._request, this._clientInfo);
+            return configManager.fetch();
+        }).then((configuration) => {
+            this._configuration = configuration;
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
@@ -65,10 +66,10 @@ export class WebView {
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
-            let defaultPlacement = this._configManager.getDefaultPlacement();
+            let defaultPlacement = this._configuration.getDefaultPlacement();
             NativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            let placements: { [id: string]: Placement } = this._configManager.getPlacements();
+            let placements: { [id: string]: Placement } = this._configuration.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
@@ -107,7 +108,7 @@ export class WebView {
             this._mustReinitialize = reinitialize;
         });
 
-        let placement: Placement = this._configManager.getPlacement(placementId);
+        let placement: Placement = this._configuration.getPlacement(placementId);
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
@@ -210,7 +211,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    this._campaignManager.retryFailedPlacements(this._configManager.getPlacements());
+                    this._campaignManager.retryFailedPlacements(this._configuration.getPlacements());
                     this._eventManager.sendUnsentSessions();
                 }
             });
