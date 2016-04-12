@@ -1,10 +1,11 @@
-import { StorageManager, StorageType } from 'Managers/StorageManager';
+import { StorageType } from 'Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export class PlayerMetaData {
 
-    public static getSid(storageManager: StorageManager): Promise<string> {
-        return storageManager.get(StorageType.PUBLIC, 'player.sid.value').then(sid => {
-            storageManager.delete(StorageType.PUBLIC, 'player.sid');
+    public static getSid(): Promise<string> {
+        return NativeBridge.Storage.get(StorageType.PUBLIC, 'player.sid.value').then(sid => {
+            NativeBridge.Storage.delete(StorageType.PUBLIC, 'player.sid');
             return sid;
         }).catch(error => {
             return undefined;

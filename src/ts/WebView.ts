@@ -1,4 +1,4 @@
-import { NativeBridge, INativeCallback, CallbackStatus } from 'NativeBridge';
+import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration } from 'Models/Configuration';
@@ -7,21 +7,19 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
-import { Request } from 'Utilities/Request';
+import { Request, NativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { AdUnitManager } from 'Managers/AdUnitManager';
-import { AdUnit, FinishState } from 'Models/AdUnit';
-import { VideoAdUnit } from 'Models/VideoAdUnit';
-import { StorageManager } from 'Managers/StorageManager';
-import { ConnectivityManager } from 'Managers/ConnectivityManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
+import { FinishState } from 'Constants/FinishState';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { KeyCode } from 'Constants/Android/KeyCode';
+import { UnityAdsError } from 'Constants/UnityAdsError';
 import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 
 export class WebView {
-
-    private _nativeBridge: NativeBridge;
 
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
@@ -31,34 +29,29 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _cacheManager: CacheManager;
-    private _storageManager: StorageManager;
+
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
-    private _adUnitManager: AdUnitManager;
-    private _connectivityManager: ConnectivityManager;
 
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor() {
         if(window && window.addEventListener) {
             window.addEventListener('error', this.onError.bind(this), false);
         }
 
-        this._nativeBridge = nativeBridge;
         this._deviceInfo = new DeviceInfo();
-        this._cacheManager = new CacheManager(nativeBridge);
-        this._request = new Request(nativeBridge);
-        this._storageManager = new StorageManager(nativeBridge);
-        this._eventManager = new EventManager(nativeBridge, this._request, this._storageManager);
-        this._connectivityManager = new ConnectivityManager(nativeBridge);
+        this._cacheManager = new CacheManager();
+        this._request = new Request();
+        this._eventManager = new EventManager(this._request);
     }
 
     public initialize(): Promise<void> {
-        return this._nativeBridge.invoke('Sdk', 'loadComplete').then((data) => {
+        return NativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
-            return this._deviceInfo.fetch(this._clientInfo.getPlatform(), this._nativeBridge);
+            return this._deviceInfo.fetch(this._clientInfo.getPlatform());
         }).then(() => {
             return this._cacheManager.cleanCache();
         }).then(() => {
@@ -69,31 +62,29 @@ export class WebView {
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
-            this._adUnitManager = new AdUnitManager(this._nativeBridge, this._sessionManager, this._storageManager);
-
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
-            this._campaignManager.subscribe('campaign', this.onCampaign.bind(this));
-            this._campaignManager.subscribe('error', this.onCampaignError.bind(this));
+            this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
+            this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configuration.getDefaultPlacement();
-            this._nativeBridge.invoke('Placement', 'setDefaultPlacement', [defaultPlacement.getId()]);
+            NativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             let placements: { [id: string]: Placement } = this._configuration.getPlacements();
             for(let placementId in placements) {
                 if(placements.hasOwnProperty(placementId)) {
                     let placement: Placement = placements[placementId];
-                    this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.NOT_AVAILABLE]]);
+                    NativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                     this._campaignManager.request(placements[placementId]);
                 }
             }
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
-            this._connectivityManager.setListeningStatus(true);
-            this._connectivityManager.subscribe('connected', this.onConnected.bind(this));
+            NativeBridge.Connectivity.setListeningStatus(true);
+            NativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
-            return this._nativeBridge.invoke('Sdk', 'initComplete');
+            return NativeBridge.Sdk.initComplete();
         }).catch(error => {
             console.log(error);
             if(error instanceof Error) {
@@ -106,10 +97,6 @@ export class WebView {
         });
     }
 
-    public setFinishState(state: FinishState): void {
-        this._adUnitManager.setFinishState(state);
-    }
-
     /*
      PUBLIC API EVENT HANDLERS
      */
@@ -119,32 +106,50 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
-        }).catch(error => {
-            console.dir(error);
         });
 
         let placement: Placement = this._configuration.getPlacement(placementId);
         if(!placement) {
-            // this.showError(true, placementId, 'No such placement: ' + placementId); // todo: fix me
+            this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
         }
 
-        PlayerMetaData.getSid(this._storageManager).then(sid => {
+        let campaign: Campaign = placement.getCampaign();
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
+
+        let orientation: ScreenOrientation = requestedOrientation;
+        if(!placement.useDeviceOrientationForVideo()) {
+            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        }
+
+        let keyEvents: any[] = [];
+        if(placement.disableBackButton()) {
+            keyEvents = [KeyCode.BACK];
+        }
+
+        PlayerMetaData.getSid().then(sid => {
             this._sessionManager.setGamerSid(sid);
 
-            let adUnit = this._adUnitManager.create(placement, requestedOrientation);
-            (<VideoAdUnit>adUnit).getEndScreen().subscribe('close', this.onClose.bind(this)); // todo: clean me up
-            this._adUnitManager.subscribe('close', this.onClose.bind(this));
+            let adUnit: AbstractAdUnit = new VideoAdUnit(this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
+            adUnit.onClose.subscribe(this.onClose.bind(this));
+            adUnit.show(orientation, keyEvents).then(() => {
+                this._sessionManager.sendShow(adUnit);
+            });
 
-            this._sessionManager.sendShow(adUnit);
-
-            this._nativeBridge.invoke('Placement', 'setPlacementState', [adUnit.getPlacement().getId(), PlacementState[PlacementState.WAITING]]);
+            NativeBridge.Placement.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
             this._campaignManager.request(adUnit.getPlacement());
         });
     }
 
-    public hide(): void {
-        this._adUnitManager.hide();
+    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
+        NativeBridge.Sdk.logError('Show invocation failed: ' + errorMsg);
+        NativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
+        if(sendFinish) {
+            NativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
     }
 
     /*
@@ -159,14 +164,14 @@ export class WebView {
             campaign.getVideoUrl()
         ];
 
-        this._cacheManager.cacheAll(cacheableAssets).then((fileUrls) => {
+        this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
             campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.invoke('Placement', 'setPlacementState', [placement.getId(), PlacementState[PlacementState.READY]]).then(() => {
-                this._nativeBridge.invoke('Listener', 'sendReadyEvent', [placement.getId()]);
+            NativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
+                NativeBridge.Listener.sendReadyEvent(placement.getId());
             });
         });
     }
@@ -182,11 +187,14 @@ export class WebView {
         }, this._clientInfo, this._deviceInfo);
     }
 
-    private onClose(adUnit: AdUnit): void {
-        this.hide();
+    private onClose(placement: Placement): void {
         if(this._mustReinitialize) {
             this.reinitialize();
         }
+    }
+
+    private isShowing(): boolean {
+        return true;
     }
 
     /*
@@ -194,10 +202,10 @@ export class WebView {
      */
 
     private onConnected(wifi: boolean, networkType: number) {
-        if(!this._adUnitManager.isShowing()) {
+        if(!this.isShowing()) {
             this.shouldReinitialize().then((reinitialize) => {
                 if(reinitialize) {
-                    if(this._adUnitManager.isShowing()) {
+                    if(this.isShowing()) {
                         this._mustReinitialize = true;
                     } else {
                         this.reinitialize();
@@ -231,10 +239,10 @@ export class WebView {
 
     private reinitialize() {
         // todo: make sure session data and other similar things are saved before issuing reinit
-        this._nativeBridge.invoke('Sdk', 'reinitialize');
+        NativeBridge.Sdk.reinitialize();
     }
 
-    private getConfigJson(): Promise<any[]> {
+    private getConfigJson(): Promise<NativeResponse> {
         return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
     }
 
@@ -245,9 +253,9 @@ export class WebView {
         if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
             return Promise.resolve(false);
         }
-        return this.getConfigJson().then(([response]) => {
+        return this.getConfigJson().then(response => {
             this._configJsonCheckedAt = Date.now();
-            let configJson = JSON.parse(response);
+            let configJson = JSON.parse(response.response);
             return configJson.hash === this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;

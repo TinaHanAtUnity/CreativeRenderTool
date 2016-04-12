@@ -3,7 +3,7 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Observable } from '../../src/ts/Utilities/Observable';
+import { Observable1 } from '../../src/ts/Utilities/Observable';
 
 describe('ObservableTest', () => {
     it('should unsubscribe', () => {
@@ -11,20 +11,13 @@ describe('ObservableTest', () => {
         let observer = () => {
             triggered++;
         };
-        let observableClass = class TestObservable extends Observable {
-
-            public testTrigger() {
-                this.trigger('test');
-            }
-
-        };
-        let observable = new observableClass();
-        observable.subscribe('test', observer);
+        let observable = new Observable1();
+        observable.subscribe(observer);
         assert.equal(triggered, 0);
-        observable.testTrigger();
+        observable.trigger(true);
         assert.equal(triggered, 1);
-        observable.unsubscribe('test', observer);
-        observable.testTrigger();
+        observable.unsubscribe(observer);
+        observable.trigger(true);
         assert.equal(triggered, 1);
     });
 
@@ -34,20 +27,13 @@ describe('ObservableTest', () => {
             assert.equal(abc, 'abc');
             triggered++;
         };
-        let observableClass = class TestObservable extends Observable {
-
-            public testTrigger() {
-                this.trigger('test');
-            }
-
-        };
-        let observable = new observableClass();
-        let boundObserver = observable.subscribe('test', observer.bind(undefined, 'abc'));
+        let observable = new Observable1();
+        let boundObserver = observable.subscribe(observer.bind(undefined, 'abc'));
         assert.equal(triggered, 0);
-        observable.testTrigger();
+        observable.trigger('abc');
         assert.equal(triggered, 1);
-        observable.unsubscribe('test', boundObserver);
-        observable.testTrigger();
+        observable.unsubscribe(boundObserver);
+        observable.trigger('abc');
         assert.equal(triggered, 1);
     });
 });

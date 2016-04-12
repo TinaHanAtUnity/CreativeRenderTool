@@ -1,9 +1,7 @@
-import { Observable } from 'Utilities/Observable';
 import { Template } from 'Utilities/Template';
-
 import { IViewBinding } from 'IViewBinding';
 
-export class View extends Observable {
+export class View {
 
     protected _template: Template;
     protected _templateData: { [key: string]: any; };
@@ -13,7 +11,6 @@ export class View extends Observable {
     protected _id: string;
 
     constructor(id: string) {
-        super();
         this._id = id;
     }
 

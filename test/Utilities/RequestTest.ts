@@ -1,13 +1,16 @@
-import { Request } from '../../src/ts/Utilities/Request';
-import { TestBridge, TestBridgeApi } from '../TestBridge';
-
 import 'mocha';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-class Url extends TestBridgeApi {
+import { RequestApi } from '../../src/ts/Native/Api/Request';
+import { Request } from '../../src/ts/Utilities/Request';
+import { ResolveApi } from '../../src/ts/Native/Api/Resolve';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+
+class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
 
-    public get(id: string, url: string, headers: [string, string][]): any[] {
+    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -28,10 +31,10 @@ class Url extends TestBridgeApi {
             this._retryCount++;
         }
 
-        return ['OK'];
+        return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body: string, headers: [string, string][]): any[] {
+    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -54,43 +57,57 @@ class Url extends TestBridgeApi {
             this._retryCount++;
         }
 
-        return ['OK'];
-    }
-
-    public resolve(id: string, host: string): any[] {
-        if(host.indexOf('fail') !== -1) {
-            setTimeout(() => {
-                this.getNativeBridge().handleEvent(['RESOLVE_FAILED', id, host, 'Error', 'Error message']);
-            }, 0);
-        } else {
-            setTimeout(() => {
-                this.getNativeBridge().handleEvent(['RESOLVE_RESOLVED', id, host, '1.2.3.4']);
-            }, 0);
-        }
-
-        return ['OK', id];
+        return Promise.resolve(id);
     }
 
     private sendSuccessResponse(id: string, url: string, body: string, headers: [string, string][]) {
-        setTimeout(() => { this.getNativeBridge().handleEvent(['URL_COMPLETE', id, url, body, 200, headers]); }, 0);
+        setTimeout(() => { this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, 200, headers]); }, 0);
     }
 
     private sendFailResponse(id: string, url: string, message: string) {
-        setTimeout(() => { this.getNativeBridge().handleEvent(['URL_FAILED', id, url, message]); }, 0);
+        setTimeout(() => { this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, message]); }, 0);
     }
 }
 
+class TestResolveApi extends ResolveApi {
+
+    public resolve(id: string, host: string): Promise<string> {
+        if(host.indexOf('fail') !== -1) {
+            setTimeout(() => {
+                this._nativeBridge.handleEvent(['RESOLVE', 'FAILED', id, host, 'Error', 'Error message']);
+            }, 0);
+        } else {
+            setTimeout(() => {
+                this._nativeBridge.handleEvent(['RESOLVE', 'COMPLETE', id, host, '1.2.3.4']);
+            }, 0);
+        }
+        return Promise.resolve(id);
+    }
+
+}
+
 describe('RequestTest', () => {
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
+    let nativeBridge, requestApi, resolveApi, request;
+
+    beforeEach(() => {
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
+
+        requestApi = NativeBridge.Request = new TestRequestApi(nativeBridge);
+        resolveApi = NativeBridge.Resolve = new TestResolveApi(nativeBridge);
+        request = new Request();
+    });
+
     it('Request get without headers (expect success)', function(done: MochaDone): void {
         let successUrl: string = 'http://www.example.org/success';
         let successMessage: string = 'Success response';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.get(successUrl).then(([response]) => {
-            assert.equal(successMessage, response, 'Did not receive correct response');
+        request.get(successUrl).then((response) => {
+            assert.equal(successMessage, response.response, 'Did not receive correct response');
             done();
         }).catch((error) => {
             done(new Error('Get without headers failed: ' + error));
@@ -101,11 +118,7 @@ describe('RequestTest', () => {
         let failUrl: string = 'http://www.example.org/fail';
         let failMessage: string = 'Fail response';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.get(failUrl).then(([response]) => {
+        request.get(failUrl).then(response => {
             done(new Error('Request should have failed but got response: ' + response));
         }).catch((error) => {
             assert.equal(failMessage, error, 'Did not receive correct error message');
@@ -118,12 +131,8 @@ describe('RequestTest', () => {
         let headerField: string = 'X-Test';
         let headerMessage: string = 'Header message';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.get(headerUrl, [[headerField, headerMessage]]).then(([response]) => {
-            assert.equal(headerMessage, response, 'Did not get correctly forwarded header response');
+        request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
+            assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
             done();
         }).catch((error) => {
             done(new Error('Get with header forwarding failed: ' + error));
@@ -136,12 +145,8 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.get(retryUrl, [], retryAttempts, retryDelay).then(([response]) => {
-            assert.equal(successMessage, response, 'Did not get success message when retrying');
+        request.get(retryUrl, [], retryAttempts, retryDelay).then(response => {
+            assert.equal(successMessage, response.response, 'Did not get success message when retrying');
             done();
         }).catch((error) => {
             done(new Error('Get with retrying failed: ' + error));
@@ -152,12 +157,8 @@ describe('RequestTest', () => {
         let successUrl: string = 'http://www.example.org/success';
         let successMessage: string = 'Success response';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.post(successUrl, 'Test').then(([response]) => {
-            assert.equal(successMessage, response, 'Did not receive correct response');
+        request.post(successUrl, 'Test').then(response => {
+            assert.equal(successMessage, response.response, 'Did not receive correct response');
             done();
         }).catch((error) => {
             done(new Error('Post without headers failed: ' + error));
@@ -168,11 +169,7 @@ describe('RequestTest', () => {
         let failUrl: string = 'http://www.example.org/fail';
         let failMessage: string = 'Fail response';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.post(failUrl).then(([response]) => {
+        request.post(failUrl, 'Test').then(response => {
             done(new Error('Request should have failed but got response: ' + response));
         }).catch((error) => {
             assert.equal(failMessage, error, 'Did not receive correct error message');
@@ -185,12 +182,8 @@ describe('RequestTest', () => {
         let headerField: string = 'X-Test';
         let headerMessage: string = 'Header message';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(([response]) => {
-            assert.equal(headerMessage, response, 'Did not get correctly forwarded header response');
+        request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
+            assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
             done();
         }).catch((error) => {
             done(new Error('Post with header forwarding failed: ' + error));
@@ -201,12 +194,8 @@ describe('RequestTest', () => {
         let testUrl: string = 'http://www.example.org/forwardbody';
         let bodyMessage: string = 'Body message';
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.post(testUrl, bodyMessage).then(([response]) => {
-            assert.equal(bodyMessage, response, 'Did not get correctly forwarded body');
+        request.post(testUrl, bodyMessage).then(response => {
+            assert.equal(bodyMessage, response.response, 'Did not get correctly forwarded body');
             done();
         }).catch((error) => {
             done(new Error('Post with body forwarding failed: ' + error));
@@ -219,12 +208,8 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
-
-        request.post(retryUrl, 'Test', [], retryAttempts, retryDelay).then(([response]) => {
-            assert.equal(successMessage, response, 'Did not get success message when retrying');
+        request.post(retryUrl, 'Test', [], retryAttempts, retryDelay).then(response => {
+            assert.equal(successMessage, response.response, 'Did not get success message when retrying');
             done();
         }).catch((error) => {
             done(new Error('Post with retrying failed: ' + error));
@@ -234,10 +219,6 @@ describe('RequestTest', () => {
     it('Resolve host with success', () => {
         let testHost: string = 'www.example.net';
         let testIp: string = '1.2.3.4';
-
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
 
         return request.resolve(testHost).then(([host, ip]) => {
             assert.equal(testHost, host, 'Hostname does not match the request');
@@ -249,10 +230,6 @@ describe('RequestTest', () => {
         let failHost: string = 'www.fail.com';
         let expectedError: string = 'Error';
         let expectedErrorMsg: string = 'Error message';
-
-        let testBridge: TestBridge = new TestBridge();
-        testBridge.setApi('Url', new Url());
-        let request: Request = new Request(testBridge.getNativeBridge());
 
         return request.resolve(failHost).then(() => {
             assert.fail('Failed resolve must not be successful');

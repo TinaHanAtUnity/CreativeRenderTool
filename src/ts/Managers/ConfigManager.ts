@@ -17,15 +17,13 @@ export class ConfigManager {
     }
 
     public fetch(): Promise<Configuration> {
-        return new Promise((resolve, reject) => {
-            this._request.get(this.createConfigUrl()).then(([response]) => {
-                try {
-                    let configJson = JSON.parse(response);
-                    resolve(new Configuration(configJson));
-                } catch (e) {
-                    reject(e);
-                }
-            });
+        return this._request.get(this.createConfigUrl()).then(response => {
+            try {
+                let configJson = JSON.parse(response.response);
+                return new Configuration(configJson);
+            } catch(error) {
+                throw new Error(error);
+            }
         });
     }
 

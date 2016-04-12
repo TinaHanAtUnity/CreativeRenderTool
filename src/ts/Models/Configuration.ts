@@ -1,6 +1,5 @@
 import { Placement } from 'Models/Placement';
 
-
 export class Configuration {
 
     private _enabled: boolean;

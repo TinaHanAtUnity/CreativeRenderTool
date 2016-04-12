@@ -1,14 +1,10 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
+import { NativeBridge } from 'Native/NativeBridge';
 import { StreamType } from 'Constants/Android/StreamType';
 import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
-
-enum StorageType {
-    EXTERNAL,
-    INTERNAL
-}
+import { StorageType } from 'Native/Api/DeviceInfo';
 
 export class DeviceInfo extends Model {
 
@@ -20,7 +16,7 @@ export class DeviceInfo extends Model {
     private _manufacturer: string;
     private _model: string;
     private _connectionType: string;
-    private _networkType: string;
+    private _networkType: number;
     private _screenLayout: number;
     private _screenDensity: number;
     private _screenWidth: number;
@@ -43,45 +39,43 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
 
-    public fetch(platform: Platform, nativeBridge: NativeBridge): Promise<any[]> {
-        let className: string = 'DeviceInfo';
+    public fetch(platform: Platform): Promise<any[]> {
         let promises = [];
-        let batch: BatchInvocation = new BatchInvocation(nativeBridge);
 
         if(platform === Platform.ANDROID) {
-            promises.push(batch.queue(className, 'getAndroidId').then(([androidId]) => this._androidId = androidId));
-            promises.push(batch.queue(className, 'getScreenLayout').then(([screenLayout]) => this._screenLayout = screenLayout));
+            NativeBridge.DeviceInfo.getAndroidId().then(androidId => this._androidId = androidId);
+            NativeBridge.DeviceInfo.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout);
         }
 
-        promises.push(batch.queue(className, 'getAdvertisingTrackingId').then(([advertisingIdentifier]) => this._advertisingIdentifier = advertisingIdentifier));
-        promises.push(batch.queue(className, 'getLimitAdTrackingFlag').then(([limitAdTracking]) => this._limitAdTracking = limitAdTracking));
-        promises.push(batch.queue(className, 'getApiLevel').then(([apiLevel]) => this._apiLevel = apiLevel));
-        promises.push(batch.queue(className, 'getOsVersion').then(([osVersion]) => this._osVersion = osVersion));
-        promises.push(batch.queue(className, 'getManufacturer').then(([manufacturer]) => this._manufacturer = manufacturer));
-        promises.push(batch.queue(className, 'getModel').then(([model]) => this._model = model));
-        promises.push(batch.queue(className, 'getConnectionType').then(([connectionType]) => this._connectionType = connectionType));
-        promises.push(batch.queue(className, 'getNetworkType').then(([networkType]) => this._networkType = networkType));
-        promises.push(batch.queue(className, 'getScreenDensity').then(([screenDensity]) => this._screenDensity = screenDensity));
-        promises.push(batch.queue(className, 'getScreenWidth').then(([screenWidth]) => this._screenWidth = screenWidth));
-        promises.push(batch.queue(className, 'getScreenHeight').then(([screenHeight]) => this._screenHeight = screenHeight));
-        promises.push(batch.queue(className, 'getNetworkOperator').then(([networkOperator]) => this._networkOperator = networkOperator));
-        promises.push(batch.queue(className, 'getNetworkOperatorName').then(([networkOperatorName]) => this._networkOperatorName = networkOperatorName));
-        promises.push(batch.queue(className, 'getHeadset').then(([headset]) => this._headset = headset));
-        promises.push(batch.queue(className, 'getTimeZone', [false]).then(([timeZone]) => this._timeZone = timeZone));
-        promises.push(batch.queue(className, 'getRingerMode').then(([ringerMode]) => this._ringerMode = ringerMode));
-        promises.push(batch.queue(className, 'getSystemLanguage').then(([language]) => this._language = language));
-        promises.push(batch.queue(className, 'getDeviceVolume', [StreamType.STREAM_SYSTEM]).then(([volume]) => this._volume = volume));
-        promises.push(batch.queue(className, 'getScreenBrightness').then(([screenBrightness]) => this._screenBrightness = screenBrightness));
-        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.EXTERNAL]]).then(([freeExternalSpace]) => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined));
-        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.EXTERNAL]]).then(([totalExternalSpace]) => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined));
-        promises.push(batch.queue(className, 'getFreeSpace', [StorageType[StorageType.INTERNAL]]).then(([freeInternalSpace]) => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined));
-        promises.push(batch.queue(className, 'getTotalSpace', [StorageType[StorageType.INTERNAL]]).then(([totalInternalSpace]) => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined));
-        promises.push(batch.queue(className, 'getBatteryLevel').then(([batteryLevel]) => this._batteryLevel = batteryLevel));
-        promises.push(batch.queue(className, 'getBatteryStatus').then(([batteryStatus]) => this._batteryStatus = batteryStatus));
-        promises.push(batch.queue(className, 'getFreeMemory').then(([freeMemory]) => this._freeMemory = freeMemory));
-        promises.push(batch.queue(className, 'getTotalMemory').then(([totalMemory]) => this._totalMemory = totalMemory));
-        promises.push(batch.queue(className, 'isRooted').then(([rooted]) => this._rooted = rooted));
-        nativeBridge.invokeBatch(batch);
+        NativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier);
+        NativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking);
+        NativeBridge.DeviceInfo.getApiLevel().then(apiLevel => this._apiLevel = apiLevel);
+        NativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion);
+        NativeBridge.DeviceInfo.getManufacturer().then(manufacturer => this._manufacturer = manufacturer);
+        NativeBridge.DeviceInfo.getModel().then(model => this._model = model);
+        NativeBridge.DeviceInfo.getConnectionType().then(connectionType => this._connectionType = connectionType);
+        NativeBridge.DeviceInfo.getNetworkType().then(networkType => this._networkType = networkType);
+        NativeBridge.DeviceInfo.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity);
+        NativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth);
+        NativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight);
+        NativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => this._networkOperator = networkOperator);
+        NativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => this._networkOperatorName = networkOperatorName);
+        NativeBridge.DeviceInfo.getHeadset().then(headset => this._headset = headset);
+        NativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone);
+        NativeBridge.DeviceInfo.getRingerMode().then(ringerMode => this._ringerMode = ringerMode);
+        NativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language);
+        NativeBridge.DeviceInfo.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => this._volume = volume);
+        NativeBridge.DeviceInfo.getScreenBrightness().then(screenBrightness => this._screenBrightness = screenBrightness);
+        NativeBridge.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then(freeExternalSpace => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined);
+        NativeBridge.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined);
+        NativeBridge.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined);
+        NativeBridge.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined);
+        NativeBridge.DeviceInfo.getBatteryLevel().then(batteryLevel => this._batteryLevel = batteryLevel);
+        NativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => this._batteryStatus = batteryStatus);
+        NativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => this._freeMemory = freeMemory);
+        NativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory);
+        NativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted);
+
         return Promise.all(promises);
     }
 
@@ -109,7 +103,7 @@ export class DeviceInfo extends Model {
         return this._model;
     }
 
-    public getNetworkType(): string {
+    public getNetworkType(): number {
         return this._networkType;
     }
 

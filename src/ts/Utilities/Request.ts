@@ -1,4 +1,4 @@
-import { NativeBridge } from 'NativeBridge';
+import { NativeBridge } from 'Native/NativeBridge';
 
 const enum RequestStatus {
     COMPLETE,
@@ -10,35 +10,43 @@ class NativeRequest {
     public failedCallback: Function;
     public id: string;
     public method: string;
-    public arguments: any[];
+    public url: string;
+    public data: string;
+    public headers: [string, string][];
     public retries: number;
     public retryDelay: number;
 }
 
+export class NativeResponse {
+    public id: string;
+    public url: string;
+    public response: string;
+    public responseCode: string;
+    public headers: string;
+}
+
 export class Request {
-    private _nativeBridge: NativeBridge;
 
     private _resolveCallbacks: Object = {};
 
     private _requests: NativeRequest[] = [];
     private _requestId: number = 1;
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
-        this._nativeBridge.subscribe('URL_COMPLETE', this.onUrlComplete.bind(this));
-        this._nativeBridge.subscribe('URL_FAILED', this.onUrlFailed.bind(this));
-        this._nativeBridge.subscribe('RESOLVE_RESOLVED', this.onResolveComplete.bind(this));
-        this._nativeBridge.subscribe('RESOLVE_FAILED', this.onResolveFailed.bind(this));
+    constructor() {
+        NativeBridge.Request.onComplete.subscribe(this.onUrlComplete.bind(this));
+        NativeBridge.Request.onFailed.subscribe(this.onUrlFailed.bind(this));
+        NativeBridge.Resolve.onComplete.subscribe(this.onResolveComplete.bind(this));
+        NativeBridge.Resolve.onFailed.subscribe(this.onResolveFailed.bind(this));
     }
 
-    public resolve(host: string): Promise<any[]> {
+    public resolve(host: string): Promise<[string, string, string]> {
         let id: string = this.getRequestId();
         let promise = this.registerCallback(this._resolveCallbacks, id);
-        this._nativeBridge.invoke('Url', 'resolve', [id, host]);
+        NativeBridge.Resolve.resolve(id, host);
         return promise;
     }
 
-    public get(url: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<any[]> {
+    public get(url: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<NativeResponse> {
         if(typeof headers === 'undefined') {
             headers = [];
         }
@@ -55,16 +63,18 @@ export class Request {
         let nativeRequest: NativeRequest = new NativeRequest();
         nativeRequest.id = id;
         nativeRequest.method = 'get';
-        nativeRequest.arguments = [id, url, headers];
+        nativeRequest.url = url;
+        nativeRequest.headers = headers;
         nativeRequest.retries = retries;
         nativeRequest.retryDelay = retryDelay;
 
         let promise = this.registerRequest(nativeRequest);
-        this.invokeRequest(nativeRequest);
-        return promise;
+        return this.invokeRequest(nativeRequest).then(() => {
+            return promise;
+        });
     }
 
-    public post(url: string, data?: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<any[]> {
+    public post(url: string, data?: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<NativeResponse> {
         if(typeof data === 'undefined') {
             data = '';
         }
@@ -86,7 +96,9 @@ export class Request {
         let nativeRequest: NativeRequest = new NativeRequest();
         nativeRequest.id = id;
         nativeRequest.method = 'post';
-        nativeRequest.arguments = [id, url, data, headers];
+        nativeRequest.url = url;
+        nativeRequest.data = data;
+        nativeRequest.headers = headers;
         nativeRequest.retries = retries;
         nativeRequest.retryDelay = retryDelay;
 
@@ -95,8 +107,8 @@ export class Request {
         return promise;
     }
 
-    private registerCallback(callbacks, id): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
+    private registerCallback(callbacks, id): Promise<[string, string, string]> {
+        return new Promise<[string, string, string]>((resolve, reject) => {
             let callbackObject = {};
             callbackObject[RequestStatus.COMPLETE] = resolve;
             callbackObject[RequestStatus.FAILED] = reject;
@@ -110,18 +122,21 @@ export class Request {
         });
     }
 
-    private registerRequest(nativeRequest: NativeRequest): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
+    private registerRequest(nativeRequest: NativeRequest): Promise<NativeResponse> {
+        return new Promise<NativeResponse>((resolve, reject) => {
             nativeRequest.successCallback = resolve;
             nativeRequest.failedCallback = reject;
-
             this._requests[nativeRequest.id] = nativeRequest;
         });
     }
 
     private onUrlComplete(id: string, url: string, response: string): void {
         if(this._requests[id]) {
-            this._requests[id].successCallback([response]);
+            let nativeResponse = new NativeResponse();
+            nativeResponse.id = id;
+            nativeResponse.url = url;
+            nativeResponse.response = response;
+            this._requests[id].successCallback(nativeResponse);
             delete this._requests[id];
         }
     }
@@ -138,8 +153,12 @@ export class Request {
         }
     }
 
-    private invokeRequest(nativeRequest: NativeRequest) {
-        this._nativeBridge.invoke('Url', nativeRequest.method, nativeRequest.arguments);
+    private invokeRequest(nativeRequest: NativeRequest): Promise<string> {
+        if(nativeRequest.method === 'get') {
+            return NativeBridge.Request.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
+        } else if(nativeRequest.method === 'post') {
+            return NativeBridge.Request.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
+        }
     }
 
     private onResolveComplete(id: string, host: string, ip: string): void {

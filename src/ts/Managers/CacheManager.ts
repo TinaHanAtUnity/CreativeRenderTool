@@ -1,31 +1,22 @@
-import { NativeBridge, BatchInvocation } from 'NativeBridge';
+import { NativeBridge } from 'Native/NativeBridge';
+import { IFileInfo } from 'Native/Api/Cache';
 
 enum CacheStatus {
     OK,
     ERROR
 }
 
-interface IFileInfo {
-    id: string;
-    found: boolean;
-    size: number;
-    mtime: number;
-}
-
 export class CacheManager {
 
-    private _nativeBridge: NativeBridge;
     private _urlCallbacks: Object = {};
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
-        nativeBridge.subscribe('CACHE_DOWNLOAD_END', this.onDownloadEnd.bind(this));
+    constructor() {
+        NativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
-        let batch = new BatchInvocation(this._nativeBridge);
         let promises = urls.map((url: string) => {
-            return batch.queue('Cache', 'download', [url, false]).then(() => {
+            return NativeBridge.Cache.download(url, false).then(() => {
                 return this.registerCallback(url);
             }).catch((error) => {
                 let errorCode = error.shift();
@@ -41,8 +32,7 @@ export class CacheManager {
                 }
             });
         });
-        this._nativeBridge.invokeBatch(batch);
-        return Promise.all(promises).then((urlPairs) => {
+        return Promise.all(promises).then(urlPairs => {
             let urlMap = {};
             urlPairs.forEach(([url, fileUrl]) => {
                 urlMap[url] = fileUrl;
@@ -51,13 +41,13 @@ export class CacheManager {
         });
     }
 
-    public getFileUrl(url: string): Promise<any[]> {
-        return this._nativeBridge.invoke('Cache', 'getFileUrl', [url]).then(([fileUrl]) => [url, fileUrl]);
+    public getFileUrl(url: string): Promise<[string, string]> {
+        return NativeBridge.Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
     }
 
     public cleanCache(): Promise<any[]> {
-        return this._nativeBridge.invoke('Cache', 'getFiles').then(([files]) => {
-            if(!files) {
+        return NativeBridge.Cache.getFiles().then(files => {
+            if(!files || !files.length) {
                 return Promise.resolve();
             }
 
@@ -82,20 +72,10 @@ export class CacheManager {
                 }
             }
 
-            if(deleteFiles.length > 0) {
-                let promises = [];
-                let deleteBatch: BatchInvocation = new BatchInvocation(this._nativeBridge);
-                promises.push(deleteBatch.queue('Sdk', 'logInfo', ['Unity Ads cache: Deleting ' + deleteFiles.length + ' old files']));
-
-                deleteFiles.forEach((file: string) => {
-                    promises.push(deleteBatch.queue('Cache', 'deleteFile', [file]));
-                });
-
-                this._nativeBridge.invokeBatch(deleteBatch);
-                return Promise.all(promises);
-            } else {
-                return Promise.resolve();
-            }
+            return Promise.all(deleteFiles.map(file => {
+                NativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
+                return NativeBridge.Cache.deleteFile(file);
+            }));
         });
     }
 
