@@ -118,11 +118,11 @@ export class DeviceInfoApi extends NativeApi {
     }
 
     public getFreeSpace (storageType: StorageType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace', [storageType]);
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace', [StorageType[storageType]]);
     }
 
     public getTotalSpace (storageType: StorageType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [storageType]);
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [StorageType[storageType]]);
     }
 
     public getBatteryLevel(): Promise<number> {
