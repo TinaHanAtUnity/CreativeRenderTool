@@ -26,7 +26,7 @@ let nativeBridge: NativeBridge = null;
 if(window && window.webviewbridge) {
     nativeBridge = new NativeBridge(window.webviewbridge);
 } else {
-    nativeBridge = new NativeBridge(new IosWebViewBridge());
+    nativeBridge = new NativeBridge(new IosWebViewBridge(), false);
 }
 window['nativebridge'] = nativeBridge;
 
