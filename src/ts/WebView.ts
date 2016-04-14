@@ -18,6 +18,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { PlayerMetaData } from 'Metadata/PlayerMetaData';
+import { Platform } from 'Constants/Platform';
 
 export class WebView {
 
@@ -57,6 +58,16 @@ export class WebView {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
         }).then(() => {
+            if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+                document.body.classList.add('android');
+            } else if(this._clientInfo.getPlatform() === Platform.IOS) {
+                let model = this._deviceInfo.getModel();
+                if(model.match(/iphone/i)) {
+                    document.body.classList.add('iphone');
+                } else if(model.match(/ipad/i)) {
+                    document.body.classList.add('ipad');
+                }
+            }
             return this._cacheManager.cleanCache();
         }).then(() => {
             let configManager = new ConfigManager(this._request, this._clientInfo);
