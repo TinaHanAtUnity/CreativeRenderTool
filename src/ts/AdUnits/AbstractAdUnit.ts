@@ -5,7 +5,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SessionManager } from 'Managers/SessionManager';
-import {NativeBridge} from "../Native/NativeBridge";
+import { NativeBridge } from 'Native/NativeBridge';
 
 export abstract class AbstractAdUnit {
 

@@ -8,7 +8,7 @@ import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { EventManager } from '../../src/ts/Managers/EventManager';
-import {NativeBridge} from "../../src/ts/Native/NativeBridge";
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
 describe('DiagnosticsTest', () => {
     let handleInvocation = sinon.spy();
@@ -20,8 +20,8 @@ describe('DiagnosticsTest', () => {
             handleInvocation,
             handleCallback
         }, false);
-    });    
-    
+    });
+
     it('should generate proper request', () => {
         let request = new Request(nativeBridge);
         let eventManager = new EventManager(nativeBridge, request);

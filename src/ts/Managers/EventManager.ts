@@ -3,7 +3,7 @@ import { Request, NativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 
 export class EventManager {
-    
+
     private _nativeBridge: NativeBridge;
     private _request: Request;
 

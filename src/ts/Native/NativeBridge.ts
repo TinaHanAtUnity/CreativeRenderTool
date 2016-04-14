@@ -26,8 +26,6 @@ export interface INativeCallback {
     (status: CallbackStatus, ...parameters: any[]): void;
 }
 
-let instance: NativeBridge = null;
-
 export class NativeBridge implements INativeBridge {
 
     public static ApiPackageName: string = 'com.unity3d.ads.api';
