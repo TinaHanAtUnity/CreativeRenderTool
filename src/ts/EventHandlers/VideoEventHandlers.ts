@@ -6,47 +6,47 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
         adUnit.getOverlay().setVideoDuration(duration);
-        NativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
+        nativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
             if (adUnit.getVideoPosition() > 0) {
-                NativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
-                    NativeBridge.VideoPlayer.play();
+                nativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
+                    nativeBridge.VideoPlayer.play();
                 });
             } else {
-                NativeBridge.VideoPlayer.play();
+                nativeBridge.VideoPlayer.play();
             }
         });
     }
 
-    public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
         if (position > 0) {
             adUnit.setVideoPosition(position);
         }
         adUnit.getOverlay().setVideoProgress(position);
     }
 
-    public static onVideoStart(adUnit: VideoAdUnit): void {
+    public static onVideoStart(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
         adUnit.getSession().sendStart(adUnit);
 
         if (adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
-            NativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
+            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
         }
 
         adUnit.newWatch();
     }
 
-    public static onVideoCompleted(adUnit: VideoAdUnit, url: string): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.getSession().sendView(adUnit);
-        NativeBridge.AdUnit.setViews(['webview']);
+        nativeBridge.AdUnit.setViews(['webview']);
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
-        NativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
+        nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if (integrationTest) {
-                NativeBridge.getInstance().rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+                nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
             }
         });
     }

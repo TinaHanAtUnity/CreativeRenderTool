@@ -5,11 +5,14 @@ import { Observable0 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SessionManager } from 'Managers/SessionManager';
+import {NativeBridge} from "../Native/NativeBridge";
 
 export abstract class AbstractAdUnit {
 
     public onStart: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
+
+    protected _nativeBridge: NativeBridge;
 
     protected _session;
     protected _placement;
@@ -19,7 +22,8 @@ export abstract class AbstractAdUnit {
 
     protected _showing: boolean = false;
 
-    constructor(session: SessionManager, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
+        this._nativeBridge = nativeBridge;
         this._session = session;
         this._placement = placement;
         this._campaign = campaign;

@@ -97,9 +97,9 @@ describe('RequestTest', () => {
             handleCallback
         });
 
-        requestApi = NativeBridge.Request = new TestRequestApi(nativeBridge);
-        resolveApi = NativeBridge.Resolve = new TestResolveApi(nativeBridge);
-        request = new Request();
+        requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
+        resolveApi = nativeBridge.Resolve = new TestResolveApi(nativeBridge);
+        request = new Request(nativeBridge);
     });
 
     it('Request get without headers (expect success)', function(done: MochaDone): void {

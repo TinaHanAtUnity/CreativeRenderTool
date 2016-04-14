@@ -26,12 +26,12 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPlayObserver;
     private _onCompletedObserver;
 
-    constructor(session: SessionManager, placement: Placement, campaign: Campaign) {
-        super(session, placement, campaign);
+    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
+        super(nativeBridge, session, placement, campaign);
 
-        NativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
-        NativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
-        NativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
+        this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
+        this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
+        this._nativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
 
         this._videoPosition = 0;
         this._videoActive = true;
@@ -45,25 +45,25 @@ export class VideoAdUnit extends AbstractAdUnit {
     public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
-        return NativeBridge.AdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+        return this._nativeBridge.AdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
     }
 
     public hide(): Promise<void> {
         if(this.isVideoActive()) {
-            NativeBridge.VideoPlayer.stop();
+            this._nativeBridge.VideoPlayer.stop();
         }
 
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
 
-        NativeBridge.VideoPlayer.onPrepared.unsubscribe(this._onPreparedObserver);
-        NativeBridge.VideoPlayer.onProgress.unsubscribe(this._onProgressObserver);
-        NativeBridge.VideoPlayer.onPlay.unsubscribe(this._onPlayObserver);
-        NativeBridge.VideoPlayer.onCompleted.unsubscribe(this._onCompletedObserver);
+        this._nativeBridge.VideoPlayer.onPrepared.unsubscribe(this._onPreparedObserver);
+        this._nativeBridge.VideoPlayer.onProgress.unsubscribe(this._onProgressObserver);
+        this._nativeBridge.VideoPlayer.onPlay.unsubscribe(this._onPlayObserver);
+        this._nativeBridge.VideoPlayer.onCompleted.unsubscribe(this._onCompletedObserver);
 
-        NativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
-        return NativeBridge.AdUnit.close().then(() => {
+        this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
+        return this._nativeBridge.AdUnit.close().then(() => {
             this._showing = false;
             this.onClose.trigger();
         });
@@ -120,7 +120,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private onResume(): void {
         if(this._showing && this.isVideoActive()) {
-            NativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
@@ -142,10 +142,10 @@ export class VideoAdUnit extends AbstractAdUnit {
      PRIVATES
      */
     private prepareVideoPlayer() {
-        this._onPreparedObserver = NativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this, duration, width, height));
-        this._onProgressObserver = NativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this, position));
-        this._onPlayObserver = NativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this));
-        this._onCompletedObserver = NativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this, url));
+        this._onPreparedObserver = this._nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this._nativeBridge, this, duration, width, height));
+        this._onProgressObserver = this._nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this._nativeBridge, this, position));
+        this._onPlayObserver = this._nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this._nativeBridge, this));
+        this._onCompletedObserver = this._nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this._nativeBridge, this, url));
     }
 
     private prepareOverlay() {
@@ -153,8 +153,8 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         overlay.render();
         document.body.appendChild(overlay.container());
-        overlay.onSkip.subscribe(() => OverlayEventHandlers.onSkip(this));
-        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(this, muted));
+        overlay.onSkip.subscribe(() => OverlayEventHandlers.onSkip(this._nativeBridge, this));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(this._nativeBridge, this, muted));
 
         if(!this._placement.allowSkip()) {
             overlay.setSkipEnabled(false);
@@ -172,8 +172,8 @@ export class VideoAdUnit extends AbstractAdUnit {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(this));
-        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this));
+        endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(this._nativeBridge, this));
+        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this._nativeBridge, this));
         endScreen.onClose.subscribe(() => this.hide());
 
         this._endScreen = endScreen;

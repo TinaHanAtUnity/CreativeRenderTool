@@ -91,8 +91,8 @@ describe('CacheManagerTest', () => {
             handleCallback
         });
 
-        cacheApi = NativeBridge.Cache = new TestCacheApi(nativeBridge);
-        cacheManager = new CacheManager();
+        cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
+        cacheManager = new CacheManager(nativeBridge);
     });
 
     it('Get local file url for cached file', () => {

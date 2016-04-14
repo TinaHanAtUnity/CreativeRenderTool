@@ -8,15 +8,17 @@ enum CacheStatus {
 
 export class CacheManager {
 
+    private _nativeBridge: NativeBridge;
     private _urlCallbacks: Object = {};
 
-    constructor() {
-        NativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
+    constructor(nativeBridge: NativeBridge) {
+        this._nativeBridge = nativeBridge;
+        this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
         let promises = urls.map((url: string) => {
-            return NativeBridge.Cache.download(url, false).then(() => {
+            return this._nativeBridge.Cache.download(url, false).then(() => {
                 return this.registerCallback(url);
             }).catch((error) => {
                 let errorCode = error.shift();
@@ -42,11 +44,11 @@ export class CacheManager {
     }
 
     public getFileUrl(url: string): Promise<[string, string]> {
-        return NativeBridge.Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
+        return this._nativeBridge.Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
     }
 
     public cleanCache(): Promise<any[]> {
-        return NativeBridge.Cache.getFiles().then(files => {
+        return this._nativeBridge.Cache.getFiles().then(files => {
             if(!files || !files.length) {
                 return Promise.resolve();
             }
@@ -73,8 +75,8 @@ export class CacheManager {
             }
 
             return Promise.all(deleteFiles.map(file => {
-                NativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
-                return NativeBridge.Cache.deleteFile(file);
+                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
+                return this._nativeBridge.Cache.deleteFile(file);
             }));
         });
     }

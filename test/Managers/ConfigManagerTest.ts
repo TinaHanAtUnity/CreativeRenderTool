@@ -46,7 +46,9 @@ describe('ConfigManagerTest', () => {
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            configPromise = Promise.resolve(['{bad json here,']);
+            let nativeResponse = new NativeResponse();
+            nativeResponse.response = '{bad json here,';
+            configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
                 get: sinon.mock().returns(configPromise)

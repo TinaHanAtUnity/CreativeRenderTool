@@ -5,18 +5,18 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(adUnit: VideoAdUnit): void {
-      NativeBridge.VideoPlayer.pause();
+  public static onSkip(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+      nativeBridge.VideoPlayer.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
       adUnit.getSession().sendSkip(adUnit);
-      NativeBridge.AdUnit.setViews(['webview']);
+      nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();
   }
 
-  public static onMute(adUnit: VideoAdUnit, muted: boolean): void {
-      NativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
+  public static onMute(nativeBridge: NativeBridge, adUnit: VideoAdUnit, muted: boolean): void {
+      nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
   }
 
 }
