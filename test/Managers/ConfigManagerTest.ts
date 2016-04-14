@@ -4,6 +4,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
+import { NativeResponse } from '../../src/ts/Utilities/Request';
 
 describe('ConfigManagerTest', () => {
 
@@ -21,7 +22,9 @@ describe('ConfigManagerTest', () => {
     describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            configPromise = Promise.resolve(['{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }']);
+            let nativeResponse = new NativeResponse();
+            nativeResponse.response = '{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }';
+            configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
                 get: sinon.mock().returns(configPromise)
@@ -43,7 +46,9 @@ describe('ConfigManagerTest', () => {
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            configPromise = Promise.resolve(['{bad json here,']);
+            let nativeResponse = new NativeResponse();
+            nativeResponse.response = '{bad json here,';
+            configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
                 get: sinon.mock().returns(configPromise)

@@ -9,41 +9,29 @@ describe('ConnectivityApi', () => {
     let handleCallback = sinon.spy();
     let nativeBridge;
 
-    before(() => {
+    beforeEach(() => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
         }, false);
     });
 
-    describe('when calling setListeningStatus', () => {
-
-        it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
-            NativeBridge.Connectivity.setListeningStatus(true);
-            sinon.assert.calledWith(handleInvocation, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
-        });
-
+    it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
+        nativeBridge.Connectivity.setListeningStatus(true);
+        sinon.assert.calledWith(handleInvocation, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
     });
 
-    describe('when nativeBridge receives CONNECTIVITY_CONNECTED', () => {
-
-        it('should trigger onConnected', () => {
-            let spy = sinon.spy();
-            NativeBridge.Connectivity.onConnected.subscribe(spy);
-            NativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-            sinon.assert.calledWith(spy, true, 0);
-        });
-
+    it('should trigger onConnected', () => {
+        let spy = sinon.spy();
+        nativeBridge.Connectivity.onConnected.subscribe(spy);
+        nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
+        sinon.assert.calledWith(spy, true, 0);
     });
 
-    describe('when nativeBridge receives an invalid event', () => {
-
-        it('should throw', () => {
-            assert.throws(() => {
-                NativeBridge.Connectivity.handleEvent('INVALID', []);
-            });
+    it('should throw', () => {
+        assert.throws(() => {
+            nativeBridge.Connectivity.handleEvent('INVALID', []);
         });
-
     });
 
 });

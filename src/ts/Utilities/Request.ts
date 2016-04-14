@@ -27,22 +27,25 @@ export class NativeResponse {
 
 export class Request {
 
+    private _nativeBridge: NativeBridge;
+
     private _resolveCallbacks: Object = {};
 
     private _requests: NativeRequest[] = [];
     private _requestId: number = 1;
 
-    constructor() {
-        NativeBridge.Request.onComplete.subscribe(this.onUrlComplete.bind(this));
-        NativeBridge.Request.onFailed.subscribe(this.onUrlFailed.bind(this));
-        NativeBridge.Resolve.onComplete.subscribe(this.onResolveComplete.bind(this));
-        NativeBridge.Resolve.onFailed.subscribe(this.onResolveFailed.bind(this));
+    constructor(nativeBridge: NativeBridge) {
+        this._nativeBridge = nativeBridge;
+        this._nativeBridge.Request.onComplete.subscribe(this.onUrlComplete.bind(this));
+        this._nativeBridge.Request.onFailed.subscribe(this.onUrlFailed.bind(this));
+        this._nativeBridge.Resolve.onComplete.subscribe(this.onResolveComplete.bind(this));
+        this._nativeBridge.Resolve.onFailed.subscribe(this.onResolveFailed.bind(this));
     }
 
     public resolve(host: string): Promise<[string, string, string]> {
         let id: string = this.getRequestId();
         let promise = this.registerCallback(this._resolveCallbacks, id);
-        NativeBridge.Resolve.resolve(id, host);
+        this._nativeBridge.Resolve.resolve(id, host);
         return promise;
     }
 
@@ -155,9 +158,9 @@ export class Request {
 
     private invokeRequest(nativeRequest: NativeRequest): Promise<string> {
         if(nativeRequest.method === 'get') {
-            return NativeBridge.Request.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
+            return this._nativeBridge.Request.get(nativeRequest.id, nativeRequest.url, nativeRequest.headers);
         } else if(nativeRequest.method === 'post') {
-            return NativeBridge.Request.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
+            return this._nativeBridge.Request.post(nativeRequest.id, nativeRequest.url, nativeRequest.data, nativeRequest.headers);
         }
     }
 

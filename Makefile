@@ -106,8 +106,20 @@ build-test: clean build-dirs build-css build-html
 	cp test-utils/runner.js $(BUILD_DIR)
 	node -e "\
 		var fs = require('fs');\
-		function getTsFromFolder(folder) { return fs.readdirSync(folder).filter(function(file) { return file.indexOf('Test.ts') !== -1; }).map(function(file) { return folder + '/' + file.replace('.ts', ''); }); }\
-		var testList = JSON.stringify(getTsFromFolder('test').concat(getTsFromFolder('test/Utilities')));\
+		var path = require('path');\
+		var getTestPaths = function(root) {\
+		    var paths = [];\
+            fs.readdirSync(root).forEach(function(file) {\
+                var fullPath = path.join(root, file);\
+                if(fs.statSync(fullPath).isDirectory()) {\
+                    paths = paths.concat(getTestPaths(fullPath));\
+                } else if(fullPath.indexOf('Test.ts') !== -1) {\
+                    paths.push(fullPath.replace('.ts', ''));\
+                }\
+            });\
+            return paths;\
+        };\
+		var testList = JSON.stringify(getTestPaths('test'));\
         console.log(testList);\
 		var o = {encoding:'utf-8'};\
 		var f = fs.readFileSync('$(BUILD_DIR)/runner.js', o);\

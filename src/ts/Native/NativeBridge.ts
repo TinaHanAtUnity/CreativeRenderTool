@@ -28,24 +28,22 @@ export interface INativeCallback {
 
 export class NativeBridge implements INativeBridge {
 
-    public static AdUnit: AdUnitApi;
-    public static Cache: CacheApi;
-    public static Connectivity: ConnectivityApi;
-    public static DeviceInfo: DeviceInfoApi;
-    public static Intent: IntentApi;
-    public static Listener: ListenerApi;
-    public static Placement: PlacementApi;
-    public static Request: RequestApi;
-    public static Resolve: ResolveApi;
-    public static Sdk: SdkApi;
-    public static Storage: StorageApi;
-    public static VideoPlayer: VideoPlayerApi;
-
     public static ApiPackageName: string = 'com.unity3d.ads.api';
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    private static _instance: NativeBridge = null;
+    public AdUnit: AdUnitApi = null;
+    public Cache: CacheApi = null;
+    public Connectivity: ConnectivityApi = null;
+    public DeviceInfo: DeviceInfoApi = null;
+    public Intent: IntentApi = null;
+    public Listener: ListenerApi = null;
+    public Placement: PlacementApi = null;
+    public Request: RequestApi = null;
+    public Resolve: ResolveApi = null;
+    public Sdk: SdkApi = null;
+    public Storage: StorageApi = null;
+    public VideoPlayer: VideoPlayerApi = null;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: Object} = {};
@@ -64,23 +62,18 @@ export class NativeBridge implements INativeBridge {
         this._autoBatchEnabled = autoBatch;
 
         this._backend = backend;
-        NativeBridge.AdUnit = new AdUnitApi(this);
-        NativeBridge.Cache = new CacheApi(this);
-        NativeBridge.Connectivity = new ConnectivityApi(this);
-        NativeBridge.DeviceInfo = new DeviceInfoApi(this);
-        NativeBridge.Intent = new IntentApi(this);
-        NativeBridge.Listener = new ListenerApi(this);
-        NativeBridge.Placement = new PlacementApi(this);
-        NativeBridge.Request = new RequestApi(this);
-        NativeBridge.Resolve = new ResolveApi(this);
-        NativeBridge.Sdk = new SdkApi(this);
-        NativeBridge.Storage = new StorageApi(this);
-        NativeBridge.VideoPlayer = new VideoPlayerApi(this);
-        NativeBridge._instance = this;
-    }
-
-    public static getInstance() {
-        return NativeBridge._instance;
+        this.AdUnit = new AdUnitApi(this);
+        this.Cache = new CacheApi(this);
+        this.Connectivity = new ConnectivityApi(this);
+        this.DeviceInfo = new DeviceInfoApi(this);
+        this.Intent = new IntentApi(this);
+        this.Listener = new ListenerApi(this);
+        this.Placement = new PlacementApi(this);
+        this.Request = new RequestApi(this);
+        this.Resolve = new ResolveApi(this);
+        this.Sdk = new SdkApi(this);
+        this.Storage = new StorageApi(this);
+        this.VideoPlayer = new VideoPlayerApi(this);
     }
 
     public registerCallback(resolve, reject): number {
@@ -138,27 +131,27 @@ export class NativeBridge implements INativeBridge {
         let event: string = parameters.shift();
         switch(category) {
             case EventCategory[EventCategory.ADUNIT]:
-                NativeBridge.AdUnit.handleEvent(event, parameters);
+                this.AdUnit.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.CACHE]:
-                NativeBridge.Cache.handleEvent(event, parameters);
+                this.Cache.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.CONNECTIVITY]:
-                NativeBridge.Connectivity.handleEvent(event, parameters);
+                this.Connectivity.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.REQUEST]:
-                NativeBridge.Request.handleEvent(event, parameters);
+                this.Request.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.RESOLVE]:
-                NativeBridge.Resolve.handleEvent(event, parameters);
+                this.Resolve.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.VIDEOPLAYER]:
-                NativeBridge.VideoPlayer.handleEvent(event, parameters);
+                this.VideoPlayer.handleEvent(event, parameters);
                 break;
 
             default:

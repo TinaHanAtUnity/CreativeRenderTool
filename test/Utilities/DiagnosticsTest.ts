@@ -8,11 +8,23 @@ import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { EventManager } from '../../src/ts/Managers/EventManager';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
 describe('DiagnosticsTest', () => {
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
+    let nativeBridge;
+
+    beforeEach(() => {
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        }, false);
+    });
+
     it('should generate proper request', () => {
-        let request = new Request();
-        let eventManager = new EventManager(request);
+        let request = new Request(nativeBridge);
+        let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
         Diagnostics.trigger(eventManager, {'test': true});
@@ -20,8 +32,8 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request with info', () => {
-        let request = new Request();
-        let eventManager = new EventManager(request);
+        let request = new Request(nativeBridge);
+        let eventManager = new EventManager(nativeBridge, request);
 
         let deviceInfo = new DeviceInfo();
         let clientInfo = new ClientInfo([

@@ -39,42 +39,42 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
 
-    public fetch(platform: Platform): Promise<any[]> {
+    public fetch(nativeBridge: NativeBridge, platform: Platform): Promise<any[]> {
         let promises = [];
 
         if(platform === Platform.ANDROID) {
-            NativeBridge.DeviceInfo.getAndroidId().then(androidId => this._androidId = androidId);
-            NativeBridge.DeviceInfo.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout);
+            nativeBridge.DeviceInfo.getAndroidId().then(androidId => this._androidId = androidId);
+            nativeBridge.DeviceInfo.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout);
         }
 
-        NativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier);
-        NativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking);
-        NativeBridge.DeviceInfo.getApiLevel().then(apiLevel => this._apiLevel = apiLevel);
-        NativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion);
-        NativeBridge.DeviceInfo.getManufacturer().then(manufacturer => this._manufacturer = manufacturer);
-        NativeBridge.DeviceInfo.getModel().then(model => this._model = model);
-        NativeBridge.DeviceInfo.getConnectionType().then(connectionType => this._connectionType = connectionType);
-        NativeBridge.DeviceInfo.getNetworkType().then(networkType => this._networkType = networkType);
-        NativeBridge.DeviceInfo.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity);
-        NativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth);
-        NativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight);
-        NativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => this._networkOperator = networkOperator);
-        NativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => this._networkOperatorName = networkOperatorName);
-        NativeBridge.DeviceInfo.getHeadset().then(headset => this._headset = headset);
-        NativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone);
-        NativeBridge.DeviceInfo.getRingerMode().then(ringerMode => this._ringerMode = ringerMode);
-        NativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language);
-        NativeBridge.DeviceInfo.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => this._volume = volume);
-        NativeBridge.DeviceInfo.getScreenBrightness().then(screenBrightness => this._screenBrightness = screenBrightness);
-        NativeBridge.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then(freeExternalSpace => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined);
-        NativeBridge.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined);
-        NativeBridge.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined);
-        NativeBridge.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined);
-        NativeBridge.DeviceInfo.getBatteryLevel().then(batteryLevel => this._batteryLevel = batteryLevel);
-        NativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => this._batteryStatus = batteryStatus);
-        NativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => this._freeMemory = freeMemory);
-        NativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory);
-        NativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted);
+        nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier);
+        nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking);
+        nativeBridge.DeviceInfo.getApiLevel().then(apiLevel => this._apiLevel = apiLevel);
+        nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion);
+        nativeBridge.DeviceInfo.getManufacturer().then(manufacturer => this._manufacturer = manufacturer);
+        nativeBridge.DeviceInfo.getModel().then(model => this._model = model);
+        nativeBridge.DeviceInfo.getConnectionType().then(connectionType => this._connectionType = connectionType);
+        nativeBridge.DeviceInfo.getNetworkType().then(networkType => this._networkType = networkType);
+        nativeBridge.DeviceInfo.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity);
+        nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth);
+        nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight);
+        nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => this._networkOperator = networkOperator);
+        nativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => this._networkOperatorName = networkOperatorName);
+        nativeBridge.DeviceInfo.getHeadset().then(headset => this._headset = headset);
+        nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone);
+        nativeBridge.DeviceInfo.getRingerMode().then(ringerMode => this._ringerMode = ringerMode);
+        nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language);
+        nativeBridge.DeviceInfo.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => this._volume = volume);
+        nativeBridge.DeviceInfo.getScreenBrightness().then(screenBrightness => this._screenBrightness = screenBrightness);
+        nativeBridge.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then(freeExternalSpace => this._freeExternalSpace = freeExternalSpace).catch(() => this._freeExternalSpace = undefined);
+        nativeBridge.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(() => this._totalExternalSpace = undefined);
+        nativeBridge.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined);
+        nativeBridge.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined);
+        nativeBridge.DeviceInfo.getBatteryLevel().then(batteryLevel => this._batteryLevel = batteryLevel);
+        nativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => this._batteryStatus = batteryStatus);
+        nativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => this._freeMemory = freeMemory);
+        nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory);
+        nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted);
 
         return Promise.all(promises);
     }

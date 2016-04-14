@@ -180,10 +180,10 @@ describe('EventManagerTest', () => {
             handleCallback
         });
 
-        storageApi = NativeBridge.Storage = new TestStorageApi(nativeBridge);
-        requestApi = NativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request();
-        eventManager = new EventManager(request);
+        storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
+        requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
+        request = new Request(nativeBridge);
+        eventManager = new EventManager(nativeBridge, request);
     });
 
     it('Send successful operative event', () => {
@@ -234,12 +234,12 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).then(data => {
-                assert.equal(url, data[1], 'Failed operative event url was not correctly stored');
+            storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
+                assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return storageApi.get<string>(StorageType.PRIVATE, dataKey);
-            }).then(data => {
-                assert.equal(data, data[1], 'Failed operative event data was not correctly stored');
+            }).then(storedData => {
+                assert.equal(data, storedData, 'Failed operative event data was not correctly stored');
                 assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
             });
         });
@@ -307,7 +307,7 @@ describe('EventManagerTest', () => {
 
     it('Get unique event id', () => {
         let testId: string = '1234-5678';
-        let deviceInfoApi: TestDeviceInfoApi = NativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
+        let deviceInfoApi: TestDeviceInfoApi = nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
         deviceInfoApi.setTestId(testId);
 
         return eventManager.getUniqueEventId().then(uniqueId => {
