@@ -1,6 +1,6 @@
-import { NativeApi } from 'Native/NativeApi';
-import { StreamType } from 'Constants/Android/StreamType';
-import { NativeBridge } from 'Native/NativeBridge';
+import {NativeApi} from 'Native/NativeApi';
+import {StreamType} from 'Constants/Android/StreamType';
+import {NativeBridge} from 'Native/NativeBridge';
 
 export enum StorageType {
     EXTERNAL,
@@ -13,7 +13,7 @@ export class DeviceInfoApi extends NativeApi {
         super(nativeBridge, 'DeviceInfo');
     }
 
-    public getAndroidId (): Promise<string> {
+    public getAndroidId(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getAndroidId');
     }
 
@@ -25,35 +25,35 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getLimitAdTrackingFlag');
     }
 
-    public getApiLevel (): Promise<number> {
+    public getApiLevel(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getApiLevel');
     }
 
-    public getOsVersion (): Promise<string> {
+    public getOsVersion(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getOsVersion');
     }
 
-    public getManufacturer (): Promise<string> {
+    public getManufacturer(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getManufacturer');
     }
 
-    public getModel (): Promise<string> {
+    public getModel(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getModel');
     }
 
-    public getScreenLayout (): Promise<number> {
+    public getScreenLayout(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenLayout');
     }
 
-    public getScreenDensity (): Promise<number> {
+    public getScreenDensity(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenDensity');
     }
 
-    public getScreenWidth (): Promise<number> {
+    public getScreenWidth(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenWidth');
     }
 
-    public getScreenHeight (): Promise<number> {
+    public getScreenHeight(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenHeight');
     }
 
@@ -101,7 +101,7 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getSystemProperty', [propertyName, defaultValue]);
     }
 
-    public getRingerMode (): Promise<number> {
+    public getRingerMode(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getRingerMode');
     }
 
@@ -113,15 +113,15 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceVolume', [streamType]);
     }
 
-    public getScreenBrightness (): Promise<number> {
+    public getScreenBrightness(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenBrightness');
     }
 
-    public getFreeSpace (storageType: StorageType): Promise<number> {
+    public getFreeSpace(storageType: StorageType): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace', [StorageType[storageType]]);
     }
 
-    public getTotalSpace (storageType: StorageType): Promise<number> {
+    public getTotalSpace(storageType: StorageType): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [StorageType[storageType]]);
     }
 

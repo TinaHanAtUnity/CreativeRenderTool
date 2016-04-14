@@ -43,9 +43,9 @@ export class CacheApi extends NativeApi {
 
     public getFiles(urls?: string[]): Promise<IFileInfo[]> {
         if(urls && urls.length) {
-            return this._nativeBridge.invoke<IFileInfo[][]>(this._apiClass, 'getFiles', [urls]).then(([files]) => files);
+            return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles', [urls]);
         }
-        return this._nativeBridge.invoke<IFileInfo[][]>(this._apiClass, 'getFiles').then(([files]) => files);
+        return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles');
     }
 
     public getFileInfo(url: string): Promise<IFileInfo> {
@@ -57,9 +57,7 @@ export class CacheApi extends NativeApi {
     }
 
     public getFileUrl(url: string): Promise<string> {
-        return this._nativeBridge.invoke<[string]>(this._apiClass, 'getFileUrl', [url]).then(([fileUrl]) => {
-            return fileUrl;
-        });
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileUrl', [url]);
     }
 
     public getFileIdFileUrl(fileId: string): Promise<string> {

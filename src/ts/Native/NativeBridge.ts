@@ -116,7 +116,7 @@ export class NativeBridge implements INativeBridge {
         results.forEach((result: any[]): void => {
             let id: number = parseInt(result.shift(), 10);
             let status: string = result.shift();
-            let parameters = result;
+            let parameters = result.shift();
             let callbackObject: Object = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
