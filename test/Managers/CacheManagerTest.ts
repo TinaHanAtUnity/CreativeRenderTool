@@ -24,11 +24,11 @@ class TestCacheApi extends CacheApi {
         let responseCode: number = 200;
 
         if(this._previouslyDownloadedFiles.indexOf(url) !== -1) {
-            return Promise.reject(['FILE_ALREADY_IN_CACHE']);
+            return Promise.reject('FILE_ALREADY_IN_CACHE');
         }
 
         if(this._previouslyQueuedFiles.indexOf(url) !== -1) {
-            return Promise.reject(['FILE_ALREADY_IN_QUEUE']);
+            return Promise.reject('FILE_ALREADY_IN_QUEUE');
         }
 
         if(this._internet) {
@@ -39,7 +39,7 @@ class TestCacheApi extends CacheApi {
             }, 1);
             return Promise.resolve(void(0));
         } else {
-            return Promise.reject(['NO_INTERNET']);
+            return Promise.reject('NO_INTERNET');
         }
     }
 
