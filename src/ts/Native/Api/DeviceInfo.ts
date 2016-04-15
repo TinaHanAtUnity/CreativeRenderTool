@@ -1,6 +1,6 @@
-import {NativeApi} from 'Native/NativeApi';
-import {StreamType} from 'Constants/Android/StreamType';
-import {NativeBridge} from 'Native/NativeBridge';
+import { NativeApi } from 'Native/NativeApi';
+import { StreamType } from 'Constants/Android/StreamType';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export enum StorageType {
     EXTERNAL,
