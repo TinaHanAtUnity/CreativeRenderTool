@@ -69,6 +69,7 @@ export class CampaignManager {
             androidId: this._deviceInfo.getAndroidId(),
             gameId: this._clientInfo.getGameId(),
             hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
+            deviceType: this._deviceInfo.getModel(),
             limitAdTracking: this._deviceInfo.getLimitAdTracking(),
             networkType: this._deviceInfo.getNetworkType(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
