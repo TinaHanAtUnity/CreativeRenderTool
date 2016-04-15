@@ -21,6 +21,10 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoActive: boolean;
     private _watches: number;
 
+    private _onResumeObserver;
+    private _onPauseObserver;
+    private _onDestroyObserver;
+
     private _onPreparedObserver;
     private _onProgressObserver;
     private _onPlayObserver;
@@ -29,9 +33,9 @@ export class VideoAdUnit extends AbstractAdUnit {
     constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
         super(nativeBridge, session, placement, campaign);
 
-        this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
-        this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
-        this._nativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
+        this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
+        this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
+        this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
 
         this._videoPosition = 0;
         this._videoActive = true;
@@ -56,6 +60,10 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
+
+        this._nativeBridge.AdUnit.onResume.unsubscribe(this._onResumeObserver);
+        this._nativeBridge.AdUnit.onPause.unsubscribe(this._onPauseObserver);
+        this._nativeBridge.AdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
 
         this._nativeBridge.VideoPlayer.onPrepared.unsubscribe(this._onPreparedObserver);
         this._nativeBridge.VideoPlayer.onProgress.unsubscribe(this._onProgressObserver);
