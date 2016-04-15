@@ -20,9 +20,8 @@ export class CacheManager {
         let promises = urls.map((url: string) => {
             return this._nativeBridge.Cache.download(url, false).then(() => {
                 return this.registerCallback(url);
-            }).catch((error) => {
-                let errorCode = error.shift();
-                switch(errorCode) {
+            }).catch(error => {
+                switch(error) {
                     case 'FILE_ALREADY_IN_CACHE':
                         return this.getFileUrl(url);
 
