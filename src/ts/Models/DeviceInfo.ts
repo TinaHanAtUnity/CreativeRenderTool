@@ -127,6 +127,14 @@ export class DeviceInfo extends Model {
         return this._screenDensity;
     }
 
+    public getScreenWidth(): number {
+        return this._screenWidth;
+    }
+
+    public getScreenHeight(): number {
+        return this._screenHeight;
+    }
+
     public isRooted(): boolean {
         return this._rooted;
     }

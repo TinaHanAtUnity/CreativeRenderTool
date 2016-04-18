@@ -95,6 +95,8 @@ export class CampaignManager {
                 platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
                 screenDensity: this._deviceInfo.getScreenDensity(),
                 screenSize: this._deviceInfo.getScreenLayout(),
+                screen_width: this._deviceInfo.getScreenWidth(),
+                screen_height: this._deviceInfo.getScreenHeight(),
                 sdkVersion: this._clientInfo.getSdkVersion(),
                 softwareVersion: this._deviceInfo.getApiLevel(),
                 placementId: placementId
