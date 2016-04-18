@@ -8,7 +8,7 @@ import { NativeResponse } from '../../src/ts/Utilities/Request';
 
 describe('ConfigManagerTest', () => {
 
-    let requestMock, clientInfoMock;
+    let requestMock, clientInfoMock, deviceInfoMock;
     let configManager: ConfigManager;
     let configPromise;
 
@@ -16,6 +16,9 @@ describe('ConfigManagerTest', () => {
         clientInfoMock = {
             getGameId: sinon.mock().returns(123),
             isDebuggable: sinon.mock().returns(false),
+        };
+        deviceInfoMock = {
+            isRooted: sinon.mock().returns(false)
         };
     });
 
@@ -30,7 +33,7 @@ describe('ConfigManagerTest', () => {
                 get: sinon.mock().returns(configPromise)
             };
 
-            configManager = new ConfigManager(requestMock, clientInfoMock);
+            configManager = new ConfigManager(requestMock, clientInfoMock, deviceInfoMock);
         });
 
         it('calling fetch should return configuration', () => {
@@ -54,7 +57,7 @@ describe('ConfigManagerTest', () => {
                 get: sinon.mock().returns(configPromise)
             };
 
-            configManager = new ConfigManager(requestMock, clientInfoMock);
+            configManager = new ConfigManager(requestMock, clientInfoMock, deviceInfoMock);
         });
 
         it('calling fetch should return error', (done) => {
