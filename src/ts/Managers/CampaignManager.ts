@@ -90,6 +90,8 @@ export class CampaignManager {
                 mediation_version: mediationVersion,
                 medation_ordinal: mediationOrdinal,
                 networkType: this._deviceInfo.getNetworkType(),
+                network_operator: this._deviceInfo.getNetworkOperator(),
+                network_operator_name: this._deviceInfo.getNetworkOperatorName(),
                 platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
                 screenDensity: this._deviceInfo.getScreenDensity(),
                 screenSize: this._deviceInfo.getScreenLayout(),

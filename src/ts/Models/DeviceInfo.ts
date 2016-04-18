@@ -107,6 +107,14 @@ export class DeviceInfo extends Model {
         return this._networkType;
     }
 
+    public getNetworkOperator(): string {
+        return this._networkOperator;
+    }
+
+    public getNetworkOperatorName(): string {
+        return this._networkOperatorName;
+    }
+
     public getOsVersion(): string {
         return this._osVersion;
     }
