@@ -77,7 +77,7 @@ export class WebView {
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
-            this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 

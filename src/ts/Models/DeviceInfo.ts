@@ -123,6 +123,10 @@ export class DeviceInfo extends Model {
         return this._rooted;
     }
 
+    public getConnectionType(): string {
+        return this._connectionType;
+    }
+
     public getDTO() {
         return {
             'android_id': this._androidId,

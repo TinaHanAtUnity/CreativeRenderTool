@@ -53,6 +53,10 @@ export class ClientInfo extends Model {
         return this._applicationVersion;
     }
 
+    public getApplicationName(): string {
+        return this._applicationName;
+    }
+
     public getSdkVersion(): string {
         return this._sdkVersion;
     }
