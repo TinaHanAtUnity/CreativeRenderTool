@@ -99,7 +99,8 @@ export class CampaignManager {
                 screen_height: this._deviceInfo.getScreenHeight(),
                 sdkVersion: this._clientInfo.getSdkVersion(),
                 softwareVersion: this._deviceInfo.getApiLevel(),
-                placementId: placementId
+                placementId: placementId,
+                timeZone: this._deviceInfo.getTimeZone()
             });
 
             if(this._clientInfo.getTestMode()) {

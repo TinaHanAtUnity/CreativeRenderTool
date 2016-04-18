@@ -143,6 +143,10 @@ export class DeviceInfo extends Model {
         return this._connectionType;
     }
 
+    public getTimeZone(): string {
+        return this._timeZone;
+    }
+
     public getDTO() {
         return {
             'android_id': this._androidId,
