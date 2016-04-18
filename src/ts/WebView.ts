@@ -70,7 +70,7 @@ export class WebView {
             }
             return this._cacheManager.cleanCache();
         }).then(() => {
-            let configManager = new ConfigManager(this._request, this._clientInfo);
+            let configManager = new ConfigManager(this._request, this._clientInfo, this._deviceInfo);
             return configManager.fetch();
         }).then((configuration) => {
             this._configuration = configuration;

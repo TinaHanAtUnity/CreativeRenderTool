@@ -119,6 +119,10 @@ export class DeviceInfo extends Model {
         return this._screenDensity;
     }
 
+    public isRooted(): boolean {
+        return this._rooted;
+    }
+
     public getDTO() {
         return {
             'android_id': this._androidId,

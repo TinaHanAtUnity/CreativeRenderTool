@@ -2,6 +2,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
 import { Configuration } from 'Models/Configuration';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class ConfigManager {
 
@@ -9,11 +10,13 @@ export class ConfigManager {
 
     private _request: Request;
     private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
     private _configuration: Configuration;
 
-    constructor(request: Request, clientInfo: ClientInfo) {
+    constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._request = request;
         this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
     }
 
     public fetch(): Promise<Configuration> {
@@ -39,7 +42,8 @@ export class ConfigManager {
         ].join('/');
 
         return Url.addParameters(url, {
-            encrypted: !this._clientInfo.isDebuggable()
+            encrypted: !this._clientInfo.isDebuggable(),
+            rooted: this._deviceInfo.isRooted()
         });
     }
 
