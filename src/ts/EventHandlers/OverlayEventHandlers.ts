@@ -5,11 +5,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+  public static onSkip(nativeBridge: NativeBridge, adUnit: VideoAdUnit, videoProgress: number): void {
       nativeBridge.VideoPlayer.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
-      adUnit.getSession().sendSkip(adUnit);
+      adUnit.getSession().sendSkip(adUnit, videoProgress);
       nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();

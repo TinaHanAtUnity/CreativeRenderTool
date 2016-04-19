@@ -46,9 +46,11 @@ export class SessionManager {
         });
     }
 
-    public sendSkip(adUnit: AbstractAdUnit): void {
+    public sendSkip(adUnit: AbstractAdUnit, videoProgress: number): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(this.getInfoJson(adUnit, id)));
+            let infoJson = this.getInfoJson(adUnit, id);
+            infoJson.skipped_at = videoProgress;
+            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         });
     }
 
@@ -110,7 +112,7 @@ export class SessionManager {
         });
     }
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string): { [key: string]: any } {
+    private getInfoJson(adUnit: AbstractAdUnit, id: string): any {
         return {
             'uuid': id,
             'gamer_id': adUnit.getCampaign().getGamerId(),
@@ -119,7 +121,7 @@ export class SessionManager {
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'os_version': this._deviceInfo.getOsVersion(),
-            'connection_type': this._deviceInfo.getNetworkType(),
+            'connection_type': this._deviceInfo.getConnectionType(),
             'sid': this._gamerSid
         };
     }
