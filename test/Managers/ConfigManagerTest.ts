@@ -9,7 +9,6 @@ import { NativeResponse } from '../../src/ts/Utilities/Request';
 describe('ConfigManagerTest', () => {
 
     let requestMock, clientInfoMock, deviceInfoMock;
-    let configManager: ConfigManager;
     let configPromise;
 
     beforeEach(() => {
@@ -32,12 +31,10 @@ describe('ConfigManagerTest', () => {
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };
-
-            configManager = new ConfigManager(requestMock, clientInfoMock, deviceInfoMock);
         });
 
         it('calling fetch should return configuration', () => {
-            configManager.fetch();
+            ConfigManager.fetch(requestMock, clientInfoMock, deviceInfoMock);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -56,12 +53,10 @@ describe('ConfigManagerTest', () => {
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };
-
-            configManager = new ConfigManager(requestMock, clientInfoMock, deviceInfoMock);
         });
 
         it('calling fetch should return error', (done) => {
-            let config = configManager.fetch();
+            let config = ConfigManager.fetch(requestMock, clientInfoMock, deviceInfoMock);
             config.then(() => {
                 assert.fail('should not resolve');
                 done();
