@@ -48,6 +48,7 @@ export class MetaDataManager {
             nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'player.gender.value'),
             nativeBridge.Storage.get<number>(StorageType.PUBLIC, 'player.age.value')
         ]).then(([sid, name, gender, age]) => {
+            nativeBridge.Storage.delete(StorageType.PUBLIC, 'player');
             return new PlayerMetaData(sid, name, gender, age);
         }).catch(() => {
             return undefined;
