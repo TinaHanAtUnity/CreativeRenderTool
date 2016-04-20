@@ -13,6 +13,8 @@ export class MetaDataManager {
             nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'adapter.version.value')
         ]).then(([name, version]) => {
             return new AdapterMetaData(name, version);
+        }).catch(() => {
+            return undefined;
         });
     }
 
@@ -22,6 +24,8 @@ export class MetaDataManager {
             nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'framework.version.value')
         ]).then(([name, version]) => {
             return new FrameworkMetaData(name, version);
+        }).catch(() => {
+            return undefined;
         });
     }
 
@@ -32,6 +36,8 @@ export class MetaDataManager {
             nativeBridge.Storage.get<number>(StorageType.PUBLIC, 'mediation.ordinal.value')
         ]).then(([name, version, ordinal]) => {
             return new MediationMetaData(name, version, ordinal);
+        }).catch(() => {
+            return undefined;
         });
     }
 
@@ -43,6 +49,8 @@ export class MetaDataManager {
             nativeBridge.Storage.get<number>(StorageType.PUBLIC, 'player.age.value')
         ]).then(([sid, name, gender, age]) => {
             return new PlayerMetaData(sid, name, gender, age);
+        }).catch(() => {
+            return undefined;
         });
     }
 

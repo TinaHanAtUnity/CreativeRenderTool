@@ -38,18 +38,17 @@ export class CampaignManager {
         }
 
         this.createRequestUrl(placement.getId()).then(requestUrl => {
-            this._request.get(requestUrl, [], 5, 5000).then(response => {
+            return this._request.get(requestUrl, [], 5, 5000).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                 placement.setCampaign(campaign);
                 this.onCampaign.trigger(placement, campaign);
-            }).catch((error) => {
-                placement.setCampaign(null);
-                this._failedPlacements.push(placement.getId());
-                this.onError.trigger(error);
             });
+        }).catch((error) => {
+            placement.setCampaign(null);
+            this._failedPlacements.push(placement.getId());
+            this.onError.trigger(error);
         });
-
     }
 
     public retryFailedPlacements(placements: { [id: string]: Placement }) {
@@ -82,9 +81,6 @@ export class CampaignManager {
                 hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
                 deviceType: this._deviceInfo.getModel(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking(),
-                mediation_name: mediation.getName(),
-                mediation_version: mediation.getVersion(),
-                medation_ordinal: mediation.getOrdinal(),
                 networkType: this._deviceInfo.getNetworkType(),
                 network_operator: this._deviceInfo.getNetworkOperator(),
                 network_operator_name: this._deviceInfo.getNetworkOperatorName(),
@@ -101,6 +97,14 @@ export class CampaignManager {
 
             if(this._clientInfo.getTestMode()) {
                 url = Url.addParameters(url, {test: true});
+            }
+
+            if(mediation) {
+                url = Url.addParameters(url, {
+                    mediation_name: mediation.getName(),
+                    mediation_version: mediation.getVersion(),
+                    medation_ordinal: mediation.getOrdinal()
+                });
             }
 
             return url;
