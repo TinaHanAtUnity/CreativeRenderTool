@@ -17,8 +17,8 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 import { Platform } from 'Constants/Platform';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class WebView {
 
@@ -144,8 +144,8 @@ export class WebView {
             keyEvents = [KeyCode.BACK];
         }
 
-        PlayerMetaData.getSid(this._nativeBridge).then(sid => {
-            this._sessionManager.setGamerSid(sid);
+        MetaDataManager.getPlayer(this._nativeBridge).then(player => {
+            this._sessionManager.setGamerSid(player.getSid());
 
             let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
             adUnit.onClose.subscribe(this.onClose.bind(this));

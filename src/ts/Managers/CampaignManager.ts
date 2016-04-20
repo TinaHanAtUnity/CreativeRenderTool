@@ -8,8 +8,8 @@ import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
-import { MediationMetaData } from 'Metadata/MediationMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
+import { MetaDataManager } from 'MetaDataManager';
 
 export class CampaignManager {
 
@@ -71,11 +71,7 @@ export class CampaignManager {
             'fill'
         ].join('/');
 
-        return Promise.all<string | number>([
-            MediationMetaData.getName(this._nativeBridge),
-            MediationMetaData.getVersion(this._nativeBridge),
-            MediationMetaData.getOrdinal(this._nativeBridge)
-        ]).then(([mediationName, mediationVersion, mediationOrdinal]) => {
+        return MetaDataManager.getMediation(this._nativeBridge).then(mediation => {
             url = Url.addParameters(url, {
                 application_version: this._clientInfo.getApplicationVersion(),
                 application_name: this._clientInfo.getApplicationName(),
@@ -86,9 +82,9 @@ export class CampaignManager {
                 hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
                 deviceType: this._deviceInfo.getModel(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking(),
-                mediation_name: mediationName,
-                mediation_version: mediationVersion,
-                medation_ordinal: mediationOrdinal,
+                mediation_name: mediation.getName(),
+                mediation_version: mediation.getVersion(),
+                medation_ordinal: mediation.getOrdinal(),
                 networkType: this._deviceInfo.getNetworkType(),
                 network_operator: this._deviceInfo.getNetworkOperator(),
                 network_operator_name: this._deviceInfo.getNetworkOperatorName(),
