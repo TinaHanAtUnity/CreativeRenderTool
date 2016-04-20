@@ -100,10 +100,10 @@ export class WebView {
 
             return this._nativeBridge.Sdk.initComplete();
         }).catch(error => {
-            console.log(error);
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
             }
+            this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
                 'type': 'unhandled_initialization_error',
                 'error': error
@@ -145,7 +145,9 @@ export class WebView {
         }
 
         MetaDataManager.getPlayer(this._nativeBridge).then(player => {
-            this._sessionManager.setGamerSid(player.getSid());
+            if(player) {
+                this._sessionManager.setGamerSid(player.getSid());
+            }
 
             let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
             adUnit.onClose.subscribe(this.onClose.bind(this));
@@ -191,10 +193,10 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        console.log(error);
         if(error instanceof Error) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
+        this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger(this._eventManager, {
             'type': 'campaign_request_failed',
             'error': error
