@@ -4,12 +4,15 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Url } from 'Utilities/Url';
 import { EventManager } from 'EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { NativeBridge } from 'Native/NativeBridge';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 
 export class SessionManager {
 
     private static VideoEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
+    private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _eventManager: EventManager;
@@ -18,7 +21,8 @@ export class SessionManager {
 
     private _gamerSid: string;
 
-    constructor(clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
+        this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._eventManager = eventManager;
@@ -36,19 +40,24 @@ export class SessionManager {
 
     public sendShow(adUnit: AbstractAdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), this.createShowEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
+            return this.getInfoJson(adUnit, id);
+        }).then(([id, infoJson]) => {
+            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
         });
     }
 
     public sendStart(adUnit: AbstractAdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('start', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(this.getInfoJson(adUnit, id)));
+            return this.getInfoJson(adUnit, id);
+        }).then(([id, infoJson]) => {
+            this._eventManager.operativeEvent('start', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         });
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress: number): void {
         this._eventManager.getUniqueEventId().then(id => {
-            let infoJson = this.getInfoJson(adUnit, id);
+            return this.getInfoJson(adUnit, id);
+        }).then(([id, infoJson]) => {
             infoJson.skipped_at = videoProgress;
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         });
@@ -56,7 +65,9 @@ export class SessionManager {
 
     public sendView(adUnit: AbstractAdUnit): void {
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(this.getInfoJson(adUnit, id)));
+            return this.getInfoJson(adUnit, id);
+        }).then(([id, infoJson]) => {
+            this._eventManager.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
         });
     }
 
@@ -67,7 +78,9 @@ export class SessionManager {
         }
 
         this._eventManager.getUniqueEventId().then(id => {
-            this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(this.getInfoJson(adUnit, id)));
+            return this.getInfoJson(adUnit, id);
+        }).then(([id, infoJson]) => {
+            this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         });
     }
 
@@ -112,18 +125,32 @@ export class SessionManager {
         });
     }
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string): any {
-        return {
+    private getInfoJson(adUnit: AbstractAdUnit, id: string): Promise<[string, any]> {
+        let infoJson: any = {
             'uuid': id,
             'gamer_id': adUnit.getCampaign().getGamerId(),
             'campaign_id': adUnit.getCampaign().getId(),
             'placement_id': adUnit.getPlacement().getId(),
+            'api_level': this._deviceInfo.getApiLevel(),
+            'network_type': this._deviceInfo.getNetworkType(),
+            'cached': true,
             'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
             'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
             'os_version': this._deviceInfo.getOsVersion(),
             'connection_type': this._deviceInfo.getConnectionType(),
-            'sid': this._gamerSid
+            'sid': this._gamerSid,
+            'device_make': this._deviceInfo.getManufacturer(),
+            'device_model': this._deviceInfo.getModel()
         };
+
+        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+            if(mediation) {
+                infoJson.mediation_name = mediation.getName();
+                infoJson.mediation_version = mediation.getVersion();
+                infoJson.mediation_ordinal = mediation.getOrdinal();
+            }
+            return [id, infoJson];
+        });
     }
 
 }
