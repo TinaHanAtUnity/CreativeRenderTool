@@ -60,7 +60,7 @@ export class PlayerMetaData extends Model {
         return {
             'sid': this._sid,
             'name': this._name,
-            'version': this._gender,
+            'gender': this._gender,
             'age': this._age
         };
     }
