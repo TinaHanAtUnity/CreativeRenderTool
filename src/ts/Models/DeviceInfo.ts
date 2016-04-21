@@ -147,6 +147,14 @@ export class DeviceInfo extends Model {
         return this._timeZone;
     }
 
+    public getFreeSpace(): number {
+        return this._freeInternalSpace;
+    }
+
+    public getLanguage(): string {
+        return this._language;
+    }
+
     public getDTO() {
         return {
             'android_id': this._androidId,
