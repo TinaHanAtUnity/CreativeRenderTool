@@ -105,7 +105,7 @@ export class CampaignManager {
                 url = Url.addParameters(url, {
                     mediation_name: mediation.getName(),
                     mediation_version: mediation.getVersion(),
-                    medation_ordinal: mediation.getOrdinal()
+                    mediation_ordinal: mediation.getOrdinal()
                 });
             }
 
