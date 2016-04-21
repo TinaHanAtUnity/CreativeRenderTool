@@ -9,7 +9,7 @@ import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 
 export class CampaignManager {
 
@@ -70,7 +70,7 @@ export class CampaignManager {
             'fill'
         ].join('/');
 
-        return MetaDataManager.getMediation(this._nativeBridge).then(mediation => {
+        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
             url = Url.addParameters(url, {
                 application_version: this._clientInfo.getApplicationVersion(),
                 application_name: this._clientInfo.getApplicationName(),

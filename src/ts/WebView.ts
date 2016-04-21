@@ -18,7 +18,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 export class WebView {
 
@@ -144,7 +144,7 @@ export class WebView {
             keyEvents = [KeyCode.BACK];
         }
 
-        MetaDataManager.getPlayer(this._nativeBridge).then(player => {
+        PlayerMetaData.fetch(this._nativeBridge).then(player => {
             if(player) {
                 this._sessionManager.setGamerSid(player.getSid());
             }
