@@ -70,7 +70,7 @@ export class WebView {
             }
             return this._cacheManager.cleanCache();
         }).then(() => {
-            return ConfigManager.fetch(this._request, this._clientInfo, this._deviceInfo);
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
             this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);

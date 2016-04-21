@@ -5,13 +5,55 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
 import { NativeResponse } from '../../src/ts/Utilities/Request';
+import { NativeBridge} from '../../src/ts/Native/NativeBridge';
+import { StorageType, StorageApi } from '../../src/ts/Native/Api/Storage';
+
+class TestStorageApi extends StorageApi {
+
+    public get(storageType: StorageType, key: string): Promise<string | number> {
+        try {
+            switch(key) {
+                case 'adapter.name.value':
+                    return Promise.resolve('adapter_name');
+
+                case 'adapter.version.value':
+                    return Promise.resolve('adapter_version');
+
+                default:
+                    throw new Error('Unknown key "' + key + '"');
+            }
+        } catch(error) {
+            return Promise.reject(['COULDNT_GET_VALUE', key]);
+        }
+    }
+
+    public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        try {
+            if(key === 'adapter') {
+                return Promise.resolve(['name', 'version']);
+            }
+        } catch(error) {
+            return Promise.resolve([]);
+        }
+    }
+
+}
 
 describe('ConfigManagerTest', () => {
 
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
+    let nativeBridge;
     let requestMock, clientInfoMock, deviceInfoMock;
     let configPromise;
 
     beforeEach(() => {
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
+        nativeBridge.Storage = new TestStorageApi(nativeBridge);
+
         clientInfoMock = {
             getGameId: sinon.mock().returns(123),
             isDebuggable: sinon.mock().returns(false),
@@ -34,7 +76,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return configuration', () => {
-            ConfigManager.fetch(requestMock, clientInfoMock, deviceInfoMock);
+            ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -56,7 +98,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return error', (done) => {
-            let config = ConfigManager.fetch(requestMock, clientInfoMock, deviceInfoMock);
+            let config = ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock);
             config.then(() => {
                 assert.fail('should not resolve');
                 done();
