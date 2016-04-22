@@ -74,14 +74,11 @@ export class CampaignManager {
             url = Url.addParameters(url, {
                 application_version: this._clientInfo.getApplicationVersion(),
                 application_name: this._clientInfo.getApplicationName(),
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                androidId: this._deviceInfo.getAndroidId(),
                 connectionType: this._deviceInfo.getConnectionType(),
                 device_free_space: this._deviceInfo.getFreeSpace(),
                 gameId: this._clientInfo.getGameId(),
                 hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
                 deviceType: this._deviceInfo.getModel(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking(),
                 language: this._deviceInfo.getLanguage(),
                 networkType: this._deviceInfo.getNetworkType(),
                 network_operator: this._deviceInfo.getNetworkOperator(),
@@ -96,6 +93,17 @@ export class CampaignManager {
                 placementId: placementId,
                 timeZone: this._deviceInfo.getTimeZone()
             });
+
+            if(this._deviceInfo.getAdvertisingIdentifier()) {
+                url = Url.addParameters(url, {
+                    advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                    limitAdTracking: this._deviceInfo.getLimitAdTracking()
+                });
+            } else {
+                url = Url.addParameters(url, {
+                    androidId: this._deviceInfo.getAndroidId()
+                });
+            }
 
             if(this._clientInfo.getTestMode()) {
                 url = Url.addParameters(url, {test: true});
