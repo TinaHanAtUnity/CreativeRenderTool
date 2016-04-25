@@ -15,17 +15,12 @@ export class EventManager {
     public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
 
-        let urlKey: string = this.getUrlKey(sessionId, eventId);
-        let dataKey: string = this.getDataKey(sessionId, eventId);
-
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, urlKey, url);
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, dataKey, data);
+        this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId), url);
+        this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getDataKey(sessionId, eventId), data);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
         return this._request.post(url, data, [], 5, 5000).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, urlKey);
-        }).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, dataKey);
+            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId));
         }).then(() => {
             return this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
@@ -66,16 +61,11 @@ export class EventManager {
     }
 
     private resendEvent(sessionId: string, eventId: string): Promise<void> {
-        let urlKey: string = this.getUrlKey(sessionId, eventId);
-        let dataKey: string = this.getDataKey(sessionId, eventId);
-
         return this.getStoredOperativeEvent(sessionId, eventId).then(([url, data]) => {
             this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event + ' + eventId + ')');
             return this._request.post(url, data, [], 5, 5000);
         }).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, urlKey);
-        }).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, dataKey);
+            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId));
         }).then(() => {
             return this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
@@ -88,11 +78,15 @@ export class EventManager {
         ]);
     }
 
+    private getEventKey(sessionId: string, eventId: string): string {
+        return 'session.' + sessionId + '.operative.' + eventId;
+    }
+
     private getUrlKey(sessionId: string, eventId: string): string {
-        return 'session.' + sessionId + '.operative.' + eventId + '.url';
+        return this.getEventKey(sessionId, eventId) + '.url';
     }
 
     private getDataKey(sessionId: string, eventId: string): string {
-        return 'session.' + sessionId + '.operative.' + eventId + '.data';
+        return this.getEventKey(sessionId, eventId) + '.data';
     }
 }
