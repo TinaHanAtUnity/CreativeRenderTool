@@ -4,6 +4,8 @@ import { StorageType } from 'Native/Api/Storage';
 
 export class MediationMetaData extends Model {
 
+    private static _cache: MediationMetaData;
+
     private _name: string;
     private _version: string;
     private _ordinal: number;
@@ -14,7 +16,13 @@ export class MediationMetaData extends Model {
         });
     }
 
-    public static fetch(nativeBridge: NativeBridge): Promise<MediationMetaData> {
+    public static fetch(nativeBridge: NativeBridge, cache?: boolean): Promise<MediationMetaData> {
+        if(typeof cache === 'undefined') {
+            cache = true;
+        }
+        if(cache && MediationMetaData._cache) {
+            return Promise.resolve(MediationMetaData._cache);
+        }
         return MediationMetaData.exists(nativeBridge).then(exists => {
             if (!exists) {
                 return Promise.resolve(undefined);
@@ -24,6 +32,12 @@ export class MediationMetaData extends Model {
                 nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'mediation.version.value').catch(() => undefined),
                 nativeBridge.Storage.get<number>(StorageType.PUBLIC, 'mediation.ordinal.value').catch(() => undefined)
             ]).then(([name, version, ordinal]) => {
+                if(cache && !MediationMetaData._cache) {
+                    MediationMetaData._cache = new MediationMetaData(name, version, ordinal);
+                }
+                if(cache) {
+                    return MediationMetaData._cache;
+                }
                 return new MediationMetaData(name, version, ordinal);
             });
         });

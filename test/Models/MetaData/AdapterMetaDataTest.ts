@@ -65,7 +65,7 @@ describe('AdapterMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return AdapterMetaData.fetch(nativeBridge).then(metaData => {
+        return AdapterMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isUndefined(metaData, 'Returned AdapterMetaData even when it doesnt exist');
         });
     });
@@ -76,7 +76,7 @@ describe('AdapterMetaDataTest', () => {
             version: { value: 'test_version' }
         }});
 
-        return AdapterMetaData.fetch(nativeBridge).then(metaData => {
+        return AdapterMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'AdapterMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
@@ -93,7 +93,7 @@ describe('AdapterMetaDataTest', () => {
             version: undefined
         }});
 
-        return AdapterMetaData.fetch(nativeBridge).then(metaData => {
+        return AdapterMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'AdapterMetaData is not defined');
             assert.equal(metaData.getName(), undefined, 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
@@ -105,7 +105,7 @@ describe('AdapterMetaDataTest', () => {
             name: { value: 'test_name' }
         }});
 
-        return AdapterMetaData.fetch(nativeBridge).then(metaData => {
+        return AdapterMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'AdapterMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');

@@ -4,6 +4,8 @@ import { Model } from 'Models/Model';
 
 export class AdapterMetaData extends Model {
 
+    private static _cache: AdapterMetaData;
+
     private _name: string;
     private _version: string;
 
@@ -13,7 +15,13 @@ export class AdapterMetaData extends Model {
         });
     }
 
-    public static fetch(nativeBridge: NativeBridge): Promise<AdapterMetaData> {
+    public static fetch(nativeBridge: NativeBridge, cache?: boolean): Promise<AdapterMetaData> {
+        if(typeof cache === 'undefined') {
+            cache = true;
+        }
+        if(cache && AdapterMetaData._cache) {
+            return Promise.resolve(AdapterMetaData._cache);
+        }
         return AdapterMetaData.exists(nativeBridge).then(exists => {
             if(!exists) {
                 return Promise.resolve(undefined);
@@ -22,6 +30,12 @@ export class AdapterMetaData extends Model {
                 nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'adapter.name.value').catch(() => undefined),
                 nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'adapter.version.value').catch(() => undefined)
             ]).then(([name, version]) => {
+                if(cache && !AdapterMetaData._cache) {
+                    AdapterMetaData._cache = new AdapterMetaData(name, version);
+                }
+                if(cache) {
+                    return AdapterMetaData._cache;
+                }
                 return new AdapterMetaData(name, version);
             });
         });

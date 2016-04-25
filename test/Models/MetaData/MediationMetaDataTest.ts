@@ -68,7 +68,7 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return MediationMetaData.fetch(nativeBridge).then(metaData => {
+        return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isUndefined(metaData, 'Returned MediationMetaData even when it doesnt exist');
         });
     });
@@ -80,7 +80,7 @@ describe('MediationMetaDataTest', () => {
             ordinal: { value: 42 }
         }});
 
-        return MediationMetaData.fetch(nativeBridge).then(metaData => {
+        return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
@@ -100,7 +100,7 @@ describe('MediationMetaDataTest', () => {
             ordinal: undefined
         }});
 
-        return MediationMetaData.fetch(nativeBridge).then(metaData => {
+        return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
             assert.equal(metaData.getName(), undefined, 'MediationMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'MediationMetaData.getVersion() did not pass through correctly');
@@ -113,7 +113,7 @@ describe('MediationMetaDataTest', () => {
             name: { value: 'test_name' }
         }});
 
-        return MediationMetaData.fetch(nativeBridge).then(metaData => {
+        return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'MediationMetaData.getVersion() did not pass through correctly');

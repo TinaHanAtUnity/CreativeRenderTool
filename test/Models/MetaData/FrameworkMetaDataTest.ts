@@ -65,7 +65,7 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return FrameworkMetaData.fetch(nativeBridge).then(metaData => {
+        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isUndefined(metaData, 'Returned FrameworkMetaData even when it doesnt exist');
         });
     });
@@ -76,7 +76,7 @@ describe('FrameworkMetaDataTest', () => {
             version: { value: 'test_version' }
         }});
 
-        return FrameworkMetaData.fetch(nativeBridge).then(metaData => {
+        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
@@ -93,7 +93,7 @@ describe('FrameworkMetaDataTest', () => {
             version: undefined
         }});
 
-        return FrameworkMetaData.fetch(nativeBridge).then(metaData => {
+        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), undefined, 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
@@ -105,7 +105,7 @@ describe('FrameworkMetaDataTest', () => {
             name: { value: 'test_name' }
         }});
 
-        return FrameworkMetaData.fetch(nativeBridge).then(metaData => {
+        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
