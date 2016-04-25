@@ -107,6 +107,14 @@ export class DeviceInfo extends Model {
         return this._networkType;
     }
 
+    public getNetworkOperator(): string {
+        return this._networkOperator;
+    }
+
+    public getNetworkOperatorName(): string {
+        return this._networkOperatorName;
+    }
+
     public getOsVersion(): string {
         return this._osVersion;
     }
@@ -119,37 +127,65 @@ export class DeviceInfo extends Model {
         return this._screenDensity;
     }
 
+    public getScreenWidth(): number {
+        return this._screenWidth;
+    }
+
+    public getScreenHeight(): number {
+        return this._screenHeight;
+    }
+
+    public isRooted(): boolean {
+        return this._rooted;
+    }
+
+    public getConnectionType(): string {
+        return this._connectionType;
+    }
+
+    public getTimeZone(): string {
+        return this._timeZone;
+    }
+
+    public getFreeSpace(): number {
+        return this._freeInternalSpace;
+    }
+
+    public getLanguage(): string {
+        return this._language;
+    }
+
     public getDTO() {
         return {
-            'android_id': this._androidId,
-            'advertising_id': this._advertisingIdentifier,
-            'tracking_enabled': this._limitAdTracking,
-            'api_level': this._apiLevel,
-            'os_version': this._osVersion,
-            'manufacturer': this._manufacturer,
-            'model': this._model,
-            'connection_type': this._connectionType,
-            'network_type': this._networkType,
-            'screen_layout': this._screenLayout,
-            'screen_density': this._screenDensity,
-            'screen_width': this._screenWidth,
-            'screen_height': this._screenHeight,
-            'network_operator': this._networkOperator,
-            'network_operator_name': this._networkOperatorName,
-            'timezone': this._timeZone,
+            'androidId': this._androidId,
+            'advertisingId': this._advertisingIdentifier,
+            'trackingEnabled': this._limitAdTracking,
+            'apiLevel': this._apiLevel,
+            'osVersion': this._osVersion,
+            'deviceMake': this._manufacturer,
+            'deviceModel': this._model,
+            'connectionType': this._connectionType,
+            'networkType': this._networkType,
+            'screenLayout': this._screenLayout,
+            'screenDensity': this._screenDensity,
+            'screenWidth': this._screenWidth,
+            'screenHeight': this._screenHeight,
+            'networkOperator': this._networkOperator,
+            'networkOperatorName': this._networkOperatorName,
+            'timeZone': this._timeZone,
             'headset': this._headset,
-            'ringer_mode': this._ringerMode,
+            'ringerMode': this._ringerMode,
             'language': this._language,
-            'device_volume': this._volume,
-            'screen_brightness': this._screenBrightness,
-            'free_space_internal': this._freeInternalSpace,
-            'total_space_internal': this._totalInternalSpace,
-            'free_space_external': this._freeExternalSpace,
-            'total_space_external': this._totalExternalSpace,
-            'battery_level': this._batteryLevel,
-            'battery_status': this._batteryStatus,
-            'free_memory': this._freeMemory,
-            'total_memory': this._totalMemory,
+            'deviceVolume': this._volume,
+            'screenBrightness': this._screenBrightness,
+            'freeSpaceInternal': this._freeInternalSpace,
+            'totalSpaceInternal': this._totalInternalSpace,
+            'freeSpaceExternal': this._freeExternalSpace,
+            'totalSpaceExternal': this._totalExternalSpace,
+            'batteryLevel': this._batteryLevel,
+            'batteryStatus': this._batteryStatus,
+            'freeMemory': this._freeMemory,
+            'totalMemory': this._totalMemory,
             'rooted': this._rooted
         };
     }
