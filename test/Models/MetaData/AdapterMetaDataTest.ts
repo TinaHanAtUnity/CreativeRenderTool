@@ -81,8 +81,8 @@ describe('AdapterMetaDataTest', () => {
             assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
-                name: 'test_name',
-                version: 'test_version'
+                adapterName: 'test_name',
+                adapterVersion: 'test_version'
             }, 'AdapterMetaData.getDTO() produced invalid output');
         });
     });

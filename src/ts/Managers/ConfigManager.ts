@@ -31,7 +31,7 @@ export class ConfigManager {
         ].join('/');
 
         url = Url.addParameters(url, {
-            bundle_id: clientInfo.getApplicationName(),
+            bundleId: clientInfo.getApplicationName(),
             encrypted: !clientInfo.isDebuggable(),
             rooted: deviceInfo.isRooted()
         });

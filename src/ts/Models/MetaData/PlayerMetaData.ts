@@ -58,10 +58,10 @@ export class PlayerMetaData extends Model {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'sid': this._sid,
-            'name': this._name,
-            'gender': this._gender,
-            'age': this._age
+            'playerSid': this._sid,
+            'playerName': this._name,
+            'playerGender': this._gender,
+            'playerAge': this._age
         };
     }
 

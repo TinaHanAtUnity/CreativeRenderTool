@@ -72,22 +72,22 @@ export class CampaignManager {
 
         return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
             url = Url.addParameters(url, {
-                application_version: this._clientInfo.getApplicationVersion(),
-                application_name: this._clientInfo.getApplicationName(),
+                bundleVersion: this._clientInfo.getApplicationVersion(),
+                bundleId: this._clientInfo.getApplicationName(),
                 connectionType: this._deviceInfo.getConnectionType(),
-                device_free_space: this._deviceInfo.getFreeSpace(),
+                deviceFreeSpace: this._deviceInfo.getFreeSpace(),
                 gameId: this._clientInfo.getGameId(),
                 hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
                 deviceType: this._deviceInfo.getModel(),
                 language: this._deviceInfo.getLanguage(),
                 networkType: this._deviceInfo.getNetworkType(),
-                network_operator: this._deviceInfo.getNetworkOperator(),
-                network_operator_name: this._deviceInfo.getNetworkOperatorName(),
+                networkOperator: this._deviceInfo.getNetworkOperator(),
+                networkOperatorName: this._deviceInfo.getNetworkOperatorName(),
                 platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
                 screenDensity: this._deviceInfo.getScreenDensity(),
                 screenSize: this._deviceInfo.getScreenLayout(),
-                screen_width: this._deviceInfo.getScreenWidth(),
-                screen_height: this._deviceInfo.getScreenHeight(),
+                screenWidth: this._deviceInfo.getScreenWidth(),
+                screenHeight: this._deviceInfo.getScreenHeight(),
                 sdkVersion: this._clientInfo.getSdkVersion(),
                 softwareVersion: this._deviceInfo.getApiLevel(),
                 placementId: placementId,
@@ -110,11 +110,7 @@ export class CampaignManager {
             }
 
             if(mediation) {
-                url = Url.addParameters(url, {
-                    mediation_name: mediation.getName(),
-                    mediation_version: mediation.getVersion(),
-                    mediation_ordinal: mediation.getOrdinal()
-                });
+                url = Url.addParameters(url, mediation.getDTO());
             }
 
             return url;

@@ -43,8 +43,8 @@ export class FrameworkMetaData extends Model {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'name': this._name,
-            'version': this._version
+            'frameworkName': this._name,
+            'frameworkVersion': this._version
         };
     }
 

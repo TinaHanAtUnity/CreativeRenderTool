@@ -50,9 +50,9 @@ export class MediationMetaData extends Model {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'name': this._name,
-            'version': this._version,
-            'ordinal': this._ordinal
+            'mediationName': this._name,
+            'mediationVersion': this._version,
+            'mediationOrdinal': this._ordinal
         };
     }
 

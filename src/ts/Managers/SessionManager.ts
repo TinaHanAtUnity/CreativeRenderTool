@@ -58,7 +58,7 @@ export class SessionManager {
         this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id);
         }).then(([id, infoJson]) => {
-            infoJson.skipped_at = videoProgress;
+            infoJson.skippedAt = videoProgress;
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         });
     }
@@ -128,26 +128,26 @@ export class SessionManager {
     private getInfoJson(adUnit: AbstractAdUnit, id: string): Promise<[string, any]> {
         let infoJson: any = {
             'uuid': id,
-            'gamer_id': adUnit.getCampaign().getGamerId(),
-            'campaign_id': adUnit.getCampaign().getId(),
-            'placement_id': adUnit.getPlacement().getId(),
-            'api_level': this._deviceInfo.getApiLevel(),
-            'network_type': this._deviceInfo.getNetworkType(),
+            'gamerId': adUnit.getCampaign().getGamerId(),
+            'campaignId': adUnit.getCampaign().getId(),
+            'placementId': adUnit.getPlacement().getId(),
+            'apiLevel': this._deviceInfo.getApiLevel(),
+            'networkType': this._deviceInfo.getNetworkType(),
             'cached': true,
-            'advertising_id': this._deviceInfo.getAdvertisingIdentifier(),
-            'tracking_enabled': this._deviceInfo.getLimitAdTracking(),
-            'os_version': this._deviceInfo.getOsVersion(),
-            'connection_type': this._deviceInfo.getConnectionType(),
+            'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
+            'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
+            'osVersion': this._deviceInfo.getOsVersion(),
+            'connectionType': this._deviceInfo.getConnectionType(),
             'sid': this._gamerSid,
-            'device_make': this._deviceInfo.getManufacturer(),
-            'device_model': this._deviceInfo.getModel()
+            'deviceMake': this._deviceInfo.getManufacturer(),
+            'deviceModel': this._deviceInfo.getModel()
         };
 
         return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
             if(mediation) {
-                infoJson.mediation_name = mediation.getName();
-                infoJson.mediation_version = mediation.getVersion();
-                infoJson.mediation_ordinal = mediation.getOrdinal();
+                infoJson.mediationName = mediation.getName();
+                infoJson.mediationVersion = mediation.getVersion();
+                infoJson.mediationOrdinal = mediation.getOrdinal();
             }
             return [id, infoJson];
         });

@@ -43,8 +43,8 @@ export class AdapterMetaData extends Model {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'name': this._name,
-            'version': this._version
+            'adapterName': this._name,
+            'adapterVersion': this._version
         };
     }
 

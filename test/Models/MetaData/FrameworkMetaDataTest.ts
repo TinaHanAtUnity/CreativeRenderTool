@@ -81,8 +81,8 @@ describe('FrameworkMetaDataTest', () => {
             assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
-                name: 'test_name',
-                version: 'test_version'
+                frameworkName: 'test_name',
+                frameworkVersion: 'test_version'
             }, 'FrameworkMetaData.getDTO() produced invalid output');
         });
     });

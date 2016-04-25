@@ -91,10 +91,10 @@ describe('PlayerMetaDataTest', () => {
             assert.equal(metaData.getGender(), 'test_gender', 'PlayerMetaData.getGender() did not pass through correctly');
             assert.equal(metaData.getAge(), 42, 'PlayerMetaData.getAge() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
-                sid: 'test_sid',
-                name: 'test_name',
-                gender: 'test_gender',
-                age: 42
+                playerSid: 'test_sid',
+                playerName: 'test_name',
+                playerGender: 'test_gender',
+                playerAge: 42
             }, 'PlayerMetaData.getDTO() produced invalid output');
             return PlayerMetaData.exists(nativeBridge).then(exists => {
                 assert.isFalse(exists, 'PlayerMetaData was not deleted after fetching');
