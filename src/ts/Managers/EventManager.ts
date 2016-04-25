@@ -12,7 +12,7 @@ export class EventManager {
         this._request = request;
     }
 
-    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void> {
+    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> {
         this._nativeBridge.Sdk.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId), url);
@@ -20,9 +20,10 @@ export class EventManager {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
         return this._request.post(url, data, [], 5, 5000).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId));
-        }).then(() => {
-            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            return Promise.all([
+                this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
+                this._nativeBridge.Storage.write(StorageType.PRIVATE)
+            ]);
         });
     }
 
@@ -60,14 +61,15 @@ export class EventManager {
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
-    private resendEvent(sessionId: string, eventId: string): Promise<void> {
+    private resendEvent(sessionId: string, eventId: string): Promise<void[]> {
         return this.getStoredOperativeEvent(sessionId, eventId).then(([url, data]) => {
             this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event + ' + eventId + ')');
             return this._request.post(url, data, [], 5, 5000);
         }).then(() => {
-            return this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId));
-        }).then(() => {
-            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            return Promise.all([
+                this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
+                this._nativeBridge.Storage.write(StorageType.PRIVATE)
+            ]);
         });
     }
 
