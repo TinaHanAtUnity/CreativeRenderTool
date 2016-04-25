@@ -54,11 +54,13 @@ export class SessionManager {
         });
     }
 
-    public sendSkip(adUnit: AbstractAdUnit, videoProgress: number): void {
+    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
         this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id);
         }).then(([id, infoJson]) => {
-            infoJson.skippedAt = videoProgress;
+            if(videoProgress) {
+                infoJson.skippedAt = videoProgress;
+            }
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         });
     }
