@@ -309,6 +309,18 @@ describe('EventManagerTest', () => {
         });
     });
 
+    it('Start new session', () => {
+        let sessionId: string = 'new-12345';
+        let sessionTsKey: string = 'session.' + sessionId + '.ts';
+
+        return eventManager.startNewSession(sessionId).then(() => {
+            return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(timestamp => {
+                assert.equal(true, Date.now() >= timestamp, 'New session timestamp must be in present or past');
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after starting new session');
+            });
+        });
+    });
+
     it('Delete old session', () => {
         let sessionId: string = 'old-1234';
         let sessionTsKey: string = 'session.' + sessionId + '.ts';
@@ -323,6 +335,22 @@ describe('EventManagerTest', () => {
                 assert.equal('COULDNT_GET_VALUE', error[0], 'Old session should have been deleted');
             }).then(() => {
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after deleting old session');
+            });
+        });
+    });
+
+    it('Delete session without timestamp', () => {
+        let randomKey: string = 'session.random123.operative.456.test';
+
+        storageApi.set(StorageType.PRIVATE, randomKey, 'test');
+
+        return eventManager.sendUnsentSessions().then(() => {
+            return storageApi.get<number>(StorageType.PRIVATE, randomKey).then(() => {
+                assert.fail('Session without timestamp found in storage but it should have been deleted');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Session without timestamp should have been deleted');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after deleting session without timestamp');
             });
         });
     });
