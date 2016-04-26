@@ -28,6 +28,8 @@ class TestRequestApi extends RequestApi {
             }
 
             this._retryCount++;
+        } else if(url.indexOf('/alwaysRetry')) {
+            this.sendSuccessResponse(id, url, 'Must continue retrying', 500, []);
         }
 
         return Promise.resolve(id);
@@ -194,6 +196,19 @@ describe('RequestTest', () => {
         }).catch(error => {
             error = error[1];
             throw new Error('Post with retrying failed: ' + error);
+        });
+    });
+
+    it('Request should fail after retry attempts', () => {
+        let retryUrl: string = 'http://www.example.org/alwaysRetry';
+        let retryAttempts: number = 5;
+        let retryDelay: number = 10;
+
+        return request.get(retryUrl, 'Test', [], retryAttempts, retryDelay).then(response => {
+            throw new Error('Should not have received a response');
+        }).catch(error => {
+            error = error[1];
+            assert.equal('FAILED_AFTER_RETRIES', error, 'Error was not correct after retries');
         });
     });
 });
