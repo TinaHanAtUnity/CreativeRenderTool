@@ -293,14 +293,16 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
-            return storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
-                let errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event url should be deleted');
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(() => {
+                assert.fail('Retried event url should be deleted from storage');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Retried event url should be deleted from storage');
             }).then(() => {
                 return storageApi.get(StorageType.PRIVATE, dataKey);
+            }).then(() => {
+                assert.fail('Retried event data should be deleted from storage');
             }).catch(error => {
-                let errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event data should be deleted');
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Retried event data should be deleted from storage');
             }).then(() => {
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after retry failed event');
             });
