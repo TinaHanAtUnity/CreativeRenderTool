@@ -209,6 +209,8 @@ export class WebView {
     private onClose(placement: Placement): void {
         if(this._mustReinitialize) {
             this.reinitialize();
+        } else {
+            this._sessionManager.create();
         }
     }
 
