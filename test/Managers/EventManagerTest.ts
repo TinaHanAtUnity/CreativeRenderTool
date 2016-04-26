@@ -279,9 +279,11 @@ describe('EventManagerTest', () => {
         let sessionId: string = 'abcd-1234';
         let eventId: string = '5678-efgh';
 
+        let sessionTsKey: string = 'session.' + sessionId + '.ts';
         let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
         let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
+        storageApi.set(StorageType.PRIVATE, sessionTsKey, Date.now() - 100);
         storageApi.set(StorageType.PRIVATE, urlKey, url);
         storageApi.set(StorageType.PRIVATE, dataKey, data);
 
