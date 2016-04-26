@@ -183,14 +183,6 @@ export class WebView {
             campaign.getVideoUrl()
         ];
 
-        Promise.all(cacheableAssets.map(asset => {
-            let parser = document.createElement('a');
-            parser.href = asset;
-            return this._resolve.resolve(parser.hostname);
-        })).then(ips => {
-            ips.forEach(ip => console.dir(ip));
-        });
-
         this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
             campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
