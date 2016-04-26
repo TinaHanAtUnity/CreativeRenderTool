@@ -201,7 +201,7 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
                 let errorCode = error.shift();
                 assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event url should be deleted');
             }).then(() => {
@@ -234,7 +234,7 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
                 assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return storageApi.get<string>(StorageType.PRIVATE, dataKey);
