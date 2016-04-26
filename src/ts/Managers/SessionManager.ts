@@ -28,7 +28,7 @@ export class SessionManager {
         this._eventManager = eventManager;
     }
 
-    public create(): Promise<any[]> {
+    public create(): Promise<void[]> {
         return this._eventManager.getUniqueEventId().then(id => {
             this._currentSession = new Session(id);
             return this._eventManager.startNewSession(id);

@@ -36,7 +36,7 @@ export class EventManager {
         return this._request.post(url, data);
     }
 
-    public startNewSession(sessionId: string): Promise<any[]> {
+    public startNewSession(sessionId: string): Promise<void[]> {
         return Promise.all([
             this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, this.getSessionTimestampKey(sessionId), Date.now()),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
