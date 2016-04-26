@@ -36,13 +36,26 @@ export class EventManager {
         return this._request.post(url, data);
     }
 
+    public startNewSession(sessionId: string): Promise<any[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, this.getSessionTimestampKey(sessionId), Date.now()),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
+
     public sendUnsentSessions(): Promise<any[]> {
         return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
-                return this.getUnsentOperativeEvents(sessionId).then(events => {
-                    return Promise.all(events.map(eventId => {
-                        return this.resendEvent(sessionId, eventId);
-                    }));
+                return this.isSessionOutdated(sessionId).then(outdated => {
+                    if(outdated) {
+                        return this.deleteSession(sessionId);
+                    } else {
+                        return this.getUnsentOperativeEvents(sessionId).then(events => {
+                            return Promise.all(events.map(eventId => {
+                                return this.resendEvent(sessionId, eventId);
+                            }));
+                        });
+                    }
                 });
             });
             return Promise.all(promises);
@@ -57,14 +70,25 @@ export class EventManager {
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
+    private isSessionOutdated(sessionId: string): Promise<boolean> {
+        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, this.getSessionTimestampKey(sessionId)).then(timestamp => {
+            let timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
+            let timeThresholdMax: number = new Date().getTime();
+
+            return !(timestamp > timeThresholdMin && timestamp < timeThresholdMax);
+        }).catch(() => {
+            return true;
+        });
+    }
+
     private getUnsentOperativeEvents(sessionId: string): Promise<string[]> {
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
     private resendEvent(sessionId: string, eventId: string): Promise<void[]> {
         return this.getStoredOperativeEvent(sessionId, eventId).then(([url, data]) => {
-            this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event + ' + eventId + ')');
-            return this._request.post(url, data, [], 5, 5000);
+            this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
+            return this._request.post(url, data);
         }).then(() => {
             return Promise.all([
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
@@ -80,8 +104,23 @@ export class EventManager {
         ]);
     }
 
+    private deleteSession(sessionId: string): Promise<any[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getSessionKey(sessionId)),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
+
+    private getSessionKey(sessionId: string): string {
+        return 'session.' + sessionId;
+    }
+
+    private getSessionTimestampKey(sessionId: string): string {
+        return this.getSessionKey(sessionId) + '.ts';
+    }
+
     private getEventKey(sessionId: string, eventId: string): string {
-        return 'session.' + sessionId + '.operative.' + eventId;
+        return this.getSessionKey(sessionId) + '.operative.' + eventId;
     }
 
     private getUrlKey(sessionId: string, eventId: string): string {
