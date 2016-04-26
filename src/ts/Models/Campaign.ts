@@ -13,6 +13,7 @@ export class Campaign {
     private _videoSize: number;
     private _streamingVideo: string;
     private _clickAttributionUrl: string;
+    private _clickAttributionUrlFollowsRedirects: boolean;
     private _bypassAppSheet: boolean;
 
     private _gamerId: string;
@@ -31,7 +32,8 @@ export class Campaign {
         this._video = campaign.trailerDownloadable;
         this._videoSize = campaign.trailerDownloadableSize;
         this._streamingVideo = campaign.trailerStreaming;
-        this._clickAttributionUrl = campaign.clickAttributionUrl;
+        this._clickAttributionUrl = 'https://handler.fiksu.com/click?adid=768307f0-702c-0133-9efa-22000b6d8b15&gaid=0cbcf778-15b6-45d5-ba6a-60f02d7ec07f&site_id=99999998765';
+        this._clickAttributionUrlFollowsRedirects = true;
         this._bypassAppSheet = campaign.bypassAppSheet;
 
         this._gamerId = gamerId;
@@ -96,6 +98,10 @@ export class Campaign {
 
     public getClickAttributionUrl(): string {
         return this._clickAttributionUrl;
+    }
+
+    public getClickAttributionUrlFollowsRedirects(): boolean {
+        return this._clickAttributionUrlFollowsRedirects;
     }
 
     public getGamerId(): string {

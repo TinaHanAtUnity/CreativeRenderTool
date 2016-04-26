@@ -248,15 +248,15 @@ describe('EventManagerTest', () => {
         return event;
     });
 
-    it('Send third party event', () => {
+    it('Send click attribution event', () => {
         let sessionId: string = '1234';
         let url: string = 'https://www.example.net/third_party_event';
 
         let requestSpy = sinon.spy(request, 'get');
 
-        return eventManager.thirdPartyEvent('Test event', sessionId, url).then(() => {
-            assert(requestSpy.calledOnce, 'Third party event did not try sending GET request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Third party event url does not match');
+        return eventManager.clickAttributionEvent(sessionId, url, false).then(() => {
+            assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
+            assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
         });
     });
 
