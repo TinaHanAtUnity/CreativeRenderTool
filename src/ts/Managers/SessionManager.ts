@@ -130,7 +130,8 @@ export class SessionManager {
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string): Promise<[string, any]> {
         let infoJson: any = {
-            'uuid': id,
+            'eventId': id,
+            'sessionId': this._currentSession.getId(),
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
