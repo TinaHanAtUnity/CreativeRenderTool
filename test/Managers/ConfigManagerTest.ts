@@ -4,7 +4,6 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
-import { NativeResponse } from '../../src/ts/Utilities/Request';
 import { NativeBridge} from '../../src/ts/Native/NativeBridge';
 import { StorageType, StorageApi } from '../../src/ts/Native/Api/Storage';
 
@@ -66,8 +65,9 @@ describe('ConfigManagerTest', () => {
     describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            let nativeResponse = new NativeResponse();
-            nativeResponse.response = '{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }';
+            let nativeResponse = {
+                response: '{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'
+            };
             configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
@@ -88,8 +88,9 @@ describe('ConfigManagerTest', () => {
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            let nativeResponse = new NativeResponse();
-            nativeResponse.response = '{bad json here,';
+            let nativeResponse = {
+                response: '{bad json here,'
+            };
             configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {

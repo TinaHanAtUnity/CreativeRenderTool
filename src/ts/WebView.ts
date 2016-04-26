@@ -7,7 +7,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
-import { Request, NativeResponse } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -19,6 +19,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { Resolve } from 'Utilities/Resolve';
 
 export class WebView {
 
@@ -28,6 +29,7 @@ export class WebView {
     private _clientInfo: ClientInfo;
 
     private _request: Request;
+    private _resolve: Resolve;
     private _configuration: Configuration;
 
     private _campaignManager: CampaignManager;
@@ -50,6 +52,7 @@ export class WebView {
         this._deviceInfo = new DeviceInfo();
         this._cacheManager = new CacheManager(this._nativeBridge);
         this._request = new Request(this._nativeBridge);
+        this._resolve = new Resolve(this._nativeBridge);
         this._eventManager = new EventManager(this._nativeBridge, this._request);
     }
 
@@ -258,7 +261,7 @@ export class WebView {
         this._nativeBridge.Sdk.reinitialize();
     }
 
-    private getConfigJson(): Promise<NativeResponse> {
+    private getConfigJson(): Promise<INativeResponse> {
         return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
     }
 

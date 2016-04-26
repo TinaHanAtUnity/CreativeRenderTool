@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Request, NativeResponse } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 
 export class EventManager {
@@ -27,12 +27,12 @@ export class EventManager {
         });
     }
 
-    public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<NativeResponse> {
+    public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
         this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
         return this._request.get(url);
     }
 
-    public diagnosticEvent(url: string, data: string): Promise<NativeResponse> {
+    public diagnosticEvent(url: string, data: string): Promise<INativeResponse> {
         return this._request.post(url, data);
     }
 
