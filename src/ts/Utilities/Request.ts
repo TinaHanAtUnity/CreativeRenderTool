@@ -42,11 +42,7 @@ export class Request {
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
     }
 
-    public get(url: string, headers?: [string, string][], retries = 0, retryDelay = 0): Promise<INativeResponse> {
-        if(typeof headers === 'undefined') {
-            headers = [];
-        }
-
+    public get(url: string, headers: [string, string][] = [], retries = 0, retryDelay = 0): Promise<INativeResponse> {
         let id = Request._callbackId++;
         let promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -59,10 +55,7 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data = '', headers?: [string, string][], retries = 0, retryDelay = 0): Promise<INativeResponse> {
-        if(typeof headers === 'undefined') {
-            headers = [];
-        }
+    public post(url: string, data = '', headers: [string, string][] = [], retries = 0, retryDelay = 0): Promise<INativeResponse> {
         headers.push(['Content-Type', 'application/json']);
 
         let id = Request._callbackId++;
