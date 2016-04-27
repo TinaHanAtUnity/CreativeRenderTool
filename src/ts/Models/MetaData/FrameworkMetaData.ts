@@ -15,10 +15,7 @@ export class FrameworkMetaData extends Model {
         });
     }
 
-    public static fetch(nativeBridge: NativeBridge, cache?: boolean): Promise<FrameworkMetaData> {
-        if(typeof cache === 'undefined') {
-            cache = true;
-        }
+    public static fetch(nativeBridge: NativeBridge, cache = true): Promise<FrameworkMetaData> {
         if(cache && FrameworkMetaData._cache) {
             return Promise.resolve(FrameworkMetaData._cache);
         }
