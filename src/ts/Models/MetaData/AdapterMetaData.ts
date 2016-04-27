@@ -15,10 +15,7 @@ export class AdapterMetaData extends Model {
         });
     }
 
-    public static fetch(nativeBridge: NativeBridge, cache?: boolean): Promise<AdapterMetaData> {
-        if(typeof cache === 'undefined') {
-            cache = true;
-        }
+    public static fetch(nativeBridge: NativeBridge, cache = true): Promise<AdapterMetaData> {
         if(cache && AdapterMetaData._cache) {
             return Promise.resolve(AdapterMetaData._cache);
         }

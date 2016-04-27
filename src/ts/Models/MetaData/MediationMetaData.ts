@@ -16,10 +16,7 @@ export class MediationMetaData extends Model {
         });
     }
 
-    public static fetch(nativeBridge: NativeBridge, cache?: boolean): Promise<MediationMetaData> {
-        if(typeof cache === 'undefined') {
-            cache = true;
-        }
+    public static fetch(nativeBridge: NativeBridge, cache = true): Promise<MediationMetaData> {
         if(cache && MediationMetaData._cache) {
             return Promise.resolve(MediationMetaData._cache);
         }

@@ -42,17 +42,9 @@ export class Request {
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
     }
 
-    public get(url: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<INativeResponse> {
+    public get(url: string, headers?: [string, string][], retries = 0, retryDelay = 0): Promise<INativeResponse> {
         if(typeof headers === 'undefined') {
             headers = [];
-        }
-
-        if(typeof retries === 'undefined') {
-            retries = 0;
-        }
-
-        if(typeof retryDelay === 'undefined') {
-            retryDelay = 0;
         }
 
         let id = Request._callbackId++;
@@ -67,23 +59,11 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data?: string, headers?: [string, string][], retries?: number, retryDelay?: number): Promise<INativeResponse> {
-        if(typeof data === 'undefined') {
-            data = '';
-        }
-
+    public post(url: string, data = '', headers?: [string, string][], retries = 0, retryDelay = 0): Promise<INativeResponse> {
         if(typeof headers === 'undefined') {
             headers = [];
         }
         headers.push(['Content-Type', 'application/json']);
-
-        if(typeof retries === 'undefined') {
-            retries = 0;
-        }
-
-        if(typeof retryDelay === 'undefined') {
-            retryDelay = 0;
-        }
 
         let id = Request._callbackId++;
         let promise = this.registerCallback(id);
