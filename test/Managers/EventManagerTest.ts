@@ -201,7 +201,7 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
                 let errorCode = error.shift();
                 assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event url should be deleted');
             }).then(() => {
@@ -210,7 +210,7 @@ describe('EventManagerTest', () => {
                 let errorCode = error.shift();
                 assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event data should be deleted');
             }).then(() => {
-                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after successful operative event');
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after successful operative event');
             });
         });
     });
@@ -234,13 +234,13 @@ describe('EventManagerTest', () => {
 
             let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
                 assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return storageApi.get<string>(StorageType.PRIVATE, dataKey);
             }).then(storedData => {
                 assert.equal(data, storedData, 'Failed operative event data was not correctly stored');
-                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after failed operative event');
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after failed operative event');
             });
         });
         clock.tick(30000);
@@ -279,9 +279,11 @@ describe('EventManagerTest', () => {
         let sessionId: string = 'abcd-1234';
         let eventId: string = '5678-efgh';
 
+        let sessionTsKey: string = 'session.' + sessionId + '.ts';
         let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
         let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
+        storageApi.set(StorageType.PRIVATE, sessionTsKey, Date.now() - 100);
         storageApi.set(StorageType.PRIVATE, urlKey, url);
         storageApi.set(StorageType.PRIVATE, dataKey, data);
 
@@ -291,16 +293,64 @@ describe('EventManagerTest', () => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
-            storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
-                let errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event url should be deleted');
+            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(() => {
+                assert.fail('Retried event url should be deleted from storage');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Retried event url should be deleted from storage');
             }).then(() => {
                 return storageApi.get(StorageType.PRIVATE, dataKey);
-            }).catch(error => {
-                let errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Retried event data should be deleted');
             }).then(() => {
-                assert.equal(false, storageApi.isDirty(), 'Store should not be left dirty after retry failed event');
+                assert.fail('Retried event data should be deleted from storage');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Retried event data should be deleted from storage');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after retry failed event');
+            });
+        });
+    });
+
+    it('Start new session', () => {
+        let sessionId: string = 'new-12345';
+        let sessionTsKey: string = 'session.' + sessionId + '.ts';
+
+        return eventManager.startNewSession(sessionId).then(() => {
+            return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(timestamp => {
+                assert.equal(true, Date.now() >= timestamp, 'New session timestamp must be in present or past');
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after starting new session');
+            });
+        });
+    });
+
+    it('Delete old session', () => {
+        let sessionId: string = 'old-1234';
+        let sessionTsKey: string = 'session.' + sessionId + '.ts';
+        let threeMonthsAgo: number = Date.now() - 90 * 24 * 60 * 60 * 1000;
+
+        storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
+
+        return eventManager.sendUnsentSessions().then(() => {
+            return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(() => {
+                assert.fail('Old session found in storage but it should have been deleted');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Old session should have been deleted');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after deleting old session');
+            });
+        });
+    });
+
+    it('Delete session without timestamp', () => {
+        let randomKey: string = 'session.random123.operative.456.test';
+
+        storageApi.set(StorageType.PRIVATE, randomKey, 'test');
+
+        return eventManager.sendUnsentSessions().then(() => {
+            return storageApi.get<number>(StorageType.PRIVATE, randomKey).then(() => {
+                assert.fail('Session without timestamp found in storage but it should have been deleted');
+            }).catch(error => {
+                assert.equal('COULDNT_GET_VALUE', error[0], 'Session without timestamp should have been deleted');
+            }).then(() => {
+                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after deleting session without timestamp');
             });
         });
     });

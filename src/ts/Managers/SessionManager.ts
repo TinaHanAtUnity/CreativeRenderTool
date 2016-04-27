@@ -29,9 +29,10 @@ export class SessionManager {
         this._eventManager = eventManager;
     }
 
-    public create(): Promise<void> {
+    public create(): Promise<void[]> {
         return this._eventManager.getUniqueEventId().then(id => {
             this._currentSession = new Session(id);
+            return this._eventManager.startNewSession(id);
         });
     }
 
@@ -129,7 +130,8 @@ export class SessionManager {
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string): Promise<[string, any]> {
         let infoJson: any = {
-            'uuid': id,
+            'eventId': id,
+            'sessionId': this._currentSession.getId(),
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
