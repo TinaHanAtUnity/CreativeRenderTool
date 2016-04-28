@@ -12,6 +12,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
+import { Vast } from 'Models/Vast';
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -30,8 +31,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPlayObserver;
     private _onCompletedObserver;
 
-    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
-        super(nativeBridge, session, placement, campaign);
+    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign, vast: Vast) {
+        super(nativeBridge, session, placement, campaign, vast);
 
         this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
         this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
@@ -43,7 +44,9 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         this.prepareVideoPlayer();
         this.prepareOverlay();
-        this.prepareEndScreen();
+        if (campaign) {
+            this.prepareEndScreen();
+        }
     }
 
     public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
@@ -58,7 +61,9 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
 
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+        if (this.getEndScreen()) {
+            this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+        }
         this.unsetReferences();
 
         this._nativeBridge.AdUnit.onResume.unsubscribe(this._onResumeObserver);
@@ -128,7 +133,11 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private onResume(): void {
         if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            if (this.getCampaign()) {
+                this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            } else if (this.getVast()) {
+                this._nativeBridge.VideoPlayer.prepare(this.getVast().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            }
         }
     }
 
@@ -175,7 +184,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     private prepareEndScreen() {
-        let endScreen = new EndScreen(this.getCampaign());
+        let endScreen = new EndScreen(this.getCampaign(), this.getVast());
 
         endScreen.render();
         endScreen.hide();

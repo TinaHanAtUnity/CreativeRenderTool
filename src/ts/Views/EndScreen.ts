@@ -5,6 +5,7 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
+import { Vast } from 'Models/Vast';
 
 export class EndScreen extends View {
 
@@ -12,20 +13,32 @@ export class EndScreen extends View {
     public onReplay: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
-    constructor(campaign: Campaign) {
+    constructor(campaign: Campaign, vast: Vast) {
         super('end-screen');
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = campaign.getRating() * 20 - 2;
-        this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon(),
-            'endScreenLandscape': campaign.getLandscapeUrl(),
-            'endScreenPortrait': campaign.getPortraitUrl(),
-            'rating': adjustedRating.toString(),
-            'ratingCount': campaign.getRatingCount().toString()
-        };
+        if (campaign) {
+            let adjustedRating: number = campaign.getRating() * 20 - 2;
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon(),
+                'endScreenLandscape': campaign.getLandscapeUrl(),
+                'endScreenPortrait': campaign.getPortraitUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': campaign.getRatingCount().toString()
+            };
+        } else {
+            // TODO where do we get this from for VAST?
+            this._templateData = {
+                'gameName': 'Unknown',
+                'gameIcon': 'Unknown',
+                'endScreenLandscape': 'http://madewith.unity.com/sites/default/files/styles/unity_mwu_front_banner/public/game-article/header-image-desktop/storyheaderimage.jpg',
+                'endScreenPortrait': 'http://madewith.unity.com/sites/default/files/styles/unity_mwu_front_banner/public/game-article/header-image-desktop/storyheaderimage.jpg',
+                'rating': '5',
+                'ratingCount': '12345'
+            };
+        }
 
         this._bindings = [
             {

@@ -9,11 +9,15 @@ import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 
+import { Vast } from 'Models/Vast';
+import { VastParser } from 'Utilities/VastParser';
+
 export class CampaignManager {
 
     private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     public onCampaign: Observable2<Placement, Campaign> = new Observable2();
+    public onVast: Observable2<Placement, Vast> = new Observable2();
     public onError: Observable1<Error> = new Observable1();
 
     private _request: Request;
@@ -35,9 +39,16 @@ export class CampaignManager {
 
         this._request.get(this.createRequestUrl(placement.getId()), [], 5, 5000).then(response => {
             let campaignJson: any = JSON.parse(response.response);
-            let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-            placement.setCampaign(campaign);
-            this.onCampaign.trigger(placement, campaign);
+            if (campaignJson.campaign) {
+                let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                placement.setCampaign(campaign);
+                this.onCampaign.trigger(placement, campaign);
+            } else {
+                let vastString = decodeURIComponent(campaignJson.vast).trim();
+                let vast: Vast = new VastParser().parseVast(vastString, campaignJson.gamerId, campaignJson.abGroup);
+                placement.setVast(vast);
+                this.onVast.trigger(placement, vast);
+            }
         }).catch((error) => {
             placement.setCampaign(null);
             this._failedPlacements.push(placement.getId());

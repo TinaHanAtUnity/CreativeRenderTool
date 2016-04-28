@@ -19,6 +19,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 import { Platform } from 'Constants/Platform';
+import { Vast } from 'Models/Vast';
 
 export class WebView {
 
@@ -79,6 +80,7 @@ export class WebView {
         }).then(() => {
             this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
+            this._campaignManager.onVast.subscribe(this.onVast.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configuration.getDefaultPlacement();
@@ -129,8 +131,7 @@ export class WebView {
             return;
         }
 
-        let campaign: Campaign = placement.getCampaign();
-        if(!campaign) {
+        if(!placement.getCampaign() && !placement.getVast()) {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
@@ -148,7 +149,8 @@ export class WebView {
         PlayerMetaData.getSid(this._nativeBridge).then(sid => {
             this._sessionManager.setGamerSid(sid);
 
-            let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
+            let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement,
+                placement.getCampaign(), placement.getVast()); // todo: select ad unit based on placement
             adUnit.onClose.subscribe(this.onClose.bind(this));
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
@@ -185,6 +187,27 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
+            this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
+                this._nativeBridge.Listener.sendReadyEvent(placement.getId());
+            });
+        });
+    }
+
+    private onVast(placement: Placement, vast: Vast): void {
+        console.log('web view got a vast: ' + JSON.stringify(vast));
+        // TODO we only need to cache the single video URL for the first ad in the vast payload
+        let cacheableAssets: string[] = [];
+        vast.getAds().map((ad) => {
+            ad.getCreatives().map((creative) => {
+                creative.getMediaFiles().map((mediaFile) => {
+                    if (mediaFile.getFileURL()) {
+                        cacheableAssets.push(mediaFile.getFileURL());
+                    }
+                });
+            });
+        });
+
+        this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
                 this._nativeBridge.Listener.sendReadyEvent(placement.getId());
             });

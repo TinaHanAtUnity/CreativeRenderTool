@@ -12,7 +12,11 @@ export class OverlayEventHandlers {
       adUnit.getSession().sendSkip(adUnit);
       nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
-      adUnit.getEndScreen().show();
+      if (adUnit.getCampaign()) {
+          adUnit.getEndScreen().show();
+      } else {
+          adUnit.hide();
+      }
   }
 
   public static onMute(nativeBridge: NativeBridge, adUnit: VideoAdUnit, muted: boolean): void {

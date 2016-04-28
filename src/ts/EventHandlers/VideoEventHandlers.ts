@@ -20,6 +20,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
+        adUnit.getSession().sendProgress(adUnit, position, adUnit.getVideoPosition());
         if (position > 0) {
             adUnit.setVideoPosition(position);
         }
@@ -43,7 +44,11 @@ export class VideoEventHandlers {
         adUnit.getSession().sendView(adUnit);
         nativeBridge.AdUnit.setViews(['webview']);
         adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
+        if (adUnit.getCampaign()) {
+            adUnit.getEndScreen().show();
+        } else {
+            adUnit.hide();
+        }
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if (integrationTest) {
                 nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
