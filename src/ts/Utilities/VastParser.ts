@@ -8,9 +8,17 @@ import { VastCompanionAd } from 'Models/VastCompanionAd';
 
 export class VastParser {
 
+    private _domParser: DOMParser;
+
+    constructor();
+    constructor(domParser: DOMParser);
+    constructor(domParser?: DOMParser) {
+        this._domParser = domParser || new DOMParser();
+    }
+
     public parseVast(vastString: string, gamerId: string, abGroup: number): Vast {
-        let xml = (new DOMParser()).parseFromString(vastString, 'text/xml');
-        let ad, ads: VastAd[] = [], errorURLTemplates: string[] = [];
+        let xml = (this._domParser).parseFromString(vastString, 'text/xml');
+        let ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (xml == null) {
             return null;
@@ -30,8 +38,8 @@ export class VastParser {
 
             if (node.nodeName === 'Error') {
                 errorURLTemplates.push(this.parseNodeText(node));
-            } else if (node.nodeName === 'Ad') {
-                ad = this.parseAdElement(node);
+            } else if (ads.length === 0 && node.nodeName === 'Ad') { // ignore ads after the first one
+                let ad = this.parseAdElement(node);
                 if (ad != null) {
                     ads.push(ad);
                 } else {
@@ -65,7 +73,7 @@ export class VastParser {
             }
         }
         if (ad) {
-            ad.setId(adElement.getAttribute("id"));
+            ad.setId(adElement.getAttribute('id'));
         }
         return ad;
     }
@@ -87,6 +95,7 @@ export class VastParser {
     }
 
     private parseInLineElement(inLineElement: any): any {
+        const parseCompanions = false;
         let ad = new VastAd();
         let childNodes = inLineElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
@@ -108,15 +117,19 @@ export class VastParser {
                             let creative: VastCreative;
                             switch (creativeTypeElement.nodeName) {
                                 case 'Linear':
-                                    creative = this.parseCreativeLinearElement(creativeTypeElement);
-                                    if (creative) {
-                                        ad.addCreative(creative);
+                                    if (ad.getCreatives().length === 0) {
+                                        creative = this.parseCreativeLinearElement(creativeTypeElement);
+                                        if (creative) {
+                                            ad.addCreative(creative);
+                                        }
                                     }
                                     break;
                                 case 'CompanionAds':
-                                    creative = this.parseCompanionAd(creativeTypeElement);
-                                    if (creative) {
-                                        ad.addCreative(creative);
+                                    if (parseCompanions) {
+                                        creative = this.parseCompanionAd(creativeTypeElement);
+                                        if (creative) {
+                                            ad.addCreative(creative);
+                                        }
                                     }
                                     break;
                                 default:
@@ -171,11 +184,11 @@ export class VastParser {
         }
 
         let mediaFilesElements = this.childsByName(creativeElement, 'MediaFiles');
-        for (let k = 0, _len2 = mediaFilesElements.length; k < _len2; k++) {
-            let mediaFilesElement = mediaFilesElements[k];
+        if (mediaFilesElements.length > 0) {
+            let mediaFilesElement = mediaFilesElements[0]; // we're only interested in the first file
             let mediaFileElements = this.childsByName(mediaFilesElement, 'MediaFile');
-            for (let l = 0; l < mediaFileElements.length; l++) {
-                let mediaFileElement = mediaFileElements[l];
+            if (mediaFileElements.length > 0) {
+                let mediaFileElement = mediaFileElements[0];
                 let mediaFile = new VastMediaFile(
                     this.parseNodeText(mediaFileElement),
                     mediaFileElement.getAttribute('delivery'),

@@ -6,6 +6,7 @@
     "es6-promise": "github:Applifier/DefinitelyTyped/es6-promise/es6-promise.d.ts#fix-es6-promise-all",
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#0dd29bf8253536ae24e61c109524e924ea510046",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#8c4ec896ab619e7cb6572f82423e6e1eece70f5a",
-    "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#8c4ec896ab619e7cb6572f82423e6e1eece70f5a"
+    "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#8c4ec896ab619e7cb6572f82423e6e1eece70f5a",
+    "xmldom": "registry:dt/xmldom#0.1.22+20160319053438"
   }
 }
