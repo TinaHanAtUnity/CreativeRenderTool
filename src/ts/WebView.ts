@@ -198,17 +198,10 @@ export class WebView {
     }
 
     private onVast(placement: Placement, vast: Vast): void {
-        // TODO we only need to cache the single video URL for the first ad in the vast payload
         let cacheableAssets: string[] = [];
-        vast.getAds().map((ad) => {
-            ad.getCreatives().map((creative) => {
-                creative.getMediaFiles().map((mediaFile) => {
-                    if (mediaFile.getFileURL()) {
-                        cacheableAssets.push(mediaFile.getFileURL());
-                    }
-                });
-            });
-        });
+        if (vast.getVideoUrl()) {
+            cacheableAssets.push(vast.getVideoUrl());
+        }
 
         this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
