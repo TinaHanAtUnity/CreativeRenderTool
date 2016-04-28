@@ -20,7 +20,6 @@ export abstract class VastCreative {
     }
 
     public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
-        console.log('add tracking eventName: "' + eventName + '" url: "' + trackingURLTemplate + '"');
         if (this._trackingEvents[eventName] == null) {
             this._trackingEvents[eventName] = [];
         }

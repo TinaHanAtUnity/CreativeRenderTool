@@ -9,22 +9,18 @@ import { VastCompanionAd } from 'Models/VastCompanionAd';
 export class VastParser {
 
     public parseVast(vastString: string, gamerId: string, abGroup: number): Vast {
-        console.log('parsing vast: "' + vastString + '"');
         let xml = (new DOMParser()).parseFromString(vastString, 'text/xml');
         let ad, ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (xml == null) {
-            console.log('xml is null');
             return null;
         }
 
         if (xml.documentElement == null) {
-            console.log('document element is null');
             return null;
         }
 
         if (xml.documentElement.nodeName !== 'VAST') {
-            console.log('document element ' + xml.documentElement.nodeName + ' is not VAST');
             return null;
         }
 
@@ -299,47 +295,3 @@ export class VastParser {
     }
 
 }
-
-//function recurseDomChildren(start, output)
-//{
-//    var nodes;
-//    if(start.childNodes)
-//    {
-//        nodes = start.childNodes;
-//        loopNodeChildren(nodes, output);
-//    }
-//}
-//
-//function loopNodeChildren(nodes, output)
-//{
-//    var node;
-//    for(var i=0;i<nodes.length;i++)
-//    {
-//        node = nodes[i];
-//        if(output)
-//        {
-//            outputNode(node);
-//        }
-//        if(node.childNodes)
-//        {
-//            recurseDomChildren(node, output);
-//        }
-//    }
-//}
-//
-//function outputNode(node)
-//{
-//    var whitespace = /^\s+$/g;
-//    if(node.nodeType === 1)
-//    {
-//        console.log("element: " + node.tagName);
-//    }else if(node.nodeType === 3)
-//    {
-//        //clear whitespace text nodes
-//        node.data = node.data.replace(whitespace, "");
-//        if(node.data)
-//        {
-//            console.log("text: " + node.data);
-//        }
-//    }
-//}

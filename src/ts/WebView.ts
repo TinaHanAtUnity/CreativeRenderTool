@@ -194,7 +194,6 @@ export class WebView {
     }
 
     private onVast(placement: Placement, vast: Vast): void {
-        console.log('web view got a vast: ' + JSON.stringify(vast));
         // TODO we only need to cache the single video URL for the first ad in the vast payload
         let cacheableAssets: string[] = [];
         vast.getAds().map((ad) => {

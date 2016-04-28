@@ -50,7 +50,6 @@ export class SessionManager {
     }
 
     public sendProgress(adUnit: AbstractAdUnit, position: number, oldPosition: number): void {
-        console.log('trying to send progress');
         this.sendVastQuartileEvent(adUnit, position, oldPosition, 1);
         this.sendVastQuartileEvent(adUnit, position, oldPosition, 2);
         this.sendVastQuartileEvent(adUnit, position, oldPosition, 3);
@@ -160,7 +159,6 @@ export class SessionManager {
             quartileEventName = 'thirdQuartile';
         }
         if (adUnit.getVast() && adUnit.getVast().getTrackingEventUrls(quartileEventName)) {
-            console.log(`sendVastQuartileEvent ${position} ${oldPosition} ${adUnit.getVast().getDuration()}`);
             let duration = adUnit.getVast().getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
                 for (let quartileUrl of adUnit.getVast().getTrackingEventUrls(quartileEventName)) {
