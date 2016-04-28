@@ -20,6 +20,7 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 export class WebView {
 
@@ -37,6 +38,7 @@ export class WebView {
 
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
+    private _wakeUpManager: WakeUpManager;
 
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
@@ -96,8 +98,9 @@ export class WebView {
             }
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
-            this._nativeBridge.Connectivity.setListeningStatus(true);
-            this._nativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
+
+            this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._wakeUpManager.onNetworkWakeUp.subscribe(this.onNetworkWakeUp.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
@@ -222,7 +225,7 @@ export class WebView {
      CONNECTIVITY EVENT HANDLERS
      */
 
-    private onConnected(wifi: boolean, networkType: number) {
+    private onNetworkWakeUp() {
         if(!this.isShowing()) {
             this.shouldReinitialize().then((reinitialize) => {
                 if(reinitialize) {
