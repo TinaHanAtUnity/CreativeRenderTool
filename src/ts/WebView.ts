@@ -1,3 +1,4 @@
+///<reference path="Constants/UnityAdsError.ts"/>
 import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
@@ -60,6 +61,8 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
+        }).catch(error => {
+            this._nativeBridge.Listener.sendErrorEvent(UnityAdsError.INVALID_ARGUMENT, error.message);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -165,7 +168,7 @@ export class WebView {
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
         this._nativeBridge.Sdk.logError('Show invocation failed: ' + errorMsg);
-        this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
+        this._nativeBridge.Listener.sendErrorEvent(UnityAdsError.SHOW_ERROR, errorMsg);
         if(sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
         }

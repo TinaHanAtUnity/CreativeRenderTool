@@ -20,7 +20,7 @@ export class ListenerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'sendFinishEvent', [placementId, FinishState[result]]);
     }
 
-    public sendErrorEvent(error: string, message: string): Promise<void> {
+    public sendErrorEvent(error: number, message: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'sendErrorEvent', [error, message]);
     }
 
