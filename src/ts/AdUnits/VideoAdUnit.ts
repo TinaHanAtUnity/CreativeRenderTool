@@ -5,7 +5,7 @@ import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { FinishState } from 'Constants/FinishState';
-import { VideoEventHandlers} from 'EventHandlers/VideoEventHandlers';
+import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
@@ -53,7 +53,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
-        if(this.isVideoActive()) {
+        if (this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop();
         }
 
@@ -127,20 +127,20 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onResume(): void {
-        if(this._showing && this.isVideoActive()) {
+        if (this._showing && this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
     private onPause(finishing: boolean): void {
-        if(finishing && this._showing) {
+        if (finishing && this._showing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     private onDestroy(finishing: boolean): void {
-        if(this._showing && finishing) {
+        if (this._showing && finishing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -164,7 +164,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(this._nativeBridge, this));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(this._nativeBridge, this, muted));
 
-        if(!this._placement.allowSkip()) {
+        if (!this._placement.allowSkip()) {
             overlay.setSkipEnabled(false);
         } else {
             overlay.setSkipEnabled(true);
