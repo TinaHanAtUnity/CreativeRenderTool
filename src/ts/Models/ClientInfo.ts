@@ -1,5 +1,6 @@
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
 
 export class ClientInfo extends Model {
 
@@ -25,7 +26,7 @@ export class ClientInfo extends Model {
         if (typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
             this._gameId = gameIdString;
         } else {
-            throw new Error('Invalid Game Identifier');
+            throw new Error(UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
         }
 
         this._testMode = data.shift();

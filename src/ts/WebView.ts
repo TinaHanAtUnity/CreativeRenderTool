@@ -60,6 +60,8 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(data);
             return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
+        }).catch(error => {
+            throw error;
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -105,6 +107,9 @@ export class WebView {
         }).catch(error => {
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+            }
+            if (error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], error.message);
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
