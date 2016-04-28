@@ -97,6 +97,14 @@ export class SessionManager {
         });
     }
 
+    public sendMute(adUnit: AbstractAdUnit, muted: boolean): void {
+        if (muted) {
+            this.sendVastTrackingEvent(adUnit, 'mute');
+        } else {
+            this.sendVastTrackingEvent(adUnit, 'unmute');
+        }
+    }
+
     public setGamerSid(sid: string): void {
         this._gamerSid = sid;
     }
