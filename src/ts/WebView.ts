@@ -13,13 +13,13 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
 import { FinishState } from 'Constants/FinishState';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
+import { AdUnitFactory } from './AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -152,7 +152,7 @@ export class WebView {
                 this._sessionManager.setGamerSid(player.getSid());
             }
 
-            let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign()); // todo: select ad unit based on placement
+            let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign());
             adUnit.onClose.subscribe(this.onClose.bind(this));
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
