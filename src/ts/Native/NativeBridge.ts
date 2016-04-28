@@ -55,10 +55,7 @@ export class NativeBridge implements INativeBridge {
     private _autoBatchTimer;
     private _autoBatchInterval = 50;
 
-    constructor(backend: IWebViewBridge, autoBatch?: boolean) {
-        if(typeof autoBatch === 'undefined') {
-            autoBatch = true;
-        }
+    constructor(backend: IWebViewBridge, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
 
         this._backend = backend;

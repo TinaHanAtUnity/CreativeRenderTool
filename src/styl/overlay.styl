@@ -17,9 +17,19 @@
     position: absolute
     left: 10px
     bottom: 10px
-    font-size: 25px
+
+    .mute-icon
+    .unmute-icon
+      width: 27px
+      height: 27px
+      background-size: cover
+      background-repeat: no-repeat
+
+    .mute-icon
+      background-image: url(../img/mute-off.png)
 
     .unmute-icon
+      background-image: url(../img/mute-on.png)
       display: none
 
     &.muted
@@ -27,7 +37,7 @@
         display: none
 
       .unmute-icon
-        display: inline
+        display: block
 
   .video-duration-text
     position: absolute

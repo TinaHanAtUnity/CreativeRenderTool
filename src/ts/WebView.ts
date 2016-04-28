@@ -7,7 +7,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
-import { Request, NativeResponse } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -17,8 +17,9 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { PlayerMetaData } from 'Metadata/PlayerMetaData';
 import { Platform } from 'Constants/Platform';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { Resolve } from 'Utilities/Resolve';
 import { Vast } from 'Models/Vast';
 
 export class WebView {
@@ -29,6 +30,7 @@ export class WebView {
     private _clientInfo: ClientInfo;
 
     private _request: Request;
+    private _resolve: Resolve;
     private _configuration: Configuration;
 
     private _campaignManager: CampaignManager;
@@ -51,6 +53,7 @@ export class WebView {
         this._deviceInfo = new DeviceInfo();
         this._cacheManager = new CacheManager(this._nativeBridge);
         this._request = new Request(this._nativeBridge);
+        this._resolve = new Resolve(this._nativeBridge);
         this._eventManager = new EventManager(this._nativeBridge, this._request);
     }
 
@@ -71,14 +74,13 @@ export class WebView {
             }
             return this._cacheManager.cleanCache();
         }).then(() => {
-            let configManager = new ConfigManager(this._request, this._clientInfo);
-            return configManager.fetch();
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
-            this._sessionManager = new SessionManager(this._clientInfo, this._deviceInfo, this._eventManager);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
-            this._campaignManager = new CampaignManager(this._request, this._clientInfo, this._deviceInfo);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
             this._campaignManager.onVast.subscribe(this.onVast.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
@@ -103,10 +105,10 @@ export class WebView {
 
             return this._nativeBridge.Sdk.initComplete();
         }).catch(error => {
-            console.log(error);
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
             }
+            this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
                 'type': 'unhandled_initialization_error',
                 'error': error
@@ -146,8 +148,10 @@ export class WebView {
             keyEvents = [KeyCode.BACK];
         }
 
-        PlayerMetaData.getSid(this._nativeBridge).then(sid => {
-            this._sessionManager.setGamerSid(sid);
+        PlayerMetaData.fetch(this._nativeBridge).then(player => {
+            if(player) {
+                this._sessionManager.setGamerSid(player.getSid());
+            }
 
             let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement,
                 placement.getCampaign(), placement.getVast()); // todo: select ad unit based on placement
@@ -214,10 +218,10 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        console.log(error);
         if(error instanceof Error) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
+        this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger(this._eventManager, {
             'type': 'campaign_request_failed',
             'error': error
@@ -227,6 +231,8 @@ export class WebView {
     private onClose(placement: Placement): void {
         if(this._mustReinitialize) {
             this.reinitialize();
+        } else {
+            this._sessionManager.create();
         }
     }
 
@@ -279,7 +285,7 @@ export class WebView {
         this._nativeBridge.Sdk.reinitialize();
     }
 
-    private getConfigJson(): Promise<NativeResponse> {
+    private getConfigJson(): Promise<INativeResponse> {
         return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
     }
 

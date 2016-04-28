@@ -9,7 +9,7 @@ export class OverlayEventHandlers {
       nativeBridge.VideoPlayer.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
-      adUnit.getSession().sendSkip(adUnit);
+      adUnit.getSession().sendSkip(adUnit, adUnit.getVideoPosition());
       nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
       if (adUnit.getCampaign()) {

@@ -31,13 +31,7 @@ export class AdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(views: string[], orientation: ScreenOrientation, keyEvents?: number[], systemUiVisibility?: SystemUiVisibility): Promise<void> {
-        if(typeof keyEvents === 'undefined') {
-            keyEvents = null;
-        }
-        if(typeof systemUiVisibility === 'undefined') {
-            systemUiVisibility = 0;
-        }
+    public open(views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
     }
 

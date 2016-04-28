@@ -1,13 +1,14 @@
 /// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
-import {Observable0, Observable1} from 'Utilities/Observable';
+
 declare var OverlayTemplate: string;
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
+import { Observable1 } from 'Utilities/Observable';
 
 export class Overlay extends View {
 
-    public onSkip: Observable0 = new Observable0();
+    public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
 
     private _skipEnabled: boolean;
@@ -96,7 +97,7 @@ export class Overlay extends View {
     private onSkipEvent(event: Event): void {
         event.preventDefault();
         if(this._skipEnabled && this._videoProgress > this._skipDuration) {
-            this.onSkip.trigger();
+            this.onSkip.trigger(this._videoProgress);
         }
     }
 

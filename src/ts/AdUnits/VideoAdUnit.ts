@@ -170,7 +170,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         overlay.render();
         document.body.appendChild(overlay.container());
-        overlay.onSkip.subscribe(() => OverlayEventHandlers.onSkip(this._nativeBridge, this));
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(this._nativeBridge, this));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(this._nativeBridge, this, muted));
 
         if(!this._placement.allowSkip()) {

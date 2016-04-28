@@ -8,6 +8,8 @@ import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
+import { NativeBridge } from 'Native/NativeBridge';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 
 import { Vast } from 'Models/Vast';
 import { VastParser } from 'Utilities/VastParser';
@@ -20,12 +22,14 @@ export class CampaignManager {
     public onVast: Observable2<Placement, Vast> = new Observable2();
     public onError: Observable1<Error> = new Observable1();
 
+    private _nativeBridge: NativeBridge;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _failedPlacements: string[];
 
-    constructor(request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+        this._nativeBridge = nativeBridge;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
@@ -37,18 +41,20 @@ export class CampaignManager {
             delete this._failedPlacements[this._failedPlacements.indexOf(placement.getId())];
         }
 
-        this._request.get(this.createRequestUrl(placement.getId()), [], 5, 5000).then(response => {
-            let campaignJson: any = JSON.parse(response.response);
-            if (campaignJson.campaign) {
-                let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                placement.setCampaign(campaign);
-                this.onCampaign.trigger(placement, campaign);
-            } else {
-                let vastString = decodeURIComponent(campaignJson.vast).trim();
-                let vast: Vast = new VastParser().parseVast(vastString, campaignJson.gamerId, campaignJson.abGroup);
-                placement.setVast(vast);
-                this.onVast.trigger(placement, vast);
-            }
+        this.createRequestUrl(placement.getId()).then(requestUrl => {
+            return this._request.get(requestUrl, [], 5, 5000).then(response => {
+                let campaignJson: any = JSON.parse(response.response);
+                if (campaignJson.campaign) {
+                    let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    placement.setCampaign(campaign);
+                    this.onCampaign.trigger(placement, campaign);
+                } else {
+                    let vastString = decodeURIComponent(campaignJson.vast).trim();
+                    let vast: Vast = new VastParser().parseVast(vastString, campaignJson.gamerId, campaignJson.abGroup);
+                    placement.setVast(vast);
+                    this.onVast.trigger(placement, vast);
+                }
+            });
         }).catch((error) => {
             placement.setCampaign(null);
             this._failedPlacements.push(placement.getId());
@@ -66,7 +72,7 @@ export class CampaignManager {
         }
     }
 
-    private createRequestUrl(placementId: string): string {
+    private createRequestUrl(placementId: string): Promise<string> {
         let url: string = [
             CampaignManager.CampaignBaseUrl,
             this._clientInfo.getGameId(),
@@ -75,27 +81,51 @@ export class CampaignManager {
             'fill'
         ].join('/');
 
-        url = Url.addParameters(url, {
-            advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-            androidId: this._deviceInfo.getAndroidId(),
-            gameId: this._clientInfo.getGameId(),
-            hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
-            deviceType: this._deviceInfo.getModel(),
-            limitAdTracking: this._deviceInfo.getLimitAdTracking(),
-            networkType: this._deviceInfo.getNetworkType(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            screenDensity: this._deviceInfo.getScreenDensity(),
-            screenSize: this._deviceInfo.getScreenLayout(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            softwareVersion: this._deviceInfo.getApiLevel(),
-            placementId: placementId
+        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+            url = Url.addParameters(url, {
+                bundleVersion: this._clientInfo.getApplicationVersion(),
+                bundleId: this._clientInfo.getApplicationName(),
+                connectionType: this._deviceInfo.getConnectionType(),
+                deviceFreeSpace: this._deviceInfo.getFreeSpace(),
+                gameId: this._clientInfo.getGameId(),
+                hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
+                deviceType: this._deviceInfo.getModel(),
+                language: this._deviceInfo.getLanguage(),
+                networkType: this._deviceInfo.getNetworkType(),
+                networkOperator: this._deviceInfo.getNetworkOperator(),
+                networkOperatorName: this._deviceInfo.getNetworkOperatorName(),
+                platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+                screenDensity: this._deviceInfo.getScreenDensity(),
+                screenSize: this._deviceInfo.getScreenLayout(),
+                screenWidth: this._deviceInfo.getScreenWidth(),
+                screenHeight: this._deviceInfo.getScreenHeight(),
+                sdkVersion: this._clientInfo.getSdkVersion(),
+                softwareVersion: this._deviceInfo.getApiLevel(),
+                placementId: placementId,
+                timeZone: this._deviceInfo.getTimeZone()
+            });
+
+            if(this._deviceInfo.getAdvertisingIdentifier()) {
+                url = Url.addParameters(url, {
+                    advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                    limitAdTracking: this._deviceInfo.getLimitAdTracking()
+                });
+            } else {
+                url = Url.addParameters(url, {
+                    androidId: this._deviceInfo.getAndroidId()
+                });
+            }
+
+            if(this._clientInfo.getTestMode()) {
+                url = Url.addParameters(url, {test: true});
+            }
+
+            if(mediation) {
+                url = Url.addParameters(url, mediation.getDTO());
+            }
+
+            return url;
         });
-
-        if(this._clientInfo.getTestMode()) {
-            url = Url.addParameters(url, {test: true});
-        }
-
-        return url;
     }
 
 }

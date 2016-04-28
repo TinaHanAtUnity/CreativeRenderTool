@@ -53,6 +53,10 @@ export class ClientInfo extends Model {
         return this._applicationVersion;
     }
 
+    public getApplicationName(): string {
+        return this._applicationName;
+    }
+
     public getSdkVersion(): string {
         return this._sdkVersion;
     }
@@ -79,16 +83,16 @@ export class ClientInfo extends Model {
 
     public getDTO() {
         return {
-            'game_id': this._gameId,
-            'test_mode': this._testMode,
-            'application_name': this._applicationName,
-            'application_version': this._applicationVersion,
-            'sdk_version': this._sdkVersion,
+            'gameId': this._gameId,
+            'testMode': this._testMode,
+            'bundleId': this._applicationName,
+            'bundleVersion': this._applicationVersion,
+            'sdkVersion': this._sdkVersion,
             'platform': Platform[this._platform].toLowerCase(),
             'encrypted': !this._debuggable,
-            'config_url': this._configUrl,
-            'webview_url': this._webviewUrl,
-            'webview_hash': this._webviewHash
+            'configUrl': this._configUrl,
+            'webviewUrl': this._webviewUrl,
+            'webviewHash': this._webviewHash
         };
     }
 }
