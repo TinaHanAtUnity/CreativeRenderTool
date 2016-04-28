@@ -20,7 +20,14 @@ export class ClientInfo extends Model {
 
     constructor(data: any[]) {
         super();
-        this._gameId = data.shift();
+
+        let gameIdString = data.shift();
+        if (typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
+            this._gameId = gameIdString;
+        } else {
+            throw new Error('Invalid Game Identifier');
+        }
+
         this._testMode = data.shift();
         this._applicationName = data.shift();
         this._applicationVersion = data.shift();
