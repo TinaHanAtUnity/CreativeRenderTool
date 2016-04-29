@@ -1,6 +1,7 @@
 import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class EndScreenEventHandlers {
 
@@ -16,8 +17,8 @@ export class EndScreenEventHandlers {
         });
     }
 
-    public static onDownload(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
-        adUnit.getSession().sendClick(adUnit);
+    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+        sessionManager.sendClick(adUnit);
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         nativeBridge.Intent.launch({
             'action': 'android.intent.action.VIEW',
