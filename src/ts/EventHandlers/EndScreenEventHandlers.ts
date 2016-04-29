@@ -23,6 +23,9 @@ export class EndScreenEventHandlers {
             'action': 'android.intent.action.VIEW',
             'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
         });
+        nativeBridge.AppSheet.present({
+            id: parseInt(adUnit.getCampaign().getAppStoreId(), 10)
+        });
     }
 
 }

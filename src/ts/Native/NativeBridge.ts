@@ -16,6 +16,7 @@ import { PlacementApi } from 'Native/Api/Placement';
 import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
+import { AppSheetApi } from 'Native/Api/AppSheet';
 
 export enum CallbackStatus {
     OK,
@@ -33,6 +34,7 @@ export class NativeBridge implements INativeBridge {
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     public AdUnit: AdUnitApi = null;
+    public AppSheet: AppSheetApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
     public DeviceInfo: DeviceInfoApi = null;
@@ -63,6 +65,7 @@ export class NativeBridge implements INativeBridge {
 
         this._backend = backend;
         this.AdUnit = new AdUnitApi(this);
+        this.AppSheet = new AppSheetApi(this);
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
         this.DeviceInfo = new DeviceInfoApi(this);
