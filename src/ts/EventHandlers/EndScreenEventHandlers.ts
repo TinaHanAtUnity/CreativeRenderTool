@@ -2,6 +2,7 @@ import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class EndScreenEventHandlers {
 
@@ -17,17 +18,18 @@ export class EndScreenEventHandlers {
         });
     }
 
-    public static onDownload(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+        sessionManager.sendClick(adUnit);
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         if(adUnit.getCampaign().getClickAttributionUrlFollowsRedirects()) {
-            adUnit.getSession().sendClick(adUnit).then(response => {
+            sessionManager.sendClick(adUnit).then(response => {
                 nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': Request.getHeader(response.headers, 'location')
                 });
             });
         } else {
-            adUnit.getSession().sendClick(adUnit);
+            sessionManager.sendClick(adUnit);
             nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()

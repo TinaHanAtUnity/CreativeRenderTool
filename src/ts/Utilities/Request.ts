@@ -56,19 +56,7 @@ export class Request {
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
     }
 
-    public get(url: string, headers?: [string, string][], retries?: number, retryDelay?: number, options?: IRequestOptions): Promise<INativeResponse> {
-        if(typeof headers === 'undefined') {
-            headers = [];
-        }
-
-        if(typeof retries === 'undefined') {
-            retries = 0;
-        }
-
-        if(typeof retryDelay === 'undefined') {
-            retryDelay = 0;
-        }
-
+    public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = {
                 followRedirects: false
@@ -88,29 +76,14 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data?: string, headers?: [string, string][], retries?: number, retryDelay?: number, options?: IRequestOptions): Promise<INativeResponse> {
-        if(typeof data === 'undefined') {
-            data = '';
-        }
-
-        if(typeof headers === 'undefined') {
-            headers = [];
-        }
-        headers.push(['Content-Type', 'application/json']);
-
-        if(typeof retries === 'undefined') {
-            retries = 0;
-        }
-
-        if(typeof retryDelay === 'undefined') {
-            retryDelay = 0;
-        }
-
+    public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = {
                 followRedirects: false
             };
         }
+
+        headers.push(['Content-Type', 'application/json']);
 
         let id = Request._callbackId++;
         let promise = this.registerCallback(id);
