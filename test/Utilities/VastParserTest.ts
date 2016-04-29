@@ -9,7 +9,7 @@ describe('VastParserTest', () => {
     let domParser;
 
     beforeEach(() => {
-        domParser = new xmldom.DOMParser({errorHandler:{}});
+        domParser = new xmldom.DOMParser({errorHandler: {}});
     });
 
     it('should return null when given null', () => {
