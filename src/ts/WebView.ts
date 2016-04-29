@@ -105,6 +105,9 @@ export class WebView {
         }).catch(error => {
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+                if (error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
+                }
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
