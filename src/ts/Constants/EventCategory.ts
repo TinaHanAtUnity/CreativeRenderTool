@@ -6,5 +6,6 @@ export enum EventCategory {
     CONNECTIVITY,
     STORAGE,
     REQUEST,
-    RESOLVE
+    RESOLVE,
+    BROADCAST
 }
