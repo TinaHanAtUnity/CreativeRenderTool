@@ -2,10 +2,16 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class WakeUpManager {
-    public onNetworkWakeUp: Observable0 = new Observable0();
+    public onNetworkConnected: Observable0 = new Observable0();
+    public onScreenOn: Observable0 = new Observable0();
+    public onScreenOff: Observable0 = new Observable0();
 
     private _nativeBridge: NativeBridge;
     private _lastConnected: number;
+
+    private _screenListener: string = 'screenListener';
+    private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
+    private ACTION_SCREEN_OFF: string = 'android.intent.action.SCREEN_OFF';
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -14,8 +20,17 @@ export class WakeUpManager {
     public initialize(): Promise<void> {
         this._lastConnected = Date.now();
         this._nativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
+        this._nativeBridge.Broadcast.onBroadcastAction.subscribe(this.onBroadcastAction.bind(this));
 
         return this._nativeBridge.Connectivity.setListeningStatus(true);
+    }
+
+    public setListenScreen(status: boolean): Promise<void> {
+        if(status) {
+            return this._nativeBridge.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
+        } else {
+            return this._nativeBridge.Broadcast.removeBroadcastListener(this._screenListener);
+        }
     }
 
     private onConnected(wifi: boolean, networkType: number) {
@@ -23,7 +38,26 @@ export class WakeUpManager {
 
         if(this._lastConnected + fifteenMinutes < Date.now()) {
             this._lastConnected = Date.now();
-            this.onNetworkWakeUp.trigger();
+            this.onNetworkConnected.trigger();
+        }
+    }
+
+    private onBroadcastAction(name: string, action: string, data: string, extra: any) {
+        if(name !== this._screenListener) {
+            return;
+        }
+
+        switch(action) {
+            case this.ACTION_SCREEN_ON:
+                this.onScreenOn.trigger();
+                break;
+
+            case this.ACTION_SCREEN_OFF:
+                this.onScreenOff.trigger();
+                break;
+
+            default:
+                break;
         }
     }
 }

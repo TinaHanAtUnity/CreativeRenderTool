@@ -100,7 +100,8 @@ export class WebView {
             this._initializedAt = this._configJsonCheckedAt = Date.now();
 
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
-            this._wakeUpManager.onNetworkWakeUp.subscribe(this.onNetworkWakeUp.bind(this));
+            this._wakeUpManager.initialize();
+            this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
@@ -225,7 +226,7 @@ export class WebView {
      CONNECTIVITY EVENT HANDLERS
      */
 
-    private onNetworkWakeUp() {
+    private onNetworkConnected() {
         if(!this.isShowing()) {
             this.shouldReinitialize().then((reinitialize) => {
                 if(reinitialize) {
