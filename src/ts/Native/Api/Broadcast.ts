@@ -14,15 +14,15 @@ export class BroadcastApi extends NativeApi {
     }
 
     public addBroadcastListener(listenerName: string, actions: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'addBroadcastListener', [name, actions]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'addBroadcastListener', [listenerName, actions]);
     }
 
     public addDataSchemeBroadcastListener(listenerName: string, dataScheme: string, actions: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'addBroadcastListener', [name, dataScheme, actions]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'addBroadcastListener', [listenerName, dataScheme, actions]);
     }
 
     public removeBroadcastListener(listenerName: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'removeBroadcastListener', [name]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'removeBroadcastListener', [listenerName]);
     }
 
     public removeAllBroadcastListeners(): Promise<void> {
