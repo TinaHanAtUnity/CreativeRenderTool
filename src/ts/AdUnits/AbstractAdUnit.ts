@@ -4,7 +4,6 @@ import { FinishState } from 'Constants/FinishState';
 import { Observable0 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
-import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export abstract class AbstractAdUnit {
@@ -14,7 +13,6 @@ export abstract class AbstractAdUnit {
 
     protected _nativeBridge: NativeBridge;
 
-    protected _session;
     protected _placement;
     protected _campaign;
 
@@ -22,19 +20,15 @@ export abstract class AbstractAdUnit {
 
     protected _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
-        this._session = session;
         this._placement = placement;
         this._campaign = campaign;
     }
 
     public abstract show(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
-    public abstract hide(): Promise<void>;
 
-    public getSession(): SessionManager {
-        return this._session;
-    }
+    public abstract hide(): Promise<void>;
 
     public getPlacement(): Placement {
         return this._placement;
@@ -45,7 +39,7 @@ export abstract class AbstractAdUnit {
     }
 
     public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
+        if (this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
         }
     }

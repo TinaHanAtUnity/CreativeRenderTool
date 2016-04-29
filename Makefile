@@ -216,6 +216,7 @@ test: clean
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
+	$(TYPESCRIPT) --project .
 	$(TYPESCRIPT) --project test
 
 	@echo
