@@ -173,16 +173,16 @@ export class SessionManager {
     }
 
     private sendVastImpressionEvent(adUnit) {
-        if (adUnit.getVast() && adUnit.getVast().getImpressionUrls()) {
-            for (let impressionUrl of adUnit.getVast().getImpressionUrls()) {
+        if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getImpressionUrls()) {
+            for (let impressionUrl of adUnit.getCampaign().getVast().getImpressionUrls()) {
                 this._eventManager.thirdPartyEvent('vast impression', this._currentSession.getId(), impressionUrl);
             }
         }
     };
 
     private sendVastTrackingEvent(adUnit: AbstractAdUnit, eventName: string) {
-        if (adUnit.getVast() && adUnit.getVast().getTrackingEventUrls(eventName)) {
-            for (let startUrl of adUnit.getVast().getTrackingEventUrls(eventName)) {
+        if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getTrackingEventUrls(eventName)) {
+            for (let startUrl of adUnit.getCampaign().getVast().getTrackingEventUrls(eventName)) {
                 this._eventManager.thirdPartyEvent(`vast ${eventName}`, this._currentSession.getId(), startUrl);
             }
         }
@@ -199,10 +199,10 @@ export class SessionManager {
         if (quartile === 3) {
             quartileEventName = 'thirdQuartile';
         }
-        if (adUnit.getVast() && adUnit.getVast().getTrackingEventUrls(quartileEventName)) {
-            let duration = adUnit.getVast().getDuration();
+        if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getTrackingEventUrls(quartileEventName)) {
+            let duration = adUnit.getCampaign().getVast().getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                for (let quartileUrl of adUnit.getVast().getTrackingEventUrls(quartileEventName)) {
+                for (let quartileUrl of adUnit.getCampaign().getVast().getTrackingEventUrls(quartileEventName)) {
                     this._eventManager.thirdPartyEvent(`vast ${quartileEventName}`, this._currentSession.getId(), quartileUrl);
                 }
             }

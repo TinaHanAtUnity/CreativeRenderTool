@@ -11,15 +11,11 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 
-import { Vast } from 'Models/Vast';
-import { VastParser } from 'Utilities/VastParser';
-
 export class CampaignManager {
 
     private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     public onCampaign: Observable2<Placement, Campaign> = new Observable2();
-    public onVast: Observable2<Placement, Vast> = new Observable2();
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
@@ -44,16 +40,9 @@ export class CampaignManager {
         this.createRequestUrl(placement.getId()).then(requestUrl => {
             return this._request.get(requestUrl, [], 5, 5000).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
-                if (campaignJson.campaign) {
-                    let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                    placement.setCampaign(campaign);
-                    this.onCampaign.trigger(placement, campaign);
-                } else {
-                    let vastString = decodeURIComponent(campaignJson.vast).trim();
-                    let vast: Vast = new VastParser().parseVast(vastString, campaignJson.gamerId, campaignJson.abGroup);
-                    placement.setVast(vast);
-                    this.onVast.trigger(placement, vast);
-                }
+                let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                placement.setCampaign(campaign);
+                this.onCampaign.trigger(placement, campaign);
             });
         }).catch((error) => {
             placement.setCampaign(null);

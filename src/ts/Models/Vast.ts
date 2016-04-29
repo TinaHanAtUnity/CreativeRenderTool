@@ -6,14 +6,12 @@ export class Vast {
 
     private _ads: VastAd[];
     private _errorURLTemplates: string[];
-    private _gamerId: string;
-    private _abGroup: number;
+    private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(ads: VastAd[], errorURLTemplates: any[], gamerId: string, abGroup: number) {
+    constructor(ads: VastAd[], errorURLTemplates: any[], additionalTrackingEvents: { [eventName: string]: string[] }) {
         this._ads = ads;
         this._errorURLTemplates = errorURLTemplates;
-        this._gamerId = gamerId;
-        this._abGroup = abGroup;
+        this._additionalTrackingEvents = additionalTrackingEvents;
     }
 
     public getAds(): VastAd[] {
@@ -22,14 +20,6 @@ export class Vast {
 
     public getErrorURLTemplates(): string[] {
         return this._errorURLTemplates;
-    }
-
-    public getGamerId(): string {
-        return this._gamerId;
-    }
-
-    public getAbGroup(): number {
-        return this._abGroup;
     }
 
     public getAd(): VastAd {
@@ -65,7 +55,7 @@ export class Vast {
     public getTrackingEventUrls(eventName: string) {
         let ad = this.getAd();
         if (ad) {
-            return ad.getTrackingEventUrls(eventName);
+            return ad.getTrackingEventUrls(eventName).concat(this._additionalTrackingEvents[eventName] || []);
         }
         return null;
     }

@@ -1,5 +1,4 @@
 import { Campaign } from 'Campaign';
-import { Vast } from 'Vast';
 
 export enum PlacementState {
     READY,
@@ -24,8 +23,6 @@ export class Placement {
     private _muteVideo: boolean;
 
     private _campaign: Campaign;
-
-    private _vast: Vast;
 
     constructor(data: any) {
         this._id = data.id;
@@ -81,11 +78,4 @@ export class Placement {
         this._campaign = campaign;
     }
 
-    public getVast(): Vast {
-        return this._vast;
-    }
-
-    public setVast(vast: Vast): void {
-        this._vast = vast;
-    }
 }

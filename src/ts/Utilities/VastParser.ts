@@ -16,8 +16,12 @@ export class VastParser {
         this._domParser = domParser || new DOMParser();
     }
 
-    public parseVast(vastString: string, gamerId: string, abGroup: number): Vast {
-        let xml = (this._domParser).parseFromString(vastString, 'text/xml');
+    public parseVast(vast: any): Vast {
+        if (!vast) {
+            return null;
+        }
+
+        let xml = (this._domParser).parseFromString(decodeURIComponent(vast.data).trim(), 'text/xml');
         let ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (xml == null) {
@@ -51,7 +55,7 @@ export class VastParser {
             }
         }
 
-        return new Vast(ads, errorURLTemplates, gamerId, abGroup);
+        return new Vast(ads, errorURLTemplates, vast.tracking);
     }
 
     private parseNodeText(node: any): string {
@@ -79,22 +83,12 @@ export class VastParser {
     }
 
     private parseWrapperElement(wrapperElement: any): VastAd {
-        let ad, wrapperCreativeElement, wrapperURLElement;
+        let ad, wrapperURLElement;
         ad = this.parseInLineElement(wrapperElement);
-        wrapperURLElement = this.childByName(wrapperElement, 'VASTAdTagURI');
-        if (wrapperURLElement != null) {
-            ad.nextWrapperURL = this.parseNodeText(wrapperURLElement);
-        }
-        wrapperCreativeElement = ad.creatives[0];
-        if ((wrapperCreativeElement != null) && (wrapperCreativeElement.trackingEvents != null)) {
-            ad.trackingEvents = wrapperCreativeElement.trackingEvents;
-        }
-        if (ad.nextWrapperURL != null) {
-            return ad;
-        }
+        return ad;
     }
 
-    private parseInLineElement(inLineElement: any): any {
+    private parseInLineElement(inLineElement: any): VastAd {
         const parseCompanions = false;
         let ad = new VastAd();
         let childNodes = inLineElement.childNodes;

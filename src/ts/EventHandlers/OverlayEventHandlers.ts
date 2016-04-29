@@ -12,10 +12,10 @@ export class OverlayEventHandlers {
       adUnit.getSession().sendSkip(adUnit, adUnit.getVideoPosition());
       nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
-      if (adUnit.getCampaign()) {
-          adUnit.getEndScreen().show();
-      } else {
+      if (adUnit.getCampaign() && adUnit.getCampaign().getVast()) {
           adUnit.hide();
+      } else {
+          adUnit.getEndScreen().show();
       }
   }
 

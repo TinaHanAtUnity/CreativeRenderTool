@@ -12,11 +12,7 @@ export class EndScreenEventHandlers {
         adUnit.getEndScreen().hide();
         adUnit.getOverlay().show();
         nativeBridge.AdUnit.setViews(['videoplayer', 'webview']).then(() => {
-            if (adUnit.getCampaign()) {
-                nativeBridge.VideoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-            } else {
-                nativeBridge.VideoPlayer.prepare(adUnit.getVast().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
-            }
+            nativeBridge.VideoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }
 

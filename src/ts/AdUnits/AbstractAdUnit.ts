@@ -6,7 +6,6 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Vast } from 'Models/Vast';
 
 export abstract class AbstractAdUnit {
 
@@ -18,18 +17,16 @@ export abstract class AbstractAdUnit {
     protected _session;
     protected _placement;
     protected _campaign;
-    protected _vast;
 
     protected _finishState;
 
     protected _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign, vast: Vast) {
+    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
         this._session = session;
         this._placement = placement;
         this._campaign = campaign;
-        this._vast = vast;
     }
 
     public abstract show(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
@@ -47,10 +44,6 @@ export abstract class AbstractAdUnit {
         return this._campaign;
     }
 
-    public getVast(): Vast {
-        return this._vast;
-    }
-
     public setFinishState(finishState: FinishState) {
         if(this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
@@ -66,19 +59,11 @@ export abstract class AbstractAdUnit {
     }
 
     public getGamerId(): string {
-        if (this._campaign) {
-            return this._campaign.getGamerId();
-        } else {
-            return this._vast.getGamerId();
-        }
+        return this._campaign.getGamerId();
     }
 
     public getCampaignId(): string {
-        if (this._campaign) {
-            return this._campaign.getId();
-        } else {
-            return this._vast.getAds()[0].getId();
-        }
+        return this._campaign.getId();
     }
 
 }

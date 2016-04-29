@@ -44,10 +44,10 @@ export class VideoEventHandlers {
         adUnit.getSession().sendView(adUnit);
         nativeBridge.AdUnit.setViews(['webview']);
         adUnit.getOverlay().hide();
-        if (adUnit.getCampaign()) {
-            adUnit.getEndScreen().show();
-        } else {
+        if (adUnit.getCampaign() && adUnit.getCampaign().getVast()) {
             adUnit.hide();
+        } else {
+            adUnit.getEndScreen().show();
         }
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if (integrationTest) {

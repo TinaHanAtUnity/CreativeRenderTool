@@ -1,3 +1,6 @@
+import { Vast } from 'Models/Vast';
+import { VastParser } from 'Utilities/VastParser';
+
 export class Campaign {
 
     private _id: string;
@@ -18,6 +21,8 @@ export class Campaign {
     private _gamerId: string;
     private _abGroup: number;
 
+    private _vast: Vast;
+
     constructor(campaign: any, gamerId: string, abGroup: number) {
         this._id = campaign.id;
         this._appStoreId = campaign.appStoreId;
@@ -36,6 +41,10 @@ export class Campaign {
 
         this._gamerId = gamerId;
         this._abGroup = abGroup;
+
+        if (campaign.vast) {
+            this._vast = new VastParser().parseVast(campaign.vast);
+        }
     }
 
     public getId(): string {
@@ -87,7 +96,11 @@ export class Campaign {
     }
 
     public getVideoUrl(): string {
-        return this._video;
+        if (this._vast && this._vast.getVideoUrl()) {
+            return this._vast.getVideoUrl();
+        } else {
+            return this._video;
+        }
     }
 
     public setVideoUrl(videoUrl: string): void {
@@ -104,6 +117,10 @@ export class Campaign {
 
     public getAbGroup(): number {
         return this._abGroup;
+    }
+
+    public getVast(): Vast {
+        return this._vast;
     }
 
 }

@@ -20,7 +20,6 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
-import { Vast } from 'Models/Vast';
 
 export class WebView {
 
@@ -82,7 +81,6 @@ export class WebView {
         }).then(() => {
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
-            this._campaignManager.onVast.subscribe(this.onVast.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
 
             let defaultPlacement = this._configuration.getDefaultPlacement();
@@ -133,7 +131,7 @@ export class WebView {
             return;
         }
 
-        if(!placement.getCampaign() && !placement.getVast()) {
+        if(!placement.getCampaign()) {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
@@ -154,7 +152,7 @@ export class WebView {
             }
 
             let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement,
-                placement.getCampaign(), placement.getVast()); // todo: select ad unit based on placement
+                placement.getCampaign()); // todo: select ad unit based on placement
             adUnit.onClose.subscribe(this.onClose.bind(this));
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
@@ -183,7 +181,9 @@ export class WebView {
             campaign.getLandscapeUrl(),
             campaign.getPortraitUrl(),
             campaign.getVideoUrl()
-        ];
+        ].filter((asset: string) => {
+            return asset != null;
+        });
 
         this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
@@ -191,19 +191,6 @@ export class WebView {
             campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
             campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
 
-            this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
-                this._nativeBridge.Listener.sendReadyEvent(placement.getId());
-            });
-        });
-    }
-
-    private onVast(placement: Placement, vast: Vast): void {
-        let cacheableAssets: string[] = [];
-        if (vast.getVideoUrl()) {
-            cacheableAssets.push(vast.getVideoUrl());
-        }
-
-        this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
             this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
                 this._nativeBridge.Listener.sendReadyEvent(placement.getId());
             });
