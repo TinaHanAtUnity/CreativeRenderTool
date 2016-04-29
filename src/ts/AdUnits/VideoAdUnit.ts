@@ -5,9 +5,6 @@ import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { FinishState } from 'Constants/FinishState';
-import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
-import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
-import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { SessionManager } from 'Managers/SessionManager';
@@ -20,17 +17,11 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoPosition: number;
     private _videoActive: boolean;
     private _watches: number;
-
     private _onResumeObserver;
     private _onPauseObserver;
     private _onDestroyObserver;
 
-    private _onPreparedObserver;
-    private _onProgressObserver;
-    private _onPlayObserver;
-    private _onCompletedObserver;
-
-    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, session, placement, campaign);
 
         this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
@@ -41,9 +32,8 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._videoActive = true;
         this._watches = 0;
 
-        this.prepareVideoPlayer();
-        this.prepareOverlay();
-        this.prepareEndScreen();
+        this._overlay = overlay;
+        this._endScreen = endScreen;
     }
 
     public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
@@ -64,11 +54,6 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._nativeBridge.AdUnit.onResume.unsubscribe(this._onResumeObserver);
         this._nativeBridge.AdUnit.onPause.unsubscribe(this._onPauseObserver);
         this._nativeBridge.AdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
-
-        this._nativeBridge.VideoPlayer.onPrepared.unsubscribe(this._onPreparedObserver);
-        this._nativeBridge.VideoPlayer.onProgress.unsubscribe(this._onProgressObserver);
-        this._nativeBridge.VideoPlayer.onPlay.unsubscribe(this._onPlayObserver);
-        this._nativeBridge.VideoPlayer.onCompleted.unsubscribe(this._onCompletedObserver);
 
         this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
         return this._nativeBridge.AdUnit.close().then(() => {
@@ -144,46 +129,5 @@ export class VideoAdUnit extends AbstractAdUnit {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
-    }
-
-    /*
-     PRIVATES
-     */
-    private prepareVideoPlayer() {
-        this._onPreparedObserver = this._nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(this._nativeBridge, this, duration, width, height));
-        this._onProgressObserver = this._nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(this._nativeBridge, this, position));
-        this._onPlayObserver = this._nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(this._nativeBridge, this));
-        this._onCompletedObserver = this._nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(this._nativeBridge, this, url));
-    }
-
-    private prepareOverlay() {
-        let overlay = new Overlay(this._placement.muteVideo());
-
-        overlay.render();
-        document.body.appendChild(overlay.container());
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(this._nativeBridge, this));
-        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(this._nativeBridge, this, muted));
-
-        if (!this._placement.allowSkip()) {
-            overlay.setSkipEnabled(false);
-        } else {
-            overlay.setSkipEnabled(true);
-            overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }
-
-        this._overlay = overlay;
-    }
-
-    private prepareEndScreen() {
-        let endScreen = new EndScreen(this.getCampaign());
-
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-        endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(this._nativeBridge, this));
-        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(this._nativeBridge, this));
-        endScreen.onClose.subscribe(() => this.hide());
-
-        this._endScreen = endScreen;
     }
 }
