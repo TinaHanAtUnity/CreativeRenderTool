@@ -20,10 +20,10 @@ export class AdUnitFactory {
     private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
         let endScreen = new EndScreen(campaign);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, sessionManager, placement, campaign, overlay, endScreen);
+        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, videoAdUnit, placement);
-        this.prepareEndScreen(endScreen, nativeBridge, videoAdUnit);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement);
+        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, videoAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit);
 
         return videoAdUnit;
