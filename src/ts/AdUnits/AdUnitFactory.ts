@@ -13,7 +13,6 @@ import { Overlay } from 'Views/Overlay';
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): AbstractAdUnit {
-
         // todo: select ad unit based on placement
         return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign);
     }

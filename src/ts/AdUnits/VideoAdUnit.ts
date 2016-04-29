@@ -7,7 +7,6 @@ import { EndScreen } from 'Views/EndScreen';
 import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
-import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class VideoAdUnit extends AbstractAdUnit {
@@ -21,8 +20,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPauseObserver;
     private _onDestroyObserver;
 
-    constructor(nativeBridge: NativeBridge, session: SessionManager, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        super(nativeBridge, session, placement, campaign);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
+        super(nativeBridge, placement, campaign);
 
         this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
         this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));

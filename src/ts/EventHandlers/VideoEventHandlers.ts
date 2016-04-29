@@ -3,6 +3,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class VideoEventHandlers {
 
@@ -26,8 +27,8 @@ export class VideoEventHandlers {
         adUnit.getOverlay().setVideoProgress(position);
     }
 
-    public static onVideoStart(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
-        adUnit.getSession().sendStart(adUnit);
+    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+        sessionManager.sendStart(adUnit);
 
         if (adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
@@ -37,10 +38,10 @@ export class VideoEventHandlers {
         adUnit.newWatch();
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, url: string): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        adUnit.getSession().sendView(adUnit);
+        sessionManager.sendView(adUnit);
         nativeBridge.AdUnit.setViews(['webview']);
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
