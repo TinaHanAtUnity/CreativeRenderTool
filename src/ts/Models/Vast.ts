@@ -1,6 +1,4 @@
 import { VastAd } from 'Models/VastAd';
-import { VastMediaFile } from 'Models/VastMediaFile';
-import { VastCreativeLinear } from 'Models/VastCreativeLinear';
 
 export class Vast {
 

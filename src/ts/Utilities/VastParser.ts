@@ -46,11 +46,6 @@ export class VastParser {
                 let ad = this.parseAdElement(node);
                 if (ad != null) {
                     ads.push(ad);
-                } else {
-                    // TODO error handling
-                    //VASTUtil.track(response.errorURLTemplates, {
-                    //    ERRORCODE: 101
-                    //});
                 }
             }
         }
@@ -83,9 +78,7 @@ export class VastParser {
     }
 
     private parseWrapperElement(wrapperElement: any): VastAd {
-        let ad, wrapperURLElement;
-        ad = this.parseInLineElement(wrapperElement);
-        return ad;
+        return this.parseInLineElement(wrapperElement);
     }
 
     private parseInLineElement(inLineElement: any): VastAd {
