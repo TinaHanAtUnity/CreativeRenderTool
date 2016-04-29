@@ -7,7 +7,7 @@ import { SessionManager } from 'Managers/SessionManager';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         adUnit.getOverlay().setVideoDuration(duration);
         nativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
             if (adUnit.getVideoPosition() > 0) {
@@ -20,7 +20,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
         if (position > 0) {
             adUnit.setVideoPosition(position);
         }
@@ -38,7 +38,7 @@ export class VideoEventHandlers {
         adUnit.newWatch();
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, url: string): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);

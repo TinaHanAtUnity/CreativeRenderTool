@@ -24,16 +24,16 @@ export class AdUnitFactory {
 
         this.prepareOverlay(overlay, nativeBridge, videoAdUnit, placement);
         this.prepareEndScreen(endScreen, nativeBridge, videoAdUnit);
-        this.prepareVideoPlayer(nativeBridge, videoAdUnit);
+        this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit);
 
         return videoAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, placement: Placement) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement) {
         overlay.render();
         document.body.appendChild(overlay.container());
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, videoAdUnit));
-        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, videoAdUnit, muted));
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
 
         if (!placement.allowSkip()) {
             overlay.setSkipEnabled(false);
@@ -43,20 +43,20 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(nativeBridge, videoAdUnit));
-        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, videoAdUnit));
+        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
         endScreen.onClose.subscribe(() => videoAdUnit.hide());
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration, width, height));
-        let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, videoAdUnit, position));
-        let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, videoAdUnit));
-        let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, videoAdUnit, url));
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
+        let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration));
+        let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(videoAdUnit, position));
+        let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
+        let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
 
         videoAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
