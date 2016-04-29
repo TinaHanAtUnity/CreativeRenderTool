@@ -177,7 +177,7 @@ export class VastParser {
             if (mediaFileElements.length > 0) {
                 let mediaFileElement = mediaFileElements[0];
                 let mediaFile = new VastMediaFile(
-                    this.parseNodeText(mediaFileElement),
+                    this.parseNodeText(mediaFileElement).trim(),
                     mediaFileElement.getAttribute('delivery'),
                     mediaFileElement.getAttribute('codec'),
                     mediaFileElement.getAttribute('type'),
