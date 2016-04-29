@@ -1,5 +1,6 @@
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
 
 export class ClientInfo extends Model {
 
@@ -20,7 +21,14 @@ export class ClientInfo extends Model {
 
     constructor(data: any[]) {
         super();
-        this._gameId = data.shift();
+
+        let gameIdString = data.shift();
+        if (typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
+            this._gameId = gameIdString;
+        } else {
+            throw new Error(UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
+        }
+
         this._testMode = data.shift();
         this._applicationName = data.shift();
         this._applicationVersion = data.shift();
