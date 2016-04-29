@@ -13,6 +13,7 @@ export class Campaign {
     private _videoSize: number;
     private _streamingVideo: string;
     private _clickAttributionUrl: string;
+    private _clickAttributionUrlFollowsRedirects: boolean;
     private _bypassAppSheet: boolean;
 
     private _gamerId: string;
@@ -32,6 +33,7 @@ export class Campaign {
         this._videoSize = campaign.trailerDownloadableSize;
         this._streamingVideo = campaign.trailerStreaming;
         this._clickAttributionUrl = campaign.clickAttributionUrl;
+        this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
         this._bypassAppSheet = campaign.bypassAppSheet;
 
         this._gamerId = gamerId;
@@ -96,6 +98,10 @@ export class Campaign {
 
     public getClickAttributionUrl(): string {
         return this._clickAttributionUrl;
+    }
+
+    public getClickAttributionUrlFollowsRedirects(): boolean {
+        return this._clickAttributionUrlFollowsRedirects;
     }
 
     public getGamerId(): string {

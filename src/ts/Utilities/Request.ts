@@ -10,6 +10,10 @@ const enum RequestMethod {
     POST
 }
 
+interface IRequestOptions {
+    followRedirects: boolean;
+}
+
 interface INativeRequest {
     method: RequestMethod;
     url: string;
@@ -17,6 +21,7 @@ interface INativeRequest {
     headers: [string, string][];
     retries: number;
     retryDelay: number;
+    options: IRequestOptions;
 }
 
 export interface INativeResponse {
@@ -28,7 +33,7 @@ export interface INativeResponse {
 
 export class Request {
 
-    private static _allowedResponseCodes = [200, 304, 501];
+    private static _allowedResponseCodes = [200, 302, 501];
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
@@ -36,13 +41,28 @@ export class Request {
 
     private _nativeBridge: NativeBridge;
 
+    public static getHeader(headers: [string, string][], headerName: string): string {
+        for(let i = 0; i < headers.length; ++i) {
+            let header = headers[i];
+            if(header[0].match(new RegExp(headerName, 'i'))) {
+                return header[1];
+            }
+        }
+    }
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
         this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
     }
 
-    public get(url: string, headers: [string, string][] = [], retries = 0, retryDelay = 0): Promise<INativeResponse> {
+    public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = {
+                followRedirects: false
+            };
+        }
+
         let id = Request._callbackId++;
         let promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -50,12 +70,19 @@ export class Request {
             url: url,
             headers: headers,
             retries: retries,
-            retryDelay: retryDelay
+            retryDelay: retryDelay,
+            options: options
         });
         return promise;
     }
 
-    public post(url: string, data = '', headers: [string, string][] = [], retries = 0, retryDelay = 0): Promise<INativeResponse> {
+    public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = {
+                followRedirects: false
+            };
+        }
+
         headers.push(['Content-Type', 'application/json']);
 
         let id = Request._callbackId++;
@@ -66,7 +93,8 @@ export class Request {
             data: data,
             headers: headers,
             retries: retries,
-            retryDelay: retryDelay
+            retryDelay: retryDelay,
+            options: options
         });
         return promise;
     }
@@ -94,44 +122,50 @@ export class Request {
         }
     }
 
-    private onRequestComplete(id: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
+    private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
         let callbackObject = Request._callbacks[id];
         if(callbackObject) {
-            let nativeResponse: INativeResponse = {
-                url: url,
-                response: response,
-                responseCode: responseCode,
-                headers: headers
-            };
-            if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
-                callbackObject[RequestStatus.COMPLETE](nativeResponse);
-                delete Request._callbacks[id];
-                delete Request._requests[id];
-            } else {
-                let nativeRequest = Request._requests[id];
-                if(nativeRequest) {
-                    if(nativeRequest.retries > 0) {
-                        nativeRequest.retries--;
-                        setTimeout(() => {
-                            this.invokeRequest(parseInt(id, 10), nativeRequest);
-                        }, nativeRequest.retryDelay);
-                    } else {
-                        callbackObject[RequestStatus.FAILED]([nativeRequest, 'FAILED_AFTER_RETRIES']);
-                        delete Request._callbacks[id];
-                        delete Request._requests[id];
-                    }
+            callbackObject[status](...parameters);
+            delete Request._callbacks[id];
+            delete Request._requests[id];
+        }
+    }
+
+    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
+        let id = parseInt(rawId, 10);
+        let nativeResponse: INativeResponse = {
+            url: url,
+            response: response,
+            responseCode: responseCode,
+            headers: headers
+        };
+        let nativeRequest = Request._requests[id];
+        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
+            if(responseCode === 302 && nativeRequest.options.followRedirects) {
+                let location = nativeRequest.url = Request.getHeader(headers, 'location');
+                if(location.match(/^https?/i)) {
+                    this.invokeRequest(id, nativeRequest);
+                } else {
+                    this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
                 }
+            } else {
+                this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+            }
+        } else {
+            if(nativeRequest.retries > 0) {
+                nativeRequest.retries--;
+                setTimeout(() => {
+                    this.invokeRequest(id, nativeRequest);
+                }, nativeRequest.retryDelay);
+            } else {
+                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
             }
         }
     }
 
-    private onRequestFailed(id: string, url: string, error: string): void {
-        let callbackObject = Request._callbacks[id];
-        if(callbackObject) {
-            callbackObject[RequestStatus.FAILED]([Request._requests[id], error]);
-            delete Request._callbacks[id];
-            delete Request._requests[id];
-        }
+    private onRequestFailed(rawId: string, url: string, error: string): void {
+        let id = parseInt(rawId, 10);
+        this.finishRequest(id, RequestStatus.FAILED, [Request._requests[id], error]);
     }
 
 }

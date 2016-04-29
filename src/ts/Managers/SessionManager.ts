@@ -6,6 +6,7 @@ import { EventManager } from 'EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { INativeResponse } from 'Utilities/Request';
 
 export class SessionManager {
 
@@ -74,17 +75,16 @@ export class SessionManager {
         });
     }
 
-    public sendClick(adUnit: AbstractAdUnit): void {
+    public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
         let campaign = adUnit.getCampaign();
-        if(campaign.getClickAttributionUrl()) {
-            this._eventManager.thirdPartyEvent('click attribution', this._currentSession.getId(), campaign.getClickAttributionUrl());
-        }
 
         this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id);
         }).then(([id, infoJson]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         });
+
+        return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
     }
 
     public setGamerSid(sid: string): void {
