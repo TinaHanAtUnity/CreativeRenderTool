@@ -4,6 +4,7 @@
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { AdUnitApi } from 'Native/Api/AdUnit';
+import { BroadcastApi } from 'Native/Api/Broadcast';
 import { CacheApi } from 'Native/Api/Cache';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
 import { RequestApi } from 'Native/Api/Request';
@@ -33,6 +34,7 @@ export class NativeBridge implements INativeBridge {
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     public AdUnit: AdUnitApi = null;
+    public Broadcast: BroadcastApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
     public DeviceInfo: DeviceInfoApi = null;
@@ -60,6 +62,7 @@ export class NativeBridge implements INativeBridge {
 
         this._backend = backend;
         this.AdUnit = new AdUnitApi(this);
+        this.Broadcast = new BroadcastApi(this);
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
         this.DeviceInfo = new DeviceInfoApi(this);
@@ -134,6 +137,10 @@ export class NativeBridge implements INativeBridge {
         switch(category) {
             case EventCategory[EventCategory.ADUNIT]:
                 this.AdUnit.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.BROADCAST]:
+                this.Broadcast.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.CACHE]:
