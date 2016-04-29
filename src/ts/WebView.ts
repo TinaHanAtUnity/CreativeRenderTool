@@ -100,7 +100,7 @@ export class WebView {
             this._initializedAt = this._configJsonCheckedAt = Date.now();
 
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
-            this._wakeUpManager.initialize();
+            this._wakeUpManager.setListenConnectivity(true);
             this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();

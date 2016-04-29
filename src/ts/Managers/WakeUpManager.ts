@@ -15,14 +15,13 @@ export class WakeUpManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-    }
-
-    public initialize(): Promise<void> {
         this._lastConnected = Date.now();
         this._nativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
         this._nativeBridge.Broadcast.onBroadcastAction.subscribe(this.onBroadcastAction.bind(this));
+    }
 
-        return this._nativeBridge.Connectivity.setListeningStatus(true);
+    public setListenConnectivity(status: boolean): Promise<void> {
+        return this._nativeBridge.Connectivity.setListeningStatus(status);
     }
 
     public setListenScreen(status: boolean): Promise<void> {
