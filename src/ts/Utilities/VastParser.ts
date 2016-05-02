@@ -87,12 +87,17 @@ export class VastParser {
         let childNodes = inLineElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
             let node = childNodes[i];
+            let url = this.parseNodeText(node);
             switch (node.nodeName) {
                 case 'Error':
-                    ad.addErrorURLTemplate(this.parseNodeText(node));
+                    if (url) {
+                        ad.addErrorURLTemplate(url);
+                    }
                     break;
                 case 'Impression':
-                    ad.addImpressionURLTemplate(this.parseNodeText(node));
+                    if (url) {
+                        ad.addImpressionURLTemplate(url);
+                    }
                     break;
                 case 'Creatives':
                     let childCreatives = this.childsByName(node, 'Creative');
