@@ -53,7 +53,12 @@ export class Vast {
     public getTrackingEventUrls(eventName: string) {
         let ad = this.getAd();
         if (ad) {
-            return ad.getTrackingEventUrls(eventName).concat(this._additionalTrackingEvents[eventName] || []);
+            let adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
+            if (adTrackingEventUrls instanceof Array) {
+                return adTrackingEventUrls.concat(this._additionalTrackingEvents[eventName] || []);
+            } else {
+                return this._additionalTrackingEvents[eventName];
+            }
         }
         return null;
     }
