@@ -47,7 +47,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
 
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        if (this.getEndScreen()) {
+        if (this.getEndScreen() && this.getEndScreen().container()) {
             this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         }
         this.unsetReferences();
