@@ -27,6 +27,16 @@ export class EventManager {
         });
     }
 
+    public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
+        if(url) {
+            if(redirects) {
+                return this._request.get(url, [], 0, 0, {followRedirects: true});
+            } else {
+                return this._request.get(url);
+            }
+        }
+    }
+
     public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
         this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
         return this._request.get(url);

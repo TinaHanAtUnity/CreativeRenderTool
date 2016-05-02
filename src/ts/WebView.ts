@@ -13,13 +13,14 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
 import { FinishState } from 'Constants/FinishState';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { AdUnitFactory } from './AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -37,6 +38,7 @@ export class WebView {
 
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
+    private _wakeUpManager: WakeUpManager;
 
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
@@ -96,8 +98,10 @@ export class WebView {
             }
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
-            this._nativeBridge.Connectivity.setListeningStatus(true);
-            this._nativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
+
+            this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._wakeUpManager.setListenConnectivity(true);
+            this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
 
             this._eventManager.sendUnsentSessions();
 
@@ -105,6 +109,9 @@ export class WebView {
         }).catch(error => {
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+                if (error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
+                }
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
@@ -151,8 +158,7 @@ export class WebView {
                 this._sessionManager.setGamerSid(player.getSid());
             }
 
-            let adUnit: AbstractAdUnit = new VideoAdUnit(this._nativeBridge, this._sessionManager, placement,
-                placement.getCampaign()); // todo: select ad unit based on placement
+            let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign());
             adUnit.onClose.subscribe(this.onClose.bind(this));
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
@@ -224,7 +230,7 @@ export class WebView {
      CONNECTIVITY EVENT HANDLERS
      */
 
-    private onConnected(wifi: boolean, networkType: number) {
+    private onNetworkConnected() {
         if(!this.isShowing()) {
             this.shouldReinitialize().then((reinitialize) => {
                 if(reinitialize) {

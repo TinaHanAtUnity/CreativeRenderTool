@@ -2,14 +2,15 @@ import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+  public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
       nativeBridge.VideoPlayer.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
-      adUnit.getSession().sendSkip(adUnit, adUnit.getVideoPosition());
+      sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
       nativeBridge.AdUnit.setViews(['webview']);
       adUnit.getOverlay().hide();
       if (adUnit.getCampaign() && adUnit.getCampaign().getVast()) {
@@ -19,9 +20,9 @@ export class OverlayEventHandlers {
       }
   }
 
-  public static onMute(nativeBridge: NativeBridge, adUnit: VideoAdUnit, muted: boolean): void {
+  public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
       nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-      adUnit.getSession().sendMute(adUnit, muted);
+      sessionManager.sendMute(adUnit, muted);
   }
 
 }
