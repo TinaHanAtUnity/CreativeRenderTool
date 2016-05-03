@@ -1,15 +1,39 @@
 import { Placement } from 'Models/Placement';
 
+export enum CacheMode {
+    FORCED,
+    ALLOWED,
+    DISABLED
+}
+
 export class Configuration {
 
     private _enabled: boolean;
     private _country: string;
+    private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement = null;
 
     constructor(configJson: any) {
         this._enabled = configJson.enabled;
         this._country = configJson.country;
+
+        switch(configJson.assetCaching) {
+            case 'forced':
+                this._cacheMode = CacheMode.FORCED;
+                break;
+
+            case 'allowed':
+                this._cacheMode = CacheMode.ALLOWED;
+                break;
+
+            case 'disabled':
+                this._cacheMode = CacheMode.DISABLED;
+                break;
+
+            default:
+                throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
+        }
 
         let placements = configJson.placements;
 
@@ -28,6 +52,10 @@ export class Configuration {
 
     public getCountry(): string {
         return this._country;
+    }
+
+    public getCacheMode(): CacheMode {
+        return this._cacheMode;
     }
 
     public getPlacement(placementId: string): Placement {
