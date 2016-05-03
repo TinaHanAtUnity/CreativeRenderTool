@@ -52,7 +52,7 @@ export class EventManager {
         return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
-                    if(outdated) {
+                    if (outdated) {
                         return this.deleteSession(sessionId);
                     } else {
                         return this.getUnsentOperativeEvents(sessionId).then(events => {
