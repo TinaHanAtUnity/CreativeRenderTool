@@ -84,7 +84,10 @@ export class SessionManager {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         });
 
-        return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+        if (campaign.getClickAttributionUrl()) {
+            return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+        }
+        return Promise.reject('Missing click attribution url');
     }
 
     public setGamerSid(sid: string): void {

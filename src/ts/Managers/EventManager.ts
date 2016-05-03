@@ -28,12 +28,10 @@ export class EventManager {
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
-        if(url) {
-            if(redirects) {
-                return this._request.get(url, [], 0, 0, {followRedirects: true});
-            } else {
-                return this._request.get(url);
-            }
+        if (redirects) {
+            return this._request.get(url, [], 0, 0, {followRedirects: true});
+        } else {
+            return this._request.get(url);
         }
     }
 
@@ -52,7 +50,7 @@ export class EventManager {
         return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
-                    if(outdated) {
+                    if (outdated) {
                         return this.deleteSession(sessionId);
                     } else {
                         return this.getUnsentOperativeEvents(sessionId).then(events => {
