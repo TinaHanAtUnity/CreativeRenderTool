@@ -23,10 +23,15 @@ export class EndScreenEventHandlers {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         if(adUnit.getCampaign().getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': Request.getHeader(response.headers, 'location')
-                });
+                let location = Request.getHeader(response.headers, 'location');
+                if (location) {
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': location
+                    });
+                } else {
+                    throw new Error('No location found');
+                }
             });
         } else {
             sessionManager.sendClick(adUnit);
