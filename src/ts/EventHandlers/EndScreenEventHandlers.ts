@@ -19,7 +19,6 @@ export class EndScreenEventHandlers {
     }
 
     public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        sessionManager.sendClick(adUnit);
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         if(adUnit.getCampaign().getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
