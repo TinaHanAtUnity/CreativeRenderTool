@@ -28,12 +28,10 @@ export class EventManager {
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
-        if(url) {
-            if(redirects) {
-                return this._request.get(url, [], 0, 0, {followRedirects: true});
-            } else {
-                return this._request.get(url);
-            }
+        if (redirects) {
+            return this._request.get(url, [], 0, 0, {followRedirects: true});
+        } else {
+            return this._request.get(url);
         }
     }
 
