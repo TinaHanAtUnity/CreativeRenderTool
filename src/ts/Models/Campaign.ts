@@ -3,6 +3,8 @@ import { VastParser } from 'Utilities/VastParser';
 
 export class Campaign {
 
+    public static vastParser: VastParser;
+
     private _id: string;
     private _appStoreId: string;
     private _gameId: number;
@@ -24,29 +26,31 @@ export class Campaign {
 
     private _vast: Vast;
 
-    constructor(campaign: any, gamerId: string, abGroup: number) {
-        this._id = campaign.id;
-        this._appStoreId = campaign.appStoreId;
-        this._gameId = campaign.gameId;
-        this._gameName = campaign.gameName;
-        this._gameIcon = campaign.gameIcon;
-        this._rating = campaign.rating;
-        this._ratingCount = campaign.ratingCount;
-        this._landscapeImage = campaign.endScreenLandscape;
-        this._portraitImage = campaign.endScreenPortrait;
-        this._video = campaign.trailerDownloadable;
-        this._videoSize = campaign.trailerDownloadableSize;
-        this._streamingVideo = campaign.trailerStreaming;
-        this._clickAttributionUrl = campaign.clickAttributionUrl;
-        this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
-        this._bypassAppSheet = campaign.bypassAppSheet;
+
+    constructor(gamerId: string, abGroup: number, data: any) {
+        if (data.campaign) {
+            const campaign = data.campaign;
+            this._id = campaign.id;
+            this._appStoreId = campaign.appStoreId;
+            this._gameId = campaign.gameId;
+            this._gameName = campaign.gameName;
+            this._gameIcon = campaign.gameIcon;
+            this._rating = campaign.rating;
+            this._ratingCount = campaign.ratingCount;
+            this._landscapeImage = campaign.endScreenLandscape;
+            this._portraitImage = campaign.endScreenPortrait;
+            this._video = campaign.trailerDownloadable;
+            this._videoSize = campaign.trailerDownloadableSize;
+            this._streamingVideo = campaign.trailerStreaming;
+            this._clickAttributionUrl = campaign.clickAttributionUrl;
+            this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
+            this._bypassAppSheet = campaign.bypassAppSheet;
+        } else if (data.vast) {
+            this._vast = (Campaign.vastParser || new VastParser()).parseVast(data.vast);
+        }
 
         this._gamerId = gamerId;
         this._abGroup = abGroup;
-
-        if (campaign.vast) {
-            this._vast = new VastParser().parseVast(campaign.vast);
-        }
     }
 
     public getId(): string {

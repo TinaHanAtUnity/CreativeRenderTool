@@ -19,7 +19,10 @@ export class AdUnitFactory {
 
     private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
-        let endScreen = new EndScreen(campaign);
+        let endScreen: EndScreen = null;
+        if (AdUnitFactory.shouldShowEndScreen(campaign)) {
+            endScreen = new EndScreen(campaign);
+        }
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement);
@@ -44,7 +47,7 @@ export class AdUnitFactory {
     }
 
     private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
-        if (!videoAdUnit.getCampaign().getVast()) {
+        if (this.shouldShowEndScreen(videoAdUnit.getCampaign())) {
             endScreen.render();
             endScreen.hide();
             document.body.appendChild(endScreen.container());
@@ -66,6 +69,10 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
         });
+    }
+
+    private static shouldShowEndScreen(campaign: Campaign): boolean {
+        return !campaign.getVast();
     }
 
 }

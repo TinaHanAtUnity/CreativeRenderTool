@@ -40,7 +40,12 @@ export class CampaignManager {
         this.createRequestUrl(placement.getId()).then(requestUrl => {
             return this._request.get(requestUrl, [], 5, 5000).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
-                let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                let campaign: Campaign;
+                if (campaignJson.campaign) {
+                    campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {campaign: campaignJson.campaign});
+                } else {
+                    campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {vast: campaignJson.vast});
+                }
                 placement.setCampaign(campaign);
                 this.onCampaign.trigger(placement, campaign);
             });
