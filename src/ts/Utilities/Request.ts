@@ -48,6 +48,7 @@ export class Request {
                 return header[1];
             }
         }
+        return null;
     }
 
     constructor(nativeBridge: NativeBridge) {
