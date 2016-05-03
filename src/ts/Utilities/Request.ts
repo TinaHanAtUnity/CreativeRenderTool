@@ -1,4 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 const enum RequestStatus {
     COMPLETE,
@@ -12,6 +13,7 @@ const enum RequestMethod {
 
 interface IRequestOptions {
     followRedirects: boolean;
+    retryWithConnectionEvents: boolean;
 }
 
 interface INativeRequest {
@@ -21,6 +23,7 @@ interface INativeRequest {
     headers: [string, string][];
     retries: number;
     retryDelay: number;
+    waitNetworkConnected: boolean;
     options: IRequestOptions;
 }
 
@@ -40,6 +43,7 @@ export class Request {
     private static _requests: { [key: number]: INativeRequest } = {};
 
     private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
 
     public static getHeader(headers: [string, string][], headerName: string): string {
         for(let i = 0; i < headers.length; ++i) {
@@ -50,16 +54,18 @@ export class Request {
         }
     }
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
+        this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
     }
 
     public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = {
-                followRedirects: false
+                followRedirects: false,
+                retryWithConnectionEvents: false
             };
         }
 
@@ -71,6 +77,7 @@ export class Request {
             headers: headers,
             retries: retries,
             retryDelay: retryDelay,
+            waitNetworkConnected: false,
             options: options
         });
         return promise;
@@ -79,7 +86,8 @@ export class Request {
     public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = {
-                followRedirects: false
+                followRedirects: false,
+                retryWithConnectionEvents: false
             };
         }
 
@@ -94,6 +102,7 @@ export class Request {
             headers: headers,
             retries: retries,
             retryDelay: retryDelay,
+            waitNetworkConnected: false,
             options: options
         });
         return promise;
@@ -158,7 +167,11 @@ export class Request {
                     this.invokeRequest(id, nativeRequest);
                 }, nativeRequest.retryDelay);
             } else {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
+                if(nativeRequest.options.retryWithConnectionEvents) {
+                    nativeRequest.waitNetworkConnected = true;
+                } else {
+                    this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
+                }
             }
         }
     }
@@ -168,4 +181,8 @@ export class Request {
         this.finishRequest(id, RequestStatus.FAILED, [Request._requests[id], error]);
     }
 
+    private onNetworkConnected(): void {
+        
+        ;
+    }
 }
