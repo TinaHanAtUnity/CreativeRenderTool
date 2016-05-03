@@ -79,6 +79,9 @@ describe('VastParserTest', () => {
         assert.deepEqual(vast.getTrackingEventUrls('unmute'), [
             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=unmute&vastcrtype=linear&crid=7286756'
         ]);
+        assert.equal(vast.getVideoUrl(), 'http://static.scanscout.com/filemanager/vhs/partner364124_f00a7d93-0858-4b28-bf8e-e9af7a879f74.mp4');
+        assert.equal(vast.getDuration(), 15);
+        assert.deepEqual(vast.getErrorURLTemplates(), []);
     });
 
 });

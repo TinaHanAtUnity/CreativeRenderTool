@@ -3,8 +3,6 @@ import { VastAd } from 'Models/VastAd';
 import { VastCreative } from 'Models/VastCreative';
 import { VastCreativeLinear } from 'Models/VastCreativeLinear';
 import { VastMediaFile } from 'Models/VastMediaFile';
-import { VastCreativeCompanion } from 'Models/VastCreativeCompanion';
-import { VastCompanionAd } from 'Models/VastCompanionAd';
 
 export class VastParser {
 
@@ -82,7 +80,6 @@ export class VastParser {
     }
 
     private parseInLineElement(inLineElement: any): VastAd {
-        const parseCompanions = false;
         let ad = new VastAd();
         let childNodes = inLineElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
@@ -111,14 +108,6 @@ export class VastParser {
                                 case 'Linear':
                                     if (ad.getCreatives().length === 0) {
                                         creative = this.parseCreativeLinearElement(creativeTypeElement);
-                                        if (creative) {
-                                            ad.addCreative(creative);
-                                        }
-                                    }
-                                    break;
-                                case 'CompanionAds':
-                                    if (parseCompanions) {
-                                        creative = this.parseCompanionAd(creativeTypeElement);
                                         if (creative) {
                                             ad.addCreative(creative);
                                         }
@@ -195,58 +184,6 @@ export class VastParser {
             }
         }
 
-        return creative;
-    }
-
-    private parseCompanionAd(creativeElement: any): any {
-        let creative = new VastCreativeCompanion();
-
-        let companionElements = this.childsByName(creativeElement, 'Companion');
-        for (let i = 0; i < companionElements.length; i++) {
-            let companionResource = companionElements[i];
-
-            let companionAd = new VastCompanionAd(companionResource.getAttribute('id') || null,
-                companionResource.getAttribute('width'), companionResource.getAttribute('height'));
-
-            let htmlResourceElements = this.childsByName(companionResource, 'HTMLResource');
-            for (let j = 0; j < htmlResourceElements.length; j++) {
-                let htmlElement = htmlResourceElements[j];
-                companionAd.setType(htmlElement.getAttribute('creativeType') || 'text/html');
-                companionAd.setHTMLResource(this.parseNodeText(htmlElement));
-            }
-
-            let iframeResourceElements = this.childsByName(companionResource, 'IFrameResource');
-            for (let j = 0; j < iframeResourceElements.length; j++) {
-                let iframeElement = iframeResourceElements[j];
-                companionAd.setType(iframeElement.getAttribute('creativeType') || 0);
-                companionAd.setIFrameResource(this.parseNodeText(iframeElement));
-            }
-
-            let staticResourceElements = this.childsByName(companionResource, 'StaticResource');
-            for (let j = 0; j < staticResourceElements.length; j++) {
-                let staticElement = staticResourceElements[j];
-                companionAd.setType(staticElement.getAttribute('creativeType') || 0);
-                companionAd.setStaticResource(this.parseNodeText(staticElement));
-            }
-
-            let trackingEventsElements = this.childsByName(companionResource, 'TrackingEvents');
-            for (let k = 0; k < trackingEventsElements.length; k++) {
-                let trackingEventsElement = trackingEventsElements[k];
-                let trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
-                for (let l = 0; l < trackingElements.length; l++) {
-                    let trackingElement = trackingElements[l];
-                    let eventName = trackingElement.getAttribute('event');
-                    let trackingURLTemplate = this.parseNodeText(trackingElement);
-                    if ((eventName != null) && (trackingURLTemplate != null)) {
-                        companionAd.addTrackingEvent(eventName, trackingURLTemplate);
-                    }
-                }
-            }
-
-            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(this.childByName(companionResource, 'CompanionClickThrough')));
-
-            creative.addVariation(companionAd);
-        }
         return creative;
     }
 
