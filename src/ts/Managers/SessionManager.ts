@@ -72,12 +72,12 @@ export class SessionManager {
 
     private _gamerSid: string;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator: SessionManagerEventMetadataCreator) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._eventManager = eventManager;
-        this._eventMetadataCreator = eventMetadataCreator;
+        this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._deviceInfo, this._nativeBridge);
     }
 
     public create(): Promise<void[]> {

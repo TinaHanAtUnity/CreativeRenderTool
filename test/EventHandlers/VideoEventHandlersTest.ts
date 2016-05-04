@@ -45,7 +45,7 @@ describe('VideoEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge)));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{}, overlay, endScreen);
+        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
 
 
@@ -55,14 +55,14 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(adUnit, 5);
+            VideoEventHandlers.onVideoProgress(sessionManager, adUnit, 5);
 
             sinon.assert.calledWith(adUnit.setVideoPosition, 5);
             sinon.assert.calledWith(overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(adUnit, -5);
+            VideoEventHandlers.onVideoProgress(sessionManager, adUnit, -5);
 
             sinon.assert.notCalled(adUnit.setVideoPosition);
             sinon.assert.calledWith(overlay.setVideoProgress, -5);

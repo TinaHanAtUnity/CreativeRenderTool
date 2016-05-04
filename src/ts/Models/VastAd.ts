@@ -68,6 +68,8 @@ export class VastAd {
         let creative = this.getCreative();
         if (creative) {
             return creative.getDuration();
+        } else {
+            return null;
         }
     }
 
