@@ -21,7 +21,6 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from './AdUnits/AdUnitFactory';
-import { SessionManagerEventMetadataCreator } from './Managers/SessionManager';
 
 export class WebView {
 
