@@ -21,6 +21,7 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from './AdUnits/AdUnitFactory';
+import { SessionManagerEventMetadataCreator } from './Managers/SessionManager';
 
 export class WebView {
 
@@ -78,7 +79,7 @@ export class WebView {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
-            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, new SessionManagerEventMetadataCreator(this._eventManager, this._deviceInfo, this._nativeBridge));
             return this._sessionManager.create();
         }).then(() => {
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
