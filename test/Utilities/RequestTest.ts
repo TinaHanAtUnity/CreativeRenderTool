@@ -5,6 +5,7 @@ import { assert } from 'chai';
 import { RequestApi } from '../../src/ts/Native/Api/Request';
 import { Request } from '../../src/ts/Utilities/Request';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
@@ -82,7 +83,7 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge);
+        request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
     });
 
     it('Request get without headers (expect success)', () => {
