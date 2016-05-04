@@ -142,7 +142,7 @@ export class Request {
         }
     }
 
-    private handleFailedRequest(id: number, nativeRequest: INativeRequest): void {
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
         if(nativeRequest.retries > 0) {
             nativeRequest.retries--;
             setTimeout(() => {
@@ -152,7 +152,7 @@ export class Request {
             if(nativeRequest.options.retryWithConnectionEvents) {
                 nativeRequest.waitNetworkConnected = true;
             } else {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
+                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
             }
         }
     }
@@ -178,14 +178,14 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else {
-            this.handleFailedRequest(id, nativeRequest);
+            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
         }
     }
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
         let id = parseInt(rawId, 10);
         let nativeRequest = Request._requests[id];
-        this.handleFailedRequest(id, nativeRequest);
+        this.handleFailedRequest(id, nativeRequest, error);
     }
 
     private onNetworkConnected(): void {

@@ -12,7 +12,7 @@ export class EventManager {
         this._request = request;
     }
 
-    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> | Promise<void> {
+    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> {
         this._nativeBridge.Sdk.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId), url);
@@ -24,8 +24,6 @@ export class EventManager {
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
             ]);
-        }).catch(() => {
-            return this._nativeBridge.Sdk.logInfo('Unity Ads operative event: failed to send ' + event + ' event to ' + url + ' (storing and resending later)');
         });
     }
 
