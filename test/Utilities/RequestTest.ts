@@ -94,7 +94,9 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
+        let clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
+        clock.restore();
         request = new Request(nativeBridge, wakeUpManager);
     });
 
@@ -226,20 +228,25 @@ describe('RequestTest', () => {
     });
 
     it('Request should succeed only after connection event', () => {
+        let clock = sinon.useFakeTimers();
         let toggleUrl: string = 'http://www.example.org/toggle';
         let successMessage: string = 'Success response';
 
-        setTimeout(() => {
-            requestApi.setToggleUrl(true);
-            nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        }, 10);
-
         requestApi.setToggleUrl(false);
-        return request.get(toggleUrl, [], 0, 0, {followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
+
+        let promise = request.get(toggleUrl, [], 0, 0, {followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
             error = error[1];
             throw new Error('Get with connection event failed: ' + error);
         });
+
+        requestApi.setToggleUrl(true);
+        clock.tick(20 * 60 * 1000);
+        nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
+        clock.tick(1);
+        clock.restore();
+
+        return promise;
     });
 });
