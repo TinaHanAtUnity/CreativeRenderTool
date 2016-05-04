@@ -9,6 +9,7 @@ import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
+    private _toggleUrl: boolean = false;
 
     public get(id: string, url: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/success') !== -1) {
@@ -21,7 +22,7 @@ class TestRequestApi extends RequestApi {
             } else {
                 this.sendFailResponse(id, url, 'No X-Test header found');
             }
-        } else if(url.indexOf('/retry')) {
+        } else if(url.indexOf('/retry') !== -1) {
             if(this._retryCount === 3) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
@@ -29,8 +30,14 @@ class TestRequestApi extends RequestApi {
             }
 
             this._retryCount++;
-        } else if(url.indexOf('/alwaysRetry')) {
+        } else if(url.indexOf('/alwaysRetry') !== -1) {
             this.sendSuccessResponse(id, url, 'Must continue retrying', 500, []);
+        } else if(url.indexOf('/toggle') !== -1) {
+            if(this._toggleUrl) {
+                this.sendSuccessResponse(id, url, 'Success response', 200, []);
+            } else {
+                this.sendFailResponse(id, url, 'URL toggled off');
+            }
         }
 
         return Promise.resolve(id);
@@ -62,6 +69,10 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
+    public setToggleUrl(status: boolean) {
+        this._toggleUrl = status;
+    }
+
     private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
         setTimeout(() => { this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]); }, 0);
     }
@@ -74,7 +85,7 @@ class TestRequestApi extends RequestApi {
 describe('RequestTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge, requestApi, request;
+    let nativeBridge, requestApi, request, wakeUpManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -83,7 +94,8 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        request = new Request(nativeBridge, wakeUpManager);
     });
 
     it('Request get without headers (expect success)', () => {
@@ -210,6 +222,24 @@ describe('RequestTest', () => {
         }).catch(error => {
             error = error[1];
             assert.equal('FAILED_AFTER_RETRIES', error, 'Error was not correct after retries');
+        });
+    });
+
+    it('Request should succeed only after connection event', () => {
+        let toggleUrl: string = 'http://www.example.org/toggle';
+        let successMessage: string = 'Success response';
+
+        setTimeout(() => {
+            requestApi.setToggleUrl(true);
+            nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
+        }, 10);
+
+        requestApi.setToggleUrl(false);
+        return request.get(toggleUrl, [], 0, 0, {followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
+            assert.equal(successMessage, response.response, 'Did not receive correct response');
+        }).catch(error => {
+            error = error[1];
+            throw new Error('Get with connection event failed: ' + error);
         });
     });
 });
