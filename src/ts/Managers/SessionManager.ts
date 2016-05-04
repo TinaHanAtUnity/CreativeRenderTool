@@ -91,15 +91,15 @@ export class SessionManager {
         return this._currentSession;
     }
 
-    public sendShow(adUnit: AbstractAdUnit): void {
+    public sendShow(adUnit: AbstractAdUnit): Promise<void> {
 
         const fulfilled = ([id, infoJson]) => {
-            this._eventManager.operativeEvent('show', id, this._currentSession.getId(), this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
-            this.sendVastImpressionEvent(adUnit, this._currentSession.getId());
+            this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
+            this.sendVastImpressionEvent(adUnit, infoJson.sessionId);
             this.sendVastTrackingEvent(adUnit, 'creativeView', infoJson.sessionId);
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
