@@ -21,7 +21,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
-        sessionManager.sendProgress(adUnit, position, adUnit.getVideoPosition());
+        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoPosition());
         if (position > 0) {
             adUnit.setVideoPosition(position);
         }

@@ -112,10 +112,10 @@ export class SessionManager {
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
     }
 
-    public sendProgress(adUnit: AbstractAdUnit, position: number, oldPosition: number): void {
-        this.sendVastQuartileEvent(adUnit, position, oldPosition, 1);
-        this.sendVastQuartileEvent(adUnit, position, oldPosition, 2);
-        this.sendVastQuartileEvent(adUnit, position, oldPosition, 3);
+    public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
+        this.sendVastQuartileEvent(adUnit, session, position, oldPosition, 1);
+        this.sendVastQuartileEvent(adUnit, session, position, oldPosition, 2);
+        this.sendVastQuartileEvent(adUnit, session, position, oldPosition, 3);
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
@@ -130,14 +130,14 @@ export class SessionManager {
         this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
     }
 
-    public sendView(adUnit: AbstractAdUnit): void {
+    public sendView(adUnit: AbstractAdUnit): Promise<void> {
 
         const fulfilled = ([id, infoJson]) => {
-            this._eventManager.operativeEvent('view', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
+            this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
             this.sendVastTrackingEvent(adUnit, 'complete', infoJson.sessionId);
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
@@ -214,7 +214,7 @@ export class SessionManager {
         }
     }
 
-    private sendVastQuartileEvent(adUnit: AbstractAdUnit, position: number, oldPosition: number, quartile: number) {
+    private sendVastQuartileEvent(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number, quartile: number) {
         let quartileEventName: string;
         if (quartile === 1) {
             quartileEventName = 'firstQuartile';
@@ -229,7 +229,7 @@ export class SessionManager {
             let duration = adUnit.getCampaign().getVast().getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
                 for (let quartileUrl of adUnit.getCampaign().getVast().getTrackingEventUrls(quartileEventName)) {
-                    this._eventManager.thirdPartyEvent(`vast ${quartileEventName}`, this._currentSession.getId(), quartileUrl);
+                    this._eventManager.thirdPartyEvent(`vast ${quartileEventName}`, session.getId(), quartileUrl);
                 }
             }
         }
