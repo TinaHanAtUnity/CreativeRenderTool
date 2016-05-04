@@ -149,7 +149,10 @@ export class SessionManager {
 
         this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
 
-        return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+        if (campaign.getClickAttributionUrl()) {
+            return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+        }
+        return Promise.reject('Missing click attribution url');
     }
 
     public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {

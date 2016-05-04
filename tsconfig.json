@@ -3,7 +3,8 @@
     "module": "amd",
     "target": "es5",
     "inlineSourceMap": true,
-    "moduleResolution": "classic"
+    "moduleResolution": "classic",
+    "noImplicitReturns": true
   },
   "exclude": [
     "test",

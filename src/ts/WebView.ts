@@ -1,7 +1,7 @@
 import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
-import { Configuration } from 'Models/Configuration';
+import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
@@ -183,6 +183,8 @@ export class WebView {
      */
 
     private onCampaign(placement: Placement, campaign: Campaign): void {
+        let cacheMode = this._configuration.getCacheMode();
+
         let cacheableAssets: string[] = [
             campaign.getGameIcon(),
             campaign.getLandscapeUrl(),
@@ -192,16 +194,29 @@ export class WebView {
             return asset != null;
         });
 
-        this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
-            campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
-            campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
-            campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
-            campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
+        let cacheAssets = () => {
+            return this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
+                campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
+                campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
+                campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
+                campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
+            });
+        };
 
-            this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
+        let sendReady = () => {
+            return this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
                 this._nativeBridge.Listener.sendReadyEvent(placement.getId());
             });
-        });
+        };
+
+        if(cacheMode === CacheMode.FORCED) {
+            cacheAssets().then(sendReady);
+        } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets();
+            sendReady();
+        } else {
+            sendReady();
+        }
     }
 
     private onCampaignError(error: any) {
