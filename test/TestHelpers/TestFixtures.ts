@@ -1,5 +1,6 @@
 import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
+import { INativeResponse } from '../../src/ts/Utilities/Request';
 
 export class TestFixtures {
 
@@ -29,6 +30,15 @@ export class TestFixtures {
             'http://example.com/index.html',
             null
         ]);
+    }
+
+    public static getOkNativeResponse(): INativeResponse {
+        return {
+            url: 'http://foo.url.com',
+            response: 'foo response',
+            responseCode: 200,
+            headers: [['location', 'http://foobar.com']],
+        };
     }
 
 }
