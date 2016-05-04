@@ -56,6 +56,8 @@ export class Request {
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
+        this._wakeUpManager = wakeUpManager;
+
         this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
         this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
         this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
@@ -140,6 +142,21 @@ export class Request {
         }
     }
 
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest): void {
+        if(nativeRequest.retries > 0) {
+            nativeRequest.retries--;
+            setTimeout(() => {
+                this.invokeRequest(id, nativeRequest);
+            }, nativeRequest.retryDelay);
+        } else {
+            if(nativeRequest.options.retryWithConnectionEvents) {
+                nativeRequest.waitNetworkConnected = true;
+            } else {
+                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
+            }
+        }
+    }
+
     private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
         let id = parseInt(rawId, 10);
         let nativeResponse: INativeResponse = {
@@ -161,28 +178,22 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else {
-            if(nativeRequest.retries > 0) {
-                nativeRequest.retries--;
-                setTimeout(() => {
-                    this.invokeRequest(id, nativeRequest);
-                }, nativeRequest.retryDelay);
-            } else {
-                if(nativeRequest.options.retryWithConnectionEvents) {
-                    nativeRequest.waitNetworkConnected = true;
-                } else {
-                    this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
-                }
-            }
+            this.handleFailedRequest(id, nativeRequest);
         }
     }
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
         let id = parseInt(rawId, 10);
-        this.finishRequest(id, RequestStatus.FAILED, [Request._requests[id], error]);
+        let nativeRequest = Request._requests[id];
+        this.handleFailedRequest(id, nativeRequest);
     }
 
     private onNetworkConnected(): void {
-        
-        ;
+        let id: any;
+        for(id in Request._requests) {
+            if(Request._requests.hasOwnProperty(id)) {
+                this.invokeRequest(id, Request._requests[id]);
+            }
+        }
     }
 }

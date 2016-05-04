@@ -12,25 +12,27 @@ export class EventManager {
         this._request = request;
     }
 
-    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> {
+    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> | Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getUrlKey(sessionId, eventId), url);
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getDataKey(sessionId, eventId), data);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
-        return this._request.post(url, data, [], 5, 5000).then(() => {
+        return this._request.post(url, data, [], 5, 5000, {followRedirects: false, retryWithConnectionEvents: false}).then(() => {
             return Promise.all([
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
             ]);
+        }).catch(() => {
+            return this._nativeBridge.Sdk.logInfo('Unity Ads operative event: failed to send ' + event + ' event to ' + url + ' (storing and resending later)');
         });
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
         if(url) {
             if(redirects) {
-                return this._request.get(url, [], 0, 0, {followRedirects: true});
+                return this._request.get(url, [], 0, 0, {followRedirects: true, retryWithConnectionEvents: false});
             } else {
                 return this._request.get(url);
             }
