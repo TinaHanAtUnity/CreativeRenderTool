@@ -152,11 +152,11 @@ export class SessionManager {
         return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
     }
 
-    public sendMute(adUnit: AbstractAdUnit, muted: boolean): void {
+    public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {
         if (muted) {
-            this.sendVastTrackingEvent(adUnit, 'mute', this._currentSession.getId());
+            this.sendVastTrackingEvent(adUnit, 'mute', session.getId());
         } else {
-            this.sendVastTrackingEvent(adUnit, 'unmute', this._currentSession.getId());
+            this.sendVastTrackingEvent(adUnit, 'unmute', session.getId());
         }
     }
 

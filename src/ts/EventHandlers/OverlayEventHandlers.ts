@@ -22,7 +22,7 @@ export class OverlayEventHandlers {
 
   public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
       nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-      sessionManager.sendMute(adUnit, muted);
+      sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
   }
 
 }
