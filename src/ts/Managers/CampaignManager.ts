@@ -32,12 +32,12 @@ export class CampaignManager {
         this._failedPlacements = [];
     }
 
-    public request(placement: Placement): void {
+    public request(placement: Placement): Promise<void> {
         if(this._failedPlacements.indexOf(placement.getId()) > -1) {
             delete this._failedPlacements[this._failedPlacements.indexOf(placement.getId())];
         }
 
-        this.createRequestUrl(placement.getId()).then(requestUrl => {
+        return this.createRequestUrl(placement.getId()).then(requestUrl => {
             return this._request.get(requestUrl, [], 5, 5000).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign;
@@ -45,6 +45,9 @@ export class CampaignManager {
                     campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {campaign: campaignJson.campaign});
                 } else {
                     campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {vast: campaignJson.vast});
+                }
+                if (!campaign.getVideoUrl()) {
+                    throw new Error('Campaign does not have a video url');
                 }
                 placement.setCampaign(campaign);
                 this.onCampaign.trigger(placement, campaign);
