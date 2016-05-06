@@ -49,6 +49,9 @@ export class CampaignManager {
                         throw new Error('Campaign does not have an impression url');
                     }
                     // todo throw an Error if required events are missing. (what are the required events?)
+                    if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                        this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for placement ${placement.getId()}`);
+                    }
                 }
                 if (!campaign.getVideoUrl()) {
                     throw new Error('Campaign does not have a video url');
