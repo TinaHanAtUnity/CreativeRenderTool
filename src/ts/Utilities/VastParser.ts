@@ -16,22 +16,22 @@ export class VastParser {
 
     public parseVast(vast: any): Vast {
         if (!vast) {
-            return null;
+            throw new Error('VAST data is missing');
         }
 
         let xml = (this._domParser).parseFromString(decodeURIComponent(vast.data).trim(), 'text/xml');
         let ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (xml == null) {
-            return null;
+            throw new Error('VAST xml data is missing');
         }
 
         if (xml.documentElement == null) {
-            return null;
+            throw new Error('VAST xml data is missing');
         }
 
         if (xml.documentElement.nodeName !== 'VAST') {
-            return null;
+            throw new Error(`VAST xml is invalid - document element must be VAST but was ${xml.documentElement.nodeName}`);
         }
 
         let childNodes = xml.documentElement.childNodes;

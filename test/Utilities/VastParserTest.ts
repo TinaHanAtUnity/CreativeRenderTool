@@ -12,20 +12,26 @@ describe('VastParserTest', () => {
         domParser = new xmldom.DOMParser({errorHandler: {}});
     });
 
-    it('should return null when given null', () => {
-        assert.isNull(new VastParser(domParser).parseVast(null));
+    it('should throw when given null', () => {
+        assert.throws(() => {
+            new VastParser(domParser).parseVast(null);
+        });
     });
 
-    it('should return null when given an object with no data', () => {
-        assert.isNull(new VastParser(domParser).parseVast({}));
+    it('should throw when given an object with no data', () => {
+        assert.throws(() => {
+            new VastParser(domParser).parseVast({});
+        });
     });
 
-    it('should return null when given a vast string with invalid document element', () => {
-        assert.isNull(new VastParser(domParser).parseVast({
-            data: `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <foo>
-            </foo>`
-        }));
+    it('should throw when given a vast string with invalid document element', () => {
+        assert.throws(() => {
+            assert.isNull(new VastParser(domParser).parseVast({
+                data: `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                       <foo>
+                       </foo>`
+            }));
+        });
     });
 
     it('should have correct data given url encoded data string and additional tracking events', () => {

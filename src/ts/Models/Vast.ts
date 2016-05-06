@@ -47,7 +47,7 @@ export class Vast {
         if (ad) {
             return ad.getImpressionURLTemplates();
         }
-        return null;
+        return [];
     }
 
     public getTrackingEventUrls(eventName: string) {

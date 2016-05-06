@@ -45,6 +45,10 @@ export class CampaignManager {
                     campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {campaign: campaignJson.campaign});
                 } else {
                     campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {vast: campaignJson.vast});
+                    if (campaign.getVast().getImpressionUrls().length === 0) {
+                        throw new Error('Campaign does not have an impression url');
+                    }
+                    // todo throw an Error if required events are missing. (what are the required events?)
                 }
                 if (!campaign.getVideoUrl()) {
                     throw new Error('Campaign does not have a video url');

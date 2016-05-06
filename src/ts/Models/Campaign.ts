@@ -47,6 +47,8 @@ export class Campaign {
             this._bypassAppSheet = campaign.bypassAppSheet;
         } else if (data.vast) {
             this._vast = (Campaign.vastParser || new VastParser()).parseVast(data.vast);
+        } else {
+            throw new Error('Campaign and VAST data is missing');
         }
 
         this._gamerId = gamerId;
