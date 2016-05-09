@@ -16,9 +16,9 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoPosition: number;
     private _videoActive: boolean;
     private _watches: number;
-    private _onResumeObserver;
-    private _onPauseObserver;
-    private _onDestroyObserver;
+    private _onResumeObserver: any;
+    private _onPauseObserver: any;
+    private _onDestroyObserver: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, placement, campaign);
