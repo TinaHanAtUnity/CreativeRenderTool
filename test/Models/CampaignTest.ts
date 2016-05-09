@@ -9,13 +9,6 @@ import { Campaign } from '../../src/ts/Models/Campaign';
 
 describe('CampaignTest', () => {
 
-    let vastParser;
-
-    beforeEach(() => {
-        let domParser = new xmldom.DOMParser({errorHandler: {}});
-        vastParser = new VastParser(domParser);
-    });
-
     describe('Parsing json with campaign data', () => {
         it('should have correct data from the json', () => {
             let json = {
@@ -72,8 +65,10 @@ describe('CampaignTest', () => {
                 },
                 'gamerId': '5712983c481291b16e1be03b'
             };
-            Campaign.vastParser = vastParser;
-            let campaign = new Campaign(json.gamerId, json.abGroup, {vast: json.vast});
+            let domParser = new xmldom.DOMParser({errorHandler: {}});
+            let vastParser = new VastParser(domParser);
+            let parsedVast = vastParser.parseVast(json.vast);
+            let campaign = new Campaign(json.gamerId, json.abGroup, {vast: parsedVast});
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), null);

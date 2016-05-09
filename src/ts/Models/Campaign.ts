@@ -1,9 +1,6 @@
 import { Vast } from 'Models/Vast';
-import { VastParser } from 'Utilities/VastParser';
 
 export class Campaign {
-
-    public static vastParser: VastParser;
 
     private _id: string;
     private _appStoreId: string;
@@ -46,7 +43,7 @@ export class Campaign {
             this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
             this._bypassAppSheet = campaign.bypassAppSheet;
         } else if (data.vast) {
-            this._vast = (Campaign.vastParser || new VastParser()).parseVast(data.vast);
+            this._vast = data.vast;
         } else {
             throw new Error('Campaign and VAST data is missing');
         }

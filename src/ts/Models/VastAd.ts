@@ -6,13 +6,15 @@ export class VastAd {
     private _creatives: VastCreative[];
     private _errorURLTemplates: string[];
     private _impressionURLTemplates: string[];
+    private _wrapperURLs: string[];
 
     constructor();
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[]) {
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[]) {
         this._id = id;
         this._creatives = creatives || [];
         this._errorURLTemplates = errorURLTemplates || [];
         this._impressionURLTemplates = impressionURLTemplates || [];
+        this._wrapperURLs = wrapperURLs || [];
     }
 
     public getId(): string {
@@ -52,6 +54,14 @@ export class VastAd {
 
     public addImpressionURLTemplate(impressionURLTemplate: string) {
         this._impressionURLTemplates.push(impressionURLTemplate);
+    }
+
+    public getWrapperURL(): string {
+        return this._wrapperURLs[0];
+    }
+
+    public addWrapperURL(url: string) {
+        this._wrapperURLs.push(url);
     }
 
     public getTrackingEventUrls(eventName: string) {

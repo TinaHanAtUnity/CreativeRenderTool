@@ -3,6 +3,7 @@ import { VastAd } from 'Models/VastAd';
 import { VastCreative } from 'Models/VastCreative';
 import { VastCreativeLinear } from 'Models/VastCreativeLinear';
 import { VastMediaFile } from 'Models/VastMediaFile';
+import { Request } from 'Utilities/Request';
 
 export class VastParser {
 
@@ -35,12 +36,19 @@ export class VastParser {
         }
 
         let childNodes = xml.documentElement.childNodes;
+
+        // collect error URLs before moving on to ads
         for (let i = 0; i < childNodes.length; i++) {
             let node = childNodes[i];
 
             if (node.nodeName === 'Error') {
                 errorURLTemplates.push(this.parseNodeText(node));
-            } else if (ads.length === 0 && node.nodeName === 'Ad') { // ignore ads after the first one
+            }
+        }
+
+        for (let i = 0; i < childNodes.length; i++) {
+            let node = childNodes[i];
+            if (ads.length === 0 && node.nodeName === 'Ad') {
                 let ad = this.parseAdElement(node);
                 if (ad != null) {
                     ads.push(ad);
@@ -49,6 +57,14 @@ export class VastParser {
         }
 
         return new Vast(ads, errorURLTemplates, vast.tracking);
+    }
+
+    public retrieveVast(vast: any, request: Request): Promise<Vast> {
+        let parsedVast = this.parseVast(vast);
+
+        // todo request and parse the wrapped url
+
+        return Promise.resolve(parsedVast);
     }
 
     private parseNodeText(node: any): string {
@@ -117,6 +133,11 @@ export class VastParser {
                                     break;
                             }
                         }
+                    }
+                    break;
+                case 'VASTAdTagURI':
+                    if (url) {
+                        ad.addWrapperURL(url.trim());
                     }
                     break;
                 default:

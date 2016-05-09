@@ -9,6 +9,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { VastParser } from 'Utilities/VastParser';
 
 export class CampaignManager {
 
@@ -21,13 +22,15 @@ export class CampaignManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _vastParser: VastParser;
     private _failedPlacements: string[];
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._vastParser = vastParser;
         this._failedPlacements = [];
     }
 
@@ -38,20 +41,25 @@ export class CampaignManager {
                 let campaign: Campaign;
                 if (campaignJson.campaign) {
                     campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {campaign: campaignJson.campaign});
+                    this.onCampaign.trigger(campaign);
                 } else {
-                    campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {vast: campaignJson.vast});
-                    if (campaign.getVast().getImpressionUrls().length === 0) {
-                        throw new Error('Campaign does not have an impression url');
-                    }
-                    // todo throw an Error if required events are missing. (what are the required events?)
-                    if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                        this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-                    }
+                    this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
+                        campaign = new Campaign(campaignJson.gamerId, campaignJson.abGroup, {vast: vast});
+                        if (campaign.getVast().getImpressionUrls().length === 0) {
+                            throw new Error('Campaign does not have an impression url');
+                        }
+                        // todo throw an Error if required events are missing. (what are the required events?)
+                        if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                            this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+                        }
+                        if (!campaign.getVideoUrl()) {
+                            throw new Error('Campaign does not have a video url');
+                        }
+                        this.onCampaign.trigger(campaign);
+                    }).catch(error => {
+                        this.onError.trigger(error);
+                    });
                 }
-                if (!campaign.getVideoUrl()) {
-                    throw new Error('Campaign does not have a video url');
-                }
-                this.onCampaign.trigger(campaign);
             });
         }).catch((error) => {
             this.onError.trigger(error);

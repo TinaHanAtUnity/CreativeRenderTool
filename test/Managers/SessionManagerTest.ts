@@ -185,7 +185,7 @@ describe('SessionManagerTest', () => {
         }, false);
 
         let domParser = new xmldom.DOMParser({errorHandler: {}});
-        Campaign.vastParser = new VastParser(domParser);
+        let vastParser = new VastParser(domParser);
 
         let json = {
             'abGroup': 3,
@@ -212,7 +212,8 @@ describe('SessionManagerTest', () => {
             },
             'gamerId': '5712983c481291b16e1be03b'
         };
-        campaign = new Campaign(json.gamerId, json.abGroup, {vast: json.vast});
+        let vast = vastParser.parseVast(json.vast);
+        campaign = new Campaign(json.gamerId, json.abGroup, {vast: vast});
 
         placement = new Placement({
             id: '123',

@@ -21,6 +21,7 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from './AdUnits/AdUnitFactory';
+import { VastParser } from 'Utilities/VastParser';
 
 export class WebView {
 
@@ -88,7 +89,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
             this._campaignManager.request();
