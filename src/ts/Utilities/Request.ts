@@ -93,11 +93,6 @@ export class Request {
     public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
-
-            options = {
-                followRedirects: false,
-                retryWithConnectionEvents: false
-            };
         }
 
         headers.push(['Content-Type', 'application/json']);
