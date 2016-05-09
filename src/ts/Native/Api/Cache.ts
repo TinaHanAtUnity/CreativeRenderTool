@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable5, Observable1 } from 'Utilities/Observable';
+import { Observable5, Observable1, Observable3 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 export enum CacheError {
@@ -18,6 +18,7 @@ enum CacheEvent {
     COULDNT_CLOSE_OUTPUT_FILE,
     DOWNLOAD_STARTED,
     DOWNLOAD_RESUMED,
+    DOWNLOAD_PROGRESS,
     DOWNLOAD_END,
     DOWNLOAD_STOPPED,
     DOWNLOAD_NO_INTERNET
@@ -33,6 +34,7 @@ export interface IFileInfo {
 export class CacheApi extends NativeApi {
 
     public onDownloadStarted: Observable1<string> = new Observable1();
+    public onDownloadProgress: Observable3<string, number, number> = new Observable3();
     public onDownloadEnd: Observable5<string, number, number, number, [string, string][]> = new Observable5();
 
     constructor(nativeBridge: NativeBridge) {
@@ -74,6 +76,14 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'deleteFile', [fileId]);
     }
 
+    public setProgressInterval(interval: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setProgressInterval', [interval]);
+    }
+
+    public getProgressInterval(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getProgressInterval');
+    }
+
     public setTimeouts(connectTimeout: number, readTimeout: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setTimeouts', [connectTimeout, readTimeout]);
     }
@@ -98,6 +108,10 @@ export class CacheApi extends NativeApi {
 
             case CacheEvent[CacheEvent.DOWNLOAD_END]:
                 this.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                break;
+
+            case CacheEvent[CacheEvent.DOWNLOAD_PROGRESS]:
+                this.onDownloadProgress.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             default:
