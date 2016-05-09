@@ -12,6 +12,8 @@ const enum RequestMethod {
 }
 
 interface IRequestOptions {
+    retries: number;
+    retryDelay: number;
     followRedirects: boolean;
     retryWithConnectionEvents: boolean;
 }
@@ -21,9 +23,7 @@ interface INativeRequest {
     url: string;
     data?: string;
     headers: [string, string][];
-    retries: number;
     retryCount: number;
-    retryDelay: number;
     options: IRequestOptions;
 }
 
@@ -36,7 +36,8 @@ export interface INativeResponse {
 
 export class Request {
 
-    private static _allowedResponseCodes = [200, 302, 501];
+    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
@@ -57,6 +58,8 @@ export class Request {
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
+            retries: 0,
+            retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false
         };
@@ -71,7 +74,7 @@ export class Request {
         this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
     }
 
-    public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+    public get(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
         }
@@ -82,15 +85,13 @@ export class Request {
             method: RequestMethod.GET,
             url: url,
             headers: headers,
-            retries: retries,
             retryCount: 0,
-            retryDelay: retryDelay,
             options: options
         });
         return promise;
     }
 
-    public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+    public post(url: string, data: string = '', headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
         }
@@ -104,9 +105,7 @@ export class Request {
             url: url,
             data: data,
             headers: headers,
-            retries: retries,
             retryCount: 0,
-            retryDelay: retryDelay,
             options: options
         });
         return promise;
@@ -145,11 +144,11 @@ export class Request {
     }
 
     private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
-        if(nativeRequest.retryCount < nativeRequest.retries) {
+        if(nativeRequest.retryCount < nativeRequest.options.retries) {
             nativeRequest.retryCount++;
             setTimeout(() => {
                 this.invokeRequest(id, nativeRequest);
-            }, nativeRequest.retryDelay);
+            }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
                 this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
@@ -167,7 +166,7 @@ export class Request {
         };
         let nativeRequest = Request._requests[id];
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
-            if(responseCode === 302 && nativeRequest.options.followRedirects) {
+            if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = nativeRequest.url = Request.getHeader(headers, 'location');
                 if(location.match(/^https?/i)) {
                     this.invokeRequest(id, nativeRequest);
@@ -193,7 +192,7 @@ export class Request {
         for(id in Request._requests) {
             if(Request._requests.hasOwnProperty(id)) {
                 let request: INativeRequest = Request._requests[id];
-                if(request.options.retryWithConnectionEvents && request.retries === request.retryCount) {
+                if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
                     this.invokeRequest(id, request);
                 }
             }

@@ -143,7 +143,7 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        return request.get(retryUrl, [], retryAttempts, retryDelay).then(response => {
+        return request.get(retryUrl, [], {retries: retryAttempts, retryDelay: retryDelay, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
             error = error[1];
@@ -206,7 +206,7 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        return request.post(retryUrl, 'Test', [], retryAttempts, retryDelay).then(response => {
+        return request.post(retryUrl, 'Test', [], {retries: retryAttempts, retryDelay: retryDelay, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
             error = error[1];
@@ -234,7 +234,7 @@ describe('RequestTest', () => {
 
         requestApi.setToggleUrl(false);
 
-        let promise = request.get(toggleUrl, [], 0, 0, {followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
+        let promise = request.get(toggleUrl, [], {retries: 0, retryDelay: 0, followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
             error = error[1];

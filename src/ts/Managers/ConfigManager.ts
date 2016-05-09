@@ -12,7 +12,7 @@ export class ConfigManager {
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
         return AdapterMetaData.fetch(nativeBridge).then(adapter => {
-            return request.get(ConfigManager.createConfigUrl(clientInfo, deviceInfo, adapter), [], 5, 5000, { followRedirects: false, retryWithConnectionEvents: true }).then(response => {
+            return request.get(ConfigManager.createConfigUrl(clientInfo, deviceInfo, adapter), [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: true}).then(response => {
                 try {
                     let configJson = JSON.parse(response.response);
                     return new Configuration(configJson);
