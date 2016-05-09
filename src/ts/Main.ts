@@ -23,13 +23,13 @@ window.addEventListener('resize', resizeHandler, false);
 
 /* tslint:disable:no-string-literal */
 let nativeBridge: NativeBridge = null;
-if(window && window.webviewbridge) {
+if(window['platform'] === 'android') {
     nativeBridge = new NativeBridge(window.webviewbridge);
-} else {
+} else if(window['platform'] === 'ios') {
     nativeBridge = new NativeBridge(new IosWebViewBridge(), false);
 }
 window['nativebridge'] = nativeBridge;
 
-let webView: WebView = new WebView(nativeBridge, window['platform'], window['string']);
+let webView: WebView = new WebView(nativeBridge, window['platform'], window['commitId']);
 window['webview'] = webView;
 webView.initialize();
