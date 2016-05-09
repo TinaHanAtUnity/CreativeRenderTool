@@ -36,6 +36,8 @@ export class WebView {
     private _campaignManager: CampaignManager;
     private _cacheManager: CacheManager;
 
+    private _campaign: Campaign;
+
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
@@ -82,21 +84,14 @@ export class WebView {
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
             return this._sessionManager.create();
         }).then(() => {
+            let defaultPlacement = this._configuration.getDefaultPlacement();
+            this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
+            this.setPlacementStates(PlacementState.NOT_AVAILABLE);
+
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
             this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
-
-            let defaultPlacement = this._configuration.getDefaultPlacement();
-            this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
-
-            let placements: { [id: string]: Placement } = this._configuration.getPlacements();
-            for(let placementId in placements) {
-                if(placements.hasOwnProperty(placementId)) {
-                    let placement: Placement = placements[placementId];
-                    this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
-                    this._campaignManager.request(placements[placementId]);
-                }
-            }
+            this._campaignManager.request();
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
 
@@ -138,8 +133,7 @@ export class WebView {
             return;
         }
 
-        let campaign: Campaign = placement.getCampaign();
-        if(!campaign) {
+        if(!this._campaign) {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
@@ -159,22 +153,36 @@ export class WebView {
                 this._sessionManager.setGamerSid(player.getSid());
             }
 
-            let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, placement.getCampaign());
+            let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
             adUnit.onClose.subscribe(this.onClose.bind(this));
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
             });
 
-            this._nativeBridge.Placement.setPlacementState(adUnit.getPlacement().getId(), PlacementState.WAITING);
-            this._campaignManager.request(adUnit.getPlacement());
+            this._campaign = null;
+            this.setPlacementStates(PlacementState.WAITING);
+            this._campaignManager.request();
         });
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
         this._nativeBridge.Sdk.logError('Show invocation failed: ' + errorMsg);
         this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
-        if(sendFinish) {
+        if (sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
+    }
+
+    private setPlacementStates(placementState: PlacementState): void {
+        let placements: { [id: string]: Placement } = this._configuration.getPlacements();
+        for(let placementId in placements) {
+            if(placements.hasOwnProperty(placementId)) {
+                let placement: Placement = placements[placementId];
+                this._nativeBridge.Placement.setPlacementState(placement.getId(), placementState);
+                if(placementState === PlacementState.READY) {
+                    this._nativeBridge.Listener.sendReadyEvent(placement.getId());
+                }
+            }
         }
     }
 
@@ -182,7 +190,9 @@ export class WebView {
      CAMPAIGN EVENT HANDLERS
      */
 
-    private onCampaign(placement: Placement, campaign: Campaign): void {
+    private onCampaign(campaign: Campaign): void {
+        this._campaign = campaign;
+
         let cacheMode = this._configuration.getCacheMode();
 
         let cacheableAssets: string[] = [
@@ -202,9 +212,7 @@ export class WebView {
         };
 
         let sendReady = () => {
-            return this._nativeBridge.Placement.setPlacementState(placement.getId(), PlacementState.READY).then(() => {
-                this._nativeBridge.Listener.sendReadyEvent(placement.getId());
-            });
+            this.setPlacementStates(PlacementState.READY);
         };
 
         if(cacheMode === CacheMode.FORCED) {
@@ -254,7 +262,6 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    this._campaignManager.retryFailedPlacements(this._configuration.getPlacements());
                     this._eventManager.sendUnsentSessions();
                 }
             });
