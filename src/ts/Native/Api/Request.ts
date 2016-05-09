@@ -16,12 +16,12 @@ export class RequestApi extends NativeApi {
         super(nativeBridge, 'Request');
     }
 
-    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers]);
+    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers, connectTimeout, readTimeout]);
     }
 
-    public post(id: string, url: string, requestBody: string, headers: [string, string][]): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers]);
+    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
     }
 
     public setConnectTimeout(connectTimeout: number): Promise<number> {

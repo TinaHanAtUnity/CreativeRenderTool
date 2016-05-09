@@ -2,6 +2,16 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Observable5, Observable1 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
+export enum CacheError {
+    FILE_IO_ERROR,
+    FILE_NOT_FOUND,
+    FILE_ALREADY_IN_CACHE,
+    FILE_ALREADY_CACHING,
+    NOT_CACHING,
+    JSON_ERROR,
+    NO_INTERNET
+}
+
 enum CacheEvent {
     COULDNT_CREATE_TARGET_FILE,
     COULDNT_REQUEST_STREAM,
@@ -33,12 +43,8 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, overwrite]);
     }
 
-    public resumeDownload(url: string, fileId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'resumeDownload', [url, fileId]);
-    }
-
-    public cancelAllDownloads(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'cancelAllDownloads');
+    public cancel(remove: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'cancel', [remove]);
     }
 
     public getFiles(urls?: string[]): Promise<IFileInfo[]> {
