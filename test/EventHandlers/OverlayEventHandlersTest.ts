@@ -15,6 +15,7 @@ import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Request } from '../../src/ts/Utilities/Request';
 import { FinishState } from '../../src/ts/Constants/FinishState';
 import { Double } from '../../src/ts/Utilities/Double';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -29,7 +30,7 @@ describe('OverlayEventHandlersTest', () => {
             handleCallback
         });
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge)));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, <EndScreen><any>{show: sinon.spy()});
     });

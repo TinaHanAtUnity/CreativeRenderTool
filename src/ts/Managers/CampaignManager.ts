@@ -1,10 +1,9 @@
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable1 } from 'Utilities/Observable';
 
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 
 import { Campaign } from 'Models/Campaign';
-import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
@@ -15,7 +14,7 @@ export class CampaignManager {
 
     private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
-    public onCampaign: Observable2<Placement, Campaign> = new Observable2();
+    public onCampaign: Observable1<Campaign> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
@@ -32,13 +31,9 @@ export class CampaignManager {
         this._failedPlacements = [];
     }
 
-    public request(placement: Placement): Promise<void> {
-        if(this._failedPlacements.indexOf(placement.getId()) > -1) {
-            delete this._failedPlacements[this._failedPlacements.indexOf(placement.getId())];
-        }
-
-        return this.createRequestUrl(placement.getId()).then(requestUrl => {
-            return this._request.get(requestUrl, [], 5, 5000).then(response => {
+    public request(): Promise<void> {
+        return this.createRequestUrl().then(requestUrl => {
+            return this._request.get(requestUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign;
                 if (campaignJson.campaign) {
@@ -50,38 +45,23 @@ export class CampaignManager {
                     }
                     // todo throw an Error if required events are missing. (what are the required events?)
                     if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                        this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for placement ${placement.getId()}`);
+                        this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                     }
                 }
                 if (!campaign.getVideoUrl()) {
                     throw new Error('Campaign does not have a video url');
                 }
-                placement.setCampaign(campaign);
-                this.onCampaign.trigger(placement, campaign);
+                this.onCampaign.trigger(campaign);
             });
         }).catch((error) => {
-            placement.setCampaign(null);
-            this._failedPlacements.push(placement.getId());
             this.onError.trigger(error);
         });
     }
 
-    public retryFailedPlacements(placements: { [id: string]: Placement }) {
-        for(let placementId in placements) {
-            if(placements.hasOwnProperty(placementId)) {
-                if(this._failedPlacements.indexOf(placementId) > -1) {
-                    this.request(placements[placementId]);
-                }
-            }
-        }
-    }
-
-    private createRequestUrl(placementId: string): Promise<string> {
+    private createRequestUrl(): Promise<string> {
         let url: string = [
             CampaignManager.CampaignBaseUrl,
             this._clientInfo.getGameId(),
-            'placements',
-            placementId,
             'fill'
         ].join('/');
 
@@ -105,7 +85,6 @@ export class CampaignManager {
                 screenHeight: this._deviceInfo.getScreenHeight(),
                 sdkVersion: this._clientInfo.getSdkVersion(),
                 softwareVersion: this._deviceInfo.getApiLevel(),
-                placementId: placementId,
                 timeZone: this._deviceInfo.getTimeZone()
             });
 

@@ -12,6 +12,9 @@ import { CampaignManager } from '../../src/ts/Managers/CampaignManager';
 import { assert } from 'chai';
 import { VastParser } from '../../src/ts/Utilities/VastParser';
 import { SdkApi } from '../../src/ts/Native/Api/Sdk';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Observable2 } from '../../src/ts/Utilities/Observable';
+import { Observable4 } from '../../src/ts/Utilities/Observable';
 
 describe('CampaignManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -23,7 +26,7 @@ describe('CampaignManagerTest', () => {
 
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/placements/fooId/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&placementId=fooId&', [], 5, 5000).returns(Promise.resolve({
+        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
@@ -44,20 +47,16 @@ describe('CampaignManagerTest', () => {
         }));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo);
-        let triggeredPlacement: Placement;
         let triggeredCampaign: Campaign;
-        campaignManager.onCampaign.subscribe((placement: Placement, campaign: Campaign) => {
-            triggeredPlacement = placement;
+        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
         });
-        const placement = TestFixtures.getPlacement();
 
         // when the campaign manager requests the placement
-        return campaignManager.request(placement).then(() => {
+        return campaignManager.request().then(() => {
 
             // then the onCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.deepEqual(triggeredPlacement, placement);
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
@@ -67,17 +66,16 @@ describe('CampaignManagerTest', () => {
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/placements/fooId/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&placementId=fooId&', [], 5, 5000).returns(Promise.resolve(response));
+        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
             triggeredError = error;
         });
-        const placement = TestFixtures.getPlacement();
 
         // when the campaign manager requests the placement
-        return campaignManager.request(placement).then(() => {
+        return campaignManager.request().then(() => {
 
             // then the onError observable is triggered with an appropriate error
             mockRequest.verify();
@@ -159,27 +157,22 @@ describe('CampaignManagerTest', () => {
         });
     });
 
-    let extracted = (response: {response: any}) => {
+    let verifyCampaignForResponse = (response: {response: any}) => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/placements/fooId/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&placementId=fooId&', [], 5, 5000).returns(Promise.resolve(response));
+        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo);
-        let triggeredPlacement: Placement;
         let triggeredCampaign: Campaign;
-        campaignManager.onCampaign.subscribe((placement: Placement, campaign: Campaign) => {
-            triggeredPlacement = placement;
+        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
         });
-        const placement = TestFixtures.getPlacement();
 
         // when the campaign manager requests the placement
-        return campaignManager.request(placement).then(() => {
+        return campaignManager.request().then(() => {
 
             // then the onCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            console.log('got here');
-            assert.deepEqual(triggeredPlacement, placement);
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
@@ -211,11 +204,11 @@ describe('CampaignManagerTest', () => {
 
             const sdk = new SdkApi(nativeBridge);
             const mockSdk = sinon.mock(sdk);
-            mockSdk.expects('logWarning').withArgs(`Campaign does not have an error url for placement ${TestFixtures.getPlacement().getId()}`);
+            mockSdk.expects('logWarning').withArgs(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`);
             nativeBridge.Sdk = sdk;
 
             // when the campaign manager requests the placement
-            return extracted(response).then(() => {
+            return verifyCampaignForResponse(response).then(() => {
 
                 // then the SDK's logWarning function is called with an appropriate message
                 mockSdk.verify();
@@ -247,9 +240,16 @@ describe('CampaignManagerTest', () => {
             },
             Sdk: {
                 logWarning: sinon.spy()
+            },
+            Connectivity: {
+                onConnected: new Observable2()
+            },
+            Broadcast: {
+                onBroadcastAction: new Observable4()
             }
         };
-        request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        request = new Request(nativeBridge, wakeUpManager);
     });
 
 });

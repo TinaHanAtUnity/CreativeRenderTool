@@ -1,5 +1,3 @@
-import { Campaign } from 'Campaign';
-
 export enum PlacementState {
     READY,
     NOT_AVAILABLE,
@@ -21,8 +19,6 @@ export class Placement {
 
     private _useDeviceOrientationForVideo: boolean;
     private _muteVideo: boolean;
-
-    private _campaign: Campaign;
 
     constructor(data: any) {
         this._id = data.id;
@@ -69,13 +65,4 @@ export class Placement {
     public muteVideo(): boolean {
         return this._muteVideo;
     }
-
-    public getCampaign(): Campaign {
-        return this._campaign;
-    }
-
-    public setCampaign(campaign: Campaign): void {
-        this._campaign = campaign;
-    }
-
 }

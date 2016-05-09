@@ -13,6 +13,7 @@ import { Request } from '../../src/ts/Utilities/Request';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
 import { SessionManagerEventMetadataCreator } from '../../src/ts/Managers/SessionManager';
 import { Session } from '../../src/ts/Models/Session';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 describe('SessionManagerTest', () => {
     let handleInvocation = sinon.spy();
@@ -27,7 +28,8 @@ describe('SessionManagerTest', () => {
         // given a VAST placement
         // when the session manager is told that the video has started
         // then the VAST start callback URL should be requested by the event manager
-        let request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        let request = new Request(nativeBridge, wakeUpManager);
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1');
@@ -50,7 +52,8 @@ describe('SessionManagerTest', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager
-        let request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        let request = new Request(nativeBridge, wakeUpManager);
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast complete', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1');
@@ -73,7 +76,8 @@ describe('SessionManagerTest', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST impression and creativeView callback URLs should be requested by the event manager
-        let request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        let request = new Request(nativeBridge, wakeUpManager);
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '123', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130');
@@ -95,7 +99,8 @@ describe('SessionManagerTest', () => {
 
     const testMuteEvent = function (muted: boolean) {
         let eventName = muted ? 'mute' : 'unmute';
-        let request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        let request = new Request(nativeBridge, wakeUpManager);
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '123', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1`);
@@ -135,7 +140,8 @@ describe('SessionManagerTest', () => {
             quartileEventName = 'thirdQuartile';
         }
 
-        let request = new Request(nativeBridge);
+        let wakeUpManager = new WakeUpManager(nativeBridge);
+        let request = new Request(nativeBridge, wakeUpManager);
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1`);
@@ -218,7 +224,6 @@ describe('SessionManagerTest', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        placement.setCampaign(campaign);
 
         deviceInfo = new DeviceInfo();
 

@@ -17,6 +17,7 @@ import { Request } from '../../src/ts/Utilities/Request';
 import { Campaign } from '../../src/ts/Models/Campaign';
 import { Overlay } from '../../src/ts/Views/Overlay';
 import { EndScreen } from '../../src/ts/Views/EndScreen';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 
 describe('VideoEventHandlersTest', () => {
@@ -43,7 +44,7 @@ describe('VideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge)));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
