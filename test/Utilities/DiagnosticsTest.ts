@@ -9,6 +9,7 @@ import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 describe('DiagnosticsTest', () => {
     let handleInvocation = sinon.spy();
@@ -23,7 +24,7 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request', () => {
-        let request = new Request(nativeBridge);
+        let request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
@@ -32,7 +33,7 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request with info', () => {
-        let request = new Request(nativeBridge);
+        let request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
         let eventManager = new EventManager(nativeBridge, request);
 
         let deviceInfo = new DeviceInfo();

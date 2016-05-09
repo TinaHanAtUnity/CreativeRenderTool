@@ -33,7 +33,7 @@ export class CampaignManager {
 
     public request(): void {
         this.createRequestUrl().then(requestUrl => {
-            return this._request.get(requestUrl, [], 5, 5000).then(response => {
+            return this._request.get(requestUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                 this.onCampaign.trigger(campaign);
