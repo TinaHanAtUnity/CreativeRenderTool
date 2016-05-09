@@ -40,7 +40,7 @@ export class DeviceInfo extends Model {
     private _rooted: boolean;
 
     public fetch(nativeBridge: NativeBridge, platform: Platform): Promise<any[]> {
-        let promises = [];
+        let promises: Promise<any>[] = [];
 
         if(platform === Platform.ANDROID) {
             promises.push(nativeBridge.DeviceInfo.getAndroidId().then(androidId => this._androidId = androidId));
