@@ -63,10 +63,28 @@ export class Vast {
         return null;
     }
 
+    public addTrackingEventUrl(eventName: string, url: string) {
+        if (!this._additionalTrackingEvents) {
+            this._additionalTrackingEvents = {};
+        }
+        if (!this._additionalTrackingEvents[eventName]) {
+            this._additionalTrackingEvents[eventName] = [];
+        }
+        this._additionalTrackingEvents[eventName].push(url);
+    }
+
     public getDuration(): number {
         let ad = this.getAd();
         if (ad) {
             return ad.getDuration();
+        }
+        return null;
+    }
+
+    public getWrapperURL(): string {
+        let ad = this.getAd();
+        if (ad) {
+            return ad.getWrapperURL();
         }
         return null;
     }

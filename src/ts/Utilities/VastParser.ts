@@ -7,12 +7,20 @@ import { Request } from 'Utilities/Request';
 
 export class VastParser {
 
+    private static DEFAULT_MAX_WRAPPER_DEPTH = 2;
+
     private _domParser: DOMParser;
+    private _maxWrapperDepth: number;
 
     constructor();
     constructor(domParser: DOMParser);
-    constructor(domParser?: DOMParser) {
+    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParser.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || new DOMParser();
+        this._maxWrapperDepth = maxWrapperDepth;
+    }
+
+    public setMaxWrapperDepth(maxWrapperDepth: number) {
+        this._maxWrapperDepth = maxWrapperDepth;
     }
 
     public parseVast(vast: any): Vast {
@@ -59,13 +67,35 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates, vast.tracking);
     }
 
-    public retrieveVast(vast: any, request: Request): Promise<Vast> {
+    public retrieveVast(vast: any, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast = this.parseVast(vast);
 
-        // todo request and parse the wrapped url
+        let wrapperURL = parsedVast.getWrapperURL();
+        if (!wrapperURL || depth === this._maxWrapperDepth) {
+            this.applyParentURLs(parsedVast, parent);
+            return Promise.resolve(parsedVast);
+        }
 
-        return Promise.resolve(parsedVast);
+        return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
+            return this.retrieveVast({data: response.response, tracking: {}}, request, parsedVast, depth + 1);
+        });
     }
+
+    private applyParentURLs(parsedVast, parent) {
+        if (parent) {
+            for (let errorUrl of parent.getAd().getErrorURLTemplates()) {
+                parsedVast.getAd().addErrorURLTemplate(errorUrl);
+            }
+            for (let impressionUrl of parent.getAd().getImpressionURLTemplates()) {
+                parsedVast.getAd().addImpressionURLTemplate(impressionUrl);
+            }
+            for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                for (let url of parent.getTrackingEventUrls(eventName)) {
+                    parsedVast.addTrackingEventUrl(eventName, url);
+                }
+            }
+        }
+    };
 
     private parseNodeText(node: any): string {
         return node && (node.textContent || node.text);

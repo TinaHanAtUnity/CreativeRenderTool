@@ -63,98 +63,140 @@ describe('CampaignManagerTest', () => {
         });
     });
 
-    //it('should have data from inside and outside the wrapper for a wrapped VAST', () => {
-    //
-    //    // given a valid VAST placement
-    //    let mockRequest = sinon.mock(request);
-    //    mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
-    //        response: `{
-    //            "abGroup": 3,
-    //            "vast": {
-    //                "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A",
-    //                "tracking": {
-    //                    "click": null,
-    //                    "complete": null,
-    //                    "firstQuartile": null,
-    //                    "midpoint": null,
-    //                    "start": [
-    //                        "http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1"
-    //                    ],
-    //                    "thirdQuartile": null
-    //                }
-    //            },
-    //            "gamerId": "5712983c481291b16e1be03b"
-    //        }`
-    //    }));
-    //    mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
-    //        response: `<?xml version="1.0" encoding="UTF-8"?>
-    //            <VAST version="2.0">
-    //              <Ad id="601364">
-    //              <InLine>
-    //                <AdSystem>Acudeo Compatible</AdSystem>
-    //                <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
-    //                <Description>VAST 2.0 Instream Test 1</Description>
-    //                <Error>http://myErrorURL/error</Error>
-    //                <Impression>http://myTrackingURL/impression</Impression>
-    //                <Creatives>
-    //                    <Creative AdID="601364">
-    //                        <Linear>
-    //                            <Duration>00:00:30</Duration>
-    //                            <TrackingEvents>
-    //                                <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
-    //                                <Tracking event="start">http://myTrackingURL/start</Tracking>
-    //                                <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
-    //                                <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
-    //                                <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
-    //                                <Tracking event="complete">http://myTrackingURL/complete</Tracking>
-    //                            </TrackingEvents>
-    //                            <VideoClicks>
-    //                                <ClickThrough>http://www.tremormedia.com</ClickThrough>
-    //                                <ClickTracking>http://myTrackingURL/click</ClickTracking>
-    //                            </VideoClicks>
-    //                            <MediaFiles>
-    //                                <MediaFile delivery="progressive" type="video/x-flv" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv</MediaFile>
-    //                            </MediaFiles>
-    //                        </Linear>
-    //                    </Creative>
-    //                    <Creative AdID="601364-Companion">
-    //                        <CompanionAds>
-    //                            <Companion width="300" height="250">
-    //                                <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
-    //                                <TrackingEvents>
-    //                                    <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
-    //                                </TrackingEvents>
-    //
-    //                                <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
-    //                            </Companion>
-    //                            <Companion width="728" height="90">
-    //                                <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
-    //                                <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
-    //                            </Companion>
-    //                        </CompanionAds>
-    //                    </Creative>
-    //                </Creatives>
-    //              </InLine>
-    //              </Ad>
-    //            </VAST>`
-    //    }));
-    //
-    //    let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
-    //    let triggeredCampaign: Campaign;
-    //    campaignManager.onCampaign.subscribe((campaign: Campaign) => {
-    //        triggeredCampaign = campaign;
-    //    });
-    //
-    //    // when the campaign manager requests the placement
-    //    return campaignManager.request().then(() => {
-    //
-    //        // then the onCampaign observable is triggered with the correct campaign data
-    //        mockRequest.verify();
-    //        assert.equal(triggeredCampaign.getAbGroup(), 3);
-    //        assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-    //        assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-    //    });
-    //});
+    it('should have data from inside and outside the wrapper for a wrapped VAST', () => {
+
+        // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
+        let mockRequest = sinon.mock(request);
+        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            response: `{
+                "abGroup": 3,
+                "vast": {
+                    "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A",
+                    "tracking": {
+                        "click": null,
+                        "complete": null,
+                        "firstQuartile": null,
+                        "midpoint": null,
+                        "start": [
+                            "http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1"
+                        ],
+                        "thirdQuartile": null
+                    }
+                },
+                "gamerId": "5712983c481291b16e1be03b"
+            }`
+        }));
+        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            response: `<?xml version="1.0" encoding="UTF-8"?>
+                <VAST version="2.0">
+                  <Ad id="601364">
+                  <InLine>
+                    <AdSystem>Acudeo Compatible</AdSystem>
+                    <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
+                    <Description>VAST 2.0 Instream Test 1</Description>
+                    <Error>http://myErrorURL/error</Error>
+                    <Impression>http://myTrackingURL/impression</Impression>
+                    <Creatives>
+                        <Creative AdID="601364">
+                            <Linear>
+                                <Duration>00:00:30</Duration>
+                                <TrackingEvents>
+                                    <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
+                                    <Tracking event="start">http://myTrackingURL/start</Tracking>
+                                    <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
+                                    <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
+                                    <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
+                                    <Tracking event="complete">http://myTrackingURL/complete</Tracking>
+                                </TrackingEvents>
+                                <VideoClicks>
+                                    <ClickThrough>http://www.tremormedia.com</ClickThrough>
+                                    <ClickTracking>http://myTrackingURL/click</ClickTracking>
+                                </VideoClicks>
+                                <MediaFiles>
+                                    <MediaFile delivery="progressive" type="video/x-flv" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv</MediaFile>
+                                </MediaFiles>
+                            </Linear>
+                        </Creative>
+                        <Creative AdID="601364-Companion">
+                            <CompanionAds>
+                                <Companion width="300" height="250">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
+                                    <TrackingEvents>
+                                        <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
+                                    </TrackingEvents>
+
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                                <Companion width="728" height="90">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                            </CompanionAds>
+                        </Creative>
+                    </Creatives>
+                  </InLine>
+                  </Ad>
+                </VAST>`
+        }));
+
+        vastParser.setMaxWrapperDepth(1);
+        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        let triggeredCampaign: Campaign;
+        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
+            triggeredCampaign = campaign;
+        });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request().then(() => {
+
+            // then the onCampaign observable is triggered with the correct campaign data
+            mockRequest.verify();
+            assert.equal(triggeredCampaign.getAbGroup(), 3);
+            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+            assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv');
+            assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
+                'http://myErrorURL/error',
+                'http://myErrorURL/wrapper/error'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getImpressionUrls(), [
+                'http://myTrackingURL/impression',
+                'http://myTrackingURL/wrapper/impression'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('creativeView'), [
+                'http://myTrackingURL/creativeView',
+                'http://myTrackingURL/wrapper/creativeView'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                'http://myTrackingURL/start',
+                'http://myTrackingURL/wrapper/start',
+                'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                'http://myTrackingURL/firstQuartile',
+                'http://myTrackingURL/wrapper/firstQuartile'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                'http://myTrackingURL/midpoint',
+                'http://myTrackingURL/wrapper/midpoint'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                'http://myTrackingURL/thirdQuartile',
+                'http://myTrackingURL/wrapper/thirdQuartile'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                'http://myTrackingURL/complete',
+                'http://myTrackingURL/wrapper/complete'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('mute'), [
+                'http://myTrackingURL/wrapper/mute'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
+                'http://myTrackingURL/wrapper/unmute'
+            ]);
+            assert.equal(triggeredCampaign.getVast().getDuration(), 30);
+        });
+    });
+
 
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
@@ -248,6 +290,38 @@ describe('CampaignManagerTest', () => {
             };
             return verifyErrorForResponse(response, 'Campaign does not have an impression url');
         });
+
+        it('should bail out when max wrapper depth is reached for a wrapped VAST', () => {
+
+            // given a valid VAST response containing a wrapper
+            const response = {
+                response: `{
+                "abGroup": 3,
+                "vast": {
+                    "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A",
+                    "tracking": {
+                        "click": null,
+                        "complete": null,
+                        "firstQuartile": null,
+                        "midpoint": null,
+                        "start": [
+                            "http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1"
+                        ],
+                        "thirdQuartile": null
+                    }
+                },
+                "gamerId": "5712983c481291b16e1be03b"
+            }`
+            };
+
+            // when the parser's max wrapper depth is set to 0 to disallow wrapping
+            vastParser.setMaxWrapperDepth(0);
+
+            // then we should get an error because there was no video URL,
+            // because the video url would have been in the wrapped xml
+            return verifyErrorForResponse(response, 'Campaign does not have a video url');
+        });
+
     });
 
     let verifyCampaignForResponse = (response: {response: any}) => {
