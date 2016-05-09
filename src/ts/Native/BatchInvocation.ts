@@ -18,7 +18,12 @@ export class BatchInvocation {
     public rawQueue<T>(packageName: string, className: string, methodName: string, parameters = []): Promise<T> {
         return new Promise<T>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
-            let fullClassName = packageName + '.' + className;
+            let fullClassName: string;
+            if(window['platform'] === 'android') {
+                fullClassName = packageName + '.' + className;
+            } else if(window['platform'] === 'ios') {
+                fullClassName = 'UADSApi' + className;
+            }
             this._batch.push([fullClassName, methodName, parameters, id.toString()]);
         });
     }
