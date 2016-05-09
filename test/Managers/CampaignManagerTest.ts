@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import * as xmldom from 'xmldom';
 import { Campaign } from '../../src/ts/Models/Campaign';
-import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Request } from '../../src/ts/Utilities/Request';
