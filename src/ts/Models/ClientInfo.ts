@@ -19,7 +19,7 @@ export class ClientInfo extends Model {
     private _webviewUrl: string;
     private _webviewHash: string;
 
-    constructor(data: any[]) {
+    constructor(platformString: string, data: any[]) {
         super();
 
         let gameIdString = data.shift();
@@ -34,7 +34,6 @@ export class ClientInfo extends Model {
         this._applicationVersion = data.shift();
         this._sdkVersion = data.shift();
 
-        let platformString = data.shift();
         if(platformString === 'android') {
             this._platform = Platform.ANDROID;
         } else if(platformString === 'ios') {

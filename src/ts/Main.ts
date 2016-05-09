@@ -30,6 +30,6 @@ if(window && window.webviewbridge) {
 }
 window['nativebridge'] = nativeBridge;
 
-let webView: WebView = new WebView(nativeBridge);
+let webView: WebView = new WebView(nativeBridge, window['platform'], window['string']);
 window['webview'] = webView;
 webView.initialize();

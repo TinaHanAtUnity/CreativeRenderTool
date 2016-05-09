@@ -10,12 +10,22 @@
   <meta name="format-detection" content="telephone=no" />
 
   <script>
-    var origin = location.search.split('?origin=')[1];
-    if(!origin) {
-      origin = 'http://localhost:8000/';
-    } else {
-      origin = origin.substring(0, origin.lastIndexOf('/') + 1);
+    var queryString = location.search.split('?')[1].split('&');
+    var queryParams = {};
+
+    for(i = 0; i < queryString.length; i++) {
+      var param = queryString[i].split('=');
+      queryParams[param[0]] = param[1];
     }
+
+    var origin;
+    if(queryParams['origin']) {
+      origin = queryParams['origin'].substring(0, queryParams['origin'].lastIndexOf('/') + 1);
+    } else {
+      origin = 'http://localhost:8000/';
+    }
+    window['platform'] = queryParams['platform'];
+    window['commitId'] = queryParams['commitId'];
 
     var require = {
       baseUrl: origin + 'js/',
