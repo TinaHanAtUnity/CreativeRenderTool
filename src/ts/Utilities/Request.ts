@@ -22,8 +22,8 @@ interface INativeRequest {
     data?: string;
     headers: [string, string][];
     retries: number;
+    retryCount: number;
     retryDelay: number;
-    waitNetworkConnected: boolean;
     options: IRequestOptions;
 }
 
@@ -55,6 +55,13 @@ export class Request {
         return null;
     }
 
+    private static getDefaultRequestOptions(): IRequestOptions {
+        return {
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        };
+    }
+
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
@@ -66,10 +73,7 @@ export class Request {
 
     public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = {
-                followRedirects: false,
-                retryWithConnectionEvents: false
-            };
+            options = Request.getDefaultRequestOptions();
         }
 
         let id = Request._callbackId++;
@@ -79,8 +83,8 @@ export class Request {
             url: url,
             headers: headers,
             retries: retries,
+            retryCount: 0,
             retryDelay: retryDelay,
-            waitNetworkConnected: false,
             options: options
         });
         return promise;
@@ -88,6 +92,8 @@ export class Request {
 
     public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
+            options = Request.getDefaultRequestOptions();
+
             options = {
                 followRedirects: false,
                 retryWithConnectionEvents: false
@@ -104,8 +110,8 @@ export class Request {
             data: data,
             headers: headers,
             retries: retries,
+            retryCount: 0,
             retryDelay: retryDelay,
-            waitNetworkConnected: false,
             options: options
         });
         return promise;
@@ -144,15 +150,13 @@ export class Request {
     }
 
     private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
-        if(nativeRequest.retries > 0) {
-            nativeRequest.retries--;
+        if(nativeRequest.retryCount < nativeRequest.retries) {
+            nativeRequest.retryCount++;
             setTimeout(() => {
                 this.invokeRequest(id, nativeRequest);
             }, nativeRequest.retryDelay);
         } else {
-            if(nativeRequest.options.retryWithConnectionEvents) {
-                nativeRequest.waitNetworkConnected = true;
-            } else {
+            if(!nativeRequest.options.retryWithConnectionEvents) {
                 this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
             }
         }
@@ -193,7 +197,10 @@ export class Request {
         let id: any;
         for(id in Request._requests) {
             if(Request._requests.hasOwnProperty(id)) {
-                this.invokeRequest(id, Request._requests[id]);
+                let request: INativeRequest = Request._requests[id];
+                if(request.options.retryWithConnectionEvents && request.retries === request.retryCount) {
+                    this.invokeRequest(id, request);
+                }
             }
         }
     }
