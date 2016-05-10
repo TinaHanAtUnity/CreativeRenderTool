@@ -4,6 +4,7 @@ import { FinishState } from 'Constants/FinishState';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
+import { Platform } from 'Constants/Platform';
 
 export class VideoEventHandlers {
 
@@ -46,8 +47,8 @@ export class VideoEventHandlers {
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if (integrationTest) {
-                nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            if (integrationTest && nativeBridge.getPlatform() === Platform.ANDROID) {
+                nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
             }
         });
     }
