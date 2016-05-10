@@ -1,4 +1,5 @@
 export enum Platform {
     ANDROID,
-    IOS
+    IOS,
+    TEST
 }

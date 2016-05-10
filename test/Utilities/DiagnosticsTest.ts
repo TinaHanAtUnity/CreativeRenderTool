@@ -10,6 +10,7 @@ import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Platform } from '../../src/ts/Constants/Platform';
 
 describe('DiagnosticsTest', () => {
     let handleInvocation = sinon.spy();
@@ -20,7 +21,7 @@ describe('DiagnosticsTest', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        }, false);
+        }, Platform.TEST, false);
     });
 
     it('should generate proper request', () => {
@@ -37,13 +38,12 @@ describe('DiagnosticsTest', () => {
         let eventManager = new EventManager(nativeBridge, request);
 
         let deviceInfo = new DeviceInfo();
-        let clientInfo = new ClientInfo([
+        let clientInfo = new ClientInfo(Platform.ANDROID, [
             '12345',
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',
             '2.0.0-alpha2',
-            'android',
             true,
             'http://example.com/config.json',
             'http://example.com/index.html',

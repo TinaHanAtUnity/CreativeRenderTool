@@ -6,6 +6,7 @@ import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { ConnectivityApi } from '../../src/ts/Native/Api/Connectivity';
 import { BroadcastApi } from '../../src/ts/Native/Api/Broadcast';
+import { Platform } from '../../src/ts/Constants/Platform';
 
 class TestConnectivityApi extends ConnectivityApi {
     public setListeningStatus(status: boolean): Promise<void> {
@@ -33,7 +34,7 @@ describe('WakeUpManagerTest', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        }, false);
+        }, Platform.TEST, false);
         nativeBridge.Connectivity = new TestConnectivityApi(nativeBridge);
         nativeBridge.Broadcast = new TestBroadcastApi(nativeBridge);
 
