@@ -19,6 +19,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onResumeObserver;
     private _onPauseObserver;
     private _onDestroyObserver;
+    private _onViewControllerDidAppearObserver;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, placement, campaign);
@@ -26,6 +27,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
         this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
         this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
+        this._onViewControllerDidAppearObserver = this._nativeBridge.AdUnit.onViewControllerDidAppear.subscribe(this.onViewDidAppear.bind(this));
 
         this._videoPosition = 0;
         this._videoActive = true;
@@ -128,5 +130,13 @@ export class VideoAdUnit extends AbstractAdUnit {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+    }
+
+    /*
+     IOS VIEWCONTROLLER EVENTS
+     */
+
+    private onViewDidAppear(): void {
+        this.onResume();
     }
 }
