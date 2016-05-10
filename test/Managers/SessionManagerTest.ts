@@ -14,6 +14,7 @@ import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
 import { SessionManagerEventMetadataCreator } from '../../src/ts/Managers/SessionManager';
 import { Session } from '../../src/ts/Models/Session';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('SessionManagerTest', () => {
     let handleInvocation = sinon.spy();
@@ -182,7 +183,7 @@ describe('SessionManagerTest', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        }, false);
+        });
 
         let domParser = new xmldom.DOMParser({errorHandler: {}});
         let vastParser = new VastParser(domParser);
@@ -228,18 +229,7 @@ describe('SessionManagerTest', () => {
 
         deviceInfo = new DeviceInfo();
 
-        clientInfo = new ClientInfo([
-            '12345',
-            false,
-            'com.unity3d.ads.example',
-            '2.0.0-test2',
-            '2.0.0-alpha2',
-            'android',
-            true,
-            'http://example.com/config.json',
-            'http://example.com/index.html',
-            null
-        ]);
+        clientInfo = TestFixtures.getClientInfo();
     });
 
 });
