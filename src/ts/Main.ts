@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';
 import { IosWebViewBridge } from 'Native/IosWebViewBridge';
 import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
 
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -24,7 +25,7 @@ window.addEventListener('resize', resizeHandler, false);
 
 /* tslint:disable:no-string-literal */
 let nativeBridge: NativeBridge = null;
-switch(window['platform']) {
+switch(Url.getQueryParameter(location.search, 'platform')) {
     case 'android':
         nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
         break;
