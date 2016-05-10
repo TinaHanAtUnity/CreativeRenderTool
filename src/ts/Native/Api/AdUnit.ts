@@ -6,6 +6,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeApi } from 'Native/NativeApi';
 
 enum AdUnitEvent {
+    // android events
     ON_START,
     ON_CREATE,
     ON_RESUME,
@@ -13,7 +14,15 @@ enum AdUnitEvent {
     ON_PAUSE,
     KEY_DOWN,
     ON_RESTORE,
-    ON_STOP
+    ON_STOP,
+
+    // ios events
+    VIEW_CONTROLLER_INIT,
+    VIEW_CONTROLLER_DID_LOAD,
+    VIEW_CONTROLLER_DID_APPEAR,
+    VIEW_CONTROLLER_WILL_DISAPPEAR,
+    VIEW_CONTROLLER_DID_DISAPPEAR,
+    VIEW_CONTROLLER_DID_RECEIVE_MEMORY_WARNING
 }
 
 export class AdUnitApi extends NativeApi {
@@ -26,6 +35,13 @@ export class AdUnitApi extends NativeApi {
     public onKeyDown: Observable4<number, number, number, number> = new Observable4();
     public onRestore: Observable0 = new Observable0();
     public onStop: Observable0 = new Observable0();
+
+    public onViewControllerInit: Observable0 = new Observable0();
+    public onViewControllerDidLoad: Observable0 = new Observable0();
+    public onViewControllerDidAppear: Observable0 = new Observable0();
+    public onViewControllerWillDisappear: Observable0 = new Observable0();
+    public onViewControllerDidDisappear: Observable0 = new Observable0();
+    public onViewControllerDidReceiveMemoryWarning: Observable0 = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit');
@@ -99,6 +115,30 @@ export class AdUnitApi extends NativeApi {
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
                 this.onStop.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
+                this.onViewControllerInit.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_DID_LOAD]:
+                this.onViewControllerDidLoad.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_DID_APPEAR]:
+                this.onViewControllerDidAppear.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_WILL_DISAPPEAR]:
+                this.onViewControllerWillDisappear.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_DID_DISAPPEAR]:
+                this.onViewControllerDidDisappear.trigger();
+                break;
+
+            case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_DID_RECEIVE_MEMORY_WARNING]:
+                this.onViewControllerDidReceiveMemoryWarning.trigger();
                 break;
 
             default:
