@@ -13,10 +13,15 @@ export class BatchInvocation {
     }
 
     public queue<T>(className: string, methodName: string, parameters = []): Promise<T> {
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this.rawQueue<T>(NativeBridge.ApiPackageName + '.' + className, methodName, parameters);
-        } else {
-            return this.rawQueue<T>('UADSApi' + className, methodName, parameters);
+        switch(this._nativeBridge.getPlatform()) {
+            case Platform.ANDROID:
+                return this.rawQueue<T>('com.unity3d.ads.api.' + className, methodName, parameters);
+
+            case Platform.IOS:
+                return this.rawQueue<T>('UADSApi' + className, methodName, parameters);
+
+            default: // for tests
+                return this.rawQueue<T>(className, methodName, parameters);
         }
     }
 

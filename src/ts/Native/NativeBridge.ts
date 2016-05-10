@@ -30,8 +30,6 @@ export interface INativeCallback {
 
 export class NativeBridge implements INativeBridge {
 
-    public static ApiPackageName: string = 'com.unity3d.ads.api';
-
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     public AdUnit: AdUnitApi = null;
@@ -59,7 +57,7 @@ export class NativeBridge implements INativeBridge {
     private _autoBatchTimer;
     private _autoBatchInterval = 50;
 
-    constructor(backend: IWebViewBridge, platform: Platform, autoBatch = true) {
+    constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
 
         this._platform = platform;
