@@ -21,7 +21,7 @@ export class BatchInvocation {
             let fullClassName: string;
             if(window['platform'] === 'android') {
                 fullClassName = packageName + '.' + className;
-            } else if(window['platform'] === 'ios') {
+            } else {
                 fullClassName = 'UADSApi' + className;
             }
             this._batch.push([fullClassName, methodName, parameters, id.toString()]);
