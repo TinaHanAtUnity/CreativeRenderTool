@@ -18,6 +18,7 @@ export class ClientInfo extends Model {
     private _configUrl: string;
     private _webviewUrl: string;
     private _webviewHash: string;
+    private _webviewVersion: string;
 
     constructor(platform: Platform, data: any[]) {
         super();
@@ -40,6 +41,7 @@ export class ClientInfo extends Model {
         this._configUrl = data.shift();
         this._webviewUrl = data.shift();
         this._webviewHash = data.shift();
+        this._webviewVersion = data.shift();
     }
 
     public getGameId(): string {
@@ -82,6 +84,10 @@ export class ClientInfo extends Model {
         return this._webviewHash;
     }
 
+    public getWebviewVersion(): string {
+        return this._webviewVersion;
+    }
+
     public getDTO() {
         return {
             'gameId': this._gameId,
@@ -93,7 +99,8 @@ export class ClientInfo extends Model {
             'encrypted': !this._debuggable,
             'configUrl': this._configUrl,
             'webviewUrl': this._webviewUrl,
-            'webviewHash': this._webviewHash
+            'webviewHash': this._webviewHash,
+            'webviewVersion': this._webviewVersion
         };
     }
 }
