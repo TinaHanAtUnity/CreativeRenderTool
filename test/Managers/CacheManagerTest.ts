@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { CacheManager } from '../../src/ts/Managers/CacheManager';
-import { IFileInfo, CacheApi } from '../../src/ts/Native/Api/Cache';
+import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
 class TestCacheApi extends CacheApi {
@@ -11,7 +11,7 @@ class TestCacheApi extends CacheApi {
     private _internet: boolean = true;
     private _files: IFileInfo[] = [];
     private _previouslyDownloadedFiles: string[] = [];
-    private _previouslyQueuedFiles: string[] = [];
+    private _currentFile = undefined;
     private _downloadedFiles: number = 0;
 
     constructor(nativeBridge: NativeBridge) {
@@ -24,22 +24,23 @@ class TestCacheApi extends CacheApi {
         let responseCode: number = 200;
 
         if(this._previouslyDownloadedFiles.indexOf(url) !== -1) {
-            return Promise.reject('FILE_ALREADY_IN_CACHE');
+            return Promise.reject(CacheError[CacheError.FILE_ALREADY_IN_CACHE]);
         }
 
-        if(this._previouslyQueuedFiles.indexOf(url) !== -1) {
-            return Promise.reject('FILE_ALREADY_IN_QUEUE');
+        if(this._currentFile !== undefined) {
+            return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
 
         if(this._internet) {
-            this._previouslyQueuedFiles.push(url);
+            this._currentFile = url;
             setTimeout(() => {
                 this._downloadedFiles++;
-                this._nativeBridge.handleEvent(['CACHE', 'DOWNLOAD_END', url, byteCount, duration, responseCode, []]);
+                this._currentFile = undefined;
+                this._nativeBridge.handleEvent(['CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []]);
             }, 1);
             return Promise.resolve(void(0));
         } else {
-            return Promise.reject('NO_INTERNET');
+            return Promise.reject(CacheError[CacheError.NO_INTERNET]);
         }
     }
 
@@ -101,8 +102,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi.setFileMapping(testUrl, testFileUrl);
 
-        return cacheManager.getFileUrl(testUrl).then(([url, fileUrl]) => {
-            assert.equal(testUrl, url, 'Remote url does not match');
+        return nativeBridge.Cache.getFileUrl(testUrl).then(fileUrl => {
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });
@@ -115,10 +115,10 @@ describe('CacheManagerTest', () => {
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cacheAll([testUrl]).then(urlMap => {
+        return cacheManager.cache(testUrl).then(fileUrl => {
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
+            assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });
 
@@ -136,14 +136,14 @@ describe('CacheManagerTest', () => {
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cacheAll([testUrl1, testUrl2, testUrl3]).then(urlMap => {
-            assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
+        return Promise.all([cacheManager.cache(testUrl1), cacheManager.cache(testUrl2), cacheManager.cache(testUrl3)]).then(fileUrls => {
+            assert.equal(5, cacheSpy.callCount, 'Cache three files did not send three download requests');
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
-            assert.equal(testFileUrl1, urlMap[testUrl1], 'Cache three files first local file url does not match');
+            assert.equal(testFileUrl1, fileUrls[0], 'Cache three files first local file url does not match');
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
-            assert.equal(testFileUrl2, urlMap[testUrl2], 'Cache three files second local file url does not match');
+            assert.equal(testFileUrl2, fileUrls[1], 'Cache three files second local file url does not match');
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
-            assert.equal(testFileUrl3, urlMap[testUrl3], 'Cache three files third local file url does not match');
+            assert.equal(testFileUrl3, fileUrls[2], 'Cache three files third local file url does not match');
         });
     });
 
@@ -152,7 +152,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi.setInternet(false);
 
-        return cacheManager.cacheAll([testUrl]).then(() => {
+        return cacheManager.cache(testUrl).then(() => {
             assert.fail('Caching should not be successful with no internet');
         }, (error) => {
             // everything ok
@@ -166,27 +166,25 @@ describe('CacheManagerTest', () => {
         cacheApi.setFileMapping(testUrl, testFileUrl);
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cacheAll([testUrl]).then(urlMap => {
+        return cacheManager.cache(testUrl).then(fileUrl => {
             assert.equal(0, cacheApi.getDownloadedFilesCount(), 'Tried downloading already downloaded file');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
+            assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });
 
     it('Cache same url twice', () => {
-        let clock = sinon.useFakeTimers();
-
         let testUrl: string = 'http://www.example.net/test.mp4';
         let testFileUrl: string = 'file:///test/cache/dir/file';
 
         cacheApi.setFileMapping(testUrl, testFileUrl);
 
-        let cachePromise = cacheManager.cacheAll([testUrl, testUrl]).then(urlMap => {
-            assert.equal(1, cacheApi.getDownloadedFilesCount(), 'One url should be cached exactly once');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
+        return Promise.all([cacheManager.cache(testUrl), cacheManager.cache(testUrl)]).then(fileUrls => {
+            assert.fail('Caching should fail with two same urls');
+        }).catch(error => {
+            if(error instanceof Error) {
+                assert.equal(testUrl + ' already in queue', error.message, 'Error was wrong');
+            }
         });
-        clock.tick(1);
-        clock.restore();
-        return cachePromise;
     });
 
     it('Clean cache from current files', () => {

@@ -1,4 +1,4 @@
-import {IObserver0, IObserver1, IObserver2, IObserver3, IObserver4, IObserver5} from 'Utilities/IObserver';
+import { IObserver0, IObserver1, IObserver2, IObserver3, IObserver4, IObserver5, IObserver6 } from 'Utilities/IObserver';
 
 export abstract class Observable<T> {
 
@@ -65,6 +65,14 @@ export class Observable5<P1, P2, P3, P4, P5> extends Observable<IObserver5<P1, P
 
     public trigger(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): void {
         this._observers.forEach(observer => observer(p1, p2, p3, p4, p5));
+    }
+
+}
+
+export class Observable6<P1, P2, P3, P4, P5, P6> extends Observable<IObserver6<P1, P2, P3, P4, P5, P6>> {
+
+    public trigger(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): void {
+        this._observers.forEach(observer => observer(p1, p2, p3, p4, p5, p6));
     }
 
 }

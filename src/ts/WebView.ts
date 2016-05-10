@@ -195,20 +195,13 @@ export class WebView {
 
         let cacheMode = this._configuration.getCacheMode();
 
-        let cacheableAssets: string[] = [
-            campaign.getGameIcon(),
-            campaign.getLandscapeUrl(),
-            campaign.getPortraitUrl(),
-            campaign.getVideoUrl()
-        ];
-
         let cacheAssets = () => {
-            return this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
-                campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
-                campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
-                campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
-                campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
-            });
+            return Promise.all([
+                this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)),
+                this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl)),
+                this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl)),
+                this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl))
+            ]);
         };
 
         let sendReady = () => {

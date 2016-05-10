@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable5, Observable1, Observable3 } from 'Utilities/Observable';
+import { Observable1, Observable3, Observable2, Observable6 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 export enum CacheError {
@@ -12,16 +12,13 @@ export enum CacheError {
     NO_INTERNET
 }
 
-enum CacheEvent {
-    COULDNT_CREATE_TARGET_FILE,
-    COULDNT_REQUEST_STREAM,
-    COULDNT_CLOSE_OUTPUT_FILE,
+export enum CacheEvent {
     DOWNLOAD_STARTED,
     DOWNLOAD_RESUMED,
     DOWNLOAD_PROGRESS,
     DOWNLOAD_END,
     DOWNLOAD_STOPPED,
-    DOWNLOAD_NO_INTERNET
+    DOWNLOAD_ERROR
 }
 
 export interface IFileInfo {
@@ -34,8 +31,11 @@ export interface IFileInfo {
 export class CacheApi extends NativeApi {
 
     public onDownloadStarted: Observable1<string> = new Observable1();
+    public onDownloadResumed: Observable2<string, number> = new Observable2();
     public onDownloadProgress: Observable3<string, number, number> = new Observable3();
-    public onDownloadEnd: Observable5<string, number, number, number, [string, string][]> = new Observable5();
+    public onDownloadEnd: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
+    public onDownloadStopped: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
+    public onDownloadError: Observable3<string, string, string> = new Observable3();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Cache');
@@ -106,12 +106,24 @@ export class CacheApi extends NativeApi {
                 this.onDownloadStarted.trigger(parameters[0]);
                 break;
 
-            case CacheEvent[CacheEvent.DOWNLOAD_END]:
-                this.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+            case CacheEvent[CacheEvent.DOWNLOAD_RESUMED]:
+                this.onDownloadResumed.trigger(parameters[0], parameters[1]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_PROGRESS]:
                 this.onDownloadProgress.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+
+            case CacheEvent[CacheEvent.DOWNLOAD_END]:
+                this.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                break;
+
+            case CacheEvent[CacheEvent.DOWNLOAD_STOPPED]:
+                this.onDownloadStopped.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                break;
+
+            case CacheEvent[CacheEvent.DOWNLOAD_ERROR]:
+                this.onDownloadError.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             default:

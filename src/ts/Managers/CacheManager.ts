@@ -1,49 +1,58 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { IFileInfo } from 'Native/Api/Cache';
+import { IFileInfo, CacheError } from 'Native/Api/Cache';
 
 enum CacheStatus {
     OK,
     ERROR
 }
 
+export interface ICacheResponse {
+    url: string;
+    size: number;
+    duration: number;
+    responseCode: number;
+    headers: [string, string][];
+}
+
 export class CacheManager {
 
     private _nativeBridge: NativeBridge;
-    private _urlCallbacks: Object = {};
+    private _callbacks: { [key: string]: { [key: number]: Function } } = {};
+    private _queue: string[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
         this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
+        this._nativeBridge.Cache.onDownloadStopped.subscribe(this.onDownloadStopped.bind(this));
+        this._nativeBridge.Cache.onDownloadError.subscribe(this.onDownloadError.bind(this));
     }
 
-    public cacheAll(urls: string[]): Promise<any[]> {
-        let promises = urls.map((url: string) => {
-            return this._nativeBridge.Cache.download(url, false).then(() => {
-                return this.registerCallback(url);
-            }).catch(error => {
-                switch(error) {
-                    case 'FILE_ALREADY_IN_CACHE':
-                        return this.getFileUrl(url);
+    public cache(url: string): Promise<string> {
+        if(!this.addUrl(url)) {
+            return Promise.reject(new Error(url + ' already in queue'));
+        }
 
-                    case 'FILE_ALREADY_IN_QUEUE':
-                        return this.registerCallback(url);
-
-                    default:
-                        return Promise.reject(error);
-                }
-            });
+        let promise = this.registerCallback(url).then(cacheResponse => {
+            // todo: add cacheResponse.responseCode handling & retrying here
+            return this._nativeBridge.Cache.getFileUrl(url);
         });
-        return Promise.all(promises).then(urlPairs => {
-            let urlMap = {};
-            urlPairs.forEach(([url, fileUrl]) => {
-                urlMap[url] = fileUrl;
-            });
-            return urlMap;
-        });
-    }
 
-    public getFileUrl(url: string): Promise<[string, string]> {
-        return this._nativeBridge.Cache.getFileUrl(url).then(fileUrl => [url, fileUrl]);
+        return this._nativeBridge.Cache.download(url, false).then(() => {
+            return promise;
+        }).catch(error => {
+            switch(error) {
+                case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
+                    this.removeUrl(url);
+                    return this._nativeBridge.Cache.getFileUrl(url);
+
+                case CacheError[CacheError.FILE_ALREADY_CACHING]:
+                    return promise;
+
+                default:
+                    this.removeUrl(url);
+                    return Promise.reject(error);
+            }
+        });
     }
 
     public cleanCache(): Promise<any[]> {
@@ -80,31 +89,66 @@ export class CacheManager {
         });
     }
 
-    private registerCallback(url): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            let callbackObject = {};
+    private addUrl(url: string): boolean {
+        if(this._queue.indexOf(url) !== -1) {
+            return false;
+        }
+        this._queue.push(url);
+        return true;
+    }
+
+    private removeUrl(url: string): boolean {
+        if(this._queue.indexOf(url) === -1) {
+            return false;
+        }
+        this._queue = this._queue.filter(queueUrl => queueUrl !== url);
+        return true;
+    }
+
+    private registerCallback(url): Promise<ICacheResponse> {
+        return new Promise<ICacheResponse>((resolve, reject) => {
+            let callbackObject: { [key: number]: Function } = {};
             callbackObject[CacheStatus.OK] = resolve;
             callbackObject[CacheStatus.ERROR] = reject;
-
-            let callbackList: Function[] = this._urlCallbacks[url];
-            if(callbackList) {
-                this._urlCallbacks[url].push(callbackObject);
-            } else {
-                this._urlCallbacks[url] = [callbackObject];
-            }
+            this._callbacks[url] = callbackObject;
         });
     }
 
-    private onDownloadEnd(url: string, size: number, duration: number): void {
-        this.getFileUrl(url).then(([url, fileUrl]) => {
-            let urlCallbacks: Function[] = this._urlCallbacks[url];
-            if(urlCallbacks) {
-                urlCallbacks.forEach((callbackObject: Object) => {
-                    callbackObject[CacheStatus.OK]([url, fileUrl]);
-                });
-                delete this._urlCallbacks[url];
-            }
-        });
+    private onDownloadEnd(url: string, size: number, duration: number, responseCode: number, headers: [string, string][]): void {
+        let callback = this._callbacks[url];
+        if(callback) {
+            let cacheResponse: ICacheResponse = {
+                url: url,
+                size: size,
+                duration: duration,
+                responseCode: responseCode,
+                headers: headers
+            };
+            this.removeUrl(url);
+            callback[CacheStatus.OK](cacheResponse);
+            delete this._callbacks[url];
+        }
+        if(this._queue.length > 0) {
+            this._nativeBridge.Cache.download(this._queue[0], false);
+        }
+    }
+
+    private onDownloadStopped(url: string, bytes: number) {
+        let callback = this._callbacks[url];
+        if(callback) {
+            this.removeUrl(url);
+            callback[CacheStatus.ERROR]([url, bytes]);
+            delete this._callbacks[url];
+        }
+    }
+
+    private onDownloadError(error: string, url: string, message: string) {
+        let callback = this._callbacks[url];
+        if(callback) {
+            this.removeUrl(url);
+            callback[CacheStatus.ERROR]([error, url, message]);
+            delete this._callbacks[url];
+        }
     }
 
 }

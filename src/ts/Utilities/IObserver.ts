@@ -21,3 +21,7 @@ export interface IObserver4<P1, P2, P3, P4> {
 export interface IObserver5<P1, P2, P3, P4, P5> {
     (p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): void;
 }
+
+export interface IObserver6<P1, P2, P3, P4, P5, P6> {
+    (p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): void;
+}
