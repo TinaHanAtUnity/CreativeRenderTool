@@ -25,7 +25,6 @@ import { AdUnitFactory } from './AdUnits/AdUnitFactory';
 export class WebView {
 
     private _nativeBridge: NativeBridge;
-    private _platform: string;
 
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
@@ -47,9 +46,8 @@ export class WebView {
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
 
-    constructor(nativeBridge: NativeBridge, platform: string, commitId: string) {
+    constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._platform = platform;
 
         if(window && window.addEventListener) {
             window.addEventListener('error', this.onError.bind(this), false);
@@ -65,7 +63,7 @@ export class WebView {
 
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
-            this._clientInfo = new ClientInfo(this._platform, data);
+            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {

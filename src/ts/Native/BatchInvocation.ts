@@ -1,4 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { Platform } from 'Constants/Platform';
 
 type NativeInvocation = [string, string, any[], string];
 
@@ -12,18 +13,16 @@ export class BatchInvocation {
     }
 
     public queue<T>(className: string, methodName: string, parameters = []): Promise<T> {
-        return this.rawQueue<T>(NativeBridge.ApiPackageName, className, methodName, parameters);
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this.rawQueue<T>(NativeBridge.ApiPackageName + '.' + className, methodName, parameters);
+        } else {
+            return this.rawQueue<T>('UADSApi' + className, methodName, parameters);
+        }
     }
 
-    public rawQueue<T>(packageName: string, className: string, methodName: string, parameters = []): Promise<T> {
+    public rawQueue<T>(fullClassName: string, methodName: string, parameters = []): Promise<T> {
         return new Promise<T>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
-            let fullClassName: string;
-            if(window['platform'] === 'android') {
-                fullClassName = packageName + '.' + className;
-            } else {
-                fullClassName = 'UADSApi' + className;
-            }
             this._batch.push([fullClassName, methodName, parameters, id.toString()]);
         });
     }

@@ -19,8 +19,10 @@ export class ClientInfo extends Model {
     private _webviewUrl: string;
     private _webviewHash: string;
 
-    constructor(platformString: string, data: any[]) {
+    constructor(platform: Platform, data: any[]) {
         super();
+
+        this._platform = platform;
 
         let gameIdString = data.shift();
         if (typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
@@ -33,14 +35,6 @@ export class ClientInfo extends Model {
         this._applicationName = data.shift();
         this._applicationVersion = data.shift();
         this._sdkVersion = data.shift();
-
-        if(platformString === 'android') {
-            this._platform = Platform.ANDROID;
-        } else if(platformString === 'ios') {
-            this._platform = Platform.IOS;
-        } else {
-            throw new Error('Unknown platform');
-        }
 
         this._debuggable = data.shift();
         this._configUrl = data.shift();
