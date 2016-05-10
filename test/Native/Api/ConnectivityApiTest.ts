@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
+import { Platform } from '../../../src/ts/Constants/Platform';
 
 describe('ConnectivityApi', () => {
     let handleInvocation = sinon.spy();
@@ -13,12 +14,12 @@ describe('ConnectivityApi', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        }, false);
+        }, Platform.TEST, false);
     });
 
     it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
         nativeBridge.Connectivity.setListeningStatus(true);
-        sinon.assert.calledWith(handleInvocation, JSON.stringify([['com.unity3d.ads.api.Connectivity', 'setConnectionMonitoring', [true], '1']]));
+        sinon.assert.calledWith(handleInvocation, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
     });
 
     it('should trigger onConnected', () => {

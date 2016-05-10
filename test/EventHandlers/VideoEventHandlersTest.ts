@@ -144,27 +144,6 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.called(adUnit.getEndScreen().show);
         });
-
-        it('should not call rawinvoke, if integration testing is disabled', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit);
-
-            return prom.then(() => {
-                sinon.assert.notCalled(nativeBridge.rawInvoke);
-            });
-        });
-
-        it('should call rawinvoke, if integration testing is enabled', () => {
-            prom = Promise.resolve(true);
-            nativeBridge.Storage.get.restore(); // undo previous stubbing
-            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
-
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit);
-
-            return prom.then(() => {
-                sinon.assert.calledWith(nativeBridge.rawInvoke, 'com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', ['fooId']);
-            });
-        });
-
     });
 
     describe('with onVideoPrepared', () => {

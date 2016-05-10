@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
+import { Platform } from '../../../src/ts/Constants/Platform';
 
 describe('BroadcastApi', () => {
     let handleInvocation = sinon.spy();
@@ -13,7 +14,7 @@ describe('BroadcastApi', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
-        }, false);
+        }, Platform.TEST, false);
     });
 
     it('should handle SCREEN_ON event', () => {
