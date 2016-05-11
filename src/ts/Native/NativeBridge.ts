@@ -85,7 +85,7 @@ export class NativeBridge implements INativeBridge {
         this.VideoPlayer = new VideoPlayerApi(this);
     }
 
-    public registerCallback(resolve, reject): number {
+    public registerCallback(resolve: Function, reject: Function): number {
         let id: number = this._callbackId++;
         this._callbackTable[id] = new PromiseCallback(resolve, reject);
         return id;
