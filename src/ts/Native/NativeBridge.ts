@@ -17,6 +17,7 @@ import { PlacementApi } from 'Native/Api/Placement';
 import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
+import { PromiseCallback } from 'Utilities/PromiseCallback';
 
 export enum CallbackStatus {
     OK,
@@ -48,7 +49,7 @@ export class NativeBridge implements INativeBridge {
     public VideoPlayer: VideoPlayerApi = null;
 
     private _callbackId: number = 1;
-    private _callbackTable: {[key: number]: Object} = {};
+    private _callbackTable: {[key: number]: PromiseCallback} = {};
 
     private _backend: IWebViewBridge;
 
@@ -56,6 +57,14 @@ export class NativeBridge implements INativeBridge {
     private _autoBatch: BatchInvocation;
     private _autoBatchTimer;
     private _autoBatchInterval = 50;
+
+    private static convertStatus(status: string): CallbackStatus {
+        switch(status) {
+            case CallbackStatus[CallbackStatus.OK]: return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]: return CallbackStatus.ERROR;
+            default: throw new Error('Status string is not valid: ' + status);
+        }
+    }
 
     constructor(backend: IWebViewBridge, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
@@ -78,10 +87,7 @@ export class NativeBridge implements INativeBridge {
 
     public registerCallback(resolve, reject): number {
         let id: number = this._callbackId++;
-        let callbackObject: Object = {};
-        callbackObject[CallbackStatus.OK] = resolve;
-        callbackObject[CallbackStatus.ERROR] = reject;
-        this._callbackTable[id] = callbackObject;
+        this._callbackTable[id] = new PromiseCallback(resolve, reject);
         return id;
     }
 
@@ -114,19 +120,27 @@ export class NativeBridge implements INativeBridge {
         return promise;
     }
 
+    /* tslint:disable:switch-default */
     public handleCallback(results: any[][]): void {
         results.forEach((result: any[]): void => {
             let id: number = parseInt(result.shift(), 10);
-            let status: string = result.shift();
+            let status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
-            let callbackObject: Object = this._callbackTable[id];
-            if(!callbackObject) {
+            let callbackObject: PromiseCallback = this._callbackTable[id];
+            if (!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             if(parameters.length === 1) {
                 parameters = parameters[0];
             }
-            callbackObject[CallbackStatus[status]](parameters);
+            switch (status) {
+                case CallbackStatus.OK:
+                    callbackObject.resolve(parameters);
+                    break;
+                case CallbackStatus.ERROR:
+                    callbackObject.reject(parameters);
+                    break;
+            }
             delete this._callbackTable[id];
         });
     }
