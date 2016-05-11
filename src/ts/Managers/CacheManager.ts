@@ -1,9 +1,15 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo } from 'Native/Api/Cache';
 
-enum CacheStatus {
-    OK,
-    ERROR
+class PromiseCallback {
+
+    public resolve: Function;
+    public reject: Function;
+
+    constructor(resolve: Function, reject: Function) {
+        this.resolve = resolve;
+        this.reject = reject;
+    }
 }
 
 export class CacheManager {
@@ -21,7 +27,7 @@ export class CacheManager {
             return this._nativeBridge.Cache.download(url, false).then(() => {
                 return this.registerCallback(url);
             }).catch(error => {
-                switch(error) {
+                switch (error) {
                     case 'FILE_ALREADY_IN_CACHE':
                         return this.getFileUrl(url);
 
@@ -48,7 +54,7 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.Cache.getFiles().then(files => {
-            if(!files || !files.length) {
+            if (!files || !files.length) {
                 return Promise.resolve();
             }
 
@@ -64,11 +70,11 @@ export class CacheManager {
                 return n2.mtime - n1.mtime;
             });
 
-            for(let i: number = 0; i < files.length; i++) {
+            for (let i: number = 0; i < files.length; i++) {
                 let file: IFileInfo = files[i];
                 totalSize += file.size;
 
-                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                if (file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
             }
@@ -82,12 +88,9 @@ export class CacheManager {
 
     private registerCallback(url): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
-            let callbackObject = {};
-            callbackObject[CacheStatus.OK] = resolve;
-            callbackObject[CacheStatus.ERROR] = reject;
+            let callbackObject = new PromiseCallback(resolve, reject);
 
-            let callbackList: Function[] = this._urlCallbacks[url];
-            if(callbackList) {
+            if (this._urlCallbacks[url]) {
                 this._urlCallbacks[url].push(callbackObject);
             } else {
                 this._urlCallbacks[url] = [callbackObject];
@@ -97,10 +100,10 @@ export class CacheManager {
 
     private onDownloadEnd(url: string, size: number, duration: number): void {
         this.getFileUrl(url).then(([url, fileUrl]) => {
-            let urlCallbacks: Function[] = this._urlCallbacks[url];
-            if(urlCallbacks) {
-                urlCallbacks.forEach((callbackObject: Object) => {
-                    callbackObject[CacheStatus.OK]([url, fileUrl]);
+            let urlCallbacks: PromiseCallback[] = this._urlCallbacks[url];
+            if (urlCallbacks) {
+                urlCallbacks.forEach((callbackObject: PromiseCallback) => {
+                    callbackObject.resolve([url, fileUrl]);
                 });
                 delete this._urlCallbacks[url];
             }
