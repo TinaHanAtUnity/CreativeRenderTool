@@ -81,7 +81,7 @@ export class VastParser {
         });
     }
 
-    private applyParentURLs(parsedVast, parent) {
+    private applyParentURLs(parsedVast: Vast, parent: Vast) {
         if (parent) {
             for (let errorUrl of parent.getAd().getErrorURLTemplates()) {
                 parsedVast.getAd().addErrorURLTemplate(errorUrl);

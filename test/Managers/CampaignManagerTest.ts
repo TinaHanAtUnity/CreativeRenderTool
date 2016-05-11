@@ -218,6 +218,31 @@ describe('CampaignManager', () => {
         });
     };
 
+    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string): Promise<void> => {
+        // given a VAST placement that wraps another VAST
+        let mockRequest = sinon.mock(request);
+        mockRequest.expects('get').withArgs('https://adserver.unityads.unity3d.com/games/12345/fill?bundleVersion=2.0.0-test2&bundleId=com.unity3d.ads.example&gameId=12345&hardwareVersion=undefined%20undefined&platform=android&sdkVersion=2.0.0-alpha2&', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve(response));
+        mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(wrappedResponse);
+
+        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        let triggeredError: Error;
+        campaignManager.onError.subscribe((error: Error) => {
+            triggeredError = error;
+        });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request().then(() => {
+
+            // then the onError observable is triggered with an appropriate error
+            mockRequest.verify();
+            if (triggeredError instanceof Error) {
+                assert.equal(triggeredError.message, expectedErrorMessage);
+            } else {
+                assert.equal(triggeredError, expectedErrorMessage);
+            }
+        });
+    };
+
     describe('VAST error handling', () => {
 
         it('should trigger onError after requesting a vast placement without a video url', () => {
@@ -233,6 +258,69 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'Campaign does not have a video url');
         });
 
+        it('should trigger onError after requesting a wrapped vast placement without a video url', () => {
+            const response = {
+                response: `{
+                "abGroup": 3,
+                "vast": {
+                    "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A"
+                },
+                "gamerId": "5712983c481291b16e1be03b"
+            }`
+            };
+            const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
+            const wrappedResponse = Promise.resolve({
+                response: `<?xml version="1.0" encoding="UTF-8"?>
+                <VAST version="2.0">
+                  <Ad id="601364">
+                  <InLine>
+                    <AdSystem>Acudeo Compatible</AdSystem>
+                    <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
+                    <Description>VAST 2.0 Instream Test 1</Description>
+                    <Error>http://myErrorURL/error</Error>
+                    <Impression>http://myTrackingURL/impression</Impression>
+                    <Creatives>
+                        <Creative AdID="601364">
+                            <Linear>
+                                <Duration>00:00:30</Duration>
+                                <TrackingEvents>
+                                    <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
+                                    <Tracking event="start">http://myTrackingURL/start</Tracking>
+                                    <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
+                                    <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
+                                    <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
+                                    <Tracking event="complete">http://myTrackingURL/complete</Tracking>
+                                </TrackingEvents>
+                                <VideoClicks>
+                                    <ClickThrough>http://www.tremormedia.com</ClickThrough>
+                                    <ClickTracking>http://myTrackingURL/click</ClickTracking>
+                                </VideoClicks>
+                            </Linear>
+                        </Creative>
+                        <Creative AdID="601364-Companion">
+                            <CompanionAds>
+                                <Companion width="300" height="250">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
+                                    <TrackingEvents>
+                                        <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
+                                    </TrackingEvents>
+
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                                <Companion width="728" height="90">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                            </CompanionAds>
+                        </Creative>
+                    </Creatives>
+                  </InLine>
+                  </Ad>
+                </VAST>`
+            });
+            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Campaign does not have a video url');
+        });
+
         it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
             const response = {
                 response: `{
@@ -246,6 +334,73 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'VAST xml is invalid - document element must be VAST but was VASTy');
         });
 
+        it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
+            const response = {
+                response: `{
+                "abGroup": 3,
+                "vast": {
+                    "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A"
+                },
+                "gamerId": "5712983c481291b16e1be03b"
+            }`
+            };
+            const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
+            const wrappedResponse = Promise.resolve({
+                response: `<?xml version="1.0" encoding="UTF-8"?>
+                <foo version="2.0">
+                  <Ad id="601364">
+                  <InLine>
+                    <AdSystem>Acudeo Compatible</AdSystem>
+                    <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
+                    <Description>VAST 2.0 Instream Test 1</Description>
+                    <Error>http://myErrorURL/error</Error>
+                    <Impression>http://myTrackingURL/impression</Impression>
+                    <Creatives>
+                        <Creative AdID="601364">
+                            <Linear>
+                                <Duration>00:00:30</Duration>
+                                <TrackingEvents>
+                                    <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
+                                    <Tracking event="start">http://myTrackingURL/start</Tracking>
+                                    <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
+                                    <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
+                                    <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
+                                    <Tracking event="complete">http://myTrackingURL/complete</Tracking>
+                                </TrackingEvents>
+                                <VideoClicks>
+                                    <ClickThrough>http://www.tremormedia.com</ClickThrough>
+                                    <ClickTracking>http://myTrackingURL/click</ClickTracking>
+                                </VideoClicks>
+                                <MediaFiles>
+                                    <MediaFile delivery="progressive" type="video/x-flv" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv</MediaFile>
+                                </MediaFiles>
+                            </Linear>
+                        </Creative>
+                        <Creative AdID="601364-Companion">
+                            <CompanionAds>
+                                <Companion width="300" height="250">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
+                                    <TrackingEvents>
+                                        <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
+                                    </TrackingEvents>
+
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                                <Companion width="728" height="90">
+                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
+                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                </Companion>
+                            </CompanionAds>
+                        </Creative>
+                    </Creatives>
+                  </InLine>
+                  </Ad>
+                </foo>`
+            });
+
+            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'VAST xml is invalid - document element must be VAST but was foo');
+        });
+
         it('should trigger onError after requesting a vast placement with no vast data', () => {
             const response = {
                 response: `{
@@ -257,7 +412,23 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'VAST xml data is missing');
         });
 
-        it('should trigger onError after requesting a vast placement with no vast data', () => {
+        it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
+            const response = {
+                response: `{
+                "abGroup": 3,
+                "vast": {
+                    "data": "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3CVAST%20version%3D%222.0%22%3E%0A%20%20%3CAd%20id%3D%22602833%22%3E%0A%20%20%3CWrapper%3E%0A%20%20%20%20%3CAdSystem%3EAcudeo%20Compatible%3C%2FAdSystem%3E%0A%20%20%20%20%3CVASTAdTagURI%3Ehttp%3A%2F%2Fdemo.tremormedia.com%2Fproddev%2Fvast%2Fvast_inline_linear.xml%3C%2FVASTAdTagURI%3E%0A%20%20%20%20%3CError%3Ehttp%3A%2F%2FmyErrorURL%2Fwrapper%2Ferror%3C%2FError%3E%0A%20%20%20%20%3CImpression%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fimpression%3C%2FImpression%3E%0A%09%3CCreatives%3E%0A%09%09%3CCreative%20AdID%3D%22602833%22%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22creativeView%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FcreativeView%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22start%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fstart%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22midpoint%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmidpoint%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22firstQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FfirstQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22thirdQuartile%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2FthirdQuartile%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22complete%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fcomplete%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22mute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22unmute%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Funmute%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22pause%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fpause%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22resume%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fresume%3C%2FTracking%3E%0A%09%09%09%09%09%3CTracking%20event%3D%22fullscreen%22%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Ffullscreen%3C%2FTracking%3E%09%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%3E%0A%09%09%09%3CLinear%3E%0A%09%09%09%09%3CVideoClicks%3E%0A%09%09%09%09%09%3CClickTracking%3Ehttp%3A%2F%2FmyTrackingURL%2Fwrapper%2Fclick%3C%2FClickTracking%3E%0A%09%09%09%09%3C%2FVideoClicks%3E%0A%09%09%09%3C%2FLinear%3E%0A%09%09%3C%2FCreative%3E%0A%09%09%3CCreative%20AdID%3D%22602833-NonLinearTracking%22%3E%0A%09%09%09%3CNonLinearAds%3E%0A%09%09%09%09%3CTrackingEvents%3E%0A%09%09%09%09%3C%2FTrackingEvents%3E%0A%09%09%09%3C%2FNonLinearAds%3E%0A%09%09%3C%2FCreative%3E%0A%09%3C%2FCreatives%3E%0A%20%20%3C%2FWrapper%3E%0A%20%20%3C%2FAd%3E%0A%3C%2FVAST%3E%0A"
+                },
+                "gamerId": "5712983c481291b16e1be03b"
+            }`
+            };
+            const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
+            const wrappedResponse = Promise.reject('Some kind of request error happened');
+
+            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
+        });
+
+        it('should trigger onError after requesting a vast placement with null vast data', () => {
             const response = {
                 response: `{
                     "abGroup": 3,
@@ -268,7 +439,7 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'VAST data is missing');
         });
 
-        it('should trigger onError after requesting a vast placement without a video url', () => {
+        it('should trigger onError after requesting a vast placement without an impression url', () => {
             const response = {
                     response: `{
                     "abGroup": 3,

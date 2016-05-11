@@ -88,12 +88,12 @@ describe('Campaign', () => {
             assert.deepEqual(vast.getTrackingEventUrls('start'), [
                 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1'
             ], 'start tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('firstQuartile'), null, 'first quartile tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('midpoint'), null, 'midpoint tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('thirdQuartile'), null, 'third quartile tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('complete'), null, 'complete tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('mute'), null, 'mute tracking event urls');
-            assert.equal(vast.getTrackingEventUrls('unmute'), null, 'unmute tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('firstQuartile'), [], 'first quartile tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('midpoint'), [], 'midpoint tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('thirdQuartile'), [], 'third quartile tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('complete'), [], 'complete tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('mute'), [], 'mute tracking event urls');
+            assert.deepEqual(vast.getTrackingEventUrls('unmute'), [], 'unmute tracking event urls');
             assert.equal(vast.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4', 'video url');
             assert.equal(vast.getDuration(), 30, 'duration');
             assert.deepEqual(vast.getErrorURLTemplates(), [], 'error urls');
