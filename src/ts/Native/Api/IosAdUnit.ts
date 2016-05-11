@@ -1,22 +1,11 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
+import { Observable0 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeApi } from 'Native/NativeApi';
 
 enum AdUnitEvent {
-    // android events
-    ON_START,
-    ON_CREATE,
-    ON_RESUME,
-    ON_DESTROY,
-    ON_PAUSE,
-    KEY_DOWN,
-    ON_RESTORE,
-    ON_STOP,
-
-    // ios events
     VIEW_CONTROLLER_INIT,
     VIEW_CONTROLLER_DID_LOAD,
     VIEW_CONTROLLER_DID_APPEAR,
@@ -25,16 +14,7 @@ enum AdUnitEvent {
     VIEW_CONTROLLER_DID_RECEIVE_MEMORY_WARNING
 }
 
-export class AdUnitApi extends NativeApi {
-
-    public onStart: Observable0 = new Observable0();
-    public onCreate: Observable0 = new Observable0();
-    public onResume: Observable0 = new Observable0();
-    public onDestroy: Observable1<boolean> = new Observable1();
-    public onPause: Observable1<boolean> = new Observable1();
-    public onKeyDown: Observable4<number, number, number, number> = new Observable4();
-    public onRestore: Observable0 = new Observable0();
-    public onStop: Observable0 = new Observable0();
+export class IosAdUnitApi extends NativeApi {
 
     public onViewControllerInit: Observable0 = new Observable0();
     public onViewControllerDidLoad: Observable0 = new Observable0();
@@ -85,38 +65,6 @@ export class AdUnitApi extends NativeApi {
 
     public handleEvent(event: string, ...parameters: any[]): void {
         switch(event) {
-            case AdUnitEvent[AdUnitEvent.ON_START]:
-                this.onStart.trigger();
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_CREATE]:
-                this.onCreate.trigger();
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_RESUME]:
-                this.onResume.trigger();
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
-                this.onDestroy.trigger(parameters[0]);
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
-                this.onPause.trigger(parameters[0]);
-                break;
-
-            case AdUnitEvent[AdUnitEvent.KEY_DOWN]:
-                this.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_RESTORE]:
-                this.onRestore.trigger();
-                break;
-
-            case AdUnitEvent[AdUnitEvent.ON_STOP]:
-                this.onStop.trigger();
-                break;
-
             case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
                 this.onViewControllerInit.trigger();
                 break;

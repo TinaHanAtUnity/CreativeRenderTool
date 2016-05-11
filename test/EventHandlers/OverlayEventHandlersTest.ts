@@ -39,7 +39,7 @@ describe('OverlayEventHandlersTest', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.spy(sessionManager, 'sendSkip');
-            sinon.spy(nativeBridge.AdUnit, 'setViews');
+            sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
 
             OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit);
         });
@@ -61,7 +61,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should set views through AdUnit API', () => {
-            sinon.assert.calledWith(nativeBridge.AdUnit.setViews, ['webview']);
+            sinon.assert.calledWith(nativeBridge.AndroidAdUnit.setViews, ['webview']);
         });
 
         it('should hide overlay', () => {
