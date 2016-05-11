@@ -24,6 +24,10 @@ export class RequestApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
     }
 
+    public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'head', [id, url, headers, connectTimeout, readTimeout]);
+    }
+
     public setConnectTimeout(connectTimeout: number): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'setConnectTimeout', [connectTimeout]);
     }
