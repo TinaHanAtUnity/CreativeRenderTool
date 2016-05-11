@@ -16,7 +16,7 @@ import { Session } from '../../src/ts/Models/Session';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 
-describe('SessionManagerTest', () => {
+describe('SessionManager', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
     let nativeBridge;
@@ -25,7 +25,7 @@ describe('SessionManagerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
 
-    it('Sends start events from VAST', () => {
+    it('sends start events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has started
         // then the VAST start callback URL should be requested by the event manager
@@ -49,7 +49,7 @@ describe('SessionManagerTest', () => {
         });
     });
 
-    it('Sends complete events from VAST', () => {
+    it('sends complete events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager
@@ -73,7 +73,7 @@ describe('SessionManagerTest', () => {
         });
     });
 
-    it('Sends impression events from VAST', () => {
+    it('sends impression events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST impression and creativeView callback URLs should be requested by the event manager
@@ -115,14 +115,14 @@ describe('SessionManagerTest', () => {
         mockEventManager.verify();
     };
 
-    it('Sends mute events from VAST', () => {
+    it('sends mute events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has been muted
         // then the VAST mute callback URL should be requested by the event manager
         testMuteEvent(true);
     });
 
-    it('Sends unmute events from VAST', () => {
+    it('sends unmute events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has been unmuted
         // then the VAST unmute callback URL should be requested by the event manager
@@ -158,21 +158,21 @@ describe('SessionManagerTest', () => {
         mockEventManager.verify();
     };
 
-    it('Sends first quartile events from VAST', () => {
+    it('sends first quartile events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager
         testQuartileEvent(1);
     });
 
-    it('Sends midpoint events from VAST', () => {
+    it('sends midpoint events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager
         testQuartileEvent(2);
     });
 
-    it('Sends third quartile events from VAST', () => {
+    it('sends third quartile events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager

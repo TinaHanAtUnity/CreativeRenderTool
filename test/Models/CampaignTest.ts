@@ -7,9 +7,9 @@ import * as xmldom from 'xmldom';
 import { Campaign } from '../../src/ts/Models/Campaign';
 
 
-describe('CampaignTest', () => {
+describe('Campaign', () => {
 
-    describe('Parsing json with campaign data', () => {
+    describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
             let json = {
                 'abGroup': 3,
@@ -46,7 +46,7 @@ describe('CampaignTest', () => {
         });
     });
 
-    describe('Parsing json with VAST data', () => {
+    describe('when created with VAST json', () => {
         it('should have correct data from the json', () => {
             let json = {
                 'abGroup': 3,

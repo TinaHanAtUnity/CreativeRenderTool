@@ -17,6 +17,13 @@ export class Vast {
     }
 
     public getErrorURLTemplates(): string[] {
+        let ad = this.getAd();
+        if (ad) {
+            let adErrorUrls = ad.getErrorURLTemplates();
+            if (adErrorUrls instanceof Array) {
+                return adErrorUrls.concat(this._errorURLTemplates || []);
+            }
+        }
         return this._errorURLTemplates;
     }
 

@@ -4,7 +4,7 @@ import * as xmldom from 'xmldom';
 
 import { VastParser } from '../../src/ts/Utilities/VastParser';
 
-describe('VastParserTest', () => {
+describe('VastParser', () => {
 
     let domParser;
 
@@ -87,7 +87,9 @@ describe('VastParserTest', () => {
         ]);
         assert.equal(vast.getVideoUrl(), 'http://static.scanscout.com/filemanager/vhs/partner364124_f00a7d93-0858-4b28-bf8e-e9af7a879f74.mp4');
         assert.equal(vast.getDuration(), 15);
-        assert.deepEqual(vast.getErrorURLTemplates(), []);
+        assert.deepEqual(vast.getErrorURLTemplates(), [
+            'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
+        ]);
     });
 
 });
