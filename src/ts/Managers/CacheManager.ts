@@ -9,6 +9,7 @@ enum CacheStatus {
 export interface ICacheResponse {
     url: string;
     size: number;
+    totalSize: number;
     duration: number;
     responseCode: number;
     headers: [string, string][];
@@ -37,8 +38,11 @@ export class CacheManager {
             return this._nativeBridge.Cache.getFileUrl(url);
         });
 
-        return this._nativeBridge.Cache.download(url, false).then(() => {
-            return promise;
+        return this._nativeBridge.Cache.isCaching().then(isCaching => {
+            if(isCaching) {
+                return promise;
+            }
+            return this._nativeBridge.Cache.download(url, false).then(() => promise);
         }).catch(error => {
             switch(error) {
                 case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
@@ -53,6 +57,10 @@ export class CacheManager {
                     return Promise.reject(error);
             }
         });
+    }
+
+    public stop(): void {
+        this._nativeBridge.Cache.cancel(false);
     }
 
     public cleanCache(): Promise<any[]> {
@@ -114,12 +122,13 @@ export class CacheManager {
         });
     }
 
-    private onDownloadEnd(url: string, size: number, duration: number, responseCode: number, headers: [string, string][]): void {
+    private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
             let cacheResponse: ICacheResponse = {
                 url: url,
                 size: size,
+                totalSize: totalSize,
                 duration: duration,
                 responseCode: responseCode,
                 headers: headers
@@ -133,11 +142,19 @@ export class CacheManager {
         }
     }
 
-    private onDownloadStopped(url: string, bytes: number) {
+    private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]) {
         let callback = this._callbacks[url];
         if(callback) {
+            let cacheResponse: ICacheResponse = {
+                url: url,
+                size: size,
+                totalSize: totalSize,
+                duration: duration,
+                responseCode: responseCode,
+                headers: headers
+            };
             this.removeUrl(url);
-            callback[CacheStatus.ERROR]([url, bytes]);
+            callback[CacheStatus.OK](cacheResponse);
             delete this._callbacks[url];
         }
     }

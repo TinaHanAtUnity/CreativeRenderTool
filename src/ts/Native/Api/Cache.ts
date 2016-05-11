@@ -45,6 +45,10 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, overwrite]);
     }
 
+    public isCaching(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isCaching');
+    }
+
     public cancel(remove: boolean): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'cancel', [remove]);
     }

@@ -138,6 +138,10 @@ export class WebView {
             return;
         }
 
+        if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
+            this._cacheManager.stop();
+        }
+
         let orientation: ScreenOrientation = requestedOrientation;
         if(!placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
@@ -196,12 +200,13 @@ export class WebView {
         let cacheMode = this._configuration.getCacheMode();
 
         let cacheAssets = () => {
-            return Promise.all([
-                this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)),
-                this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl)),
-                this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl)),
-                this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl))
-            ]);
+            return this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() => {
+                return this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl));
+            }).then(() => {
+                return this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl));
+            }).then(() => {
+                return this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl));
+            });
         };
 
         let sendReady = () => {
