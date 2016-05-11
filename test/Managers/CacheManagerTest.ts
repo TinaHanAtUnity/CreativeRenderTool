@@ -44,6 +44,10 @@ class TestCacheApi extends CacheApi {
         }
     }
 
+    public isCaching(): Promise<boolean> {
+        return Promise.resolve(this._currentFile !== undefined);
+    }
+
     public getFileUrl(url: string): Promise<string> {
         return Promise.resolve(this._mappings[url]);
     }
