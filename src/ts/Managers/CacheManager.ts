@@ -1,16 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo } from 'Native/Api/Cache';
+import { PromiseCallback } from 'Utilities/PromiseCallback';
 
-class PromiseCallback {
-
-    public resolve: Function;
-    public reject: Function;
-
-    constructor(resolve: Function, reject: Function) {
-        this.resolve = resolve;
-        this.reject = reject;
-    }
-}
 
 export class CacheManager {
 
