@@ -5,6 +5,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
+import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class VideoEventHandlers {
 
@@ -44,11 +45,7 @@ export class VideoEventHandlers {
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
+        NativeAdUnit.showWebView(nativeBridge);
 
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();

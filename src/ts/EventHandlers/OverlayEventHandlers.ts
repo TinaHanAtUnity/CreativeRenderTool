@@ -3,7 +3,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { Platform } from 'Constants/Platform';
+import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class OverlayEventHandlers {
 
@@ -13,11 +13,7 @@ export class OverlayEventHandlers {
       adUnit.setFinishState(FinishState.SKIPPED);
       sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
 
-      if(nativeBridge.getPlatform() === Platform.IOS) {
-          nativeBridge.IosAdUnit.setViews(['webview']);
-      } else {
-          nativeBridge.AndroidAdUnit.setViews(['webview']);
-      }
+      NativeAdUnit.showWebView(nativeBridge);
 
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();
