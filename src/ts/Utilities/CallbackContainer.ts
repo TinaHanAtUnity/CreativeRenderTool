@@ -1,4 +1,4 @@
-export class PromiseCallback {
+export class CallbackContainer {
 
     public resolve: Function;
     public reject: Function;

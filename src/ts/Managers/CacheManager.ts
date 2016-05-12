@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo } from 'Native/Api/Cache';
-import { PromiseCallback } from 'Utilities/PromiseCallback';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
 
 
 export class CacheManager {
@@ -79,7 +79,7 @@ export class CacheManager {
 
     private registerCallback(url): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
-            let callbackObject = new PromiseCallback(resolve, reject);
+            let callbackObject = new CallbackContainer(resolve, reject);
 
             if (this._urlCallbacks[url]) {
                 this._urlCallbacks[url].push(callbackObject);
@@ -91,9 +91,9 @@ export class CacheManager {
 
     private onDownloadEnd(url: string, size: number, duration: number): void {
         this.getFileUrl(url).then(([url, fileUrl]) => {
-            let urlCallbacks: PromiseCallback[] = this._urlCallbacks[url];
+            let urlCallbacks: CallbackContainer[] = this._urlCallbacks[url];
             if (urlCallbacks) {
-                urlCallbacks.forEach((callbackObject: PromiseCallback) => {
+                urlCallbacks.forEach((callbackObject: CallbackContainer) => {
                     callbackObject.resolve([url, fileUrl]);
                 });
                 delete this._urlCallbacks[url];

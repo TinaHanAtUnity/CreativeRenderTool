@@ -17,7 +17,7 @@ import { PlacementApi } from 'Native/Api/Placement';
 import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { PromiseCallback } from 'Utilities/PromiseCallback';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 
 export enum CallbackStatus {
@@ -48,7 +48,7 @@ export class NativeBridge implements INativeBridge {
     public VideoPlayer: VideoPlayerApi = null;
 
     private _callbackId: number = 1;
-    private _callbackTable: {[key: number]: PromiseCallback} = {};
+    private _callbackTable: {[key: number]: CallbackContainer} = {};
 
     private _platform: Platform;
     private _backend: IWebViewBridge;
@@ -88,7 +88,7 @@ export class NativeBridge implements INativeBridge {
 
     public registerCallback(resolve: Function, reject: Function): number {
         let id: number = this._callbackId++;
-        this._callbackTable[id] = new PromiseCallback(resolve, reject);
+        this._callbackTable[id] = new CallbackContainer(resolve, reject);
         return id;
     }
 
@@ -127,7 +127,7 @@ export class NativeBridge implements INativeBridge {
             let id: number = parseInt(result.shift(), 10);
             let status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
-            let callbackObject: PromiseCallback = this._callbackTable[id];
+            let callbackObject: CallbackContainer = this._callbackTable[id];
             if (!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
