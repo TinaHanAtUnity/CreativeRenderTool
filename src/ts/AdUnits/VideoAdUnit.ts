@@ -29,9 +29,9 @@ export class VideoAdUnit extends AbstractAdUnit {
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
         } else {
-            this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(() => this.onResume());
-            this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
-            this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
+            this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe(() => this.onResume());
+            this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
+            this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
         }
 
         this._videoPosition = 0;

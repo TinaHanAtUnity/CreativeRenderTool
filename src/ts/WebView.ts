@@ -181,7 +181,7 @@ export class WebView {
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 adUnit.showIos(iosOrientation).then(() => {
                     this._sessionManager.sendShow(adUnit);
-                })
+                });
             } else {
                 adUnit.showAndroid(androidOrientation, keyEvents).then(() => {
                     this._sessionManager.sendShow(adUnit);

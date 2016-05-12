@@ -30,7 +30,7 @@ export abstract class AbstractAdUnit {
 
     public abstract showAndroid(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
 
-    public abstract showIos(supportedOrientations: InterfaceOrientation);
+    public abstract showIos(supportedOrientations: InterfaceOrientation): Promise<void>;
 
     public abstract hide(): Promise<void>;
 
