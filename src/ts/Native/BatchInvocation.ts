@@ -12,7 +12,7 @@ export class BatchInvocation {
         this._nativeBridge = nativeBridge;
     }
 
-    public queue<T>(className: string, methodName: string, parameters = []): Promise<T> {
+    public queue<T>(className: string, methodName: string, parameters: any[] = []): Promise<T> {
         switch(this._nativeBridge.getPlatform()) {
             case Platform.ANDROID:
                 return this.rawQueue<T>('com.unity3d.ads.api.' + className, methodName, parameters);
@@ -25,7 +25,7 @@ export class BatchInvocation {
         }
     }
 
-    public rawQueue<T>(fullClassName: string, methodName: string, parameters = []): Promise<T> {
+    public rawQueue<T>(fullClassName: string, methodName: string, parameters: any[] = []): Promise<T> {
         return new Promise<T>((resolve, reject): void => {
             let id = this._nativeBridge.registerCallback(resolve, reject);
             this._batch.push([fullClassName, methodName, parameters, id.toString()]);
