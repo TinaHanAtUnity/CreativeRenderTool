@@ -1,9 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0 } from 'Utilities/Observable';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeApi } from 'Native/NativeApi';
+import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,
@@ -27,8 +25,8 @@ export class IosAdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
+    public open(view: string[], supportedOrientations: InterfaceOrientation, statusBarHidden: boolean, shouldAutorotate: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [supportedOrientations, statusBarHidden, shouldAutorotate]);
     }
 
     public close(): Promise<void> {
@@ -43,24 +41,32 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getViews');
     }
 
-    public setOrientation(orientation: ScreenOrientation): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setOrientation', [orientation]);
+    public setSupportedOrientations(supportedOrientations: InterfaceOrientation): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setSupportedOrientations', [supportedOrientations]);
     }
 
-    public getOrientation(): Promise<ScreenOrientation> {
-        return this._nativeBridge.invoke<ScreenOrientation>(this._apiClass, 'getOrientation');
+    public getSupportedOrientations(): Promise<InterfaceOrientation> {
+        return this._nativeBridge.invoke<InterfaceOrientation>(this._apiClass, 'getSupportedOrientations');
     }
 
     public setKeepScreenOn(screenOn: boolean): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setKeepScreenOn', [screenOn]);
     }
 
-    public setSystemUiVisibility(systemUiVisibility: SystemUiVisibility): Promise<SystemUiVisibility> {
-        return this._nativeBridge.invoke<SystemUiVisibility>(this._apiClass, 'setSystemUiVisibility', [systemUiVisibility]);
+    public setStatusBarHidden(hidden: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setStatusBarHidden', [hidden]);
     }
 
-    public setKeyEventList(keyEventList: KeyCode[]): Promise<KeyCode[]> {
-        return this._nativeBridge.invoke<KeyCode[]>(this._apiClass, 'setKeyEventList', [keyEventList]);
+    public getStatusBarHidden(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getStatusBarHidden');
+    }
+
+    public setShouldAutorotate(autorotate: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setShouldAutorotate', [autorotate]);
+    }
+
+    public getShouldAutorate(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
     }
 
     public handleEvent(event: string, ...parameters: any[]): void {
