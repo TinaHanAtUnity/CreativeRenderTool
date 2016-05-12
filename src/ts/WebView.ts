@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
-import { CacheManager } from 'Managers/CacheManager';
+import { CacheManager, CacheStatus } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
@@ -199,13 +199,19 @@ export class WebView {
 
         let cacheMode = this._configuration.getCacheMode();
 
+        let handleStopped = (error) => {
+            if(error !== CacheStatus.STOPPED) {
+                throw error;
+            }
+        };
+
         let cacheAssets = () => {
-            return this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() => {
-                return this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl));
+            return this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).catch(handleStopped).then(() => {
+                return this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).catch(handleStopped);
             }).then(() => {
-                return this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl));
+                return this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl)).catch(handleStopped);
             }).then(() => {
-                return this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl));
+                return this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(handleStopped);
             });
         };
 

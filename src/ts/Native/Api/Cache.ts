@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable1, Observable3, Observable2, Observable6 } from 'Utilities/Observable';
+import { Observable3, Observable6, Observable5 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 export enum CacheError {
@@ -30,8 +30,8 @@ export interface IFileInfo {
 
 export class CacheApi extends NativeApi {
 
-    public onDownloadStarted: Observable1<string> = new Observable1();
-    public onDownloadResumed: Observable2<string, number> = new Observable2();
+    public onDownloadStarted: Observable5<string, number, number, number, [string, string][]> = new Observable5();
+    public onDownloadResumed: Observable5<string, number, number, number, [string, string][]> = new Observable5();
     public onDownloadProgress: Observable3<string, number, number> = new Observable3();
     public onDownloadEnd: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
     public onDownloadStopped: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
@@ -107,11 +107,11 @@ export class CacheApi extends NativeApi {
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
-                this.onDownloadStarted.trigger(parameters[0]);
+                this.onDownloadStarted.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_RESUMED]:
-                this.onDownloadResumed.trigger(parameters[0], parameters[1]);
+                this.onDownloadResumed.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_PROGRESS]:

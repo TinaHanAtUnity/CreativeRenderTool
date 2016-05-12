@@ -1,8 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
+import { StorageType } from 'Native/Api/Storage';
 
-enum CacheStatus {
+export enum CacheStatus {
     OK,
+    STOPPED,
     ERROR
 }
 
@@ -23,6 +25,8 @@ export class CacheManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
+        this._nativeBridge.Cache.onDownloadStarted.subscribe(this.onDownloadStarted.bind(this));
+        this._nativeBridge.Cache.onDownloadResumed.subscribe(this.onDownloadResumed.bind(this));
         this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
         this._nativeBridge.Cache.onDownloadStopped.subscribe(this.onDownloadStopped.bind(this));
         this._nativeBridge.Cache.onDownloadError.subscribe(this.onDownloadError.bind(this));
@@ -35,7 +39,15 @@ export class CacheManager {
 
         let promise = this.registerCallback(url).then(cacheResponse => {
             // todo: add cacheResponse.responseCode handling & retrying here
-            return this._nativeBridge.Cache.getFileUrl(url);
+            return this._nativeBridge.Cache.getFileUrl(url).then(fileUrl => {
+                if(cacheResponse.size !== cacheResponse.totalSize) {
+                    this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.' + fileUrl + '.totalSize', cacheResponse.totalSize).then(() => {
+                        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+                    });
+                    return Promise.reject(CacheStatus.STOPPED);
+                }
+                return fileUrl;
+            });
         });
 
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
@@ -120,6 +132,14 @@ export class CacheManager {
             callbackObject[CacheStatus.ERROR] = reject;
             this._callbacks[url] = callbackObject;
         });
+    }
+
+    private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
+        // empty block
+    }
+
+    private onDownloadResumed(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
+        // empty block
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
