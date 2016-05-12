@@ -69,9 +69,9 @@ export class Request {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
 
-        this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
-        this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
-        this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
+        this._nativeBridge.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
+        this._nativeBridge.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
+        this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
     public get(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {

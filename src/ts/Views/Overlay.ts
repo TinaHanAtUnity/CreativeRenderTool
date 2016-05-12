@@ -39,12 +39,12 @@ export class Overlay extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: this.onSkipEvent.bind(this),
+                listener: (event) => this.onSkipEvent(event),
                 selector: '.skip-button'
             },
             {
                 event: 'click',
-                listener: this.onMuteEvent.bind(this),
+                listener: (event) => this.onMuteEvent(event),
                 selector: '.mute-button'
             }
         ];
