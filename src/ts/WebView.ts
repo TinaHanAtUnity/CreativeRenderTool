@@ -3,8 +3,6 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
@@ -15,22 +13,12 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
 import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { AdUnitFactory } from './AdUnits/AdUnitFactory';
-
-interface IAndroidShowExtras {
-    requestedOrientation: ScreenOrientation;
-}
-
-interface IIosShowExtras {
-    supportedOrientations: InterfaceOrientation;
-    shouldAutorotate: boolean;
-}
+import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -130,7 +118,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string, extras: any, callback: INativeCallback): void {
+    public show(placementId: string, options: any, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -148,45 +136,18 @@ export class WebView {
             return;
         }
 
-        let androidOrientation: ScreenOrientation;
-        let iosOrientation: InterfaceOrientation;
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            let iosShowExtras: IIosShowExtras = extras;
-            iosOrientation = iosShowExtras.supportedOrientations;
-            if(!placement.useDeviceOrientationForVideo()) {
-                iosOrientation = InterfaceOrientation.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
-            }
-        } else {
-            let androidShowExtras: IAndroidShowExtras = extras;
-            androidOrientation = androidShowExtras.requestedOrientation;
-            if (!placement.useDeviceOrientationForVideo()) {
-                androidOrientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-            }
-        }
-
-        let keyEvents: any[] = [];
-        if(placement.disableBackButton()) {
-            keyEvents = [KeyCode.BACK];
-        }
-
         PlayerMetaData.fetch(this._nativeBridge).then(player => {
             if(player) {
                 this._sessionManager.setGamerSid(player.getSid());
             }
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
+            adUnit.setNativeOptions(options);
             adUnit.onClose.subscribe(() => this.onClose());
 
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                adUnit.showIos(iosOrientation).then(() => {
-                    this._sessionManager.sendShow(adUnit);
-                });
-            } else {
-                adUnit.showAndroid(androidOrientation, keyEvents).then(() => {
-                    this._sessionManager.sendShow(adUnit);
-                });
-            }
+            adUnit.show().then(() => {
+                this._sessionManager.sendShow(adUnit);
+            });
 
             this._campaign = null;
             this.setPlacementStates(PlacementState.WAITING);

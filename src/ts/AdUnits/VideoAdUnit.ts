@@ -10,6 +10,16 @@ import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
+
+interface IAndroidOptions {
+    requestedOrientation: ScreenOrientation;
+}
+
+interface IIosOptions {
+    supportedOrientations: InterfaceOrientation;
+    shouldAutorotate: boolean;
+}
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -22,6 +32,9 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
     private _onViewControllerDidAppearObserver: any;
+
+    private _androidOptions: IAndroidOptions;
+    private _iosOptions: IIosOptions;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, placement, campaign);
@@ -42,16 +55,30 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._endScreen = endScreen;
     }
 
-    public showAndroid(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
+    public show(): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
-        return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
-    }
 
-    public showIos(supportedOrientations: InterfaceOrientation): Promise<void> {
-        this._showing = true;
-        this.setVideoActive(true);
-        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], supportedOrientations, true, true);
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            let orientation: InterfaceOrientation = this._iosOptions.supportedOrientations;
+            if(!this._placement.useDeviceOrientationForVideo()) {
+                orientation = InterfaceOrientation.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            }
+
+            return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
+        } else {
+            let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
+            if (!this._placement.useDeviceOrientationForVideo()) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            }
+
+            let keyEvents: any[] = [];
+            if(this._placement.disableBackButton()) {
+                keyEvents = [KeyCode.BACK];
+            }
+
+            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+        }
     }
 
     public hide(): Promise<void> {
@@ -77,6 +104,14 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._showing = false;
             this.onClose.trigger();
         });
+    }
+
+    public setNativeOptions(options: any): void {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._iosOptions = options;
+        } else {
+            this._androidOptions = options;
+        }
     }
 
     public isShowing(): boolean {
