@@ -77,7 +77,7 @@ export class CacheManager {
         });
     }
 
-    private registerCallback(url): Promise<any[]> {
+    private registerCallback(url: string): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             let callbackObject = new CallbackContainer(resolve, reject);
 
