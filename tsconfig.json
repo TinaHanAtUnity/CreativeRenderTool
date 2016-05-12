@@ -4,7 +4,9 @@
     "target": "es5",
     "inlineSourceMap": true,
     "moduleResolution": "classic",
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "exclude": [
     "test",

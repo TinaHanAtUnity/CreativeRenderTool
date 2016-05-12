@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
 
 export enum CacheStatus {
     OK,
@@ -20,7 +21,7 @@ export interface ICacheResponse {
 export class CacheManager {
 
     private _nativeBridge: NativeBridge;
-    private _callbacks: { [key: string]: { [key: number]: Function } } = {};
+    private _callbacks: { [key: string]: CallbackContainer } = {};
     private _queue: string[] = [];
 
     constructor(nativeBridge: NativeBridge) {
@@ -77,7 +78,7 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.Cache.getFiles().then(files => {
-            if(!files || !files.length) {
+            if (!files || !files.length) {
                 return Promise.resolve();
             }
 
@@ -93,11 +94,11 @@ export class CacheManager {
                 return n2.mtime - n1.mtime;
             });
 
-            for(let i: number = 0; i < files.length; i++) {
+            for (let i: number = 0; i < files.length; i++) {
                 let file: IFileInfo = files[i];
                 totalSize += file.size;
 
-                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                if (file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
             }
@@ -125,12 +126,9 @@ export class CacheManager {
         return true;
     }
 
-    private registerCallback(url): Promise<ICacheResponse> {
+    private registerCallback(url: string): Promise<ICacheResponse> {
         return new Promise<ICacheResponse>((resolve, reject) => {
-            let callbackObject: { [key: number]: Function } = {};
-            callbackObject[CacheStatus.OK] = resolve;
-            callbackObject[CacheStatus.ERROR] = reject;
-            this._callbacks[url] = callbackObject;
+            this._callbacks[url] = new CallbackContainer(resolve, reject);
         });
     }
 
@@ -154,7 +152,7 @@ export class CacheManager {
                 headers: headers
             };
             this.removeUrl(url);
-            callback[CacheStatus.OK](cacheResponse);
+            callback.resolve(cacheResponse);
             delete this._callbacks[url];
         }
         if(this._queue.length > 0) {
@@ -174,7 +172,7 @@ export class CacheManager {
                 headers: headers
             };
             this.removeUrl(url);
-            callback[CacheStatus.OK](cacheResponse);
+            callback.resolve(cacheResponse);
             delete this._callbacks[url];
         }
     }
@@ -183,7 +181,7 @@ export class CacheManager {
         let callback = this._callbacks[url];
         if(callback) {
             this.removeUrl(url);
-            callback[CacheStatus.ERROR]([error, url, message]);
+            callback.reject([error, url, message]);
             delete this._callbacks[url];
         }
     }

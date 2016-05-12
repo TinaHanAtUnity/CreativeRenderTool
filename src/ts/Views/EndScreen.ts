@@ -30,17 +30,17 @@ export class EndScreen extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: this.onDownloadEvent.bind(this),
+                listener: (event) => this.onDownloadEvent(event),
                 selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
-                listener: this.onReplayEvent.bind(this),
+                listener: (event) => this.onReplayEvent(event),
                 selector: '.btn-watch-again-region'
             },
             {
                 event: 'click',
-                listener: this.onCloseEvent.bind(this),
+                listener: (event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
             }
         ];

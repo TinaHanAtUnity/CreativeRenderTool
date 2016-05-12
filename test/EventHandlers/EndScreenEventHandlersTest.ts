@@ -51,15 +51,8 @@ describe('EndScreenEventHandlersTest', () => {
         beforeEach(() => {
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.spy(nativeBridge.Listener, 'sendClickEvent');
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
-        });
-
-        it('should send a click with Listener', () => {
-            EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
-
-            sinon.assert.calledWith(nativeBridge.Listener.sendClickEvent, TestFixtures.getPlacement().getId());
         });
 
         it('should send a click with session manager', () => {

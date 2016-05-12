@@ -10,7 +10,7 @@ enum ConnectivityEvent {
 
 export class ConnectivityApi extends NativeApi {
 
-    public onConnected: Observable2<boolean, string> = new Observable2();
+    public onConnected: Observable2<boolean, number> = new Observable2();
     public onDisconnected: Observable0 = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
