@@ -14,8 +14,8 @@ export class Resolve {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.Resolve.onComplete.subscribe(this.onResolveComplete.bind(this));
-        this._nativeBridge.Resolve.onFailed.subscribe(this.onResolveFailed.bind(this));
+        this._nativeBridge.Resolve.onComplete.subscribe((id, host, ip) => this.onResolveComplete(id, host, ip));
+        this._nativeBridge.Resolve.onFailed.subscribe((id, host, error, message) => this.onResolveFailed(id, host, error, message));
     }
 
     public resolve(host: string): Promise<[string, string, string]> {

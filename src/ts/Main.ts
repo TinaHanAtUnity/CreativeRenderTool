@@ -8,6 +8,11 @@ import { IosWebViewBridge } from 'Native/IosWebViewBridge';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 
+interface IExtendedWindow extends Window {
+    nativebridge: NativeBridge;
+    webview: WebView;
+}
+
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
     let newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
@@ -23,7 +28,6 @@ let resizeHandler: EventListener = (event: Event) => {
 resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
-/* tslint:disable:no-string-literal */
 let nativeBridge: NativeBridge = null;
 switch(Url.getQueryParameter(location.search, 'platform')) {
     case 'android':
@@ -38,8 +42,8 @@ switch(Url.getQueryParameter(location.search, 'platform')) {
         throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
 }
 
-window['nativebridge'] = nativeBridge;
+let extWindow = <IExtendedWindow> window;
+extWindow.nativebridge = nativeBridge;
+extWindow.webview = new WebView(nativeBridge);
 
-let webView: WebView = new WebView(nativeBridge);
-window['webview'] = webView;
-webView.initialize();
+extWindow.webview.initialize();

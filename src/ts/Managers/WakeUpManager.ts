@@ -16,8 +16,8 @@ export class WakeUpManager {
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
         this._lastConnected = Date.now();
-        this._nativeBridge.Connectivity.onConnected.subscribe(this.onConnected.bind(this));
-        this._nativeBridge.Broadcast.onBroadcastAction.subscribe(this.onBroadcastAction.bind(this));
+        this._nativeBridge.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
+        this._nativeBridge.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
     }
 
     public setListenConnectivity(status: boolean): Promise<void> {

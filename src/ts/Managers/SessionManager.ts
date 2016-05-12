@@ -201,7 +201,7 @@ export class SessionManager {
         });
     }
 
-    private sendVastImpressionEvent(adUnit, id) {
+    private sendVastImpressionEvent(adUnit: AbstractAdUnit, id: string) {
         if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getImpressionUrls()) {
             for (let impressionUrl of adUnit.getCampaign().getVast().getImpressionUrls()) {
                 this._eventManager.thirdPartyEvent('vast impression', id, impressionUrl);

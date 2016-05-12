@@ -102,10 +102,10 @@ export class VastParser {
     }
 
     private parseAdElement(adElement: any): VastAd {
-        let adTypeElement, childNodes, ad: VastAd;
-        childNodes = adElement.childNodes;
+        let ad: VastAd;
+        let childNodes = adElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
-            adTypeElement = childNodes[i];
+            let adTypeElement = childNodes[i];
             if (adTypeElement.nodeName === 'Wrapper') {
                 ad = this.parseWrapperElement(adTypeElement);
                 break;
@@ -276,7 +276,7 @@ export class VastParser {
     }
 
     private childsByName(node: any, name: string): any {
-        let matches = [];
+        let matches: Node[] = [];
         let childNodes = node.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
             let child = childNodes[i];
