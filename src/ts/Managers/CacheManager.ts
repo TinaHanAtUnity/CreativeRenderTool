@@ -10,7 +10,7 @@ export class CacheManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
+        this._nativeBridge.Cache.onDownloadEnd.subscribe((url, size, duration) => this.onDownloadEnd(url, size, duration));
     }
 
     public cacheAll(urls: string[]): Promise<any[]> {
