@@ -1,6 +1,6 @@
 export class Url {
 
-    public static addParameters(url: string, parameters: {}): string {
+    public static addParameters(url: string, parameters: { [key: string]: any }): string {
         let newUrl: string = url.toString();
         if (newUrl.indexOf('?') !== -1) {
             newUrl += '&';

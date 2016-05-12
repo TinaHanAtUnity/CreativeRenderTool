@@ -50,7 +50,7 @@ export class WebView {
         this._nativeBridge = nativeBridge;
 
         if(window && window.addEventListener) {
-            window.addEventListener('error', this.onError.bind(this), false);
+            window.addEventListener('error', (event) => this.onError(<ErrorEvent>event), false);
         }
 
         this._deviceInfo = new DeviceInfo();
@@ -89,14 +89,14 @@ export class WebView {
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
-            this._campaignManager.onCampaign.subscribe(this.onCampaign.bind(this));
-            this._campaignManager.onError.subscribe(this.onCampaignError.bind(this));
+            this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
+            this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._campaignManager.request();
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
 
             this._wakeUpManager.setListenConnectivity(true);
-            this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
+            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
             this._eventManager.sendUnsentSessions();
 
@@ -154,7 +154,7 @@ export class WebView {
             }
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
-            adUnit.onClose.subscribe(this.onClose.bind(this));
+            adUnit.onClose.subscribe(() => this.onClose());
             adUnit.show(orientation, keyEvents).then(() => {
                 this._sessionManager.sendShow(adUnit);
             });
@@ -236,7 +236,7 @@ export class WebView {
         }, this._clientInfo, this._deviceInfo);
     }
 
-    private onClose(placement: Placement): void {
+    private onClose(): void {
         if(this._mustReinitialize) {
             this.reinitialize();
         } else {

@@ -12,12 +12,9 @@ export abstract class AbstractAdUnit {
     public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;
-
-    protected _placement;
-    protected _campaign;
-
-    protected _finishState;
-
+    protected _placement: Placement;
+    protected _campaign: Campaign;
+    protected _finishState: FinishState;
     protected _showing: boolean = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign) {

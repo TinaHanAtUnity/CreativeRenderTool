@@ -16,16 +16,16 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoPosition: number;
     private _videoActive: boolean;
     private _watches: number;
-    private _onResumeObserver;
-    private _onPauseObserver;
-    private _onDestroyObserver;
+    private _onResumeObserver: any;
+    private _onPauseObserver: any;
+    private _onDestroyObserver: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, placement, campaign);
 
-        this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(this.onResume.bind(this));
-        this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe(this.onPause.bind(this));
-        this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe(this.onDestroy.bind(this));
+        this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(() => this.onResume());
+        this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
+        this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
 
         this._videoPosition = 0;
         this._videoActive = true;
