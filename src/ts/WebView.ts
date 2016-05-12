@@ -4,6 +4,7 @@ import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
@@ -21,6 +22,15 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from './AdUnits/AdUnitFactory';
+
+interface IAndroidShowExtras {
+    requestedOrientation: ScreenOrientation;
+}
+
+interface IIosShowExtras {
+    supportedOrientations: InterfaceOrientation;
+    shouldAutorotate: boolean;
+}
 
 export class WebView {
 
@@ -120,7 +130,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
+    public show(placementId: string, extras: any, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -138,9 +148,21 @@ export class WebView {
             return;
         }
 
-        let orientation: ScreenOrientation = requestedOrientation;
-        if(!placement.useDeviceOrientationForVideo()) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        let androidOrientation: ScreenOrientation;
+        let iosOrientation: InterfaceOrientation;
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            let iosShowExtras: IIosShowExtras = extras;
+            iosOrientation = iosShowExtras.supportedOrientations;
+            if(!placement.useDeviceOrientationForVideo()) {
+                iosOrientation = InterfaceOrientation.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            }
+        } else {
+            let androidShowExtras: IAndroidShowExtras = extras;
+            androidOrientation = androidShowExtras.requestedOrientation;
+            if (!placement.useDeviceOrientationForVideo()) {
+                androidOrientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            }
         }
 
         let keyEvents: any[] = [];
@@ -155,9 +177,15 @@ export class WebView {
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
             adUnit.onClose.subscribe(this.onClose.bind(this));
-            adUnit.show(orientation, keyEvents).then(() => {
-                this._sessionManager.sendShow(adUnit);
-            });
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                adUnit.showIos(iosOrientation).then(() => {
+                    this._sessionManager.sendShow(adUnit);
+                })
+            } else {
+                adUnit.showAndroid(androidOrientation, keyEvents).then(() => {
+                    this._sessionManager.sendShow(adUnit);
+                });
+            }
 
             this._campaign = null;
             this.setPlacementStates(PlacementState.WAITING);

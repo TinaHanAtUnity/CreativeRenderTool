@@ -9,6 +9,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
+import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -41,14 +42,16 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._endScreen = endScreen;
     }
 
-    public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
+    public showAndroid(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
-        } else {
-            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
-        }
+        return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+    }
+
+    public showIos(supportedOrientations: InterfaceOrientation): Promise<void> {
+        this._showing = true;
+        this.setVideoActive(true);
+        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], supportedOrientations, true, true);
     }
 
     public hide(): Promise<void> {

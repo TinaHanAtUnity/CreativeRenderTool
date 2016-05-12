@@ -6,6 +6,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeAdUnit } from 'AdUnits/NativeAdUnit';
+import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
 
 export abstract class AbstractAdUnit {
 
@@ -29,7 +30,9 @@ export abstract class AbstractAdUnit {
         this._campaign = campaign;
     }
 
-    public abstract show(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
+    public abstract showAndroid(requestedOrientation: ScreenOrientation, keyEvents: KeyCode[]): Promise<void>;
+
+    public abstract showIos(supportedOrientations: InterfaceOrientation);
 
     public abstract hide(): Promise<void>;
 
