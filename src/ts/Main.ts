@@ -8,9 +8,9 @@ import { IosWebViewBridge } from 'Native/IosWebViewBridge';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 
-class ExtendedWindow extends Window {
-    public nativebridge: NativeBridge;
-    public webview: WebView;
+interface IExtendedWindow extends Window {
+    nativebridge: NativeBridge;
+    webview: WebView;
 }
 
 let resizeHandler: EventListener = (event: Event) => {
@@ -42,7 +42,7 @@ switch(Url.getQueryParameter(location.search, 'platform')) {
         throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
 }
 
-let extWindow = <ExtendedWindow> window;
+let extWindow = <IExtendedWindow> window;
 extWindow.nativebridge = nativeBridge;
 extWindow.webview = new WebView(nativeBridge);
 
