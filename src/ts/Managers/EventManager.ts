@@ -19,7 +19,7 @@ export class EventManager {
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getDataKey(sessionId, eventId), data);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
-        return this._request.post(url, data, [], 5, 5000).then(() => {
+        return this._request.post(url, data, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(() => {
             return Promise.all([
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
@@ -29,7 +29,7 @@ export class EventManager {
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
         if (redirects) {
-            return this._request.get(url, [], 0, 0, {followRedirects: true});
+            return this._request.get(url, [], {retries: 0, retryDelay: 0, followRedirects: true, retryWithConnectionEvents: false});
         } else {
             return this._request.get(url);
         }

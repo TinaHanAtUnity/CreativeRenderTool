@@ -1,4 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 const enum RequestStatus {
     COMPLETE,
@@ -11,7 +12,10 @@ const enum RequestMethod {
 }
 
 interface IRequestOptions {
+    retries: number;
+    retryDelay: number;
     followRedirects: boolean;
+    retryWithConnectionEvents: boolean;
 }
 
 interface INativeRequest {
@@ -19,8 +23,7 @@ interface INativeRequest {
     url: string;
     data?: string;
     headers: [string, string][];
-    retries: number;
-    retryDelay: number;
+    retryCount: number;
     options: IRequestOptions;
 }
 
@@ -33,13 +36,15 @@ export interface INativeResponse {
 
 export class Request {
 
-    private static _allowedResponseCodes = [200, 302, 501];
+    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
 
     private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
 
     public static getHeader(headers: [string, string][], headerName: string): string {
         for(let i = 0; i < headers.length; ++i) {
@@ -51,17 +56,27 @@ export class Request {
         return null;
     }
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
-        this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
-        this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
+    private static getDefaultRequestOptions(): IRequestOptions {
+        return {
+            retries: 0,
+            retryDelay: 0,
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        };
     }
 
-    public get(url: string, headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
+        this._nativeBridge = nativeBridge;
+        this._wakeUpManager = wakeUpManager;
+
+        this._nativeBridge.Request.onComplete.subscribe(this.onRequestComplete.bind(this));
+        this._nativeBridge.Request.onFailed.subscribe(this.onRequestFailed.bind(this));
+        this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
+    }
+
+    public get(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = {
-                followRedirects: false
-            };
+            options = Request.getDefaultRequestOptions();
         }
 
         let id = Request._callbackId++;
@@ -70,18 +85,15 @@ export class Request {
             method: RequestMethod.GET,
             url: url,
             headers: headers,
-            retries: retries,
-            retryDelay: retryDelay,
+            retryCount: 0,
             options: options
         });
         return promise;
     }
 
-    public post(url: string, data: string = '', headers: [string, string][] = [], retries: number = 0, retryDelay: number = 0, options?: IRequestOptions): Promise<INativeResponse> {
+    public post(url: string, data: string = '', headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = {
-                followRedirects: false
-            };
+            options = Request.getDefaultRequestOptions();
         }
 
         headers.push(['Content-Type', 'application/json']);
@@ -93,8 +105,7 @@ export class Request {
             url: url,
             data: data,
             headers: headers,
-            retries: retries,
-            retryDelay: retryDelay,
+            retryCount: 0,
             options: options
         });
         return promise;
@@ -132,6 +143,19 @@ export class Request {
         }
     }
 
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
+        if(nativeRequest.retryCount < nativeRequest.options.retries) {
+            nativeRequest.retryCount++;
+            setTimeout(() => {
+                this.invokeRequest(id, nativeRequest);
+            }, nativeRequest.options.retryDelay);
+        } else {
+            if(!nativeRequest.options.retryWithConnectionEvents) {
+                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
+            }
+        }
+    }
+
     private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
         let id = parseInt(rawId, 10);
         let nativeResponse: INativeResponse = {
@@ -142,7 +166,7 @@ export class Request {
         };
         let nativeRequest = Request._requests[id];
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
-            if(responseCode === 302 && nativeRequest.options.followRedirects) {
+            if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = nativeRequest.url = Request.getHeader(headers, 'location');
                 if(location.match(/^https?/i)) {
                     this.invokeRequest(id, nativeRequest);
@@ -153,20 +177,25 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else {
-            if(nativeRequest.retries > 0) {
-                nativeRequest.retries--;
-                setTimeout(() => {
-                    this.invokeRequest(id, nativeRequest);
-                }, nativeRequest.retryDelay);
-            } else {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_AFTER_RETRIES']);
-            }
+            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
         }
     }
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
         let id = parseInt(rawId, 10);
-        this.finishRequest(id, RequestStatus.FAILED, [Request._requests[id], error]);
+        let nativeRequest = Request._requests[id];
+        this.handleFailedRequest(id, nativeRequest, error);
     }
 
+    private onNetworkConnected(): void {
+        let id: any;
+        for(id in Request._requests) {
+            if(Request._requests.hasOwnProperty(id)) {
+                let request: INativeRequest = Request._requests[id];
+                if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
+                    this.invokeRequest(id, request);
+                }
+            }
+        }
+    }
 }

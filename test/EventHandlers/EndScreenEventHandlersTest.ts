@@ -15,6 +15,7 @@ import { EventManager } from '../../src/ts/Managers/EventManager';
 import { Request } from '../../src/ts/Utilities/Request';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
 import { Campaign } from '../../src/ts/Models/Campaign';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -39,7 +40,7 @@ describe('EndScreenEventHandlersTest', () => {
             hide: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge)));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{getVideoUrl: () => 'fake url', getAppStoreId: () => 'fooAppId', getClickAttributionUrlFollowsRedirects: () => true }, overlay, endScreen);
     });
@@ -50,15 +51,8 @@ describe('EndScreenEventHandlersTest', () => {
         beforeEach(() => {
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.spy(nativeBridge.Listener, 'sendClickEvent');
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
-        });
-
-        it('should send a click with Listener', () => {
-            EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
-
-            sinon.assert.calledWith(nativeBridge.Listener.sendClickEvent, TestFixtures.getPlacement().getId());
         });
 
         it('should send a click with session manager', () => {

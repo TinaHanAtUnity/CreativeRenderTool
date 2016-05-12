@@ -22,4 +22,16 @@ export class Url {
         return newUrl;
     }
 
+    public static getQueryParameter(locationString: string, parameter: string): string {
+        let queryString: string[] = locationString.split('?')[1].split('&');
+
+        for(let i: number = 0; i < queryString.length; i++) {
+            let queryParam = queryString[i].split('=');
+            if(queryParam[0] === parameter) {
+                return queryParam[1];
+            }
+        }
+
+        return null;
+    }
 }

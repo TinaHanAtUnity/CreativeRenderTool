@@ -5,6 +5,8 @@ import 'Workarounds';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';
 import { IosWebViewBridge } from 'Native/IosWebViewBridge';
+import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
 
 class ExtendedWindow extends Window {
     public nativebridge: NativeBridge;
@@ -27,10 +29,17 @@ resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
 let nativeBridge: NativeBridge = null;
-if(window && window.webviewbridge) {
-    nativeBridge = new NativeBridge(window.webviewbridge);
-} else {
-    nativeBridge = new NativeBridge(new IosWebViewBridge(), false);
+switch(Url.getQueryParameter(location.search, 'platform')) {
+    case 'android':
+        nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
+        break;
+
+    case 'ios':
+        nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
+        break;
+
+    default:
+        throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
 }
 
 let extWindow = <ExtendedWindow> window;

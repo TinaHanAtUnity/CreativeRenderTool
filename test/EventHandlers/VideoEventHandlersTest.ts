@@ -17,6 +17,7 @@ import { Request } from '../../src/ts/Utilities/Request';
 import { Campaign } from '../../src/ts/Models/Campaign';
 import { Overlay } from '../../src/ts/Views/Overlay';
 import { EndScreen } from '../../src/ts/Views/EndScreen';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 
 describe('VideoEventHandlersTest', () => {
@@ -43,7 +44,7 @@ describe('VideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge)));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{}, overlay, endScreen);
     });
@@ -143,27 +144,6 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.called(adUnit.getEndScreen().show);
         });
-
-        it('should not call rawinvoke, if integration testing is disabled', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit);
-
-            return prom.then(() => {
-                sinon.assert.notCalled(nativeBridge.rawInvoke);
-            });
-        });
-
-        it('should call rawinvoke, if integration testing is enabled', () => {
-            prom = Promise.resolve(true);
-            nativeBridge.Storage.get.restore(); // undo previous stubbing
-            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
-
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit);
-
-            return prom.then(() => {
-                sinon.assert.calledWith(nativeBridge.rawInvoke, 'com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', ['fooId']);
-            });
-        });
-
     });
 
     describe('with onVideoPrepared', () => {

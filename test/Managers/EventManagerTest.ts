@@ -8,6 +8,7 @@ import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 import { RequestApi } from '../../src/ts/Native/Api/Request';
 import { DeviceInfoApi } from '../../src/ts/Native/Api/DeviceInfo';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 class TestStorageApi extends StorageApi {
 
@@ -182,7 +183,7 @@ describe('EventManagerTest', () => {
 
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge);
+        request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
         eventManager = new EventManager(nativeBridge, request);
     });
 

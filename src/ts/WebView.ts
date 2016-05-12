@@ -55,14 +55,15 @@ export class WebView {
 
         this._deviceInfo = new DeviceInfo();
         this._cacheManager = new CacheManager(this._nativeBridge);
-        this._request = new Request(this._nativeBridge);
+        this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+        this._request = new Request(this._nativeBridge, this._wakeUpManager);
         this._resolve = new Resolve(this._nativeBridge);
         this._eventManager = new EventManager(this._nativeBridge, this._request);
     }
 
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
-            this._clientInfo = new ClientInfo(data);
+            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
@@ -94,7 +95,6 @@ export class WebView {
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
 
-            this._wakeUpManager = new WakeUpManager(this._nativeBridge);
             this._wakeUpManager.setListenConnectivity(true);
             this._wakeUpManager.onNetworkConnected.subscribe(this.onNetworkConnected.bind(this));
 

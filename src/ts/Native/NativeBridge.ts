@@ -18,6 +18,7 @@ import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { PromiseCallback } from 'Utilities/PromiseCallback';
+import { Platform } from 'Constants/Platform';
 
 export enum CallbackStatus {
     OK,
@@ -29,8 +30,6 @@ export interface INativeCallback {
 }
 
 export class NativeBridge implements INativeBridge {
-
-    public static ApiPackageName: string = 'com.unity3d.ads.api';
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
@@ -51,6 +50,7 @@ export class NativeBridge implements INativeBridge {
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: PromiseCallback} = {};
 
+    private _platform: Platform;
     private _backend: IWebViewBridge;
 
     private _autoBatchEnabled: boolean;
@@ -66,9 +66,10 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
-    constructor(backend: IWebViewBridge, autoBatch = true) {
+    constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
 
+        this._platform = platform;
         this._backend = backend;
         this.AdUnit = new AdUnitApi(this);
         this.Broadcast = new BroadcastApi(this);
@@ -113,9 +114,9 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
-    public rawInvoke(packageName: string, className: string, methodName: string, parameters?: any[]): Promise<any[]> {
+    public rawInvoke(fullClassName: string, methodName: string, parameters?: any[]): Promise<any[]> {
         let batch: BatchInvocation = new BatchInvocation(this);
-        let promise = batch.rawQueue(packageName, className, methodName, parameters);
+        let promise = batch.rawQueue(fullClassName, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
     }
@@ -190,6 +191,10 @@ export class NativeBridge implements INativeBridge {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
         window[className][methodName].apply(window[className], parameters);
+    }
+
+    public getPlatform(): Platform {
+        return this._platform;
     }
 
     private invokeBatch(batch: BatchInvocation): void {
