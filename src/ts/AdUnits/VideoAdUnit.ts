@@ -9,7 +9,6 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -71,7 +70,7 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
         }
 
-        return NativeAdUnit.close(this._nativeBridge).then(() => {
+        return this._nativeAdUnit.close().then(() => {
             this._showing = false;
             this.onClose.trigger();
         });

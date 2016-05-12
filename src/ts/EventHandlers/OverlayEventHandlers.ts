@@ -3,7 +3,6 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class OverlayEventHandlers {
 
@@ -13,7 +12,7 @@ export class OverlayEventHandlers {
       adUnit.setFinishState(FinishState.SKIPPED);
       sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
 
-      NativeAdUnit.showWebView(nativeBridge);
+      adUnit.getNativeAdUnit().showWebView();
 
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();

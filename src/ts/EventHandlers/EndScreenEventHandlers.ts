@@ -3,7 +3,6 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
-import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class EndScreenEventHandlers {
 
@@ -14,7 +13,7 @@ export class EndScreenEventHandlers {
         adUnit.getOverlay().setSkipDuration(0);
         adUnit.getEndScreen().hide();
         adUnit.getOverlay().show();
-        NativeAdUnit.showVideoPlayer(nativeBridge).then(() => {
+        adUnit.getNativeAdUnit().showVideoPlayer().then(() => {
             nativeBridge.VideoPlayer.prepare(adUnit.getCampaign().getVideoUrl(), new Double(adUnit.getPlacement().muteVideo() ? 0.0 : 1.0));
         });
     }

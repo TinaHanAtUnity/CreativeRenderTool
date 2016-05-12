@@ -5,6 +5,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeBridge } from 'Native/NativeBridge';
+import { NativeAdUnit } from 'AdUnits/NativeAdUnit';
 
 export abstract class AbstractAdUnit {
 
@@ -12,6 +13,7 @@ export abstract class AbstractAdUnit {
     public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;
+    protected _nativeAdUnit: NativeAdUnit;
 
     protected _placement;
     protected _campaign;
@@ -22,6 +24,7 @@ export abstract class AbstractAdUnit {
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
+        this._nativeAdUnit = new NativeAdUnit(nativeBridge);
         this._placement = placement;
         this._campaign = campaign;
     }
@@ -52,4 +55,7 @@ export abstract class AbstractAdUnit {
         return this._showing;
     }
 
+    public getNativeAdUnit(): NativeAdUnit {
+        return this._nativeAdUnit;
+    }
 }

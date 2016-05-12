@@ -5,7 +5,6 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { NativeAdUnit } from 'Utilities/NativeAdUnit';
 
 export class VideoEventHandlers {
 
@@ -45,7 +44,7 @@ export class VideoEventHandlers {
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        NativeAdUnit.showWebView(nativeBridge);
+        adUnit.getNativeAdUnit().showWebView();
 
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
