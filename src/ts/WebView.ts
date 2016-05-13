@@ -206,7 +206,7 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(sendReady);
+            cacheAssets().then(() => sendReady);
         } else if(cacheMode === CacheMode.ALLOWED) {
             cacheAssets();
             sendReady();
