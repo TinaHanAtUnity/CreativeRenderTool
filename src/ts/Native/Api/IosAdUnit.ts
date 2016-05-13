@@ -26,7 +26,7 @@ export class IosAdUnitApi extends NativeApi {
     }
 
     public open(view: string[], supportedOrientations: InterfaceOrientation, statusBarHidden: boolean, shouldAutorotate: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [supportedOrientations, statusBarHidden, shouldAutorotate]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate]);
     }
 
     public close(): Promise<void> {
