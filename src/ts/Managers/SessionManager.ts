@@ -212,6 +212,7 @@ export class SessionManager {
     private sendVastTrackingEvent(adUnit: AbstractAdUnit, eventName: string, sessionId: string) {
         if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getTrackingEventUrls(eventName)) {
             for (let url of adUnit.getCampaign().getVast().getTrackingEventUrls(eventName)) {
+                url = url.replace(/%ZONE%/, adUnit.getPlacement().getId());
                 this._eventManager.thirdPartyEvent(`vast ${eventName}`, sessionId, url);
             }
         }
@@ -231,9 +232,7 @@ export class SessionManager {
         if (adUnit.getCampaign().getVast() && adUnit.getCampaign().getVast().getTrackingEventUrls(quartileEventName)) {
             let duration = adUnit.getCampaign().getVast().getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                for (let quartileUrl of adUnit.getCampaign().getVast().getTrackingEventUrls(quartileEventName)) {
-                    this._eventManager.thirdPartyEvent(`vast ${quartileEventName}`, session.getId(), quartileUrl);
-                }
+                this.sendVastTrackingEvent(adUnit, quartileEventName, session.getId());
             }
         }
     }
