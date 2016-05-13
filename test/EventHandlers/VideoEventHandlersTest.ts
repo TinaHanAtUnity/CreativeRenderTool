@@ -190,7 +190,7 @@ describe('VideoEventHandlersTest', () => {
             adUnit.setVideoPosition(123);
 
             VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
-            return volumeResolved.then(() => seekResolved).then(() => {
+            return volumeResolved.then(seekResolved).then(() => {
                 sinon.assert.calledWith(nativeBridge.VideoPlayer.seekTo, 123);
                 sinon.assert.called(nativeBridge.VideoPlayer.play);
             });
