@@ -3,7 +3,6 @@
 
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
-import { AdUnitApi } from 'Native/Api/AdUnit';
 import { BroadcastApi } from 'Native/Api/Broadcast';
 import { CacheApi } from 'Native/Api/Cache';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
@@ -19,6 +18,10 @@ import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
+import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
+import { NotificationApi } from 'Native/Api/Notification';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 export enum CallbackStatus {
     OK,
@@ -33,19 +36,22 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    public AdUnit: AdUnitApi = null;
+    public AndroidAdUnit: AndroidAdUnitApi = null;
+    public IosAdUnit: IosAdUnitApi = null;
     public Broadcast: BroadcastApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
     public DeviceInfo: DeviceInfoApi = null;
     public Intent: IntentApi = null;
     public Listener: ListenerApi = null;
+    public Notification: NotificationApi = null;
     public Placement: PlacementApi = null;
     public Request: RequestApi = null;
     public Resolve: ResolveApi = null;
     public Sdk: SdkApi = null;
     public Storage: StorageApi = null;
     public VideoPlayer: VideoPlayerApi = null;
+    public UrlScheme: UrlSchemeApi = null;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer} = {};
@@ -71,19 +77,27 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
-        this.AdUnit = new AdUnitApi(this);
+
+        if(platform === Platform.IOS) {
+            this.IosAdUnit = new IosAdUnitApi(this);
+        } else {
+            this.AndroidAdUnit = new AndroidAdUnitApi(this);
+        }
+
         this.Broadcast = new BroadcastApi(this);
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
         this.DeviceInfo = new DeviceInfoApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
+        this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
         this.Sdk = new SdkApi(this);
         this.Storage = new StorageApi(this);
         this.VideoPlayer = new VideoPlayerApi(this);
+        this.UrlScheme = new UrlSchemeApi(this);
     }
 
     public registerCallback(resolve: Function, reject: Function): number {
@@ -151,7 +165,11 @@ export class NativeBridge implements INativeBridge {
         let event: string = parameters.shift();
         switch(category) {
             case EventCategory[EventCategory.ADUNIT]:
-                this.AdUnit.handleEvent(event, parameters);
+                if(this.getPlatform() === Platform.IOS) {
+                    this.IosAdUnit.handleEvent(event, parameters);
+                } else {
+                    this.AndroidAdUnit.handleEvent(event, parameters);
+                }
                 break;
 
             case EventCategory[EventCategory.BROADCAST]:
@@ -164,6 +182,10 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.CONNECTIVITY]:
                 this.Connectivity.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.NOTIFICATION]:
+                this.Notification.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.REQUEST]:
