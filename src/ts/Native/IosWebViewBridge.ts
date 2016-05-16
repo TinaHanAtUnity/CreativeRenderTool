@@ -11,11 +11,7 @@ export class IosWebViewBridge implements IWebViewBridge {
     public handleCallback(id: string, status: string, parameters?: string) {
         let xhr = new XMLHttpRequest();
         xhr.open('POST', IosWebViewBridge._nativeUrl + '/handleCallback', false);
-        xhr.send(JSON.stringify({
-            id: id,
-            status: status,
-            parameters: parameters
-        }));
+        xhr.send('{"id":"' + id + '","status":"' + status + '","parameters":' + parameters + '}');
     }
 
 }
