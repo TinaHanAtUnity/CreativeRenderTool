@@ -101,11 +101,12 @@ export class Campaign {
     }
 
     public getVideoUrl(): string {
-        if (this._vast && this._vast.getVideoUrl()) {
-            return this._vast.getVideoUrl();
-        } else {
+        if (this._video) {
             return this._video;
+        } else if (this._vast && this._vast.getVideoUrl()) {
+            return this._vast.getVideoUrl();
         }
+        return null;
     }
 
     public setVideoUrl(videoUrl: string): void {
