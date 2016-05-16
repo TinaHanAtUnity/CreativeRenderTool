@@ -20,6 +20,7 @@ import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 export enum CallbackStatus {
     OK,
@@ -48,6 +49,7 @@ export class NativeBridge implements INativeBridge {
     public Sdk: SdkApi = null;
     public Storage: StorageApi = null;
     public VideoPlayer: VideoPlayerApi = null;
+    public UrlScheme: UrlSchemeApi = null;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer} = {};
@@ -92,6 +94,7 @@ export class NativeBridge implements INativeBridge {
         this.Sdk = new SdkApi(this);
         this.Storage = new StorageApi(this);
         this.VideoPlayer = new VideoPlayerApi(this);
+        this.UrlScheme = new UrlSchemeApi(this);
     }
 
     public registerCallback(resolve: Function, reject: Function): number {
