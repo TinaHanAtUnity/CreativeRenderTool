@@ -54,6 +54,7 @@ describe('ConfigManagerTest', () => {
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
 
         clientInfoMock = {
+            getApplicationName: sinon.mock().returns('test_application'),
             getGameId: sinon.mock().returns(123),
             isDebuggable: sinon.mock().returns(false),
         };
@@ -66,7 +67,7 @@ describe('ConfigManagerTest', () => {
 
         beforeEach(() => {
             let nativeResponse = {
-                response: '{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'
+                response: '{ "enabled": true, "country": "fi", "assetCaching": "forced", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'
             };
             configPromise = Promise.resolve(nativeResponse);
 
@@ -98,14 +99,11 @@ describe('ConfigManagerTest', () => {
             };
         });
 
-        it('calling fetch should return error', (done) => {
-            let config = ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock);
-            config.then(() => {
+        it('calling fetch should return error', () => {
+            return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
-                done();
-            }, (e) => {
-                assert.instanceOf(e, Error);
-                done();
+            }).catch(error => {
+                assert.instanceOf(error, Error);
             });
         });
     });

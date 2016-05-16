@@ -1,5 +1,6 @@
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
 
 export class ClientInfo extends Model {
 
@@ -17,28 +18,30 @@ export class ClientInfo extends Model {
     private _configUrl: string;
     private _webviewUrl: string;
     private _webviewHash: string;
+    private _webviewVersion: string;
 
-    constructor(data: any[]) {
+    constructor(platform: Platform, data: any[]) {
         super();
-        this._gameId = data.shift();
+
+        this._platform = platform;
+
+        let gameIdString = data.shift();
+        if (typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
+            this._gameId = gameIdString;
+        } else {
+            throw new Error(UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
+        }
+
         this._testMode = data.shift();
         this._applicationName = data.shift();
         this._applicationVersion = data.shift();
         this._sdkVersion = data.shift();
 
-        let platformString = data.shift();
-        if(platformString === 'android') {
-            this._platform = Platform.ANDROID;
-        } else if(platformString === 'ios') {
-            this._platform = Platform.IOS;
-        } else {
-            throw new Error('Unknown platform');
-        }
-
         this._debuggable = data.shift();
         this._configUrl = data.shift();
         this._webviewUrl = data.shift();
         this._webviewHash = data.shift();
+        this._webviewVersion = data.shift();
     }
 
     public getGameId(): string {
@@ -81,6 +84,10 @@ export class ClientInfo extends Model {
         return this._webviewHash;
     }
 
+    public getWebviewVersion(): string {
+        return this._webviewVersion;
+    }
+
     public getDTO() {
         return {
             'gameId': this._gameId,
@@ -92,7 +99,8 @@ export class ClientInfo extends Model {
             'encrypted': !this._debuggable,
             'configUrl': this._configUrl,
             'webviewUrl': this._webviewUrl,
-            'webviewHash': this._webviewHash
+            'webviewHash': this._webviewHash,
+            'webviewVersion': this._webviewVersion
         };
     }
 }

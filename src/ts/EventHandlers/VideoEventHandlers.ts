@@ -3,10 +3,12 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
+import { SessionManager } from 'Managers/SessionManager';
+import { Platform } from 'Constants/Platform';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, width: number, height: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         adUnit.getOverlay().setVideoDuration(duration);
         nativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
             if (adUnit.getVideoPosition() > 0) {
@@ -19,15 +21,15 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
         if (position > 0) {
             adUnit.setVideoPosition(position);
         }
         adUnit.getOverlay().setVideoProgress(position);
     }
 
-    public static onVideoStart(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
-        adUnit.getSession().sendStart(adUnit);
+    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+        sessionManager.sendStart(adUnit);
 
         if (adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
@@ -37,16 +39,22 @@ export class VideoEventHandlers {
         adUnit.newWatch();
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        adUnit.getSession().sendView(adUnit);
-        nativeBridge.AdUnit.setViews(['webview']);
+        sessionManager.sendView(adUnit);
+
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setViews(['webview']);
+        } else {
+            nativeBridge.AndroidAdUnit.setViews(['webview']);
+        }
+
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if (integrationTest) {
-                nativeBridge.rawInvoke('com.unity3d.ads.test.integration', 'IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            if (integrationTest && nativeBridge.getPlatform() === Platform.ANDROID) {
+                nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
             }
         });
     }

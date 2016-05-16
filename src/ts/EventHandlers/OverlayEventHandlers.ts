@@ -2,20 +2,28 @@ import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
+import { SessionManager } from 'Managers/SessionManager';
+import { Platform } from 'Constants/Platform';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+  public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
       nativeBridge.VideoPlayer.pause();
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
-      adUnit.getSession().sendSkip(adUnit, adUnit.getVideoPosition());
-      nativeBridge.AdUnit.setViews(['webview']);
+      sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
+
+      if(nativeBridge.getPlatform() === Platform.IOS) {
+          nativeBridge.IosAdUnit.setViews(['webview']);
+      } else {
+          nativeBridge.AndroidAdUnit.setViews(['webview']);
+      }
+
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();
   }
 
-  public static onMute(nativeBridge: NativeBridge, adUnit: VideoAdUnit, muted: boolean): void {
+  public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
       nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
   }
 

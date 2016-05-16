@@ -3,7 +3,10 @@
     "module": "amd",
     "target": "es5",
     "inlineSourceMap": true,
-    "moduleResolution": "classic"
+    "moduleResolution": "classic",
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "exclude": [
     "test",

@@ -7,22 +7,22 @@ export class Tap {
     private _startX: number;
     private _startY: number;
 
-    private _onTouchMoveListener;
-    private _onTouchEndListener;
-    private _onTouchCancelListener;
+    private _onTouchMoveListener: (ev: TouchEvent) => any;
+    private _onTouchEndListener: (ev: TouchEvent) => any;
+    private _onTouchCancelListener: (ev: TouchEvent) => any;
 
     constructor(element: HTMLElement) {
         this._element = element;
         this._moved = false;
         this._startX = 0;
         this._startY = 0;
-        this._element.addEventListener('touchstart', this.onTouchStart.bind(this), false);
+        this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), false);
     }
 
     private onTouchStart(event: TouchEvent) {
-        this._onTouchMoveListener = this.onTouchMove.bind(this);
-        this._onTouchEndListener = this.onTouchEnd.bind(this);
-        this._onTouchCancelListener = this.onTouchCancel.bind(this);
+        this._onTouchMoveListener = (event) => this.onTouchMove(event);
+        this._onTouchEndListener = (event) => this.onTouchEnd(event);
+        this._onTouchCancelListener = (event) => this.onTouchCancel(event);
         this._element.addEventListener('touchmove', this._onTouchMoveListener, false);
         this._element.addEventListener('touchend', this._onTouchEndListener, false);
         this._element.addEventListener('touchcancel', this._onTouchCancelListener, false);

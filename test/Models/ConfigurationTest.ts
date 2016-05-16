@@ -2,7 +2,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Configuration } from '../../src/ts/Models/Configuration';
+import { Configuration, CacheMode } from '../../src/ts/Models/Configuration';
 
 describe('configurationTest', () => {
 
@@ -10,7 +10,7 @@ describe('configurationTest', () => {
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse('{ "enabled": true, "country": "fi", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'));
+            configuration = new Configuration(JSON.parse('{ "enabled": true, "country": "fi", "assetCaching": "forced", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'));
         });
 
         it('should have enabled parameter from configuration', () => {
@@ -19,6 +19,10 @@ describe('configurationTest', () => {
 
         it('should have country parameter from configuration', () => {
             assert.equal(configuration.getCountry(), 'fi');
+        });
+
+        it('should have forced cache mode', () => {
+            assert.equal(configuration.getCacheMode(), CacheMode.FORCED);
         });
 
         describe('parsing two placements', () => {

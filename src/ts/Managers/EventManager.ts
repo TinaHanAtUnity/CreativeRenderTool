@@ -19,7 +19,7 @@ export class EventManager {
         this._nativeBridge.Storage.set(StorageType.PRIVATE, this.getDataKey(sessionId, eventId), data);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
-        return this._request.post(url, data, [], 5, 5000).then(() => {
+        return this._request.post(url, data, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(() => {
             return Promise.all([
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
@@ -27,9 +27,12 @@ export class EventManager {
         });
     }
 
-    public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
-        return this._request.get(url);
+    public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
+        if (redirects) {
+            return this._request.get(url, [], {retries: 0, retryDelay: 0, followRedirects: true, retryWithConnectionEvents: false});
+        } else {
+            return this._request.get(url);
+        }
     }
 
     public diagnosticEvent(url: string, data: string): Promise<INativeResponse> {
@@ -47,7 +50,7 @@ export class EventManager {
         return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
-                    if(outdated) {
+                    if (outdated) {
                         return this.deleteSession(sessionId);
                     } else {
                         return this.getUnsentOperativeEvents(sessionId).then(events => {

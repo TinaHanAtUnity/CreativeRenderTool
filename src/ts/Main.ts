@@ -5,6 +5,13 @@ import 'Workarounds';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';
 import { IosWebViewBridge } from 'Native/IosWebViewBridge';
+import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
+
+interface IExtendedWindow extends Window {
+    nativebridge: NativeBridge;
+    webview: WebView;
+}
 
 let resizeHandler: EventListener = (event: Event) => {
     let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -21,15 +28,22 @@ let resizeHandler: EventListener = (event: Event) => {
 resizeHandler(null);
 window.addEventListener('resize', resizeHandler, false);
 
-/* tslint:disable:no-string-literal */
 let nativeBridge: NativeBridge = null;
-if(window && window.webviewbridge) {
-    nativeBridge = new NativeBridge(window.webviewbridge);
-} else {
-    nativeBridge = new NativeBridge(new IosWebViewBridge(), false);
-}
-window['nativebridge'] = nativeBridge;
+switch(Url.getQueryParameter(location.search, 'platform')) {
+    case 'android':
+        nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
+        break;
 
-let webView: WebView = new WebView(nativeBridge);
-window['webview'] = webView;
-webView.initialize();
+    case 'ios':
+        nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
+        break;
+
+    default:
+        throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
+}
+
+let extWindow = <IExtendedWindow> window;
+extWindow.nativebridge = nativeBridge;
+extWindow.webview = new WebView(nativeBridge);
+
+extWindow.webview.initialize();
