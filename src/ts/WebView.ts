@@ -192,7 +192,7 @@ export class WebView {
             campaign.getVideoUrl()
         ];
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
                 id: parseInt(campaign.getAppStoreId(), 10)
             });
