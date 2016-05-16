@@ -65,7 +65,7 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setShouldAutorotate', [autorotate]);
     }
 
-    public getShouldAutorate(): Promise<boolean> {
+    public getShouldAutorotate(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
     }
 

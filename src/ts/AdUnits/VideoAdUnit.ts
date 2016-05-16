@@ -94,16 +94,21 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
+
+            return this._nativeBridge.IosAdUnit.close().then(() => {
+                this._showing = false;
+                this.onClose.trigger();
+            });
         } else {
             this._nativeBridge.AndroidAdUnit.onResume.unsubscribe(this._onResumeObserver);
             this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
             this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
-        }
 
-        return this._nativeAdUnit.close().then(() => {
-            this._showing = false;
-            this.onClose.trigger();
-        });
+            return this._nativeBridge.AndroidAdUnit.close().then(() => {
+                this._showing = false;
+                this.onClose.trigger();
+            });
+        }
     }
 
     public setNativeOptions(options: any): void {

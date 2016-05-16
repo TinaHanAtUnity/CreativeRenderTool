@@ -44,7 +44,11 @@ export class VideoEventHandlers {
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        adUnit.getNativeAdUnit().showWebView();
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setViews(['webview']);
+        } else {
+            nativeBridge.AndroidAdUnit.setViews(['webview']);
+        }
 
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
