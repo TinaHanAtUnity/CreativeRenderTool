@@ -3,7 +3,6 @@
 
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
-import { AdUnitApi } from 'Native/Api/AdUnit';
 import { BroadcastApi } from 'Native/Api/Broadcast';
 import { CacheApi } from 'Native/Api/Cache';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
@@ -19,6 +18,8 @@ import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
+import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 
 export enum CallbackStatus {
     OK,
@@ -33,7 +34,8 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    public AdUnit: AdUnitApi = null;
+    public AndroidAdUnit: AndroidAdUnitApi = null;
+    public IosAdUnit: IosAdUnitApi = null;
     public Broadcast: BroadcastApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
@@ -71,7 +73,13 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
-        this.AdUnit = new AdUnitApi(this);
+
+        if(platform === Platform.IOS) {
+            this.IosAdUnit = new IosAdUnitApi(this);
+        } else {
+            this.AndroidAdUnit = new AndroidAdUnitApi(this);
+        }
+
         this.Broadcast = new BroadcastApi(this);
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
@@ -151,7 +159,11 @@ export class NativeBridge implements INativeBridge {
         let event: string = parameters.shift();
         switch(category) {
             case EventCategory[EventCategory.ADUNIT]:
-                this.AdUnit.handleEvent(event, parameters);
+                if(this.getPlatform() === Platform.IOS) {
+                    this.IosAdUnit.handleEvent(event, parameters);
+                } else {
+                    this.AndroidAdUnit.handleEvent(event, parameters);
+                }
                 break;
 
             case EventCategory[EventCategory.BROADCAST]:
