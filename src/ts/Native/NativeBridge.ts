@@ -20,6 +20,7 @@ import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
+import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 export enum CallbackStatus {
@@ -43,6 +44,7 @@ export class NativeBridge implements INativeBridge {
     public DeviceInfo: DeviceInfoApi = null;
     public Intent: IntentApi = null;
     public Listener: ListenerApi = null;
+    public Notification: NotificationApi = null;
     public Placement: PlacementApi = null;
     public Request: RequestApi = null;
     public Resolve: ResolveApi = null;
@@ -88,6 +90,7 @@ export class NativeBridge implements INativeBridge {
         this.DeviceInfo = new DeviceInfoApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
+        this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
@@ -179,6 +182,10 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.CONNECTIVITY]:
                 this.Connectivity.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.NOTIFICATION]:
+                this.Notification.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.REQUEST]:
