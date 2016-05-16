@@ -245,7 +245,7 @@ export class WebView {
     }
 
     private isShowing(): boolean {
-        return true;
+        return true; // todo: fixme?
     }
 
     /*
