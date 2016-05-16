@@ -161,6 +161,10 @@ export class NativeBridge implements INativeBridge {
         let category: string = parameters.shift();
         let event: string = parameters.shift();
         switch(category) {
+            case EventCategory[EventCategory.APPSHEET]:
+                this.AppSheet.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.ADUNIT]:
                 if(this.getPlatform() === Platform.IOS) {
                     this.IosAdUnit.handleEvent(event, parameters);

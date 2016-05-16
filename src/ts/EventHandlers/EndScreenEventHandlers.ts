@@ -40,10 +40,16 @@ export class EndScreenEventHandlers {
             });
         } else {
             sessionManager.sendClick(adUnit);
-            nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
-            });
+            if(nativeBridge.getPlatform() === Platform.IOS) {
+                nativeBridge.AppSheet.present({
+                    id: parseInt(adUnit.getCampaign().getAppStoreId(), 10)
+                });
+            } else {
+                nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'market://details?id=' + adUnit.getCampaign().getAppStoreId()
+                });
+            }
         }
     }
 
