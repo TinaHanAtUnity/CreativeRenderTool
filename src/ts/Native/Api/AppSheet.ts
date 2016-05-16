@@ -1,5 +1,6 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
+import { Observable2, Observable1 } from 'Utilities/Observable';
 
 /*
  // iTunes Store item identifier (NSNumber) of the product
@@ -43,7 +44,19 @@ export interface IAppSheetOptions {
     advp?: string;
 }
 
+export enum AppSheetEvent {
+    PREPARED,
+    OPENED,
+    CLOSED,
+    FAILED
+}
+
 export class AppSheetApi extends NativeApi {
+
+    public onPrepared: Observable1<IAppSheetOptions> = new Observable1();
+    public onOpen: Observable1<IAppSheetOptions> = new Observable1();
+    public onClose: Observable1<IAppSheetOptions> = new Observable1();
+    public onError: Observable2<string, IAppSheetOptions> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AppSheet');
@@ -53,19 +66,50 @@ export class AppSheetApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'canOpen');
     }
 
-    public prepare(options: IAppSheetOptions): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'prepare', [options]);
+    public prepare(options: IAppSheetOptions, timeout: number = 30000): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'prepare', [options, timeout]);
     }
 
     public present(options: IAppSheetOptions, animated: boolean = true): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'present', [options, animated]);
     }
 
-    public destroy(iTunesId?: string): Promise<void> {
-        if(typeof iTunesId === 'undefined') {
+    public destroy(options?: IAppSheetOptions): Promise<void> {
+        if(typeof options === 'undefined') {
             return this._nativeBridge.invoke<void>(this._apiClass, 'destroy');
         }
-        return this._nativeBridge.invoke<void>(this._apiClass, 'destroy', [iTunesId]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'destroy', [options]);
+    }
+
+    public setPrepareTimeout(timeout: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setPrepareTimeout', [timeout]);
+    }
+
+    public getPrepareTimeout(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getPrepareTimeout');
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
+        switch(event) {
+            case AppSheetEvent[AppSheetEvent.PREPARED]:
+                this.onPrepared.trigger(parameters[0]);
+                break;
+
+            case AppSheetEvent[AppSheetEvent.OPENED]:
+                this.onOpen.trigger(parameters[0]);
+                break;
+
+            case AppSheetEvent[AppSheetEvent.CLOSED]:
+                this.onClose.trigger(parameters[0]);
+                break;
+
+            case AppSheetEvent[AppSheetEvent.FAILED]:
+                this.onError.trigger(parameters[0], parameters[1]);
+                break;
+
+            default:
+                super.handleEvent(event, parameters);
+        }
     }
 
 }
