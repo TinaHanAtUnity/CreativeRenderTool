@@ -20,7 +20,7 @@ import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
-import { UrlSchemeApi } from 'Api/UrlScheme';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 export enum CallbackStatus {
     OK,
