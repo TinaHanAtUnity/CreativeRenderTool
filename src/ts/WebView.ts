@@ -108,7 +108,7 @@ export class WebView {
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger(this._eventManager, {
-                'type': 'unhandled_initialization_error',
+                'type': 'initialization_error',
                 'error': error
             }, this._clientInfo, this._deviceInfo);
         });
@@ -191,6 +191,12 @@ export class WebView {
             campaign.getPortraitUrl(),
             campaign.getVideoUrl()
         ];
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
+            this._nativeBridge.AppSheet.prepare({
+                id: parseInt(campaign.getAppStoreId(), 10)
+            });
+        }
 
         let cacheAssets = () => {
             return this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {

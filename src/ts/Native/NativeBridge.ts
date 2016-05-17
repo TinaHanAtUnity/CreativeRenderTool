@@ -16,6 +16,7 @@ import { PlacementApi } from 'Native/Api/Placement';
 import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
+import { AppSheetApi } from 'Native/Api/AppSheet';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
@@ -36,6 +37,7 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
+    public AppSheet: AppSheetApi = null;
     public AndroidAdUnit: AndroidAdUnitApi = null;
     public IosAdUnit: IosAdUnitApi = null;
     public Broadcast: BroadcastApi = null;
@@ -80,6 +82,7 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
+        this.AppSheet = new AppSheetApi(this);
 
         if(platform === Platform.IOS) {
             this.IosAdUnit = new IosAdUnitApi(this);
@@ -167,6 +170,10 @@ export class NativeBridge implements INativeBridge {
         let category: string = parameters.shift();
         let event: string = parameters.shift();
         switch(category) {
+            case EventCategory[EventCategory.APPSHEET]:
+                this.AppSheet.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.ADUNIT]:
                 if(this.getPlatform() === Platform.IOS) {
                     this.IosAdUnit.handleEvent(event, parameters);
