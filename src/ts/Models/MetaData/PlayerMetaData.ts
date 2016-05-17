@@ -17,7 +17,7 @@ export class PlayerMetaData extends Model {
 
     public static fetch(nativeBridge: NativeBridge): Promise<PlayerMetaData> {
         return PlayerMetaData.exists(nativeBridge).then(exists => {
-            if (!exists) {
+            if(!exists) {
                 return Promise.resolve(undefined);
             }
             return Promise.all([

@@ -60,9 +60,12 @@ export class NativeBridge implements INativeBridge {
 
     private static convertStatus(status: string): CallbackStatus {
         switch(status) {
-            case CallbackStatus[CallbackStatus.OK]: return CallbackStatus.OK;
-            case CallbackStatus[CallbackStatus.ERROR]: return CallbackStatus.ERROR;
-            default: throw new Error('Status string is not valid: ' + status);
+            case CallbackStatus[CallbackStatus.OK]:
+                return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]:
+                return CallbackStatus.ERROR;
+            default:
+                throw new Error('Status string is not valid: ' + status);
         }
     }
 
@@ -128,13 +131,13 @@ export class NativeBridge implements INativeBridge {
             let status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
             let callbackObject: CallbackContainer = this._callbackTable[id];
-            if (!callbackObject) {
+            if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             if(parameters.length === 1) {
                 parameters = parameters[0];
             }
-            switch (status) {
+            switch(status) {
                 case CallbackStatus.OK:
                     callbackObject.resolve(parameters);
                     break;

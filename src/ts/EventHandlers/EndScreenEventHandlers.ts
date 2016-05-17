@@ -22,7 +22,7 @@ export class EndScreenEventHandlers {
         if(adUnit.getCampaign().getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
                 let location = Request.getHeader(response.headers, 'location');
-                if (location) {
+                if(location) {
                     nativeBridge.Intent.launch({
                         'action': 'android.intent.action.VIEW',
                         'uri': location

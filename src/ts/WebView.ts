@@ -104,7 +104,7 @@ export class WebView {
         }).catch(error => {
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
-                if (error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
             }
@@ -168,7 +168,7 @@ export class WebView {
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
         this._nativeBridge.Sdk.logError('Show invocation failed: ' + errorMsg);
         this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
-        if (sendFinish) {
+        if(sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
         }
     }

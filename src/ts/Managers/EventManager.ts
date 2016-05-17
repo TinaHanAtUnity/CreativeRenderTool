@@ -39,7 +39,12 @@ export class EventManager {
         this._nativeBridge.Storage.set(StorageType.PRIVATE, EventManager.getDataKey(sessionId, eventId), data);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
-        return this._request.post(url, data, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(() => {
+        return this._request.post(url, data, [], {
+            retries: 5,
+            retryDelay: 5000,
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        }).then(() => {
             return Promise.all([
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, EventManager.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
@@ -48,8 +53,13 @@ export class EventManager {
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
-        if (redirects) {
-            return this._request.get(url, [], {retries: 0, retryDelay: 0, followRedirects: true, retryWithConnectionEvents: false});
+        if(redirects) {
+            return this._request.get(url, [], {
+                retries: 0,
+                retryDelay: 0,
+                followRedirects: true,
+                retryWithConnectionEvents: false
+            });
         } else {
             return this._request.get(url);
         }
@@ -70,7 +80,7 @@ export class EventManager {
         return this.getUnsentSessions().then(sessions => {
             let promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
-                    if (outdated) {
+                    if(outdated) {
                         return this.deleteSession(sessionId);
                     } else {
                         return this.getUnsentOperativeEvents(sessionId).then(events => {

@@ -29,7 +29,7 @@ export class BroadcastApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'removeAllBroadcastListeners', []);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         if(event === BroadcastEvent[BroadcastEvent.ACTION]) {
             this.onBroadcastAction.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
         } else {
