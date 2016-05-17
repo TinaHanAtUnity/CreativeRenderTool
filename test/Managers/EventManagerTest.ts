@@ -6,7 +6,7 @@ import { Request } from '../../src/ts/Utilities/Request';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 import { RequestApi } from '../../src/ts/Native/Api/Request';
-import { AndroidDeviceInfoApi } from '../../src/ts/Native/Api/AndroidDeviceInfo';
+import { DeviceInfoApi } from '../../src/ts/Native/Api/DeviceInfo';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
@@ -151,7 +151,7 @@ class TestRequestApi extends RequestApi {
 
 }
 
-class TestAndroidDeviceInfoApi extends AndroidDeviceInfoApi {
+class TestDeviceInfoApi extends DeviceInfoApi {
 
     private _testId: string;
 
@@ -358,7 +358,7 @@ describe('EventManagerTest', () => {
 
     it('Get unique event id', () => {
         let testId: string = '1234-5678';
-        let deviceInfoApi: TestAndroidDeviceInfoApi = nativeBridge.AndroidDeviceInfo = new TestAndroidDeviceInfoApi(nativeBridge);
+        let deviceInfoApi: TestDeviceInfoApi = nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
         deviceInfoApi.setTestId(testId);
 
         return eventManager.getUniqueEventId().then(uniqueId => {

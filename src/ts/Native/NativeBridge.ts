@@ -21,7 +21,7 @@ import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { DeviceInfoApi } from 'Api/DeviceInfo';
+import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 
 export enum CallbackStatus {
     OK,
