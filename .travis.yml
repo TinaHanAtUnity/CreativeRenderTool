@@ -10,7 +10,7 @@ cache:
     - typings
 
 install:
-  - npm install -g typescript tslint@3.6.0 typings
+  - npm install -g typescript tslint typings
   - npm install
   - typings install --ambient
 
