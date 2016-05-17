@@ -120,7 +120,7 @@ describe('EndScreenEventHandlersTest', () => {
             resolvedPromise = Promise.resolve();
 
             sinon.spy(nativeBridge.VideoPlayer, 'prepare');
-            sinon.stub(nativeBridge.AdUnit, 'setViews').returns(resolvedPromise);
+            sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(resolvedPromise);
         });
 
         it('should activate video', () => {
@@ -157,7 +157,7 @@ describe('EndScreenEventHandlersTest', () => {
         it('should call native for views', () => {
             EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
 
-            sinon.assert.calledWith(nativeBridge.AdUnit.setViews, ['videoplayer', 'webview']);
+            sinon.assert.calledWith(nativeBridge.AndroidAdUnit.setViews, ['videoplayer', 'webview']);
         });
 
         it('should prepare video', () => {

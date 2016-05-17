@@ -43,7 +43,13 @@ export class VideoEventHandlers {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
-        nativeBridge.AdUnit.setViews(['webview']);
+
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setViews(['webview']);
+        } else {
+            nativeBridge.AndroidAdUnit.setViews(['webview']);
+        }
+
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {

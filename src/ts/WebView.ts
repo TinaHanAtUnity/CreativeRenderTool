@@ -3,7 +3,6 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { Campaign } from 'Models/Campaign';
 import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
@@ -14,13 +13,12 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { EventManager } from 'Managers/EventManager';
 import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { KeyCode } from 'Constants/Android/KeyCode';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { AdUnitFactory } from './AdUnits/AdUnitFactory';
+import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -120,7 +118,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string, requestedOrientation: ScreenOrientation, callback: INativeCallback): void {
+    public show(placementId: string, options: any, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -138,24 +136,16 @@ export class WebView {
             return;
         }
 
-        let orientation: ScreenOrientation = requestedOrientation;
-        if(!placement.useDeviceOrientationForVideo()) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-        }
-
-        let keyEvents: any[] = [];
-        if(placement.disableBackButton()) {
-            keyEvents = [KeyCode.BACK];
-        }
-
         PlayerMetaData.fetch(this._nativeBridge).then(player => {
             if(player) {
                 this._sessionManager.setGamerSid(player.getSid());
             }
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
+            adUnit.setNativeOptions(options);
             adUnit.onClose.subscribe(() => this.onClose());
-            adUnit.show(orientation, keyEvents).then(() => {
+
+            adUnit.show().then(() => {
                 this._sessionManager.sendShow(adUnit);
             });
 
@@ -216,7 +206,7 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(sendReady);
+            cacheAssets().then(() => sendReady());
         } else if(cacheMode === CacheMode.ALLOWED) {
             cacheAssets();
             sendReady();

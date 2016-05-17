@@ -8,6 +8,18 @@ import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
+import { Platform } from 'Constants/Platform';
+import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
+
+interface IAndroidOptions {
+    requestedOrientation: ScreenOrientation;
+}
+
+interface IIosOptions {
+    supportedOrientations: InterfaceOrientation;
+    shouldAutorotate: boolean;
+}
 
 export class VideoAdUnit extends AbstractAdUnit {
 
@@ -19,13 +31,21 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onResumeObserver: any;
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
+    private _onViewControllerDidAppearObserver: any;
+
+    private _androidOptions: IAndroidOptions;
+    private _iosOptions: IIosOptions;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
         super(nativeBridge, placement, campaign);
 
-        this._onResumeObserver = this._nativeBridge.AdUnit.onResume.subscribe(() => this.onResume());
-        this._onPauseObserver = this._nativeBridge.AdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
-        this._onDestroyObserver = this._nativeBridge.AdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+        } else {
+            this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe(() => this.onResume());
+            this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
+            this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
+        }
 
         this._videoPosition = 0;
         this._videoActive = true;
@@ -35,10 +55,30 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._endScreen = endScreen;
     }
 
-    public show(orientation: ScreenOrientation, keyEvents: any[]): Promise<void> {
+    public show(): Promise<void> {
         this._showing = true;
         this.setVideoActive(true);
-        return this._nativeBridge.AdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            let orientation: InterfaceOrientation = this._iosOptions.supportedOrientations;
+            if(!this._placement.useDeviceOrientationForVideo()) {
+                orientation = InterfaceOrientation.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            }
+
+            return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
+        } else {
+            let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
+            if (!this._placement.useDeviceOrientationForVideo()) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            }
+
+            let keyEvents: any[] = [];
+            if(this._placement.disableBackButton()) {
+                keyEvents = [KeyCode.BACK];
+            }
+
+            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+        }
     }
 
     public hide(): Promise<void> {
@@ -50,15 +90,33 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
         this.unsetReferences();
 
-        this._nativeBridge.AdUnit.onResume.unsubscribe(this._onResumeObserver);
-        this._nativeBridge.AdUnit.onPause.unsubscribe(this._onPauseObserver);
-        this._nativeBridge.AdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
-
         this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
-        return this._nativeBridge.AdUnit.close().then(() => {
-            this._showing = false;
-            this.onClose.trigger();
-        });
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
+
+            return this._nativeBridge.IosAdUnit.close().then(() => {
+                this._showing = false;
+                this.onClose.trigger();
+            });
+        } else {
+            this._nativeBridge.AndroidAdUnit.onResume.unsubscribe(this._onResumeObserver);
+            this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
+            this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
+
+            return this._nativeBridge.AndroidAdUnit.close().then(() => {
+                this._showing = false;
+                this.onClose.trigger();
+            });
+        }
+    }
+
+    public setNativeOptions(options: any): void {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._iosOptions = options;
+        } else {
+            this._androidOptions = options;
+        }
     }
 
     public isShowing(): boolean {
@@ -128,5 +186,13 @@ export class VideoAdUnit extends AbstractAdUnit {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+    }
+
+    /*
+     IOS VIEWCONTROLLER EVENTS
+     */
+
+    private onViewDidAppear(): void {
+        this.onResume();
     }
 }

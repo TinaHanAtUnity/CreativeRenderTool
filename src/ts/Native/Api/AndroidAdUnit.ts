@@ -13,10 +13,10 @@ enum AdUnitEvent {
     ON_PAUSE,
     KEY_DOWN,
     ON_RESTORE,
-    ON_STOP
+    ON_STOP,
 }
 
-export class AdUnitApi extends NativeApi {
+export class AndroidAdUnitApi extends NativeApi {
 
     public onStart: Observable0 = new Observable0();
     public onCreate: Observable0 = new Observable0();
