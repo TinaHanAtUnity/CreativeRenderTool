@@ -52,12 +52,12 @@ export class CampaignManager {
 
         return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
             url = Url.addParameters(url, {
+                appleWatch: this._deviceInfo.isAppleWatchPaired(),
                 bundleVersion: this._clientInfo.getApplicationVersion(),
                 bundleId: this._clientInfo.getApplicationName(),
                 connectionType: this._deviceInfo.getConnectionType(),
                 deviceFreeSpace: this._deviceInfo.getFreeSpace(),
                 gameId: this._clientInfo.getGameId(),
-                hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
                 deviceType: this._deviceInfo.getModel(),
                 language: this._deviceInfo.getLanguage(),
                 networkType: this._deviceInfo.getNetworkType(),
@@ -68,9 +68,11 @@ export class CampaignManager {
                 screenSize: this._deviceInfo.getScreenLayout(),
                 screenWidth: this._deviceInfo.getScreenWidth(),
                 screenHeight: this._deviceInfo.getScreenHeight(),
+                screenScale: this._deviceInfo.getScreenScale(),
                 sdkVersion: this._clientInfo.getSdkVersion(),
                 softwareVersion: this._deviceInfo.getApiLevel(),
-                timeZone: this._deviceInfo.getTimeZone()
+                timeZone: this._deviceInfo.getTimeZone(),
+                userInterfaceIdiom: this._deviceInfo.getUserInterfaceIdiom()
             });
 
             if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -81,6 +83,16 @@ export class CampaignManager {
             } else {
                 url = Url.addParameters(url, {
                     androidId: this._deviceInfo.getAndroidId()
+                });
+            }
+
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                url = Url.addParameters(url, {
+                    hardwareVersion: this._deviceInfo.getModel()
+                });
+            } else {
+                url = Url.addParameters(url, {
+                    hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel()
                 });
             }
 
