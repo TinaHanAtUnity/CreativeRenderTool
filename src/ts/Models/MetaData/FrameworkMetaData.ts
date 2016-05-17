@@ -20,7 +20,7 @@ export class FrameworkMetaData extends Model {
             return Promise.resolve(FrameworkMetaData._cache);
         }
         return FrameworkMetaData.exists(nativeBridge).then(exists => {
-            if (!exists) {
+            if(!exists) {
                 return Promise.resolve(undefined);
             }
             return Promise.all([

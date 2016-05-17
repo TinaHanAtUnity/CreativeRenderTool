@@ -1,4 +1,4 @@
-import {IObserver0, IObserver1, IObserver2, IObserver3, IObserver4, IObserver5} from 'Utilities/IObserver';
+import { IObserver0, IObserver1, IObserver2, IObserver3, IObserver4, IObserver5 } from 'Utilities/IObserver';
 
 export abstract class Observable<T> {
 
@@ -10,8 +10,8 @@ export abstract class Observable<T> {
     }
 
     public unsubscribe(observer?: T): void {
-        if (this._observers.length) {
-            if (typeof observer !== 'undefined') {
+        if(this._observers.length) {
+            if(typeof observer !== 'undefined') {
                 this._observers = this._observers.filter(storedObserver => storedObserver !== observer);
             } else {
                 this._observers = [];

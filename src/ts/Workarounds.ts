@@ -16,6 +16,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
     Object.defineProperty(HTMLElement.prototype, 'classList', {
         get: function() {
             let self = this;
+
             function update(fn: Function) {
                 return function(value: string) {
                     let classes = self.className.split(/\s+/);

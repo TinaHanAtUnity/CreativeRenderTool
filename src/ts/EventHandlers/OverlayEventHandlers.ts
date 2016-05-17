@@ -23,8 +23,8 @@ export class OverlayEventHandlers {
       adUnit.getEndScreen().show();
   }
 
-  public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
-      nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-  }
+    public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
+        nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
+    }
 
 }
