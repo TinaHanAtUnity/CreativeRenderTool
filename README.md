@@ -37,7 +37,7 @@
 ### Dependencies
 
 - `npm install`
-- `typings install --ambient`
+- `typings install`
 
 ### Development Build
 
