@@ -11,7 +11,7 @@ cache:
 install:
   - npm install -g typescript tslint typings
   - npm install
-  - typings install --ambient
+  - typings install
 
 script:
   - make lint
