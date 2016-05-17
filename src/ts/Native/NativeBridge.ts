@@ -21,8 +21,7 @@ import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { AndroidDeviceInfoApi } from 'Native/Api/AndroidDeviceInfo';
-import { IosDeviceInfoApi } from 'Native/Api/IosDeviceInfo';
+import { DeviceInfoApi } from 'Api/DeviceInfo';
 
 export enum CallbackStatus {
     OK,
@@ -38,13 +37,12 @@ export class NativeBridge implements INativeBridge {
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     public AndroidAdUnit: AndroidAdUnitApi = null;
-    public AndroidDeviceInfo: AndroidDeviceInfoApi = null;
     public Broadcast: BroadcastApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
+    public DeviceInfo: DeviceInfoApi = null;
     public Intent: IntentApi = null;
     public IosAdUnit: IosAdUnitApi = null;
-    public IosDeviceInfo: IosDeviceInfoApi = null;
     public Listener: ListenerApi = null;
     public Notification: NotificationApi = null;
     public Placement: PlacementApi = null;
@@ -82,15 +80,14 @@ export class NativeBridge implements INativeBridge {
 
         if(platform === Platform.IOS) {
             this.IosAdUnit = new IosAdUnitApi(this);
-            this.IosDeviceInfo = new IosDeviceInfoApi(this);
         } else {
             this.AndroidAdUnit = new AndroidAdUnitApi(this);
-            this.AndroidDeviceInfo = new AndroidDeviceInfoApi(this);
         }
 
         this.Broadcast = new BroadcastApi(this);
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
+        this.DeviceInfo = new DeviceInfoApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
         this.Notification = new NotificationApi(this);
