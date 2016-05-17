@@ -21,7 +21,7 @@ export class MediationMetaData extends Model {
             return Promise.resolve(MediationMetaData._cache);
         }
         return MediationMetaData.exists(nativeBridge).then(exists => {
-            if (!exists) {
+            if(!exists) {
                 return Promise.resolve(undefined);
             }
             return Promise.all([

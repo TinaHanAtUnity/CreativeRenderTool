@@ -12,10 +12,26 @@ export class Resolve {
 
     private _nativeBridge: NativeBridge;
 
+    private static onResolveComplete(id: string, host: string, ip: string): void {
+        let callbackObject = Resolve._callbacks[id];
+        if(callbackObject) {
+            callbackObject[RequestStatus.COMPLETE]([host, ip]);
+            delete Resolve._callbacks[id];
+        }
+    }
+
+    private static onResolveFailed(id: string, host: string, error: string, message: string): void {
+        let callbackObject = Resolve._callbacks[id];
+        if(callbackObject) {
+            callbackObject[RequestStatus.FAILED]([error, message]);
+            delete Resolve._callbacks[id];
+        }
+    }
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.Resolve.onComplete.subscribe((id, host, ip) => this.onResolveComplete(id, host, ip));
-        this._nativeBridge.Resolve.onFailed.subscribe((id, host, error, message) => this.onResolveFailed(id, host, error, message));
+        this._nativeBridge.Resolve.onComplete.subscribe((id, host, ip) => Resolve.onResolveComplete(id, host, ip));
+        this._nativeBridge.Resolve.onFailed.subscribe((id, host, error, message) => Resolve.onResolveFailed(id, host, error, message));
     }
 
     public resolve(host: string): Promise<[string, string, string]> {
@@ -32,22 +48,6 @@ export class Resolve {
             callbackObject[RequestStatus.FAILED] = reject;
             Resolve._callbacks[id] = callbackObject;
         });
-    }
-
-    private onResolveComplete(id: string, host: string, ip: string): void {
-        let callbackObject = Resolve._callbacks[id];
-        if(callbackObject) {
-            callbackObject[RequestStatus.COMPLETE]([host, ip]);
-            delete Resolve._callbacks[id];
-        }
-    }
-
-    private onResolveFailed(id: string, host: string, error: string, message: string): void {
-        let callbackObject = Resolve._callbacks[id];
-        if(callbackObject) {
-            callbackObject[RequestStatus.FAILED]([error, message]);
-            delete Resolve._callbacks[id];
-        }
     }
 
 }

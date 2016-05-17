@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 
 import 'mocha';
 import { assert } from 'chai';
@@ -77,12 +77,14 @@ describe('PlayerMetaDataTest', () => {
     });
 
     it('should fetch correctly', () => {
-        storageApi.setStorage({player: {
-            sid: { value: 'test_sid' },
-            name: { value: 'test_name' },
-            gender: { value: 'test_gender' },
-            age: { value: 42 }
-        }});
+        storageApi.setStorage({
+            player: {
+                sid: {value: 'test_sid'},
+                name: {value: 'test_name'},
+                gender: {value: 'test_gender'},
+                age: {value: 42}
+            }
+        });
 
         return PlayerMetaData.fetch(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
@@ -103,12 +105,14 @@ describe('PlayerMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is undefined', () => {
-        storageApi.setStorage({player: {
-            sid: undefined,
-            name: undefined,
-            gender: undefined,
-            age: undefined
-        }});
+        storageApi.setStorage({
+            player: {
+                sid: undefined,
+                name: undefined,
+                gender: undefined,
+                age: undefined
+            }
+        });
 
         return PlayerMetaData.fetch(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
@@ -120,10 +124,12 @@ describe('PlayerMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is partially undefined', () => {
-        storageApi.setStorage({player: {
-            sid: { value: 'test_sid' },
-            age: { value: 666 }
-        }});
+        storageApi.setStorage({
+            player: {
+                sid: {value: 'test_sid'},
+                age: {value: 666}
+            }
+        });
 
         return PlayerMetaData.fetch(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');

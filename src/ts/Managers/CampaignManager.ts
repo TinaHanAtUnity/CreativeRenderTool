@@ -1,8 +1,6 @@
 import { Observable1 } from 'Utilities/Observable';
-
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
-
 import { Campaign } from 'Models/Campaign';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -21,19 +19,22 @@ export class CampaignManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _failedPlacements: string[];
 
     constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._failedPlacements = [];
     }
 
     public request(): void {
         this.createRequestUrl().then(requestUrl => {
-            return this._request.get(requestUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
+            return this._request.get(requestUrl, [], {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: false
+            }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                 this.onCampaign.trigger(campaign);

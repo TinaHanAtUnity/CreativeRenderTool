@@ -47,7 +47,7 @@ export class Tap {
         this._onTouchEndListener = undefined;
         this._onTouchCancelListener = undefined;
 
-        if (!this._moved) {
+        if(!this._moved) {
             let fakeEvent = new MouseEvent('click', {
                 view: window,
                 bubbles: true,
