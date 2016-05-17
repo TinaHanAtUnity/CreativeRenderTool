@@ -14,8 +14,7 @@
     "es6-promise": "^3.0.2",
     "requirejs": "^2.1.20",
     "requirejs-text": "^2.0.12",
-    "stylus": "^0.52.0",
-    "xmldom": "^0.1.22"
+    "stylus": "^0.52.0"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
@@ -27,6 +26,7 @@
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.2.0",
     "remap-istanbul": "^0.5.1",
-    "sinon": "^1.17.2"
+    "sinon": "^1.17.2",
+    "xmldom": "^0.1.22"
   }
 }
