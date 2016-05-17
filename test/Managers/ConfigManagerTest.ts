@@ -4,7 +4,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
-import { NativeBridge} from '../../src/ts/Native/NativeBridge';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { StorageType, StorageApi } from '../../src/ts/Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
