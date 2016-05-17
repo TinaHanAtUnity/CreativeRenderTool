@@ -22,7 +22,7 @@ export class View {
 
         this._bindings.forEach((binding: IViewBinding) => {
             let elements: NodeList = this._container.querySelectorAll(binding.selector);
-            for (let i: number = 0; i < elements.length; ++i) {
+            for(let i: number = 0; i < elements.length; ++i) {
                 let element: Node = elements[i];
                 if(binding.event === 'click') {
                     binding.tap = new Tap(<HTMLElement>element);

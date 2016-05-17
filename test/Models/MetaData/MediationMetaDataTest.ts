@@ -74,11 +74,13 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should fetch correctly', () => {
-        storageApi.setStorage({mediation: {
-            name: { value: 'test_name' },
-            version: { value: 'test_version' },
-            ordinal: { value: 42 }
-        }});
+        storageApi.setStorage({
+            mediation: {
+                name: {value: 'test_name'},
+                version: {value: 'test_version'},
+                ordinal: {value: 42}
+            }
+        });
 
         return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
@@ -94,11 +96,13 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is undefined', () => {
-        storageApi.setStorage({mediation: {
-            name: undefined,
-            version: undefined,
-            ordinal: undefined
-        }});
+        storageApi.setStorage({
+            mediation: {
+                name: undefined,
+                version: undefined,
+                ordinal: undefined
+            }
+        });
 
         return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
@@ -109,9 +113,11 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is partially undefined', () => {
-        storageApi.setStorage({mediation: {
-            name: { value: 'test_name' }
-        }});
+        storageApi.setStorage({
+            mediation: {
+                name: {value: 'test_name'}
+            }
+        });
 
         return MediationMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');

@@ -21,6 +21,7 @@ import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
+import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 export enum CallbackStatus {
@@ -45,6 +46,7 @@ export class NativeBridge implements INativeBridge {
     public DeviceInfo: DeviceInfoApi = null;
     public Intent: IntentApi = null;
     public Listener: ListenerApi = null;
+    public Notification: NotificationApi = null;
     public Placement: PlacementApi = null;
     public Request: RequestApi = null;
     public Resolve: ResolveApi = null;
@@ -66,9 +68,12 @@ export class NativeBridge implements INativeBridge {
 
     private static convertStatus(status: string): CallbackStatus {
         switch(status) {
-            case CallbackStatus[CallbackStatus.OK]: return CallbackStatus.OK;
-            case CallbackStatus[CallbackStatus.ERROR]: return CallbackStatus.ERROR;
-            default: throw new Error('Status string is not valid: ' + status);
+            case CallbackStatus[CallbackStatus.OK]:
+                return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]:
+                return CallbackStatus.ERROR;
+            default:
+                throw new Error('Status string is not valid: ' + status);
         }
     }
 
@@ -91,6 +96,7 @@ export class NativeBridge implements INativeBridge {
         this.DeviceInfo = new DeviceInfoApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
+        this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
@@ -142,13 +148,13 @@ export class NativeBridge implements INativeBridge {
             let status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
             let callbackObject: CallbackContainer = this._callbackTable[id];
-            if (!callbackObject) {
+            if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             if(parameters.length === 1) {
                 parameters = parameters[0];
             }
-            switch (status) {
+            switch(status) {
                 case CallbackStatus.OK:
                     callbackObject.resolve(parameters);
                     break;
@@ -186,6 +192,10 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.CONNECTIVITY]:
                 this.Connectivity.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.NOTIFICATION]:
+                this.Notification.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.REQUEST]:

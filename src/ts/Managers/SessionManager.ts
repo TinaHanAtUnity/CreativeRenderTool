@@ -84,7 +84,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         });
 
-        if (campaign.getClickAttributionUrl()) {
+        if(campaign.getClickAttributionUrl()) {
             return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
         }
         return Promise.reject('Missing click attribution url');

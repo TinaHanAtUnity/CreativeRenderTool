@@ -33,7 +33,7 @@ export class EndScreenEventHandlers {
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
                 let location = Request.getHeader(response.headers, 'location');
-                if (location) {
+                if(location) {
                     if(platform === Platform.IOS) {
                         nativeBridge.UrlScheme.open(location);
                     } else {
@@ -50,7 +50,7 @@ export class EndScreenEventHandlers {
             sessionManager.sendClick(adUnit);
             if(platform === Platform.IOS) {
                 if(!campaign.getBypassAppSheet()) {
-                    nativeBridge.AppSheet.present({
+                    nativeBridge.AppSheet.present({ // todo: needs check to prepare appsheet after presenting on ios 8+
                         id: parseInt(campaign.getAppStoreId(), 10)
                     });
                 } else {
