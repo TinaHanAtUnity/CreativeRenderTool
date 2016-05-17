@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 
 import 'mocha';
 import { assert } from 'chai';
@@ -71,10 +71,12 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should fetch correctly', () => {
-        storageApi.setStorage({framework: {
-            name: { value: 'test_name' },
-            version: { value: 'test_version' }
-        }});
+        storageApi.setStorage({
+            framework: {
+                name: {value: 'test_name'},
+                version: {value: 'test_version'}
+            }
+        });
 
         return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
@@ -88,10 +90,12 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is undefined', () => {
-        storageApi.setStorage({framework: {
-            name: undefined,
-            version: undefined
-        }});
+        storageApi.setStorage({
+            framework: {
+                name: undefined,
+                version: undefined
+            }
+        });
 
         return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
@@ -101,9 +105,11 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should fetch correctly when data is partially undefined', () => {
-        storageApi.setStorage({framework: {
-            name: { value: 'test_name' }
-        }});
+        storageApi.setStorage({
+            framework: {
+                name: {value: 'test_name'}
+            }
+        });
 
         return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');

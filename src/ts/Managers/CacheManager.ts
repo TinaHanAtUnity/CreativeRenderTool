@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo } from 'Native/Api/Cache';
-import { CallbackContainer } from 'Utilities/CallbackContainer';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
 
 
 export class CacheManager {
@@ -18,7 +18,7 @@ export class CacheManager {
             return this._nativeBridge.Cache.download(url, false).then(() => {
                 return this.registerCallback(url);
             }).catch(error => {
-                switch (error) {
+                switch(error) {
                     case 'FILE_ALREADY_IN_CACHE':
                         return this.getFileUrl(url);
 
@@ -45,7 +45,7 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.Cache.getFiles().then(files => {
-            if (!files || !files.length) {
+            if(!files || !files.length) {
                 return Promise.resolve();
             }
 
@@ -61,11 +61,11 @@ export class CacheManager {
                 return n2.mtime - n1.mtime;
             });
 
-            for (let i: number = 0; i < files.length; i++) {
+            for(let i: number = 0; i < files.length; i++) {
                 let file: IFileInfo = files[i];
                 totalSize += file.size;
 
-                if (file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
             }
@@ -81,7 +81,7 @@ export class CacheManager {
         return new Promise<any[]>((resolve, reject) => {
             let callbackObject = new CallbackContainer(resolve, reject);
 
-            if (this._urlCallbacks[url]) {
+            if(this._urlCallbacks[url]) {
                 this._urlCallbacks[url].push(callbackObject);
             } else {
                 this._urlCallbacks[url] = [callbackObject];
@@ -92,7 +92,7 @@ export class CacheManager {
     private onDownloadEnd(url: string, size: number, duration: number): void {
         this.getFileUrl(url).then(([url, fileUrl]) => {
             let urlCallbacks: CallbackContainer[] = this._urlCallbacks[url];
-            if (urlCallbacks) {
+            if(urlCallbacks) {
                 urlCallbacks.forEach((callbackObject: CallbackContainer) => {
                     callbackObject.resolve([url, fileUrl]);
                 });

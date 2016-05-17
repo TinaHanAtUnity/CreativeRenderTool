@@ -1,4 +1,4 @@
-/// <reference path="../../typings/main.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 import 'mocha';
 import * as sinon from 'sinon';
@@ -42,7 +42,11 @@ describe('EndScreenEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{getVideoUrl: () => 'fake url', getAppStoreId: () => 'fooAppId', getClickAttributionUrlFollowsRedirects: () => true }, overlay, endScreen);
+        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+            getVideoUrl: () => 'fake url',
+            getAppStoreId: () => 'fooAppId',
+            getClickAttributionUrlFollowsRedirects: () => true
+        }, overlay, endScreen);
     });
 
     describe('with onDownload', () => {

@@ -1,5 +1,3 @@
-/// <reference path="../../typings/main.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 import { VastParser } from '../../src/ts/Utilities/VastParser';
@@ -30,7 +28,7 @@ describe('Campaign', () => {
                 },
                 'gamerId': '5712983c481291b16e1be03b'
             };
-            let campaign = new Campaign(json.gamerId, json.abGroup, {campaign: json.campaign});
+            let campaign = new Campaign({campaign: json.campaign}, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
@@ -68,7 +66,7 @@ describe('Campaign', () => {
             let domParser = new xmldom.DOMParser({errorHandler: {}});
             let vastParser = new VastParser(domParser);
             let parsedVast = vastParser.parseVast(json.vast);
-            let campaign = new Campaign(json.gamerId, json.abGroup, {vast: parsedVast});
+            let campaign = new Campaign({vast: parsedVast}, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), null);
@@ -120,7 +118,7 @@ describe('Campaign', () => {
             let domParser = new xmldom.DOMParser({errorHandler: {}});
             let vastParser = new VastParser(domParser);
             let parsedVast = vastParser.parseVast(json.vast);
-            let campaign = new Campaign(json.gamerId, json.abGroup, {vast: parsedVast});
+            let campaign = new Campaign({vast: parsedVast}, json.gamerId, json.abGroup);
             campaign.setVideoUrl('file://some/cache/path.mp4');
             assert.equal(campaign.getVideoUrl(), 'file://some/cache/path.mp4');
         });

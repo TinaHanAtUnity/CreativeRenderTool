@@ -30,12 +30,12 @@ export class SessionManagerEventMetadataCreator {
         let infoJson: any = {
             'eventId': id,
             'sessionId': currentSession.getId(),
-            'gamer_id': adUnit.getGamerId(),
-            'campaign_id': adUnit.getCampaignId(),
+            'gamerId': adUnit.getCampaign().getGamerId(),
+            'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
             'networkType': this._deviceInfo.getNetworkType(),
-            'cached': true,
+            'cached': true, // todo: get actual value
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
@@ -149,7 +149,7 @@ export class SessionManager {
 
         this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
 
-        if (campaign.getClickAttributionUrl()) {
+        if(campaign.getClickAttributionUrl()) {
             return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
         }
         return Promise.reject('Missing click attribution url');

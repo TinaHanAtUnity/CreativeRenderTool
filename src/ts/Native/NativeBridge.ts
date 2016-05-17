@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 /// <reference path="WebViewBridge.d.ts" />
 
 import { INativeBridge } from 'Native/INativeBridge';
@@ -16,6 +16,7 @@ import { PlacementApi } from 'Native/Api/Placement';
 import { SdkApi } from 'Native/Api/Sdk';
 import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
+import { AppSheetApi } from 'Native/Api/AppSheet';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { Platform } from 'Constants/Platform';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
@@ -36,6 +37,7 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
+    public AppSheet: AppSheetApi = null;
     public AndroidAdUnit: AndroidAdUnitApi = null;
     public IosAdUnit: IosAdUnitApi = null;
     public Broadcast: BroadcastApi = null;
@@ -66,9 +68,12 @@ export class NativeBridge implements INativeBridge {
 
     private static convertStatus(status: string): CallbackStatus {
         switch(status) {
-            case CallbackStatus[CallbackStatus.OK]: return CallbackStatus.OK;
-            case CallbackStatus[CallbackStatus.ERROR]: return CallbackStatus.ERROR;
-            default: throw new Error('Status string is not valid: ' + status);
+            case CallbackStatus[CallbackStatus.OK]:
+                return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]:
+                return CallbackStatus.ERROR;
+            default:
+                throw new Error('Status string is not valid: ' + status);
         }
     }
 
@@ -77,6 +82,7 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
+        this.AppSheet = new AppSheetApi(this);
 
         if(platform === Platform.IOS) {
             this.IosAdUnit = new IosAdUnitApi(this);
@@ -142,13 +148,13 @@ export class NativeBridge implements INativeBridge {
             let status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
             let callbackObject: CallbackContainer = this._callbackTable[id];
-            if (!callbackObject) {
+            if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             if(parameters.length === 1) {
                 parameters = parameters[0];
             }
-            switch (status) {
+            switch(status) {
                 case CallbackStatus.OK:
                     callbackObject.resolve(parameters);
                     break;
@@ -164,6 +170,10 @@ export class NativeBridge implements INativeBridge {
         let category: string = parameters.shift();
         let event: string = parameters.shift();
         switch(category) {
+            case EventCategory[EventCategory.APPSHEET]:
+                this.AppSheet.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.ADUNIT]:
                 if(this.getPlatform() === Platform.IOS) {
                     this.IosAdUnit.handleEvent(event, parameters);

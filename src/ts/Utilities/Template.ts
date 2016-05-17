@@ -46,7 +46,7 @@ export class Template {
             this._templateFunction = (data: any) => {
                 return templateFunction.call(this, data);
             };
-        } catch (error) {
+        } catch(error) {
             error.source = source;
             throw error;
         }

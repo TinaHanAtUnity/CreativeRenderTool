@@ -82,7 +82,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
-        if (this.isVideoActive()) {
+        if(this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop();
         }
 
@@ -171,20 +171,20 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onResume(): void {
-        if (this._showing && this.isVideoActive()) {
+        if(this._showing && this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
     private onPause(finishing: boolean): void {
-        if (finishing && this._showing) {
+        if(finishing && this._showing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     private onDestroy(finishing: boolean): void {
-        if (this._showing && finishing) {
+        if(this._showing && finishing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }

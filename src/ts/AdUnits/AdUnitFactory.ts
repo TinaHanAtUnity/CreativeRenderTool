@@ -38,7 +38,7 @@ export class AdUnitFactory {
         overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, videoAdUnit, muted));
 
-        if (!placement.allowSkip()) {
+        if(!placement.allowSkip()) {
             overlay.setSkipEnabled(false);
         } else {
             overlay.setSkipEnabled(true);

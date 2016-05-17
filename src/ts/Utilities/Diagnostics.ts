@@ -24,7 +24,7 @@ export class Diagnostics {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
                 'device': deviceInfo ? deviceInfo.getDTO() : null
-             }
+            }
         };
     }
 
