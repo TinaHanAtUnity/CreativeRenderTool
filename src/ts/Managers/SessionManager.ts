@@ -140,7 +140,7 @@ export class SessionManager {
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
             'networkType': this._deviceInfo.getNetworkType(),
-            'cached': true,
+            'cached': true, // todo: get actual value
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
