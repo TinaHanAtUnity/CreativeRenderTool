@@ -7,7 +7,7 @@ export enum StorageType {
     INTERNAL
 }
 
-export class DeviceInfoApi extends NativeApi {
+export class IosDeviceInfoApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo');
@@ -140,7 +140,4 @@ export class DeviceInfoApi extends NativeApi {
     public getTotalMemory(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalMemory');
     }
-
 }
-
-

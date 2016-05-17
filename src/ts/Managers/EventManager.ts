@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
+import { Platform } from 'Constants/Platform';
 
 export class EventManager {
 
@@ -66,7 +67,11 @@ export class EventManager {
     }
 
     public getUniqueEventId(): Promise<string> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId();
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.IosDeviceInfo.getUniqueEventId();
+        } else {
+            return this._nativeBridge.AndroidDeviceInfo.getUniqueEventId();
+        }
     }
 
     private getUnsentSessions(): Promise<string[]> {

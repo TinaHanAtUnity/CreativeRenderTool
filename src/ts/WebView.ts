@@ -62,7 +62,7 @@ export class WebView {
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
+            return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
