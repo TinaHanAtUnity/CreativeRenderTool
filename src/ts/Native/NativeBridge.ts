@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 /// <reference path="WebViewBridge.d.ts" />
 
 import { INativeBridge } from 'Native/INativeBridge';
