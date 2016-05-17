@@ -28,8 +28,8 @@ export class CampaignManager {
     }
 
     public request(): void {
-        this.createRequestUrl().then(requestUrl => {
-            return this._request.get(requestUrl, [], {
+        this.createRequestBody().then(requestBody => {
+            return this._request.post(this.createRequestUrl(), requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
@@ -44,56 +44,71 @@ export class CampaignManager {
         });
     }
 
-    private createRequestUrl(): Promise<string> {
+    private createRequestUrl(): string {
         let url: string = [
             CampaignManager.CampaignBaseUrl,
             this._clientInfo.getGameId(),
             'fill'
         ].join('/');
 
-        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+        if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
+                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: this._deviceInfo.getLimitAdTracking()
+            });
+        } else if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+            url = Url.addParameters(url, {
+                androidId: this._deviceInfo.getAndroidId()
+            });
+        }
+
+        url = Url.addParameters(url, {
+            connectionType: this._deviceInfo.getConnectionType(),
+            deviceMake: this._deviceInfo.getManufacturer(),
+            deviceModel: this._deviceInfo.getModel(),
+            networkType: this._deviceInfo.getNetworkType(),
+            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            screenDensity: this._deviceInfo.getScreenDensity(),
+            screenSize: this._deviceInfo.getScreenLayout(),
+            screenWidth: this._deviceInfo.getScreenWidth(),
+            screenHeight: this._deviceInfo.getScreenHeight(),
+            sdkVersion: this._clientInfo.getSdkVersion()
+        });
+
+        if(this._clientInfo.getPlatform() === Platform.IOS) {
+            url = Url.addParameters(url, {
+                osVersion: this._deviceInfo.getOsVersion()
+            });
+        } else {
+            url = Url.addParameters(url, {
+                apiLevel: this._deviceInfo.getApiLevel()
+            });
+        }
+
+        if(this._clientInfo.getTestMode()) {
+            url = Url.addParameters(url, {test: true});
+        }
+
+        return url;
+    }
+
+    private createRequestBody(): Promise<string> {
+        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+            let body: any = {
                 bundleVersion: this._clientInfo.getApplicationVersion(),
                 bundleId: this._clientInfo.getApplicationName(),
-                connectionType: this._deviceInfo.getConnectionType(),
                 deviceFreeSpace: this._deviceInfo.getFreeSpace(),
-                gameId: this._clientInfo.getGameId(),
-                hardwareVersion: this._deviceInfo.getManufacturer() + ' ' + this._deviceInfo.getModel(),
-                deviceType: this._deviceInfo.getModel(),
                 language: this._deviceInfo.getLanguage(),
-                networkType: this._deviceInfo.getNetworkType(),
                 networkOperator: this._deviceInfo.getNetworkOperator(),
                 networkOperatorName: this._deviceInfo.getNetworkOperatorName(),
-                platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
-                screenDensity: this._deviceInfo.getScreenDensity(),
-                screenSize: this._deviceInfo.getScreenLayout(),
-                screenWidth: this._deviceInfo.getScreenWidth(),
-                screenHeight: this._deviceInfo.getScreenHeight(),
-                sdkVersion: this._clientInfo.getSdkVersion(),
-                softwareVersion: this._deviceInfo.getApiLevel(),
                 timeZone: this._deviceInfo.getTimeZone()
-            });
-
-            if(this._deviceInfo.getAdvertisingIdentifier()) {
-                url = Url.addParameters(url, {
-                    advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                    limitAdTracking: this._deviceInfo.getLimitAdTracking()
-                });
-            } else {
-                url = Url.addParameters(url, {
-                    androidId: this._deviceInfo.getAndroidId()
-                });
-            }
-
-            if(this._clientInfo.getTestMode()) {
-                url = Url.addParameters(url, {test: true});
-            }
+            };
 
             if(mediation) {
-                url = Url.addParameters(url, mediation.getDTO());
+                body.mediation = mediation.getDTO();
             }
 
-            return url;
+            return JSON.stringify(body);
         });
     }
 
