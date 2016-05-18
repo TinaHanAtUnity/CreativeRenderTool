@@ -1,4 +1,4 @@
-import * as sinon from 'sinon';
+/*import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import * as xmldom from 'xmldom';
@@ -22,7 +22,7 @@ describe('CampaignManager', () => {
     let request: Request;
     let vastParser: VastParser;
 
-    /*it('should trigger onCampaign after requesting a valid vast placement', () => {
+    it('should trigger onCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
@@ -673,6 +673,7 @@ describe('CampaignManager', () => {
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
-    });*/
+    });
 
 });
+*/
