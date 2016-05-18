@@ -3,8 +3,6 @@ import * as sinon from 'sinon';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
-import { VastParser } from '../../src/ts/Utilities/VastParser';
-import * as xmldom from 'xmldom';
 import { Campaign } from '../../src/ts/Models/Campaign';
 import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
@@ -185,8 +183,7 @@ describe('SessionManager', () => {
             handleCallback
         });
 
-        let domParser = new xmldom.DOMParser({errorHandler: {}});
-        let vastParser = new VastParser(domParser);
+        let vastParser = TestFixtures.getVastParser();
 
         let json = {
             'abGroup': 3,

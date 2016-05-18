@@ -1,8 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
-import { VastParser } from '../../src/ts/Utilities/VastParser';
-import * as xmldom from 'xmldom';
 import { Campaign } from '../../src/ts/Models/Campaign';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 
 describe('Campaign', () => {
@@ -63,8 +62,7 @@ describe('Campaign', () => {
                 },
                 'gamerId': '5712983c481291b16e1be03b'
             };
-            let domParser = new xmldom.DOMParser({errorHandler: {}});
-            let vastParser = new VastParser(domParser);
+            let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(json.vast);
             let campaign = new Campaign({vast: parsedVast}, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
@@ -115,8 +113,7 @@ describe('Campaign', () => {
                 },
                 'gamerId': '5712983c481291b16e1be03b'
             };
-            let domParser = new xmldom.DOMParser({errorHandler: {}});
-            let vastParser = new VastParser(domParser);
+            let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(json.vast);
             let campaign = new Campaign({vast: parsedVast}, json.gamerId, json.abGroup);
             campaign.setVideoUrl('file://some/cache/path.mp4');

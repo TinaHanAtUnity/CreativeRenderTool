@@ -1,7 +1,6 @@
-/*import * as sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import * as xmldom from 'xmldom';
 import { Campaign } from '../../src/ts/Models/Campaign';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
@@ -27,7 +26,7 @@ describe('CampaignManager', () => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -73,12 +72,12 @@ describe('CampaignManager', () => {
         });
     });
 
-    it('should have data from inside and outside the wrapper for a wrapped VAST', () => {
+    it('should have data from inside and outside the wrapper for a wrapped VAST', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -164,11 +163,6 @@ describe('CampaignManager', () => {
         let triggeredCampaign: Campaign;
         campaignManager.onCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
-        });
-
-        // when the campaign manager requests the placement
-        return campaignManager.request().then(() => {
-
             // then the onCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
@@ -214,7 +208,11 @@ describe('CampaignManager', () => {
                 'http://myTrackingURL/wrapper/unmute'
             ]);
             assert.equal(triggeredCampaign.getVast().getDuration(), 30);
+            done();
         });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request();
     });
 
 
@@ -222,7 +220,7 @@ describe('CampaignManager', () => {
         // given a VAST placement with invalid XML
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -248,11 +246,11 @@ describe('CampaignManager', () => {
         });
     };
 
-    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string): Promise<void> => {
+    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
         // given a VAST placement that wraps another VAST
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -266,13 +264,7 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
-        campaignManager.onError.subscribe((error: Error) => {
-            triggeredError = error;
-        });
-
-        // when the campaign manager requests the placement
-        return campaignManager.request().then(() => {
-
+        let verify = () => {
             // then the onError observable is triggered with an appropriate error
             mockRequest.verify();
             if (triggeredError instanceof Error) {
@@ -280,6 +272,21 @@ describe('CampaignManager', () => {
             } else {
                 assert.equal(triggeredError, expectedErrorMessage);
             }
+        };
+
+        campaignManager.onError.subscribe((error: Error) => {
+            triggeredError = error;
+            if (done) {
+                // then the onError observable is triggered with an appropriate error
+                verify();
+                done();
+            }
+        });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request().then(() => {
+            // then the onError observable is triggered with an appropriate error
+            verify();
         });
     };
 
@@ -298,7 +305,7 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'Campaign does not have a video url');
         });
 
-        it('should trigger onError after requesting a wrapped vast placement without a video url', () => {
+        it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
             const response = {
                 response: `{
                 "abGroup": 3,
@@ -358,7 +365,7 @@ describe('CampaignManager', () => {
                   </Ad>
                 </VAST>`
             });
-            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Campaign does not have a video url');
+            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Campaign does not have a video url', done);
         });
 
         it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
@@ -539,7 +546,7 @@ describe('CampaignManager', () => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -642,8 +649,7 @@ describe('CampaignManager', () => {
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = new DeviceInfo();
-        let domParser = new xmldom.DOMParser({errorHandler: {}});
-        vastParser = new VastParser(domParser);
+        vastParser = TestFixtures.getVastParser();
         nativeBridge = <NativeBridge><any>{
             Storage: {
                 get:
@@ -676,4 +682,3 @@ describe('CampaignManager', () => {
     });
 
 });
-*/

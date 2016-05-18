@@ -14,7 +14,8 @@
     "es6-promise": "^3.0.2",
     "requirejs": "^2.1.20",
     "requirejs-text": "^2.0.12",
-    "stylus": "^0.52.0"
+    "stylus": "^0.52.0",
+    "xmldom": "git@github.com:gjritter/xmldom.git#1f6973cc406266225fed4a73ea41caaea9ebed48"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
@@ -26,7 +27,6 @@
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.2.0",
     "remap-istanbul": "^0.5.1",
-    "sinon": "^1.17.2",
-    "xmldom": "^0.1.22"
+    "sinon": "^1.17.2"
   }
 }

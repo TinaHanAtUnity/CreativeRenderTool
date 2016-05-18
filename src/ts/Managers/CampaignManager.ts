@@ -32,7 +32,6 @@ export class CampaignManager {
 
     public request(): Promise<void> {
         return this.createRequestBody().then(requestBody => {
-            console.log(`got request body: ${requestBody} requestUrl: ${this.createRequestUrl()}`);
             return this._request.post(this.createRequestUrl(), requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
