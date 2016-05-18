@@ -11,7 +11,7 @@ import { VastParser } from 'Utilities/VastParser';
 
 export class CampaignManager {
 
-    private static CampaignBaseUrl = 'http://staging.applifier.info:7003/test/games';
+    private static CampaignBaseUrl = 'http://yield.unityads.unity3d.com/test/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
