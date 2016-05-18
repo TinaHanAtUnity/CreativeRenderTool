@@ -87,9 +87,9 @@ build-release: clean build-dirs build-ts build-js build-css
 	@echo Generating commit id based build directory
 	@echo
 
-	mkdir $(BUILD_DIR)/$(COMMIT_ID)
-	rsync -r $(BUILD_DIR)/* $(BUILD_DIR)/$(COMMIT_ID)
-	rm -rf $(BUILD_DIR)/$(COMMIT_ID)/$(COMMIT_ID)
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/* build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
@@ -174,9 +174,9 @@ build-test: clean build-dirs build-css build-html
 	@echo Generating commit id based build directory
 	@echo
 
-	mkdir $(BUILD_DIR)/$(COMMIT_ID)
-	rsync -r $(BUILD_DIR)/* $(BUILD_DIR)/$(COMMIT_ID)
-	rm -rf $(BUILD_DIR)/$(COMMIT_ID)/$(COMMIT_ID)
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/* build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 build-dir:
 	@echo
