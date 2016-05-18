@@ -11,15 +11,21 @@ var branch = process.env.TRAVIS_BRANCH;
 if(!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
+var commit = process.env.TRAVIS_COMMIT;
+if(!commit) {
+    throw new Error('Invalid commit: ' + commit);
+}
 
 var getBuildPaths = function(root) {
     var paths = [];
     fs.readdirSync(root).forEach(function(file) {
         var fullPath = path.join(root, file);
-        if(fs.statSync(fullPath).isDirectory()) {
-            paths = paths.concat(getBuildPaths(fullPath));
-        } else {
-            paths.push(fullPath);
+        if(fullPath.indexOf(commit) === -1) {
+            if(fs.statSync(fullPath).isDirectory()) {
+                paths = paths.concat(getBuildPaths(fullPath));
+            } else {
+                paths.push(fullPath);
+            }
         }
     });
     return paths;
