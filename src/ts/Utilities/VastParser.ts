@@ -4,6 +4,7 @@ import { VastCreative } from 'Models/VastCreative';
 import { VastCreativeLinear } from 'Models/VastCreativeLinear';
 import { VastMediaFile } from 'Models/VastMediaFile';
 import { Request } from 'Utilities/Request';
+import * as xmldom from 'xmldom';
 
 export class VastParser {
 
@@ -12,10 +13,14 @@ export class VastParser {
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
 
+    private static createDOMParser() {
+        return new xmldom.DOMParser();
+    };
+
     constructor();
     constructor(domParser: DOMParser);
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParser.DEFAULT_MAX_WRAPPER_DEPTH) {
-        this._domParser = domParser || new DOMParser();
+        this._domParser = domParser || VastParser.createDOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
