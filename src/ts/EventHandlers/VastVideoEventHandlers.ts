@@ -3,7 +3,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 
 export class VastVideoEventHandlers extends VideoEventHandlers {
 
-    protected static afterSkip(adUnit: VideoAdUnit) {
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
         adUnit.hide();
     }
 
