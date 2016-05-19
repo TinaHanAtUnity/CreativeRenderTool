@@ -22,10 +22,10 @@ TEST_SRC = test
 # Branch and commit id
 ifeq ($(TRAVIS), true)
     BRANCH = $(TRAVIS_BRANCH)
-    COMMITID = $(TRAVIS_COMMIT)
+    COMMIT_ID = $(TRAVIS_COMMIT)
 else
     BRANCH = $(shell git symbolic-ref --short HEAD)
-    COMMITID = $(shell git rev-parse HEAD)
+    COMMIT_ID = $(shell git rev-parse HEAD)
 endif
 
 # Targets
@@ -80,8 +80,16 @@ build-release: clean build-dirs build-ts build-js build-css
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace('{VERSION}', '$(COMMITID)');\
+		c=c.replace('{VERSION}', '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+
+	@echo
+	@echo Generating commit id based build directory
+	@echo
+
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/* build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
@@ -159,8 +167,16 @@ build-test: clean build-dirs build-css build-html
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace('{VERSION}', '$(COMMITID)');\
+		c=c.replace('{VERSION}', '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+
+	@echo
+	@echo Generating commit id based build directory
+	@echo
+
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/* build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 build-dir:
 	@echo
