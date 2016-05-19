@@ -88,7 +88,7 @@ define({TEST_LIST}, function() {
         if(window.webviewbridge) {
             window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));
         } else {
-            let xhr = new XMLHttpRequest();
+            var xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
             xhr.send(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));
         }
