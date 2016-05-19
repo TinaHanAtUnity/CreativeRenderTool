@@ -13,6 +13,7 @@ import { SdkApi } from '../../src/ts/Native/Api/Sdk';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
+import { Platform } from '../../src/ts/Constants/Platform';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -675,6 +676,9 @@ describe('CampaignManager', () => {
             },
             Broadcast: {
                 onBroadcastAction: new Observable4()
+            },
+            getPlatform: () => {
+                return Platform.TEST;
             }
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
