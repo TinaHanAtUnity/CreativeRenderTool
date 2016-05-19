@@ -53,8 +53,12 @@ export class VideoEventHandlers {
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if(integrationTest && nativeBridge.getPlatform() === Platform.ANDROID) {
-                nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+            if(integrationTest) {
+                if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                    nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+                } else {
+                    nativeBridge.rawInvoke('UADSIntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
+                }
             }
         });
     }
