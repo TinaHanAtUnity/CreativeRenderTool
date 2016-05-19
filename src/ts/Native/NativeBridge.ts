@@ -39,12 +39,12 @@ export class NativeBridge implements INativeBridge {
 
     public AppSheet: AppSheetApi = null;
     public AndroidAdUnit: AndroidAdUnitApi = null;
-    public IosAdUnit: IosAdUnitApi = null;
     public Broadcast: BroadcastApi = null;
     public Cache: CacheApi = null;
     public Connectivity: ConnectivityApi = null;
     public DeviceInfo: DeviceInfoApi = null;
     public Intent: IntentApi = null;
+    public IosAdUnit: IosAdUnitApi = null;
     public Listener: ListenerApi = null;
     public Notification: NotificationApi = null;
     public Placement: PlacementApi = null;

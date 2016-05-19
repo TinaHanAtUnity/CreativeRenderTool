@@ -63,10 +63,14 @@ export class WebView {
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            return this._deviceInfo.fetch(this._nativeBridge, this._clientInfo.getPlatform());
+            return this._deviceInfo.fetch(this._nativeBridge);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
+                if(this._deviceInfo.getApiLevel() >= 11 && this._deviceInfo.getApiLevel() <= 15) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads init: disabling hardware acceleration from webview');
+                    this._nativeBridge.Sdk.Android.disableWebViewAcceleration();
+                }
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 let model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i)) {

@@ -9,7 +9,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { KeyCode } from 'Constants/Android/KeyCode';
 
 interface IAndroidOptions {
@@ -17,7 +17,7 @@ interface IAndroidOptions {
 }
 
 interface IIosOptions {
-    supportedOrientations: InterfaceOrientation;
+    supportedOrientations: UIInterfaceOrientationMask;
     shouldAutorotate: boolean;
 }
 
@@ -60,9 +60,9 @@ export class VideoAdUnit extends AbstractAdUnit {
         this.setVideoActive(true);
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            let orientation: InterfaceOrientation = this._iosOptions.supportedOrientations;
+            let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
             if(!this._placement.useDeviceOrientationForVideo()) {
-                orientation = InterfaceOrientation.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
             }
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);

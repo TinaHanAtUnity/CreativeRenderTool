@@ -88,8 +88,14 @@ build-release: clean build-dirs build-ts build-js build-css
 	@echo
 
 	mkdir build/$(COMMIT_ID) | true
-	rsync -r build/* build/$(COMMIT_ID)
+	rsync -r build/release build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('build/$(COMMIT_ID)/release/config.json', o);\
+		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
+		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
@@ -176,8 +182,14 @@ build-test: clean build-dirs build-css build-html
 	@echo
 
 	mkdir build/$(COMMIT_ID) | true
-	rsync -r build/* build/$(COMMIT_ID)
+	rsync -r build/test build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('build/$(COMMIT_ID)/test/config.json', o);\
+		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
+		fs.writeFileSync('build/$(COMMIT_ID)/test/config.json', c, o);"
 
 build-dir:
 	@echo
