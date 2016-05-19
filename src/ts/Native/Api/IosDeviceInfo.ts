@@ -1,5 +1,6 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 export class IosDeviceInfoApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
@@ -10,8 +11,8 @@ export class IosDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenScale');
     }
 
-    public getUserInterfaceIdiom(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getUserInterfaceIdiom');
+    public getUserInterfaceIdiom(): Promise<UIUserInterfaceIdiom> {
+        return this._nativeBridge.invoke<UIUserInterfaceIdiom>(this._apiClass, 'getUserInterfaceIdiom');
     }
 
     public getDeviceVolume(): Promise<number> {

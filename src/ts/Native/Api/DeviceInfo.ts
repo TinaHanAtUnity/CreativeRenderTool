@@ -34,10 +34,6 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getModel');
     }
 
-    public getScreenLayout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenLayout');
-    }
-
     public getScreenWidth(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenWidth');
     }

@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
-import { InterfaceOrientation } from 'Constants/iOS/InterfaceOrientation';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,
@@ -25,7 +25,7 @@ export class IosAdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(view: string[], supportedOrientations: InterfaceOrientation, statusBarHidden: boolean, shouldAutorotate: boolean): Promise<void> {
+    public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate]);
     }
 
@@ -41,12 +41,12 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getViews');
     }
 
-    public setSupportedOrientations(supportedOrientations: InterfaceOrientation): Promise<void> {
+    public setSupportedOrientations(supportedOrientations: UIInterfaceOrientationMask): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setSupportedOrientations', [supportedOrientations]);
     }
 
-    public getSupportedOrientations(): Promise<InterfaceOrientation> {
-        return this._nativeBridge.invoke<InterfaceOrientation>(this._apiClass, 'getSupportedOrientations');
+    public getSupportedOrientations(): Promise<UIInterfaceOrientationMask> {
+        return this._nativeBridge.invoke<UIInterfaceOrientationMask>(this._apiClass, 'getSupportedOrientations');
     }
 
     public setKeepScreenOn(screenOn: boolean): Promise<void> {

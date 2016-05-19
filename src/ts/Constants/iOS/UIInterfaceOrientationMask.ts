@@ -1,4 +1,4 @@
-export enum InterfaceOrientation {
+export enum UIInterfaceOrientationMask {
     INTERFACE_ORIENTATION_MASK_PORTRAIT = 2,
     INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT = 16,
     INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT = 8,

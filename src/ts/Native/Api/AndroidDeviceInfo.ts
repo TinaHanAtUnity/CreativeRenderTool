@@ -24,6 +24,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getManufacturer');
     }
 
+    public getScreenLayout(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenLayout');
+    }
+
     public getScreenDensity(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenDensity');
     }

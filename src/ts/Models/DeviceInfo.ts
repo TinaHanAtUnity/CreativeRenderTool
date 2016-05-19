@@ -5,6 +5,7 @@ import { RingerMode } from 'Constants/Android/RingerMode';
 import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 export class DeviceInfo extends Model {
 
@@ -22,7 +23,7 @@ export class DeviceInfo extends Model {
     private _screenWidth: number;
     private _screenHeight: number;
     private _screenScale: number;
-    private _userInterfaceIdiom: string;
+    private _userInterfaceIdiom: UIUserInterfaceIdiom;
     private _networkOperator: string;
     private _networkOperatorName: string;
     private _timeZone: string;
@@ -46,7 +47,6 @@ export class DeviceInfo extends Model {
     public fetch(nativeBridge: NativeBridge): Promise<any[]> {
         let promises: Promise<any>[] = [];
 
-        promises.push(nativeBridge.DeviceInfo.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout));
         promises.push(nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier));
         promises.push(nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking));
         promises.push(nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion));
@@ -71,7 +71,9 @@ export class DeviceInfo extends Model {
             promises.push(nativeBridge.DeviceInfo.Ios.getDeviceVolume().then(volume => this._volume = volume));
             promises.push(nativeBridge.DeviceInfo.Ios.getFreeSpace().then(freeInternalSpace => this._freeInternalSpace = freeInternalSpace).catch(() => this._freeInternalSpace = undefined));
             promises.push(nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(() => this._totalInternalSpace = undefined));
+            promises.push(nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
         } else {
+            promises.push(nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout));
             promises.push(nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
             promises.push(nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel));
             promises.push(nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
@@ -147,7 +149,7 @@ export class DeviceInfo extends Model {
         return this._screenScale;
     }
 
-    public getUserInterfaceIdiom(): string {
+    public getUserInterfaceIdiom(): UIUserInterfaceIdiom {
         return this._userInterfaceIdiom;
     }
 
