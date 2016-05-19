@@ -15,7 +15,7 @@
     "requirejs": "^2.1.20",
     "requirejs-text": "^2.0.12",
     "stylus": "^0.52.0",
-    "xmldom": "git@github.com:gjritter/xmldom.git#1f6973cc406266225fed4a73ea41caaea9ebed48"
+    "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
