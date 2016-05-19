@@ -1,6 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Campaign } from '../../src/ts/Models/Campaign';
+import { VastCampaign } from '../../src/ts/Models/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 
@@ -27,7 +28,7 @@ describe('Campaign', () => {
                 },
                 'gamerId': '5712983c481291b16e1be03b'
             };
-            let campaign = new Campaign({campaign: json.campaign}, json.gamerId, json.abGroup);
+            let campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
@@ -39,7 +40,6 @@ describe('Campaign', () => {
             assert.equal(campaign.getId(), json.campaign.id);
             assert.equal(campaign.getRating(), json.campaign.rating);
             assert.equal(campaign.getRatingCount(), json.campaign.ratingCount);
-            assert.equal(campaign.getVast(), null);
         });
     });
 
@@ -64,7 +64,7 @@ describe('Campaign', () => {
             };
             let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(json.vast);
-            let campaign = new Campaign({vast: parsedVast}, json.gamerId, json.abGroup);
+            let campaign = new VastCampaign(parsedVast, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), null);

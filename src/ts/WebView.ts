@@ -93,6 +93,7 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._campaignManager.request();
 
@@ -210,6 +211,33 @@ export class WebView {
                 campaign.setGameIcon(fileUrls[campaign.getGameIcon()]);
                 campaign.setLandscapeUrl(fileUrls[campaign.getLandscapeUrl()]);
                 campaign.setPortraitUrl(fileUrls[campaign.getPortraitUrl()]);
+                campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
+            });
+        };
+
+        let sendReady = () => {
+            this.setPlacementStates(PlacementState.READY);
+        };
+
+        if(cacheMode === CacheMode.FORCED) {
+            cacheAssets().then(() => sendReady());
+        } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets();
+            sendReady();
+        } else {
+            sendReady();
+        }
+    }
+
+    private onVastCampaign(campaign: Campaign): void {
+        this._campaign = campaign;
+
+        let cacheMode = this._configuration.getCacheMode();
+
+        let cacheableAssets: string[] = [campaign.getVideoUrl()];
+
+        let cacheAssets = () => {
+            return this._cacheManager.cacheAll(cacheableAssets).then(fileUrls => {
                 campaign.setVideoUrl(fileUrls[campaign.getVideoUrl()]);
             });
         };

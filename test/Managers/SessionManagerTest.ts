@@ -3,12 +3,12 @@ import * as sinon from 'sinon';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
-import { Campaign } from '../../src/ts/Models/Campaign';
+import { VastCampaign } from '../../src/ts/Models/VastCampaign';
 import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Request } from '../../src/ts/Utilities/Request';
-import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
+import { VastAdUnit } from '../../src/ts/AdUnits/VastAdUnit';
 import { SessionManagerEventMetadataCreator } from '../../src/ts/Managers/SessionManager';
 import { Session } from '../../src/ts/Models/Session';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
@@ -18,7 +18,7 @@ describe('SessionManager', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
     let nativeBridge;
-    let campaign: Campaign;
+    let campaign: VastCampaign;
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
@@ -39,9 +39,9 @@ describe('SessionManager', () => {
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, null, null);
+        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        return sessionManager.sendStart(videoAdUnit).then(() => {
+        return sessionManager.sendStart(adUnit).then(() => {
             mockMetadataCreator.verify();
             mockEventManager.verify();
         });
@@ -63,9 +63,9 @@ describe('SessionManager', () => {
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, null, null);
+        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        return sessionManager.sendView(videoAdUnit).then(() => {
+        return sessionManager.sendView(adUnit).then(() => {
             mockMetadataCreator.verify();
             mockEventManager.verify();
         });
@@ -88,9 +88,9 @@ describe('SessionManager', () => {
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, null, null);
+        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        return sessionManager.sendShow(videoAdUnit).then(() => {
+        return sessionManager.sendShow(adUnit).then(() => {
             mockMetadataCreator.verify();
             mockEventManager.verify();
         });
@@ -107,9 +107,9 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, null, null);
+        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        sessionManager.sendMute(videoAdUnit, new Session('123'), muted);
+        sessionManager.sendMute(adUnit, new Session('123'), muted);
         mockEventManager.verify();
     };
 
@@ -148,11 +148,11 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, null, null);
+        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
         const session = new Session('123');
         const quartilePosition = campaign.getVast().getDuration() * 0.25 * quartile * 1000;
-        sessionManager.sendProgress(videoAdUnit, session, quartilePosition + 100, quartilePosition - 100);
+        sessionManager.sendProgress(adUnit, session, quartilePosition + 100, quartilePosition - 100);
         mockEventManager.verify();
     };
 
@@ -211,7 +211,7 @@ describe('SessionManager', () => {
             'gamerId': '5712983c481291b16e1be03b'
         };
         let vast = vastParser.parseVast(json.vast);
-        campaign = new Campaign({vast: vast}, json.gamerId, json.abGroup);
+        campaign = new VastCampaign(vast, json.gamerId, json.abGroup);
 
         placement = new Placement({
             id: '123',

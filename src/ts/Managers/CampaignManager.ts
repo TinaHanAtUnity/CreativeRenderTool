@@ -2,6 +2,7 @@ import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/VastCampaign';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
@@ -14,6 +15,7 @@ export class CampaignManager {
     private static CampaignBaseUrl = 'http://yield.unityads.unity3d.com/test/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
+    public onVastCampaign: Observable1<Campaign> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
@@ -39,13 +41,12 @@ export class CampaignManager {
                 retryWithConnectionEvents: false
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
-                let campaign: Campaign;
                 if (campaignJson.campaign) {
-                    campaign = new Campaign({campaign: campaignJson.campaign}, campaignJson.gamerId, campaignJson.abGroup);
+                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else {
                     this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
-                        campaign = new Campaign({vast: vast}, campaignJson.gamerId, campaignJson.abGroup);
+                        let campaign = new VastCampaign(vast, campaignJson.gamerId, campaignJson.abGroup);
                         if (campaign.getVast().getImpressionUrls().length === 0) {
                             this.onError.trigger(new Error('Campaign does not have an impression url'));
                             return;
@@ -58,7 +59,7 @@ export class CampaignManager {
                             this.onError.trigger(new Error('Campaign does not have a video url'));
                             return;
                         }
-                        this.onCampaign.trigger(campaign);
+                        this.onVastCampaign.trigger(campaign);
                     }).catch((error) => {
                         this.onError.trigger(error);
                     });

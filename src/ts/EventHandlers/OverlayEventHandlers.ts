@@ -20,12 +20,12 @@ export class OverlayEventHandlers {
       }
 
       adUnit.getOverlay().hide();
-      if (adUnit.getCampaign() && adUnit.getCampaign().getVast()) {
-          adUnit.hide();
-      } else {
-          adUnit.getEndScreen().show();
-      }
+      this.afterSkip(adUnit);
   }
+
+    protected static afterSkip(adUnit: VideoAdUnit) {
+        adUnit.getEndScreen().show();
+    };
 
     public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
         nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));

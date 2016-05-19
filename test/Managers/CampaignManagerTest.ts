@@ -2,6 +2,7 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { Campaign } from '../../src/ts/Models/Campaign';
+import { VastCampaign } from '../../src/ts/Models/VastCampaign';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Request } from '../../src/ts/Utilities/Request';
@@ -22,7 +23,7 @@ describe('CampaignManager', () => {
     let request: Request;
     let vastParser: VastParser;
 
-    it('should trigger onCampaign after requesting a valid vast placement', () => {
+    it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
@@ -58,14 +59,14 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
-        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
+        campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
 
-            // then the onCampaign observable is triggered with the correct campaign data
+            // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
@@ -161,10 +162,10 @@ describe('CampaignManager', () => {
 
         vastParser.setMaxWrapperDepth(1);
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
-        let triggeredCampaign: Campaign;
-        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
+        let triggeredCampaign: VastCampaign;
+        campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
-            // then the onCampaign observable is triggered with the correct campaign data
+            // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
@@ -560,14 +561,14 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
-        campaignManager.onCampaign.subscribe((campaign: Campaign) => {
+        campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
 
-            // then the onCampaign observable is triggered with the correct campaign data
+            // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');

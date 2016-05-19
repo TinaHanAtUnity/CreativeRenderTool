@@ -52,11 +52,7 @@ export class VideoEventHandlers {
         }
 
         adUnit.getOverlay().hide();
-        if (adUnit.getCampaign() && adUnit.getCampaign().getVast()) {
-            adUnit.hide();
-        } else {
-            adUnit.getEndScreen().show();
-        }
+        this.afterVideoCompleted(adUnit);
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if(integrationTest) {
                 if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -67,5 +63,9 @@ export class VideoEventHandlers {
             }
         });
     }
+
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+        adUnit.getEndScreen().show();
+    };
 
 }

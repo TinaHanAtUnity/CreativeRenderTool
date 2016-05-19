@@ -1,5 +1,3 @@
-import { Vast } from 'Models/Vast';
-
 export class Campaign {
 
     private _id: string;
@@ -22,32 +20,23 @@ export class Campaign {
     private _gamerId: string;
     private _abGroup: number;
 
-    private _vast: Vast;
-
-    constructor(data: any, gamerId: string, abGroup: number) {
-        if (data.campaign) {
-            const campaign = data.campaign;
-            this._id = campaign.id;
-            this._appStoreId = campaign.appStoreId;
-            this._appStoreCountry = campaign.appStoreCountry;
-            this._gameId = campaign.gameId;
-            this._gameName = campaign.gameName;
-            this._gameIcon = campaign.gameIcon;
-            this._rating = campaign.rating;
-            this._ratingCount = campaign.ratingCount;
-            this._landscapeImage = campaign.endScreenLandscape;
-            this._portraitImage = campaign.endScreenPortrait;
-            this._video = campaign.trailerDownloadable;
-            this._videoSize = campaign.trailerDownloadableSize;
-            this._streamingVideo = campaign.trailerStreaming;
-            this._clickAttributionUrl = campaign.clickAttributionUrl;
-            this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
-            this._bypassAppSheet = campaign.bypassAppSheet;
-        } else if (data.vast) {
-            this._vast = data.vast;
-        } else {
-            throw new Error('Campaign and VAST data is missing');
-        }
+    constructor(campaign: any, gamerId: string, abGroup: number) {
+        this._id = campaign.id;
+        this._appStoreId = campaign.appStoreId;
+        this._appStoreCountry = campaign.appStoreCountry;
+        this._gameId = campaign.gameId;
+        this._gameName = campaign.gameName;
+        this._gameIcon = campaign.gameIcon;
+        this._rating = campaign.rating;
+        this._ratingCount = campaign.ratingCount;
+        this._landscapeImage = campaign.endScreenLandscape;
+        this._portraitImage = campaign.endScreenPortrait;
+        this._video = campaign.trailerDownloadable;
+        this._videoSize = campaign.trailerDownloadableSize;
+        this._streamingVideo = campaign.trailerStreaming;
+        this._clickAttributionUrl = campaign.clickAttributionUrl;
+        this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
+        this._bypassAppSheet = campaign.bypassAppSheet;
 
         this._gamerId = gamerId;
         this._abGroup = abGroup;
@@ -106,12 +95,7 @@ export class Campaign {
     }
 
     public getVideoUrl(): string {
-        if (this._video) {
-            return this._video;
-        } else if (this._vast && this._vast.getVideoUrl()) {
-            return this._vast.getVideoUrl();
-        }
-        return null;
+        return this._video;
     }
 
     public setVideoUrl(videoUrl: string): void {
@@ -136,10 +120,6 @@ export class Campaign {
 
     public getAbGroup(): number {
         return this._abGroup;
-    }
-
-    public getVast(): Vast {
-        return this._vast;
     }
 
 }
