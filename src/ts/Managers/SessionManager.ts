@@ -168,32 +168,35 @@ export class SessionManager {
     }
 
     private createShowEventUrl(adUnit: AbstractAdUnit): string {
+        const campaign = adUnit.getCampaign();
         return [
             SessionManager.VideoEventBaseUrl,
-            adUnit.getGamerId(),
+            campaign.getGamerId(),
             'show',
-            adUnit.getCampaignId(),
+            campaign.getId(),
             this._clientInfo.getGameId()
         ].join('/');
     }
 
     private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {
+        const campaign = adUnit.getCampaign();
         return [
             SessionManager.VideoEventBaseUrl,
-            adUnit.getGamerId(),
+            campaign.getGamerId(),
             'video',
             type,
-            adUnit.getCampaignId(),
+            campaign.getId(),
             this._clientInfo.getGameId()
         ].join('/');
     }
 
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
+        const campaign = adUnit.getCampaign();
         let url = [
             SessionManager.ClickEventBaseUrl,
-            adUnit.getCampaignId(),
+            campaign.getId(),
             'click',
-            adUnit.getGamerId(),
+            campaign.getGamerId(),
         ].join('/');
         return Url.addParameters(url, {
             gameId: this._clientInfo.getGameId(),

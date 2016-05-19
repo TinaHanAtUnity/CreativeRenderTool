@@ -50,12 +50,4 @@ export abstract class AbstractAdUnit {
         return this._showing;
     }
 
-    public getGamerId(): string {
-        return this._campaign.getGamerId();
-    }
-
-    public getCampaignId(): string {
-        return this._campaign.getId();
-    }
-
 }
