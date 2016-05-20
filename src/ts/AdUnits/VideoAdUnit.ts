@@ -22,6 +22,7 @@ interface IIosOptions {
 }
 
 export class VideoAdUnit extends AbstractAdUnit {
+    private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
 
     private _overlay: Overlay;
     private _endScreen: EndScreen;
@@ -32,6 +33,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
     private _onViewControllerDidAppearObserver: any;
+    private _onNotificationObserver: any;
 
     private _androidOptions: IAndroidOptions;
     private _iosOptions: IIosOptions;
@@ -41,6 +43,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+
         } else {
             this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe(() => this.onResume());
             this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
@@ -65,7 +68,10 @@ export class VideoAdUnit extends AbstractAdUnit {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
             }
 
-            return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
+            return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true).then(() => {
+                this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+                return this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt);
+            });
         } else {
             let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
             if (!this._placement.useDeviceOrientationForVideo()) {
@@ -100,7 +106,8 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
-
+            this._nativeBridge.Notification.onNotification.unsubscribe(this._onNotificationObserver);
+            this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._audioSessionInterrupt);
             return this._nativeBridge.IosAdUnit.close().then(() => {
                 this._showing = false;
                 this.onClose.trigger();
@@ -200,5 +207,11 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private onViewDidAppear(): void {
         this.onResume();
+    }
+
+    private onNotification(event: string, parameters: any): void {
+        if(event === VideoAdUnit._audioSessionInterrupt) {
+            // todo: check parameters and invoke this.onResume()
+        }
     }
 }
