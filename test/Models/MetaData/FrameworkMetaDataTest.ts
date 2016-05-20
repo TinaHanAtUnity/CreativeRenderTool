@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { FrameworkMetaData } from '../../../src/ts/Models/MetaData/FrameworkMetaData';
+import { MetaDataManager } from '../../../src/ts/Models/MetaData/MetaDataManager';
 import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
@@ -65,7 +65,7 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
+        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
             assert.isUndefined(metaData, 'Returned FrameworkMetaData even when it doesnt exist');
         });
     });
@@ -78,7 +78,7 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
+        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
@@ -97,7 +97,7 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
+        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), undefined, 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
@@ -111,7 +111,7 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return FrameworkMetaData.fetch(nativeBridge, false).then(metaData => {
+        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
             assert.isDefined(metaData, 'FrameworkMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
