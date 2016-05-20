@@ -5,13 +5,14 @@ import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
+import { MetaDataManager } from 'Models/MetaData/MetaDataManager';
 
 export class ConfigManager {
 
     private static ConfigBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return AdapterMetaData.fetch(nativeBridge).then(adapter => {
+        return MetaDataManager.fetchAdapterMetaData(nativeBridge).then(adapter => {
             return request.get(ConfigManager.createConfigUrl(clientInfo, deviceInfo, adapter), [], {
                 retries: 5,
                 retryDelay: 5000,

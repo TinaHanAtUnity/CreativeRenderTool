@@ -2,22 +2,18 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 import { Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
 
 export class MetaDataManager {
 
     private static caches = {
         framework: Model,
-
+        adapter: Model,
     };
 
-    public static keyExists(rootkey: string, nativeBridge: NativeBridge): Promise<boolean> {
-        return nativeBridge.Storage.getKeys(StorageType.PUBLIC, rootkey, false).then(keys => {
-            return keys.length > 0;
-        });
-    }
 
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
-        return MetaDataManager.keyExists(category, nativeBridge).then(exists => {
+        return MetaDataManager.categoryExists(category, nativeBridge).then(exists => {
             if(!exists) {
                 return Promise.resolve(undefined);
             }
@@ -29,6 +25,13 @@ export class MetaDataManager {
         return MetaDataManager.fetch(FrameworkMetaData.getCategory(), FrameworkMetaData.getKeys(), nativeBridge, cache)
             .then(result => {
                 return Promise.resolve(<FrameworkMetaData>result);
+            });
+    }
+
+    public static fetchAdapterMetaData(nativeBridge: NativeBridge, cache = true): Promise<AdapterMetaData> {
+        return MetaDataManager.fetch(AdapterMetaData.getCategory(), AdapterMetaData.getKeys(), nativeBridge, cache)
+            .then(result => {
+                return Promise.resolve(<AdapterMetaData>result);
             });
     }
 
@@ -55,12 +58,20 @@ export class MetaDataManager {
         return MetaDataManager.createByCategory(category, data);
     }
 
-    public static createByCategory(category: string, data: string[]) {
+    public static createByCategory(category: string, data: string[]): Model {
         switch(category) {
             case 'framework':
                 return new FrameworkMetaData(data);
+            case 'adapter':
+                return new AdapterMetaData(data);
             default:
                 return null;
         }
+    }
+
+    private static categoryExists(rootkey: string, nativeBridge: NativeBridge): Promise<boolean> {
+        return nativeBridge.Storage.getKeys(StorageType.PUBLIC, rootkey, false).then(keys => {
+            return keys.length > 0;
+        });
     }
 }
