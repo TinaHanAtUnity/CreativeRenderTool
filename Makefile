@@ -80,7 +80,7 @@ build-release: clean build-dirs build-ts build-js build-css
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace('{VERSION}', '$(COMMIT_ID)');\
+		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
 	@echo
@@ -173,7 +173,7 @@ build-test: clean build-dirs build-css build-html
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace('{VERSION}', '$(COMMIT_ID)');\
+		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
 	@echo
