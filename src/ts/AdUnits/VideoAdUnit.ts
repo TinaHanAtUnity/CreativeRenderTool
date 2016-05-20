@@ -77,7 +77,13 @@ export class VideoAdUnit extends AbstractAdUnit {
                 keyEvents = [KeyCode.BACK];
             }
 
-            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE);
+            let hardwareAccel: boolean = true;
+
+            if(this._nativeBridge.getApiLevel() < 17) {
+                hardwareAccel = false;
+            }
+
+            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         }
     }
 
