@@ -66,6 +66,7 @@ export class WebView {
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
+                this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 let model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i)) {

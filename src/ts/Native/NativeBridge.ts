@@ -59,6 +59,7 @@ export class NativeBridge implements INativeBridge {
     private _callbackTable: {[key: number]: CallbackContainer} = {};
 
     private _platform: Platform;
+    private _apiLevel: number;
     private _backend: IWebViewBridge;
 
     private _autoBatchEnabled: boolean;
@@ -223,6 +224,14 @@ export class NativeBridge implements INativeBridge {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
         window[className][methodName].apply(window[className], parameters);
+    }
+
+    public setApiLevel(apiLevel: number) {
+        this._apiLevel = apiLevel;
+    }
+
+    public getApiLevel(): number {
+        return this._apiLevel;
     }
 
     public getPlatform(): Platform {
