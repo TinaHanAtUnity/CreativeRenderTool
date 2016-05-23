@@ -20,7 +20,8 @@
 
     var origin;
     if(queryParams['origin']) {
-      origin = queryParams['origin'].substring(0, queryParams['origin'].lastIndexOf('/') + 1);
+      var decodedOrigin = decodeURIComponent(queryParams['origin']);
+      origin = decodedOrigin.substring(0, decodedOrigin.lastIndexOf('/') + 1);
     } else {
       origin = 'http://localhost:8000/';
     }
