@@ -206,12 +206,27 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onViewDidAppear(): void {
+        this._nativeBridge.Sdk.logInfo('onViewDidAppear event received in webview');
         this.onResume();
     }
 
     private onNotification(event: string, parameters: any): void {
         if(event === VideoAdUnit._audioSessionInterrupt) {
-            // todo: check parameters and invoke this.onResume()
+            let data: { AVAudioSessionInterruptionTypeKey: number } = parameters;
+            this._nativeBridge.Sdk.logInfo('onNotification ' + event + ': ' + JSON.stringify(parameters));
+            if(data.AVAudioSessionInterruptionTypeKey === 1) {
+                this._nativeBridge.Sdk.logInfo('AUDIO INTERRUPT STARTED');
+            }
+            if(data.AVAudioSessionInterruptionTypeKey === 0) {
+                let data2: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
+                this._nativeBridge.Sdk.logInfo('AUDIO INTERRUPT STOPPED ' + data2.AVAudioSessionInterruptionTypeKey + ' ' + data2.AVAudioSessionInterruptionOptionKey);
+                if(data2.AVAudioSessionInterruptionOptionKey === 1) {
+                    this._nativeBridge.VideoPlayer.play();
+                } else {
+                    this._nativeBridge.Sdk.logInfo('NOT RESUMING VIDEO AFTER AUDIO INTERRUPT');
+                    // stop video playback
+                }
+            }
         }
     }
 }
