@@ -84,10 +84,22 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
 }
 
 define({TEST_LIST}, function() {
+    function getPlatform() {
+        var queryString = window.location.search.split('?')[1].split('&');
+        for(var i = 0; i < queryString.length; i++) {
+            var queryParam = queryString[i].split('=');
+            if(queryParam[0] === 'platform') {
+                return queryParam[1];
+            }
+        }
+        return undefined;
+    }
+
     mocha.run(function(failures) {
-        if(window.webviewbridge) {
+        var platform = getPlatform();
+        if(platform === 'android') {
             window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));
-        } else {
+        } else if(platform === 'ios') {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
             xhr.send(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));

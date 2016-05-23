@@ -1,19 +1,11 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { AndroidSdkApi } from 'Native/Api/AndroidSdk';
-import { Platform } from 'Constants/Platform';
 
 export type ClientInfoData = [number, boolean, string, string, string, string, boolean, string, string, string];
 
 export class SdkApi extends NativeApi {
-    public Android: AndroidSdkApi;
-
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Sdk');
-
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            this.Android = new AndroidSdkApi(nativeBridge);
-        }
     }
 
     public loadComplete(): Promise<ClientInfoData> {
