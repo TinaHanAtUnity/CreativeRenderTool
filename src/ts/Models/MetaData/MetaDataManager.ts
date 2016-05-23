@@ -3,14 +3,15 @@ import { StorageType } from 'Native/Api/Storage';
 import { Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
+import { MediationMetaData } from './MediationMetaData';
 
 export class MetaDataManager {
 
     private static caches = {
         framework: Model,
         adapter: Model,
+        mediation: Model,
     };
-
 
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
         return MetaDataManager.categoryExists(category, nativeBridge).then(exists => {
@@ -32,6 +33,13 @@ export class MetaDataManager {
         return MetaDataManager.fetch(AdapterMetaData.getCategory(), AdapterMetaData.getKeys(), nativeBridge, cache)
             .then(result => {
                 return Promise.resolve(<AdapterMetaData>result);
+            });
+    }
+
+    public static fetchMediationMetaData(nativeBridge: NativeBridge, cache = true): Promise<MediationMetaData> {
+        return MetaDataManager.fetch(MediationMetaData.getCategory(), MediationMetaData.getKeys(), nativeBridge, cache)
+            .then(result => {
+                return Promise.resolve(<MediationMetaData>result);
             });
     }
 
@@ -64,6 +72,8 @@ export class MetaDataManager {
                 return new FrameworkMetaData(data);
             case 'adapter':
                 return new AdapterMetaData(data);
+            case 'mediation':
+                return new MediationMetaData(data);
             default:
                 return null;
         }
