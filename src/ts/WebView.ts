@@ -100,6 +100,11 @@ export class WebView {
             this._wakeUpManager.setListenConnectivity(true);
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._wakeUpManager.setListenScreen(true);
+                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
+            }
+
             this._eventManager.sendUnsentSessions();
 
             return this._nativeBridge.Sdk.initComplete();
@@ -256,7 +261,7 @@ export class WebView {
     }
 
     /*
-     CONNECTIVITY EVENT HANDLERS
+     CONNECTIVITY AND USER ACTIVITY EVENT HANDLERS
      */
 
     private onNetworkConnected() {
@@ -269,13 +274,21 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
-                        this._refillTimestamp = 0;
-                        this._campaignManager.request();
-                    }
+                    this.checkRefill();
                     this._eventManager.sendUnsentSessions();
                 }
             });
+        }
+    }
+
+    private onScreenOn() {
+        this.checkRefill();
+    }
+
+    private checkRefill(): void {
+        if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
+            this._refillTimestamp = 0;
+            this._campaignManager.request();
         }
     }
 
