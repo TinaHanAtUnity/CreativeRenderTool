@@ -33,7 +33,7 @@ export class CampaignManager {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
