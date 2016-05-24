@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { MetaDataManager } from '../../../src/ts/Models/MetaData/MetaDataManager';
+import { MetaDataManager } from '../../../src/ts/Managers/MetaDataManager';
 import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {

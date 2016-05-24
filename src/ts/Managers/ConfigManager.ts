@@ -5,7 +5,7 @@ import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Models/MetaData/MetaDataManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class ConfigManager {
 

@@ -5,7 +5,7 @@ import { Url } from 'Utilities/Url';
 import { EventManager } from 'EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Models/MetaData/MetaDataManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 
 export class SessionManager {

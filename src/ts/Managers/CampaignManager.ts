@@ -6,7 +6,7 @@ import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Models/MetaData/MetaDataManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class CampaignManager {
 

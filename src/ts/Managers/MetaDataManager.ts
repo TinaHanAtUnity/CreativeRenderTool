@@ -1,10 +1,10 @@
-import { NativeBridge } from '../Native/NativeBridge';
-import { StorageType } from '../Native/Api/Storage';
-import { Model } from '../Models/Model';
-import { FrameworkMetaData } from '../Models/MetaData/FrameworkMetaData';
+import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType } from 'Native/Api/Storage';
+import { Model } from 'Models/Model';
+import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
-import { MediationMetaData } from '../Models/MetaData/MediationMetaData';
-import { PlayerMetaData } from '../Models/MetaData/PlayerMetaData';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 interface IMetaDataCaches {
     framework: Model;
