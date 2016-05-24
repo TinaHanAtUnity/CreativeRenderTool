@@ -3,7 +3,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
-import { MediationMetaData } from './MediationMetaData';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 interface IMetaDataCaches {
