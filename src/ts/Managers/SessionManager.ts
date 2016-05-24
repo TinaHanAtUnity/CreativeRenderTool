@@ -20,7 +20,7 @@ export class SessionManager {
 
     private _currentSession: Session;
 
-    private _gamerSid: string;
+    private _gamerServerId: string;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
         this._nativeBridge = nativeBridge;
@@ -90,8 +90,8 @@ export class SessionManager {
         return Promise.reject('Missing click attribution url');
     }
 
-    public setGamerSid(sid: string): void {
-        this._gamerSid = sid;
+    public setGamerServerId(serverId: string): void {
+        this._gamerServerId = serverId;
     }
 
     private createShowEventUrl(adUnit: AbstractAdUnit): string {
@@ -145,7 +145,7 @@ export class SessionManager {
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
             'connectionType': this._deviceInfo.getConnectionType(),
-            'sid': this._gamerSid,
+            'sid': this._gamerServerId,
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel()
         };
