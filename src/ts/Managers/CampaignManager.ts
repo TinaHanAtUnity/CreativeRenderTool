@@ -41,7 +41,7 @@ export class CampaignManager {
                     let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else {
-                    this.onNoFill.trigger(3600); // Default to retry in one hour. This value should be set by server.
+                    this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
                 }
             });
         }).catch((error) => {

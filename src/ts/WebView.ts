@@ -100,7 +100,10 @@ export class WebView {
             this._wakeUpManager.setListenConnectivity(true);
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._wakeUpManager.setListenAppForeground(true);
+                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
+            } else {
                 this._wakeUpManager.setListenScreen(true);
                 this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
@@ -281,7 +284,11 @@ export class WebView {
         }
     }
 
-    private onScreenOn() {
+    private onScreenOn(): void {
+        this.checkRefill();
+    }
+
+    private onAppForeground(): void {
         this.checkRefill();
     }
 

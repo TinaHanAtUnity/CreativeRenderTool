@@ -71,7 +71,6 @@ export class VideoAdUnit extends AbstractAdUnit {
             }
 
             this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
-            this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._appDidBecomeActive);
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt);
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange);
 
@@ -111,7 +110,6 @@ export class VideoAdUnit extends AbstractAdUnit {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
             this._nativeBridge.Notification.onNotification.unsubscribe(this._onNotificationObserver);
-            this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._appDidBecomeActive);
             this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._audioSessionInterrupt);
             this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._audioSessionRouteChange);
 
