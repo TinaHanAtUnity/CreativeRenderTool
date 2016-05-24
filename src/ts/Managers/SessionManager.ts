@@ -70,7 +70,7 @@ export class SessionManager {
 
     private _currentSession: Session;
 
-    private _gamerSid: string;
+    private _gamerServerId: string;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;
@@ -99,7 +99,7 @@ export class SessionManager {
             adUnit.sendTrackingEvent(this._eventManager, 'creativeView', infoJson.sessionId);
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
@@ -109,7 +109,7 @@ export class SessionManager {
             adUnit.sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
@@ -127,7 +127,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
@@ -137,7 +137,7 @@ export class SessionManager {
             adUnit.sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
@@ -147,7 +147,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerSid).then(fulfilled);
+        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
 
         if(campaign.getClickAttributionUrl()) {
             return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
@@ -163,8 +163,8 @@ export class SessionManager {
         }
     }
 
-    public setGamerSid(sid: string): void {
-        this._gamerSid = sid;
+    public setGamerServerId(serverId: string): void {
+        this._gamerServerId = serverId;
     }
 
     private createShowEventUrl(adUnit: AbstractAdUnit): string {
@@ -203,5 +203,4 @@ export class SessionManager {
             redirect: false
         });
     }
-
 }

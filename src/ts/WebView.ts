@@ -141,7 +141,7 @@ export class WebView {
 
         PlayerMetaData.fetch(this._nativeBridge).then(player => {
             if(player) {
-                this._sessionManager.setGamerSid(player.getSid());
+                this._sessionManager.setGamerServerId(player.getServerId());
             }
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
