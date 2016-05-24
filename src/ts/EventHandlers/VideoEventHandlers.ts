@@ -5,6 +5,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
 
 export class VideoEventHandlers {
 
@@ -63,4 +64,15 @@ export class VideoEventHandlers {
         });
     }
 
+    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, what: number, extra: number) {
+        adUnit.setVideoActive(false);
+        adUnit.setFinishState(FinishState.ERROR);
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.Sdk.logError('Unity Ads video player error');
+        } else {
+            nativeBridge.Sdk.logError('Unity Ads video player error ' + what + ' ' + extra);
+        }
+        nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
+        adUnit.hide();
+    }
 }
