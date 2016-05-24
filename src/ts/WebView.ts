@@ -43,6 +43,7 @@ export class WebView {
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
+    private _refillTimestamp: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -89,7 +90,9 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
+            this._refillTimestamp = 0;
             this._campaignManager.request();
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -152,6 +155,7 @@ export class WebView {
 
             this._campaign = null;
             this.setPlacementStates(PlacementState.WAITING);
+            this._refillTimestamp = 0;
             this._campaignManager.request();
         });
     }
@@ -222,6 +226,12 @@ export class WebView {
         }
     }
 
+    private onNoFill(retryTime: number) {
+        this._refillTimestamp = Date.now() + retryTime * 1000;
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
+        this.setPlacementStates(PlacementState.NO_FILL);
+    }
+
     private onCampaignError(error: any) {
         if(error instanceof Error) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
@@ -259,6 +269,10 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
+                    if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
+                        this._refillTimestamp = 0;
+                        this._campaignManager.request();
+                    }
                     this._eventManager.sendUnsentSessions();
                 }
             });

@@ -13,6 +13,7 @@ export class CampaignManager {
     private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
+    public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
@@ -36,8 +37,12 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
-                let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                this.onCampaign.trigger(campaign);
+                if(campaignJson.campaign) {
+                    let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    this.onCampaign.trigger(campaign);
+                } else {
+                    this.onNoFill.trigger(3600); // Default to retry in one hour. This value should be set by server.
+                }
             });
         }).catch((error) => {
             this.onError.trigger(error);
