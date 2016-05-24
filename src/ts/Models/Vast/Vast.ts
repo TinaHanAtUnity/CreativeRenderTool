@@ -1,4 +1,4 @@
-import { VastAd } from 'Models/VastAd';
+import { VastAd } from 'Models/Vast/VastAd';
 
 export class Vast {
 

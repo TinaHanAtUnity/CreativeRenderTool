@@ -1,4 +1,4 @@
-import { VastCreative } from 'Models/VastCreative';
+import { VastCreative } from 'Models/Vast/VastCreative';
 
 export class VastAd {
 

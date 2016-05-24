@@ -1,5 +1,5 @@
-import { VastCreative } from 'Models/VastCreative';
-import { VastMediaFile } from 'Models/VastMediaFile';
+import { VastCreative } from 'Models/Vast/VastCreative';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 export class VastCreativeLinear extends VastCreative {
 

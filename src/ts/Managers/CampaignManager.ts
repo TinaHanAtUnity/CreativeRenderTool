@@ -2,7 +2,7 @@ import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
-import { VastCampaign } from 'Models/VastCampaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';

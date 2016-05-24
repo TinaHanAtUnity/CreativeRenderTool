@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { Campaign } from '../../src/ts/Models/Campaign';
-import { VastCampaign } from '../../src/ts/Models/VastCampaign';
+import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Request } from '../../src/ts/Utilities/Request';

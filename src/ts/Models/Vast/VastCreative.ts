@@ -1,4 +1,4 @@
-import { VastMediaFile } from 'Models/VastMediaFile';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 export abstract class VastCreative {
 

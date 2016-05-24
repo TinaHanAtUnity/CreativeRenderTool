@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { VastCampaign } from 'Models/VastCampaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';

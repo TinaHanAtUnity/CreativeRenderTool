@@ -1,5 +1,5 @@
 import { Campaign } from 'Models/Campaign';
-import { Vast } from 'Models/Vast';
+import { Vast } from 'Models/Vast/Vast';
 
 export class VastCampaign extends Campaign {
 

@@ -2,8 +2,8 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { Overlay } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { Vast } from 'Models/Vast';
-import { VastCampaign } from 'Models/VastCampaign';
+import { Vast } from 'Models/Vast/Vast';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 
 export class VastAdUnit extends VideoAdUnit {

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
-import { VastCampaign } from '../../src/ts/Models/VastCampaign';
+import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
 import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';

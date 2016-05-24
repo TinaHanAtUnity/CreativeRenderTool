@@ -1,8 +1,8 @@
-import { Vast } from 'Models/Vast';
-import { VastAd } from 'Models/VastAd';
-import { VastCreative } from 'Models/VastCreative';
-import { VastCreativeLinear } from 'Models/VastCreativeLinear';
-import { VastMediaFile } from 'Models/VastMediaFile';
+import { Vast } from 'Models/Vast/Vast';
+import { VastAd } from 'Models/Vast/VastAd';
+import { VastCreative } from 'Models/Vast/VastCreative';
+import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
 import * as xmldom from 'xmldom';
 
