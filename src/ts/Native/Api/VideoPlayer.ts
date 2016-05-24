@@ -4,15 +4,19 @@ import { Observable3, Observable1, Observable4 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 enum VideoPlayerEvent {
-    ON_ERROR,
+    GENERIC_ERROR,
     PROGRESS,
     INFO,
     COMPLETED,
     PREPARED,
+    PREPARE_ERROR,
     PLAY,
+    PAUSE_ERROR,
     PAUSE,
+    SEEKTO_ERROR,
     SEEKTO,
-    STOP
+    STOP,
+    ILLEGAL_STATE
 }
 
 export class VideoPlayerApi extends NativeApi {
@@ -77,7 +81,7 @@ export class VideoPlayerApi extends NativeApi {
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
-            case VideoPlayerEvent[VideoPlayerEvent.ON_ERROR]:
+            case VideoPlayerEvent[VideoPlayerEvent.GENERIC_ERROR]:
                 this.onError.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
