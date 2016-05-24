@@ -4,13 +4,22 @@ import { Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
 import { MediationMetaData } from './MediationMetaData';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+
+interface IMetaDataCaches {
+    framework: Model;
+    adapter: Model;
+    mediation: Model;
+    player: Model;
+}
 
 export class MetaDataManager {
 
-    private static caches = {
-        framework: Model,
-        adapter: Model,
-        mediation: Model,
+    private static caches: IMetaDataCaches = {
+        framework: undefined,
+        adapter: undefined,
+        mediation: undefined,
+        player: undefined,
     };
 
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
@@ -43,6 +52,17 @@ export class MetaDataManager {
             });
     }
 
+    public static fetchPlayerMetaData(nativeBridge: NativeBridge, cache = true): Promise<PlayerMetaData> {
+        return MetaDataManager.fetch(PlayerMetaData.getCategory(), PlayerMetaData.getKeys(), nativeBridge, cache)
+            .then(result => {
+                if (result != null) {
+                    MetaDataManager.caches.player = undefined;
+                    return nativeBridge.Storage.delete(StorageType.PUBLIC, PlayerMetaData.getCategory()).then(() => <PlayerMetaData>result);
+                }
+                return Promise.resolve(<PlayerMetaData>result);
+            });
+    }
+
     public static fetch(category: string, keys: string[], nativeBridge: NativeBridge, cache = true): Promise<Model> {
         if(cache && MetaDataManager.caches[category]) {
             return Promise.resolve(MetaDataManager.caches[category]);
@@ -54,14 +74,14 @@ export class MetaDataManager {
     }
 
     public static createAndCache(category: string, data: string[], cache = true) {
+        if (data === undefined) {
+            return undefined;
+        }
         if(cache && !MetaDataManager.caches[category]) {
             MetaDataManager.caches[category] = MetaDataManager.createByCategory(category, data);
         }
         if(cache) {
             return MetaDataManager.caches[category];
-        }
-        if (data === undefined) {
-            return undefined;
         }
         return MetaDataManager.createByCategory(category, data);
     }
@@ -74,9 +94,20 @@ export class MetaDataManager {
                 return new AdapterMetaData(data);
             case 'mediation':
                 return new MediationMetaData(data);
+            case 'player':
+                return new PlayerMetaData(data);
             default:
                 return null;
         }
+    }
+
+    public static clearCaches() {
+        MetaDataManager.caches = {
+            framework: undefined,
+            adapter: undefined,
+            mediation: undefined,
+            player: undefined,
+        };
     }
 
     private static categoryExists(rootkey: string, nativeBridge: NativeBridge): Promise<boolean> {
