@@ -67,12 +67,18 @@ export class VideoEventHandlers {
     public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, what: number, extra: number) {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.ERROR);
+
+        nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
+
         if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.Sdk.logError('Unity Ads video player error');
+            nativeBridge.IosAdUnit.setViews(['webview']);
         } else {
             nativeBridge.Sdk.logError('Unity Ads video player error ' + what + ' ' + extra);
+            nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
-        nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
-        adUnit.hide();
+
+        adUnit.getOverlay().hide();
+        adUnit.getEndScreen().show();
     }
 }
