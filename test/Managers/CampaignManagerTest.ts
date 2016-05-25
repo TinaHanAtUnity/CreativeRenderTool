@@ -28,7 +28,7 @@ describe('CampaignManager', () => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -79,7 +79,7 @@ describe('CampaignManager', () => {
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -222,7 +222,7 @@ describe('CampaignManager', () => {
         // given a VAST placement with invalid XML
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -252,7 +252,7 @@ describe('CampaignManager', () => {
         // given a VAST placement that wraps another VAST
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {
@@ -548,7 +548,7 @@ describe('CampaignManager', () => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').withArgs(
-            'http://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
             '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
             [],
             {

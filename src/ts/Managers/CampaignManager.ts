@@ -12,7 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class CampaignManager {
 
-    private static CampaignBaseUrl = 'http://yield.unityads.unity3d.com/test/games';
+    private static CampaignBaseUrl = 'https://yield.unityads.unity3d.com/test/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
