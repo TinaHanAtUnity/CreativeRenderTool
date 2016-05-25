@@ -67,7 +67,7 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<KeyCode[]>(this._apiClass, 'setKeyEventList', [keyEventList]);
     }
 
-    public handleEvent(event: string, ...parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
                 this.onStart.trigger();

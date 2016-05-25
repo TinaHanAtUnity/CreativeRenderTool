@@ -47,7 +47,6 @@ export class AdUnitFactory {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(nativeBridge, videoAdUnit));
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
     }
@@ -57,12 +56,14 @@ export class AdUnitFactory {
         let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(videoAdUnit, position));
         let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
         let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
+        let onErrorObserver = nativeBridge.VideoPlayer.onError.subscribe((what, extra, url) => VideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, what, extra));
 
         videoAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+            nativeBridge.VideoPlayer.onError.unsubscribe(onErrorObserver);
         });
     }
 
