@@ -27,10 +27,7 @@ export class FrameworkMetaData extends Model {
         return this._version;
     }
 
-    public getDTO(): {
-        [key: string
-            ]: any
-    } {
+    public getDTO(): { [key: string]: any } {
         return {
             'frameworkName': this._name,
             'frameworkVersion': this._version
