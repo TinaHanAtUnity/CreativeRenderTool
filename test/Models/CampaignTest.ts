@@ -64,7 +64,7 @@ describe('Campaign', () => {
             };
             let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(json.vast);
-            let campaign = new VastCampaign(parsedVast, json.gamerId, json.abGroup);
+            let campaign = new VastCampaign(parsedVast, '12345', json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), null);
@@ -73,7 +73,7 @@ describe('Campaign', () => {
             assert.equal(campaign.getGameIcon(), null);
             assert.equal(campaign.getGameId(), null);
             assert.equal(campaign.getGameName(), null);
-            assert.equal(campaign.getId(), null);
+            assert.equal(campaign.getId(), '12345');
             assert.equal(campaign.getRating(), null);
             assert.equal(campaign.getRatingCount(), null);
             const vast = campaign.getVast();

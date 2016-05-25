@@ -3,11 +3,17 @@ import { Vast } from 'Models/Vast/Vast';
 
 export class VastCampaign extends Campaign {
 
+    private _campaignId: string;
     private _vast: Vast;
 
-    constructor(vast: Vast, gamerId: string, abGroup: number) {
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number) {
         super({}, gamerId, abGroup);
+        this._campaignId = campaignId;
         this._vast = vast;
+    }
+
+    public getId(): string {
+        return this._campaignId;
     }
 
     public getVast(): Vast {

@@ -47,7 +47,13 @@ export class CampaignManager {
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
-                        let campaign = new VastCampaign(vast, campaignJson.gamerId, campaignJson.abGroup);
+                        let campaignId: string = undefined;
+                        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                            campaignId = '00005472656d6f7220694f53';
+                        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                            campaignId = '005472656d6f7220416e6472';
+                        }
+                        let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
                         if (campaign.getVast().getImpressionUrls().length === 0) {
                             this.onError.trigger(new Error('Campaign does not have an impression url'));
                             return;

@@ -211,7 +211,7 @@ describe('SessionManager', () => {
             'gamerId': '5712983c481291b16e1be03b'
         };
         let vast = vastParser.parseVast(json.vast);
-        campaign = new VastCampaign(vast, json.gamerId, json.abGroup);
+        campaign = new VastCampaign(vast, '12345', json.gamerId, json.abGroup);
 
         placement = new Placement({
             id: '123',
