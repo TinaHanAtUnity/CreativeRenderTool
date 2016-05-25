@@ -1,32 +1,20 @@
 import { Model } from 'Models/Model';
-import { NativeBridge } from 'Native/NativeBridge';
-import { StorageType } from 'Native/Api/Storage';
 
 export class PlayerMetaData extends Model {
 
     private _serverId: string;
 
-    public static exists(nativeBridge: NativeBridge): Promise<boolean> {
-        return nativeBridge.Storage.getKeys(StorageType.PUBLIC, 'player', false).then(keys => {
-            return keys.length > 0;
-        });
+    public static getCategory(): string {
+        return 'player';
     }
 
-    public static fetch(nativeBridge: NativeBridge): Promise<PlayerMetaData> {
-        return PlayerMetaData.exists(nativeBridge).then(exists => {
-            if(!exists) {
-                return Promise.resolve(undefined);
-            }
-            return nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'player.server_id.value').catch(() => undefined).then(serverId => {
-                nativeBridge.Storage.delete(StorageType.PUBLIC, 'player');
-                return new PlayerMetaData(serverId);
-            });
-        });
+    public static getKeys(): string[] {
+        return ['server_id.value'];
     }
 
-    constructor(serverId: string) {
+    constructor(data: string[]) {
         super();
-        this._serverId = serverId;
+        this._serverId = data[0];
     }
 
     public getServerId(): string {

@@ -79,7 +79,12 @@ export class Overlay extends View {
             this._skipRemaining = Math.round((this._skipDuration - value) / 1000);
             this.setSkipText(this._skipRemaining);
         }
-        this._videoDurationElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
+        if(this._videoDuration > value) {
+            this._videoDurationElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
+        } else {
+            // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
+            this._videoDurationElement.innerHTML = '0';
+        }
     }
 
     public isMuted(): boolean {
