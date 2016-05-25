@@ -344,7 +344,7 @@ export class WebView {
         return this.getConfigJson().then(response => {
             this._configJsonCheckedAt = Date.now();
             let configJson = JSON.parse(response.response);
-            return configJson.hash === this._clientInfo.getWebviewHash();
+            return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;
         });
