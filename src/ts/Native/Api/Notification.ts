@@ -14,8 +14,8 @@ export class NotificationApi extends NativeApi {
         super(nativeBridge, 'Notification');
     }
 
-    public addNotificationObserver(name: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'addNotificationObserver', [name]);
+    public addNotificationObserver(name: string, keys: string[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'addNotificationObserver', [name, keys]);
     }
 
     public removeNotificationObserver(name: string): Promise<void> {

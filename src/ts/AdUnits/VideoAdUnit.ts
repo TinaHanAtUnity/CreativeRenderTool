@@ -71,8 +71,8 @@ export class VideoAdUnit extends AbstractAdUnit {
             }
 
             this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
-            this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt);
-            this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange);
+            this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
+            this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange, []);
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
