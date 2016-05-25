@@ -38,7 +38,7 @@ export class WakeUpManager {
 
     public setListenAppForeground(status: boolean): Promise<void> {
         if(status) {
-            return this._nativeBridge.Notification.addNotificationObserver(WakeUpManager._appForegroundNotification);
+            return this._nativeBridge.Notification.addNotificationObserver(WakeUpManager._appForegroundNotification, []);
         } else {
             return this._nativeBridge.Notification.removeNotificationObserver(WakeUpManager._appForegroundNotification);
         }
