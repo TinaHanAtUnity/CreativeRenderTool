@@ -62,6 +62,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
+        this.onStart.trigger();
         this.setVideoActive(true);
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
