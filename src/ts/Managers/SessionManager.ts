@@ -5,7 +5,7 @@ import { Url } from 'Utilities/Url';
 import { EventManager } from 'EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 
 export class SessionManager {
@@ -150,7 +150,7 @@ export class SessionManager {
             'deviceModel': this._deviceInfo.getModel()
         };
 
-        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
             if(mediation) {
                 infoJson.mediationName = mediation.getName();
                 infoJson.mediationVersion = mediation.getVersion();

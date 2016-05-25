@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { PlayerMetaData } from '../../../src/ts/Models/MetaData/PlayerMetaData';
+import { MetaDataManager } from '../../../src/ts/Managers/MetaDataManager';
 import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
@@ -61,9 +61,14 @@ describe('PlayerMetaDataTest', () => {
         nativeBridge.Storage = storageApi = new TestStorageApi(nativeBridge);
     });
 
-    it('should return undefined when data doesnt exist', () => {
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
-            assert.isUndefined(metaData, 'Returned PlayerMetaData even when it doesnt exist');
+    beforeEach(() => {
+        MetaDataManager.clearCaches();
+
+    });
+
+    it('should return undefined when data does not exist', () => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
+            assert.isUndefined(metaData, 'Returned PlayerMetaData even when it does not exist');
         });
     });
 
@@ -74,14 +79,14 @@ describe('PlayerMetaDataTest', () => {
             }
         });
 
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
             assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
                 sid: 'test_sid',
             }, 'PlayerMetaData.getDTO() produced invalid output');
-            return PlayerMetaData.exists(nativeBridge).then(exists => {
-                assert.isFalse(exists, 'PlayerMetaData was not deleted after fetching');
+            return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(exists => {
+                assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');
             });
         });
     });
@@ -93,7 +98,7 @@ describe('PlayerMetaDataTest', () => {
             }
         });
 
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
             assert.equal(metaData.getServerId(), undefined, 'PlayerMetaData.getServerId() did not pass through correctly');
         });

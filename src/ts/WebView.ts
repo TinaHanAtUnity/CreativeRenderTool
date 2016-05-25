@@ -15,7 +15,7 @@ import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
-import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
@@ -148,7 +148,7 @@ export class WebView {
             return;
         }
 
-        PlayerMetaData.fetch(this._nativeBridge).then(player => {
+        MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
             if(player) {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }

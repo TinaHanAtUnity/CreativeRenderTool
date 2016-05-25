@@ -6,7 +6,7 @@ import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class CampaignManager {
 
@@ -98,7 +98,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(): Promise<string> {
-        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
             let body: any = {
                 bundleVersion: this._clientInfo.getApplicationVersion(),
                 bundleId: this._clientInfo.getApplicationName(),
