@@ -35,7 +35,7 @@ describe('CampaignManager', () => {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }
         ).returns(Promise.resolve({
             response: `{
@@ -86,7 +86,7 @@ describe('CampaignManager', () => {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }
         ).returns(Promise.resolve({
             response: `{
@@ -229,7 +229,7 @@ describe('CampaignManager', () => {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }
         ).returns(Promise.resolve(response));
 
@@ -259,7 +259,7 @@ describe('CampaignManager', () => {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }
         ).returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(wrappedResponse);
@@ -555,7 +555,7 @@ describe('CampaignManager', () => {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }
         ).returns(Promise.resolve(response));
 
@@ -677,6 +677,9 @@ describe('CampaignManager', () => {
             },
             Broadcast: {
                 onBroadcastAction: new Observable4()
+            },
+            Notification: {
+                onNotification: new Observable2()
             },
             getPlatform: () => {
                 return Platform.TEST;

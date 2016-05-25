@@ -13,7 +13,7 @@ import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
-import { IObserver1 } from 'Utilities/IObserver';
+import { IObserver1, IObserver3 } from 'Utilities/IObserver';
 
 export class AdUnitFactory {
 
@@ -75,7 +75,6 @@ export class AdUnitFactory {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onReplay.subscribe(() => EndScreenEventHandlers.onReplay(nativeBridge, videoAdUnit));
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
     }
@@ -84,11 +83,15 @@ export class AdUnitFactory {
         let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration));
         let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(sessionManager, videoAdUnit, position));
         let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
+
         let onCompletedObserver: IObserver1<string>;
+        let onErrorObserver: IObserver3<number, number, string>;
         if (videoAdUnit instanceof VastAdUnit) {
             onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
+            onErrorObserver = nativeBridge.VideoPlayer.onError.subscribe((what, extra, url) => VastVideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, what, extra));
         } else {
             onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
+            onErrorObserver = nativeBridge.VideoPlayer.onError.subscribe((what, extra, url) => VideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, what, extra));
         }
 
         videoAdUnit.onClose.subscribe(() => {
@@ -96,6 +99,7 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+            nativeBridge.VideoPlayer.onError.unsubscribe(onErrorObserver);
         });
     }
 

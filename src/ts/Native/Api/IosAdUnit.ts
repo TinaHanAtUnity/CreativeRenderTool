@@ -69,7 +69,7 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
     }
 
-    public handleEvent(event: string, ...parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
                 this.onViewControllerInit.trigger();

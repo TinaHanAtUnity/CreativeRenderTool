@@ -16,6 +16,7 @@ export class CampaignManager {
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
+    public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
@@ -38,13 +39,13 @@ export class CampaignManager {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 if (campaignJson.campaign) {
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
-                } else {
+                } else if('vast' in campaignJson) {
                     this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
                         let campaign = new VastCampaign(vast, campaignJson.gamerId, campaignJson.abGroup);
                         if (campaign.getVast().getImpressionUrls().length === 0) {
@@ -63,6 +64,8 @@ export class CampaignManager {
                     }).catch((error) => {
                         this.onError.trigger(error);
                     });
+                } else {
+                    this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
                 }
             });
         }).catch((error) => {
