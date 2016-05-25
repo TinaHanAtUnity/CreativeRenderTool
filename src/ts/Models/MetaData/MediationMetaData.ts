@@ -18,7 +18,7 @@ export class MediationMetaData extends Model {
         super();
         this._name = data[0];
         this._version = data[1];
-        this._ordinal = parseInt(data[2]);
+        this._ordinal = parseInt(data[2], 10);
     }
 
     public getName(): string {
