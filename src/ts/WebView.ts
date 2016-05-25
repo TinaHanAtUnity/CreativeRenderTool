@@ -40,6 +40,7 @@ export class WebView {
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
 
+    private _showing: boolean = false;
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
@@ -155,6 +156,7 @@ export class WebView {
 
             let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
             adUnit.setNativeOptions(options);
+            adUnit.onStart.subscribe(() => this.onStart());
             adUnit.onClose.subscribe(() => this.onClose());
 
             adUnit.show().then(() => {
@@ -251,7 +253,12 @@ export class WebView {
         }, this._clientInfo, this._deviceInfo);
     }
 
+    private onStart(): void {
+        this._showing = true;
+    }
+
     private onClose(): void {
+        this._showing = false;
         if(this._mustReinitialize) {
             this.reinitialize();
         } else {
@@ -260,7 +267,7 @@ export class WebView {
     }
 
     private isShowing(): boolean {
-        return true; // todo: fixme?
+        return this._showing;
     }
 
     /*
@@ -337,7 +344,7 @@ export class WebView {
         return this.getConfigJson().then(response => {
             this._configJsonCheckedAt = Date.now();
             let configJson = JSON.parse(response.response);
-            return configJson.hash === this._clientInfo.getWebviewHash();
+            return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;
         });
