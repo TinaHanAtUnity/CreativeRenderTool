@@ -16,7 +16,7 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = campaign.getRating() * 20 - 2;
+        let adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon(),
