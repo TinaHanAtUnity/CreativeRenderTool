@@ -477,7 +477,8 @@ describe('CampaignManager', () => {
             return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
         });
 
-        it('should trigger onError after requesting a vast placement with null vast data', () => {
+        it('should trigger onNoFill after requesting a vast placement with null vast data', () => {
+            // given a VAST placement with null vast
             const response = {
                 response: `{
                     "abGroup": 3,
@@ -485,7 +486,33 @@ describe('CampaignManager', () => {
                     "gamerId": "5712983c481291b16e1be03b"
                 }`
             };
-            return verifyErrorForResponse(response, 'VAST data is missing');
+
+            let mockRequest = sinon.mock(request);
+            mockRequest.expects('post').withArgs(
+                'https://yield.unityads.unity3d.com/test/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+                '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+                [],
+                {
+                    retries: 5,
+                    retryDelay: 5000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }
+            ).returns(Promise.resolve(response));
+
+            let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+            let triggeredRetryTime: number;
+            campaignManager.onNoFill.subscribe((retryTime: number) => {
+                triggeredRetryTime = retryTime;
+            });
+
+            // when the campaign manager requests the placement
+            return campaignManager.request().then(() => {
+
+                // then the onNoFill observable is triggered
+                mockRequest.verify();
+                assert.equal(triggeredRetryTime, 3600);
+            });
         });
 
         it('should trigger onError after requesting a vast placement without an impression url', () => {
