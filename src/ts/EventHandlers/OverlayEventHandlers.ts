@@ -3,6 +3,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
+import { Platform } from 'Constants/Platform';
 
 export class OverlayEventHandlers {
 
@@ -11,13 +12,19 @@ export class OverlayEventHandlers {
       adUnit.setVideoActive(false);
       adUnit.setFinishState(FinishState.SKIPPED);
       sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
-      nativeBridge.AdUnit.setViews(['webview']);
+
+      if(nativeBridge.getPlatform() === Platform.IOS) {
+          nativeBridge.IosAdUnit.setViews(['webview']);
+      } else {
+          nativeBridge.AndroidAdUnit.setViews(['webview']);
+      }
+
       adUnit.getOverlay().hide();
       adUnit.getEndScreen().show();
   }
 
-  public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
-      nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-  }
+    public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
+        nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
+    }
 
 }

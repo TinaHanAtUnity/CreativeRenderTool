@@ -1,11 +1,11 @@
-/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { PlayerMetaData } from '../../../src/ts/Models/MetaData/PlayerMetaData';
+import { MetaDataManager } from '../../../src/ts/Managers/MetaDataManager';
 import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
@@ -19,17 +19,8 @@ class TestStorageApi extends StorageApi {
     public get(storageType: StorageType, key: string): Promise<string | number> {
         try {
             switch(key) {
-                case 'player.sid.value':
-                    return Promise.resolve(this._storage.player.sid.value);
-
-                case 'player.name.value':
-                    return Promise.resolve(this._storage.player.name.value);
-
-                case 'player.gender.value':
-                    return Promise.resolve(this._storage.player.gender.value);
-
-                case 'player.age.value':
-                    return Promise.resolve(this._storage.player.age.value);
+                case 'player.server_id.value':
+                    return Promise.resolve(this._storage.player.server_id.value);
 
                 default:
                     throw new Error('Unknown player key "' + key + '"');
@@ -70,67 +61,46 @@ describe('PlayerMetaDataTest', () => {
         nativeBridge.Storage = storageApi = new TestStorageApi(nativeBridge);
     });
 
-    it('should return undefined when data doesnt exist', () => {
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
-            assert.isUndefined(metaData, 'Returned PlayerMetaData even when it doesnt exist');
+    beforeEach(() => {
+        MetaDataManager.clearCaches();
+
+    });
+
+    it('should return undefined when data does not exist', () => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
+            assert.isUndefined(metaData, 'Returned PlayerMetaData even when it does not exist');
         });
     });
 
     it('should fetch correctly', () => {
-        storageApi.setStorage({player: {
-            sid: { value: 'test_sid' },
-            name: { value: 'test_name' },
-            gender: { value: 'test_gender' },
-            age: { value: 42 }
-        }});
+        storageApi.setStorage({
+            player: {
+                server_id: {value: 'test_sid'},
+            }
+        });
 
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
-            assert.equal(metaData.getSid(), 'test_sid', 'PlayerMetaData.getSid() did not pass through correctly');
-            assert.equal(metaData.getName(), 'test_name', 'PlayerMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getGender(), 'test_gender', 'PlayerMetaData.getGender() did not pass through correctly');
-            assert.equal(metaData.getAge(), 42, 'PlayerMetaData.getAge() did not pass through correctly');
+            assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
-                playerSid: 'test_sid',
-                playerName: 'test_name',
-                playerGender: 'test_gender',
-                playerAge: 42
+                sid: 'test_sid',
             }, 'PlayerMetaData.getDTO() produced invalid output');
-            return PlayerMetaData.exists(nativeBridge).then(exists => {
-                assert.isFalse(exists, 'PlayerMetaData was not deleted after fetching');
+            return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(exists => {
+                assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');
             });
         });
     });
 
     it('should fetch correctly when data is undefined', () => {
-        storageApi.setStorage({player: {
-            sid: undefined,
-            name: undefined,
-            gender: undefined,
-            age: undefined
-        }});
-
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
-            assert.isDefined(metaData, 'PlayerMetaData is not defined');
-            assert.equal(metaData.getSid(), undefined, 'PlayerMetaData.getSid() did not pass through correctly');
-            assert.equal(metaData.getName(), undefined, 'PlayerMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getGender(), undefined, 'PlayerMetaData.getGender() did not pass through correctly');
-            assert.equal(metaData.getAge(), undefined, 'PlayerMetaData.getAge() did not pass through correctly');
+        storageApi.setStorage({
+            player: {
+                server_id: undefined
+            }
         });
-    });
 
-    it('should fetch correctly when data is partially undefined', () => {
-        storageApi.setStorage({player: {
-            sid: { value: 'test_sid' },
-            age: { value: 666 }
-        }});
-
-        return PlayerMetaData.fetch(nativeBridge).then(metaData => {
+        return MetaDataManager.fetchPlayerMetaData(nativeBridge).then(metaData => {
             assert.isDefined(metaData, 'PlayerMetaData is not defined');
-            assert.equal(metaData.getSid(), 'test_sid', 'PlayerMetaData.getSid() did not pass through correctly');
-            assert.equal(metaData.getName(), undefined, 'PlayerMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getGender(), undefined, 'PlayerMetaData.getGender() did not pass through correctly');
-            assert.equal(metaData.getAge(), 666, 'PlayerMetaData.getAge() did not pass through correctly');
+            assert.equal(metaData.getServerId(), undefined, 'PlayerMetaData.getServerId() did not pass through correctly');
         });
     });
 

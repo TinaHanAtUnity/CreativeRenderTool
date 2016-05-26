@@ -11,7 +11,7 @@ class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
 
-    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
+    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -43,7 +43,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
+    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -74,11 +74,15 @@ class TestRequestApi extends RequestApi {
     }
 
     private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
-        setTimeout(() => { this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]); }, 0);
+        setTimeout(() => {
+            this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]);
+        }, 0);
     }
 
     private sendFailResponse(id: string, url: string, message: string) {
-        setTimeout(() => { this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, message]); }, 0);
+        setTimeout(() => {
+            this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, message]);
+        }, 0);
     }
 }
 
@@ -143,7 +147,12 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        return request.get(retryUrl, [], {retries: retryAttempts, retryDelay: retryDelay, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
+        return request.get(retryUrl, [], {
+            retries: retryAttempts,
+            retryDelay: retryDelay,
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
             error = error[1];
@@ -206,7 +215,12 @@ describe('RequestTest', () => {
         let retryAttempts: number = 3;
         let retryDelay: number = 10;
 
-        return request.post(retryUrl, 'Test', [], {retries: retryAttempts, retryDelay: retryDelay, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
+        return request.post(retryUrl, 'Test', [], {
+            retries: retryAttempts,
+            retryDelay: retryDelay,
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
             error = error[1];
@@ -234,7 +248,12 @@ describe('RequestTest', () => {
 
         requestApi.setToggleUrl(false);
 
-        let promise = request.get(toggleUrl, [], {retries: 0, retryDelay: 0, followRedirects: false, retryWithConnectionEvents: true}).then((response) => {
+        let promise = request.get(toggleUrl, [], {
+            retries: 0,
+            retryDelay: 0,
+            followRedirects: false,
+            retryWithConnectionEvents: true
+        }).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
             error = error[1];

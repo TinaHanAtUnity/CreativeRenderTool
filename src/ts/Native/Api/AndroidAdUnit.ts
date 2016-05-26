@@ -13,10 +13,10 @@ enum AdUnitEvent {
     ON_PAUSE,
     KEY_DOWN,
     ON_RESTORE,
-    ON_STOP
+    ON_STOP,
 }
 
-export class AdUnitApi extends NativeApi {
+export class AndroidAdUnitApi extends NativeApi {
 
     public onStart: Observable0 = new Observable0();
     public onCreate: Observable0 = new Observable0();
@@ -31,8 +31,8 @@ export class AdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility]);
+    public open(views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility, hardwareAccel]);
     }
 
     public close(): Promise<void> {
@@ -67,7 +67,7 @@ export class AdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<KeyCode[]>(this._apiClass, 'setKeyEventList', [keyEventList]);
     }
 
-    public handleEvent(event: string, ...parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
                 this.onStart.trigger();

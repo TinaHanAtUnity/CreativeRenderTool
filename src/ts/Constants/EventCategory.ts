@@ -1,4 +1,5 @@
 export enum EventCategory {
+    APPSHEET,
     ADUNIT,
     VIDEOPLAYER,
     URL,
@@ -7,5 +8,6 @@ export enum EventCategory {
     STORAGE,
     REQUEST,
     RESOLVE,
-    BROADCAST
+    BROADCAST,
+    NOTIFICATION
 }

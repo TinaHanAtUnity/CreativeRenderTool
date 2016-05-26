@@ -9,7 +9,6 @@ import { Campaign } from 'Models/Campaign';
 export class EndScreen extends View {
 
     public onDownload: Observable0 = new Observable0();
-    public onReplay: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
     constructor(campaign: Campaign) {
@@ -17,7 +16,7 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = campaign.getRating() * 20 - 2;
+        let adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon(),
@@ -35,11 +34,6 @@ export class EndScreen extends View {
             },
             {
                 event: 'click',
-                listener: (event) => this.onReplayEvent(event),
-                selector: '.btn-watch-again-region'
-            },
-            {
-                event: 'click',
                 listener: (event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
             }
@@ -49,11 +43,6 @@ export class EndScreen extends View {
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
         this.onDownload.trigger();
-    }
-
-    private onReplayEvent(event: Event): void {
-        event.preventDefault();
-        this.onReplay.trigger();
     }
 
     private onCloseEvent(event: Event): void {

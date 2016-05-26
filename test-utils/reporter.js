@@ -1,13 +1,59 @@
 define([], function() {
     "use strict";
 
-    function Base(runner) {
-        var self = this
-            , stats = this.stats = {suites: 0, tests: 0, passes: 0, pending: 0, failures: 0}
-            , failures = this.failures = [];
+    function Logger(platform) {
+        this.timers = {};
+        this.level = 0;
+        this.platform = platform;
+    }
 
+    Logger.prototype.time = function(label) {
+        console.time(label);
+        this.timers[label] = Date.now();
+    };
+
+    Logger.prototype.timeEnd = function(label) {
+        console.timeEnd(label);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label + ': ' + Date.now() - this.timers[label] + 'ms']);
+        delete this.timers[label];
+    };
+
+    Logger.prototype.group = function(label) {
+        console.group(label);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label]);
+        this.level++;
+    };
+
+    Logger.prototype.groupEnd = function() {
+        console.groupEnd();
+        this.level--;
+    };
+
+    Logger.prototype.log = function(message) {
+        console.log(message);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + message]);
+    };
+
+    Logger.prototype.error = function(message) {
+        console.error(message);
+        this.callNative('Sdk', 'logError', [(new Array(this.level)).join('\t') + message]);
+    };
+
+    Logger.prototype.callNative = function(className, methodName, parameters) {
+        if(this.platform === 'android') {
+            window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.api.' + className, methodName, parameters, 'null']]));
+        } else if(this.platform === 'ios') {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
+            xhr.send(JSON.stringify([['UADSApi' + className, methodName, parameters, 'null']]));
+        }
+    };
+
+    function BaseReporter(runner) {
         if (!runner) return;
-        this.runner = runner;
+
+        var stats = this.stats = {suites: 0, tests: 0, passes: 0, pending: 0, failures: 0};
+        var failures = this.failures = [];
 
         runner.stats = stats;
 
@@ -55,94 +101,74 @@ define([], function() {
         });
     }
 
-    /**
-     * Default symbol map.
-     */
+    function getPlatform() {
+        var queryString = window.location.search.split('?')[1].split('&');
+        for(var i = 0; i < queryString.length; i++) {
+            var queryParam = queryString[i].split('=');
+            if(queryParam[0] === 'platform') {
+                return queryParam[1];
+            }
+        }
+        return undefined;
+    }
 
-    Base.symbols = {
-        ok: '✓',
-        err: '✖',
-        dot: '․'
-    };
+    function HybridTestReporter(runner) {
+        BaseReporter.call(this, runner);
 
-    var styles = {
-        bold: 'font-weight:bold;',
-        normal: 'font-weight:normal;',
-        success: 'color:green;',
-        pending: 'color:blue;',
-        fail: 'color:red;',
-        suite: 'font-weight:bold;',
-        slow: 'color:white; background:red; border-radius:5px; padding:0 4px;',
-        medium: 'color:white; background:orange; border-radius:5px; padding:0 4px;'
-    };
-
-    /**
-     * Initialize a new `WebKit` test reporter.
-     *
-     * @param {Runner} runner
-     * @api public
-     */
-
-    function WebKit(runner) {
-        Base.call(this, runner);
-
-        var self = this
-            , stats = this.stats
-            , failures = 0;
+        var failures = 0;
+        var logger = new Logger(getPlatform());
 
         runner.on('start', function () {
-            console.time('duration');
+            logger.time('duration');
         });
 
         runner.on('suite', function (suite) {
             if (suite.root) return;
-            console.group('%c' + suite.title, styles.suite);
+            logger.group(suite.title);
         });
 
         runner.on('suite end', function (suite) {
             if (suite.root) return;
-            console.groupEnd();
+            logger.groupEnd();
         });
 
         runner.on('pending', function (test) {
-            console.log('%c- ' + test.title, styles.pending);
+            logger.log(test.title);
         });
 
         runner.on('pass', function (test) {
             if ('fast' == test.speed) {
-                console.log('%c' + Base.symbols.ok + ' ' + test.title, styles.success);
+                logger.log('passed: ' + test.title);
             }
             else if ('medium' == test.speed) {
-                console.log('%c' + Base.symbols.ok + ' ' + test.title + ' %c' + test.duration,
-                    styles.success, styles.medium);
+                logger.log('passed: ' + test.title + ' in: ' + test.duration);
             }
             else {
-                console.log('%c' + Base.symbols.ok + ' ' + test.title + ' %c' + test.duration,
-                    styles.success, styles.slow);
+                logger.log('passed: ' + test.title + ' in: ' + test.duration);
             }
         });
 
         runner.on('fail', function (test, err) {
-            console.error(++failures + ') ' + test.title + '%O', err);
+            logger.error(++failures + ') ' + test.title, err);
         });
 
         runner.on('end', function () {
             var stats = this.stats;
 
             // duration
-            console.timeEnd('duration');
+            logger.timeEnd('duration');
 
             // passes
-            console.log('%c' + (stats.passes || 0) + ' passing', styles.success);
+            logger.log((stats.passes || 0) + ' passing');
 
             // pending
             if (stats.pending) {
-                console.log('%c' + stats.pending + ' pending', styles.pending);
+                logger.log(stats.pending + ' pending');
             }
 
             // failures
             if (stats.failures) {
-                console.log('%c' + stats.failures + ' failing', 'color:red;');
+                logger.log(stats.failures + ' failing');
                 errors.call(this, this.failures);
             }
         }.bind(this));
@@ -165,14 +191,12 @@ define([], function() {
                 }
 
                 // indent stack trace without msg
-                stack = stack.slice(index ? index + 1 : index)
-                    .replace(/^/gm, '  ');
+                stack = stack.slice(index ? index + 1 : index).replace(/^/gm, '  ');
 
-                console.error((i + 1) + ') ' + test.fullTitle() + '\n%c' + msg + '\n%c' + stack,
-                    styles.bold, styles.normal);
+                logger.error((i + 1) + ') ' + test.fullTitle() + '\n' + msg + '\n' + stack);
             });
         }
     }
 
-    return WebKit;
+    return HybridTestReporter;
 });

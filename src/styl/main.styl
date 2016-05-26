@@ -54,20 +54,12 @@ body.android
     position: absolute
     z-index: 1
 
-  .btn-watch-again-region
-    position: absolute
-    z-index: 1
-
-  a.btn-watch-again
   a.btn-close
     z-index: 1
     position: absolute
     background-color: rgba(255, 255, 255, 0.5);
     color: #222c37
     text-align: center
-
-  a.btn-watch-again
-    -webkit-transform: rotate(90deg)
 
   .game-background
     width: 100%
@@ -188,88 +180,6 @@ body.android
       height: 100%
       right: 0
 
-  /************************
-  *
-  * POPUP
-  *
-  *************************/
-
-  .popup-background
-    visibility: hidden
-    position: absolute
-    top: 0
-    left: 0
-    background-color: rgba(0, 0, 0, 0.75)
-    width: 100%
-    height: 100%
-    z-index: 100
-    text-align: center
-    background-size: cover
-
-  /************************
-  *
-  * SPINNER
-  *
-  *************************/
-
-  .spinner-container
-    display: inline-block
-    text-align: center
-    background-color: #000
-    color: #FFF
-
-  .spinner-text
-    float: left
-
-  .spinner-animation
-    width: 24px
-    height: 24px
-    float: left
-    margin-right: 15px
-    border: 4px solid #fff
-    border-left-color: transparent
-    border-right-color: transparent
-    border-radius: 200px
-    -webkit-animation: spinner 1s linear infinite
-
-  @-webkit-keyframes spinner
-    from
-      -webkit-transform: rotate(0deg)
-    to
-      -webkit-transform: rotate(360deg)
-
-  /************************
-  * ERROR
-  *************************/
-
-  .error-container
-  .privacy-container
-    display: inline-block
-    text-align: center
-    background-color: #000
-    color: #FFF
-
-    .privacy-simple-text
-      display: none
-
-    &.simple
-      .privacy-text
-        display: none
-      .privacy-simple-text
-        display: block
-
-  .btn-ok
-  .btn-cancel
-    display: block
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4aaef0), color-stop(100%, #016add))
-    background: -webkit-linear-gradient(top, #4aaef0, #016add)
-
-// Only show privacy button on Android
-body.iphone
-body.ipad
-  .privacy-button
-    display: none
-
 /************************
 * DEVICE AND GAME SPECIFICS
 *************************/
@@ -277,3 +187,4 @@ body.ipad
 @import "fresh-base-size.styl"
 @import "fresh-responsive.styl"
 @import "overlay.styl"
+@import "icons.styl"

@@ -20,7 +20,7 @@ export class Placement {
     private _useDeviceOrientationForVideo: boolean;
     private _muteVideo: boolean;
 
-    constructor(data: any) {
+    constructor(data: any) {
         this._id = data.id;
         this._name = data.name;
         this._default = data.default;

@@ -10,8 +10,8 @@ export abstract class Observable<T> {
     }
 
     public unsubscribe(observer?: T): void {
-        if (this._observers.length) {
-            if (typeof observer !== 'undefined') {
+        if(this._observers.length) {
+            if(typeof observer !== 'undefined') {
                 this._observers = this._observers.filter(storedObserver => storedObserver !== observer);
             } else {
                 this._observers = [];

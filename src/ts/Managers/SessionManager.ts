@@ -5,7 +5,7 @@ import { Url } from 'Utilities/Url';
 import { EventManager } from 'EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 
 export class SessionManager {
@@ -20,7 +20,7 @@ export class SessionManager {
 
     private _currentSession: Session;
 
-    private _gamerSid: string;
+    private _gamerServerId: string;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager) {
         this._nativeBridge = nativeBridge;
@@ -84,14 +84,14 @@ export class SessionManager {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         });
 
-        if (campaign.getClickAttributionUrl()) {
+        if(campaign.getClickAttributionUrl()) {
             return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
         }
         return Promise.reject('Missing click attribution url');
     }
 
-    public setGamerSid(sid: string): void {
-        this._gamerSid = sid;
+    public setGamerServerId(serverId: string): void {
+        this._gamerServerId = serverId;
     }
 
     private createShowEventUrl(adUnit: AbstractAdUnit): string {
@@ -140,17 +140,17 @@ export class SessionManager {
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
             'networkType': this._deviceInfo.getNetworkType(),
-            'cached': true,
+            'cached': true, // todo: get actual value
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
             'connectionType': this._deviceInfo.getConnectionType(),
-            'sid': this._gamerSid,
+            'sid': this._gamerServerId,
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel()
         };
 
-        return MediationMetaData.fetch(this._nativeBridge).then(mediation => {
+        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
             if(mediation) {
                 infoJson.mediationName = mediation.getName();
                 infoJson.mediationVersion = mediation.getVersion();

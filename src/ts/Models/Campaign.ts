@@ -2,6 +2,7 @@ export class Campaign {
 
     private _id: string;
     private _appStoreId: string;
+    private _appStoreCountry: string;
     private _gameId: number;
     private _gameName: string;
     private _gameIcon: string;
@@ -22,6 +23,7 @@ export class Campaign {
     constructor(campaign: any, gamerId: string, abGroup: number) {
         this._id = campaign.id;
         this._appStoreId = campaign.appStoreId;
+        this._appStoreCountry = campaign.appStoreCountry;
         this._gameId = campaign.gameId;
         this._gameName = campaign.gameName;
         this._gameIcon = campaign.gameIcon;
@@ -46,6 +48,10 @@ export class Campaign {
 
     public getAppStoreId(): string {
         return this._appStoreId;
+    }
+
+    public getAppStoreCountry(): string {
+        return this._appStoreCountry;
     }
 
     public getGameId(): number {
@@ -102,6 +108,10 @@ export class Campaign {
 
     public getClickAttributionUrlFollowsRedirects(): boolean {
         return this._clickAttributionUrlFollowsRedirects;
+    }
+
+    public getBypassAppSheet(): boolean {
+        return this._bypassAppSheet;
     }
 
     public getGamerId(): string {

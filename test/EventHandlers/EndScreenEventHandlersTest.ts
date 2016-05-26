@@ -1,10 +1,8 @@
-/// <reference path="../../typings/main.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
-import { Double } from '../../src/ts/Utilities/Double';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { Overlay } from '../../src/ts/Views/Overlay';
 import { EndScreen } from '../../src/ts/Views/EndScreen';
@@ -42,7 +40,11 @@ describe('EndScreenEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{getVideoUrl: () => 'fake url', getAppStoreId: () => 'fooAppId', getClickAttributionUrlFollowsRedirects: () => true }, overlay, endScreen);
+        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+            getVideoUrl: () => 'fake url',
+            getAppStoreId: () => 'fooAppId',
+            getClickAttributionUrlFollowsRedirects: () => true
+        }, overlay, endScreen);
     });
 
     describe('with onDownload', () => {
@@ -106,72 +108,6 @@ describe('EndScreenEventHandlersTest', () => {
 
         });
 
-
-    });
-
-    describe('with onReplay', () => {
-        let resolvedPromise;
-
-        beforeEach(() => {
-            resolvedPromise = Promise.resolve();
-
-            sinon.spy(nativeBridge.VideoPlayer, 'prepare');
-            sinon.stub(nativeBridge.AdUnit, 'setViews').returns(resolvedPromise);
-        });
-
-        it('should activate video', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            assert.isTrue(adUnit.isVideoActive());
-        });
-
-        it('should set video position to start', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            assert.equal(adUnit.getVideoPosition(), 0);
-        });
-
-        it('should setup skipping', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            sinon.assert.calledWith(adUnit.getOverlay().setSkipEnabled, true);
-            sinon.assert.calledWith(adUnit.getOverlay().setSkipDuration, 0);
-        });
-
-        it('should hide endscreen', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            sinon.assert.called(adUnit.getEndScreen().hide);
-        });
-
-        it('should show overlay', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            sinon.assert.called(adUnit.getOverlay().show);
-        });
-
-        it('should call native for views', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            sinon.assert.calledWith(nativeBridge.AdUnit.setViews, ['videoplayer', 'webview']);
-        });
-
-        it('should prepare video', () => {
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            return resolvedPromise.then(() => {
-                sinon.assert.calledWith(nativeBridge.VideoPlayer.prepare, 'fake url', new Double(1.0));
-            });
-        });
-
-        it('should prepare muted video', () => {
-            sinon.stub(adUnit.getPlacement(), 'muteVideo').returns(true);
-            EndScreenEventHandlers.onReplay(nativeBridge, adUnit);
-
-            return resolvedPromise.then(() => {
-                sinon.assert.calledWith(nativeBridge.VideoPlayer.prepare, 'fake url', new Double(0.0));
-            });
-        });
 
     });
 

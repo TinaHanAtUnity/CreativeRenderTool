@@ -19,11 +19,13 @@ PROD_CONFIG_SRC = src/config.json
 TEST_CONFIG_SRC = src/test-config.json
 TEST_SRC = test
 
-# Branch
+# Branch and commit id
 ifeq ($(TRAVIS), true)
     BRANCH = $(TRAVIS_BRANCH)
+    COMMIT_ID = $(TRAVIS_COMMIT)
 else
     BRANCH = $(shell git symbolic-ref --short HEAD)
+    COMMIT_ID = $(shell git rev-parse HEAD)
 endif
 
 # Targets
@@ -78,7 +80,22 @@ build-release: clean build-dirs build-ts build-js build-css
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
+		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+
+	@echo
+	@echo Generating commit id based build directory
+	@echo
+
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/release build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('build/$(COMMIT_ID)/release/config.json', o);\
+		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
+		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
 build-test: clean build-dirs build-css build-html
@@ -156,7 +173,22 @@ build-test: clean build-dirs build-css build-html
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{BRANCH}', '$(BRANCH)');\
+		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+
+	@echo
+	@echo Generating commit id based build directory
+	@echo
+
+	mkdir build/$(COMMIT_ID) | true
+	rsync -r build/test build/$(COMMIT_ID)
+	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var c=fs.readFileSync('build/$(COMMIT_ID)/test/config.json', o);\
+		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
+		fs.writeFileSync('build/$(COMMIT_ID)/test/config.json', c, o);"
 
 build-dir:
 	@echo
@@ -244,3 +276,6 @@ test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
 
 	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
+
+watch:
+	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test

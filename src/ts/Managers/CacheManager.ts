@@ -78,7 +78,7 @@ export class CacheManager {
 
     public cleanCache(): Promise<any[]> {
         return this._nativeBridge.Cache.getFiles().then(files => {
-            if (!files || !files.length) {
+            if(!files || !files.length) {
                 return Promise.resolve();
             }
 
@@ -94,11 +94,11 @@ export class CacheManager {
                 return n2.mtime - n1.mtime;
             });
 
-            for (let i: number = 0; i < files.length; i++) {
+            for(let i: number = 0; i < files.length; i++) {
                 let file: IFileInfo = files[i];
                 totalSize += file.size;
 
-                if (file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
             }

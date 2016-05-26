@@ -37,7 +37,7 @@
 ### Dependencies
 
 - `npm install`
-- `typings install --ambient`
+- `typings install`
 
 ### Development Build
 
@@ -45,7 +45,7 @@
 
 To build and test continuously (on file changes), use:
 
-- `watchman-make -p 'src/ts/**/*.ts' -t build-dev -p 'test/**/*.ts' -t test`
+- `make watch`
 
 ### Running development builds
 

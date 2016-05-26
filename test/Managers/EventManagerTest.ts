@@ -136,7 +136,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body?: string, headers?: [string, string][]): Promise<string> {
+    public post(id: string, url: string, body?: string, headers?: [string, string][]): Promise<string> {
         if(url.indexOf('/fail') !== -1) {
             setTimeout(() => {
                 this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
