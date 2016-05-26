@@ -251,6 +251,7 @@ export class WebView {
             'type': 'campaign_request_failed',
             'error': error
         }, this._clientInfo, this._deviceInfo);
+        this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
     private onStart(): void {

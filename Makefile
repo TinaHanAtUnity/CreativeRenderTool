@@ -276,3 +276,6 @@ test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
 
 	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
+
+watch:
+	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
