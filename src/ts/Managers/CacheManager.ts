@@ -29,29 +29,30 @@ export class CacheManager {
         this._nativeBridge.Cache.onDownloadError.subscribe(this.onDownloadError.bind(this));
     }
 
-    public cache(url: string): Promise<CacheStatus> {
-        let promise = this.registerCallback(url).then(cacheResponse => {
-            // todo: add cacheResponse.responseCode handling & retrying here
-            if(cacheResponse.size !== cacheResponse.totalSize) {
-                return CacheStatus.STOPPED;
-            }
-            return CacheStatus.OK;
-        });
+    public cache(url: string): Promise<[CacheStatus, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 return Promise.reject(CacheError.FILE_ALREADY_CACHING);
             }
             return this.getFileId(url).then(fileId => {
-                return this._nativeBridge.Cache.download(url, fileId).then(() => promise);
-            });
-        }).catch(error => {
-            switch(error) {
-                case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
-                    return CacheStatus.OK;
+                return this._nativeBridge.Cache.download(url, fileId).then(() => {
+                    return this.registerCallback(url).then(cacheResponse => {
+                        // todo: add cacheResponse.responseCode handling & retrying here
+                        if(cacheResponse.size !== cacheResponse.totalSize) {
+                            return [CacheStatus.STOPPED, fileId];
+                        }
+                        return [CacheStatus.OK, fileId];
+                    });
+                }).catch(error => {
+                    switch(error) {
+                        case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
+                            return [CacheStatus.OK, fileId];
 
-                default:
-                    return Promise.reject(error);
-            }
+                        default:
+                            return Promise.reject(error);
+                    }
+                });
+            });
         });
     }
 
@@ -93,13 +94,7 @@ export class CacheManager {
         });
     }
 
-    private registerCallback(url: string): Promise<ICacheResponse> {
-        return new Promise<ICacheResponse>((resolve, reject) => {
-            this._callbacks[url] = new CallbackContainer(resolve, reject);
-        });
-    }
-
-    private getFileId(url: string): Promise<string> {
+    public getFileId(url: string): Promise<string> {
         let splittedUrl = url.split('.');
         let extension: string = '';
         if(splittedUrl.length > 1) {
@@ -108,7 +103,12 @@ export class CacheManager {
         return this._nativeBridge.Cache.getHash(url).then(hash => {
             return hash + '.' + extension;
         });
+    }
 
+    private registerCallback(url: string): Promise<ICacheResponse> {
+        return new Promise<ICacheResponse>((resolve, reject) => {
+            this._callbacks[url] = new CallbackContainer(resolve, reject);
+        });
     }
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {

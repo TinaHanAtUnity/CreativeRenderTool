@@ -52,9 +52,9 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isCaching');
     }
 
-    public getFiles(urls?: string[]): Promise<IFileInfo[]> {
-        if(urls && urls.length) {
-            return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles', [urls]);
+    public getFiles(fileIds?: string[]): Promise<IFileInfo[]> {
+        if(fileIds && fileIds.length) {
+            return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles', [fileIds]);
         }
         return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles');
     }
@@ -63,8 +63,8 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileInfo', [fileId]);
     }
 
-    public getFileUrl(url: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileUrl', [url]);
+    public getFileUrl(fileId: string): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileUrl', [fileId]);
     }
 
     public getHash(value: string): Promise<string> {
