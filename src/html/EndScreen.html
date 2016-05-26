@@ -1,4 +1,4 @@
-<div class="btn-close-region"><a class="btn-close">&#215;</a></div>
+<div class="btn-close-region"><a class="btn-close"><span class="icon-close"></span></a></div>
 <div class="campaign-container">
   <div class="game-background game-background-landscape" style="background-image: url(<%= data.endScreenLandscape %>)"></div>
   <div class="game-background game-background-portrait" style="background-image: url(<%= data.endScreenPortrait %>)"></div>
@@ -12,7 +12,12 @@
       <div class="store-container">
         <a class="store-button"></a>
         <div class="game-store-info">
-          <span class="game-rating"><span class="game-rating-mask" style="width: <%= data.rating %>%">&#9733;&#9733;&#9733;&#9733;&#9733;</span>&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="game-rating">
+            <span class="game-rating-mask" style="width: <%= data.rating %>%">
+            <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+            </span>
+            <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+          </span>
           <br class="game-rating-br">
           <span class="game-rating-count">
             (<span class="game-rating-count-number"><%= data.ratingCount %></span><span class="game-rating-postfix"> Ratings</span>)
