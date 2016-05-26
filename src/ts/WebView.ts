@@ -204,26 +204,29 @@ export class WebView {
 
         let cacheMode = this._configuration.getCacheMode();
 
-        let handleStopped = (error: any) => {
-            if(error !== CacheStatus.STOPPED) {
-                throw error;
-            }
-        };
-
         if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
                 id: parseInt(campaign.getAppStoreId(), 10)
             });
         }
 
-        let cacheAssets = () => {
-            return this._cacheManager.cache(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).catch(handleStopped).then(() => {
-                return this._cacheManager.cache(campaign.getLandscapeUrl()).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).catch(handleStopped);
-            }).then(() => {
-                return this._cacheManager.cache(campaign.getPortraitUrl()).then(fileUrl => campaign.setPortraitUrl(fileUrl)).catch(handleStopped);
-            }).then(() => {
-                return this._cacheManager.cache(campaign.getGameIcon()).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(handleStopped);
+        let cacheAsset = (url: string) => {
+            return this._cacheManager.cache(url).then(status => {
+                if(status === CacheStatus.OK) {
+                    return this._nativeBridge.Cache.getFileUrl(url);
+                }
+                return url;
+            }).catch(error => {
+                this.onError(error);
+                return url;
             });
+        };
+
+        let cacheAssets = () => {
+            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl));
         };
 
         let sendReady = () => {

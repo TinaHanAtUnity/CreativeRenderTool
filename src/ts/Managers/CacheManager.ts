@@ -1,12 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
-import { StorageType } from 'Native/Api/Storage';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 
 export enum CacheStatus {
     OK,
-    STOPPED,
-    ERROR
+    STOPPED
 }
 
 export interface ICacheResponse {
@@ -22,58 +20,43 @@ export class CacheManager {
 
     private _nativeBridge: NativeBridge;
     private _callbacks: { [key: string]: CallbackContainer } = {};
-    private _queue: string[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
         this._nativeBridge.Cache.onDownloadStarted.subscribe(this.onDownloadStarted.bind(this));
-        this._nativeBridge.Cache.onDownloadResumed.subscribe(this.onDownloadResumed.bind(this));
         this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
         this._nativeBridge.Cache.onDownloadStopped.subscribe(this.onDownloadStopped.bind(this));
         this._nativeBridge.Cache.onDownloadError.subscribe(this.onDownloadError.bind(this));
     }
 
-    public cache(url: string): Promise<string> {
-        if(!this.addUrl(url)) {
-            return Promise.reject(new Error(url + ' already in queue'));
-        }
-
+    public cache(url: string): Promise<CacheStatus> {
         let promise = this.registerCallback(url).then(cacheResponse => {
             // todo: add cacheResponse.responseCode handling & retrying here
-            return this._nativeBridge.Cache.getFileUrl(url).then(fileUrl => {
-                if(cacheResponse.size !== cacheResponse.totalSize) {
-                    this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.' + fileUrl + '.totalSize', cacheResponse.totalSize).then(() => {
-                        this._nativeBridge.Storage.write(StorageType.PRIVATE);
-                    });
-                    return Promise.reject(CacheStatus.STOPPED);
-                }
-                return fileUrl;
-            });
+            if(cacheResponse.size !== cacheResponse.totalSize) {
+                return CacheStatus.STOPPED;
+            }
+            return CacheStatus.OK;
         });
-
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
-                return promise;
+                return Promise.reject(CacheError.FILE_ALREADY_CACHING);
             }
-            return this._nativeBridge.Cache.download(url, false).then(() => promise);
+            return this.getFileId(url).then(fileId => {
+                return this._nativeBridge.Cache.download(url, fileId).then(() => promise);
+            });
         }).catch(error => {
             switch(error) {
                 case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
-                    this.removeUrl(url);
-                    return this._nativeBridge.Cache.getFileUrl(url);
-
-                case CacheError[CacheError.FILE_ALREADY_CACHING]:
-                    return promise;
+                    return CacheStatus.OK;
 
                 default:
-                    this.removeUrl(url);
                     return Promise.reject(error);
             }
         });
     }
 
     public stop(): void {
-        this._nativeBridge.Cache.cancel(false);
+        this._nativeBridge.Cache.stop();
     }
 
     public cleanCache(): Promise<any[]> {
@@ -110,33 +93,25 @@ export class CacheManager {
         });
     }
 
-    private addUrl(url: string): boolean {
-        if(this._queue.indexOf(url) !== -1) {
-            return false;
-        }
-        this._queue.push(url);
-        return true;
-    }
-
-    private removeUrl(url: string): boolean {
-        if(this._queue.indexOf(url) === -1) {
-            return false;
-        }
-        this._queue = this._queue.filter(queueUrl => queueUrl !== url);
-        return true;
-    }
-
     private registerCallback(url: string): Promise<ICacheResponse> {
         return new Promise<ICacheResponse>((resolve, reject) => {
             this._callbacks[url] = new CallbackContainer(resolve, reject);
         });
     }
 
-    private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
-        // empty block
+    private getFileId(url: string): Promise<string> {
+        let splittedUrl = url.split('.');
+        let extension: string = '';
+        if(splittedUrl.length > 1) {
+            extension = splittedUrl[splittedUrl.length - 1];
+        }
+        return this._nativeBridge.Cache.getHash(url).then(hash => {
+            return hash + '.' + extension;
+        });
+
     }
 
-    private onDownloadResumed(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
+    private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         // empty block
     }
 
@@ -151,12 +126,8 @@ export class CacheManager {
                 responseCode: responseCode,
                 headers: headers
             };
-            this.removeUrl(url);
             callback.resolve(cacheResponse);
             delete this._callbacks[url];
-        }
-        if(this._queue.length > 0) {
-            this._nativeBridge.Cache.download(this._queue[0], false);
         }
     }
 
@@ -171,7 +142,6 @@ export class CacheManager {
                 responseCode: responseCode,
                 headers: headers
             };
-            this.removeUrl(url);
             callback.resolve(cacheResponse);
             delete this._callbacks[url];
         }
@@ -180,7 +150,6 @@ export class CacheManager {
     private onDownloadError(error: string, url: string, message: string) {
         let callback = this._callbacks[url];
         if(callback) {
-            this.removeUrl(url);
             callback.reject([error, url, message]);
             delete this._callbacks[url];
         }

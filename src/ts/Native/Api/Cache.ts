@@ -31,7 +31,6 @@ export interface IFileInfo {
 export class CacheApi extends NativeApi {
 
     public onDownloadStarted: Observable5<string, number, number, number, [string, string][]> = new Observable5();
-    public onDownloadResumed: Observable5<string, number, number, number, [string, string][]> = new Observable5();
     public onDownloadProgress: Observable3<string, number, number> = new Observable3();
     public onDownloadEnd: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
     public onDownloadStopped: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
@@ -41,16 +40,16 @@ export class CacheApi extends NativeApi {
         super(nativeBridge, 'Cache');
     }
 
-    public download(url: string, overwrite: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, overwrite]);
+    public download(url: string, fileId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId]);
+    }
+
+    public stop(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'cancel');
     }
 
     public isCaching(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isCaching');
-    }
-
-    public cancel(remove: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'cancel', [remove]);
     }
 
     public getFiles(urls?: string[]): Promise<IFileInfo[]> {
@@ -60,20 +59,16 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles');
     }
 
-    public getFileInfo(url: string): Promise<IFileInfo> {
-        return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileInfo', [url]);
-    }
-
-    public getFileIdFileInfo(fileId: string): Promise<IFileInfo> {
-        return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileIdFileInfo', [fileId]);
+    public getFileInfo(fileId: string): Promise<IFileInfo> {
+        return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileInfo', [fileId]);
     }
 
     public getFileUrl(url: string): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getFileUrl', [url]);
     }
 
-    public getFileIdFileUrl(fileId: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileIdFileUrl', [fileId]);
+    public getHash(value: string): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getHash', [value]);
     }
 
     public deleteFile(fileId: string): Promise<void> {
@@ -108,10 +103,6 @@ export class CacheApi extends NativeApi {
         switch(event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
                 this.onDownloadStarted.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
-                break;
-
-            case CacheEvent[CacheEvent.DOWNLOAD_RESUMED]:
-                this.onDownloadResumed.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_PROGRESS]:

@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheManager } from '../../src/ts/Managers/CacheManager';
+import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
@@ -18,7 +18,7 @@ class TestCacheApi extends CacheApi {
         super(nativeBridge);
     }
 
-    public download(url: string, overwrite: boolean): Promise<void> {
+    public download(url: string, fileId: string): Promise<void> {
         let byteCount: number = 12345;
         let duration: number = 6789;
         let responseCode: number = 200;
@@ -54,6 +54,19 @@ class TestCacheApi extends CacheApi {
 
     public getFiles(): Promise<IFileInfo[]> {
         return Promise.resolve(this._files);
+    }
+
+    public getHash(value: string): Promise<string> {
+        let hash = 0;
+        if(!value.length) {
+            return Promise.resolve(hash.toString());
+        }
+        for(let i = 0; i < value.length; ++i) {
+            let char = value.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Promise.resolve(hash.toString());
     }
 
     public deleteFile(fileId: string): Promise<void> {
@@ -119,10 +132,13 @@ describe('CacheManagerTest', () => {
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(status => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK');
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
-            assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            return nativeBridge.Cache.getFileUrl(testUrl).then(fileUrl => {
+                assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            });
         });
     });
 
@@ -140,14 +156,26 @@ describe('CacheManagerTest', () => {
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return Promise.all([cacheManager.cache(testUrl1), cacheManager.cache(testUrl2), cacheManager.cache(testUrl3)]).then(fileUrls => {
-            assert.equal(5, cacheSpy.callCount, 'Cache three files did not send three download requests');
+        return cacheManager.cache(testUrl1).then(status => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for second test url');
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
-            assert.equal(testFileUrl1, fileUrls[0], 'Cache three files first local file url does not match');
-            assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
-            assert.equal(testFileUrl2, fileUrls[1], 'Cache three files second local file url does not match');
-            assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
-            assert.equal(testFileUrl3, fileUrls[2], 'Cache three files third local file url does not match');
+            return nativeBridge.Cache.getFileUrl(testUrl1).then(fileUrl => {
+                assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
+            });
+        }).then(() => cacheManager.cache(testUrl2)).then(status => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for second test url');
+            assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files first download request url does not match');
+            return nativeBridge.Cache.getFileUrl(testUrl2).then(fileUrl => {
+                assert.equal(testFileUrl2, fileUrl, 'Cache three files first local file url does not match');
+            });
+        }).then(() => cacheManager.cache(testUrl3)).then(status => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for second test url');
+            assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files first download request url does not match');
+            return nativeBridge.Cache.getFileUrl(testUrl3).then(fileUrl => {
+                assert.equal(testFileUrl3, fileUrl, 'Cache three files first local file url does not match');
+            });
+        }).then(() => {
+            assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
         });
     });
 
@@ -170,9 +198,12 @@ describe('CacheManagerTest', () => {
         cacheApi.setFileMapping(testUrl, testFileUrl);
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(status => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for already downloaded file');
             assert.equal(0, cacheApi.getDownloadedFilesCount(), 'Tried downloading already downloaded file');
-            assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            return nativeBridge.Cache.getFileUrl(testUrl).then(fileUrl => {
+                assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            });
         });
     });
 
