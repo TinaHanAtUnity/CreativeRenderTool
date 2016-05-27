@@ -210,12 +210,9 @@ export class WebView {
             });
         }
 
-        let cacheAsset = (url: string, video: boolean = false) => {
+        let cacheAsset = (url: string) => {
             return this._cacheManager.cache(url).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
-                    if(video && this._nativeBridge.getPlatform() === Platform.IOS) {
-                        return this._nativeBridge.Cache.getFilePath(fileId);
-                    }
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 return url;
@@ -226,7 +223,7 @@ export class WebView {
         };
 
         let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl(), true).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() =>
+            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl));
