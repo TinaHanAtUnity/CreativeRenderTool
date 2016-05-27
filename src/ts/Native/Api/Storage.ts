@@ -6,7 +6,7 @@ export enum StorageType {
     PUBLIC
 }
 
-public enum StorageError {
+export enum StorageError {
     COULDNT_SET_VALUE,
     COULDNT_GET_VALUE,
     COULDNT_WRITE_STORAGE_TO_CACHE,

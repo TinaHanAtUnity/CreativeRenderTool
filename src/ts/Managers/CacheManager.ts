@@ -164,7 +164,7 @@ export class CacheManager {
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         if(size === 0) {
-            this.writeCacheResponse(url, size, totalSize, 0, responseCode, headers);
+            this.writeCacheResponse(url, this.createCacheResponse(url, size, totalSize, 0, responseCode, headers));
         }
     }
 
