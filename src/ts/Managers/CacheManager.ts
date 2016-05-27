@@ -105,6 +105,12 @@ export class CacheManager {
         });
     }
 
+    public getFileUrl(fileId: string): Promise<string> {
+        return this._nativeBridge.Cache.getFilePath(fileId).then(filePath => {
+            return 'file://' + filePath;
+        });
+    }
+
     private registerCallback(url: string): Promise<ICacheResponse> {
         return new Promise<ICacheResponse>((resolve, reject) => {
             this._callbacks[url] = new CallbackContainer(resolve, reject);

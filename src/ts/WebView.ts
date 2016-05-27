@@ -213,7 +213,7 @@ export class WebView {
         let cacheAsset = (url: string) => {
             return this._cacheManager.cache(url).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
-                    return this._nativeBridge.Cache.getFileUrl(fileId);
+                    return this._cacheManager.getFileUrl(fileId);
                 }
                 return url;
             }).catch(error => {

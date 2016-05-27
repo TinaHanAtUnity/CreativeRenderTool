@@ -63,7 +63,7 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileInfo', [fileId]);
     }
 
-    public getFileUrl(fileId: string): Promise<string> {
+    public getFilePath(fileId: string): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getFileUrl', [fileId]);
     }
 

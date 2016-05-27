@@ -8,7 +8,7 @@ import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
 class TestCacheApi extends CacheApi {
 
-    private _filePrefix = 'file:///test/cache/dir/UnityAdsCache-';
+    private _filePrefix = '/test/cache/dir/UnityAdsCache-';
     private _internet: boolean = true;
     private _files: { [key: string]: IFileInfo } = {};
     private _currentFile = undefined;
@@ -48,7 +48,7 @@ class TestCacheApi extends CacheApi {
         return Promise.resolve(this._currentFile !== undefined);
     }
 
-    public getFileUrl(fileId: string): Promise<string> {
+    public getFilePath(fileId: string): Promise<string> {
         if(fileId in this._files) {
             return Promise.resolve(this._filePrefix + fileId);
         }
@@ -143,7 +143,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.getFileId(testUrl).then(fileId => nativeBridge.Cache.getFileUrl(fileId)).then(fileUrl => {
+        return cacheManager.getFileId(testUrl).then(fileId => cacheManager.getFileUrl(fileId)).then(fileUrl => {
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });
@@ -160,7 +160,7 @@ describe('CacheManagerTest', () => {
             assert.equal(testFileId, fileId, 'Cache one file fileId was invalid');
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
-            return nativeBridge.Cache.getFileUrl(testFileId).then(fileUrl => {
+            return cacheManager.getFileUrl(fileId).then(fileUrl => {
                 assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
             });
         });
@@ -180,21 +180,21 @@ describe('CacheManagerTest', () => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for first test url');
             assert.equal('1647395140.jpg', fileId, 'fileId was not valid for first test url');
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
-            return nativeBridge.Cache.getFileUrl('1647395140.jpg').then(fileUrl => {
+            return cacheManager.getFileUrl('1647395140.jpg').then(fileUrl => {
                 assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
             });
         }).then(() => cacheManager.cache(testUrl2)).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for second test url');
             assert.equal('158720486.jpg', fileId, 'fileId was not valid for second test url');
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
-            return nativeBridge.Cache.getFileUrl('158720486.jpg').then(fileUrl => {
+            return cacheManager.getFileUrl('158720486.jpg').then(fileUrl => {
                 assert.equal(testFileUrl2, fileUrl, 'Cache three files second local file url does not match');
             });
         }).then(() => cacheManager.cache(testUrl3)).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for third test url');
             assert.equal('929022075.jpg', fileId, 'fileId was not valid for third test url');
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
-            return nativeBridge.Cache.getFileUrl('929022075.jpg').then(fileUrl => {
+            return cacheManager.getFileUrl('929022075.jpg').then(fileUrl => {
                 assert.equal(testFileUrl3, fileUrl, 'Cache three files third local file url does not match');
             });
         }).then(() => {
@@ -222,7 +222,7 @@ describe('CacheManagerTest', () => {
 
         return cacheManager.cache(testUrl).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for already downloaded file');
-            return nativeBridge.Cache.getFileUrl(fileId).then(fileUrl => {
+            return cacheManager.getFileUrl(fileId).then(fileUrl => {
                 assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
             });
         });
