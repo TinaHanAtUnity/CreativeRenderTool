@@ -23,10 +23,12 @@ export class CacheManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._nativeBridge.Cache.onDownloadStarted.subscribe(this.onDownloadStarted.bind(this));
-        this._nativeBridge.Cache.onDownloadEnd.subscribe(this.onDownloadEnd.bind(this));
-        this._nativeBridge.Cache.onDownloadStopped.subscribe(this.onDownloadStopped.bind(this));
-        this._nativeBridge.Cache.onDownloadError.subscribe(this.onDownloadError.bind(this));
+        this._nativeBridge.Cache.setProgressInterval(500);
+        this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
+        this._nativeBridge.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
+        this._nativeBridge.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
+        this._nativeBridge.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
+        this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
     public cache(url: string): Promise<[CacheStatus, string]> {
@@ -119,6 +121,10 @@ export class CacheManager {
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         // empty block
+    }
+
+    private onDownloadProgress(url: string, size: number, totalSize: number): void {
+        this._nativeBridge.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
