@@ -34,6 +34,7 @@ export class WebView {
     private _campaignManager: CampaignManager;
     private _cacheManager: CacheManager;
 
+    private _adUnit: AbstractAdUnit;
     private _campaign: Campaign;
 
     private _sessionManager: SessionManager;
@@ -158,13 +159,13 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            let adUnit: AbstractAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
-            adUnit.setNativeOptions(options);
-            adUnit.onStart.subscribe(() => this.onStart());
-            adUnit.onClose.subscribe(() => this.onClose());
+            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign);
+            this._adUnit.setNativeOptions(options);
+            this._adUnit.onStart.subscribe(() => this.onStart());
+            this._adUnit.onClose.subscribe(() => this.onClose());
 
-            adUnit.show().then(() => {
-                this._sessionManager.sendShow(adUnit);
+            this._adUnit.show().then(() => {
+                this._sessionManager.sendShow(this._adUnit);
             });
 
             this._campaign = null;
@@ -215,10 +216,13 @@ export class WebView {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
-                return url;
+                throw status;
             }).catch(error => {
-                this.onError(error);
-                return url;
+                if(error !== CacheStatus.STOPPED) {
+                    this.onError(error);
+                    return url;
+                }
+                throw error;
             });
         };
 
@@ -226,7 +230,11 @@ export class WebView {
             return cacheAsset(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl));
+                cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                }
+            });
         };
 
         let sendReady = () => {
@@ -236,7 +244,14 @@ export class WebView {
         if(cacheMode === CacheMode.FORCED) {
             cacheAssets().then(() => sendReady());
         } else if(cacheMode === CacheMode.ALLOWED) {
-            cacheAssets();
+            if(this._adUnit) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    cacheAssets().then(() => sendReady());
+                });
+            } else {
+                cacheAssets().then(() => sendReady());
+            }
             sendReady();
         } else {
             sendReady();
