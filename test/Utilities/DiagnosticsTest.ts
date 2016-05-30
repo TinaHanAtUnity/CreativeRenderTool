@@ -43,6 +43,7 @@ describe('DiagnosticsTest', () => {
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',
+            '2000',
             '2.0.0-alpha2',
             true,
             'http://example.com/config.json',
@@ -51,7 +52,7 @@ describe('DiagnosticsTest', () => {
         ]);
 
         let mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
         Diagnostics.trigger(eventManager, {'test': true}, clientInfo, deviceInfo);
         mockEventManager.verify();
     });
