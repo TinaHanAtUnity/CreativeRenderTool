@@ -2,61 +2,95 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheManager } from '../../src/ts/Managers/CacheManager';
-import { IFileInfo, CacheApi } from '../../src/ts/Native/Api/Cache';
+import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
+import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 
 class TestCacheApi extends CacheApi {
-    private _mappings: {} = {};
+
+    private _filePrefix = '/test/cache/dir/UnityAdsCache-';
     private _internet: boolean = true;
-    private _files: IFileInfo[] = [];
-    private _previouslyDownloadedFiles: string[] = [];
-    private _previouslyQueuedFiles: string[] = [];
-    private _downloadedFiles: number = 0;
+    private _files: { [key: string]: IFileInfo } = {};
+    private _currentFile = undefined;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
     }
 
-    public download(url: string, overwrite: boolean): Promise<void> {
+    public download(url: string, fileId: string): Promise<void> {
         let byteCount: number = 12345;
         let duration: number = 6789;
         let responseCode: number = 200;
 
-        if(this._previouslyDownloadedFiles.indexOf(url) !== -1) {
-            return Promise.reject('FILE_ALREADY_IN_CACHE');
+        if(fileId in this._files) {
+            return Promise.reject(CacheError[CacheError.FILE_ALREADY_IN_CACHE]);
         }
 
-        if(this._previouslyQueuedFiles.indexOf(url) !== -1) {
-            return Promise.reject('FILE_ALREADY_IN_QUEUE');
+        if(this._currentFile !== undefined) {
+            return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
+
+        this.addFile(fileId, 123, 123);
 
         if(this._internet) {
-            this._previouslyQueuedFiles.push(url);
+            this._currentFile = url;
             setTimeout(() => {
-                this._downloadedFiles++;
-                this._nativeBridge.handleEvent(['CACHE', 'DOWNLOAD_END', url, byteCount, duration, responseCode, []]);
+                this._currentFile = undefined;
+                this._nativeBridge.handleEvent(['CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []]);
             }, 1);
             return Promise.resolve(void(0));
         } else {
-            return Promise.reject('NO_INTERNET');
+            return Promise.reject(CacheError[CacheError.NO_INTERNET]);
         }
     }
 
-    public getFileUrl(url: string): Promise<string> {
-        return Promise.resolve(this._mappings[url]);
+    public isCaching(): Promise<boolean> {
+        return Promise.resolve(this._currentFile !== undefined);
+    }
+
+    public getFilePath(fileId: string): Promise<string> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._filePrefix + fileId);
+        }
+        return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
     }
 
     public getFiles(): Promise<IFileInfo[]> {
-        return Promise.resolve(this._files);
+        let files: IFileInfo[] = [];
+        for(let key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
+                files.push(this._files[key]);
+            }
+        }
+        return Promise.resolve(files);
+    }
+
+    public getFileInfo(fileId: string): Promise<IFileInfo> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._files[fileId]);
+        }
+        return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
+    }
+
+    public getHash(value: string): Promise<string> {
+        return Promise.resolve(this.getHashDirect(value));
+    }
+
+    public getHashDirect(value: string): string {
+        let hash = 0;
+        if(!value.length) {
+            return hash.toString();
+        }
+        for(let i = 0; i < value.length; ++i) {
+            let char = value.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString();
     }
 
     public deleteFile(fileId: string): Promise<void> {
         return;
-    }
-
-    public setFileMapping(source: string, target: string): void {
-        this._mappings[source] = target;
     }
 
     public setInternet(internet: boolean): void {
@@ -65,15 +99,30 @@ class TestCacheApi extends CacheApi {
 
     public addFile(id: string, mtime: number, size: number): void {
         let fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
-        this._files.push(fileInfo);
+        this._files[id] = fileInfo;
+    }
+
+    public getExtension(url: string): string {
+        let splittedUrl = url.split('.');
+        let extension: string = '';
+        if(splittedUrl.length > 1) {
+            extension = splittedUrl[splittedUrl.length - 1];
+        }
+        return extension;
     }
 
     public addPreviouslyDownloadedFile(url: string) {
-        this._previouslyDownloadedFiles.push(url);
+        this.addFile(this.getHashDirect(url) + '.' + this.getExtension(url), 123, 123);
     }
 
     public getDownloadedFilesCount(): number {
-        return this._downloadedFiles;
+        let fileCount = 0;
+        for(let key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
+                ++fileCount;
+            }
+        }
+        return fileCount;
     }
 }
 
@@ -93,57 +142,71 @@ describe('CacheManagerTest', () => {
 
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         cacheManager = new CacheManager(nativeBridge);
+        sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
     });
 
     it('Get local file url for cached file', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl: string = 'file:///test/cache/dir/file';
+        let testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-        cacheApi.setFileMapping(testUrl, testFileUrl);
+        cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.getFileUrl(testUrl).then(([url, fileUrl]) => {
-            assert.equal(testUrl, url, 'Remote url does not match');
+        return cacheManager.getFileId(testUrl).then(fileId => cacheManager.getFileUrl(fileId)).then(fileUrl => {
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });
 
     it('Cache one file with success', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl: string = 'file:///test/cache/dir/file';
-
-        cacheApi.setFileMapping(testUrl, testFileUrl);
+        let testFileId: string = '-960478764.mp4';
+        let testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cacheAll([testUrl]).then(urlMap => {
+        return cacheManager.cache(testUrl).then(([status, fileId]) => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK');
+            assert.equal(testFileId, fileId, 'Cache one file fileId was invalid');
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
+            return cacheManager.getFileUrl(fileId).then(fileUrl => {
+                assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            });
         });
     });
 
     it('Cache three files with success', () => {
-        let testUrl1: string = 'http://www.example.net/first';
-        let testUrl2: string = 'http://www.example.net/second';
-        let testUrl3: string = 'http://www.example.net/third';
-        let testFileUrl1: string = 'file:///test/cache/dir/1';
-        let testFileUrl2: string = 'file:///test/cache/dir/2';
-        let testFileUrl3: string = 'file:///test/cache/dir/3';
-
-        cacheApi.setFileMapping(testUrl1, testFileUrl1);
-        cacheApi.setFileMapping(testUrl2, testFileUrl2);
-        cacheApi.setFileMapping(testUrl3, testFileUrl3);
+        let testUrl1: string = 'http://www.example.net/first.jpg';
+        let testUrl2: string = 'http://www.example.net/second.jpg';
+        let testUrl3: string = 'http://www.example.net/third.jpg';
+        let testFileUrl1: string = 'file:///test/cache/dir/UnityAdsCache-1647395140.jpg';
+        let testFileUrl2: string = 'file:///test/cache/dir/UnityAdsCache-158720486.jpg';
+        let testFileUrl3: string = 'file:///test/cache/dir/UnityAdsCache-929022075.jpg';
 
         let cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cacheAll([testUrl1, testUrl2, testUrl3]).then(urlMap => {
-            assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
+        return cacheManager.cache(testUrl1).then(([status, fileId]) => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for first test url');
+            assert.equal('1647395140.jpg', fileId, 'fileId was not valid for first test url');
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
-            assert.equal(testFileUrl1, urlMap[testUrl1], 'Cache three files first local file url does not match');
+            return cacheManager.getFileUrl('1647395140.jpg').then(fileUrl => {
+                assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
+            });
+        }).then(() => cacheManager.cache(testUrl2)).then(([status, fileId]) => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for second test url');
+            assert.equal('158720486.jpg', fileId, 'fileId was not valid for second test url');
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
-            assert.equal(testFileUrl2, urlMap[testUrl2], 'Cache three files second local file url does not match');
+            return cacheManager.getFileUrl('158720486.jpg').then(fileUrl => {
+                assert.equal(testFileUrl2, fileUrl, 'Cache three files second local file url does not match');
+            });
+        }).then(() => cacheManager.cache(testUrl3)).then(([status, fileId]) => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for third test url');
+            assert.equal('929022075.jpg', fileId, 'fileId was not valid for third test url');
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
-            assert.equal(testFileUrl3, urlMap[testUrl3], 'Cache three files third local file url does not match');
+            return cacheManager.getFileUrl('929022075.jpg').then(fileUrl => {
+                assert.equal(testFileUrl3, fileUrl, 'Cache three files third local file url does not match');
+            });
+        }).then(() => {
+            assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
         });
     });
 
@@ -152,7 +215,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi.setInternet(false);
 
-        return cacheManager.cacheAll([testUrl]).then(() => {
+        return cacheManager.cache(testUrl).then(() => {
             assert.fail('Caching should not be successful with no internet');
         }, (error) => {
             // everything ok
@@ -161,32 +224,16 @@ describe('CacheManagerTest', () => {
 
     it('Cache one already downloaded file', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl: string = 'file:///test/cache/dir/file';
+        let testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-        cacheApi.setFileMapping(testUrl, testFileUrl);
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cacheAll([testUrl]).then(urlMap => {
-            assert.equal(0, cacheApi.getDownloadedFilesCount(), 'Tried downloading already downloaded file');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
+        return cacheManager.cache(testUrl).then(([status, fileId]) => {
+            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for already downloaded file');
+            return cacheManager.getFileUrl(fileId).then(fileUrl => {
+                assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
+            });
         });
-    });
-
-    it('Cache same url twice', () => {
-        let clock = sinon.useFakeTimers();
-
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl: string = 'file:///test/cache/dir/file';
-
-        cacheApi.setFileMapping(testUrl, testFileUrl);
-
-        let cachePromise = cacheManager.cacheAll([testUrl, testUrl]).then(urlMap => {
-            assert.equal(1, cacheApi.getDownloadedFilesCount(), 'One url should be cached exactly once');
-            assert.equal(testFileUrl, urlMap[testUrl], 'Local file url does not match');
-        });
-        clock.tick(1);
-        clock.restore();
-        return cachePromise;
     });
 
     it('Clean cache from current files', () => {
