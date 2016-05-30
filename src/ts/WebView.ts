@@ -247,12 +247,13 @@ export class WebView {
             if(this._adUnit) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets().then(() => sendReady());
+                    cacheAssets();
+                    sendReady();
                 });
             } else {
-                cacheAssets().then(() => sendReady());
+                cacheAssets();
+                sendReady();
             }
-            sendReady();
         } else {
             sendReady();
         }
