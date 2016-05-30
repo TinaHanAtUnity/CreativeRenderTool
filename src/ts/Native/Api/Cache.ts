@@ -51,10 +51,7 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isCaching');
     }
 
-    public getFiles(fileIds?: string[]): Promise<IFileInfo[]> {
-        if(fileIds && fileIds.length) {
-            return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles', [fileIds]);
-        }
+    public getFiles(): Promise<IFileInfo[]> {
         return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles');
     }
 
