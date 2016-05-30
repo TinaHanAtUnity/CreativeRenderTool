@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable5, Observable3 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
+import { Platform } from 'Constants/Platform';
 
 export enum RequestEvent {
     COMPLETE,
@@ -16,12 +17,28 @@ export class RequestApi extends NativeApi {
         super(nativeBridge, 'Request');
     }
 
-    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers]);
+    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers, connectTimeout]);
+        } else {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers, connectTimeout, readTimeout]);
+        }
     }
 
-    public post(id: string, url: string, requestBody: string, headers: [string, string][]): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers]);
+    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers, connectTimeout]);
+        } else {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
+        }
+    }
+
+    public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'head', [id, url, headers, connectTimeout]);
+        } else {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'head', [id, url, headers, connectTimeout, readTimeout]);
+        }
     }
 
     public setConnectTimeout(connectTimeout: number): Promise<number> {

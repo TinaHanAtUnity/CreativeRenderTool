@@ -9,24 +9,27 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "akamai": "^0.10.1",
-    "amdclean": "^2.7.0",
-    "es6-promise": "^3.0.2",
-    "requirejs": "^2.1.20",
-    "requirejs-text": "^2.0.12",
-    "stylus": "^0.52.0",
+    "akamai": "0.10.1",
+    "amdclean": "2.7.0",
+    "es6-promise": "3.2.1",
+    "requirejs": "2.2.0",
+    "requirejs-text": "2.0.12",
+    "stylus": "0.54.5",
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
-    "babel-cli": "^6.4.5",
-    "babel-plugin-transform-es3-member-expression-literals": "^6.3.13",
-    "babel-plugin-transform-es3-property-literals": "^6.3.13",
-    "chai": "^3.4.0",
-    "coveralls": "^2.11.8",
-    "istanbul": "^0.4.0",
-    "mocha": "^2.3.3",
-    "mocha-lcov-reporter": "^1.2.0",
-    "remap-istanbul": "^0.5.1",
-    "sinon": "^1.17.2"
+    "babel-cli": "6.9.0",
+    "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
+    "babel-plugin-transform-es3-property-literals": "6.8.0",
+    "chai": "3.5.0",
+    "coveralls": "2.11.9",
+    "istanbul": "0.4.3",
+    "mocha": "2.5.3",
+    "mocha-lcov-reporter": "1.2.0",
+    "remap-istanbul": "0.6.4",
+    "sinon": "1.17.4"
+  },
+  "optionalDependencies": {
+    "fsevents": "^1.0.12"
   }
 }

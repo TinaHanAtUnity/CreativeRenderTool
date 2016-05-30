@@ -36,6 +36,9 @@ export interface INativeResponse {
 
 export class Request {
 
+    private static _connectTimeout = 30000;
+    private static _readTimeout = 30000;
+
     private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
     private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
 
@@ -124,10 +127,10 @@ export class Request {
         Request._requests[id] = nativeRequest;
         switch(nativeRequest.method) {
             case RequestMethod.GET:
-                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers);
+                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data, nativeRequest.headers);
+                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             default:
                 throw new Error('Unsupported request method "' + nativeRequest.method + '"');
