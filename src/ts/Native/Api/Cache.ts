@@ -14,7 +14,6 @@ export enum CacheError {
 
 export enum CacheEvent {
     DOWNLOAD_STARTED,
-    DOWNLOAD_RESUMED,
     DOWNLOAD_PROGRESS,
     DOWNLOAD_END,
     DOWNLOAD_STOPPED,
