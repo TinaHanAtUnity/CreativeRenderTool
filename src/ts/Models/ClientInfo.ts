@@ -10,6 +10,7 @@ export class ClientInfo extends Model {
     private _applicationName: string;
     private _applicationVersion: string;
     private _sdkVersion: string;
+    private _sdkVersionName: string;
 
     private _platform: Platform;
 
@@ -36,6 +37,7 @@ export class ClientInfo extends Model {
         this._applicationName = data.shift();
         this._applicationVersion = data.shift();
         this._sdkVersion = data.shift();
+        this._sdkVersionName = data.shift();
 
         this._debuggable = data.shift();
         this._configUrl = data.shift();
@@ -62,6 +64,10 @@ export class ClientInfo extends Model {
 
     public getSdkVersion(): string {
         return this._sdkVersion;
+    }
+
+    public getSdkVersionName(): string {
+        return this._sdkVersionName;
     }
 
     public getPlatform(): Platform {
@@ -95,6 +101,7 @@ export class ClientInfo extends Model {
             'bundleId': this._applicationName,
             'bundleVersion': this._applicationVersion,
             'sdkVersion': this._sdkVersion,
+            'sdkVersionName': this._sdkVersionName,
             'platform': Platform[this._platform].toLowerCase(),
             'encrypted': !this._debuggable,
             'configUrl': this._configUrl,
