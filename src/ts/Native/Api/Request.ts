@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable5, Observable3 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
-import { Platform } from '../../Constants/Platform';
+import { Platform } from 'Constants/Platform';
 
 export enum RequestEvent {
     COMPLETE,
