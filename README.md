@@ -50,7 +50,7 @@ To build and test continuously (on file changes), use:
 ### Running development builds
 
 - Change SDK configuration URL to point to local build (http://LOCAL_IP:LOCAL_PORT/build/dev/config.json)
-- Change webview development config to point to local build (http://LOCAL_IP:LOCAL_PORT/build/dev/index.html)
+- Change webview development config to point to local build (is done automagically by `make build-dev`) (http://LOCAL_IP:LOCAL_PORT/build/dev/index.html)
 - Start local web server in project root (python3 -m http.server)
 
 ## Testing
@@ -62,14 +62,14 @@ To build and test continuously (on file changes), use:
 ### Hybrid tests
 
 - Change SDK configuration URL to point to local build (http://LOCAL_IP:LOCAL_PORT/build/test/config.json)
-- Change webview development config to point to local build (http://LOCAL_IP:LOCAL_PORT/build/test/index.html)
+- Change webview test config (src/test-config.json) to point to local build (http://LOCAL_IP:LOCAL_PORT/build/test/index.html)
 - `make build-test`
 - Run hybrid test suite from the SDK
 
 ### Integration tests
 
 - Change SDK configuration URL to point to local build (http://LOCAL_IP:LOCAL_PORT/build/release/config.json)
-- Change webview development config to point to local build (http://LOCAL_IP:LOCAL_PORT/build/release/index.html)
+- Change webview release config (src/config.json) to point to local build (http://LOCAL_IP:LOCAL_PORT/build/release/index.html)
 - `make build-release`
 - Run integration test suite from the SDK
 
