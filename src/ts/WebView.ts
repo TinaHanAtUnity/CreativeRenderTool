@@ -80,38 +80,7 @@ export class WebView {
                 }
             }
 
-            this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.serverUrl.value').then((url) => {
-                if(url) {
-                    ConfigManager.setTestBaseUrl(url);
-                    CampaignManager.setTestBaseUrl(url);
-                    SessionManager.setTestBaseUrl(url);
-                }
-            }).catch(([error]) => {
-                switch(error) {
-                    case StorageError[StorageError.COULDNT_GET_VALUE]:
-                        // normal case, use default urls
-                        break;
-
-                    default:
-                        throw new Error(error);
-                }
-            });
-
-            this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
-                if(url) {
-                    Diagnostics.setTestBaseUrl(url);
-                }
-            }).catch(([error]) => {
-                switch(error) {
-                    case StorageError[StorageError.COULDNT_GET_VALUE]:
-                        // normal case, use default urls
-                        break;
-
-                    default:
-                        throw new Error(error);
-                }
-            });
-
+            this.setupTestEnvironment();
             return this._cacheManager.cleanCache();
         }).then(() => {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
@@ -405,6 +374,44 @@ export class WebView {
             return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;
+        });
+    }
+
+    /*
+     TEST HELPERS
+     */
+
+    private setupTestEnvironment(): void {
+        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.serverUrl.value').then((url) => {
+            if(url) {
+                ConfigManager.setTestBaseUrl(url);
+                CampaignManager.setTestBaseUrl(url);
+                SessionManager.setTestBaseUrl(url);
+            }
+        }).catch(([error]) => {
+            switch(error) {
+                case StorageError[StorageError.COULDNT_GET_VALUE]:
+                    // normal case, use default urls
+                    break;
+
+                default:
+                    throw new Error(error);
+            }
+        });
+
+        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
+            if(url) {
+                Diagnostics.setTestBaseUrl(url);
+            }
+        }).catch(([error]) => {
+            switch(error) {
+                case StorageError[StorageError.COULDNT_GET_VALUE]:
+                    // normal case, use default urls
+                    break;
+
+                default:
+                    throw new Error(error);
+            }
         });
     }
 }
