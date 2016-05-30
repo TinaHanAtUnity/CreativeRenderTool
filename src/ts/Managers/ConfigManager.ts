@@ -9,7 +9,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class ConfigManager {
 
-    private static ConfigBaseUrl = 'https://adserver.unityads.unity3d.com/games';
+    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
         return MetaDataManager.fetchAdapterMetaData(nativeBridge).then(adapter => {
@@ -27,6 +27,10 @@ export class ConfigManager {
                 }
             });
         });
+    }
+
+    public static setTestBaseUrl(baseUrl: string): void {
+        ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, adapter: AdapterMetaData): string {

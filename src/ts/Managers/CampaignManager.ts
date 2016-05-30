@@ -10,7 +10,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class CampaignManager {
 
-    private static CampaignBaseUrl = 'https://adserver.unityads.unity3d.com/games';
+    private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
@@ -20,6 +20,10 @@ export class CampaignManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+
+    public static setTestBaseUrl(baseUrl: string): void {
+        CampaignManager.CampaignBaseUrl = baseUrl + '/games';
+    }
 
     constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;

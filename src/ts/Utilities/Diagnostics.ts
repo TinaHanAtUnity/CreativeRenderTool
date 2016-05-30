@@ -19,6 +19,10 @@ export class Diagnostics {
         return eventManager.diagnosticEvent(Diagnostics.DiagnosticsBaseUrl, rawData);
     }
 
+    public static setTestBaseUrl(baseUrl: string) {
+        Diagnostics.DiagnosticsBaseUrl = baseUrl + '/v1/events';
+    }
+
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo) {
         return {
             'common': {
