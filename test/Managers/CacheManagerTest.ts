@@ -65,6 +65,13 @@ class TestCacheApi extends CacheApi {
         return Promise.resolve(files);
     }
 
+    public getFileInfo(fileId: string): Promise<IFileInfo> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._files[fileId]);
+        }
+        return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
+    }
+
     public getHash(value: string): Promise<string> {
         return Promise.resolve(this.getHashDirect(value));
     }
@@ -135,6 +142,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         cacheManager = new CacheManager(nativeBridge);
+        sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
     });
 
     it('Get local file url for cached file', () => {
