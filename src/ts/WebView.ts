@@ -266,12 +266,6 @@ export class WebView {
 
         let cacheMode = this._configuration.getCacheMode();
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
-            this._nativeBridge.AppSheet.prepare({
-                id: parseInt(campaign.getAppStoreId(), 10)
-            });
-        }
-
         let cacheAsset = (url: string) => {
             return this._cacheManager.cache(url).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
