@@ -230,7 +230,10 @@ export class WebView {
         };
 
         let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).then(() =>
+            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
+            }).then(() =>
                 cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {

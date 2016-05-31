@@ -13,7 +13,6 @@ export class VideoEventHandlers {
         let overlay = adUnit.getOverlay();
 
         overlay.setVideoDuration(duration);
-        overlay.setSpinnerEnabled(true);
         overlay.setSkipVisible(true);
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
@@ -30,13 +29,13 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
-        if(position - adUnit.getVideoPosition() < 100) {
-            adUnit.getOverlay().setSpinnerEnabled(true);
-        } else {
-            adUnit.getOverlay().setSpinnerEnabled(false);
-        }
-
         if(position > 0) {
+            let lastPosition = adUnit.getVideoPosition();
+            if(lastPosition > 0 && position - lastPosition < 100) {
+                adUnit.getOverlay().setSpinnerEnabled(true);
+            } else {
+                adUnit.getOverlay().setSpinnerEnabled(false);
+            }
             adUnit.setVideoPosition(position);
         }
         adUnit.getOverlay().setVideoProgress(position);

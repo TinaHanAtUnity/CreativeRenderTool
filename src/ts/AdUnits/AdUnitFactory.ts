@@ -23,18 +23,20 @@ export class AdUnitFactory {
         let endScreen = new EndScreen(campaign);
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, videoAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit);
 
         return videoAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
         overlay.render();
         document.body.appendChild(overlay.container());
         overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
+
+        overlay.setSpinnerEnabled(!campaign.isVideoCached());
 
         if(!placement.allowSkip()) {
             overlay.setSkipEnabled(false);

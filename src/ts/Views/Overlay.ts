@@ -11,7 +11,7 @@ export class Overlay extends View {
     public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
 
-    private _spinnerEnabled: boolean = true;
+    private _spinnerEnabled: boolean = false;
 
     private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
