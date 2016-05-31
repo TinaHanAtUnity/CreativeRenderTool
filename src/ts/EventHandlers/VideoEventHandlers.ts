@@ -10,8 +10,14 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
-        adUnit.getOverlay().setVideoDuration(duration);
-        nativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
+        let overlay = adUnit.getOverlay();
+
+        overlay.setVideoDuration(duration);
+        overlay.setSkipVisible(true);
+        overlay.setMuteEnabled(true);
+        overlay.setVideoDurationEnabled(true);
+
+        nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
                     nativeBridge.VideoPlayer.play();
@@ -22,8 +28,14 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
         if(position > 0) {
+            let lastPosition = adUnit.getVideoPosition();
+            if(lastPosition > 0 && position - lastPosition < 100) {
+                adUnit.getOverlay().setSpinnerEnabled(true);
+            } else {
+                adUnit.getOverlay().setSpinnerEnabled(false);
+            }
             adUnit.setVideoPosition(position);
         }
         adUnit.getOverlay().setVideoProgress(position);
@@ -31,6 +43,9 @@ export class VideoEventHandlers {
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         sessionManager.sendStart(adUnit);
+
+        adUnit.getOverlay().setSpinnerEnabled(false);
+        nativeBridge.VideoPlayer.setProgressEventInterval(250);
 
         if(adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
