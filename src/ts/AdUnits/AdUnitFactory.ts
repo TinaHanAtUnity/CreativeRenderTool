@@ -9,7 +9,7 @@ import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
-import { Platform } from '../Constants/Platform';
+import { Platform } from 'Constants/Platform';
 
 export class AdUnitFactory {
 
