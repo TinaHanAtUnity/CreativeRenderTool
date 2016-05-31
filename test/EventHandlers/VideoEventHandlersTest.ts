@@ -38,6 +38,7 @@ describe('VideoEventHandlersTest', () => {
             setVideoDuration: sinon.spy(),
             isMuted: sinon.spy(),
             hide: sinon.spy(),
+            setSpinner: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
