@@ -10,6 +10,7 @@ export class Configuration {
 
     private _enabled: boolean;
     private _country: string;
+    private _coppaCompliant: boolean;
     private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement = null;
@@ -17,6 +18,7 @@ export class Configuration {
     constructor(configJson: any) {
         this._enabled = configJson.enabled;
         this._country = configJson.country;
+        this._coppaCompliant = configJson.coppaCompliant;
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -52,6 +54,10 @@ export class Configuration {
 
     public getCountry(): string {
         return this._country;
+    }
+
+    public isCoppaCompliant(): boolean {
+        return this._coppaCompliant;
     }
 
     public getCacheMode(): CacheMode {

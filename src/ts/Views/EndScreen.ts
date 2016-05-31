@@ -14,8 +14,11 @@ export class EndScreen extends View {
     public onPrivacy: Observable1<string> = new Observable1();
     public onClose: Observable0 = new Observable0();
 
-    constructor(campaign: Campaign) {
+    private _coppaCompliant: boolean;
+
+    constructor(campaign: Campaign, coppaCompliant: boolean) {
         super('end-screen');
+        this._coppaCompliant = coppaCompliant;
 
         this._template = new Template(EndScreenTemplate);
 
@@ -60,7 +63,7 @@ export class EndScreen extends View {
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        let privacy = new Privacy(true);
+        let privacy = new Privacy(this._coppaCompliant);
         privacy.render();
         document.body.appendChild(privacy.container());
         privacy.onPrivacy.subscribe((url) => {
@@ -68,6 +71,7 @@ export class EndScreen extends View {
         });
         privacy.onClose.subscribe(() => {
             privacy.hide();
+            privacy.container().parentElement.removeChild(privacy.container());
         });
     }
 
