@@ -1,19 +1,18 @@
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
+import { Observable3 } from 'Utilities/Observable';
+
+enum AndroidVideoPlayerEvent {
+    INFO
+}
 
 export class AndroidVideoPlayerApi extends NativeApi {
 
+    public onInfo: Observable3<number, number, string> = new Observable3();
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
-    }
-
-    public getCurrentPosition(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getCurrentPosition');
-    }
-
-    public getVolume(): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'getVolume');
     }
 
     public setInfoListenerEnabled(enabled: boolean): Promise<void> {
@@ -22,6 +21,10 @@ export class AndroidVideoPlayerApi extends NativeApi {
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
+            case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
+                this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+
             default:
                 throw new Error('VideoPlayer event ' + event + ' does not have an observable');
         }
