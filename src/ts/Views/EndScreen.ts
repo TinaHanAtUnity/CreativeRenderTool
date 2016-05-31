@@ -1,14 +1,17 @@
 /// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
+
 declare var EndScreenTemplate: string;
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
+import { Privacy } from 'Views/Privacy';
 
 export class EndScreen extends View {
 
     public onDownload: Observable0 = new Observable0();
+    public onPrivacy: Observable1<string> = new Observable1();
     public onClose: Observable0 = new Observable0();
 
     constructor(campaign: Campaign) {
@@ -36,6 +39,11 @@ export class EndScreen extends View {
                 event: 'click',
                 listener: (event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
+            },
+            {
+                event: 'click',
+                listener: (event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
             }
         ];
     }
@@ -48,6 +56,19 @@ export class EndScreen extends View {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this.onClose.trigger();
+    }
+
+    private onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        let privacy = new Privacy(true);
+        privacy.render();
+        document.body.appendChild(privacy.container());
+        privacy.onPrivacy.subscribe((url) => {
+            this.onPrivacy.trigger(url);
+        });
+        privacy.onClose.subscribe(() => {
+            privacy.hide();
+        });
     }
 
 }
