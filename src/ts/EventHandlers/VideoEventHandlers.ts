@@ -13,7 +13,10 @@ export class VideoEventHandlers {
         let overlay = adUnit.getOverlay();
 
         overlay.setVideoDuration(duration);
-        overlay.setSpinner(true);
+        overlay.setSpinnerEnabled(true);
+        overlay.setSkipVisible(true);
+        overlay.setMuteEnabled(true);
+        overlay.setVideoDurationEnabled(true);
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {
@@ -26,11 +29,11 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, adUnit: VideoAdUnit, position: number): void {
         if(position - adUnit.getVideoPosition() < 100) {
-            adUnit.getOverlay().setSpinner(true);
+            adUnit.getOverlay().setSpinnerEnabled(true);
         } else {
-            adUnit.getOverlay().setSpinner(false);
+            adUnit.getOverlay().setSpinnerEnabled(false);
         }
 
         if(position > 0) {
@@ -42,7 +45,7 @@ export class VideoEventHandlers {
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         sessionManager.sendStart(adUnit);
 
-        adUnit.getOverlay().setSpinner(false);
+        adUnit.getOverlay().setSpinnerEnabled(false);
         nativeBridge.VideoPlayer.setProgressEventInterval(250);
 
         if(adUnit.getWatches() === 0) {

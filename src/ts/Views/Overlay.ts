@@ -13,19 +13,23 @@ export class Overlay extends View {
 
     private _spinnerEnabled: boolean = true;
 
+    private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
     private _skipDuration: number;
     private _skipRemaining: number;
 
+    private _videoDurationEnabled: boolean = false;
     private _videoDuration: number;
     private _videoProgress: number;
 
+    private _muteEnabled: boolean = false;
     private _muted: boolean;
 
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _skipDurationElement: HTMLElement;
     private _videoDurationElement: HTMLElement;
+    private _videoDurationCounterElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
 
     constructor(muted: boolean) {
@@ -58,21 +62,27 @@ export class Overlay extends View {
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._skipDurationElement = <HTMLElement>this._container.querySelector('.skip-duration');
-        this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration');
+        this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration-text');
+        this._videoDurationCounterElement = <HTMLElement>this._container.querySelector('.video-duration');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
     }
 
-    public setSpinner(value: boolean): void {
+    public setSpinnerEnabled(value: boolean): void {
         if(this._spinnerEnabled !== value) {
             this._spinnerEnabled = value;
             this._spinnerElement.style.display = value ? 'block' : 'none';
         }
     }
 
+    public setSkipVisible(value: boolean) {
+        if(this._skipVisible !== value) {
+            this._skipElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
-            this._skipElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -81,9 +91,16 @@ export class Overlay extends View {
         this.setSkipText(value);
     }
 
+    public setVideoDurationEnabled(value: boolean) {
+        if(this._videoDurationEnabled !== value) {
+            this._videoDurationEnabled = value;
+            this._videoDurationElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
     public setVideoDuration(value: number): void {
         this._videoDuration = value;
-        this._videoDurationElement.innerHTML = Math.round(value / 1000).toString();
+        this._videoDurationCounterElement.innerHTML = Math.round(value / 1000).toString();
     }
 
     public setVideoProgress(value: number): void {
@@ -93,10 +110,17 @@ export class Overlay extends View {
             this.setSkipText(this._skipRemaining);
         }
         if(this._videoDuration > value) {
-            this._videoDurationElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
+            this._videoDurationCounterElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
         } else {
             // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
-            this._videoDurationElement.innerHTML = '0';
+            this._videoDurationCounterElement.innerHTML = '0';
+        }
+    }
+
+    public setMuteEnabled(value: boolean) {
+        if(this._muteEnabled !== value) {
+            this._muteEnabled = value;
+            this._muteButtonElement.style.display = value ? 'block' : 'none';
         }
     }
 
