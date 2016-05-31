@@ -9,6 +9,7 @@ import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
+import { Platform } from '../Constants/Platform';
 
 export class AdUnitFactory {
 
@@ -65,6 +66,17 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onError.unsubscribe(onErrorObserver);
         });
+
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            let onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
+                if(likelyToKeepUp === true) {
+                    nativeBridge.VideoPlayer.play();
+                }
+            });
+            videoAdUnit.onClose.subscribe(() => {
+                nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.unsubscribe(onLikelyToKeepUpObserver);
+            });
+        }
     }
 
 }
