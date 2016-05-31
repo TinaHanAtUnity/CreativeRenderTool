@@ -1,4 +1,3 @@
-import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
 import { Observable3 } from 'Utilities/Observable';
