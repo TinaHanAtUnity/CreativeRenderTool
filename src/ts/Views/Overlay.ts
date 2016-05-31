@@ -11,6 +11,8 @@ export class Overlay extends View {
     public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
 
+    private _spinnerEnabled: boolean = true;
+
     private _skipEnabled: boolean;
     private _skipDuration: number;
     private _skipRemaining: number;
@@ -21,6 +23,7 @@ export class Overlay extends View {
     private _muted: boolean;
 
     private _skipElement: HTMLElement;
+    private _spinnerElement: HTMLElement;
     private _skipDurationElement: HTMLElement;
     private _videoDurationElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
@@ -53,14 +56,24 @@ export class Overlay extends View {
     public render(): void {
         super.render();
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
+        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._skipDurationElement = <HTMLElement>this._container.querySelector('.skip-duration');
         this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
     }
 
+    public setSpinner(value: boolean): void {
+        if(this._spinnerEnabled !== value) {
+            this._spinnerEnabled = value;
+            this._spinnerElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
     public setSkipEnabled(value: boolean): void {
-        this._skipEnabled = value;
-        this._skipElement.style.display = value ? 'block' : 'none';
+        if(this._skipEnabled !== value) {
+            this._skipEnabled = value;
+            this._skipElement.style.display = value ? 'block' : 'none';
+        }
     }
 
     public setSkipDuration(value: number): void {

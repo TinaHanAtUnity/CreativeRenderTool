@@ -10,8 +10,12 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
-        adUnit.getOverlay().setVideoDuration(duration);
-        nativeBridge.VideoPlayer.setVolume(new Double(adUnit.getOverlay().isMuted() ? 0.0 : 1.0)).then(() => {
+        let overlay = adUnit.getOverlay();
+
+        overlay.setVideoDuration(duration);
+        overlay.setSpinner(true);
+
+        nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
                     nativeBridge.VideoPlayer.play();
@@ -23,6 +27,12 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(adUnit: VideoAdUnit, position: number): void {
+        if(position - adUnit.getVideoPosition() < 100) {
+            adUnit.getOverlay().setSpinner(true);
+        } else {
+            adUnit.getOverlay().setSpinner(false);
+        }
+
         if(position > 0) {
             adUnit.setVideoPosition(position);
         }
@@ -31,6 +41,9 @@ export class VideoEventHandlers {
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         sessionManager.sendStart(adUnit);
+
+        adUnit.getOverlay().setSpinner(false);
+        nativeBridge.VideoPlayer.setProgressEventInterval(250);
 
         if(adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
