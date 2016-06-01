@@ -19,7 +19,6 @@ import { Overlay } from '../../src/ts/Views/Overlay';
 import { EndScreen } from '../../src/ts/Views/EndScreen';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
-
 describe('VideoEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
@@ -50,7 +49,7 @@ describe('VideoEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{}, overlay, endScreen);
+        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
 
 
@@ -60,14 +59,14 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, adUnit, 5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
 
             sinon.assert.calledWith(adUnit.setVideoPosition, 5);
             sinon.assert.calledWith(overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, adUnit, -5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, -5);
 
             sinon.assert.notCalled(adUnit.setVideoPosition);
             sinon.assert.calledWith(overlay.setVideoProgress, -5);

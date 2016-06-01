@@ -32,7 +32,7 @@ describe('OverlayEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{}, <Overlay><any>{hide: sinon.spy()}, <EndScreen><any>{show: sinon.spy()});
+        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, <EndScreen><any>{show: sinon.spy()});
     });
 
     describe('When calling onSkip', () => {
@@ -77,16 +77,17 @@ describe('OverlayEventHandlersTest', () => {
     describe('When calling onMute', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge.VideoPlayer, 'setVolume');
+            sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
         });
 
         it('should set volume to zero when muted', () => {
-            OverlayEventHandlers.onMute(nativeBridge, true);
+            OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, true);
 
             sinon.assert.calledWith(nativeBridge.VideoPlayer.setVolume, new Double(0.0));
         });
 
         it('should set volume to 1 when not muted', () => {
-            OverlayEventHandlers.onMute(nativeBridge, false);
+            OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, false);
 
             sinon.assert.calledWith(nativeBridge.VideoPlayer.setVolume, new Double(1.0));
         });

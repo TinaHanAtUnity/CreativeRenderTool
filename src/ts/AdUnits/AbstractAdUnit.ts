@@ -3,6 +3,7 @@ import { Campaign } from 'Models/Campaign';
 import { FinishState } from 'Constants/FinishState';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
+import { EventManager } from 'Managers/EventManager';
 
 export abstract class AbstractAdUnit {
 
@@ -48,5 +49,17 @@ export abstract class AbstractAdUnit {
 
     public isShowing(): boolean {
         return this._showing;
+    }
+
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string): void {
+        // do nothing; can be overridden in subclasses
+    }
+
+    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string): void {
+        // do nothing; can be overridden in subclasses
+    }
+
+    public sendProgressEvents(eventManager: EventManager, sessionId: string, position: number, oldPosition: number) {
+        // do nothing; can be overridden in subclasses
     }
 }

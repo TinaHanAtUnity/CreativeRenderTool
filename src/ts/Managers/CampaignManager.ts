@@ -2,10 +2,12 @@ import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
+import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class CampaignManager {
@@ -13,6 +15,7 @@ export class CampaignManager {
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     public onCampaign: Observable1<Campaign> = new Observable1();
+    public onVastCampaign: Observable1<Campaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
@@ -20,20 +23,22 @@ export class CampaignManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _vastParser: VastParser;
 
     public static setTestBaseUrl(baseUrl: string): void {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
     }
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._vastParser = vastParser;
     }
 
-    public request(): void {
-        this.createRequestBody().then(requestBody => {
+    public request(): Promise<void> {
+        return this.createRequestBody().then(requestBody => {
             return this._request.post(this.createRequestUrl(), requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
@@ -41,9 +46,38 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
-                if(campaignJson.campaign) {
-                    let campaign: Campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                if (campaignJson.campaign) {
+                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
+                } else if('vast' in campaignJson) {
+                    if (campaignJson.vast === null) {
+                        this.onNoFill.trigger(3600);
+                    } else {
+                        this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
+                            let campaignId: string = undefined;
+                            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                                campaignId = '00005472656d6f7220694f53';
+                            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                                campaignId = '005472656d6f7220416e6472';
+                            }
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
+                            if (campaign.getVast().getImpressionUrls().length === 0) {
+                                this.onError.trigger(new Error('Campaign does not have an impression url'));
+                                return;
+                            }
+                            // todo throw an Error if required events are missing. (what are the required events?)
+                            if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+                            }
+                            if (!campaign.getVideoUrl()) {
+                                this.onError.trigger(new Error('Campaign does not have a video url'));
+                                return;
+                            }
+                            this.onVastCampaign.trigger(campaign);
+                        }).catch((error) => {
+                            this.onError.trigger(error);
+                        });
+                    }
                 } else {
                     this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
                 }

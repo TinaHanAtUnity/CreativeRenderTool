@@ -2,6 +2,8 @@ import { Placement } from '../../src/ts/Models/Placement';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { INativeResponse } from '../../src/ts/Utilities/Request';
 import { Platform } from '../../src/ts/Constants/Platform';
+import { VastParser } from '../../src/ts/Utilities/VastParser';
+import * as xmldom from 'xmldom';
 
 export class TestFixtures {
 
@@ -39,6 +41,13 @@ export class TestFixtures {
             responseCode: 200,
             headers: [['location', 'http://foobar.com']],
         };
+    }
+
+    public static getVastParser(): VastParser {
+        let vastParser: VastParser;
+        let domParser = new xmldom.DOMParser({errorHandler: {}});
+        vastParser = new VastParser(domParser);
+        return vastParser;
     }
 
 }

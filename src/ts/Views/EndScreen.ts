@@ -22,15 +22,17 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate);
 
-        let adjustedRating: number = campaign.getRating() * 20;
-        this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon(),
-            'endScreenLandscape': campaign.getLandscapeUrl(),
-            'endScreenPortrait': campaign.getPortraitUrl(),
-            'rating': adjustedRating.toString(),
-            'ratingCount': campaign.getRatingCount().toString()
-        };
+        if (campaign) {
+            let adjustedRating: number = campaign.getRating() * 20;
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon(),
+                'endScreenLandscape': campaign.getLandscapeUrl(),
+                'endScreenPortrait': campaign.getPortraitUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': campaign.getRatingCount().toString()
+            };
+        }
 
         this._bindings = [
             {

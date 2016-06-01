@@ -14,7 +14,8 @@
     "es6-promise": "3.2.1",
     "requirejs": "2.2.0",
     "requirejs-text": "2.0.12",
-    "stylus": "0.54.5"
+    "stylus": "0.54.5",
+    "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
     "babel-cli": "6.9.0",

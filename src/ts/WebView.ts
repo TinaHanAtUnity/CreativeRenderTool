@@ -19,6 +19,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
+import { VastParser } from 'Utilities/VastParser';
 import { StorageType, StorageError } from 'Native/Api/Storage';
 
 export class WebView {
@@ -93,8 +94,9 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
             this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._refillTimestamp = 0;
@@ -237,6 +239,59 @@ export class WebView {
                 cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
                 cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                }
+            });
+        };
+
+        let sendReady = () => {
+            this.setPlacementStates(PlacementState.READY);
+        };
+
+        if(cacheMode === CacheMode.FORCED) {
+            cacheAssets().then(() => sendReady());
+        } else if(cacheMode === CacheMode.ALLOWED) {
+            if(this._adUnit) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    cacheAssets();
+                    sendReady();
+                });
+            } else {
+                cacheAssets();
+                sendReady();
+            }
+        } else {
+            sendReady();
+        }
+    }
+
+    private onVastCampaign(campaign: Campaign): void {
+        this._campaign = campaign;
+
+        let cacheMode = this._configuration.getCacheMode();
+
+        let cacheAsset = (url: string) => {
+            return this._cacheManager.cache(url).then(([status, fileId]) => {
+                if(status === CacheStatus.OK) {
+                    return this._cacheManager.getFileUrl(fileId);
+                }
+                throw status;
+            }).catch(error => {
+                if(error !== CacheStatus.STOPPED) {
+                    this.onError(error);
+                    return url;
+                }
+                throw error;
+            });
+        };
+
+        let cacheAssets = () => {
+            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
+            }).catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                 }

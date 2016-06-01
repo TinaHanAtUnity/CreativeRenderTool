@@ -101,9 +101,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         if(this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop();
         }
-
-        this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+        this.hideChildren();
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
@@ -129,6 +127,11 @@ export class VideoAdUnit extends AbstractAdUnit {
             });
         }
     }
+
+    protected hideChildren() {
+        this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
+        this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+    };
 
     public setNativeOptions(options: any): void {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {

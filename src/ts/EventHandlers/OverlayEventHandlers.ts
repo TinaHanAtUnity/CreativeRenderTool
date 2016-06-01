@@ -28,11 +28,16 @@ export class OverlayEventHandlers {
       }
 
       adUnit.getOverlay().hide();
-      adUnit.getEndScreen().show();
+      this.afterSkip(adUnit);
   }
 
-    public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
+    protected static afterSkip(adUnit: VideoAdUnit) {
+        adUnit.getEndScreen().show();
+    };
+
+    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
         nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
+        sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
     }
 
 }
