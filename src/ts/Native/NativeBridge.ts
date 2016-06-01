@@ -211,6 +211,10 @@ export class NativeBridge implements INativeBridge {
                 this.VideoPlayer.handleEvent(event, parameters);
                 break;
 
+            case EventCategory[EventCategory.STORAGE]:
+                this.Storage.handleEvent(event, parameters);
+                break;
+
             default:
                 throw new Error('Unknown event category: ' + category);
         }

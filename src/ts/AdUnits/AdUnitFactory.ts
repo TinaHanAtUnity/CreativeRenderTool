@@ -14,44 +14,48 @@ import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
 import { IObserver1, IObserver3 } from 'Utilities/IObserver';
+import { Platform } from 'Constants/Platform';
+import { Configuration } from 'Models/Configuration';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign);
+            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
         } else {
-            return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign);
+            return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
         }
     }
 
-    private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): VideoAdUnit {
+    private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
-        let endScreen: EndScreen = new EndScreen(campaign);
+        let endScreen = new EndScreen(campaign, configuration.isCoppaCompliant());
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, videoAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit);
 
         return videoAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign): VideoAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
         let vastAdUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit, placement);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit, placement, campaign);
         this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit);
 
         return vastAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
         overlay.render();
         document.body.appendChild(overlay.container());
         this.prepareOverlayEventHandlers(overlay, nativeBridge, sessionManager, videoAdUnit);
+
+        overlay.setSpinnerEnabled(!campaign.isVideoCached());
 
         if(!placement.allowSkip()) {
             overlay.setSkipEnabled(false);
@@ -76,12 +80,13 @@ export class AdUnitFactory {
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
+        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
     }
 
     private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
         let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration));
-        let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(sessionManager, videoAdUnit, position));
+        let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, videoAdUnit, position));
         let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
 
         let onCompletedObserver: IObserver1<string>;
@@ -101,6 +106,17 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onError.unsubscribe(onErrorObserver);
         });
+
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            let onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
+                if(likelyToKeepUp === true) {
+                    nativeBridge.VideoPlayer.play();
+                }
+            });
+            videoAdUnit.onClose.subscribe(() => {
+                nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.unsubscribe(onLikelyToKeepUpObserver);
+            });
+        }
     }
 
 }

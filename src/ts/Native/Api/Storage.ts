@@ -49,4 +49,11 @@ export class StorageApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getKeys', [StorageType[type], key, recursive]);
     }
 
+    public handleEvent(event: string, parameters: any[]): void {
+        switch(event) {
+            default:
+                break; // todo: ignore storage events for now
+        }
+    }
+
 }

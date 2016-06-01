@@ -2,11 +2,13 @@ import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable3, Observable1, Observable4 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
+import { Platform } from 'Constants/Platform';
+import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
+import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
 
 enum VideoPlayerEvent {
     GENERIC_ERROR,
     PROGRESS,
-    INFO,
     COMPLETED,
     PREPARED,
     PREPARE_ERROR,
@@ -21,9 +23,11 @@ enum VideoPlayerEvent {
 
 export class VideoPlayerApi extends NativeApi {
 
+    public Ios: IosVideoPlayerApi;
+    public Android: AndroidVideoPlayerApi;
+
     public onError: Observable3<number, number, string> = new Observable3();
     public onProgress: Observable1<number> = new Observable1();
-    public onInfo: Observable3<number, number, string> = new Observable3();
     public onCompleted: Observable1<string> = new Observable1();
     public onPrepared: Observable4<number, number, number, string> = new Observable4();
     public onPlay: Observable1<string> = new Observable1();
@@ -33,6 +37,11 @@ export class VideoPlayerApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            this.Ios = new IosVideoPlayerApi(nativeBridge);
+        } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            this.Android = new AndroidVideoPlayerApi(nativeBridge);
+        }
     }
 
     public setProgressEventInterval(milliseconds: number): Promise<void> {
@@ -75,10 +84,6 @@ export class VideoPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<Double>(this._apiClass, 'setVolume', [volume]);
     }
 
-    public setInfoListenerEnabled(enabled: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setInfoListenerEnabled', [enabled]);
-    }
-
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.GENERIC_ERROR]:
@@ -87,10 +92,6 @@ export class VideoPlayerApi extends NativeApi {
 
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
                 this.onProgress.trigger(parameters[0]);
-                break;
-
-            case VideoPlayerEvent[VideoPlayerEvent.INFO]:
-                this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.COMPLETED]:
@@ -118,7 +119,11 @@ export class VideoPlayerApi extends NativeApi {
                 break;
 
             default:
-                throw new Error('VideoPlayer event ' + event + ' does not have an observable');
+                if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    this.Ios.handleEvent(event, parameters);
+                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this.Android.handleEvent(event, parameters);
+                }
         }
     }
 

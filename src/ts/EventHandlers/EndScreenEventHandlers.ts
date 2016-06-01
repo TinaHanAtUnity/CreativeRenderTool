@@ -49,6 +49,17 @@ export class EndScreenEventHandlers {
         }
     }
 
+    public static onPrivacy(nativeBridge: NativeBridge, url: string): void {
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.UrlScheme.open(url);
+        } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
+    }
+
     public static onClose(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
         if(nativeBridge.getPlatform() === Platform.IOS && !adUnit.getCampaign().getBypassAppSheet()) {
             nativeBridge.AppSheet.destroy({

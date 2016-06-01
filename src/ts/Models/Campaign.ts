@@ -20,6 +20,8 @@ export class Campaign {
     private _gamerId: string;
     private _abGroup: number;
 
+    private _isVideoCached: boolean = false;
+
     constructor(campaign: any, gamerId: string, abGroup: number) {
         this._id = campaign.id;
         this._appStoreId = campaign.appStoreId;
@@ -120,6 +122,14 @@ export class Campaign {
 
     public getAbGroup(): number {
         return this._abGroup;
+    }
+
+    public isVideoCached(): boolean {
+        return this._isVideoCached;
+    }
+
+    public setVideoCached(value: boolean) {
+        this._isVideoCached = value;
     }
 
 }
