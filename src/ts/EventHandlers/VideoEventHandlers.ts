@@ -6,8 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { ScreenOrientation } from '../Constants/Android/ScreenOrientation';
-import { UIInterfaceOrientationMask } from '../Constants/iOS/UIInterfaceOrientationMask';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 
 export class VideoEventHandlers {
 
