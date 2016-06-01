@@ -10,17 +10,18 @@ import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
+import { Configuration } from 'Models/Configuration';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): AbstractAdUnit {
         // todo: select ad unit based on placement
-        return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign);
+        return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
     }
 
-    private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): VideoAdUnit {
+    private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
-        let endScreen = new EndScreen(campaign);
+        let endScreen = new EndScreen(campaign, configuration.isCoppaCompliant());
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);
@@ -51,6 +52,7 @@ export class AdUnitFactory {
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
+        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
     }
 

@@ -6,6 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 
 export class VideoEventHandlers {
 
@@ -68,6 +70,13 @@ export class VideoEventHandlers {
 
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
+        }
+
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
             if(integrationTest) {
                 if(nativeBridge.getPlatform() === Platform.ANDROID) {
