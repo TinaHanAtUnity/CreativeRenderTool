@@ -288,7 +288,10 @@ export class WebView {
         };
 
         let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => campaign.setVideoUrl(fileUrl)).catch(error => {
+            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
+            }).catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                 }
