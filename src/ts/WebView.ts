@@ -140,9 +140,11 @@ export class WebView {
     public show(placementId: string, options: any, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
-        this.shouldReinitialize().then((reinitialize) => {
-            this._mustReinitialize = reinitialize;
-        });
+        if(this._showing) {
+            // do not send finish event because there will be a finish event from currently open ad unit
+            this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
+            return;
+        }
 
         let placement: Placement = this._configuration.getPlacement(placementId);
         if(!placement) {
@@ -155,6 +157,12 @@ export class WebView {
             return;
         }
 
+        this._showing = true;
+
+        this.shouldReinitialize().then((reinitialize) => {
+            this._mustReinitialize = reinitialize;
+        });
+
         if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
             this._cacheManager.stop();
         }
@@ -166,7 +174,6 @@ export class WebView {
 
             this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign, this._configuration);
             this._adUnit.setNativeOptions(options);
-            this._adUnit.onStart.subscribe(() => this.onStart());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
             this._adUnit.show().then(() => {
@@ -336,10 +343,6 @@ export class WebView {
             'error': error
         }, this._clientInfo, this._deviceInfo);
         this.onNoFill(3600); // todo: on errors, retry again in an hour
-    }
-
-    private onStart(): void {
-        this._showing = true;
     }
 
     private onClose(): void {
