@@ -72,8 +72,15 @@ export class Configuration {
         return this._placements;
     }
 
+    public getPlacementCount(): number {
+        if(this._placements) {
+            return Object.keys(this._placements).length;
+        }
+
+        return 0;
+    }
+
     public getDefaultPlacement(): Placement {
         return this._defaultPlacement;
     }
-
 }

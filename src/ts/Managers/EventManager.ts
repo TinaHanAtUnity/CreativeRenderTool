@@ -33,7 +33,7 @@ export class EventManager {
     }
 
     public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads operative event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
+        this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, EventManager.getUrlKey(sessionId, eventId), url);
         this._nativeBridge.Storage.set(StorageType.PRIVATE, EventManager.getDataKey(sessionId, eventId), data);

@@ -39,7 +39,9 @@ export class CampaignManager {
 
     public request(): Promise<void> {
         return this.createRequestBody().then(requestBody => {
-            return this._request.post(this.createRequestUrl(), requestBody, [], {
+            let requestUrl: string = this.createRequestUrl();
+            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            return this._request.post(requestUrl, requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
                 followRedirects: false,
@@ -47,12 +49,15 @@ export class CampaignManager {
             }).then(response => {
                 let campaignJson: any = JSON.parse(response.response);
                 if (campaignJson.campaign) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
+                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
                         this.onNoFill.trigger(3600);
                     } else {
+                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
                         this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
                             let campaignId: string = undefined;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -79,6 +84,7 @@ export class CampaignManager {
                         });
                     }
                 } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
                     this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
                 }
             });
