@@ -75,6 +75,8 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange, []);
 
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
+
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
             let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
@@ -92,6 +94,8 @@ export class VideoAdUnit extends AbstractAdUnit {
             if(this._nativeBridge.getApiLevel() < 17) {
                 hardwareAccel = false;
             }
+
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
             return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         }

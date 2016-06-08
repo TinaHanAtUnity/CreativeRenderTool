@@ -346,8 +346,10 @@ export class WebView {
     }
 
     private onClose(): void {
+        this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
         if(this._mustReinitialize) {
+            this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
         } else {
             this._sessionManager.create();
@@ -369,6 +371,7 @@ export class WebView {
                     if(this.isShowing()) {
                         this._mustReinitialize = true;
                     } else {
+                        this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
                         this.reinitialize();
                     }
                 } else {

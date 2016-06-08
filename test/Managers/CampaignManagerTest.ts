@@ -10,7 +10,6 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { CampaignManager } from '../../src/ts/Managers/CampaignManager';
 import { assert } from 'chai';
 import { VastParser } from '../../src/ts/Utilities/VastParser';
-import { SdkApi } from '../../src/ts/Native/Api/Sdk';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
@@ -22,6 +21,7 @@ describe('CampaignManager', () => {
     let nativeBridge: NativeBridge;
     let request: Request;
     let vastParser: VastParser;
+    let warningSpy;
 
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
@@ -626,16 +626,11 @@ describe('CampaignManager', () => {
                 }`
             };
 
-            const sdk = new SdkApi(nativeBridge);
-            const mockSdk = sinon.mock(sdk);
-            mockSdk.expects('logWarning').withArgs(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`);
-            nativeBridge.Sdk = sdk;
-
             // when the campaign manager requests the placement
             return verifyCampaignForResponse(response).then(() => {
 
                 // then the SDK's logWarning function is called with an appropriate message
-                mockSdk.verify();
+                assert.isTrue(warningSpy.calledWith(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`));
             });
         });
 
@@ -661,16 +656,11 @@ describe('CampaignManager', () => {
                 }`
             };
 
-            const sdk = new SdkApi(nativeBridge);
-            const mockSdk = sinon.mock(sdk);
-            mockSdk.expects('logWarning').never();
-            nativeBridge.Sdk = sdk;
-
             // when the campaign manager requests the placement
             return verifyCampaignForResponse(response).then(() => {
 
                 // then the SDK's logWarning function is called with an appropriate message
-                mockSdk.verify();
+                assert.equal(warningSpy.callCount, 0);
             });
         });
     });
@@ -679,6 +669,7 @@ describe('CampaignManager', () => {
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = new DeviceInfo();
         vastParser = TestFixtures.getVastParser();
+        warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
                 get:
@@ -697,7 +688,8 @@ describe('CampaignManager', () => {
                 }
             },
             Sdk: {
-                logWarning: sinon.spy()
+                logWarning: warningSpy,
+                logInfo: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
