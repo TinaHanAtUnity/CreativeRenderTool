@@ -10,7 +10,6 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { CampaignManager } from '../../src/ts/Managers/CampaignManager';
 import { assert } from 'chai';
 import { VastParser } from '../../src/ts/Utilities/VastParser';
-import { SdkApi } from '../../src/ts/Native/Api/Sdk';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
