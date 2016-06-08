@@ -73,11 +73,18 @@ export class Configuration {
     }
 
     public getPlacementCount(): number {
-        if(this._placements) {
-            return Object.keys(this._placements).length;
+        if(!this._placements) {
+            return 0;
         }
 
-        return 0;
+        let count: number = 0;
+        for(let placement in this._placements) {
+            if(this._placements.hasOwnProperty(placement)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     public getDefaultPlacement(): Placement {
