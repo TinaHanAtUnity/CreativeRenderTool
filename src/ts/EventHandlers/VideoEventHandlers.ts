@@ -15,7 +15,9 @@ export class VideoEventHandlers {
         let overlay = adUnit.getOverlay();
 
         overlay.setVideoDuration(duration);
-        overlay.setSkipVisible(true);
+        if(adUnit.getPlacement().allowSkip()) {
+            overlay.setSkipVisible(true);
+        }
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
 
