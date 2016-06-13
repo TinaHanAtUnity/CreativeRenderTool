@@ -256,7 +256,7 @@ test: clean
 	@echo Running local tests
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive
+	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive --check-leaks --require test-utils/unhandled_rejection
 
 test-coverage: clean
 	@echo
@@ -270,7 +270,7 @@ test-coverage: clean
 	@echo Running local tests with coverage
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive
+	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive --check-leaks --require test-utils/unhandled_rejection
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
 
 test-coveralls: test-coverage
