@@ -44,6 +44,7 @@ export class WebView {
     private _wakeUpManager: WakeUpManager;
 
     private _showing: boolean = false;
+    private _initialized: boolean = false;
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
@@ -80,28 +81,10 @@ export class WebView {
                 }
             }
 
-            this.setupTestEnvironment();
-            return this._cacheManager.cleanCache();
-        }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
-        }).then((configuration) => {
-            this._configuration = configuration;
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
-            return this._sessionManager.create();
-        }).then(() => {
-            let defaultPlacement = this._configuration.getDefaultPlacement();
-            this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
-            this.setPlacementStates(PlacementState.NOT_AVAILABLE);
-
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
-            this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
-            this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
-            this._refillTimestamp = 0;
-            this._campaignManager.request();
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
+            this._nativeBridge.Sdk.initComplete();
 
             this._wakeUpManager.setListenConnectivity(true);
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -114,9 +97,30 @@ export class WebView {
                 this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
 
-            this._eventManager.sendUnsentSessions();
+            this._cacheManager.cleanCache();
 
-            return this._nativeBridge.Sdk.initComplete();
+            return this.setupTestEnvironment();
+        }).then(() => {
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+        }).then((configuration) => {
+            this._configuration = configuration;
+            return this._sessionManager.create();
+        }).then(() => {
+            let defaultPlacement = this._configuration.getDefaultPlacement();
+            this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
+            this.setPlacementStates(PlacementState.NOT_AVAILABLE);
+
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
+            this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
+            this._refillTimestamp = 0;
+            return this._campaignManager.request();
+        }).then(() => {
+            this._initialized = true;
+
+            return this._eventManager.sendUnsentSessions();
         }).catch(error => {
             if(error instanceof Error) {
                 error = {'message': error.message, 'name': error.name, 'stack': error.stack};
@@ -364,7 +368,7 @@ export class WebView {
      */
 
     private onNetworkConnected() {
-        if(!this.isShowing()) {
+        if(!this.isShowing() && this._initialized) {
             this.shouldReinitialize().then((reinitialize) => {
                 if(reinitialize) {
                     if(this.isShowing()) {
@@ -416,7 +420,6 @@ export class WebView {
      */
 
     private reinitialize() {
-        // todo: make sure session data and other similar things are saved before issuing reinit
         this._nativeBridge.Sdk.reinitialize();
     }
 

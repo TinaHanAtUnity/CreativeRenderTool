@@ -99,6 +99,7 @@ export class CacheManager {
 
             return Promise.all(deleteFiles.map(file => {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
+                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file);
                 return this._nativeBridge.Cache.deleteFile(file);
             }));
         });
