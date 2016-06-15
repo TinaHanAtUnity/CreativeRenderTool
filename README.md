@@ -36,8 +36,7 @@
 
 ### Dependencies
 
-- `npm install`
-- `typings install`
+- `make setup`
 
 ### Development Build
 
@@ -73,6 +72,6 @@ To build and test continuously (on file changes), use:
 - `make build-release`
 - Run integration test suite from the SDK
 
-### Releasing
+## Releasing
 
 Before releasing, update dependencies to latest versions in `package.json`, then regenerate `npm-shrinkwrap.json` with `npm shrinkwrap` and then manually remove `fsevents` dependency from the `npm-shrinkwrap.json` file (`fsevents` breaks build on Linux machines. See [this](https://github.com/npm/npm/issues/2679#issuecomment-150084700))
