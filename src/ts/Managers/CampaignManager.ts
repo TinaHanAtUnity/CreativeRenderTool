@@ -126,7 +126,7 @@ export class CampaignManager {
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             url = Url.addParameters(url, {
-                WebviewUA: encodeURIComponent(navigator.userAgent)
+                webviewUa: encodeURIComponent(navigator.userAgent)
             });
         }
 
