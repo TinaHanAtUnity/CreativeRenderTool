@@ -124,6 +124,12 @@ export class CampaignManager {
             sdkVersion: this._clientInfo.getSdkVersion()
         });
 
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            url = Url.addParameters(url, {
+                webviewUa: encodeURIComponent(navigator.userAgent)
+            });
+        }
+
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion()
