@@ -49,12 +49,19 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
+        let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
+        });
+        campaignManager.onError.subscribe(error => {
+            triggeredError = error;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
+            if(triggeredError) {
+                throw triggeredError;
+            }
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
@@ -452,12 +459,19 @@ describe('CampaignManager', () => {
 
             let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
             let triggeredRetryTime: number;
+            let triggeredError: any;
             campaignManager.onNoFill.subscribe((retryTime: number) => {
                 triggeredRetryTime = retryTime;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
             });
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
 
                 // then the onNoFill observable is triggered
                 mockRequest.verify();
@@ -528,12 +542,19 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
+        let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
+        });
+        campaignManager.onError.subscribe(error => {
+            triggeredError = error;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
+            if(triggeredError) {
+                throw triggeredError;
+            }
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
