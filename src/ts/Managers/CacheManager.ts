@@ -97,9 +97,15 @@ export class CacheManager {
                 }
             }
 
-            return Promise.all(deleteFiles.map(file => {
+            if(deleteFiles.length === 0) {
+                return Promise.resolve();
+            } else {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
+            }
+
+            return Promise.all(deleteFiles.map(file => {
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file);
+                this._nativeBridge.Storage.write(StorageType.PRIVATE);
                 return this._nativeBridge.Cache.deleteFile(file);
             }));
         });
