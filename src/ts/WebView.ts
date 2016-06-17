@@ -260,9 +260,18 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => sendReady());
+            cacheAssets().then(() => {
+                if(this._showing) {
+                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            });
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._adUnit) {
+            if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
@@ -313,9 +322,18 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => sendReady());
+            cacheAssets().then(() => {
+                if(this._showing) {
+                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            });
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._adUnit) {
+            if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
