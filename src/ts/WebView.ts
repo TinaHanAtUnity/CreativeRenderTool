@@ -218,8 +218,7 @@ export class WebView {
     private onCampaign(campaign: Campaign): void {
         this._campaign = campaign;
 
-        // let cacheMode = this._configuration.getCacheMode(); todo: DO NOT MERGE
-        let cacheMode = CacheMode.ALLOWED;
+        let cacheMode = this._configuration.getCacheMode();
 
         if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
