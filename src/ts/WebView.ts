@@ -218,7 +218,8 @@ export class WebView {
     private onCampaign(campaign: Campaign): void {
         this._campaign = campaign;
 
-        let cacheMode = this._configuration.getCacheMode();
+        // let cacheMode = this._configuration.getCacheMode(); todo: DO NOT MERGE
+        let cacheMode = CacheMode.ALLOWED;
 
         if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
@@ -260,9 +261,18 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => sendReady());
+            cacheAssets().then(() => {
+                if(this._showing) {
+                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            });
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._adUnit) {
+            if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
@@ -313,9 +323,18 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => sendReady());
+            cacheAssets().then(() => {
+                if(this._showing) {
+                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            });
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._adUnit) {
+            if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
