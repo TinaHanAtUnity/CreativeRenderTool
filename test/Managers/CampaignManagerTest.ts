@@ -208,17 +208,7 @@ describe('CampaignManager', () => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
-            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
-            [],
-            {
-                retries: 5,
-                retryDelay: 5000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }
-        ).returns(Promise.resolve({
+        mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
@@ -238,7 +228,7 @@ describe('CampaignManager', () => {
             }`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_1.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                 <Ad id="602833">
@@ -284,7 +274,7 @@ describe('CampaignManager', () => {
                 </VAST>`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                   <Ad id="601364">
@@ -398,17 +388,7 @@ describe('CampaignManager', () => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
-            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
-            [],
-            {
-                retries: 5,
-                retryDelay: 5000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }
-        ).returns(Promise.resolve({
+        mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
@@ -428,7 +408,7 @@ describe('CampaignManager', () => {
             }`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_1.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                 <Ad id="602833">
@@ -474,7 +454,7 @@ describe('CampaignManager', () => {
                 </VAST>`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                 <Ad id="602833">
@@ -520,7 +500,7 @@ describe('CampaignManager', () => {
                 </VAST>`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_3.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                 <Ad id="602833">
@@ -566,7 +546,7 @@ describe('CampaignManager', () => {
                 </VAST>`
         }));
 
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_4.xml', [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').returns(Promise.resolve({
             response: `<?xml version="1.0" encoding="UTF-8"?>
                 <VAST version="2.0">
                   <Ad id="601364">
