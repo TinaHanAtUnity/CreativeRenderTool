@@ -621,7 +621,7 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         campaignManager.onError.subscribe((err: Error) => {
-            assert.equal(err.message, "VAST wrapper depth exceeded");
+            assert.equal(err.message, 'VAST wrapper depth exceeded');
             done();
         });
 
