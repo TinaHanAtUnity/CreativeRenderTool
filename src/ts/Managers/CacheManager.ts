@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { StorageType } from 'Native/Api/Storage';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 export enum CacheStatus {
     OK,
@@ -20,11 +21,13 @@ export interface ICacheResponse {
 export class CacheManager {
 
     private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
     private _callbacks: { [key: string]: CallbackContainer } = {};
     private _fileIds: { [key: string]: string } = {};
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
+        this._wakeUpManager = wakeUpManager;
         this._nativeBridge.Cache.setProgressInterval(500);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
         this._nativeBridge.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));

@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 class TestCacheApi extends CacheApi {
 
@@ -133,6 +134,7 @@ describe('CacheManagerTest', () => {
 
     let cacheApi: TestCacheApi;
     let cacheManager: CacheManager;
+    let wakeUpManager: WakeUpManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -141,7 +143,8 @@ describe('CacheManagerTest', () => {
         });
 
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
-        cacheManager = new CacheManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        cacheManager = new CacheManager(nativeBridge, wakeUpManager);
         sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
     });
 
