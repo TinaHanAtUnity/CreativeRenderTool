@@ -33,6 +33,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoPosition());
         if(position > 0) {
             let lastPosition = adUnit.getVideoPosition();
             if(lastPosition > 0 && position - lastPosition < 100) {
