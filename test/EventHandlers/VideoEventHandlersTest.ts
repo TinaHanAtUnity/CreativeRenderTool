@@ -71,6 +71,13 @@ describe('VideoEventHandlersTest', () => {
             sinon.assert.notCalled(adUnit.setVideoPosition);
             sinon.assert.calledWith(overlay.setVideoProgress, -5);
         });
+
+        it('should send progress event with SessionManager', () => {
+            sinon.spy(sessionManager, 'sendProgress');
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
+
+            sinon.assert.calledWith(sessionManager.sendProgress, adUnit, sessionManager.getSession(), 5, 0);
+        });
     });
 
     describe('with onVideoStart', () => {
