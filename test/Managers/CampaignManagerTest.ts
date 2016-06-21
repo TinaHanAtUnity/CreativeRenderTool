@@ -221,17 +221,7 @@ describe('CampaignManager', () => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs(
-            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
-            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
-            [],
-            {
-                retries: 5,
-                retryDelay: 5000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }
-        ).returns(Promise.resolve({
+        mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
