@@ -27,7 +27,17 @@ describe('CampaignManager', () => {
 
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').returns(Promise.resolve({
+        mockRequest.expects('post').withArgs(
+            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+            [],
+            {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }
+        ).returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
@@ -49,19 +59,12 @@ describe('CampaignManager', () => {
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
-        let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
-        });
-        campaignManager.onError.subscribe(error => {
-            triggeredError = error;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
-            if(triggeredError) {
-                throw triggeredError;
-            }
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
@@ -75,7 +78,17 @@ describe('CampaignManager', () => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').returns(Promise.resolve({
+        mockRequest.expects('post').withArgs(
+            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+            [],
+            {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }
+        ).returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
                 "vast": {
@@ -577,7 +590,17 @@ describe('CampaignManager', () => {
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').returns(Promise.resolve(response));
+        mockRequest.expects('post').withArgs(
+            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+            [],
+            {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }
+        ).returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
@@ -597,7 +620,17 @@ describe('CampaignManager', () => {
     let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
         // given a VAST placement that wraps another VAST
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').returns(Promise.resolve(response));
+        mockRequest.expects('post').withArgs(
+            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+            [],
+            {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }
+        ).returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -824,23 +857,26 @@ describe('CampaignManager', () => {
             };
 
             let mockRequest = sinon.mock(request);
-            mockRequest.expects('post').returns(Promise.resolve(response));
+            mockRequest.expects('post').withArgs(
+                'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+                '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+                [],
+                {
+                    retries: 5,
+                    retryDelay: 5000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }
+            ).returns(Promise.resolve(response));
 
             let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
             let triggeredRetryTime: number;
-            let triggeredError: any;
             campaignManager.onNoFill.subscribe((retryTime: number) => {
                 triggeredRetryTime = retryTime;
-            });
-            campaignManager.onError.subscribe(error => {
-                triggeredError = error;
             });
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
-                if(triggeredError) {
-                    throw triggeredError;
-                }
 
                 // then the onNoFill observable is triggered
                 mockRequest.verify();
@@ -907,23 +943,26 @@ describe('CampaignManager', () => {
     let verifyCampaignForResponse = (response: {response: any}) => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
-        mockRequest.expects('post').returns(Promise.resolve(response));
+        mockRequest.expects('post').withArgs(
+            'https://adserver.unityads.unity3d.com/games/12345/fill?&platform=android&sdkVersion=2.0.0-alpha2&',
+            '{"bundleVersion":"2.0.0-test2","bundleId":"com.unity3d.ads.example"}',
+            [],
+            {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }
+        ).returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
-        let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
             triggeredCampaign = campaign;
-        });
-        campaignManager.onError.subscribe(error => {
-            triggeredError = error;
         });
 
         // when the campaign manager requests the placement
         return campaignManager.request().then(() => {
-            if(triggeredError) {
-                throw triggeredError;
-            }
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();

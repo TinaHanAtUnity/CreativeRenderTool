@@ -260,18 +260,9 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
-                if(this._showing) {
-                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            });
+            cacheAssets().then(() => sendReady());
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._showing) {
+            if(this._adUnit) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
@@ -322,18 +313,9 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
-                if(this._showing) {
-                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            });
+            cacheAssets().then(() => sendReady());
         } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._showing) {
+            if(this._adUnit) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
                     cacheAssets();
@@ -471,9 +453,6 @@ export class WebView {
                 ConfigManager.setTestBaseUrl(url);
                 CampaignManager.setTestBaseUrl(url);
                 SessionManager.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.serverUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
         }).catch(([error]) => {
             switch(error) {
@@ -489,9 +468,6 @@ export class WebView {
         this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
             if(url) {
                 Diagnostics.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.kafkaUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
         }).catch(([error]) => {
             switch(error) {
