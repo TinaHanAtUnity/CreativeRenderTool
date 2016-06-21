@@ -29,7 +29,7 @@ export class VastAdUnit extends VideoAdUnit {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (let impressionUrl of impressionUrls) {
-                eventManager.thirdPartyEvent('vast impression', sessionId, impressionUrl);
+                this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
             }
         }
     }
@@ -38,8 +38,7 @@ export class VastAdUnit extends VideoAdUnit {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (let url of trackingEventUrls) {
-                url = url.replace(/%ZONE%/, this.getPlacement().getId());
-                eventManager.thirdPartyEvent(`vast ${eventName}`, sessionId, url);
+                this.sendThirdPartyEvent(eventManager, `vast ${eventName}`, sessionId, url);
             }
         }
     }
@@ -67,6 +66,11 @@ export class VastAdUnit extends VideoAdUnit {
                 this.sendTrackingEvent(eventManager, quartileEventName, sessionId);
             }
         }
+    }
+
+    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, url: string): void {
+        url = url.replace(/%ZONE%/, this.getPlacement().getId());
+        eventManager.thirdPartyEvent(event, sessionId, url);
     }
 
     private getTrackingEventUrls(eventName: string): string[] {
