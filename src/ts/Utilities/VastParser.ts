@@ -74,10 +74,10 @@ export class VastParser {
 
     public retrieveVast(vast: any, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast = this.parseVast(vast);
-        this.applyParentURLs(parsedVast, parent);
 
         let wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL || depth === this._maxWrapperDepth) {
+            this.applyParentURLs(parsedVast, parent);
             return Promise.resolve(parsedVast);
         }
 
