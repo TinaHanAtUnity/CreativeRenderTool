@@ -1,0 +1,661 @@
+[
+  {
+    "key": "abGroup",
+    "previous_key": "abGroup",
+    "type": "Integer",
+    "description": "Integer from 0 to 19",
+    "changes": "Static",
+    "provider": "Server",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "adapterName",
+    "previous_key": "",
+    "type": "String",
+    "description": "If there was an adapter between the framework and SDK native code, for instance: UnityAds AssetStore Plugin or UnityAds Engine Integration",
+    "changes": "Rarely",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "adapterVersion",
+    "previous_key": "",
+    "type": "String",
+    "description": "For instance: 1.2.4",
+    "changes": "Possibly",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "advertisingId",
+    "previous_key": "rawAdvertisingTrackingId",
+    "type": "String",
+    "description": "Advertising identifier in raw format",
+    "changes": "Rarely",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "apiLevel",
+    "previous_key": "softwareVersion (Android)",
+    "type": "Integer",
+    "description": "Android device API level",
+    "changes": "Rarely",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "applicationMuted",
+    "previous_key": "",
+    "type": "Boolean",
+    "description": "If game has been muted",
+    "changes": "Possibly",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "applicationOrientation",
+    "previous_key": "",
+    "type": "String",
+    "description": "Configured/Allowed orientations for the app",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "batteryLevel",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Precentage of battery charging status",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "batteryStatus",
+    "previous_key": "",
+    "type": "String",
+    "description": "Charging / Full / Draining etc.",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "bundleId",
+    "previous_key": "",
+    "type": "String",
+    "description": "Bundle identifier for the app",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "bundleVersion",
+    "previous_key": "",
+    "type": "String",
+    "description": "Game version",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "cached",
+    "previous_key": "cachedPlayback",
+    "type": "Boolean",
+    "description": "If video is cached or streamed",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "cachingDuration",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Milliseconds taken to cache",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "cachingSize",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Size of the asset cached",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "campaignId",
+    "previous_key": "campaignId or endpoint based",
+    "type": "String",
+    "description": "Internal campaign identifier",
+    "changes": "Yes",
+    "provider": "Server",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "connectionType",
+    "previous_key": "connectionType",
+    "type": "String",
+    "description": "\"wifi\", \"cellular\" or \"none\"",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "country",
+    "previous_key": "country",
+    "type": "String",
+    "description": "2 character country code",
+    "changes": "Yes",
+    "provider": "Server",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "currentOrientation",
+    "previous_key": "",
+    "type": "String",
+    "description": "Current orientation at the time of the event",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "deviceFreeMemory",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Free memory in kilobytes",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceFreeSpace",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Free space in kilobytes",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceHeadset",
+    "previous_key": "",
+    "type": "Boolean",
+    "description": "Boolean if user has headset plugged in",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceMake",
+    "previous_key": "hardwareVersion",
+    "type": "String",
+    "description": "Android device manufacturer",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceModel",
+    "previous_key": "hardwareVersion",
+    "type": "String",
+    "description": "Android device model",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceRingerMode",
+    "previous_key": "",
+    "type": "String",
+    "description": "Silent / Vibrate / Sound",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceTotalMemory",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Total memory in kilobytes",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceTotalSpace",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Total space in kilobytes",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceType",
+    "previous_key": "deviceType",
+    "type": "String",
+    "description": "iOS raw device type",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "deviceVolume",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Device volume",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "encrypted",
+    "previous_key": "encrypted",
+    "type": "Boolean",
+    "description": "Basically is the application debuggable or not ",
+    "changes": "Rarely",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "eventId",
+    "previous_key": "",
+    "type": "String",
+    "description": "Unique event identifier",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "frameworkName",
+    "previous_key": "",
+    "type": "String",
+    "description": "The framework/game toolkit used to build the game, for example: Unity",
+    "changes": "Rarely",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "frameworkVersion",
+    "previous_key": "unityVersion",
+    "type": "String",
+    "description": "For instance: 5.3.1p3",
+    "changes": "Possibly",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "gameId",
+    "previous_key": "gameId or endpoint based",
+    "type": "String",
+    "description": "Source game identifier",
+    "changes": "Static",
+    "provider": "Admin",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "gamerId",
+    "previous_key": "gamerId or endpoint based",
+    "type": "String",
+    "description": "Internal gamer identifier",
+    "changes": "Rarely",
+    "provider": "Server",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "language",
+    "previous_key": "",
+    "type": "String",
+    "description": "Device language code (e.g. en_US or fr_CA)",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "mediationOrdinal",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Order of ad shown in mediation waterfall? IIRC",
+    "changes": "Yes",
+    "provider": "Mediation",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "mediationProvider",
+    "previous_key": "",
+    "type": "String",
+    "description": "Mediation provider name",
+    "changes": "Static",
+    "provider": "Mediation",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "mediationVersion",
+    "previous_key": "",
+    "type": "String",
+    "description": "Mediation SDK version",
+    "changes": "Rarely",
+    "provider": "Mediation",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "muted",
+    "previous_key": "",
+    "type": "Boolean",
+    "description": "Is the video muted from the UI",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "networkOperator",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "MCC + MNC codes",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "networkOperatorName",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Cell network operator name",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "networkType",
+    "previous_key": "ios/androidNetworkType",
+    "type": "String",
+    "description": "Detailed cellular network type",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "osVersion",
+    "previous_key": "softwareVersion (iOS)",
+    "type": "String",
+    "description": "Device operating system version",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "placementId",
+    "previous_key": "zoneId",
+    "type": "String",
+    "description": "Internal placement identifier",
+    "changes": "Yes",
+    "provider": "Admin",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "placementType",
+    "previous_key": "",
+    "type": "String",
+    "description": "\"rewarded\" or \"interstitial\"",
+    "changes": "Yes",
+    "provider": "Admin",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "platform",
+    "previous_key": "platform",
+    "type": "String",
+    "description": "\"android\" or \"ios\"",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "retryCount",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "How many times this event_id has been retried",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "rooted",
+    "previous_key": "",
+    "type": "Boolean",
+    "description": "Was the device rooted/jailbroken or not according to check",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "TRUE"
+  },
+  {
+    "key": "screenBrightness",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Brightness value",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "screenDensity",
+    "previous_key": "screenDensity",
+    "type": "Integer",
+    "description": "In DPI",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "screenHeight",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Screen height in pixels",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "screenLayout",
+    "previous_key": "screenSize",
+    "type": "Integer",
+    "description": "Android raw screen layout value",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "screenWidth",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Screen width in pixels",
+    "changes": "Static",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "sdkVersion",
+    "previous_key": "sdkVersion",
+    "type": "String",
+    "description": "SDK version",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "sessionId",
+    "previous_key": "",
+    "type": "String",
+    "description": "Unique session identifier",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "sid",
+    "previous_key": "sid",
+    "type": "String",
+    "description": "Server side reward callback id",
+    "changes": "Possibly",
+    "provider": "App",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "skippableAt",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Milliseconds when user can skip",
+    "changes": "Yes",
+    "provider": "Admin",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "skippedAt",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Milliseconds from video start when it was skipped",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "testMode",
+    "previous_key": "test",
+    "type": "Boolean",
+    "description": "Test mode",
+    "changes": "Rarely",
+    "provider": "App",
+    "in_url": "TRUE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "timestamp",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Local time of triggering the event",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "timezone",
+    "previous_key": "",
+    "type": "String",
+    "description": "How many hours is the local time offset from UTC. For instance PST would be \"-8:00\", India would be \"+5:30\" ",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "trackingEnabled",
+    "previous_key": "trackingEnabled",
+    "type": "Boolean",
+    "description": "Boolean if user has limited tracking or not",
+    "changes": "Rarely",
+    "provider": "SDK",
+    "in_url": "TRUE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "userAgent",
+    "previous_key": "",
+    "type": "String",
+    "description": "WebView user agent",
+    "changes": "Possibly",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "videoLength",
+    "previous_key": "",
+    "type": "Integer",
+    "description": "Video length in milliseconds",
+    "changes": "Yes",
+    "provider": "Admin",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  },
+  {
+    "key": "webviewVersion",
+    "previous_key": "",
+    "type": "String",
+    "description": "WebView version",
+    "changes": "Yes",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "TRUE"
+  },
+  {
+    "key": "integrationType",
+    "previous_key": "",
+    "type": "string",
+    "description": "\"AssetStore\",\"Engine\",\"native\",\"mediation\"",
+    "changes": "Rarely",
+    "provider": "SDK",
+    "in_url": "FALSE",
+    "guaranteed": "FALSE"
+  }
+]
