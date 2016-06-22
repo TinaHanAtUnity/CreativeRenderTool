@@ -20,6 +20,7 @@ export interface ICacheResponse {
 interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
+    retries: number;
     resolve: Function;
     reject: Function;
 }
@@ -64,7 +65,24 @@ export class CacheManager {
     }
 
     public stop(): void {
-        this._nativeBridge.Cache.stop();
+        let activeDownload: boolean = false;
+
+        let url: any;
+        for(url in this._callbacks) {
+            if(this._callbacks.hasOwnProperty(url)) {
+                let callback: ICallbackObject = this._callbacks[url];
+                if(callback.networkRetry) {
+                    callback.reject([CacheStatus.STOPPED, callback.fileId]);
+                    delete this._callbacks[url];
+                } else {
+                    activeDownload = true;
+                }
+            }
+        }
+
+        if(activeDownload) {
+            this._nativeBridge.Cache.stop();
+        }
     }
 
     public cleanCache(): Promise<any[]> {
@@ -171,6 +189,7 @@ export class CacheManager {
             let callbackObject: ICallbackObject = {
                 fileId: fileId,
                 networkRetry: false,
+                retries: 0,
                 resolve: resolve,
                 reject: reject
             };
@@ -233,7 +252,13 @@ export class CacheManager {
         if(callback) {
             switch(error) {
                 case CacheError[CacheError.FILE_IO_ERROR]:
-                    callback.networkRetry = true;
+                    if(callback.retries < 5) {
+                        callback.retries++;
+                        callback.networkRetry = true;
+                    } else {
+                        callback.reject(error);
+                        delete this._callbacks[url];
+                    }
                     return;
 
                 default:
@@ -245,6 +270,15 @@ export class CacheManager {
     }
 
     private onNetworkConnected(): void {
-        // todo
+        let url: any;
+        for(url in this._callbacks) {
+            if(this._callbacks.hasOwnProperty(url)) {
+                let callback: ICallbackObject = this._callbacks[url];
+                if(callback.networkRetry) {
+                    callback.networkRetry = false;
+                    this.downloadFile(url, callback.fileId);
+                }
+            }
+        }
     }
 }
