@@ -9,6 +9,7 @@ export enum CacheStatus {
 }
 
 export interface ICacheResponse {
+    fullyDownloaded: boolean;
     url: string;
     size: number;
     totalSize: number;
@@ -150,10 +151,10 @@ export class CacheManager {
     private shouldCache(url: string): Promise<boolean> {
         return this.getFileId(url).then(fileId => {
             return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
-                if(fileInfo.found) {
+                if(fileInfo.found && fileInfo.size > 0) {
                     return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
                         let storedCacheResponse: ICacheResponse = JSON.parse(rawStoredCacheResponse);
-                        return fileInfo.size !== storedCacheResponse.totalSize;
+                        return !storedCacheResponse.fullyDownloaded;
                     });
                 } else {
                     return true;
@@ -197,8 +198,9 @@ export class CacheManager {
         });
     }
 
-    private createCacheResponse(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): ICacheResponse {
+    private createCacheResponse(fullyDownloaded: boolean, url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): ICacheResponse {
         return {
+            fullyDownloaded: fullyDownloaded,
             url: url,
             size: size,
             totalSize: totalSize,
@@ -215,7 +217,7 @@ export class CacheManager {
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         if(size === 0) {
-            this.writeCacheResponse(url, this.createCacheResponse(url, size, totalSize, 0, responseCode, headers));
+            this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
         }
     }
 
@@ -226,22 +228,16 @@ export class CacheManager {
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
-            this._nativeBridge.Cache.getFileInfo(this._fileIds[url]).then(fileInfo => {
-                let cacheResponse = this.createCacheResponse(url, size, totalSize, duration, responseCode, headers);
-                if(fileInfo.size === totalSize) {
-                    this.writeCacheResponse(url, cacheResponse);
-                }
-                callback.resolve([CacheStatus.OK, callback.fileId]);
-                delete this._callbacks[url];
-            });
+            this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
+            callback.resolve([CacheStatus.OK, callback.fileId]);
+            delete this._callbacks[url];
         }
     }
 
     private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
-            let cacheResponse = this.createCacheResponse(url, size, totalSize, duration, responseCode, headers);
-            this.writeCacheResponse(url, cacheResponse);
+            this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
             callback.resolve([CacheStatus.STOPPED, callback.fileId]);
             delete this._callbacks[url];
         }
