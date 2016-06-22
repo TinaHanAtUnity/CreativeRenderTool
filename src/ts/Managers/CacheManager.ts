@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
-import { CallbackContainer } from 'Utilities/CallbackContainer';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 
