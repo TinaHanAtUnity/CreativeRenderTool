@@ -131,13 +131,25 @@ export class CacheManager {
         if(url in this._fileIds) {
             return Promise.resolve(this._fileIds[url]);
         }
-        let splittedUrl = url.split('.');
-        let extension: string = '';
-        if(splittedUrl.length > 1) {
-            extension = splittedUrl[splittedUrl.length - 1];
+
+        let extension: string;
+        let urlFilename: string = url;
+        let urlPaths = url.split('/');
+        if(urlPaths.length > 1) {
+            urlFilename = urlPaths[urlPaths.length - 1];
         }
+        let fileExtensions = urlFilename.split('.');
+        if(fileExtensions.length > 1) {
+            extension = fileExtensions[fileExtensions.length - 1];
+        }
+
         return this._nativeBridge.Cache.getHash(url).then(hash => {
-            let fileId = this._fileIds[url] = hash + '.' + extension;
+            let fileId: string;
+            if(extension) {
+                fileId = this._fileIds[url] = hash + '.' + extension;
+            } else {
+                fileId = this._fileIds[url] = hash;
+            }
             return fileId;
         });
     }
