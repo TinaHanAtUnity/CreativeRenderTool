@@ -3,6 +3,7 @@ import { ClientInfo } from '../../src/ts/Models/ClientInfo';
 import { INativeResponse } from '../../src/ts/Utilities/Request';
 import { Platform } from '../../src/ts/Constants/Platform';
 import { VastParser } from '../../src/ts/Utilities/VastParser';
+import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import * as xmldom from 'xmldom';
 
 export class TestFixtures {
@@ -50,4 +51,15 @@ export class TestFixtures {
         return vastParser;
     }
 
+    public static getNativeBridge(): NativeBridge {
+        let backend = {
+            handleInvocation: function() {
+                // no-op
+            },
+            handleCallback: function() {
+                // no-op
+            }
+        };
+        return new NativeBridge(backend);
+    }
 }
