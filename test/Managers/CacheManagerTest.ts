@@ -23,10 +23,6 @@ class TestCacheApi extends CacheApi {
         let duration: number = 6789;
         let responseCode: number = 200;
 
-        if(fileId in this._files) {
-            return Promise.reject(CacheError[CacheError.FILE_ALREADY_IN_CACHE]);
-        }
-
         if(this._currentFile !== undefined) {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
@@ -210,18 +206,6 @@ describe('CacheManagerTest', () => {
             });
         }).then(() => {
             assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
-        });
-    });
-
-    it('Cache one file with no internet', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-
-        cacheApi.setInternet(false);
-
-        return cacheManager.cache(testUrl).then(() => {
-            assert.fail('Caching should not be successful with no internet');
-        }, (error) => {
-            // everything ok
         });
     });
 

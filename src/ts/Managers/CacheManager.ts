@@ -18,16 +18,24 @@ export interface ICacheResponse {
     headers: [string, string][];
 }
 
+interface ICallbackObject {
+    fileId: string;
+    networkRetry: boolean;
+    resolve: Function;
+    reject: Function;
+}
+
 export class CacheManager {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
-    private _callbacks: { [key: string]: CallbackContainer } = {};
+    private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+        this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         this._nativeBridge.Cache.setProgressInterval(500);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
         this._nativeBridge.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
@@ -46,25 +54,12 @@ export class CacheManager {
                 this.getFileId(url)
             ]).then(([shouldCache, fileId]) => {
                 if(!shouldCache) {
-                    return [CacheStatus.OK, fileId];
+                    return Promise.resolve([CacheStatus.OK, fileId]);
                 }
-                return this._nativeBridge.Cache.download(url, fileId).then(() => {
-                    return this.registerCallback(url).then(cacheResponse => {
-                        // todo: add cacheResponse.responseCode handling & retrying here
-                        if(cacheResponse.size !== cacheResponse.totalSize) {
-                            return [CacheStatus.STOPPED, fileId];
-                        }
-                        return [CacheStatus.OK, fileId];
-                    });
-                }).catch(error => {
-                    switch(error) {
-                        case CacheError[CacheError.FILE_ALREADY_IN_CACHE]:
-                            return [CacheStatus.OK, fileId];
 
-                        default:
-                            return Promise.reject(error);
-                    }
-                });
+                let promise = this.registerCallback(url, fileId);
+                this.downloadFile(url, fileId);
+                return promise;
             });
         });
     }
@@ -150,9 +145,37 @@ export class CacheManager {
         });
     }
 
-    private registerCallback(url: string): Promise<ICacheResponse> {
-        return new Promise<ICacheResponse>((resolve, reject) => {
-            this._callbacks[url] = new CallbackContainer(resolve, reject);
+    private downloadFile(url: string, fileId: string): void {
+        this._nativeBridge.Cache.download(url, fileId).catch(error => {
+            let callback = this._callbacks[url];
+            if(callback) {
+                switch(error) {
+                    case CacheError[CacheError.FILE_ALREADY_CACHING]:
+                        this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
+                        callback.reject(error);
+                        return;
+
+                    case CacheError[CacheError.NO_INTERNET]:
+                        callback.networkRetry = true;
+                        return;
+
+                    default:
+                        callback.reject(error);
+                        return;
+                }
+            }
+        });
+    }
+
+    private registerCallback(url: string, fileId: string): Promise<[CacheStatus, string]> {
+        return new Promise<[CacheStatus, string]>((resolve, reject) => {
+            let callbackObject: ICallbackObject = {
+                fileId: fileId,
+                networkRetry: false,
+                resolve: resolve,
+                reject: reject
+            };
+            this._callbacks[url] = callbackObject;
         });
     }
 
@@ -190,28 +213,39 @@ export class CacheManager {
                 if(fileInfo.size === totalSize) {
                     this.writeCacheResponse(url, cacheResponse);
                 }
-                callback.resolve(cacheResponse);
+                callback.resolve([CacheStatus.OK, callback.fileId]);
                 delete this._callbacks[url];
             });
         }
     }
 
-    private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]) {
+    private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
             let cacheResponse = this.createCacheResponse(url, size, totalSize, duration, responseCode, headers);
             this.writeCacheResponse(url, cacheResponse);
-            callback.resolve(cacheResponse);
+            callback.resolve([CacheStatus.STOPPED, callback.fileId]);
             delete this._callbacks[url];
         }
     }
 
-    private onDownloadError(error: string, url: string, message: string) {
+    private onDownloadError(error: string, url: string, message: string): void {
         let callback = this._callbacks[url];
         if(callback) {
-            callback.reject([error, url, message]);
-            delete this._callbacks[url];
+            switch(error) {
+                case CacheError[CacheError.FILE_IO_ERROR]:
+                    callback.networkRetry = true;
+                    return;
+
+                default:
+                    callback.reject(error);
+                    delete this._callbacks[url];
+                    return;
+            }
         }
     }
 
+    private onNetworkConnected(): void {
+        // todo
+    }
 }
