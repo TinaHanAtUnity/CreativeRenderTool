@@ -473,6 +473,7 @@ export class WebView {
                 SessionManager.setTestBaseUrl(url);
 
                 this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.serverUrl');
+                this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
         }).catch(([error]) => {
             switch(error) {
@@ -490,6 +491,7 @@ export class WebView {
                 Diagnostics.setTestBaseUrl(url);
 
                 this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.kafkaUrl');
+                this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
         }).catch(([error]) => {
             switch(error) {
