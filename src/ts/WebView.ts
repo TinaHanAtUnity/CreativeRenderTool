@@ -227,7 +227,7 @@ export class WebView {
         }
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
@@ -292,7 +292,7 @@ export class WebView {
         let cacheMode = this._configuration.getCacheMode();
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }

@@ -4,6 +4,7 @@ import * as sinon from 'sinon';
 
 import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
+import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
@@ -123,12 +124,31 @@ class TestCacheApi extends CacheApi {
     }
 }
 
+class TestStorageApi extends StorageApi {
+    public write(type: StorageType): Promise<void> {
+        return;
+    }
+
+    public get<T>(type: StorageType, key: string): Promise<T> {
+        return Promise.resolve();
+    }
+
+    public set<T>(type: StorageType, key: string, value: T): Promise<void> {
+        return;
+    }
+
+    public delete(type: StorageType, key: string): Promise<void> {
+        return;
+    }
+}
+
 describe('CacheManagerTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
     let nativeBridge;
 
     let cacheApi: TestCacheApi;
+    let storageApi: TestStorageApi;
     let cacheManager: CacheManager;
     let wakeUpManager: WakeUpManager;
 
@@ -139,6 +159,7 @@ describe('CacheManagerTest', () => {
         });
 
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
+        storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
         cacheManager = new CacheManager(nativeBridge, wakeUpManager);
         sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));

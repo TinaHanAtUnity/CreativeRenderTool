@@ -8,6 +8,10 @@ export enum CacheStatus {
     STOPPED
 }
 
+export interface ICacheOptions {
+    retries: number;
+}
+
 export interface ICacheResponse {
     fullyDownloaded: boolean;
     url: string;
@@ -21,9 +25,10 @@ export interface ICacheResponse {
 interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
-    retries: number;
+    retryCount: number;
     resolve: Function;
     reject: Function;
+    options: ICacheOptions;
 }
 
 export class CacheManager {
@@ -32,6 +37,12 @@ export class CacheManager {
     private _wakeUpManager: WakeUpManager;
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
+
+    private static getDefaultCacheOptions(): ICacheOptions {
+        return {
+            retries: 0
+        };
+    }
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
@@ -45,7 +56,11 @@ export class CacheManager {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string): Promise<[CacheStatus, string]> {
+    public cache(url: string, options?: ICacheOptions): Promise<[CacheStatus, string]> {
+        if(typeof options === 'undefined') {
+            options = CacheManager.getDefaultCacheOptions();
+        }
+
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 return Promise.reject(CacheError.FILE_ALREADY_CACHING);
@@ -58,7 +73,7 @@ export class CacheManager {
                     return Promise.resolve([CacheStatus.OK, fileId]);
                 }
 
-                let promise = this.registerCallback(url, fileId);
+                let promise = this.registerCallback(url, fileId, options);
                 this.downloadFile(url, fileId);
                 return promise;
             });
@@ -119,11 +134,16 @@ export class CacheManager {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
             }
 
-            return Promise.all(deleteFiles.map(file => {
-                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file);
-                this._nativeBridge.Storage.write(StorageType.PRIVATE);
-                return this._nativeBridge.Cache.deleteFile(file);
-            }));
+            let promises: Promise<any>[] = [];
+
+            deleteFiles.map(file => {
+                promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file));
+                promises.push(this._nativeBridge.Cache.deleteFile(file));
+            });
+
+            promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+
+            return Promise.all(promises);
         });
     }
 
@@ -197,14 +217,15 @@ export class CacheManager {
         });
     }
 
-    private registerCallback(url: string, fileId: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, options: ICacheOptions): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             let callbackObject: ICallbackObject = {
                 fileId: fileId,
                 networkRetry: false,
-                retries: 0,
+                retryCount: 0,
                 resolve: resolve,
-                reject: reject
+                reject: reject,
+                options: options
             };
             this._callbacks[url] = callbackObject;
         });
@@ -260,8 +281,8 @@ export class CacheManager {
         if(callback) {
             switch(error) {
                 case CacheError[CacheError.FILE_IO_ERROR]:
-                    if(callback.retries < 5) {
-                        callback.retries++;
+                    if(callback.retryCount < callback.options.retries) {
+                        callback.retryCount++;
                         callback.networkRetry = true;
                     } else {
                         callback.reject(error);
