@@ -123,6 +123,30 @@ export class SessionManager {
         }
     }
 
+    public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
+        const fulfilled = ([id, infoJson]) => {
+            this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
+        };
+
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
+    public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
+        const fulfilled = ([id, infoJson]) => {
+            this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
+        };
+
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
+    public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
+        const fulfilled = ([id, infoJson]) => {
+            this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
+        };
+
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
 
         const fulfilled = ([id, infoJson]) => {

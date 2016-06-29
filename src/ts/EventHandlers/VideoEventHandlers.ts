@@ -14,6 +14,7 @@ export class VideoEventHandlers {
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         let overlay = adUnit.getOverlay();
 
+        adUnit.setVideoDuration(duration);
         overlay.setVideoDuration(duration);
         if(adUnit.getPlacement().allowSkip()) {
             overlay.setSkipVisible(true);
@@ -33,7 +34,9 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+        // todo: video progress event should be handled here and not delegated to session manager
         sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoPosition());
+
         if(position > 0) {
             let lastPosition = adUnit.getVideoPosition();
             if(lastPosition > 0 && position - lastPosition < 100) {
@@ -41,8 +44,19 @@ export class VideoEventHandlers {
             } else {
                 adUnit.getOverlay().setSpinnerEnabled(false);
             }
+
+            let previousQuartile: number = adUnit.getVideoQuartile();
             adUnit.setVideoPosition(position);
+
+            if(previousQuartile === 0 && adUnit.getVideoQuartile() === 1) {
+                sessionManager.sendFirstQuartile(adUnit);
+            } else if(previousQuartile === 1 && adUnit.getVideoQuartile() === 2) {
+                sessionManager.sendMidpoint(adUnit);
+            } else if(previousQuartile === 2 && adUnit.getVideoQuartile() === 3) {
+                sessionManager.sendThirdQuartile(adUnit);
+            }
         }
+
         adUnit.getOverlay().setVideoProgress(position);
     }
 

@@ -52,9 +52,9 @@ describe('VideoEventHandlersTest', () => {
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
 
-
     describe('with onVideoProgress', () => {
         beforeEach(() => {
+            adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
             sinon.spy(adUnit, 'setVideoPosition');
         });
 
@@ -77,6 +77,36 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
 
             sinon.assert.calledWith(sessionManager.sendProgress, adUnit, sessionManager.getSession(), 5, 0);
+        });
+
+        it('should send first quartile event', () => {
+            sinon.spy(sessionManager, 'sendFirstQuartile');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(4000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 6000);
+
+            sinon.assert.calledWith(sessionManager.sendFirstQuartile, adUnit);
+        });
+
+        it('should send midpoint event', () => {
+            sinon.spy(sessionManager, 'sendMidpoint');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(9000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 11000);
+
+            sinon.assert.calledWith(sessionManager.sendMidpoint, adUnit);
+        });
+
+        it('should send third quartile event', () => {
+            sinon.spy(sessionManager, 'sendThirdQuartile');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(14000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 16000);
+
+            sinon.assert.calledWith(sessionManager.sendThirdQuartile, adUnit);
         });
     });
 
