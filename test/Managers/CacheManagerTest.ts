@@ -270,6 +270,22 @@ describe('CacheManagerTest', () => {
         });
     });
 
+    it('Stop caching', () => {
+        let testUrl: string = 'http://www.example.net/test.mp4';
+        let testFileId: string = '-960478764.mp4';
+
+        cacheApi.setInternet(false);
+
+        setTimeout(() => { cacheManager.stop(); }, 5);
+
+        return cacheManager.cache(testUrl, { retries: 1 }).then(() => {
+            assert.fail('Caching should fail when stopped');
+        }).catch(([status, fileId]) => {
+            assert.equal(status, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');
+            assert.equal(testFileId, fileId, 'Wrong file id after caching stopped');
+        });
+    });
+
     it('Cache one already downloaded file', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
         let testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
