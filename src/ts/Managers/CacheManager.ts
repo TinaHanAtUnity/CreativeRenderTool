@@ -206,7 +206,7 @@ export class CacheManager {
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
-                        callback.networkRetry = true;
+                        this.handleRetry(callback, url, CacheError[CacheError.NO_INTERNET]);
                         return;
 
                     default:
@@ -281,13 +281,7 @@ export class CacheManager {
         if(callback) {
             switch(error) {
                 case CacheError[CacheError.FILE_IO_ERROR]:
-                    if(callback.retryCount < callback.options.retries) {
-                        callback.retryCount++;
-                        callback.networkRetry = true;
-                    } else {
-                        callback.reject(error);
-                        delete this._callbacks[url];
-                    }
+                    this.handleRetry(callback, url, error);
                     return;
 
                 default:
@@ -295,6 +289,16 @@ export class CacheManager {
                     delete this._callbacks[url];
                     return;
             }
+        }
+    }
+
+    private handleRetry(callback: ICallbackObject, url: string, error: string): void {
+        if(callback.retryCount < callback.options.retries) {
+            callback.retryCount++;
+            callback.networkRetry = true;
+        } else {
+            callback.reject(error);
+            delete this._callbacks[url];
         }
     }
 

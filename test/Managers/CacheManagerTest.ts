@@ -230,6 +230,46 @@ describe('CacheManagerTest', () => {
         });
     });
 
+    it('Cache one file with network failure', () => {
+        let testUrl: string = 'http://www.example.net/test.mp4';
+        let testFileId: string = '-960478764.mp4';
+        let networkTriggered: boolean = false;
+
+        cacheApi.setInternet(false);
+        setTimeout(() => {
+            networkTriggered = true;
+            cacheApi.setInternet(true);
+            wakeUpManager.onNetworkConnected.trigger();
+        }, 10);
+
+        return cacheManager.cache(testUrl, { retries: 1 }).then(([status, fileId]) => {
+            assert(networkTriggered, 'Cache one file with network failure: network was not triggered');
+            assert.equal(CacheStatus.OK, status, 'Cache one file with network failure: cache status was not ok');
+            assert.equal(testFileId, fileId, 'Cache one file with network failure: fileId was invalid');
+        });
+    });
+
+    it('Cache one file with repeated network failures (expect to fail)', () => {
+        let testUrl: string = 'http://www.example.net/test.mp4';
+        let networkTriggers: number = 0;
+
+        let triggerNetwork: Function = () => {
+            networkTriggers++;
+            wakeUpManager.onNetworkConnected.trigger();
+        };
+
+        cacheApi.setInternet(false);
+        setTimeout(() => { triggerNetwork(); }, 5);
+        setTimeout(() => { triggerNetwork(); }, 10);
+        setTimeout(() => { triggerNetwork(); }, 15);
+
+        return cacheManager.cache(testUrl, { retries: 3}).then(() => {
+            assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
+        }).catch(error => {
+            assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
+        });
+    });
+
     it('Cache one already downloaded file', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
         let testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
