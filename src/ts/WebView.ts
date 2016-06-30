@@ -61,8 +61,8 @@ export class WebView {
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo();
-            this._cacheManager = new CacheManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
@@ -227,7 +227,7 @@ export class WebView {
         }
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
@@ -292,7 +292,7 @@ export class WebView {
         let cacheMode = this._configuration.getCacheMode();
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
