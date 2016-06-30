@@ -114,13 +114,13 @@ export class VideoEventHandlers {
 
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
-        adUnit.onEndScreen.trigger();
+        adUnit.onNewAdRequestAllowed.trigger();
     }
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
         adUnit.getOverlay().hide();
         adUnit.getEndScreen().show();
-        adUnit.onEndScreen.trigger();
+        adUnit.onNewAdRequestAllowed.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);

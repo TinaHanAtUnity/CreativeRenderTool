@@ -178,7 +178,7 @@ export class WebView {
 
             this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign, this._configuration);
             this._adUnit.setNativeOptions(options);
-            this._adUnit.onEndScreen.subscribe(() => this.onEndScreen());
+            this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
             this._adUnit.show().then(() => {
@@ -368,7 +368,7 @@ export class WebView {
         this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
-    private onEndScreen(): void {
+    private onNewAdRequestAllowed(): void {
         if(this._mustRefill) {
             this._mustRefill = false;
             this._campaignManager.request();
