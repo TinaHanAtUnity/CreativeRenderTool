@@ -33,6 +33,7 @@ export class OverlayEventHandlers {
 
     protected static afterSkip(adUnit: VideoAdUnit) {
         adUnit.getEndScreen().show();
+        adUnit.onNewAdRequestAllowed.trigger();
     };
 
     public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
