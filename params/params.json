@@ -1,0 +1,492 @@
+[
+  {
+    "key": "abgroup",
+    "type": "integer",
+    "description": "integer from 0 to 19",
+    "provider": "server",
+    "platforms": null
+  },
+  {
+    "key": "adaptername",
+    "type": "string",
+    "description": "if there was an adapter between the framework and sdk native code, for instance: unityads assetstore plugin or unityads engine integration",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "adapterversion",
+    "type": "string",
+    "description": "for instance: 1.2.4",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "advertisingid",
+    "type": "string",
+    "description": "advertising identifier in raw format",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "androidid",
+    "type": null,
+    "description": null,
+    "provider": null,
+    "platforms": null
+  },
+  {
+    "key": "apilevel",
+    "type": "integer",
+    "description": "android device api level",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "applicationmuted",
+    "type": "boolean",
+    "description": "if game has been muted",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "applicationorientation",
+    "type": "string",
+    "description": "configured/allowed orientations for the app",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "batterylevel",
+    "type": "integer",
+    "description": "precentage of battery charging status",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "batterystatus",
+    "type": "string",
+    "description": "charging / full / draining etc.",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "bundleid",
+    "type": "string",
+    "description": "bundle identifier for the app",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "bundleversion",
+    "type": "string",
+    "description": "game version",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "cached",
+    "type": "boolean",
+    "description": "if video is cached or streamed",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "cachingduration",
+    "type": "integer",
+    "description": "milliseconds taken to cache",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "cachingsize",
+    "type": "integer",
+    "description": "size of the asset cached",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "campaignid",
+    "type": "string",
+    "description": "internal campaign identifier",
+    "provider": "server",
+    "platforms": null
+  },
+  {
+    "key": "connectiontype",
+    "type": "string",
+    "description": "\"wifi\", \"cellular\" or \"none\"",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "country",
+    "type": "string",
+    "description": "2 character country code",
+    "provider": "server",
+    "platforms": null
+  },
+  {
+    "key": "currentorientation",
+    "type": "string",
+    "description": "current orientation at the time of the event",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicefreememory",
+    "type": "integer",
+    "description": "free memory in kilobytes",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicefreespace",
+    "type": "integer",
+    "description": "free space in kilobytes",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "deviceheadset",
+    "type": "boolean",
+    "description": "boolean if user has headset plugged in",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicemake",
+    "type": "string",
+    "description": "android device manufacturer",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicemodel",
+    "type": "string",
+    "description": "android device model",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "deviceringermode",
+    "type": "string",
+    "description": "silent / vibrate / sound ()",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "deviceringermode",
+    "type": "string",
+    "description": "silent / vibrate / sound",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicetotalmemory",
+    "type": "integer",
+    "description": "total memory in kilobytes",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicetotalspace",
+    "type": "integer",
+    "description": "total space in kilobytes",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicetype",
+    "type": "string",
+    "description": "ios raw device type",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "devicevolume",
+    "type": "integer",
+    "description": "device volume",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "encrypted",
+    "type": "boolean",
+    "description": "basically is the application debuggable or not ",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "eventid",
+    "type": "string",
+    "description": "unique event identifier",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "eventtype",
+    "type": "string",
+    "description": "event type",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "frameworkname",
+    "type": "string",
+    "description": "the framework/game toolkit used to build the game, for example: unity",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "frameworkversion",
+    "type": "string",
+    "description": "for instance: 5.3.1p3",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "gameid",
+    "type": "string",
+    "description": "source game identifier",
+    "provider": "admin",
+    "platforms": null
+  },
+  {
+    "key": "gamerid",
+    "type": "string",
+    "description": "internal gamer identifier",
+    "provider": "server",
+    "platforms": null
+  },
+  {
+    "key": "integrationtype",
+    "type": "string",
+    "description": "\"assetstore\",\"engine\",\"native\",\"mediation\"",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "language",
+    "type": "string",
+    "description": "device language code (e.g. en_us or fr_ca)",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "limitadtracking",
+    "type": "boolean",
+    "description": "boolean if user has limited tracking or not",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "mediationordinal",
+    "type": "integer",
+    "description": "order of ad shown in mediation waterfall? iirc",
+    "provider": "mediation",
+    "platforms": null
+  },
+  {
+    "key": "mediationprovider",
+    "type": "string",
+    "description": "mediation provider name",
+    "provider": "mediation",
+    "platforms": null
+  },
+  {
+    "key": "mediationversion",
+    "type": "string",
+    "description": "mediation sdk version",
+    "provider": "mediation",
+    "platforms": null
+  },
+  {
+    "key": "muted",
+    "type": "boolean",
+    "description": "is the video muted from the ui",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "networkoperator",
+    "type": "integer",
+    "description": "mcc + mnc codes",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "networkoperatorname",
+    "type": "integer",
+    "description": "cell network operator name",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "networktype",
+    "type": "string",
+    "description": "detailed cellular network type",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "osversion",
+    "type": "string",
+    "description": "device operating system version",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "placementid",
+    "type": "string",
+    "description": "internal placement identifier",
+    "provider": "admin",
+    "platforms": null
+  },
+  {
+    "key": "placementtype",
+    "type": "string",
+    "description": "\"rewarded\" or \"interstitial\"",
+    "provider": "admin",
+    "platforms": null
+  },
+  {
+    "key": "platform",
+    "type": "string",
+    "description": "\"android\" or \"ios\"",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "retrycount",
+    "type": "integer",
+    "description": "how many times this event_id has been retried",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "rooted",
+    "type": "boolean",
+    "description": "was the device rooted/jailbroken or not according to check",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "screenbrightness",
+    "type": "integer",
+    "description": "brightness value",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "screendensity",
+    "type": "integer",
+    "description": "in dpi",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "screenheight",
+    "type": "integer",
+    "description": "screen height in pixels",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "screenlayout",
+    "type": "integer",
+    "description": "android raw screen layout value",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "screenwidth",
+    "type": "integer",
+    "description": "screen width in pixels",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "sdkversion",
+    "type": "string",
+    "description": "sdk version",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "sessionid",
+    "type": "string",
+    "description": "unique session identifier",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "sid",
+    "type": "string",
+    "description": "server side reward callback id",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "skippableat",
+    "type": "integer",
+    "description": "milliseconds when user can skip",
+    "provider": "admin",
+    "platforms": null
+  },
+  {
+    "key": "skippedat",
+    "type": "integer",
+    "description": "milliseconds from video start when it was skipped",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "testmode",
+    "type": "boolean",
+    "description": "test mode",
+    "provider": "app",
+    "platforms": null
+  },
+  {
+    "key": "timestamp",
+    "type": "integer",
+    "description": "local time of triggering the event",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "timezone",
+    "type": "string",
+    "description": "how many hours is the local time offset from utc. for instance pst would be \"-8:00\", india would be \"+5:30\" ",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "trackingenabled",
+    "type": "boolean",
+    "description": "boolean if user has limited tracking or not",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "useragent",
+    "type": "string",
+    "description": "webview user agent",
+    "provider": "sdk",
+    "platforms": null
+  },
+  {
+    "key": "videolength",
+    "type": "integer",
+    "description": "video length in milliseconds",
+    "provider": "admin",
+    "platforms": null
+  },
+  {
+    "key": "webviewversion",
+    "type": "string",
+    "description": "webview version",
+    "provider": "sdk",
+    "platforms": null
+  }
+]
