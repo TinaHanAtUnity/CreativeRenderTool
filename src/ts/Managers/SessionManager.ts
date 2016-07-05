@@ -97,6 +97,13 @@ export class SessionManager {
     }
 
     public sendShow(adUnit: AbstractAdUnit): Promise<void> {
+        // todo: this pattern is rather bad and it's used only to allow tests to temporarily pass without having to create a new session for each test
+        if(this._currentSession) {
+            if(this._currentSession.showSent) {
+                return;
+            }
+            this._currentSession.showSent = true;
+        }
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
@@ -108,6 +115,12 @@ export class SessionManager {
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.startSent) {
+                return;
+            }
+            this._currentSession.startSent = true;
+        }
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
@@ -124,6 +137,13 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.firstQuartileSent) {
+                return;
+            }
+            this._currentSession.firstQuartileSent = true;
+        }
+
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
         };
@@ -132,6 +152,13 @@ export class SessionManager {
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.midpointSent) {
+                return;
+            }
+            this._currentSession.midpointSent = true;
+        }
+
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
@@ -140,6 +167,13 @@ export class SessionManager {
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if (this._currentSession.thirdQuartileSent) {
+                return;
+            }
+            this._currentSession.thirdQuartileSent = true;
+        }
+
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
         };
@@ -148,6 +182,12 @@ export class SessionManager {
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
+        if(this._currentSession) {
+            if(this._currentSession.skipSent) {
+                return;
+            }
+            this._currentSession.skipSent = true;
+        }
 
         const fulfilled = ([id, infoJson]) => {
             if(videoProgress) {
@@ -160,6 +200,12 @@ export class SessionManager {
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.viewSent) {
+                return;
+            }
+            this._currentSession.viewSent = true;
+        }
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
