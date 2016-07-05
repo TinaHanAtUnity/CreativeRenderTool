@@ -249,9 +249,8 @@ describe('CacheManagerTest', () => {
         });
     });
 
-    /*
-    todo: these two tests are unstable in hybrid tests on old Androids and should be refactored
-    it('Cache one file with repeated network failures (expect to fail)', () => {
+    // todo: these two tests are unstable in hybrid tests on old Androids and should be refactored
+    xit('Cache one file with repeated network failures (expect to fail)', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
@@ -272,7 +271,7 @@ describe('CacheManagerTest', () => {
         });
     });
 
-    it('Stop caching', () => {
+    xit('Stop caching', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
         let testFileId: string = '-960478764.mp4';
 
@@ -287,7 +286,6 @@ describe('CacheManagerTest', () => {
             assert.equal(testFileId, fileId, 'Wrong file id after caching stopped');
         });
     });
-    */
 
     it('Cache one already downloaded file', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
