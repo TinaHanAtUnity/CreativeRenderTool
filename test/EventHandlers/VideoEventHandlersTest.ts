@@ -241,21 +241,21 @@ describe('VideoEventHandlersTest', () => {
             });
         });
 
-        it('should set debug message visibility to true', () => {
+        it('should set debug message visibility to true if the app is debuggable', () => {
             sinon.stub(sessionManager, 'isDebuggable').returns(true);
             VideoEventHandlers.onVideoPrepared(nativeBridge, sessionManager, adUnit, 10);
 
             sinon.assert.calledWith(overlay.setDebugMessageVisible, true);
         });
 
-        it('should set debug message to performance ad', () => {
+        it('should set debug message to performance ad if the ad unit is not VAST', () => {
             sinon.stub(sessionManager, 'isDebuggable').returns(true);
             VideoEventHandlers.onVideoPrepared(nativeBridge, sessionManager, adUnit, 10);
 
             sinon.assert.calledWith(overlay.setDebugMessage, 'Performance Ad');
         });
 
-        it('should set debug message to programmatic ad', () => {
+        it('should set debug message to programmatic ad if the ad unit is VAST', () => {
             sinon.stub(sessionManager, 'isDebuggable').returns(true);
             let vastCampaign = new VastCampaign(new Vast([], [], {}), 'campaignId', 'gamerId', 12);
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
@@ -264,7 +264,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.assert.calledWith(overlay.setDebugMessage, 'Programmatic Ad');
         });
 
-        it('should not set debug message', () => {
+        it('should not set debug message when the app is not debuggable', () => {
             sinon.stub(sessionManager, 'isDebuggable').returns(false);
             VideoEventHandlers.onVideoPrepared(nativeBridge, sessionManager, adUnit, 10);
 
