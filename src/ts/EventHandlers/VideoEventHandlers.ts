@@ -24,9 +24,9 @@ export class VideoEventHandlers {
         overlay.setVideoDurationEnabled(true);
 
         // only show this overlay if SDK is in the debug mode
-        let isDebugMode = sessionManager.isDebugMode();
-        overlay.setDebugMessageVisible(isDebugMode);
-        if(isDebugMode) {
+        let isDebuggable = sessionManager.isDebuggable();
+        overlay.setDebugMessageVisible(isDebuggable);
+        if(isDebuggable) {
             let debugMessage = '';
             if (adUnit instanceof VastAdUnit) {
                 debugMessage = 'Programmatic Ad';

@@ -242,7 +242,7 @@ export class SessionManager {
         this._gamerServerId = serverId;
     }
 
-    public isDebugMode(): boolean {
+    public isDebuggable(): boolean {
         return this._clientInfo.isDebuggable();
     }
 
