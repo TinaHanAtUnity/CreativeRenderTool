@@ -1,5 +1,6 @@
 import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -11,7 +12,7 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, duration: number): void {
         let overlay = adUnit.getOverlay();
 
         adUnit.setVideoDuration(duration);
@@ -21,6 +22,19 @@ export class VideoEventHandlers {
         }
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
+
+        // only show this overlay if SDK is in the debug mode
+        let isDebugMode = sessionManager.isDebugMode();
+        overlay.setDebugMessageVisible(isDebugMode);
+        if(isDebugMode) {
+            let debugMessage = '';
+            if (adUnit instanceof VastAdUnit) {
+                debugMessage = 'Programmatic Ad';
+            } else {
+                debugMessage = 'Performance Ad';
+            }
+            overlay.setDebugMessage(debugMessage);
+        }
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {

@@ -242,6 +242,10 @@ export class SessionManager {
         this._gamerServerId = serverId;
     }
 
+    public isDebugMode(): boolean {
+        return this._clientInfo.isDebuggable();
+    }
+
     private createShowEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
         return [

@@ -25,12 +25,15 @@ export class Overlay extends View {
     private _muteEnabled: boolean = false;
     private _muted: boolean;
 
+    private _debugMessageVisible: boolean = false;
+
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _skipDurationElement: HTMLElement;
     private _videoDurationElement: HTMLElement;
     private _videoDurationCounterElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
+    private _debugMessageElement: HTMLElement;
 
     constructor(muted: boolean) {
         super('overlay');
@@ -65,6 +68,7 @@ export class Overlay extends View {
         this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration-text');
         this._videoDurationCounterElement = <HTMLElement>this._container.querySelector('.video-duration');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -121,6 +125,16 @@ export class Overlay extends View {
         if(this._muteEnabled !== value) {
             this._muteEnabled = value;
             this._muteButtonElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
+    public setDebugMessage(value: string): void {
+        this._debugMessageElement.innerHTML = value;
+    }
+
+    public setDebugMessageVisible(value: boolean) {
+        if(this._debugMessageVisible !== value) {
+            this._debugMessageElement.style.display = value ? 'block' : 'none';
         }
     }
 
