@@ -97,4 +97,8 @@ export class DeviceInfoApi extends NativeApi {
     public getTotalMemory(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalMemory');
     }
+
+    public isSimulator(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isSimulator');
+    }
 }

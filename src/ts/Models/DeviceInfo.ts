@@ -63,6 +63,7 @@ export class DeviceInfo extends Model {
         promises.push(nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
         promises.push(nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted));
         promises.push(nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
+        promises.push(nativeBridge.DeviceInfo.isSimulator().then(simulator => this._simulator = simulator));
 
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -245,7 +246,6 @@ export class DeviceInfo extends Model {
     }
 
     public isSimulator(): boolean {
-        // TODO: getter missing from DeviceInfo
         return this._simulator;
     }
 
