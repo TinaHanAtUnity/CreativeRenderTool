@@ -7,6 +7,9 @@ import { assert } from 'chai';
 import { VideoEventHandlers } from '../../src/ts/EventHandlers/VideoEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
+import { VastAdUnit } from '../../src/ts/AdUnits/VastAdUnit';
+import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
+import { Vast } from '../../src/ts/Models/Vast/Vast';
 import { FinishState } from '../../src/ts/Constants/FinishState';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
@@ -40,7 +43,9 @@ describe('VideoEventHandlersTest', () => {
             setSpinnerEnabled: sinon.spy(),
             setSkipVisible: sinon.spy(),
             setMuteEnabled: sinon.spy(),
-            setVideoDurationEnabled: sinon.spy()
+            setVideoDurationEnabled: sinon.spy(),
+            setDebugMessage: sinon.spy(),
+            setDebugMessageVisible: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
@@ -233,6 +238,48 @@ describe('VideoEventHandlersTest', () => {
             return volumeResolved.then(() => seekResolved).then(() => {
                 sinon.assert.calledWith(nativeBridge.VideoPlayer.seekTo, 123);
                 sinon.assert.called(nativeBridge.VideoPlayer.play);
+            });
+        });
+
+        it('should set debug message visibility to true if the debug overlay is enabled in the metadata', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessageVisible, true);
+            });
+        });
+
+        it('should set debug message to performance ad if the ad unit is not VAST', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessage, 'Performance Ad');
+            });
+        });
+
+        it('should set debug message to programmatic ad if the ad unit is VAST', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            let vastCampaign = new VastCampaign(new Vast([], [], {}), 'campaignId', 'gamerId', 12);
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessage, 'Programmatic Ad');
+            });
+        });
+
+        it('should not set debug message when the debug overlay is disabled in the metadata', () => {
+            let prom = Promise.resolve(false);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.notCalled(overlay.setDebugMessage);
             });
         });
 
