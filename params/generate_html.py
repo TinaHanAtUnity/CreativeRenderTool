@@ -1,4 +1,5 @@
 import json
+from argparse import ArgumentParser
 
 PARAMS_JSON = "params.json"
 CONFIGURATION_JSON = "configuration.json"
@@ -10,8 +11,6 @@ PARAM_ORDER = ["key", "type", "description", "provider", "platforms"]
 
 PARAM_FIELDS_IN_EVENT = ["key", "required", "queryString", "body", "type",
                          "description", "provider", "platforms"]
-
-CREATE_MARKDOWN = True
 
 
 class Creator(object):
@@ -91,11 +90,22 @@ class MarkdownCreator(Creator):
         return combined_content
 
 
-this_creator = HtmlCreator()
-outfile = HTML_OUTFILE
-if CREATE_MARKDOWN:
+parser = ArgumentParser(description="Generate Document based on json")
+parser.add_argument('-d', '--documentType', dest='document_type', help='What Document type are we going to generate. Possible values HTML or MD')
+args = parser.parse_args()
+
+document_type = args.document_type
+
+print(document_type)
+# default to MD
+if not document_type or document_type.upper() == "MD":
+    print("Markdown creator")
     this_creator = MarkdownCreator()
     outfile = MARKDOWN_OUTFILE
+elif document_type.upper() == "HTML":
+    print("HTML Creator")
+    this_creator = HtmlCreator()
+    outfile = HTML_OUTFILE
 
 params = json.load(open(PARAMS_JSON))
 
