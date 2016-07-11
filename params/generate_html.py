@@ -14,7 +14,7 @@ PARAM_FIELDS_IN_EVENT = ["key", "required", "queryString", "body", "type",
 CREATE_MARKDOWN = True
 
 
-class Creator:
+class Creator(object):
     def create_event_table(self, event_name, json_path):
         event_dict = json.load(open(json_path))
         event_html_str = self.create_table_head(PARAM_FIELDS_IN_EVENT)
