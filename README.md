@@ -4,7 +4,7 @@
 ## Requirements
 
 - Node (`brew install node`)
-- TypeScript (`npm install -g typescript`)
+- TypeScript (`npm install -g typescript@1.8.10`)
 - TSLint (`npm install -g tslint`)
 - Typings (`npm install -g typings`)
 

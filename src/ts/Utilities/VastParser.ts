@@ -8,7 +8,7 @@ import * as xmldom from 'xmldom';
 
 export class VastParser {
 
-    private static DEFAULT_MAX_WRAPPER_DEPTH = 2;
+    private static DEFAULT_MAX_WRAPPER_DEPTH = 3;
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
@@ -77,8 +77,10 @@ export class VastParser {
         this.applyParentURLs(parsedVast, parent);
 
         let wrapperURL = parsedVast.getWrapperURL();
-        if (!wrapperURL || depth === this._maxWrapperDepth) {
+        if (!wrapperURL) {
             return Promise.resolve(parsedVast);
+        } else if (depth >= this._maxWrapperDepth) {
+            throw new Error('VAST wrapper depth exceeded');
         }
 
         return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {

@@ -48,6 +48,7 @@ export class WebView {
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
+    private _mustRefill: boolean;
     private _refillTimestamp: number;
 
     constructor(nativeBridge: NativeBridge) {
@@ -61,8 +62,8 @@ export class WebView {
     public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo();
-            this._cacheManager = new CacheManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
@@ -177,6 +178,7 @@ export class WebView {
 
             this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign, this._configuration);
             this._adUnit.setNativeOptions(options);
+            this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
             this._adUnit.show().then(() => {
@@ -186,7 +188,7 @@ export class WebView {
             this._campaign = null;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
-            this._campaignManager.request();
+            this._mustRefill = true;
         });
     }
 
@@ -227,7 +229,7 @@ export class WebView {
         }
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
@@ -292,7 +294,7 @@ export class WebView {
         let cacheMode = this._configuration.getCacheMode();
 
         let cacheAsset = (url: string) => {
-            return this._cacheManager.cache(url).then(([status, fileId]) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
@@ -366,6 +368,13 @@ export class WebView {
         this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
+    private onNewAdRequestAllowed(): void {
+        if(this._mustRefill) {
+            this._mustRefill = false;
+            this._campaignManager.request();
+        }
+    }
+
     private onClose(): void {
         this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
@@ -373,6 +382,10 @@ export class WebView {
             this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
         } else {
+            if(this._mustRefill) {
+                this._mustRefill = false;
+                this._campaignManager.request();
+            }
             this._sessionManager.create();
         }
     }

@@ -8,6 +8,7 @@ import { EventManager } from 'Managers/EventManager';
 export abstract class AbstractAdUnit {
 
     public onStart: Observable0 = new Observable0();
+    public onNewAdRequestAllowed: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;

@@ -4,7 +4,9 @@ import * as sinon from 'sinon';
 
 import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
+import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
 class TestCacheApi extends CacheApi {
 
@@ -21,10 +23,6 @@ class TestCacheApi extends CacheApi {
         let byteCount: number = 12345;
         let duration: number = 6789;
         let responseCode: number = 200;
-
-        if(fileId in this._files) {
-            return Promise.reject(CacheError[CacheError.FILE_ALREADY_IN_CACHE]);
-        }
 
         if(this._currentFile !== undefined) {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
@@ -126,13 +124,33 @@ class TestCacheApi extends CacheApi {
     }
 }
 
+class TestStorageApi extends StorageApi {
+    public write(type: StorageType): Promise<void> {
+        return;
+    }
+
+    public get<T>(type: StorageType, key: string): Promise<T> {
+        return Promise.resolve();
+    }
+
+    public set<T>(type: StorageType, key: string, value: T): Promise<void> {
+        return;
+    }
+
+    public delete(type: StorageType, key: string): Promise<void> {
+        return;
+    }
+}
+
 describe('CacheManagerTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
     let nativeBridge;
 
     let cacheApi: TestCacheApi;
+    let storageApi: TestStorageApi;
     let cacheManager: CacheManager;
+    let wakeUpManager: WakeUpManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -141,7 +159,9 @@ describe('CacheManagerTest', () => {
         });
 
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
-        cacheManager = new CacheManager(nativeBridge);
+        storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        cacheManager = new CacheManager(nativeBridge, wakeUpManager);
         sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
     });
 
@@ -210,15 +230,60 @@ describe('CacheManagerTest', () => {
         });
     });
 
-    it('Cache one file with no internet', () => {
+    it('Cache one file with network failure', () => {
         let testUrl: string = 'http://www.example.net/test.mp4';
+        let testFileId: string = '-960478764.mp4';
+        let networkTriggered: boolean = false;
+
+        cacheApi.setInternet(false);
+        setTimeout(() => {
+            networkTriggered = true;
+            cacheApi.setInternet(true);
+            wakeUpManager.onNetworkConnected.trigger();
+        }, 10);
+
+        return cacheManager.cache(testUrl, { retries: 1 }).then(([status, fileId]) => {
+            assert(networkTriggered, 'Cache one file with network failure: network was not triggered');
+            assert.equal(CacheStatus.OK, status, 'Cache one file with network failure: cache status was not ok');
+            assert.equal(testFileId, fileId, 'Cache one file with network failure: fileId was invalid');
+        });
+    });
+
+    // todo: these two tests are unstable in hybrid tests on old Androids and should be refactored
+    xit('Cache one file with repeated network failures (expect to fail)', () => {
+        let testUrl: string = 'http://www.example.net/test.mp4';
+        let networkTriggers: number = 0;
+
+        let triggerNetwork: Function = () => {
+            networkTriggers++;
+            wakeUpManager.onNetworkConnected.trigger();
+        };
+
+        cacheApi.setInternet(false);
+        setTimeout(() => { triggerNetwork(); }, 5);
+        setTimeout(() => { triggerNetwork(); }, 10);
+        setTimeout(() => { triggerNetwork(); }, 15);
+
+        return cacheManager.cache(testUrl, { retries: 3}).then(() => {
+            assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
+        }).catch(error => {
+            assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
+        });
+    });
+
+    xit('Stop caching', () => {
+        let testUrl: string = 'http://www.example.net/test.mp4';
+        let testFileId: string = '-960478764.mp4';
 
         cacheApi.setInternet(false);
 
-        return cacheManager.cache(testUrl).then(() => {
-            assert.fail('Caching should not be successful with no internet');
-        }, (error) => {
-            // everything ok
+        setTimeout(() => { cacheManager.stop(); }, 5);
+
+        return cacheManager.cache(testUrl, { retries: 1 }).then(() => {
+            assert.fail('Caching should fail when stopped');
+        }).catch(([status, fileId]) => {
+            assert.equal(status, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');
+            assert.equal(testFileId, fileId, 'Wrong file id after caching stopped');
         });
     });
 

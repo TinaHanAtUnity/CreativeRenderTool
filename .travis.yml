@@ -9,7 +9,7 @@ cache:
     - node_modules
 
 install:
-  - npm install -g typescript tslint typings
+  - npm install -g typescript@1.8.10 tslint typings
   - npm install
   - typings install
 

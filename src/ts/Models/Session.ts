@@ -1,4 +1,11 @@
 export class Session {
+    public showSent: boolean = false;
+    public startSent: boolean = false;
+    public firstQuartileSent: boolean = false;
+    public midpointSent: boolean = false;
+    public thirdQuartileSent: boolean = false;
+    public viewSent: boolean = false;
+    public skipSent: boolean = false;
 
     private _id: string;
 

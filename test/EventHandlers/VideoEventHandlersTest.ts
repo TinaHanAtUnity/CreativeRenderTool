@@ -7,6 +7,9 @@ import { assert } from 'chai';
 import { VideoEventHandlers } from '../../src/ts/EventHandlers/VideoEventHandlers';
 import { Double } from '../../src/ts/Utilities/Double';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
+import { VastAdUnit } from '../../src/ts/AdUnits/VastAdUnit';
+import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
+import { Vast } from '../../src/ts/Models/Vast/Vast';
 import { FinishState } from '../../src/ts/Constants/FinishState';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
@@ -40,7 +43,9 @@ describe('VideoEventHandlersTest', () => {
             setSpinnerEnabled: sinon.spy(),
             setSkipVisible: sinon.spy(),
             setMuteEnabled: sinon.spy(),
-            setVideoDurationEnabled: sinon.spy()
+            setVideoDurationEnabled: sinon.spy(),
+            setDebugMessage: sinon.spy(),
+            setDebugMessageVisible: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
@@ -52,9 +57,9 @@ describe('VideoEventHandlersTest', () => {
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
 
-
     describe('with onVideoProgress', () => {
         beforeEach(() => {
+            adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
             sinon.spy(adUnit, 'setVideoPosition');
         });
 
@@ -77,6 +82,36 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
 
             sinon.assert.calledWith(sessionManager.sendProgress, adUnit, sessionManager.getSession(), 5, 0);
+        });
+
+        it('should send first quartile event', () => {
+            sinon.spy(sessionManager, 'sendFirstQuartile');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(4000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 6000);
+
+            sinon.assert.calledWith(sessionManager.sendFirstQuartile, adUnit);
+        });
+
+        it('should send midpoint event', () => {
+            sinon.spy(sessionManager, 'sendMidpoint');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(9000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 11000);
+
+            sinon.assert.calledWith(sessionManager.sendMidpoint, adUnit);
+        });
+
+        it('should send third quartile event', () => {
+            sinon.spy(sessionManager, 'sendThirdQuartile');
+
+            adUnit.setVideoDuration(20000);
+            adUnit.setVideoPosition(14000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 16000);
+
+            sinon.assert.calledWith(sessionManager.sendThirdQuartile, adUnit);
         });
     });
 
@@ -203,6 +238,48 @@ describe('VideoEventHandlersTest', () => {
             return volumeResolved.then(() => seekResolved).then(() => {
                 sinon.assert.calledWith(nativeBridge.VideoPlayer.seekTo, 123);
                 sinon.assert.called(nativeBridge.VideoPlayer.play);
+            });
+        });
+
+        it('should set debug message visibility to true if the debug overlay is enabled in the metadata', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessageVisible, true);
+            });
+        });
+
+        it('should set debug message to performance ad if the ad unit is not VAST', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessage, 'Performance Ad');
+            });
+        });
+
+        it('should set debug message to programmatic ad if the ad unit is VAST', () => {
+            let prom = Promise.resolve(true);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            let vastCampaign = new VastCampaign(new Vast([], [], {}), 'campaignId', 'gamerId', 12);
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.calledWith(overlay.setDebugMessage, 'Programmatic Ad');
+            });
+        });
+
+        it('should not set debug message when the debug overlay is disabled in the metadata', () => {
+            let prom = Promise.resolve(false);
+            sinon.stub(nativeBridge.Storage, 'get').returns(prom);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            prom.then(() => {
+                sinon.assert.notCalled(overlay.setDebugMessage);
             });
         });
 
