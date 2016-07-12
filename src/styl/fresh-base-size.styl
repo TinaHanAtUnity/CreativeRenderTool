@@ -8,7 +8,15 @@ body.android
   * END SCREEN
   *
   ************************/
-
+  &.portrait
+    .name-container
+      font-size: 20pt
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+        
   .btn-close-region
     top: 0
     right: 0
@@ -20,7 +28,6 @@ body.android
     font-size: 28px
     width: 32px
     height: 32px
-    border-radius: 17px
 
   a.btn-close
     line-height: 28px
@@ -117,6 +124,12 @@ body.android
     .name-container
       font-size: 18pt
       padding-top: 95px
+      font-size: 20pt
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
 
     .store-container
       float: none
