@@ -152,10 +152,11 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getScreenLayout());
 
         return Promise.all(promises).then(values => {
+            let [connectionType, networkType, screenLayout] = values;
             url = Url.addParameters(url, {
-                connectionType: values[0],
-                networkType: values[1],
-                screenSize: values[2]
+                connectionType: connectionType,
+                networkType: networkType,
+                screenSize: screenLayout
             });
             return url;
         });
@@ -166,8 +167,6 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
-        promises.push(this._deviceInfo.getScreenLayout());
-
 
         let body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -177,9 +176,11 @@ export class CampaignManager {
         };
 
         return Promise.all(promises).then(results => {
-            body.deviceFreeSpace = results[0];
-            body.networkOperator = results[1];
-            body.networkOperatorName = results[2];
+            let [freeSpace, operator, operatorName] = results;
+
+            body.deviceFreeSpace = freeSpace;
+            body.networkOperator = operator;
+            body.networkOperatorName = operatorName;
 
             return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
                 if(mediation) {
