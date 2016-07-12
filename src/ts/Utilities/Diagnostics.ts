@@ -36,10 +36,8 @@ export class Diagnostics {
 
         if (deviceInfo) {
             return deviceInfo.getDTO().then(deviceInfoDTO => {
-                console.log("create common object != null then");
-
                 common.device = deviceInfoDTO;
-                return common
+                return common;
             });
         } else {
             return Promise.resolve(common);

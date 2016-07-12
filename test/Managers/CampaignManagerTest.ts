@@ -1027,7 +1027,7 @@ describe('CampaignManager', () => {
                 onNotification: new Observable2()
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve("wifi")),
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
                 getNetworkType: sinon.stub().returns(Promise.resolve(0))
             },
             getPlatform: () => {

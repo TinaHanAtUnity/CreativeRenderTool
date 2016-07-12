@@ -262,7 +262,7 @@ export class DeviceInfo extends Model {
     }
 
     public isAppleWatchPaired(): Promise<boolean> {
-        // TODO: getter missing from DeviceInfo
+        // todo: getter missing from DeviceInfoApi
         return Promise.resolve(this._appleWatchPaired);
     }
 
