@@ -68,7 +68,7 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            return this._deviceInfo.fetch(this._nativeBridge);
+            return this._deviceInfo.fetch();
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');

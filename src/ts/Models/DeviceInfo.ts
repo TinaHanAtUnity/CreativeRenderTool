@@ -51,30 +51,30 @@ export class DeviceInfo extends Model {
         this._nativeBridge = nativeBridge;
     }
 
-    public fetch(nativeBridge: NativeBridge): Promise<any[]> {
+    public fetch(): Promise<any[]> {
         let promises: Promise<any>[] = [];
 
-        promises.push(nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier));
-        promises.push(nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking));
-        promises.push(nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion));
-        promises.push(nativeBridge.DeviceInfo.getModel().then(model => this._model = model));
-        promises.push(nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth));
-        promises.push(nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight));
-        promises.push(nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
-        promises.push(nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted));
-        promises.push(nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
-        promises.push(nativeBridge.DeviceInfo.isSimulator().then(simulator => this._simulator = simulator));
-        promises.push(nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone));
+        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier));
+        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking));
+        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion));
+        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this._model = model));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight));
+        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
+        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted));
+        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
+        promises.push(this._nativeBridge.DeviceInfo.isSimulator().then(simulator => this._simulator = simulator));
+        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone));
 
 
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            promises.push(nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
         } else {
-            promises.push(nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
-            promises.push(nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel));
-            promises.push(nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
-            promises.push(nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity));
         }
 
         return Promise.all(promises);
