@@ -27,17 +27,23 @@ export class Diagnostics {
     }
 
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any> {
-
         let common: any = {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
-                'device': deviceInfo ? deviceInfo.getDTO() : null,
+                'device': null,
             }
         };
 
-        return deviceInfo.getDTO().then(deviceInfoDTO => {
-            common.device = deviceInfoDTO;
-            return common
-        });
+        if (deviceInfo) {
+            return deviceInfo.getDTO().then(deviceInfoDTO => {
+                console.log("create common object != null then");
+
+                common.device = deviceInfoDTO;
+                return common
+            });
+        } else {
+            return Promise.resolve(common);
+        }
+
     }
 }
