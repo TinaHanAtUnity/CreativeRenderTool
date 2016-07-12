@@ -162,23 +162,35 @@ export class CampaignManager {
     }
 
     private createRequestBody(): Promise<string> {
-        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
-            let body: any = {
-                bundleVersion: this._clientInfo.getApplicationVersion(),
-                bundleId: this._clientInfo.getApplicationName(),
-                deviceFreeSpace: this._deviceInfo.getFreeSpace(),
-                language: this._deviceInfo.getLanguage(),
-                networkOperator: this._deviceInfo.getNetworkOperator(),
-                networkOperatorName: this._deviceInfo.getNetworkOperatorName(),
-                timeZone: this._deviceInfo.getTimeZone()
-            };
+        let promises: Promise<any>[] = [];
+        promises.push(this._deviceInfo.getFreeSpace());
+        promises.push(this._deviceInfo.getNetworkOperator());
+        promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this._deviceInfo.getScreenLayout());
 
-            if(mediation) {
-                body.mediation = mediation.getDTO();
-            }
 
-            return JSON.stringify(body);
+        let body: any = {
+            bundleVersion: this._clientInfo.getApplicationVersion(),
+            bundleId: this._clientInfo.getApplicationName(),
+            language: this._deviceInfo.getLanguage(),
+            timeZone: this._deviceInfo.getTimeZone(),
+        };
+
+        return Promise.all(promises).then(results => {
+            body.deviceFreeSpace = results[0];
+            body.networkOperator = results[1];
+            body.networkOperatorName = results[2];
+
+            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+                if(mediation) {
+                    body.mediation = mediation.getDTO();
+                }
+
+                return JSON.stringify(body);
+            });
         });
     }
+
+
 
 }

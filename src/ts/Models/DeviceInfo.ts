@@ -64,11 +64,14 @@ export class DeviceInfo extends Model {
         promises.push(nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted));
         promises.push(nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
         promises.push(nativeBridge.DeviceInfo.isSimulator().then(simulator => this._simulator = simulator));
+        promises.push(nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone));
+
 
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             promises.push(nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
         } else {
+            promises.push(nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
             promises.push(nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel));
             promises.push(nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
             promises.push(nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity));
@@ -102,18 +105,14 @@ export class DeviceInfo extends Model {
     }
 
     public getNetworkType(): Promise<number> {
-        if (!this._networkType) {
-            return this._nativeBridge.DeviceInfo.getNetworkType().then(networkType => {
-                this._networkType = networkType;
-                return this._networkType;
-            });
-        } else {
-            return Promise.resolve(this._networkType);
-        }
+        return this._nativeBridge.DeviceInfo.getNetworkType().then(networkType => {
+            this._networkType = networkType;
+            return this._networkType;
+        });
     }
 
     public getNetworkOperator(): Promise<string> {
-        if (!this._networkOperator) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => {
                 this._networkOperator = networkOperator;
                 return this._networkOperator;
@@ -121,10 +120,12 @@ export class DeviceInfo extends Model {
         } else {
             return Promise.resolve(this._networkOperator);
         }
+
+
     }
 
     public getNetworkOperatorName(): Promise<string> {
-        if (!this._networkOperatorName) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
                 this._networkOperatorName = networkOperatorName;
                 return this._networkOperatorName;
@@ -132,6 +133,8 @@ export class DeviceInfo extends Model {
         } else {
             return Promise.resolve(this._networkOperatorName);
         }
+
+
     }
 
     public getOsVersion(): string {
@@ -162,7 +165,7 @@ export class DeviceInfo extends Model {
     }
 
     public getScreenScale(): Promise<number> {
-        if (!this._screenScale) {
+        if (!this._screenScale && this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => {
                 this._screenScale = screenScale;
                 return this._screenScale;
@@ -187,15 +190,8 @@ export class DeviceInfo extends Model {
         });
     }
 
-    public getTimeZone(): Promise<string> {
-        if (!this._timeZone) {
-            return this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => {
-                this._timeZone = timeZone;
-                return this._timeZone;
-            });
-        } else {
-            return Promise.resolve(this._timeZone);
-        }
+    public getTimeZone(): string {
+        return this._timeZone;
     }
 
     public getFreeSpace(): Promise<number> {
@@ -204,11 +200,13 @@ export class DeviceInfo extends Model {
                 this._freeInternalSpace = freeInternalSpace;
                 return this._freeInternalSpace;
             });
-        } else {
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
                 this._freeInternalSpace = freeInternalSpace;
                 return this._freeInternalSpace;
             });
+        } else {
+            return Promise.resolve(this._freeInternalSpace);
         }
     }
 
@@ -218,26 +216,40 @@ export class DeviceInfo extends Model {
                 this._totalInternalSpace = totalSpace;
                 return this._totalInternalSpace;
             });
-        } else {
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalSpace => {
                 this._totalInternalSpace = totalSpace;
                 return this._totalInternalSpace;
             });
+        } else {
+            return Promise.resolve(this._totalInternalSpace);
         }
     }
 
     public getFreeSpaceExternal(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
-            this._freeExternalSpace = freeSpace;
-            return this._freeExternalSpace;
-        });
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
+                this._freeExternalSpace = freeSpace;
+                return this._freeExternalSpace;
+            });
+        } else {
+            return Promise.resolve(this._freeExternalSpace);
+        }
+
+
     }
 
     public getTotalSpaceExternal(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalSpace => {
-            this._totalExternalSpace = totalSpace;
-            return this._totalExternalSpace;
-        });
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalSpace => {
+                this._totalExternalSpace = totalSpace;
+                return this._totalExternalSpace;
+            });
+        } else {
+            return Promise.resolve(this._totalExternalSpace);
+        }
+
+
     }
 
 
@@ -262,10 +274,14 @@ export class DeviceInfo extends Model {
     }
 
     public getRingerMode(): Promise<RingerMode> {
-        return this._nativeBridge.DeviceInfo.Android.getRingerMode().then(ringerMode => {
-            this._ringerMode = ringerMode;
-            return this._ringerMode;
-        });
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getRingerMode().then(ringerMode => {
+                this._ringerMode = ringerMode;
+                return this._ringerMode;
+            });
+        } else {
+            return Promise.resolve(this._ringerMode);
+        }
     }
 
     public getDeviceVolume(): Promise<number> {
@@ -274,11 +290,13 @@ export class DeviceInfo extends Model {
                 this._volume = volume;
                 return this._volume;
             });
-        } else {
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => {
                 this._volume = volume;
                 return this._volume;
             });
+        } else {
+            return Promise.resolve(this._volume);
         }
     }
 
@@ -326,7 +344,6 @@ export class DeviceInfo extends Model {
         promises.push(this.getScreenScale());
         promises.push(this.getNetworkOperator());
         promises.push(this.getNetworkOperatorName());
-        promises.push(this.getTimeZone());
         promises.push(this.getHeadset());
         promises.push(this.getRingerMode());
         promises.push(this.getDeviceVolume());

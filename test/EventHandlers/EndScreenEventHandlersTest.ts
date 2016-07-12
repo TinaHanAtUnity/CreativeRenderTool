@@ -38,7 +38,7 @@ describe('EndScreenEventHandlersTest', () => {
             hide: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
             getVideoUrl: () => 'fake url',

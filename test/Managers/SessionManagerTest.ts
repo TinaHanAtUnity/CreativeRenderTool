@@ -224,7 +224,7 @@ describe('SessionManager', () => {
             muteVideo: false
         });
 
-        deviceInfo = new DeviceInfo();
+        deviceInfo = new DeviceInfo(nativeBridge);
 
         clientInfo = TestFixtures.getClientInfo();
     });
