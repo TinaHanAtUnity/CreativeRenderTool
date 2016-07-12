@@ -49,6 +49,10 @@ export class VastAdUnit extends VideoAdUnit {
         this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 3);
     }
 
+    public getVideoClickThroughURL(): string {
+        return this.getVast().getVideoClickThroughURL();
+    }
+
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number) {
         let quartileEventName: string;
         if (quartile === 1) {

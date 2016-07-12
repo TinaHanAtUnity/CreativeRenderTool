@@ -100,4 +100,11 @@ export class Vast {
         return null;
     }
 
+    public getVideoClickThroughURL(): string {
+        let ad = this.getAd();
+        if (ad) {
+            return ad.getVideoClickThroughURLTemplate();
+        }
+        return null;
+    }
 }
