@@ -1,0 +1,401 @@
+{
+  "event": "configuration",
+  "parameters": [
+    {
+      "parameter": "abGroup",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "adapterName",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "adapterVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "advertisingId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "apiLevel",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "applicationMuted",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "applicationOrientation",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "batteryLevel",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "batteryStatus",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "bundleId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "bundleVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "cached",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "cachingDuration",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "cachingSize",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "campaignId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "connectionType",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "country",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "currentOrientation",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceFreeMemory",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceHeadset",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceMake",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceModel",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceRingerMode",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceTotalMemory",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceTotalSpace",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceType",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "deviceVolume",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "encrypted",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "eventId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "frameworkName",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "frameworkVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "gameId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "gamerId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "language",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "mediationOrdinal",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "mediationProvider",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "mediationVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "muted",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "networkOperator",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "networkOperatorName",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "networkType",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "osVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "placementId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "placementType",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "platform",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "retryCount",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "rooted",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "screenBrightness",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "screenDensity",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "screenHeight",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "screenLayout",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "screenWidth",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "sdkVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "sessionId",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "sid",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "skippableAt",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "skippedAt",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "testMode",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "timestamp",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "timezone",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "trackingEnabled",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "userAgent",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "videoLength",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "webviewVersion",
+      "required": null,
+      "queryString": null,
+      "body": null
+    },
+    {
+      "parameter": "integrationType",
+      "required": null,
+      "queryString": null,
+      "body": null
+    }
+  ]
+}
