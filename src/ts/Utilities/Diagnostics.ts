@@ -38,6 +38,9 @@ export class Diagnostics {
             return deviceInfo.getDTO().then(deviceInfoDTO => {
                 common.device = deviceInfoDTO;
                 return common;
+            }).catch(err => {
+                // on error send diagnostics without device dto
+                return common;
             });
         } else {
             return Promise.resolve(common);
