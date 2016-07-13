@@ -281,4 +281,4 @@ watch:
 	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
 
 setup: clean
-	sudo npm install -g typescript tslint typings && rm -rf node_modules typings && npm install && typings install
+	sudo npm install -g typescript@1.8.10 tslint typings && rm -rf node_modules typings && npm install && typings install

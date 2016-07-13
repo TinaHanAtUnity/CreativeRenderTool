@@ -1,5 +1,6 @@
 import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -21,6 +22,19 @@ export class VideoEventHandlers {
         }
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
+
+        nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'test.debugOverlayEnabled.value').then(debugOverlayEnabled => {
+            if(debugOverlayEnabled === true) {
+                overlay.setDebugMessageVisible(true);
+                let debugMessage = '';
+                if (adUnit instanceof VastAdUnit) {
+                    debugMessage = 'Programmatic Ad';
+                } else {
+                    debugMessage = 'Performance Ad';
+                }
+                overlay.setDebugMessage(debugMessage);
+            }
+        });
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {
