@@ -15,10 +15,12 @@ export class EndScreen extends View {
     public onClose: Observable0 = new Observable0();
 
     private _coppaCompliant: boolean;
+    private _gameName: string;
 
     constructor(campaign: Campaign, coppaCompliant: boolean) {
         super('end-screen');
         this._coppaCompliant = coppaCompliant;
+        this._gameName = campaign.getGameName();
 
         this._template = new Template(EndScreenTemplate);
 
@@ -51,6 +53,19 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+    }
+
+    public show(): void {
+        super.show();
+
+        // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
+        // for some reason webkit-line-clamp is not applied without some kind of a hack
+        // this is very strange because identical style works fine in 1.5
+        // this is most certainly not a proper solution to this problem but without this hack, sometimes game name
+        // would prevent download button from showing which completely breaks layout and monetization
+        // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
+        let nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
+        nameContainer.innerHTML = this._gameName + ' ';
     }
 
     private onDownloadEvent(event: Event): void {
