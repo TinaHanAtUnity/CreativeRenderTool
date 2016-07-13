@@ -27,6 +27,7 @@ describe('VastAdUnit', () => {
         let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
         let nativeBridge = TestFixtures.getNativeBridge();
         adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        sandbox.stub(vast, 'getVideoClickThroughURL').returns('http://foo.com');
     });
 
     afterEach(() => sandbox.restore);
@@ -65,5 +66,10 @@ describe('VastAdUnit', () => {
            assert.equal(args[1], 'sessionId');
            assert.equal(args[2], 'http://foo.biz/' + placement.getId() + '/456');
        });
+    });
+
+    it('should return correct click through url', () => {
+        let clickThroughURL = adUnit.getVideoClickThroughURL();
+        assert.equal(clickThroughURL, 'http://foo.com');
     });
 });
