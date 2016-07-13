@@ -38,61 +38,55 @@ export class CampaignManager {
     }
 
     public request(): Promise<void> {
-        return this.createRequestBody().then(requestBody => {
-            this._nativeBridge.Sdk.logInfo('Create request body ');
-
-            return this.createRequestUrl().then(requestUrl => {
-                this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-                return this._request.post(requestUrl, requestBody, [], {
-                    retries: 5,
-                    retryDelay: 5000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
-                }).then(response => {
-                    let campaignJson: any = JSON.parse(response.response);
-                    if (campaignJson.campaign) {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                        let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                        this.onCampaign.trigger(campaign);
-                    } else if('vast' in campaignJson) {
-                        if (campaignJson.vast === null) {
-                            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                            this.onNoFill.trigger(3600);
-                        } else {
-                            this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                            this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
-                                let campaignId: string = undefined;
-                                if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                                    campaignId = '00005472656d6f7220694f53';
-                                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                                    campaignId = '005472656d6f7220416e6472';
-                                }
-                                let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
-                                if (campaign.getVast().getImpressionUrls().length === 0) {
-                                    this.onError.trigger(new Error('Campaign does not have an impression url'));
-                                    return;
-                                }
-                                // todo throw an Error if required events are missing. (what are the required events?)
-                                if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                                    this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-                                }
-                                if (!campaign.getVideoUrl()) {
-                                    this.onError.trigger(new Error('Campaign does not have a video url'));
-                                    return;
-                                }
-                                this.onVastCampaign.trigger(campaign);
-                            }).catch((error) => {
-                                this.onError.trigger(error);
-                            });
-                        }
-                    } else {
+        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            return this._request.post(requestUrl, requestBody, [], {
+                retries: 5,
+                retryDelay: 5000,
+                followRedirects: false,
+                retryWithConnectionEvents: true
+            }).then(response => {
+                let campaignJson: any = JSON.parse(response.response);
+                if (campaignJson.campaign) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
+                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    this.onCampaign.trigger(campaign);
+                } else if('vast' in campaignJson) {
+                    if (campaignJson.vast === null) {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                        this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
+                        this.onNoFill.trigger(3600);
+                    } else {
+                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
+                        this._vastParser.retrieveVast(campaignJson.vast, this._request).then(vast => {
+                            let campaignId: string = undefined;
+                            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                                campaignId = '00005472656d6f7220694f53';
+                            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                                campaignId = '005472656d6f7220416e6472';
+                            }
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
+                            if (campaign.getVast().getImpressionUrls().length === 0) {
+                                this.onError.trigger(new Error('Campaign does not have an impression url'));
+                                return;
+                            }
+                            // todo throw an Error if required events are missing. (what are the required events?)
+                            if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+                            }
+                            if (!campaign.getVideoUrl()) {
+                                this.onError.trigger(new Error('Campaign does not have a video url'));
+                                return;
+                            }
+                            this.onVastCampaign.trigger(campaign);
+                        }).catch((error) => {
+                            this.onError.trigger(error);
+                        });
                     }
-                });
-
+                } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
+                    this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
+                }
             });
-
         }).catch((error) => {
             this.onError.trigger(error);
         });
@@ -151,8 +145,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getScreenLayout());
 
-        return Promise.all(promises).then(values => {
-            let [connectionType, networkType, screenLayout] = values;
+        return Promise.all(promises).then(([connectionType, networkType, screenLayout]) => {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
@@ -175,12 +168,10 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
         };
 
-        return Promise.all(promises).then(results => {
-            let [freeSpace, operator, operatorName] = results;
-
+        return Promise.all(promises).then(([freeSpace,networkOperator, networkOperatorName]) => {
             body.deviceFreeSpace = freeSpace;
-            body.networkOperator = operator;
-            body.networkOperatorName = operatorName;
+            body.networkOperator = networkOperator;
+            body.networkOperatorName = networkOperatorName;
 
             return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
                 if(mediation) {
