@@ -143,13 +143,12 @@ export class CampaignManager {
         let promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this._deviceInfo.getScreenLayout());
 
-        return Promise.all(promises).then(([connectionType, networkType, screenLayout]) => {
+        return Promise.all(promises).then(([connectionType, networkType]) => {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
-                screenSize: screenLayout
+                screenSize: this._deviceInfo.getScreenLayout()
             });
             return url;
         });
