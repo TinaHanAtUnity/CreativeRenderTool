@@ -44,18 +44,15 @@ export class OverlayEventHandlers {
 
     public static onCallButton(nativeBridge: NativeBridge, adUnit: VastAdUnit): void {
         let clickThroughURL = adUnit.getVideoClickThroughURL();
-        // todo: should we validate the URL?
-        if (clickThroughURL) {
-            nativeBridge.VideoPlayer.pause();
+        nativeBridge.VideoPlayer.pause();
 
-            if(nativeBridge.getPlatform() === Platform.IOS) {
-                nativeBridge.UrlScheme.open(clickThroughURL);
-            } else {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': clickThroughURL
-                });
-            }
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.UrlScheme.open(clickThroughURL);
+        } else {
+            nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': clickThroughURL
+            });
         }
     }
 }
