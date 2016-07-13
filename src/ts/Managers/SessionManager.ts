@@ -47,9 +47,9 @@ export class SessionManagerEventMetadataCreator {
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
 
-        return Promise.all(promises).then(values => {
-            infoJson.networkType = values[0];
-            infoJson.connectionType = values[1];
+        return Promise.all(promises).then(([networkType, connectionType]) => {
+            infoJson.networkType = networkType;
+            infoJson.connectionType = connectionType;
 
             return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
                 if(mediation) {

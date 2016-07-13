@@ -168,7 +168,7 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
         };
 
-        return Promise.all(promises).then(([freeSpace,networkOperator, networkOperatorName]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
