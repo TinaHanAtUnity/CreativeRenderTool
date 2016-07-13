@@ -69,7 +69,7 @@ export class AdUnitFactory {
         if (videoAdUnit instanceof VastAdUnit) {
             overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
             overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(nativeBridge, sessionManager, videoAdUnit, muted));
-            overlay.onCallButton.subscribe((clicked) => VastOverlayEventHandlers.onCallButton(nativeBridge, videoAdUnit));
+            overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, videoAdUnit));
         } else {
             overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
             overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, videoAdUnit, muted));
