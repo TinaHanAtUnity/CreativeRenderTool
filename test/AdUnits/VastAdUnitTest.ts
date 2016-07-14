@@ -32,7 +32,7 @@ describe('VastAdUnit', () => {
     afterEach(() => sandbox.restore);
 
     describe('sendTrackingEvent', () => {
-        it('should replace "%ZONE%" in the url with the placement id', () => {
+        it.skip('should replace "%ZONE%" in the url with the placement id', () => {
             let placement = adUnit.getPlacement();
             let vast = (<VastCampaign> adUnit.getCampaign()).getVast();
             let urlTemplate = 'http://foo.biz/%ZONE%/123';
@@ -50,7 +50,7 @@ describe('VastAdUnit', () => {
     });
 
     describe('sendImpressionEvent', () => {
-       it('should replace "%ZONE%" in the url with the placement id', () => {
+       it.skip('should replace "%ZONE%" in the url with the placement id', () => {
            let placement = adUnit.getPlacement();
            let vast = (<VastCampaign> adUnit.getCampaign()).getVast();
            let urlTemplate = 'http://foo.biz/%ZONE%/456';
