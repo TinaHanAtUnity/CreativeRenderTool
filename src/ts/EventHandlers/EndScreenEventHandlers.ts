@@ -5,6 +5,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
 import { IAppSheetOptions } from 'Native/Api/AppSheet';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export class EndScreenEventHandlers {
 
@@ -67,6 +68,12 @@ export class EndScreenEventHandlers {
             });
         }
         adUnit.hide();
+    }
+
+    public static onKeyEvent(keyCode: number, nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+        if (keyCode === KeyCode.BACK && !adUnit.isVideoActive()) {
+            this.onClose(nativeBridge, adUnit);
+        }
     }
 
     private static getAppStoreUrl(platform: Platform, campaign: Campaign) {
