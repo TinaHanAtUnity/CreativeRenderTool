@@ -117,7 +117,8 @@ export class CampaignManager {
             screenDensity: this._deviceInfo.getScreenDensity(),
             screenWidth: this._deviceInfo.getScreenWidth(),
             screenHeight: this._deviceInfo.getScreenHeight(),
-            sdkVersion: this._clientInfo.getSdkVersion()
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            screenSize: this._deviceInfo.getScreenLayout()
         });
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -148,7 +149,6 @@ export class CampaignManager {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
-                screenSize: this._deviceInfo.getScreenLayout()
             });
             return url;
         });
