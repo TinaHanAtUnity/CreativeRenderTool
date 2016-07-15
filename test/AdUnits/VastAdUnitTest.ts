@@ -27,7 +27,6 @@ describe('VastAdUnit', () => {
         let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
         let nativeBridge = TestFixtures.getNativeBridge();
         adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
-        sandbox.stub(vast, 'getVideoClickThroughURL').returns('http://foo.com');
     });
 
     afterEach(() => sandbox.restore);
@@ -68,8 +67,41 @@ describe('VastAdUnit', () => {
        });
     });
 
-    it('should return correct click through url', () => {
-        let clickThroughURL = adUnit.getVideoClickThroughURL();
-        assert.equal(clickThroughURL, 'http://foo.com');
+    describe('with click through url', () => {
+        let vast;
+
+        beforeEach(() => {
+            vast = new Vast([], [], {});
+            let placement = TestFixtures.getPlacement();
+            let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+            let nativeBridge = TestFixtures.getNativeBridge();
+            adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        });
+
+        it('should return correct http:// url', () => {
+            sandbox.stub(vast, 'getVideoClickThroughURL').returns('http://www.example.com/wpstyle/?p=364');
+
+            let clickThroughURL = adUnit.getVideoClickThroughURL();
+            assert.equal(clickThroughURL, 'http://www.example.com/wpstyle/?p=364');
+        });
+
+        it('should return correct https:// url', () => {
+            sandbox.stub(vast, 'getVideoClickThroughURL').returns('https://www.example.com/foo/?bar=baz&inga=42&quux');
+            let clickThroughURL = adUnit.getVideoClickThroughURL();
+            assert.equal(clickThroughURL, 'https://www.example.com/foo/?bar=baz&inga=42&quux');
+        });
+
+        it('should return null for malformed url', () => {
+            sandbox.stub(vast, 'getVideoClickThroughURL').returns('www.foo.com');
+            let clickThroughURL = adUnit.getVideoClickThroughURL();
+            assert.equal(clickThroughURL, null);
+        });
+
+        it('should return null for a deeplink to an app', () => {
+            sandbox.stub(vast, 'getVideoClickThroughURL').returns('myapp://details?id=foo');
+            let clickThroughURL = adUnit.getVideoClickThroughURL();
+            assert.equal(clickThroughURL, null);
+        });
     });
 });
