@@ -38,8 +38,7 @@ export class CampaignManager {
     }
 
     public request(): Promise<void> {
-        return this.createRequestBody().then(requestBody => {
-            let requestUrl: string = this.createRequestUrl();
+        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
                 retries: 5,
@@ -93,7 +92,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestUrl(): string {
+    private createRequestUrl(): Promise<string> {
         let url: string = [
             CampaignManager.CampaignBaseUrl,
             this._clientInfo.getGameId(),
@@ -112,16 +111,14 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
-            connectionType: this._deviceInfo.getConnectionType(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
-            networkType: this._deviceInfo.getNetworkType(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
             screenDensity: this._deviceInfo.getScreenDensity(),
-            screenSize: this._deviceInfo.getScreenLayout(),
             screenWidth: this._deviceInfo.getScreenWidth(),
             screenHeight: this._deviceInfo.getScreenHeight(),
-            sdkVersion: this._clientInfo.getSdkVersion()
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            screenSize: this._deviceInfo.getScreenLayout()
         });
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -144,27 +141,47 @@ export class CampaignManager {
             url = Url.addParameters(url, {test: true});
         }
 
-        return url;
+        let promises: Promise<any>[] = [];
+        promises.push(this._deviceInfo.getConnectionType());
+        promises.push(this._deviceInfo.getNetworkType());
+
+        return Promise.all(promises).then(([connectionType, networkType]) => {
+            url = Url.addParameters(url, {
+                connectionType: connectionType,
+                networkType: networkType,
+            });
+            return url;
+        });
     }
 
     private createRequestBody(): Promise<string> {
-        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
-            let body: any = {
-                bundleVersion: this._clientInfo.getApplicationVersion(),
-                bundleId: this._clientInfo.getApplicationName(),
-                deviceFreeSpace: this._deviceInfo.getFreeSpace(),
-                language: this._deviceInfo.getLanguage(),
-                networkOperator: this._deviceInfo.getNetworkOperator(),
-                networkOperatorName: this._deviceInfo.getNetworkOperatorName(),
-                timeZone: this._deviceInfo.getTimeZone()
-            };
+        let promises: Promise<any>[] = [];
+        promises.push(this._deviceInfo.getFreeSpace());
+        promises.push(this._deviceInfo.getNetworkOperator());
+        promises.push(this._deviceInfo.getNetworkOperatorName());
 
-            if(mediation) {
-                body.mediation = mediation.getDTO();
-            }
+        let body: any = {
+            bundleVersion: this._clientInfo.getApplicationVersion(),
+            bundleId: this._clientInfo.getApplicationName(),
+            language: this._deviceInfo.getLanguage(),
+            timeZone: this._deviceInfo.getTimeZone(),
+        };
 
-            return JSON.stringify(body);
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
+            body.deviceFreeSpace = freeSpace;
+            body.networkOperator = networkOperator;
+            body.networkOperatorName = networkOperatorName;
+
+            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+                if(mediation) {
+                    body.mediation = mediation.getDTO();
+                }
+
+                return JSON.stringify(body);
+            });
         });
     }
+
+
 
 }

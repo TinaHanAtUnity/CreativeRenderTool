@@ -994,7 +994,6 @@ describe('CampaignManager', () => {
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
-        deviceInfo = new DeviceInfo();
         vastParser = TestFixtures.getVastParser();
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
@@ -1027,12 +1026,17 @@ describe('CampaignManager', () => {
             Notification: {
                 onNotification: new Observable2()
             },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+            },
             getPlatform: () => {
                 return Platform.TEST;
             }
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
+        deviceInfo = new DeviceInfo(nativeBridge);
     });
 
 });

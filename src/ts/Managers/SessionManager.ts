@@ -34,27 +34,33 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'networkType': this._deviceInfo.getNetworkType(),
             'cached': true, // todo: get actual value
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
-            'connectionType': this._deviceInfo.getConnectionType(),
             'sid': gamerSid,
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel()
         };
 
-        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
-            if(mediation) {
-                infoJson.mediationName = mediation.getName();
-                infoJson.mediationVersion = mediation.getVersion();
-                infoJson.mediationOrdinal = mediation.getOrdinal();
-            }
-            return [id, infoJson];
+        let promises: Promise<any>[] = [];
+        promises.push(this._deviceInfo.getNetworkType());
+        promises.push(this._deviceInfo.getConnectionType());
+
+        return Promise.all(promises).then(([networkType, connectionType]) => {
+            infoJson.networkType = networkType;
+            infoJson.connectionType = connectionType;
+
+            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+                if(mediation) {
+                    infoJson.mediationName = mediation.getName();
+                    infoJson.mediationVersion = mediation.getVersion();
+                    infoJson.mediationOrdinal = mediation.getOrdinal();
+                }
+                return [id, infoJson];
+            });
         });
     }
-
 }
 
 export class SessionManager {
