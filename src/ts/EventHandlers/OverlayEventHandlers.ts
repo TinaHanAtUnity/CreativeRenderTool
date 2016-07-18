@@ -44,7 +44,6 @@ export class OverlayEventHandlers {
 
     public static onCallButton(nativeBridge: NativeBridge, adUnit: VastAdUnit): void {
         let clickThroughURL = adUnit.getVideoClickThroughURL();
-        nativeBridge.VideoPlayer.pause();
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.UrlScheme.open(clickThroughURL);

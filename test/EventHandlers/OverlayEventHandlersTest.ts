@@ -105,11 +105,6 @@ describe('OverlayEventHandlersTest', () => {
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
         });
 
-        it('should pause the video when call button is clicked', () => {
-            OverlayEventHandlers.onCallButton(nativeBridge, vastAdUnit);
-            sinon.assert.called(nativeBridge.VideoPlayer.pause);
-        });
-
         it('should open click trough link in iOS web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
