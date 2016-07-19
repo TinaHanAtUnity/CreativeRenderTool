@@ -23,6 +23,10 @@ export class VideoEventHandlers {
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
 
+        if (adUnit instanceof VastAdUnit && adUnit.getVideoClickThroughURL()) {
+            overlay.setCallButtonVisible(true);
+        }
+
         nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'test.debugOverlayEnabled.value').then(debugOverlayEnabled => {
             if(debugOverlayEnabled === true) {
                 overlay.setDebugMessageVisible(true);

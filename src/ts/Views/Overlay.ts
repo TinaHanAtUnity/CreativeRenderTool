@@ -10,6 +10,7 @@ export class Overlay extends View {
 
     public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
+    public onCallButton: Observable1<boolean> = new Observable1();
 
     private _spinnerEnabled: boolean = false;
 
@@ -27,6 +28,8 @@ export class Overlay extends View {
 
     private _debugMessageVisible: boolean = false;
 
+    private _callButtonVisible: boolean = false;
+
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _skipDurationElement: HTMLElement;
@@ -34,6 +37,7 @@ export class Overlay extends View {
     private _videoDurationCounterElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
+    private _callButtonElement: HTMLElement;
 
     constructor(muted: boolean) {
         super('overlay');
@@ -56,6 +60,11 @@ export class Overlay extends View {
                 event: 'click',
                 listener: (event) => this.onMuteEvent(event),
                 selector: '.mute-button'
+            },
+            {
+                event: 'click',
+                listener: (event) => this.onCallButtonEvent(event),
+                selector: '.call-button'
             }
         ];
     }
@@ -69,6 +78,7 @@ export class Overlay extends View {
         this._videoDurationCounterElement = <HTMLElement>this._container.querySelector('.video-duration');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -138,6 +148,12 @@ export class Overlay extends View {
         }
     }
 
+    public setCallButtonVisible(value: boolean) {
+        if(this._callButtonVisible !== value) {
+            this._callButtonElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
     public isMuted(): boolean {
         return this._muted;
     }
@@ -167,6 +183,11 @@ export class Overlay extends View {
             this._muted = true;
         }
         this.onMute.trigger(this._muted);
+    }
+
+    private onCallButtonEvent(event: Event): void {
+        event.preventDefault();
+        this.onCallButton.trigger(true);
     }
 
 }
