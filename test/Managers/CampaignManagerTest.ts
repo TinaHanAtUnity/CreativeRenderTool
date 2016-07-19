@@ -1,3 +1,4 @@
+import 'mocha';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
