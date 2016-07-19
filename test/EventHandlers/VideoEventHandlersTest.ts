@@ -45,7 +45,8 @@ describe('VideoEventHandlersTest', () => {
             setMuteEnabled: sinon.spy(),
             setVideoDurationEnabled: sinon.spy(),
             setDebugMessage: sinon.spy(),
-            setDebugMessageVisible: sinon.spy()
+            setDebugMessageVisible: sinon.spy(),
+            setCallButtonVisible: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
@@ -283,6 +284,27 @@ describe('VideoEventHandlersTest', () => {
             });
         });
 
+        it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.calledWith(overlay.setCallButtonVisible, true);
+        });
+
+        it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.notCalled(overlay.setCallButtonVisible);
+        });
+
+        it('should not set call button visibility to true if the ad unit is not VAST', () => {
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            sinon.assert.notCalled(overlay.setCallButtonVisible);
+        });
     });
 
 });
