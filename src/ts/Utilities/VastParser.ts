@@ -205,7 +205,14 @@ export class VastParser {
         let videoClicksElement = this.childByName(creativeElement, 'VideoClicks');
         if (videoClicksElement != null) {
             creative.setVideoClickThroughURLTemplate(this.parseNodeText(this.childByName(videoClicksElement, 'ClickThrough')));
-            creative.setVideoClickTrackingURLTemplate(this.parseNodeText(this.childByName(videoClicksElement, 'ClickTracking')));
+            let trackingVideoClickEventsElements = this.childsByName(videoClicksElement, 'ClickTracking');
+            for (let i = 0; i < trackingVideoClickEventsElements.length; i++) {
+                let trackingVideoClickEventsElement = trackingVideoClickEventsElements[i];
+                let trackingVideoClickURLTemplate = this.parseNodeText(trackingVideoClickEventsElement);
+                if (trackingVideoClickURLTemplate != null) {
+                    creative.addVideoClickTrackingURLTemplate(trackingVideoClickURLTemplate);
+                }
+            }
         }
 
         let trackingEventsElements = this.childsByName(creativeElement, 'TrackingEvents');

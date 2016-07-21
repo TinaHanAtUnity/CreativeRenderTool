@@ -60,6 +60,16 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
+    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string): void {
+        let clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
+
+        if (clickTrackingEventUrls) {
+            for (let i = 0; i < clickTrackingEventUrls.length; i++) {
+                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, clickTrackingEventUrls[i]);
+            }
+        }
+    }
+
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number) {
         let quartileEventName: string;
         if (quartile === 1) {

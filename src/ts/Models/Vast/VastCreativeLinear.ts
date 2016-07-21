@@ -7,20 +7,20 @@ export class VastCreativeLinear extends VastCreative {
     private _skipDelay: number;
     private _mediaFiles: VastMediaFile[];
     private _videoClickThroughURLTemplate: string;
-    private _videoClickTrackingURLTemplate: string;
+    private _videoClickTrackingURLTemplates: string[];
     private _videoCustomClickURLTemplates: string[];
     private _adParameters: any;
 
     constructor();
     constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
-                videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplate?: string,
+                videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
                 videoCustomClickURLTemplates?: string[], adParameters?: any) {
         super('linear');
         this._duration = duration || 0;
         this._skipDelay = skipDelay || null;
         this._mediaFiles = mediaFiles || [];
         this._videoClickThroughURLTemplate = videoClickThroughURLTemplate || null;
-        this._videoClickTrackingURLTemplate = videoClickTrackingURLTemplate || null;
+        this._videoClickTrackingURLTemplates = videoClickTrackingURLTemplates || [];
         this._videoCustomClickURLTemplates = videoCustomClickURLTemplates || [];
         this._adParameters = adParameters || null;
     }
@@ -57,12 +57,12 @@ export class VastCreativeLinear extends VastCreative {
         this._videoClickThroughURLTemplate = videoClickThroughURLTemplate;
     }
 
-    public getVideoClickTrackingURLTemplate(): string {
-        return this._videoClickTrackingURLTemplate;
+    public getVideoClickTrackingURLTemplates(): string[] {
+        return this._videoClickTrackingURLTemplates;
     }
 
-    public setVideoClickTrackingURLTemplate(videoClickTrackingURLTemplate: string) {
-        this._videoClickTrackingURLTemplate = videoClickTrackingURLTemplate;
+    public addVideoClickTrackingURLTemplate(trackingURLTemplate: string) {
+        this._videoClickTrackingURLTemplates.push(trackingURLTemplate);
     }
 
     public getVideoCustomClickURLTemplates(): string[] {
