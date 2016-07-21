@@ -3,6 +3,10 @@ import { assert } from 'chai';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Platform } from '../../src/ts/Constants/Platform';
+import { RingerMode } from '../../src/ts/Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from '../../src/ts/Constants/iOS/UIUserInterfaceIdiom';
+
+
 import * as sinon from 'sinon';
 
 describe('DeviceInfoTest', () => {
@@ -32,7 +36,7 @@ describe('DeviceInfoTest', () => {
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
                 getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024))
+                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
             },
 
         };
@@ -60,6 +64,139 @@ describe('DeviceInfoTest', () => {
             assert.equal(dto.batteryLevel, 0.3);
             assert.equal(dto.batteryStatus, 1);
             assert.equal(dto.freeMemory, 1024);
+
+            done();
+        });
+    });
+});
+
+describe('DeviceInfoTest Android', () => {
+
+    let deviceInfo: DeviceInfo;
+    let nativeBridge: NativeBridge;
+
+    beforeEach(() => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.ANDROID;
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
+                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
+                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+                getModel: sinon.stub().returns(Promise.resolve('testModel')),
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+                isRooted: sinon.stub().returns(Promise.resolve(true)),
+                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getHeadset: sinon.stub().returns(Promise.resolve(true)),
+                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+
+                Android: {
+                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
+                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
+                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
+                    getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
+                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
+                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                }
+            },
+
+        };
+        deviceInfo = new DeviceInfo(nativeBridge);
+        return deviceInfo.fetch();
+
+    });
+
+    it('Get DeviceInfo DTO Android', (done) => {
+        deviceInfo.getDTO().then(dto => {
+            assert.equal(dto.androidId, 17);
+            assert.equal(dto.apiLevel, 16);
+            assert.equal(dto.deviceMake, 'N');
+            assert.equal(dto.screenDensity, 2);
+            assert.equal(dto.screenLayout, 1);
+            assert.equal(dto.freeSpaceInternal, 16);
+            assert.equal(dto.networkOperatorName, 'operatorName');
+            assert.equal(dto.networkOperator, 'operator');
+            assert.equal(dto.ringerMode, 2);
+            assert.equal(dto.deviceVolume, 0.5);
+            assert.equal(dto.totalSpaceExternal, 1024);
+
+            done();
+        });
+    });
+});
+
+describe('DeviceInfoTest iOS', () => {
+
+    let deviceInfo: DeviceInfo;
+    let nativeBridge: NativeBridge;
+
+
+    beforeEach(() => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.IOS;
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
+                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
+                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+                getModel: sinon.stub().returns(Promise.resolve('testModel')),
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+                isRooted: sinon.stub().returns(Promise.resolve(true)),
+                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getHeadset: sinon.stub().returns(Promise.resolve(true)),
+                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+
+                Ios: {
+                    getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
+                    getScreenScale: sinon.stub().returns(Promise.resolve(2)),
+                    isAppleWatchPaired: sinon.stub().returns(Promise.resolve(true)),
+                    isSimulator: sinon.stub().returns(Promise.resolve(true)),
+                    getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
+                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                }
+            },
+        };
+        deviceInfo = new DeviceInfo(nativeBridge);
+        return deviceInfo.fetch();
+    });
+
+    it('Get DeviceInfo DTO iOS', (done) => {
+        deviceInfo.getDTO().then(dto => {
+            assert.equal(dto.userInterfaceIdiom, 1);
+            assert.equal(dto.screenScale, 2);
+            assert.equal(dto.appleWatchPaired, true);
+            assert.equal(dto.simulator, true);
+            assert.equal(dto.freeSpaceInternal, 16);
+            assert.equal(dto.networkOperatorName, 'operatorName');
+            assert.equal(dto.networkOperator, 'operator');
+            assert.equal(dto.deviceVolume, 0.5);
+            assert.equal(dto.totalSpaceInternal, 1024);
 
             done();
         });
