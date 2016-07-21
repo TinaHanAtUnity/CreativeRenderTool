@@ -1,5 +1,5 @@
 import 'mocha';
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
 import { Platform } from '../../src/ts/Constants/Platform';
