@@ -7,6 +7,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -242,6 +243,10 @@ export class SessionManager {
         } else {
             adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
         }
+    }
+
+    public sendVideoClickTracking(adUnit: VastAdUnit, session: Session): void {
+        adUnit.sendVideoClickTrackingEvent(this._eventManager, session.getId());
     }
 
     public setGamerServerId(serverId: string): void {

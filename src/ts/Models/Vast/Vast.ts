@@ -107,4 +107,12 @@ export class Vast {
         }
         return null;
     }
+
+    public getVideoClickTrackingURLs(): string[] {
+        let ad = this.getAd();
+        if (ad) {
+            return ad.getVideoClickTrackingURLTemplates();
+        }
+        return null;
+    }
 }
