@@ -67,7 +67,6 @@ export class EventManager {
 
     public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
         this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
-        console.log('event', event, url)
         return this._request.get(url);
     }
 
