@@ -42,8 +42,9 @@ export class OverlayEventHandlers {
         sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
     }
 
-    public static onCallButton(nativeBridge: NativeBridge, adUnit: VastAdUnit): void {
+    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
         let clickThroughURL = adUnit.getVideoClickThroughURL();
+        sessionManager.sendVideoClickTracking(adUnit, sessionManager.getSession());
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.UrlScheme.open(clickThroughURL);

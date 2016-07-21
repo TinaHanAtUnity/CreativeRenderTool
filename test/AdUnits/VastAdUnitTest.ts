@@ -103,5 +103,19 @@ describe('VastAdUnit', () => {
             let clickThroughURL = adUnit.getVideoClickThroughURL();
             assert.equal(clickThroughURL, null);
         });
+
+        it('should call video click tracking url', () => {
+            sandbox.stub(vast, 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
+            let stub = <SinonStub> eventManager.thirdPartyEvent;
+            adUnit.sendVideoClickTrackingEvent(eventManager, 'foo');
+            sinon.assert.calledTwice(stub);
+        });
+
+        it('should not call thirdPartyEvent if there are no tracking urls', () => {
+            sandbox.stub(vast, 'getVideoClickTrackingURLs').returns([]);
+            let stub = <SinonStub> eventManager.thirdPartyEvent;
+            adUnit.sendVideoClickTrackingEvent(eventManager, 'foo');
+            sinon.assert.notCalled(stub);
+        });
     });
 });
