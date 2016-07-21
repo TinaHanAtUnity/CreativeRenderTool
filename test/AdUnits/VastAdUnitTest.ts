@@ -7,7 +7,6 @@ import { Vast } from '../../src/ts/Models/Vast/Vast';
 import { Overlay } from '../../src/ts/Views/Overlay';
 import { EventManager } from '../../src/ts/Managers/EventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { SinonStub } from '~sinon/lib/sinon';
 import { Request } from '../../src/ts/Utilities/Request';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 
@@ -36,38 +35,30 @@ describe('VastAdUnit', () => {
     afterEach(() => sandbox.restore);
 
     describe('sendTrackingEvent', () => {
-        it.skip('should replace "%ZONE%" in the url with the placement id', () => {
+        it('should replace "%ZONE%" in the url with the placement id', () => {
             let placement = adUnit.getPlacement();
             let vast = (<VastCampaign> adUnit.getCampaign()).getVast();
             let urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
-
+            sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
             adUnit.sendTrackingEvent(eventManager, 'eventName', 'sessionId');
 
-            let stub = <SinonStub> eventManager.thirdPartyEvent;
-            let args = stub.firstCall.args;
-            sinon.assert.calledOnce(stub);
-            assert.equal(args[0], 'vast eventName');
-            assert.equal(args[1], 'sessionId');
-            assert.equal(args[2], 'http://foo.biz/' + placement.getId() + '/123');
+            sinon.assert.calledOnce(eventManager.thirdPartyEvent);
+            sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast eventName', 'sessionId', 'http://foo.biz/' + placement.getId() + '/123');
         });
     });
 
     describe('sendImpressionEvent', () => {
-       it.skip('should replace "%ZONE%" in the url with the placement id', () => {
+       it('should replace "%ZONE%" in the url with the placement id', () => {
            let placement = adUnit.getPlacement();
            let vast = (<VastCampaign> adUnit.getCampaign()).getVast();
            let urlTemplate = 'http://foo.biz/%ZONE%/456';
            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-
+           sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
            adUnit.sendImpressionEvent(eventManager, 'sessionId');
 
-           let stub = <SinonStub> eventManager.thirdPartyEvent;
-           let args = stub.firstCall.args;
-           sinon.assert.calledOnce(stub);
-           assert.equal(args[0], 'vast impression');
-           assert.equal(args[1], 'sessionId');
-           assert.equal(args[2], 'http://foo.biz/' + placement.getId() + '/456');
+           sinon.assert.calledOnce(eventManager.thirdPartyEvent);
+           sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
        });
     });
 
