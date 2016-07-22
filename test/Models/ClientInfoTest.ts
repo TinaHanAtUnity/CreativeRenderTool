@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Platform } from '../../src/ts/Constants/Platform';
 import { ClientInfo } from '../../src/ts/Models/ClientInfo';
-import {UnityAdsError} from '../../src/ts/Constants/UnityAdsError';
+import { UnityAdsError } from '../../src/ts/Constants/UnityAdsError';
 
 describe('ClientInfoTest', () => {
 
@@ -27,10 +27,7 @@ describe('ClientInfoTest', () => {
         ];
 
         clientInfo = new ClientInfo(Platform.TEST, data);
-        console.log(JSON.stringify(clientInfo));
-
         let dto: any = clientInfo.getDTO();
-        console.log(JSON.stringify(dto));
 
         assert.equal(dto.gameId, '11111');
         assert.equal(dto.testMode, true);
