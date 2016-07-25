@@ -69,7 +69,6 @@ export class DeviceInfo extends Model {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
             promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this._screenScale = screenScale));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this._totalInternalSpace = totalSpace));
             promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this._simulator = simulator));
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
@@ -77,8 +76,6 @@ export class DeviceInfo extends Model {
             promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalSpace => this._totalInternalSpace = totalSpace));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalSpace => this._totalExternalSpace = totalSpace));
         }
 
         return Promise.all(promises);
@@ -196,10 +193,6 @@ export class DeviceInfo extends Model {
         }
     }
 
-    public getTotalSpace(): number {
-        return this._totalInternalSpace;
-    }
-
     public getFreeSpaceExternal(): Promise<number> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
@@ -211,8 +204,31 @@ export class DeviceInfo extends Model {
         }
     }
 
-    public getTotalSpaceExternal(): number {
-        return this._totalExternalSpace;
+    public getTotalSpace(): Promise<number> {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => {
+                this._totalInternalSpace = totalSpace;
+                return this._totalInternalSpace;
+            });
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => {
+                this._totalInternalSpace = totalInternalSpace;
+                return this._totalInternalSpace;
+            });
+        } else {
+            return Promise.resolve(this._totalInternalSpace);
+        }
+    }
+
+    public getTotalSpaceExternal(): Promise<number> {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => {
+                this._totalExternalSpace = totalExternalSpace;
+                return this._totalExternalSpace;
+            });
+        } else {
+            return Promise.resolve(this._totalExternalSpace);
+        }
     }
 
 
@@ -318,6 +334,8 @@ export class DeviceInfo extends Model {
         promises.push(this.getBatteryStatus());
         promises.push(this.getFreeMemory());
         promises.push(this.isAppleWatchPaired());
+        promises.push(this.getTotalSpace());
+        promises.push(this.getTotalSpaceExternal());
 
         return Promise.all(promises).then(values => {
             return {
