@@ -198,6 +198,8 @@ export class DeviceInfo extends Model {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
                 this._freeExternalSpace = freeSpace;
                 return this._freeExternalSpace;
+            }).catch(err => {
+                return this._freeExternalSpace;
             });
         } else {
             return Promise.resolve(this._freeExternalSpace);
@@ -224,6 +226,8 @@ export class DeviceInfo extends Model {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => {
                 this._totalExternalSpace = totalExternalSpace;
+                return this._totalExternalSpace;
+            }).catch(err => {
                 return this._totalExternalSpace;
             });
         } else {
