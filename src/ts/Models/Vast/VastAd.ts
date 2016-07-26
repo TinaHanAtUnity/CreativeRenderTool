@@ -1,4 +1,5 @@
 import { VastCreative } from 'Models/Vast/VastCreative';
+import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 
 export class VastAd {
 
@@ -83,4 +84,19 @@ export class VastAd {
         }
     }
 
+    public getVideoClickThroughURLTemplate(): string {
+        let creative = this.getCreative();
+        if (creative instanceof VastCreativeLinear) {
+            return creative.getVideoClickThroughURLTemplate();
+        }
+        return null;
+    }
+
+    public getVideoClickTrackingURLTemplates(): string[] {
+        let creative = this.getCreative();
+        if (creative instanceof VastCreativeLinear) {
+            return creative.getVideoClickTrackingURLTemplates();
+        }
+        return null;
+    }
 }

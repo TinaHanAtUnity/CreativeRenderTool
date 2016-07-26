@@ -4,7 +4,9 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
+import { VastAdUnit } from '../../src/ts/AdUnits/VastAdUnit';
 import { Campaign } from '../../src/ts/Models/Campaign';
+import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
 import { SessionManager } from '../../src/ts/Managers/SessionManager';
 import { OverlayEventHandlers } from '../../src/ts/EventHandlers/OverlayEventHandlers';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -16,6 +18,7 @@ import { Request } from '../../src/ts/Utilities/Request';
 import { FinishState } from '../../src/ts/Constants/FinishState';
 import { Double } from '../../src/ts/Utilities/Double';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Platform } from '../../src/ts/Constants/Platform';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -30,7 +33,7 @@ describe('OverlayEventHandlersTest', () => {
             handleCallback
         });
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, <EndScreen><any>{show: sinon.spy()});
     });
@@ -90,6 +93,42 @@ describe('OverlayEventHandlersTest', () => {
             OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, false);
 
             sinon.assert.calledWith(nativeBridge.VideoPlayer.setVolume, new Double(1.0));
+        });
+    });
+
+    describe('When calling onCallButton', () => {
+        let vastAdUnit;
+
+        beforeEach(() => {
+            vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{});
+            sinon.spy(nativeBridge.VideoPlayer, 'pause');
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
+            sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
+            sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
+        });
+
+        it('should call video click through tracking url', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open');
+            OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
+            sinon.assert.calledOnce(vastAdUnit.sendVideoClickTrackingEvent);
+        });
+
+        it('should open click trough link in iOS web browser when call button is clicked', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open');
+            OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
+            sinon.assert.calledWith(nativeBridge.UrlScheme.open, 'http://foo.com');
+        });
+
+        it('should open click trough link in Android web browser when call button is clicked', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sinon.stub(nativeBridge.Intent, 'launch');
+            OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
+            sinon.assert.calledWith(nativeBridge.Intent.launch, {
+                'action': 'android.intent.action.VIEW',
+                'uri': 'http://foo.com'
+            });
         });
     });
 });

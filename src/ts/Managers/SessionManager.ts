@@ -7,6 +7,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -34,27 +35,33 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'networkType': this._deviceInfo.getNetworkType(),
             'cached': true, // todo: get actual value
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
-            'connectionType': this._deviceInfo.getConnectionType(),
             'sid': gamerSid,
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel()
         };
 
-        return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
-            if(mediation) {
-                infoJson.mediationName = mediation.getName();
-                infoJson.mediationVersion = mediation.getVersion();
-                infoJson.mediationOrdinal = mediation.getOrdinal();
-            }
-            return [id, infoJson];
+        let promises: Promise<any>[] = [];
+        promises.push(this._deviceInfo.getNetworkType());
+        promises.push(this._deviceInfo.getConnectionType());
+
+        return Promise.all(promises).then(([networkType, connectionType]) => {
+            infoJson.networkType = networkType;
+            infoJson.connectionType = connectionType;
+
+            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+                if(mediation) {
+                    infoJson.mediationName = mediation.getName();
+                    infoJson.mediationVersion = mediation.getVersion();
+                    infoJson.mediationOrdinal = mediation.getOrdinal();
+                }
+                return [id, infoJson];
+            });
         });
     }
-
 }
 
 export class SessionManager {
@@ -236,6 +243,10 @@ export class SessionManager {
         } else {
             adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
         }
+    }
+
+    public sendVideoClickTracking(adUnit: VastAdUnit, session: Session): void {
+        adUnit.sendVideoClickTrackingEvent(this._eventManager, session.getId());
     }
 
     public setGamerServerId(serverId: string): void {

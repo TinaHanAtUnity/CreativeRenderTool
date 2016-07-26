@@ -13,23 +13,38 @@ export class Diagnostics {
             'type': 'ads.sdk2.diagnostics',
             'msg': data
         });
-        messages.unshift(Diagnostics.createCommonObject(clientInfo, deviceInfo));
 
-        let rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-        return eventManager.diagnosticEvent(Diagnostics.DiagnosticsBaseUrl, rawData);
+        return Diagnostics.createCommonObject(clientInfo, deviceInfo).then(commonObject => {
+            messages.unshift(commonObject);
+
+            let rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
+            return eventManager.diagnosticEvent(Diagnostics.DiagnosticsBaseUrl, rawData);
+        });
     }
 
     public static setTestBaseUrl(baseUrl: string) {
         Diagnostics.DiagnosticsBaseUrl = baseUrl + '/v1/events';
     }
 
-    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo) {
-        return {
+    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any> {
+        let common: any = {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
-                'device': deviceInfo ? deviceInfo.getDTO() : null
+                'device': null,
             }
         };
-    }
 
+        if (deviceInfo) {
+            return deviceInfo.getDTO().then(deviceInfoDTO => {
+                common.device = deviceInfoDTO;
+                return common;
+            }).catch(err => {
+                // on error send diagnostics without device dto
+                return common;
+            });
+        } else {
+            return Promise.resolve(common);
+        }
+
+    }
 }

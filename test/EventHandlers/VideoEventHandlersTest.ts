@@ -45,14 +45,15 @@ describe('VideoEventHandlersTest', () => {
             setMuteEnabled: sinon.spy(),
             setVideoDurationEnabled: sinon.spy(),
             setDebugMessage: sinon.spy(),
-            setDebugMessageVisible: sinon.spy()
+            setDebugMessageVisible: sinon.spy(),
+            setCallButtonVisible: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
             show: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
     });
@@ -283,6 +284,29 @@ describe('VideoEventHandlersTest', () => {
             });
         });
 
+        xit('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
+            // todo: mocking VastAdUnit type fails in hybrid tests so that instanceof is false when testing for VastAdUnit
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.calledWith(overlay.setCallButtonVisible, true);
+        });
+
+        xit('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
+            // todo: mocking VastAdUnit type fails in hybrid tests so that instanceof is false when testing for VastAdUnit
+            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.notCalled(overlay.setCallButtonVisible);
+        });
+
+        it('should not set call button visibility to true if the ad unit is not VAST', () => {
+            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
+
+            sinon.assert.notCalled(overlay.setCallButtonVisible);
+        });
     });
 
 });
