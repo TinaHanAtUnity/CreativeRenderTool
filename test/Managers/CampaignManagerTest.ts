@@ -122,7 +122,7 @@ describe('CampaignManager', () => {
                                     <ClickTracking>http://myTrackingURL/click</ClickTracking>
                                 </VideoClicks>
                                 <MediaFiles>
-                                    <MediaFile delivery="progressive" type="video/x-flv" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv</MediaFile>
+                                    <MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4</MediaFile>
                                 </MediaFiles>
                             </Linear>
                         </Creative>
@@ -157,7 +157,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv');
+            assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
             assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
                 'http://myErrorURL/error',
                 'http://myErrorURL/wrapper/error'
@@ -536,7 +536,7 @@ describe('CampaignManager', () => {
                                     <ClickTracking>http://myTrackingURL/click</ClickTracking>
                                 </VideoClicks>
                                 <MediaFiles>
-                                    <MediaFile delivery="progressive" type="video/x-flv" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.flv</MediaFile>
+                                    <MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4</MediaFile>
                                 </MediaFiles>
                             </Linear>
                         </Creative>
