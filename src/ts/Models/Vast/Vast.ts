@@ -39,7 +39,8 @@ export class Vast {
         if (ad) {
             for (let creative of ad.getCreatives()) {
                 for (let mediaFile of creative.getMediaFiles()) {
-                    if (mediaFile.getFileURL()) {
+                    let playable = this.isPlayableMIMEType(mediaFile.getMIMEType());
+                    if (mediaFile.getFileURL() && playable) {
                         return mediaFile.getFileURL();
                     }
                 }
@@ -114,5 +115,10 @@ export class Vast {
             return ad.getVideoClickTrackingURLTemplates();
         }
         return null;
+    }
+
+    private isPlayableMIMEType(MIMEType: string): boolean {
+        let playableMIMEType = 'video/mp4';
+        return MIMEType === playableMIMEType;
     }
 }
