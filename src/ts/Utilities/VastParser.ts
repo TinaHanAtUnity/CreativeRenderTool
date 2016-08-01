@@ -231,10 +231,10 @@ export class VastParser {
 
         let mediaFilesElements = this.childsByName(creativeElement, 'MediaFiles');
         if (mediaFilesElements.length > 0) {
-            let mediaFilesElement = mediaFilesElements[0]; // we're only interested in the first file
+            let mediaFilesElement = mediaFilesElements[0];
             let mediaFileElements = this.childsByName(mediaFilesElement, 'MediaFile');
-            if (mediaFileElements.length > 0) {
-                let mediaFileElement = mediaFileElements[0];
+            for (let i = 0; i < mediaFileElements.length; i++) {
+                let mediaFileElement = mediaFileElements[i];
                 let mediaFile = new VastMediaFile(
                     this.parseNodeText(mediaFileElement).trim(),
                     mediaFileElement.getAttribute('delivery'),
