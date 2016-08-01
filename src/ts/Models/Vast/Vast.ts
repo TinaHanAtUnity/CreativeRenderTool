@@ -117,13 +117,6 @@ export class Vast {
         return null;
     }
 
-    public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {
-        let ad = this.getAd();
-        if (ad) {
-            ad.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
-        }
-    }
-
     private isPlayableMIMEType(MIMEType: string): boolean {
         let playableMIMEType = 'video/mp4';
         return MIMEType === playableMIMEType;
