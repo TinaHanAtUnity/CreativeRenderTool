@@ -120,7 +120,7 @@ export class Vast {
     public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {
         let ad = this.getAd();
         if (ad) {
-            return ad.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
+            ad.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
         }
     }
 
