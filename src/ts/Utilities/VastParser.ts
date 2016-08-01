@@ -8,7 +8,7 @@ import * as xmldom from 'xmldom';
 
 export class VastParser {
 
-    private static DEFAULT_MAX_WRAPPER_DEPTH = 3;
+    private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
