@@ -99,4 +99,11 @@ export class VastAd {
         }
         return null;
     }
+
+    public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {
+        let creative = this.getCreative();
+        if (creative instanceof VastCreativeLinear) {
+            creative.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
+        }
+    }
 }

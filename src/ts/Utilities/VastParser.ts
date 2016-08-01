@@ -96,6 +96,9 @@ export class VastParser {
             for (let impressionUrl of parent.getAd().getImpressionURLTemplates()) {
                 parsedVast.getAd().addImpressionURLTemplate(impressionUrl);
             }
+            for (let clickTrackingUrl of parent.getAd().getVideoClickTrackingURLTemplates()) {
+                parsedVast.getAd().addVideoClickTrackingURLTemplate(clickTrackingUrl);
+            }
             for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
                 for (let url of parent.getTrackingEventUrls(eventName)) {
                     parsedVast.addTrackingEventUrl(eventName, url);
