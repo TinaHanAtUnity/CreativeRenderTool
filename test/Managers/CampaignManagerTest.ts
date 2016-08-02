@@ -202,7 +202,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        return campaignManager.request();
+        campaignManager.request();
     });
 
 
@@ -344,7 +344,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        return campaignManager.request();
+        campaignManager.request();
     });
 
     it('should fail when max depth is exceeded', (done) => {
@@ -569,7 +569,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        return campaignManager.request();
+        campaignManager.request();
     });
 
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
