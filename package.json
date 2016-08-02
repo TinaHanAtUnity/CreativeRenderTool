@@ -18,16 +18,16 @@
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
-    "babel-cli": "6.9.0",
+    "babel-cli": "6.11.4",
     "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
     "babel-plugin-transform-es3-property-literals": "6.8.0",
     "chai": "3.5.0",
-    "coveralls": "2.11.9",
-    "istanbul": "0.4.3",
-    "mocha": "2.5.3",
+    "coveralls": "2.11.12",
+    "istanbul": "0.4.4",
+    "mocha": "3.0.0",
     "mocha-lcov-reporter": "1.2.0",
     "remap-istanbul": "0.6.4",
-    "sinon": "1.17.4"
+    "sinon": "1.17.5"
   },
   "optionalDependencies": {
     "fsevents": "^1.0.12"
