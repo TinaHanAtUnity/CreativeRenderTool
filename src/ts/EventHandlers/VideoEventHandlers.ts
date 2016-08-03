@@ -12,6 +12,10 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 
 export class VideoEventHandlers {
 
+    public static isVast(arg: any): arg is VastAdUnit {
+        return arg.getVast !== undefined;
+    }
+
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         let overlay = adUnit.getOverlay();
 
@@ -23,7 +27,7 @@ export class VideoEventHandlers {
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
 
-        if (adUnit instanceof VastAdUnit && adUnit.getVideoClickThroughURL()) {
+        if (this.isVast(adUnit) && adUnit.getVideoClickThroughURL()) {
             overlay.setCallButtonVisible(true);
         }
 
@@ -31,7 +35,7 @@ export class VideoEventHandlers {
             if(debugOverlayEnabled === true) {
                 overlay.setDebugMessageVisible(true);
                 let debugMessage = '';
-                if (adUnit instanceof VastAdUnit) {
+                if (this.isVast(adUnit)) {
                     debugMessage = 'Programmatic Ad';
                 } else {
                     debugMessage = 'Performance Ad';
