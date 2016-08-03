@@ -197,6 +197,10 @@ describe('CampaignManager', () => {
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
                 'http://myTrackingURL/wrapper/unmute'
             ]);
+            assert.deepEqual(triggeredCampaign.getVast().getVideoClickTrackingURLs(), [
+                'http://myTrackingURL/click'
+            ]);
+            assert.equal(triggeredCampaign.getVast().getVideoClickThroughURL(), 'http://www.tremormedia.com');
             assert.equal(triggeredCampaign.getVast().getDuration(), 30);
             done();
         });
@@ -256,6 +260,7 @@ describe('CampaignManager', () => {
                               <Tracking event="fullscreen"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1010&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
                             </TrackingEvents>
                             <VideoClicks>
+                              <ClickTracking><![CDATA[https://www.tremor.com/click-last-wrapped]]></ClickTracking>
                               <ClickThrough id="pointroll"><![CDATA[http://clk.pointroll.com/bc/?a=2183676&c=9001&i=C0350500-4E6E-9A6D-0314-A20018D20101&clickurl=https://ad.doubleclick.net/ddm/clk/302764234%3B129068239%3Bg%3Fhttp://www.choosenissan.com/altima/%3Fdcp=zmm.%25epid!.%26dcc=%25ecid!.%25eaid!%26utm_source=%25esid!%26utm_medium=%25epid!%26utm_content=%25ecid!.%25eaid!%26dcn=1]]></ClickThrough>
                             </VideoClicks>
                             <MediaFiles>
@@ -339,6 +344,13 @@ describe('CampaignManager', () => {
                 'https://x.vindicosuite.com/event/?e=18;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=5138;cr=1883451934;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm/IBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                 'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=149645;'
             ]);
+            assert.deepEqual(triggeredCampaign.getVast().getVideoClickTrackingURLs(), [
+                'https://www.tremor.com/click-last-wrapped',
+                'https://x.vindicosuite.com/click/?v=5;m=3;l=454826;c=918974;b=3968433;ts=1466475479;ui=Mzxw7vcjJKIYUBr51X6qI4T75yHPBloC4oFyIzlnzuseNOCWolB7mBUvaYyxz5q64WKJSiV1f2Vkqdfz1Uc8_w;pc=1;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm/IBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;ep=1',
+                'https://adclick.g.doubleclick.net/pcs/click?xai=AKAOjstYlfbiBdblfXq6LMym7IC5jwoF21UXuGUDBRde_xEZcfAEOwcQjxvzCqZC5xoBrfhSWeKfI9Vz-D1j&sai=AMfl-YT-yQK5ngqbHCt-MCth_f3g6Ql6PBVZa7-oecKkqrVqkSNK6jTjavZZXhulRKo&sig=Cg0ArKJSzI2sXx3KmnQbEAE&urlfix=1&adurl=',
+                'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=click&vastcrtype=linear&crid=67817785'
+            ]);
+            assert.equal(triggeredCampaign.getVast().getVideoClickThroughURL(), 'http://clk.pointroll.com/bc/?a=2183676&c=9001&i=C0350500-4E6E-9A6D-0314-A20018D20101&clickurl=https://ad.doubleclick.net/ddm/clk/302764234;129068239;g?http://www.choosenissan.com/altima/?dcp=zmm.%epid!.&dcc=%ecid!.%eaid!&utm_source=%esid!&utm_medium=%epid!&utm_content=%ecid!.%eaid!&dcn=1');
             assert.equal(triggeredCampaign.getVast().getDuration(), 15);
             done();
         });
@@ -371,195 +383,111 @@ describe('CampaignManager', () => {
             }`
         }));
 
-        mockRequest.expects('get').returns(Promise.resolve({
-            response: `<?xml version="1.0" encoding="UTF-8"?>
-                <VAST version="2.0">
-                <Ad id="602833">
-                <Wrapper>
-                <AdSystem>Acudeo Compatible</AdSystem>
-                <VASTAdTagURI>http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml</VASTAdTagURI>
-                <Error>http://myErrorURL/wrapper/error</Error>
-                <Impression>http://myTrackingURL/wrapper/impression</Impression>
-                <Creatives>
-                    <Creative AdID="602833">
-                        <Linear>
-                            <TrackingEvents>
-                                <Tracking event="creativeView">http://myTrackingURL/wrapper/creativeView</Tracking>
-                                <Tracking event="start">http://myTrackingURL/wrapper/start</Tracking>
-                                <Tracking event="midpoint">http://myTrackingURL/wrapper/midpoint</Tracking>
-                                <Tracking event="firstQuartile">http://myTrackingURL/wrapper/firstQuartile</Tracking>
-                                <Tracking event="thirdQuartile">http://myTrackingURL/wrapper/thirdQuartile</Tracking>
-                                <Tracking event="complete">http://myTrackingURL/wrapper/complete</Tracking>
-                                <Tracking event="mute">http://myTrackingURL/wrapper/mute</Tracking>
-                                <Tracking event="unmute">http://myTrackingURL/wrapper/unmute</Tracking>
-                                <Tracking event="pause">http://myTrackingURL/wrapper/pause</Tracking>
-                                <Tracking event="resume">http://myTrackingURL/wrapper/resume</Tracking>
-                                <Tracking event="fullscreen">http://myTrackingURL/wrapper/fullscreen</Tracking>
-                            </TrackingEvents>
-                        </Linear>
-                    </Creative>
-                    <Creative>
-                        <Linear>
-                            <VideoClicks>
-                                <ClickTracking>http://myTrackingURL/wrapper/click</ClickTracking>
-                            </VideoClicks>
-                        </Linear>
-                    </Creative>
-                    <Creative AdID="602833-NonLinearTracking">
-                        <NonLinearAds>
-                            <TrackingEvents>
-                            </TrackingEvents>
-                        </NonLinearAds>
-                    </Creative>
-                </Creatives>
-                </Wrapper>
-                </Ad>
-                </VAST>`
-        }));
-
-        mockRequest.expects('get').returns(Promise.resolve({
-            response: `<?xml version="1.0" encoding="UTF-8"?>
-                <VAST version="2.0">
-                <Ad id="602833">
-                <Wrapper>
-                <AdSystem>Acudeo Compatible</AdSystem>
-                <VASTAdTagURI>http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_3.xml</VASTAdTagURI>
-                <Error>http://myErrorURL/wrapper/error</Error>
-                <Impression>http://myTrackingURL/wrapper/impression</Impression>
-                <Creatives>
-                    <Creative AdID="602833">
-                        <Linear>
-                            <TrackingEvents>
-                                <Tracking event="creativeView">http://myTrackingURL/wrapper/creativeView</Tracking>
-                                <Tracking event="start">http://myTrackingURL/wrapper/start</Tracking>
-                                <Tracking event="midpoint">http://myTrackingURL/wrapper/midpoint</Tracking>
-                                <Tracking event="firstQuartile">http://myTrackingURL/wrapper/firstQuartile</Tracking>
-                                <Tracking event="thirdQuartile">http://myTrackingURL/wrapper/thirdQuartile</Tracking>
-                                <Tracking event="complete">http://myTrackingURL/wrapper/complete</Tracking>
-                                <Tracking event="mute">http://myTrackingURL/wrapper/mute</Tracking>
-                                <Tracking event="unmute">http://myTrackingURL/wrapper/unmute</Tracking>
-                                <Tracking event="pause">http://myTrackingURL/wrapper/pause</Tracking>
-                                <Tracking event="resume">http://myTrackingURL/wrapper/resume</Tracking>
-                                <Tracking event="fullscreen">http://myTrackingURL/wrapper/fullscreen</Tracking>
-                            </TrackingEvents>
-                        </Linear>
-                    </Creative>
-                    <Creative>
-                        <Linear>
-                            <VideoClicks>
-                                <ClickTracking>http://myTrackingURL/wrapper/click</ClickTracking>
-                            </VideoClicks>
-                        </Linear>
-                    </Creative>
-                    <Creative AdID="602833-NonLinearTracking">
-                        <NonLinearAds>
-                            <TrackingEvents>
-                            </TrackingEvents>
-                        </NonLinearAds>
-                    </Creative>
-                </Creatives>
-                </Wrapper>
-                </Ad>
-                </VAST>`
-        }));
-
-        mockRequest.expects('get').returns(Promise.resolve({
-            response: `<?xml version="1.0" encoding="UTF-8"?>
-                <VAST version="2.0">
-                <Ad id="602833">
-                <Wrapper>
-                <AdSystem>Acudeo Compatible</AdSystem>
-                <VASTAdTagURI>http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_4.xml</VASTAdTagURI>
-                <Error>http://myErrorURL/wrapper/error</Error>
-                <Impression>http://myTrackingURL/wrapper/impression</Impression>
-                <Creatives>
-                    <Creative AdID="602833">
-                        <Linear>
-                            <TrackingEvents>
-                                <Tracking event="creativeView">http://myTrackingURL/wrapper/creativeView</Tracking>
-                                <Tracking event="start">http://myTrackingURL/wrapper/start</Tracking>
-                                <Tracking event="midpoint">http://myTrackingURL/wrapper/midpoint</Tracking>
-                                <Tracking event="firstQuartile">http://myTrackingURL/wrapper/firstQuartile</Tracking>
-                                <Tracking event="thirdQuartile">http://myTrackingURL/wrapper/thirdQuartile</Tracking>
-                                <Tracking event="complete">http://myTrackingURL/wrapper/complete</Tracking>
-                                <Tracking event="mute">http://myTrackingURL/wrapper/mute</Tracking>
-                                <Tracking event="unmute">http://myTrackingURL/wrapper/unmute</Tracking>
-                                <Tracking event="pause">http://myTrackingURL/wrapper/pause</Tracking>
-                                <Tracking event="resume">http://myTrackingURL/wrapper/resume</Tracking>
-                                <Tracking event="fullscreen">http://myTrackingURL/wrapper/fullscreen</Tracking>
-                            </TrackingEvents>
-                        </Linear>
-                    </Creative>
-                    <Creative>
-                        <Linear>
-                            <VideoClicks>
-                                <ClickTracking>http://myTrackingURL/wrapper/click</ClickTracking>
-                            </VideoClicks>
-                        </Linear>
-                    </Creative>
-                    <Creative AdID="602833-NonLinearTracking">
-                        <NonLinearAds>
-                            <TrackingEvents>
-                            </TrackingEvents>
-                        </NonLinearAds>
-                    </Creative>
-                </Creatives>
-                </Wrapper>
-                </Ad>
-                </VAST>`
-        }));
-
-        mockRequest.expects('get').returns(Promise.resolve({
-            response: `<?xml version="1.0" encoding="UTF-8"?>
-                <VAST version="2.0">
-                  <Ad id="601364">
-                  <InLine>
-                    <AdSystem>Acudeo Compatible</AdSystem>
-                    <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
-                    <Description>VAST 2.0 Instream Test 1</Description>
-                    <Error>http://myErrorURL/error</Error>
-                    <Impression>http://myTrackingURL/impression</Impression>
-                    <Creatives>
-                        <Creative AdID="601364">
-                            <Linear>
-                                <Duration>00:00:30</Duration>
-                                <TrackingEvents>
-                                    <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
-                                    <Tracking event="start">http://myTrackingURL/start</Tracking>
-                                    <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
-                                    <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
-                                    <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
-                                    <Tracking event="complete">http://myTrackingURL/complete</Tracking>
-                                </TrackingEvents>
-                                <VideoClicks>
-                                    <ClickThrough>http://www.tremormedia.com</ClickThrough>
-                                    <ClickTracking>http://myTrackingURL/click</ClickTracking>
-                                </VideoClicks>
-                                <MediaFiles>
-                                    <MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4</MediaFile>
-                                </MediaFiles>
-                            </Linear>
-                        </Creative>
-                        <Creative AdID="601364-Companion">
-                            <CompanionAds>
-                                <Companion width="300" height="250">
-                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
+        let nonWrappedVAST = `<?xml version="1.0" encoding="UTF-8"?>
+            <VAST version="2.0">
+                <Ad id="601364">
+                    <InLine>
+                        <AdSystem>Acudeo Compatible</AdSystem>
+                        <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
+                        <Description>VAST 2.0 Instream Test 1</Description>
+                        <Error>http://myErrorURL/error</Error>
+                        <Impression>http://myTrackingURL/impression</Impression>
+                        <Creatives>
+                            <Creative AdID="601364">
+                                <Linear>
+                                    <Duration>00:00:30</Duration>
                                     <TrackingEvents>
-                                        <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
+                                        <Tracking event="creativeView">http://myTrackingURL/creativeView</Tracking>
+                                        <Tracking event="start">http://myTrackingURL/start</Tracking>
+                                        <Tracking event="midpoint">http://myTrackingURL/midpoint</Tracking>
+                                        <Tracking event="firstQuartile">http://myTrackingURL/firstQuartile</Tracking>
+                                        <Tracking event="thirdQuartile">http://myTrackingURL/thirdQuartile</Tracking>
+                                        <Tracking event="complete">http://myTrackingURL/complete</Tracking>
                                     </TrackingEvents>
+                                    <VideoClicks>
+                                        <ClickThrough>http://www.tremormedia.com</ClickThrough>
+                                        <ClickTracking>http://myTrackingURL/click</ClickTracking>
+                                    </VideoClicks>
+                                    <MediaFiles>
+                                        <MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true">http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4</MediaFile>
+                                    </MediaFiles>
+                                </Linear>
+                            </Creative>
+                            <Creative AdID="601364-Companion">
+                                <CompanionAds>
+                                    <Companion width="300" height="250">
+                                        <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/Blistex1.jpg</StaticResource>
+                                        <TrackingEvents>
+                                            <Tracking event="creativeView">http://myTrackingURL/firstCompanionCreativeView</Tracking>
+                                        </TrackingEvents>
+                        
+                                        <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                    </Companion>
+                                    <Companion width="728" height="90">
+                                        <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
+                                        <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
+                                    </Companion>
+                                </CompanionAds>
+                            </Creative>
+                        </Creatives>
+                    </InLine>
+                </Ad>
+            </VAST>`;
 
-                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
-                                </Companion>
-                                <Companion width="728" height="90">
-                                    <StaticResource creativeType="image/jpeg">http://demo.tremormedia.com/proddev/vast/728x90_banner1.jpg</StaticResource>
-                                    <CompanionClickThrough>http://www.tremormedia.com</CompanionClickThrough>
-                                </Companion>
-                            </CompanionAds>
-                        </Creative>
-                    </Creatives>
-                  </InLine>
-                  </Ad>
-                </VAST>`
+        let wrappedVAST = `<?xml version="1.0" encoding="UTF-8"?>
+            <VAST version="2.0">
+            <Ad id="602833">
+            <Wrapper>
+            <AdSystem>Acudeo Compatible</AdSystem>
+            <VASTAdTagURI>http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml</VASTAdTagURI>
+            <Error>http://myErrorURL/wrapper/error</Error>
+            <Impression>http://myTrackingURL/wrapper/impression</Impression>
+            <Creatives>
+                <Creative AdID="602833">
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking event="creativeView">http://myTrackingURL/wrapper/creativeView</Tracking>
+                            <Tracking event="start">http://myTrackingURL/wrapper/start</Tracking>
+                            <Tracking event="midpoint">http://myTrackingURL/wrapper/midpoint</Tracking>
+                            <Tracking event="firstQuartile">http://myTrackingURL/wrapper/firstQuartile</Tracking>
+                            <Tracking event="thirdQuartile">http://myTrackingURL/wrapper/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://myTrackingURL/wrapper/complete</Tracking>
+                            <Tracking event="mute">http://myTrackingURL/wrapper/mute</Tracking>
+                            <Tracking event="unmute">http://myTrackingURL/wrapper/unmute</Tracking>
+                            <Tracking event="pause">http://myTrackingURL/wrapper/pause</Tracking>
+                            <Tracking event="resume">http://myTrackingURL/wrapper/resume</Tracking>
+                            <Tracking event="fullscreen">http://myTrackingURL/wrapper/fullscreen</Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+                <Creative>
+                    <Linear>
+                        <VideoClicks>
+                            <ClickTracking>http://myTrackingURL/wrapper/click</ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+                <Creative AdID="602833-NonLinearTracking">
+                    <NonLinearAds>
+                        <TrackingEvents>
+                        </TrackingEvents>
+                    </NonLinearAds>
+                </Creative>
+            </Creatives>
+            </Wrapper>
+            </Ad>
+            </VAST>`;
+
+        // create intermediate wrappers
+        for(let i = 0; i < 8; i++) {
+            mockRequest.expects('get').returns(Promise.resolve({
+                response: wrappedVAST
+            }));
+        }
+
+        // return last non wrapped VAST
+        mockRequest.expects('get').returns(Promise.resolve({
+            response: nonWrappedVAST
         }));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);

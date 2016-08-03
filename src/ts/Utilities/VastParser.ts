@@ -5,10 +5,11 @@ import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
 import * as xmldom from 'xmldom';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export class VastParser {
 
-    private static DEFAULT_MAX_WRAPPER_DEPTH = 3;
+    private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
@@ -72,7 +73,7 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates, vast.tracking);
     }
 
-    public retrieveVast(vast: any, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
+    public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast = this.parseVast(vast);
         this.applyParentURLs(parsedVast, parent);
 
@@ -83,8 +84,10 @@ export class VastParser {
             throw new Error('VAST wrapper depth exceeded');
         }
 
+        nativeBridge.Sdk.logInfo('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
+
         return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast({data: response.response, tracking: {}}, request, parsedVast, depth + 1);
+            return this.retrieveVast({data: response.response, tracking: {}}, nativeBridge, request, parsedVast, depth + 1);
         });
     }
 
@@ -95,6 +98,9 @@ export class VastParser {
             }
             for (let impressionUrl of parent.getAd().getImpressionURLTemplates()) {
                 parsedVast.getAd().addImpressionURLTemplate(impressionUrl);
+            }
+            for (let clickTrackingUrl of parent.getAd().getVideoClickTrackingURLTemplates()) {
+                parsedVast.getAd().addVideoClickTrackingURLTemplate(clickTrackingUrl);
             }
             for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
                 for (let url of parent.getTrackingEventUrls(eventName)) {
