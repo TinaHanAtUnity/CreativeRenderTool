@@ -161,6 +161,12 @@ export class WebView {
             return;
         }
 
+        if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
+            this._nativeBridge.AppSheet.prepare({
+                id: parseInt(this._campaign.getAppStoreId(), 10)
+            });
+        }
+
         this._showing = true;
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -221,12 +227,6 @@ export class WebView {
         this._campaign = campaign;
 
         let cacheMode = this._configuration.getCacheMode();
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getBypassAppSheet()) {
-            this._nativeBridge.AppSheet.prepare({
-                id: parseInt(campaign.getAppStoreId(), 10)
-            });
-        }
 
         let cacheAsset = (url: string) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
