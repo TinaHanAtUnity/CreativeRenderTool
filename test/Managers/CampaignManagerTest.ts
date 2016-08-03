@@ -202,7 +202,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        campaignManager.request();
+        return campaignManager.request();
     });
 
 
@@ -344,7 +344,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        campaignManager.request();
+        return campaignManager.request();
     });
 
     it('should fail when max depth is exceeded', (done) => {
@@ -569,7 +569,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        campaignManager.request();
+        return campaignManager.request();
     });
 
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
@@ -641,8 +641,7 @@ describe('CampaignManager', () => {
             return verifyErrorForResponse(response, 'Campaign does not have a video url');
         });
 
-        // todo: disabled this broken test, should be fixed
-        xit('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
+        it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
             const response = {
                 response: `{
                 "abGroup": 3,
