@@ -54,28 +54,30 @@ export class DeviceInfo extends Model {
     public fetch(): Promise<any[]> {
         let promises: Promise<any>[] = [];
 
-        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier));
-        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking));
-        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion));
-        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this._model = model));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight));
-        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
-        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted));
-        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language));
-        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone));
-        promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory));
+        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this._model = model).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory).catch(err => this.handleDeviceInfoError(err)));
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this._screenScale = screenScale));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this._simulator = simulator));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this._screenScale = screenScale).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this._simulator = simulator).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this._totalInternalSpace = totalSpace).catch(err => this.handleDeviceInfoError(err)));
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout).catch(err => this.handleDeviceInfoError(err)));
         }
 
         return Promise.all(promises);
@@ -198,41 +200,18 @@ export class DeviceInfo extends Model {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
                 this._freeExternalSpace = freeSpace;
                 return this._freeExternalSpace;
-            }).catch(err => {
-                return this._freeExternalSpace;
             });
         } else {
             return Promise.resolve(this._freeExternalSpace);
         }
     }
 
-    public getTotalSpace(): Promise<number> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => {
-                this._totalInternalSpace = totalSpace;
-                return this._totalInternalSpace;
-            });
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => {
-                this._totalInternalSpace = totalInternalSpace;
-                return this._totalInternalSpace;
-            });
-        } else {
-            return Promise.resolve(this._totalInternalSpace);
-        }
+    public getTotalSpace(): number {
+        return this._totalInternalSpace;
     }
 
-    public getTotalSpaceExternal(): Promise<number> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => {
-                this._totalExternalSpace = totalExternalSpace;
-                return this._totalExternalSpace;
-            }).catch(err => {
-                return this._totalExternalSpace;
-            });
-        } else {
-            return Promise.resolve(this._totalExternalSpace);
-        }
+    public getTotalSpaceExternal(): number {
+        return this._totalExternalSpace;
     }
 
 
@@ -323,23 +302,26 @@ export class DeviceInfo extends Model {
 
     public getDTO(): Promise<any> {
         let promises: Promise<any>[] = [];
+        promises.push(this.getConnectionType().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getNetworkType().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getHeadset().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getFreeSpace().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this.getFreeMemory().catch(err => this.handleDeviceInfoError(err)));
 
-        promises.push(this.getConnectionType());
-        promises.push(this.getNetworkType());
-        promises.push(this.getNetworkOperator());
-        promises.push(this.getNetworkOperatorName());
-        promises.push(this.getHeadset());
-        promises.push(this.getRingerMode());
-        promises.push(this.getDeviceVolume());
-        promises.push(this.getScreenBrightness());
-        promises.push(this.getFreeSpace());
-        promises.push(this.getFreeSpaceExternal());
-        promises.push(this.getBatteryLevel());
-        promises.push(this.getBatteryStatus());
-        promises.push(this.getFreeMemory());
-        promises.push(this.isAppleWatchPaired());
-        promises.push(this.getTotalSpace());
-        promises.push(this.getTotalSpaceExternal());
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            promises.push(this.isAppleWatchPaired().catch(err => this.handleDeviceInfoError(err)));
+        }
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this.getRingerMode().catch(err => this.handleDeviceInfoError(err)));
+        }
 
         return Promise.all(promises).then(values => {
             return {
@@ -381,5 +363,9 @@ export class DeviceInfo extends Model {
         });
 
 
+    }
+
+    private handleDeviceInfoError(error: any) {
+        this._nativeBridge.Sdk.logWarning(JSON.stringify(error));
     }
 }
