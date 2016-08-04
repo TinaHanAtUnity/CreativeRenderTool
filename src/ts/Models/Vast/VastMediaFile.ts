@@ -36,4 +36,7 @@ export class VastMediaFile {
         return this._fileURL;
     }
 
+    public getMIMEType(): string {
+        return this._mimeType;
+    }
 }
