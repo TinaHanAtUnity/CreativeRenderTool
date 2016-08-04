@@ -247,7 +247,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(nativeBridge.Storage, 'get').returns(prom);
             VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
 
-            prom.then(() => {
+            return prom.then(() => {
                 sinon.assert.calledWith(overlay.setDebugMessageVisible, true);
             });
         });
@@ -257,7 +257,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(nativeBridge.Storage, 'get').returns(prom);
             VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
 
-            prom.then(() => {
+            return prom.then(() => {
                 sinon.assert.calledWith(overlay.setDebugMessage, 'Performance Ad');
             });
         });
@@ -269,7 +269,7 @@ describe('VideoEventHandlersTest', () => {
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
-            prom.then(() => {
+            return prom.then(() => {
                 sinon.assert.calledWith(overlay.setDebugMessage, 'Programmatic Ad');
             });
         });
@@ -279,12 +279,12 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(nativeBridge.Storage, 'get').returns(prom);
             VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10);
 
-            prom.then(() => {
+            return prom.then(() => {
                 sinon.assert.notCalled(overlay.setDebugMessage);
             });
         });
 
-        xit('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
+        it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
             // todo: mocking VastAdUnit type fails in hybrid tests so that instanceof is false when testing for VastAdUnit
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
@@ -293,7 +293,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.assert.calledWith(overlay.setCallButtonVisible, true);
         });
 
-        xit('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
+        it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
             // todo: mocking VastAdUnit type fails in hybrid tests so that instanceof is false when testing for VastAdUnit
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
