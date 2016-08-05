@@ -38,6 +38,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _onDestroyObserver: any;
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
+    private _onBackKeyObserver: any;
 
     private _androidOptions: IAndroidOptions;
     private _iosOptions: IIosOptions;
@@ -90,6 +91,7 @@ export class VideoAdUnit extends AbstractAdUnit {
             let keyEvents: any[] = [];
             if(this._placement.disableBackButton()) {
                 keyEvents = [KeyCode.BACK];
+                this._onBackKeyObserver = this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => this.onKeyEvent(keyCode));
             }
 
             let hardwareAccel: boolean = true;
@@ -101,6 +103,12 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
             return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+        }
+    }
+
+    public onKeyEvent(keyCode: number): void {
+        if (keyCode === KeyCode.BACK && !this.isVideoActive()) {
+            this.hide();
         }
     }
 
@@ -127,6 +135,7 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onResume.unsubscribe(this._onResumeObserver);
             this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
             this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
+            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
                 this._showing = false;
