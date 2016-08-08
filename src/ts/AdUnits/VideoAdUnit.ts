@@ -32,6 +32,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoPosition: number;
     private _videoQuartile: number;
     private _videoActive: boolean;
+    private _onPauseReceived: boolean;
     private _watches: number;
     private _onResumeObserver: any;
     private _onPauseObserver: any;
@@ -83,6 +84,8 @@ export class VideoAdUnit extends AbstractAdUnit {
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
+            this._onPauseReceived = false;
+
             let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
             if (!this._placement.useDeviceOrientationForVideo()) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
@@ -223,12 +226,16 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onResume(): void {
+        this._onPauseReceived = false;
+
         if(this._showing && this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
     private onPause(finishing: boolean): void {
+        this._onPauseReceived = true;
+
         if(finishing && this._showing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
@@ -236,7 +243,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     private onDestroy(finishing: boolean): void {
-        if(this._showing && finishing) {
+        if(this._showing && finishing && this._onPauseReceived) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
