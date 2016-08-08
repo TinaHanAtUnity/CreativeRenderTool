@@ -21,6 +21,9 @@ export class VideoEventHandlers {
 
         adUnit.setVideoDuration(duration);
         overlay.setVideoDuration(duration);
+        if(adUnit.getVideoPosition() > 0) {
+            overlay.setVideoProgress(adUnit.getVideoPosition());
+        }
         if(adUnit.getPlacement().allowSkip()) {
             overlay.setSkipVisible(true);
         }
