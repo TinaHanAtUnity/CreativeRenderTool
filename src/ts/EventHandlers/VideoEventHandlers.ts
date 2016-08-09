@@ -86,6 +86,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+        sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
         adUnit.getOverlay().setSpinnerEnabled(false);

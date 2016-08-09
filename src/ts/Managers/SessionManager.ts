@@ -103,6 +103,10 @@ export class SessionManager {
         return this._currentSession;
     }
 
+    public setSession(session: Session) {
+        this._currentSession = session;
+    }
+
     public sendShow(adUnit: AbstractAdUnit): Promise<void> {
         // todo: this pattern is rather bad and it's used only to allow tests to temporarily pass without having to create a new session for each test
         if(this._currentSession) {
@@ -114,11 +118,21 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
-            adUnit.sendImpressionEvent(this._eventManager, infoJson.sessionId);
-            adUnit.sendTrackingEvent(this._eventManager, 'creativeView', infoJson.sessionId);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
+    public sendImpressionEvent(adUnit: AbstractAdUnit): void {
+        if(this._currentSession) {
+            if(this._currentSession.impressionSent) {
+                return;
+            }
+            this._currentSession.impressionSent = true;
+        }
+
+        adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId());
+        adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {

@@ -72,7 +72,7 @@ describe('SessionManager', () => {
         });
     });
 
-    it('sends impression events from VAST', () => {
+    it('sends impression and creativeView events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST impression and creativeView callback URLs should be requested by the event manager
@@ -83,18 +83,13 @@ describe('SessionManager', () => {
         mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '123', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
         mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '123', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        const metadataPromise = Promise.resolve(['42', {sessionId: '123'}]);
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
-        let mockMetadataCreator = sinon.mock(metadataCreator);
-        mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
-
-        let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
+        let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager);
+        sessionManager.setSession(new Session('123'));
         let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        return sessionManager.sendShow(adUnit).then(() => {
-            mockMetadataCreator.verify();
-            mockEventManager.verify();
-        });
+        sessionManager.sendImpressionEvent(adUnit);
+
+        mockEventManager.verify();
     });
 
     const testMuteEvent = function (muted: boolean) {
