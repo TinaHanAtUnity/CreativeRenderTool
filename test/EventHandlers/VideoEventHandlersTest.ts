@@ -21,6 +21,7 @@ import { Campaign } from '../../src/ts/Models/Campaign';
 import { Overlay } from '../../src/ts/Views/Overlay';
 import { EndScreen } from '../../src/ts/Views/EndScreen';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Session } from '../../src/ts/Models/Session';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -120,6 +121,7 @@ describe('VideoEventHandlersTest', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge, 'invoke');
             sinon.spy(sessionManager, 'sendStart');
+            sessionManager.setSession(new Session('123'));
         });
 
         it('should send start event with SessionManager', () => {
