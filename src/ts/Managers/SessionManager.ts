@@ -114,6 +114,20 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
+        };
+
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
+    public sendImpressionEvent(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.impressionSent) {
+                return;
+            }
+            this._currentSession.impressionSent = true;
+        }
+
+        const fulfilled = ([id, infoJson]) => {
             adUnit.sendImpressionEvent(this._eventManager, infoJson.sessionId);
             adUnit.sendTrackingEvent(this._eventManager, 'creativeView', infoJson.sessionId);
         };

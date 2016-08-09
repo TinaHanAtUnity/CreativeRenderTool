@@ -72,7 +72,7 @@ describe('SessionManager', () => {
         });
     });
 
-    it('sends impression events from VAST', () => {
+    it('sends impression and creativeView events from VAST', () => {
         // given a VAST placement
         // when the session manager is told that the video has completed
         // then the VAST impression and creativeView callback URLs should be requested by the event manager
@@ -91,7 +91,7 @@ describe('SessionManager', () => {
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
         let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
 
-        return sessionManager.sendShow(adUnit).then(() => {
+        return sessionManager.sendImpressionEvent(adUnit).then(() => {
             mockMetadataCreator.verify();
             mockEventManager.verify();
         });
