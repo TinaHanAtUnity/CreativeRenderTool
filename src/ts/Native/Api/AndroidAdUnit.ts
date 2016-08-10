@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable5 } from 'Utilities/Observable';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { KeyCode } from 'Constants/Android/KeyCode';
@@ -18,21 +18,21 @@ enum AdUnitEvent {
 
 export class AndroidAdUnitApi extends NativeApi {
 
-    public onStart: Observable0 = new Observable0();
-    public onCreate: Observable0 = new Observable0();
-    public onResume: Observable0 = new Observable0();
-    public onDestroy: Observable1<boolean> = new Observable1();
-    public onPause: Observable1<boolean> = new Observable1();
-    public onKeyDown: Observable4<number, number, number, number> = new Observable4();
-    public onRestore: Observable0 = new Observable0();
-    public onStop: Observable0 = new Observable0();
+    public onStart: Observable1<number> = new Observable1();
+    public onCreate: Observable1<number> = new Observable1();
+    public onResume: Observable1<number> = new Observable1();
+    public onDestroy: Observable2<boolean, number> = new Observable2();
+    public onPause: Observable2<boolean, number> = new Observable2();
+    public onKeyDown: Observable5<number, number, number, number, number> = new Observable5();
+    public onRestore: Observable1<number> = new Observable1();
+    public onStop: Observable1<number> = new Observable1();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [views, orientation, keyEvents, systemUiVisibility, hardwareAccel]);
+    public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = null, systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel]);
     }
 
     public close(): Promise<void> {
@@ -70,35 +70,35 @@ export class AndroidAdUnitApi extends NativeApi {
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
-                this.onStart.trigger();
+                this.onStart.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_CREATE]:
-                this.onCreate.trigger();
+                this.onCreate.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESUME]:
-                this.onResume.trigger();
+                this.onResume.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
-                this.onDestroy.trigger(parameters[0]);
+                this.onDestroy.trigger(parameters[0], parameters[1]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
-                this.onPause.trigger(parameters[0]);
+                this.onPause.trigger(parameters[0], parameters[1]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.KEY_DOWN]:
-                this.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                this.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESTORE]:
-                this.onRestore.trigger();
+                this.onRestore.trigger(parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
-                this.onStop.trigger();
+                this.onStop.trigger(parameters[0]);
                 break;
 
             default:

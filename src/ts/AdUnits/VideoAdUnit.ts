@@ -25,6 +25,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
+    private static _activityIdCounter: number = 1;
 
     private _overlay: Overlay;
     private _endScreen: EndScreen;
@@ -32,7 +33,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _videoPosition: number;
     private _videoQuartile: number;
     private _videoActive: boolean;
-    private _onPauseReceived: boolean;
+    private _activityId: number;
     private _watches: number;
     private _onResumeObserver: any;
     private _onPauseObserver: any;
@@ -51,9 +52,11 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
 
         } else {
-            this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe(() => this.onResume());
-            this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing) => this.onPause(finishing));
-            this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing) => this.onDestroy(finishing));
+            this._activityId = VideoAdUnit._activityIdCounter++;
+
+            this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
+            this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
+            this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
         }
 
         this._videoPosition = 0;
@@ -84,8 +87,6 @@ export class VideoAdUnit extends AbstractAdUnit {
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
-            this._onPauseReceived = false;
-
             let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
             if (!this._placement.useDeviceOrientationForVideo()) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
@@ -105,7 +106,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
             this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-            return this._nativeBridge.AndroidAdUnit.open(['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+            return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         }
     }
 
@@ -225,25 +226,21 @@ export class VideoAdUnit extends AbstractAdUnit {
      ANDROID ACTIVITY LIFECYCLE EVENTS
      */
 
-    private onResume(): void {
-        this._onPauseReceived = false;
-
-        if(this._showing && this.isVideoActive()) {
+    private onResume(activityId: number): void {
+        if(this._showing && this.isVideoActive() && activityId === this._activityId) {
             this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
-    private onPause(finishing: boolean): void {
-        this._onPauseReceived = true;
-
-        if(finishing && this._showing) {
+    private onPause(finishing: boolean, activityId: number): void {
+        if(finishing && this._showing && activityId === this._activityId) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
-    private onDestroy(finishing: boolean): void {
-        if(this._showing && finishing && this._onPauseReceived) {
+    private onDestroy(finishing: boolean, activityId: number): void {
+        if(this._showing && finishing && activityId === this._activityId) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -254,7 +251,9 @@ export class VideoAdUnit extends AbstractAdUnit {
      */
 
     private onViewDidAppear(): void {
-        this.onResume();
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+        }
     }
 
     private onNotification(event: string, parameters: any): void {
