@@ -288,6 +288,7 @@ export class WebView {
         }
     }
 
+    // todo: remove this when CacheManager is refactored to support redirects
     private getLocationFromHeaders(response: any): any {
         let locationUrl: any = null;
         if (response && response.headers ) {
@@ -318,7 +319,8 @@ export class WebView {
 
         let cacheAssets = () => {
             let videoUrl = campaign.getVideoUrl();
-            // follow video url 302 redirects until we get the real video location
+            // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
+            // todo: remove this when CacheManager is refactored to support redirects
             return this._request.head(videoUrl, [], {
                 retries: 5,
                 retryDelay: 1000,
@@ -334,6 +336,8 @@ export class WebView {
                         this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                     }
                 });
+            }).catch(error => {
+                this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
             });
         };
 
