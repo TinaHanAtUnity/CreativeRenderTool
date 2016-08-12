@@ -75,7 +75,7 @@ export class WebView {
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 let model = this._deviceInfo.getModel();
-                if(model.match(/iphone/i)) {
+                if(model.match(/iphone/i) || model.match(/ipod/i)) {
                     document.body.classList.add('iphone');
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
