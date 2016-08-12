@@ -8,7 +8,8 @@ const enum RequestStatus {
 
 const enum RequestMethod {
     GET,
-    POST
+    POST,
+    HEAD
 }
 
 interface IRequestOptions {
@@ -114,6 +115,23 @@ export class Request {
         return promise;
     }
 
+    public head(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = Request.getDefaultRequestOptions();
+        }
+
+        let id = Request._callbackId++;
+        let promise = this.registerCallback(id);
+        this.invokeRequest(id, {
+            method: RequestMethod.HEAD,
+            url: url,
+            headers: headers,
+            retryCount: 0,
+            options: options
+        });
+        return promise;
+    }
+
     private registerCallback(id: number): Promise<INativeResponse> {
         return new Promise<INativeResponse>((resolve, reject) => {
             let callbackObject: { [key: number]: Function } = {};
@@ -131,6 +149,9 @@ export class Request {
 
             case RequestMethod.POST:
                 return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+
+            case RequestMethod.HEAD:
+                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             default:
                 throw new Error('Unsupported request method "' + nativeRequest.method + '"');
@@ -171,7 +192,7 @@ export class Request {
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = nativeRequest.url = Request.getHeader(headers, 'location');
-                if(location.match(/^https?/i)) {
+                if(location && location.match(/^https?/i)) {
                     this.invokeRequest(id, nativeRequest);
                 } else {
                     this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
