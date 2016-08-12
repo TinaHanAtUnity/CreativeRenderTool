@@ -288,6 +288,15 @@ export class WebView {
         }
     }
 
+    // todo: remove this when CacheManager is refactored to support redirects
+    private getLocationFromHeaders(response: any): any {
+        let locationUrl: any = null;
+        if (response && response.headers ) {
+            locationUrl = response.headers.Location;
+        }
+        return locationUrl;
+    }
+
     private onVastCampaign(campaign: Campaign): void {
         this._campaign = campaign;
 
@@ -309,13 +318,26 @@ export class WebView {
         };
 
         let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
-                campaign.setVideoUrl(fileUrl);
-                campaign.setVideoCached(true);
+            let videoUrl = campaign.getVideoUrl();
+            // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
+            // todo: remove this when CacheManager is refactored to support redirects
+            return this._request.head(videoUrl, [], {
+                retries: 5,
+                retryDelay: 1000,
+                followRedirects: true,
+                retryWithConnectionEvents: false
+            }).then(response => {
+                let locationUrl = this.getLocationFromHeaders(response) || videoUrl;
+                cacheAsset(locationUrl).then(fileUrl => {
+                    campaign.setVideoUrl(fileUrl);
+                    campaign.setVideoCached(true);
+                }).catch(error => {
+                    if(error === CacheStatus.STOPPED) {
+                        this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                    }
+                });
             }).catch(error => {
-                if(error === CacheStatus.STOPPED) {
-                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
-                }
+                this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
             });
         };
 

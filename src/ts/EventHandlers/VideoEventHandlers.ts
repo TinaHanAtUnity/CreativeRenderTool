@@ -139,7 +139,12 @@ export class VideoEventHandlers {
         }
 
         adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
+
+        let endScreen = adUnit.getEndScreen();
+        if(endScreen) {
+            adUnit.getEndScreen().show();
+        }
+
         adUnit.onNewAdRequestAllowed.trigger();
     }
 
