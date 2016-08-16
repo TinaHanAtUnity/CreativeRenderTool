@@ -6,6 +6,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class ConfigManager {
 
@@ -22,7 +23,7 @@ export class ConfigManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 try {
-                    let configJson = JSON.parse(response.response);
+                    let configJson = JsonParser.parse(response.response);
                     let config: Configuration = new Configuration(configJson);
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
                     return config;

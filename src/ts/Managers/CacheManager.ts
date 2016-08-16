@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export enum CacheStatus {
     OK,
@@ -185,7 +186,7 @@ export class CacheManager {
             return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
                 if(fileInfo.found && fileInfo.size > 0) {
                     return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
-                        let storedCacheResponse: ICacheResponse = JSON.parse(rawStoredCacheResponse);
+                        let storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
                         return !storedCacheResponse.fullyDownloaded;
                     });
                 } else {

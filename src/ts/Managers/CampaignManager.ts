@@ -9,6 +9,7 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class CampaignManager {
 
@@ -46,7 +47,7 @@ export class CampaignManager {
                 followRedirects: false,
                 retryWithConnectionEvents: true
             }).then(response => {
-                let campaignJson: any = JSON.parse(response.response);
+                let campaignJson: any = JsonParser.parse(response.response);
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
