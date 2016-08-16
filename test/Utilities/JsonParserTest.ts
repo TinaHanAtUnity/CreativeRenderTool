@@ -12,7 +12,6 @@ describe('JsonParserTest', () => {
         } catch(e) {
             assert.equal(e.failingContent, 'bad content');
             assert.equal(e.name, 'JsonSyntaxError');
-            assert.equal(e.message, 'Unexpected token b in JSON at position 0');
         }
     });
 });
