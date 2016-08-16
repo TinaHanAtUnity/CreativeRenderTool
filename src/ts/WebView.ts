@@ -4,6 +4,7 @@ import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { CacheManager, CacheStatus } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -114,7 +115,7 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => this.onVastCampaign(campaign));
             this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._refillTimestamp = 0;
@@ -298,8 +299,9 @@ export class WebView {
         return locationUrl;
     }
 
-    private onVastCampaign(campaign: Campaign): void {
+    private onVastCampaign(campaign: VastCampaign): void {
         this._campaign = campaign;
+        this._refillTimestamp = Date.now() + campaign.getCacheTTL() * 1000;
 
         let cacheMode = this._configuration.getCacheMode();
 
