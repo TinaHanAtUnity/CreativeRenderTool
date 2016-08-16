@@ -21,6 +21,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
 import { StorageType, StorageError } from 'Native/Api/Storage';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class WebView {
 
@@ -489,7 +490,7 @@ export class WebView {
         }
         return this.getConfigJson().then(response => {
             this._configJsonCheckedAt = Date.now();
-            let configJson = JSON.parse(response.response);
+            let configJson = JsonParser.parse(response.response);
             return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;
