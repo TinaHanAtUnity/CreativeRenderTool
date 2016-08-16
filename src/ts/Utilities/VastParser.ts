@@ -70,6 +70,10 @@ export class VastParser {
             }
         }
 
+        if (ads.length === 0) {
+            throw new Error('VAST Ad tag is missing');
+        }
+
         return new Vast(ads, errorURLTemplates, vast.tracking);
     }
 
@@ -86,7 +90,7 @@ export class VastParser {
 
         nativeBridge.Sdk.logInfo('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
 
-        return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: false, retryWithConnectionEvents: false}).then(response => {
+        return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast({data: response.response, tracking: {}}, nativeBridge, request, parsedVast, depth + 1);
         });
     }
