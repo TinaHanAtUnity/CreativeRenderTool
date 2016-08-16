@@ -14,4 +14,11 @@ describe('JsonParserTest', () => {
             assert.equal(e.name, 'JsonSyntaxError');
         }
     });
+
+    it('should work just like JSON.parse on happy case', () => {
+        assert.deepEqual(JsonParser.parse('{}'), {});
+        assert.equal(JsonParser.parse('true'), true);
+        assert.deepEqual(JsonParser.parse('[1, 5, "false"]'), [1, 5, 'false']);
+        assert.equal(JsonParser.parse('null'), null);
+    });
 });
