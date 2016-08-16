@@ -163,6 +163,14 @@ export class WebView {
             return;
         }
 
+        if(this._campaign instanceof VastCampaign) {
+            if(this.checkRefill()) {
+                this._nativeBridge.Sdk.logInfo('VAST Campaign has expired');
+                this.onNoFill(300);
+                return;
+            }
+        }
+
         if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
                 id: parseInt(this._campaign.getAppStoreId(), 10)
@@ -449,11 +457,13 @@ export class WebView {
         this.checkRefill();
     }
 
-    private checkRefill(): void {
+    private checkRefill(): boolean {
         if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
             this._refillTimestamp = 0;
             this._campaignManager.request();
+            return true;
         }
+        return false;
     }
 
     /*

@@ -65,7 +65,7 @@ export class CampaignManager {
                             } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                                 campaignId = '005472656d6f7220416e6472';
                             }
-                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
                                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                                 return;
