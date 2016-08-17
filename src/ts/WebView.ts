@@ -52,6 +52,7 @@ export class WebView {
     private _configJsonCheckedAt: number;
     private _mustRefill: boolean;
     private _refillTimestamp: number;
+    private _vastCacheTimeout: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -163,12 +164,9 @@ export class WebView {
             return;
         }
 
-        if(this._campaign instanceof VastCampaign) {
-            if(this.checkRefill()) {
-                this._nativeBridge.Sdk.logInfo('VAST Campaign has expired');
-                this.onNoFill(300);
-                return;
-            }
+        if(this._campaign instanceof VastCampaign && this.isVastCacheExpired()) {
+            this.onVastCacheInvalid();
+            return;
         }
 
         if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
@@ -309,7 +307,7 @@ export class WebView {
 
     private onVastCampaign(campaign: VastCampaign): void {
         this._campaign = campaign;
-        this._refillTimestamp = Date.now() + campaign.getCacheTTLInSeconds() * 1000;
+        this.setVastCacheTimeout(campaign.getCacheTTLInSeconds());
 
         let cacheMode = this._configuration.getCacheMode();
 
@@ -389,6 +387,17 @@ export class WebView {
         this.setPlacementStates(PlacementState.NO_FILL);
     }
 
+    private setVastCacheTimeout(cacheTTL: number) {
+        this._nativeBridge.Sdk.logInfo(`VAST campaign will expire in ${cacheTTL} seconds`);
+        this._vastCacheTimeout = Date.now() + cacheTTL * 1000;
+    }
+
+    private onVastCacheInvalid() {
+        this._nativeBridge.Sdk.logInfo('Cached VAST campaign has expired');
+        this.setPlacementStates(PlacementState.NO_FILL);
+        this._campaignManager.request();
+    }
+
     private onCampaignError(error: any) {
         if(error instanceof Error) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
@@ -443,6 +452,7 @@ export class WebView {
                     }
                 } else {
                     this.checkRefill();
+                    this.checkVastCacheExpiry();
                     this._eventManager.sendUnsentSessions();
                 }
             });
@@ -451,19 +461,29 @@ export class WebView {
 
     private onScreenOn(): void {
         this.checkRefill();
+        this.checkVastCacheExpiry();
     }
 
     private onAppForeground(): void {
         this.checkRefill();
+        this.checkVastCacheExpiry();
     }
 
-    private checkRefill(): boolean {
+    private checkRefill(): void {
         if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
             this._refillTimestamp = 0;
             this._campaignManager.request();
-            return true;
         }
-        return false;
+    }
+
+    private isVastCacheExpired(): boolean {
+        return Date.now() > this._vastCacheTimeout;
+    }
+
+    private checkVastCacheExpiry(): void {
+        if(this.isVastCacheExpired()) {
+            this.onVastCacheInvalid();
+        }
     }
 
     /*
