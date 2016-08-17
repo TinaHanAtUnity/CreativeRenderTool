@@ -309,7 +309,7 @@ export class WebView {
 
     private onVastCampaign(campaign: VastCampaign): void {
         this._campaign = campaign;
-        this._refillTimestamp = Date.now() + campaign.getCacheTTL() * 1000;
+        this._refillTimestamp = Date.now() + campaign.getCacheTTLInSeconds() * 1000;
 
         let cacheMode = this._configuration.getCacheMode();
 
