@@ -58,6 +58,7 @@ export class DeviceInfo extends Model {
         promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then((limitAdTracking) => {
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 // iOS native implementation was accidentally implemented to give reverse values
+                // todo: fix this in native, then remove this hack from master
                 this._limitAdTracking = !limitAdTracking;
             } else {
                 this._limitAdTracking = limitAdTracking;
