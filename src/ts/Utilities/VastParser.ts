@@ -3,6 +3,7 @@ import { VastAd } from 'Models/Vast/VastAd';
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { VastSyntaxError } from 'Models/Vast/VastSyntaxError';
 import { Request } from 'Utilities/Request';
 import * as xmldom from 'xmldom';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -13,6 +14,7 @@ export class VastParser {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
+    private _rootWrapperVast: any;
 
     private static createDOMParser() {
         return new xmldom.DOMParser();
@@ -78,7 +80,23 @@ export class VastParser {
     }
 
     public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
-        let parsedVast = this.parseVast(vast);
+        let parsedVast: Vast;
+
+        if (depth === 0) {
+            this._rootWrapperVast = vast;
+        }
+
+        try {
+            parsedVast = this.parseVast(vast);
+        } catch (e) {
+            let error = new VastSyntaxError(e.message, vast, depth, e.stack);
+            if (depth > 0) {
+                error.rootWrapperVast = this._rootWrapperVast;
+            }
+
+            throw error;
+        }
+
         this.applyParentURLs(parsedVast, parent);
 
         let wrapperURL = parsedVast.getWrapperURL();

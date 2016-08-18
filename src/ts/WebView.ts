@@ -22,6 +22,7 @@ import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
 import { StorageType, StorageError } from 'Native/Api/Storage';
 import { JsonParser } from 'Utilities/JsonParser';
+import { VastSyntaxError } from 'Models/Vast/VastSyntaxError';
 
 export class WebView {
 
@@ -380,6 +381,10 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
+        if(error instanceof VastSyntaxError) {
+            error = error.toKafkaFormat();
+        }
+
         if(error instanceof Error) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
