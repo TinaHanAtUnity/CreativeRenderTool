@@ -51,10 +51,21 @@ export class Request {
     private _wakeUpManager: WakeUpManager;
 
     public static getHeader(headers: [string, string][], headerName: string): string {
-        for(let i = 0; i < headers.length; ++i) {
-            let header = headers[i];
-            if(header[0].match(new RegExp(headerName, 'i'))) {
-                return header[1];
+        if (headers instanceof Array) {
+            for (let i = 0; i < headers.length; ++i) {
+                let header = headers[i];
+                if (header[0].match(new RegExp(headerName, 'i'))) {
+                    return header[1];
+                }
+            }
+        } else {
+            // todo: this is a hack due to the fact that headers in iOS are returned as a hashmap
+            for (let key in headers) {
+                if (headers.hasOwnProperty(key)) {
+                    if (key.match(new RegExp(headerName, 'i'))) {
+                        return headers[key].toString();
+                    }
+                }
             }
         }
         return null;
