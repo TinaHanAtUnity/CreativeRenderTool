@@ -52,8 +52,8 @@ export class Request {
 
     public static getHeader(headers: [string, string][], headerName: string): string {
         // todo: Fix this hack with a proper solution.
-        // Due to a native side API mismatch Android and iOS send headers in a different way.
-        // Android sends headers as a JSON array, iOS as a JSON object
+        // due to a native side API mismatch Android and iOS send headers in a different way
+        // android sends headers as a JSON array, iOS as a JSON object
         if (headers instanceof Array) {
             for (let i = 0; i < headers.length; ++i) {
                 let header = headers[i];
