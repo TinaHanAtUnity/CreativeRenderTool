@@ -289,15 +289,6 @@ export class WebView {
         }
     }
 
-    // todo: remove this when CacheManager is refactored to support redirects
-    private getLocationFromHeaders(response: any): any {
-        let locationUrl: any = null;
-        if (response && response.headers ) {
-            locationUrl = response.headers.Location;
-        }
-        return locationUrl;
-    }
-
     private onVastCampaign(campaign: Campaign): void {
         this._campaign = campaign;
 
@@ -328,7 +319,7 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                let locationUrl = this.getLocationFromHeaders(response) || videoUrl;
+                let locationUrl = response.url || videoUrl;
                 cacheAsset(locationUrl).then(fileUrl => {
                     campaign.setVideoUrl(fileUrl);
                     campaign.setVideoCached(true);
