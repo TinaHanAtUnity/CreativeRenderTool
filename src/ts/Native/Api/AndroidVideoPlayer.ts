@@ -6,6 +6,11 @@ enum AndroidVideoPlayerEvent {
     INFO
 }
 
+export enum AndroidVideoPlayerError {
+    VIDEOVIEW_NULL,
+    API_LEVEL_ERROR
+}
+
 export class AndroidVideoPlayerApi extends NativeApi {
 
     public onInfo: Observable3<number, number, string> = new Observable3();

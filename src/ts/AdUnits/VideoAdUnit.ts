@@ -11,6 +11,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
+import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -118,7 +120,13 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     public hide(): Promise<void> {
         if(this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.stop();
+            this._nativeBridge.VideoPlayer.stop().catch(error => {
+                if(error === AndroidVideoPlayerError[AndroidVideoPlayerError.VIDEOVIEW_NULL]) {
+                    // sometimes system has already destroyed video view so just ignore this error
+                } else {
+                    throw new Error(error);
+                }
+            });
         }
         this.hideChildren();
         this.unsetReferences();
@@ -144,6 +152,14 @@ export class VideoAdUnit extends AbstractAdUnit {
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
                 this._showing = false;
                 this.onClose.trigger();
+            }).catch(error => {
+                // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
+                if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
+                    this._showing = false;
+                    this.onClose.trigger();
+                } else {
+                    throw new Error(error);
+                }
             });
         }
     }
