@@ -16,6 +16,7 @@ import { Overlay } from 'Views/Overlay';
 import { IObserver1, IObserver3 } from 'Utilities/IObserver';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
+import { TestMetaData } from 'Utilities/TestMetaData';
 
 export class AdUnitFactory {
 
@@ -32,10 +33,11 @@ export class AdUnitFactory {
         let overlay = new Overlay(placement.muteVideo());
         let endScreen = new EndScreen(campaign, configuration.isCoppaCompliant());
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
+        let testMetaData = new TestMetaData(nativeBridge);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, videoAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit);
+        this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit, testMetaData);
 
         return videoAdUnit;
     }
@@ -43,9 +45,10 @@ export class AdUnitFactory {
     private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration): VideoAdUnit {
         let overlay = new Overlay(placement.muteVideo());
         let vastAdUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let testMetaData = new TestMetaData(nativeBridge);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit, placement, campaign);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit);
+        this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, testMetaData);
 
         return vastAdUnit;
     }
@@ -85,18 +88,18 @@ export class AdUnitFactory {
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
-        let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration));
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, testMetaData: TestMetaData) {
+        let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration, testMetaData));
         let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, videoAdUnit, position));
         let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
 
         let onCompletedObserver: IObserver1<string>;
         let onErrorObserver: IObserver3<number, number, string>;
         if (videoAdUnit instanceof VastAdUnit) {
-            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
+            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit, testMetaData));
             onErrorObserver = nativeBridge.VideoPlayer.onError.subscribe((what, extra, url) => VastVideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, what, extra));
         } else {
-            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit));
+            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit, testMetaData));
             onErrorObserver = nativeBridge.VideoPlayer.onError.subscribe((what, extra, url) => VideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, what, extra));
         }
 

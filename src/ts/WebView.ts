@@ -20,8 +20,8 @@ import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
-import { StorageType, StorageError } from 'Native/Api/Storage';
 import { JsonParser } from 'Utilities/JsonParser';
+import { TestMetaData } from 'Utilities/TestMetaData';
 
 export class WebView {
 
@@ -493,41 +493,19 @@ export class WebView {
      */
 
     private setupTestEnvironment(): void {
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.serverUrl.value').then((url) => {
+        let testMetaData: TestMetaData = new TestMetaData(this._nativeBridge);
+
+        testMetaData.get<string>('test.serverUrl', true).then((url) => {
             if(url) {
                 ConfigManager.setTestBaseUrl(url);
                 CampaignManager.setTestBaseUrl(url);
                 SessionManager.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.serverUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
 
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
+        testMetaData.get<string>('test.kafkaUrl', true).then((url) => {
             if(url) {
                 Diagnostics.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.kafkaUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
     }
