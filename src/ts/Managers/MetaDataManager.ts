@@ -74,7 +74,7 @@ export class MetaDataManager {
     }
 
     public static createAndCache(category: string, data: string[], cache = true) {
-        if (data === undefined) {
+        if (!data.length) {
             return undefined;
         }
         if(cache && !MetaDataManager.caches[category]) {
