@@ -37,23 +37,23 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    public AppSheet: AppSheetApi = null;
-    public AndroidAdUnit: AndroidAdUnitApi = null;
-    public Broadcast: BroadcastApi = null;
-    public Cache: CacheApi = null;
-    public Connectivity: ConnectivityApi = null;
-    public DeviceInfo: DeviceInfoApi = null;
-    public Intent: IntentApi = null;
-    public IosAdUnit: IosAdUnitApi = null;
-    public Listener: ListenerApi = null;
-    public Notification: NotificationApi = null;
-    public Placement: PlacementApi = null;
-    public Request: RequestApi = null;
-    public Resolve: ResolveApi = null;
-    public Sdk: SdkApi = null;
-    public Storage: StorageApi = null;
-    public VideoPlayer: VideoPlayerApi = null;
-    public UrlScheme: UrlSchemeApi = null;
+    public AppSheet: AppSheetApi;
+    public AndroidAdUnit: AndroidAdUnitApi;
+    public Broadcast: BroadcastApi;
+    public Cache: CacheApi;
+    public Connectivity: ConnectivityApi;
+    public DeviceInfo: DeviceInfoApi;
+    public Intent: IntentApi;
+    public IosAdUnit: IosAdUnitApi;
+    public Listener: ListenerApi;
+    public Notification: NotificationApi;
+    public Placement: PlacementApi;
+    public Request: RequestApi;
+    public Resolve: ResolveApi;
+    public Sdk: SdkApi;
+    public Storage: StorageApi;
+    public VideoPlayer: VideoPlayerApi;
+    public UrlScheme: UrlSchemeApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer} = {};
@@ -122,7 +122,7 @@ export class NativeBridge implements INativeBridge {
             if(!this._autoBatchTimer) {
                 this._autoBatchTimer = setTimeout(() => {
                     this.invokeBatch(this._autoBatch);
-                    this._autoBatch = null;
+                    delete this._autoBatch;
                     this._autoBatchTimer = null;
                 }, this._autoBatchInterval);
             }

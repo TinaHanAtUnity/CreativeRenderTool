@@ -13,7 +13,7 @@ export class Configuration {
     private _coppaCompliant: boolean;
     private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
-    private _defaultPlacement: Placement = null;
+    private _defaultPlacement: Placement;
 
     constructor(configJson: any) {
         this._enabled = configJson.enabled;

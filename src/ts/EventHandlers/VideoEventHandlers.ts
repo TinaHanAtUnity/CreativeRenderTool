@@ -142,7 +142,7 @@ export class VideoEventHandlers {
 
         let endScreen = adUnit.getEndScreen();
         if(endScreen) {
-            adUnit.getEndScreen().show();
+            endScreen.show();
         }
 
         adUnit.onNewAdRequestAllowed.trigger();
@@ -150,7 +150,10 @@ export class VideoEventHandlers {
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
         adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
+        let endScreen = adUnit.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        }
         adUnit.onNewAdRequestAllowed.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {

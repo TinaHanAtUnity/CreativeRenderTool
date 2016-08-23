@@ -95,20 +95,24 @@ export class VastParser {
         });
     }
 
-    private applyParentURLs(parsedVast: Vast, parent: Vast) {
+    private applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
-            for (let errorUrl of parent.getAd().getErrorURLTemplates()) {
-                parsedVast.getAd().addErrorURLTemplate(errorUrl);
-            }
-            for (let impressionUrl of parent.getAd().getImpressionURLTemplates()) {
-                parsedVast.getAd().addImpressionURLTemplate(impressionUrl);
-            }
-            for (let clickTrackingUrl of parent.getAd().getVideoClickTrackingURLTemplates()) {
-                parsedVast.getAd().addVideoClickTrackingURLTemplate(clickTrackingUrl);
-            }
-            for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
-                for (let url of parent.getTrackingEventUrls(eventName)) {
-                    parsedVast.addTrackingEventUrl(eventName, url);
+            let ad = parent.getAd();
+            let parsedAd = parsedVast.getAd();
+            if(ad && parsedAd) {
+                for (let errorUrl of ad.getErrorURLTemplates()) {
+                    parsedAd.addErrorURLTemplate(errorUrl);
+                }
+                for (let impressionUrl of ad.getImpressionURLTemplates()) {
+                    parsedAd.addImpressionURLTemplate(impressionUrl);
+                }
+                for (let clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
+                    parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
+                }
+                for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                    for (let url of parent.getTrackingEventUrls(eventName)) {
+                        parsedVast.addTrackingEventUrl(eventName, url);
+                    }
                 }
             }
         }
@@ -118,8 +122,8 @@ export class VastParser {
         return node && (node.textContent || node.text);
     }
 
-    private parseAdElement(adElement: any): VastAd {
-        let ad: VastAd;
+    private parseAdElement(adElement: any): VastAd | undefined {
+        let ad: VastAd | undefined;
         let childNodes = adElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
             let adTypeElement = childNodes[i];

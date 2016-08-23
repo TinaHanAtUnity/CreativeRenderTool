@@ -28,7 +28,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private static _activityIdCounter: number = 1;
 
     private _overlay: Overlay;
-    private _endScreen: EndScreen;
+    private _endScreen: EndScreen | null;
     private _videoDuration: number;
     private _videoPosition: number;
     private _videoQuartile: number;
@@ -45,7 +45,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _androidOptions: IAndroidOptions;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen | null) {
         super(nativeBridge, placement, campaign);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -150,7 +150,10 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     protected hideChildren() {
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+        let endScreen = this.getEndScreen();
+        if(endScreen) {
+            endScreen.container().parentElement.removeChild(endScreen.container());
+        }
     };
 
     public setNativeOptions(options: any): void {
@@ -209,7 +212,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         return this._overlay;
     }
 
-    public getEndScreen(): EndScreen {
+    public getEndScreen(): EndScreen | null {
         return this._endScreen;
     }
 
@@ -218,8 +221,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public unsetReferences() {
-        this._endScreen = null;
-        this._overlay = null;
+        delete this._endScreen;
+        delete this._overlay;
     }
 
     /*

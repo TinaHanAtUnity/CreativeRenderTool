@@ -58,10 +58,6 @@ export class CacheManager {
     }
 
     public cache(url: string, options?: ICacheOptions): Promise<[CacheStatus, string]> {
-        if(typeof options === 'undefined') {
-            options = CacheManager.getDefaultCacheOptions();
-        }
-
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 return Promise.reject(CacheError.FILE_ALREADY_CACHING);
@@ -74,6 +70,9 @@ export class CacheManager {
                     return Promise.resolve([CacheStatus.OK, fileId]);
                 }
 
+                if(typeof options === 'undefined') {
+                    options = CacheManager.getDefaultCacheOptions();
+                }
                 let promise = this.registerCallback(url, fileId, options);
                 this.downloadFile(url, fileId);
                 return promise;

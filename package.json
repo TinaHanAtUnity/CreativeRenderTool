@@ -15,6 +15,8 @@
     "requirejs": "2.2.0",
     "requirejs-text": "2.0.12",
     "stylus": "0.54.5",
+    "tslint": "3.15.1",
+    "typescript": "2.0.0",
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {

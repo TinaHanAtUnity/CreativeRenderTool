@@ -43,9 +43,9 @@ export class Tap {
         this._element.removeEventListener('touchmove', this._onTouchMoveListener, false);
         this._element.removeEventListener('touchend', this._onTouchEndListener, false);
         this._element.removeEventListener('touchcancel', this._onTouchCancelListener, false);
-        this._onTouchMoveListener = undefined;
-        this._onTouchEndListener = undefined;
-        this._onTouchCancelListener = undefined;
+        delete this._onTouchMoveListener;
+        delete this._onTouchEndListener;
+        delete this._onTouchCancelListener;
 
         if(!this._moved) {
             let fakeEvent = new MouseEvent('click', {

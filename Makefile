@@ -1,14 +1,15 @@
 # Binaries
-TYPESCRIPT = tsc
-TSLINT = tslint
-REQUIREJS = node_modules/.bin/r.js
-STYLUS = node_modules/.bin/stylus
-BABEL = node_modules/.bin/babel
+BIN = node_modules/.bin
+TYPESCRIPT = $(BIN)/tsc
+TSLINT = $(BIN)/tslint
+REQUIREJS = $(BIN)/r.js
+STYLUS = $(BIN)/stylus
+BABEL = $(BIN)/babel
 
-MOCHA = node_modules/.bin/_mocha
-ISTANBUL = node_modules/.bin/istanbul
-REMAP_ISTANBUL = node_modules/.bin/remap-istanbul
-COVERALLS = node_modules/coveralls/bin/coveralls.js
+MOCHA = $(BIN)/_mocha
+ISTANBUL = $(BIN)/istanbul
+REMAP_ISTANBUL = $(BIN)/remap-istanbul
+COVERALLS = $(BIN)/coveralls.js
 
 # Sources
 TS_SRC = src/ts
@@ -203,7 +204,7 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-	$(TYPESCRIPT) --rootDir src/ts --outDir $(BUILD_DIR)/js
+	$(TYPESCRIPT) --project . --outDir $(BUILD_DIR)/js
 
 build-js:
 	@echo
@@ -281,4 +282,4 @@ watch:
 	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
 
 setup: clean
-	sudo npm install -g typescript@1.8.10 tslint typings && rm -rf node_modules typings && npm install && typings install
+	rm -rf node_modules && npm install

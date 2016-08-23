@@ -7,10 +7,10 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 interface IMetaDataCaches {
-    framework: Model;
-    adapter: Model;
-    mediation: Model;
-    player: Model;
+    framework: Model | undefined;
+    adapter: Model | undefined;
+    mediation: Model | undefined;
+    player: Model | undefined;
 }
 
 export class MetaDataManager {
@@ -25,7 +25,7 @@ export class MetaDataManager {
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
         return MetaDataManager.categoryExists(category, nativeBridge).then(exists => {
             if(!exists) {
-                return Promise.resolve(undefined);
+                return Promise.resolve([]);
             }
             return Promise.all(keys.map((key) => nativeBridge.Storage.get<string>(StorageType.PUBLIC, category + '.' + key).catch(() => undefined)));
         });
@@ -86,7 +86,7 @@ export class MetaDataManager {
         return MetaDataManager.createByCategory(category, data);
     }
 
-    public static createByCategory(category: string, data: string[]): Model {
+    public static createByCategory(category: string, data: string[]): Model | undefined {
         switch(category) {
             case 'framework':
                 return new FrameworkMetaData(data);
@@ -97,7 +97,7 @@ export class MetaDataManager {
             case 'player':
                 return new PlayerMetaData(data);
             default:
-                return null;
+                return undefined;
         }
     }
 

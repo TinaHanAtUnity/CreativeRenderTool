@@ -50,7 +50,7 @@ export class Request {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
 
-    public static getHeader(headers: [string, string][], headerName: string): string {
+    public static getHeader(headers: [string, string][], headerName: string): string | null {
         // todo: Fix this hack with a proper solution.
         // due to a native side API mismatch Android and iOS send headers in a different way
         // android sends headers as a JSON array, iOS as a JSON object
@@ -162,7 +162,7 @@ export class Request {
                 return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             case RequestMethod.HEAD:
                 return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
@@ -205,8 +205,9 @@ export class Request {
         let nativeRequest = Request._requests[id];
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
-                let location = nativeRequest.url = Request.getHeader(headers, 'location');
+                let location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
+                    nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
                     this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
