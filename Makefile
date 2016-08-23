@@ -9,7 +9,7 @@ BABEL = $(BIN)/babel
 MOCHA = $(BIN)/_mocha
 ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
-COVERALLS = $(BIN)/coveralls.js
+COVERALLS = $(BIN)/coveralls
 
 # Sources
 TS_SRC = src/ts
