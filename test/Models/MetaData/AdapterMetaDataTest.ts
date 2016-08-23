@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';

@@ -1,5 +1,5 @@
 import 'mocha';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 import { assert } from 'chai';
 
 import { RequestApi } from 'Native/Api/Request';

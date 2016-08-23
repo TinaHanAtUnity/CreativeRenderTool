@@ -1,5 +1,5 @@
 import 'mocha';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';

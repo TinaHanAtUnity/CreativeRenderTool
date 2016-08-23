@@ -1,5 +1,5 @@
 import 'mocha';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 
 import { Request } from 'Utilities/Request';
 import { Diagnostics } from 'Utilities/Diagnostics';

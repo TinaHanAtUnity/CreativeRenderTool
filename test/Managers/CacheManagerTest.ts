@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 
 import { CacheManager, CacheStatus } from 'Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';

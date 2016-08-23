@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 
 import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
