@@ -1,5 +1,5 @@
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
-import { DiagnosticError } from '../Errors/DiagnosticError';
 export class JsonParser {
 
     public static parse(text: string, reviver?: (key: any, value: any) => any): any {
