@@ -1,14 +1,14 @@
 import 'mocha';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { Platform } from '../../../src/ts/Constants/Platform';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Platform } from 'Constants/Platform';
 
 describe('ConnectivityApi', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -19,14 +19,14 @@ describe('ConnectivityApi', () => {
 
     it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
         nativeBridge.Connectivity.setListeningStatus(true);
-        sinon.assert.calledWith(handleInvocation, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
+        Sinon.assert.calledWith(handleInvocation, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
     });
 
     it('should trigger onConnected', () => {
-        let spy = sinon.spy();
+        let spy = Sinon.spy();
         nativeBridge.Connectivity.onConnected.subscribe(spy);
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        sinon.assert.calledWith(spy, true, 0);
+        Sinon.assert.calledWith(spy, true, 0);
     });
 
     it('should throw', () => {

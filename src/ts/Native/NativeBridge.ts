@@ -1,4 +1,3 @@
-/// <reference path="../../../typings/index.d.ts" />
 /// <reference path="WebViewBridge.d.ts" />
 
 import { INativeBridge } from 'Native/INativeBridge';

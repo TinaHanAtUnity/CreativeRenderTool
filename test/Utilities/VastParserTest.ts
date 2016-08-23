@@ -2,8 +2,8 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Request } from '../../src/ts/Utilities/Request';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { Request } from 'Utilities/Request';
+import { NativeBridge } from 'Native/NativeBridge';
 
 describe('VastParser', () => {
     let nativeBridge: NativeBridge;

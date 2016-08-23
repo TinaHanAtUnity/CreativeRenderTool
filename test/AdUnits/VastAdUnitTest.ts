@@ -1,30 +1,31 @@
 import 'mocha';
-import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { VastAdUnit } from '../../src/ts/AdUnits/VastAdUnit';
-import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
-import { Vast } from '../../src/ts/Models/Vast/Vast';
-import { Overlay } from '../../src/ts/Views/Overlay';
-import { EventManager } from '../../src/ts/Managers/EventManager';
+import * as Sinon from 'Sinon';
+
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { Vast } from 'Models/Vast/Vast';
+import { Overlay } from 'Views/Overlay';
+import { EventManager } from 'Managers/EventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Request } from '../../src/ts/Utilities/Request';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 describe('VastAdUnit', () => {
 
-    let sandbox;
-    let eventManager;
+    let sandbox: Sinon.SinonSandbox;
+    let eventManager: EventManager;
     let adUnit: VastAdUnit;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = Sinon.sandbox.create();
     });
 
     beforeEach(() => {
         let placement = TestFixtures.getPlacement();
         let vast = new Vast([], [], {});
         let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
-        let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+        let overlay = <Overlay><any>Sinon.createStubInstance(Overlay);
         let nativeBridge = TestFixtures.getNativeBridge();
         let wakeUpManager = new WakeUpManager(nativeBridge);
         let request = new Request(nativeBridge, wakeUpManager);
@@ -43,8 +44,8 @@ describe('VastAdUnit', () => {
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
             adUnit.sendTrackingEvent(eventManager, 'eventName', 'sessionId');
 
-            sinon.assert.calledOnce(eventManager.thirdPartyEvent);
-            sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast eventName', 'sessionId', 'http://foo.biz/' + placement.getId() + '/123');
+            Sinon.assert.calledOnce(<Sinon.SinonSpy>eventManager.thirdPartyEvent);
+            Sinon.assert.calledWith(<Sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast eventName', 'sessionId', 'http://foo.biz/' + placement.getId() + '/123');
         });
     });
 
@@ -57,19 +58,19 @@ describe('VastAdUnit', () => {
            sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
            adUnit.sendImpressionEvent(eventManager, 'sessionId');
 
-           sinon.assert.calledOnce(eventManager.thirdPartyEvent);
-           sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
+           Sinon.assert.calledOnce(<Sinon.SinonSpy>eventManager.thirdPartyEvent);
+           Sinon.assert.calledWith(<Sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
        });
     });
 
     describe('with click through url', () => {
-        let vast;
+        let vast: Vast;
 
         beforeEach(() => {
             vast = new Vast([], [], {});
             let placement = TestFixtures.getPlacement();
             let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
-            let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+            let overlay = <Overlay><any> Sinon.createStubInstance(Overlay);
             let nativeBridge = TestFixtures.getNativeBridge();
             adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
         });
@@ -103,14 +104,14 @@ describe('VastAdUnit', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
             adUnit.sendVideoClickTrackingEvent(eventManager, 'foo');
-            sinon.assert.calledTwice(eventManager.thirdPartyEvent);
+            Sinon.assert.calledTwice(<Sinon.SinonSpy>eventManager.thirdPartyEvent);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns([]);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
             adUnit.sendVideoClickTrackingEvent(eventManager, 'foo');
-            sinon.assert.notCalled(eventManager.thirdPartyEvent);
+            Sinon.assert.notCalled(<Sinon.SinonSpy>eventManager.thirdPartyEvent);
         });
     });
 });

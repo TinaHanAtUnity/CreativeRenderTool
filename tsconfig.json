@@ -3,20 +3,22 @@
     "module": "amd",
     "target": "es5",
     "inlineSourceMap": true,
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "rootDir": "src/ts",
+    "rootDirs": [
+      "src/ts",
+      "test"
+    ],
+    "baseUrl": "src/ts",
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true
   },
   "include": [
-    "src/ts/**/*.ts"
-  ],
-  "exclude": [
-    "test",
-    "node_modules"
+    "src/ts/**/*.ts",
+    "test/**/*.ts"
   ]
 }

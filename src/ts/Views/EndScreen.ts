@@ -39,17 +39,17 @@ export class EndScreen extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event) => this.onDownloadEvent(event),
+                listener: (event: Event) => this.onDownloadEvent(event),
                 selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
-                listener: (event) => this.onCloseEvent(event),
+                listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
             },
             {
                 event: 'click',
-                listener: (event) => this.onPrivacyEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
             }
         ];

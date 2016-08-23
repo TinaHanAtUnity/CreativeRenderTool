@@ -50,7 +50,7 @@ export class Request {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
 
-    public static getHeader(headers: [string, string][], headerName: string): string | null {
+    public static getHeader(headers: [string, string][] | { [key: string]: string }, headerName: string): string | null {
         // todo: Fix this hack with a proper solution.
         // due to a native side API mismatch Android and iOS send headers in a different way
         // android sends headers as a JSON array, iOS as a JSON object

@@ -1,5 +1,5 @@
 import { Template } from 'Utilities/Template';
-import { IViewBinding } from 'IViewBinding';
+import { IViewBinding } from 'Views/IViewBinding';
 import { Tap } from 'Utilities/Tap';
 
 export class View {

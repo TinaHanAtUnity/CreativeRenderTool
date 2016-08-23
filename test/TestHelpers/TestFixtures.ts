@@ -1,9 +1,9 @@
-import { Placement } from '../../src/ts/Models/Placement';
-import { ClientInfo } from '../../src/ts/Models/ClientInfo';
-import { INativeResponse } from '../../src/ts/Utilities/Request';
-import { Platform } from '../../src/ts/Constants/Platform';
-import { VastParser } from '../../src/ts/Utilities/VastParser';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
+import { Placement } from 'Models/Placement';
+import { ClientInfo } from 'Models/ClientInfo';
+import { INativeResponse } from 'Utilities/Request';
+import { Platform } from 'Constants/Platform';
+import { VastParser } from 'Utilities/VastParser';
+import { NativeBridge } from 'Native/NativeBridge';
 import * as xmldom from 'xmldom';
 
 export class TestFixtures {

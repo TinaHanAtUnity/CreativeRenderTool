@@ -1,11 +1,11 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
-import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { StorageType, StorageApi } from '../../src/ts/Native/Api/Storage';
+import * as Sinon from 'Sinon';
+
+import { ConfigManager } from 'Managers/ConfigManager';
+import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType, StorageApi } from 'Native/Api/Storage';
+import { INativeResponse } from 'Utilities/Request';
 
 class TestStorageApi extends StorageApi {
 
@@ -31,6 +31,7 @@ class TestStorageApi extends StorageApi {
             if(key === 'adapter') {
                 return Promise.resolve(['name', 'version']);
             }
+            return Promise.resolve([]);
         } catch(error) {
             return Promise.resolve([]);
         }
@@ -40,11 +41,11 @@ class TestStorageApi extends StorageApi {
 
 describe('ConfigManagerTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge;
-    let requestMock, clientInfoMock, deviceInfoMock;
-    let configPromise;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge;
+    let requestMock: any, clientInfoMock: any, deviceInfoMock: any;
+    let configPromise: Promise<INativeResponse>;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -54,12 +55,12 @@ describe('ConfigManagerTest', () => {
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
 
         clientInfoMock = {
-            getApplicationName: sinon.mock().returns('test_application'),
-            getGameId: sinon.mock().returns(123),
-            isDebuggable: sinon.mock().returns(false),
+            getApplicationName: Sinon.mock().returns('test_application'),
+            getGameId: Sinon.mock().returns(123),
+            isDebuggable: Sinon.mock().returns(false),
         };
         deviceInfoMock = {
-            isRooted: sinon.mock().returns(false)
+            isRooted: Sinon.mock().returns(false)
         };
     });
 
@@ -72,7 +73,7 @@ describe('ConfigManagerTest', () => {
             configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
-                get: sinon.mock().returns(configPromise)
+                get: Sinon.mock().returns(configPromise)
             };
         });
 
@@ -95,7 +96,7 @@ describe('ConfigManagerTest', () => {
             configPromise = Promise.resolve(nativeResponse);
 
             requestMock = {
-                get: sinon.mock().returns(configPromise)
+                get: Sinon.mock().returns(configPromise)
             };
         });
 

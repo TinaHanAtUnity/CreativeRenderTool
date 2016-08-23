@@ -104,7 +104,7 @@ build-test: clean build-dirs build-css build-html
 	@echo Transpiling .ts to .js for remote tests
 	@echo
 
-	$(TYPESCRIPT) --project test --module amd --outDir $(BUILD_DIR)
+	$(TYPESCRIPT) --project . --module amd --outDir $(BUILD_DIR)
 
 	@echo
 	@echo Generating test runner
@@ -211,7 +211,7 @@ build-js:
 	@echo Bundling .js files
 	@echo
 
-	$(REQUIREJS) -o config/requirejs/release.js baseUrl=$(BUILD_DIR)/js out=$(BUILD_DIR)/main.js
+	$(REQUIREJS) -o config/requirejs/release.js baseUrl=$(BUILD_DIR)/js/src/ts out=$(BUILD_DIR)/main.js
 
 build-css:
 	@echo
@@ -250,8 +250,7 @@ test: clean
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project .
-	$(TYPESCRIPT) --project test
+	$(TYPESCRIPT) --project . --module commonjs
 
 	@echo
 	@echo Running local tests
@@ -264,8 +263,7 @@ test-coverage: clean
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project .
-	$(TYPESCRIPT) --project test
+	$(TYPESCRIPT) --project . --module commonjs
 
 	@echo
 	@echo Running local tests with coverage

@@ -1,12 +1,10 @@
-/// <reference path="../../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 
-import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { MetaDataManager } from '../../../src/ts/Managers/MetaDataManager';
-import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
 
@@ -48,6 +46,7 @@ class TestStorageApi extends StorageApi {
             if(key === 'mediation') {
                 return Promise.resolve(Object.keys(this._storage.mediation));
             }
+            return Promise.resolve([]);
         } catch(error) {
             return Promise.resolve([]);
         }
@@ -55,9 +54,9 @@ class TestStorageApi extends StorageApi {
 }
 
 describe('MediationMetaDataTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge, storageApi;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge, storageApi: TestStorageApi;
 
     before(() => {
         nativeBridge = new NativeBridge({

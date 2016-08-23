@@ -1,11 +1,11 @@
 import 'mocha';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 import { assert } from 'chai';
 
-import { RequestApi } from '../../src/ts/Native/Api/Request';
-import { Request } from '../../src/ts/Utilities/Request';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { RequestApi } from 'Native/Api/Request';
+import { Request } from 'Utilities/Request';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
@@ -87,9 +87,9 @@ class TestRequestApi extends RequestApi {
 }
 
 describe('RequestTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge, requestApi, request, wakeUpManager;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -98,7 +98,7 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        let clock = sinon.useFakeTimers();
+        let clock = Sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
         clock.restore();
         request = new Request(nativeBridge, wakeUpManager);
@@ -233,7 +233,12 @@ describe('RequestTest', () => {
         let retryAttempts: number = 5;
         let retryDelay: number = 10;
 
-        return request.get(retryUrl, 'Test', [], retryAttempts, retryDelay).then(response => {
+        return request.get(retryUrl, [], {
+            retries: retryAttempts,
+            retryDelay: retryDelay,
+            followRedirects: false,
+            retryWithConnectionEvents: false
+        }).then(response => {
             throw new Error('Should not have received a response');
         }).catch(error => {
             error = error[1];
@@ -242,7 +247,7 @@ describe('RequestTest', () => {
     });
 
     it('Request should succeed only after connection event', () => {
-        let clock = sinon.useFakeTimers();
+        let clock = Sinon.useFakeTimers();
         let toggleUrl: string = 'http://www.example.org/toggle';
         let successMessage: string = 'Success response';
 

@@ -2,16 +2,11 @@ sudo: false
 
 language: node_js
 node_js:
-  - 4.4.7
+  - node
 
 cache:
   directories:
     - node_modules
-
-install:
-  - npm install -g typescript@1.8.10 tslint typings
-  - npm install
-  - typings install
 
 script:
   - make lint

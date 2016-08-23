@@ -1,20 +1,20 @@
 import 'mocha';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { Campaign } from '../../src/ts/Models/Campaign';
-import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
-import { ClientInfo } from '../../src/ts/Models/ClientInfo';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { Request } from '../../src/ts/Utilities/Request';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Request } from 'Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { CampaignManager } from '../../src/ts/Managers/CampaignManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 import { assert } from 'chai';
-import { VastParser } from '../../src/ts/Utilities/VastParser';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
-import { Observable2 } from '../../src/ts/Utilities/Observable';
-import { Observable4 } from '../../src/ts/Utilities/Observable';
-import { Platform } from '../../src/ts/Constants/Platform';
+import { VastParser } from 'Utilities/VastParser';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Observable2 } from 'Utilities/Observable';
+import { Observable4 } from 'Utilities/Observable';
+import { Platform } from 'Constants/Platform';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -22,12 +22,12 @@ describe('CampaignManager', () => {
     let nativeBridge: NativeBridge;
     let request: Request;
     let vastParser: VastParser;
-    let warningSpy;
+    let warningSpy: Sinon.SinonSpy;
 
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -75,7 +75,7 @@ describe('CampaignManager', () => {
     it('should have data from inside and outside the wrapper for a wrapped VAST', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -158,7 +158,7 @@ describe('CampaignManager', () => {
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
-            assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
+            assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'http://myErrorURL/error',
                 'http://myErrorURL/wrapper/error'
             ]);
@@ -213,7 +213,7 @@ describe('CampaignManager', () => {
     it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -284,7 +284,7 @@ describe('CampaignManager', () => {
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
-            assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
+            assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
                 'http://events.tremorhub.com/diag?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&rid=fd53cdbe934c44c68c57467d184160d7&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=rwd19-1059849-video&seatId=60673&pbid=1585&brid=3418&sid=9755&sdom=demo.app.com&asid=5097&nid=3&lid=3&adom=nissanusa.com&crid=17282869&aid=13457'
             ]);
@@ -362,7 +362,7 @@ describe('CampaignManager', () => {
     it('should fail when max depth is exceeded', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -502,7 +502,7 @@ describe('CampaignManager', () => {
 
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -522,7 +522,7 @@ describe('CampaignManager', () => {
 
     let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
         // given a VAST placement that wraps another VAST
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
@@ -750,7 +750,7 @@ describe('CampaignManager', () => {
                 }`
             };
 
-            let mockRequest = sinon.mock(request);
+            let mockRequest = Sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -833,7 +833,7 @@ describe('CampaignManager', () => {
 
     let verifyCampaignForResponse = (response: {response: any}) => {
         // given a valid VAST placement
-        let mockRequest = sinon.mock(request);
+        let mockRequest = Sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -925,27 +925,27 @@ describe('CampaignManager', () => {
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
-        warningSpy = sinon.spy();
+        warningSpy = Sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
                 get:
-                    sinon.stub()
+                    Sinon.stub()
                         .onCall(0).returns(Promise.resolve('mediation name'))
                         .onCall(1).returns(Promise.resolve('mediation version'))
                         .onCall(2).returns(Promise.resolve(42)),
-                getKeys: sinon.stub().returns(Promise.resolve([]))
+                getKeys: Sinon.stub().returns(Promise.resolve([]))
             },
             Request: {
                 onComplete: {
-                    subscribe: sinon.spy()
+                    subscribe: Sinon.spy()
                 },
                 onFailed: {
-                    subscribe: sinon.spy()
+                    subscribe: Sinon.spy()
                 }
             },
             Sdk: {
                 logWarning: warningSpy,
-                logInfo: sinon.spy()
+                logInfo: Sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
@@ -957,8 +957,8 @@ describe('CampaignManager', () => {
                 onNotification: new Observable2()
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+                getConnectionType: Sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: Sinon.stub().returns(Promise.resolve(0))
             },
             getPlatform: () => {
                 return Platform.TEST;

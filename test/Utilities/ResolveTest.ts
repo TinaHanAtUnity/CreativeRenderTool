@@ -1,10 +1,10 @@
 import 'mocha';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 import { assert } from 'chai';
 
-import { Resolve } from '../../src/ts/Utilities/Resolve';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { ResolveApi } from '../../src/ts/Native/Api/Resolve';
+import { Resolve } from 'Utilities/Resolve';
+import { NativeBridge } from 'Native/NativeBridge';
+import { ResolveApi } from 'Native/Api/Resolve';
 
 class TestResolveApi extends ResolveApi {
 
@@ -24,9 +24,9 @@ class TestResolveApi extends ResolveApi {
 }
 
 describe('ResolveTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge, resolveApi, resolve;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge, resolveApi: TestResolveApi, resolve: Resolve;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

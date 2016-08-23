@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'Workarounds';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';

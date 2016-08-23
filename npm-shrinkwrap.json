@@ -2,6 +2,31 @@
   "name": "unity-ads-webview",
   "version": "2.0.0",
   "dependencies": {
+    "@types/chai": {
+      "version": "3.4.31",
+      "from": "@types/chai@latest",
+      "resolved": "https://registry.npmjs.org/@types/chai/-/chai-3.4.31.tgz"
+    },
+    "@types/es6-promise": {
+      "version": "0.0.30",
+      "from": "@types/es6-promise@latest",
+      "resolved": "https://registry.npmjs.org/@types/es6-promise/-/es6-promise-0.0.30.tgz"
+    },
+    "@types/mocha": {
+      "version": "2.2.30",
+      "from": "@types/mocha@latest",
+      "resolved": "https://registry.npmjs.org/@types/mocha/-/mocha-2.2.30.tgz"
+    },
+    "@types/sinon": {
+      "version": "1.16.28",
+      "from": "@types/sinon@latest",
+      "resolved": "https://registry.npmjs.org/@types/sinon/-/sinon-1.16.28.tgz"
+    },
+    "@types/xmldom": {
+      "version": "0.1.27",
+      "from": "@types/xmldom@latest",
+      "resolved": "https://registry.npmjs.org/@types/xmldom/-/xmldom-0.1.27.tgz"
+    },
     "abbrev": {
       "version": "1.0.9",
       "from": "abbrev@>=1.0.0 <1.1.0",

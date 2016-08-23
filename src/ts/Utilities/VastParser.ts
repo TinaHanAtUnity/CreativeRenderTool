@@ -4,7 +4,6 @@ import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
-import * as xmldom from 'xmldom';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class VastParser {
@@ -15,7 +14,7 @@ export class VastParser {
     private _maxWrapperDepth: number;
 
     private static createDOMParser() {
-        return new xmldom.DOMParser();
+        return new DOMParser();
     };
 
     constructor();

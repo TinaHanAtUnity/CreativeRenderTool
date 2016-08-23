@@ -42,7 +42,9 @@ export class Overlay extends View {
     constructor(muted: boolean) {
         super('overlay');
 
-        this._template = new Template(OverlayTemplate);
+        if(typeof OverlayTemplate !== 'undefined') {
+            this._template = new Template(OverlayTemplate);
+        }
 
         this._muted = muted;
 
@@ -53,17 +55,17 @@ export class Overlay extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event) => this.onSkipEvent(event),
+                listener: (event: Event) => this.onSkipEvent(event),
                 selector: '.skip-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onMuteEvent(event),
+                listener: (event: Event) => this.onMuteEvent(event),
                 selector: '.mute-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onCallButtonEvent(event),
+                listener: (event: Event) => this.onCallButtonEvent(event),
                 selector: '.call-button'
             }
         ];

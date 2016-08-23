@@ -1,8 +1,7 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
-import { Configuration, CacheMode } from '../../src/ts/Models/Configuration';
+
+import { Configuration, CacheMode } from 'Models/Configuration';
 
 describe('configurationTest', () => {
 

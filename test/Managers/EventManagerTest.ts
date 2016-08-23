@@ -1,14 +1,14 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import * as Sinon from 'Sinon';
 
-import { Request } from '../../src/ts/Utilities/Request';
-import { EventManager } from '../../src/ts/Managers/EventManager';
-import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
-import { RequestApi } from '../../src/ts/Native/Api/Request';
-import { DeviceInfoApi } from '../../src/ts/Native/Api/DeviceInfo';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
+import { EventManager } from 'Managers/EventManager';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { RequestApi } from 'Native/Api/Request';
+import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 class TestStorageApi extends StorageApi {
 
@@ -18,7 +18,7 @@ class TestStorageApi extends StorageApi {
     public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
         this._dirty = true;
         this._storage = this.setInMemoryValue(this._storage, key, value);
-        return;
+        return Promise.resolve(void(0));
     }
 
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -35,13 +35,13 @@ class TestStorageApi extends StorageApi {
 
     public write(storageType: StorageType): Promise<void> {
         this._dirty = false;
-        return;
+        return Promise.resolve(void(0));
     }
 
     public delete(storageType: StorageType, key: string): Promise<void> {
         this._dirty = true;
         this._storage = this.deleteInMemoryValue(this._storage, key);
-        return;
+        return Promise.resolve(void(0));
     }
 
     public isDirty(): boolean {
@@ -166,9 +166,9 @@ class TestDeviceInfoApi extends DeviceInfoApi {
 }
 
 describe('EventManagerTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge;
 
     let storageApi: TestStorageApi;
     let requestApi: TestRequestApi;
@@ -193,7 +193,7 @@ describe('EventManagerTest', () => {
         let url: string = 'https://www.example.net/operative_event';
         let data: string = 'Test data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        let requestSpy = Sinon.spy(request, 'post');
 
         return eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert(requestSpy.calledOnce, 'Operative event did not send POST request');
@@ -217,14 +217,14 @@ describe('EventManagerTest', () => {
     });
 
     it('Send failed operative event', () => {
-        let clock = sinon.useFakeTimers();
+        let clock = Sinon.useFakeTimers();
 
         let eventId: string = '1234';
         let sessionId: string = '5678';
         let url: string = 'https://www.example.net/fail';
         let data: string = 'Test data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        let requestSpy = Sinon.spy(request, 'post');
 
         let event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
@@ -253,7 +253,7 @@ describe('EventManagerTest', () => {
         let sessionId: string = '1234';
         let url: string = 'https://www.example.net/third_party_event';
 
-        let requestSpy = sinon.spy(request, 'get');
+        let requestSpy = Sinon.spy(request, 'get');
 
         return eventManager.clickAttributionEvent(sessionId, url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
@@ -265,7 +265,7 @@ describe('EventManagerTest', () => {
         let url: string = 'https://www.example.net/diagnostic_event';
         let data: string = 'Test Data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        let requestSpy = Sinon.spy(request, 'post');
 
         return eventManager.diagnosticEvent(url, data).then(() => {
             assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
@@ -288,7 +288,7 @@ describe('EventManagerTest', () => {
         storageApi.set(StorageType.PRIVATE, urlKey, url);
         storageApi.set(StorageType.PRIVATE, dataKey, data);
 
-        let requestSpy = sinon.spy(request, 'post');
+        let requestSpy = Sinon.spy(request, 'post');
 
         return eventManager.sendUnsentSessions().then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');

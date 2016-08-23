@@ -1,26 +1,25 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
-import * as sinon from 'sinon';
-import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { Overlay } from '../../src/ts/Views/Overlay';
-import { EndScreen } from '../../src/ts/Views/EndScreen';
-import { SessionManager } from '../../src/ts/Managers/SessionManager';
+import * as Sinon from 'Sinon';
+
+import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Overlay } from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { EventManager } from '../../src/ts/Managers/EventManager';
-import { Request } from '../../src/ts/Utilities/Request';
-import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
-import { Campaign } from '../../src/ts/Models/Campaign';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { EventManager } from 'Managers/EventManager';
+import { Request, INativeResponse } from 'Utilities/Request';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { Campaign } from 'Models/Campaign';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge, adUnit, overlay, endScreen;
-    let sessionManager;
+    let handleInvocation = Sinon.spy();
+    let handleCallback = Sinon.spy();
+    let nativeBridge: NativeBridge, adUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let sessionManager: SessionManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -29,13 +28,13 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         overlay = <Overlay><any> {
-            setSkipEnabled: sinon.spy(),
-            setSkipDuration: sinon.spy(),
-            show: sinon.spy(),
+            setSkipEnabled: Sinon.spy(),
+            setSkipDuration: Sinon.spy(),
+            show: Sinon.spy(),
         };
 
         endScreen = <EndScreen><any> {
-            hide: sinon.spy(),
+            hide: Sinon.spy(),
         };
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
@@ -48,19 +47,19 @@ describe('EndScreenEventHandlersTest', () => {
     });
 
     describe('with onDownload', () => {
-        let resolvedPromise;
+        let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
-            sinon.spy(nativeBridge.Intent, 'launch');
+            Sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+            Sinon.spy(nativeBridge.Intent, 'launch');
         });
 
         it('should send a click with session manager', () => {
             EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
-            sinon.assert.calledWith(sessionManager.sendClick, adUnit);
+            Sinon.assert.calledWith(<Sinon.SinonSpy>sessionManager.sendClick, adUnit);
         });
 
         describe('with follow redirects', () => {
@@ -68,7 +67,7 @@ describe('EndScreenEventHandlersTest', () => {
                 EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
                 return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(nativeBridge.Intent.launch, {
+                    Sinon.assert.calledWith(<Sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': 'http://foobar.com'
                     });
@@ -79,13 +78,13 @@ describe('EndScreenEventHandlersTest', () => {
                 let response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
-                sessionManager.sendClick.restore();
-                sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+                (<Sinon.SinonSpy>sessionManager.sendClick).restore();
+                Sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
 
                 EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
                 return resolvedPromise.then(() => {
-                    sinon.assert.notCalled(nativeBridge.Intent.launch);
+                    Sinon.assert.notCalled(<Sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
             });
 
@@ -93,14 +92,14 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects', () => {
             beforeEach(() => {
-                sinon.stub(adUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                Sinon.stub(adUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
 
                 EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
             });
 
             it('should launch market view', () => {
-                sinon.assert.calledWith(nativeBridge.Intent.launch, {
+                Sinon.assert.calledWith(<Sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
                     'uri': 'market://details?id=fooAppId'
                 });
