@@ -10,7 +10,7 @@ cache:
 
 install:
   - npm install
-  - npm install typescript@next
+  - npm install typescript@next || true
 
 script:
   - make lint
