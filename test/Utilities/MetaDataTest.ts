@@ -4,17 +4,17 @@ import { assert } from 'chai';
 
 import { NativeBridge } from '../../src/ts/Native/NativeBridge';
 import { StorageType, StorageError } from '../../src/ts/Native/Api/Storage';
-import { TestMetaData } from '../../src/ts/Utilities/TestMetaData';
+import { MetaData } from '../../src/ts/Utilities/MetaData';
 
-describe('TestMetaDataTest', () => {
+describe('MetaDataTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
     let nativeBridge;
-    let testMetaData;
+    let metaData;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({handleInvocation, handleCallback});
-        testMetaData = new TestMetaData(nativeBridge);
+        metaData = new MetaData(nativeBridge);
     });
 
     it('should return value successfully and not delete', () => {
@@ -23,7 +23,8 @@ describe('TestMetaDataTest', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.resolve([value]));
         let deleteStub = sinon.stub(nativeBridge.Storage, 'delete');
 
-        return testMetaData.get(key, false).then(result => {
+        return metaData.get(key, false).then(([found, result]) => {
+            assert.equal(true, found, 'existing value was not found');
             assert.equal(value, result, 'results do not match');
             sinon.assert.notCalled(deleteStub);
         });
@@ -36,7 +37,8 @@ describe('TestMetaDataTest', () => {
         let deleteStub = sinon.stub(nativeBridge.Storage, 'delete').withArgs(StorageType.PUBLIC, key);
         let writeStub = sinon.stub(nativeBridge.Storage, 'write').withArgs(StorageType.PUBLIC);
 
-        return testMetaData.get(key, true).then(result => {
+        return metaData.get(key, true).then(([found, result]) => {
+            assert.equal(true, found, 'existing value was not found');
             assert.equal(value, result, 'results do not match');
             sinon.assert.calledOnce(deleteStub);
             sinon.assert.calledOnce(writeStub);
@@ -47,7 +49,8 @@ describe('TestMetaDataTest', () => {
         let key: string = 'testkey';
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([StorageError[StorageError.COULDNT_GET_VALUE]]));
 
-        return testMetaData.get(key, false).then(result => {
+        return metaData.get(key, false).then(([found, result]) => {
+            assert.equal(false, found, 'value was found when expecting error');
             assert.isNull(result, 'result was not null when value was not found');
         });
     });
@@ -56,7 +59,8 @@ describe('TestMetaDataTest', () => {
         let key: string = 'testkey';
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([StorageError[StorageError.COULDNT_GET_STORAGE]]));
 
-        return testMetaData.get(key, false).then(result => {
+        return metaData.get(key, false).then(([found, result]) => {
+            assert.equal(false, found, 'value was found when expecting error');
             assert.isNull(result, 'result was not null when storage was not found');
         });
     });
@@ -66,7 +70,7 @@ describe('TestMetaDataTest', () => {
         let errorMsg: string = 'UNKNOWN_ERROR';
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([errorMsg]));
 
-        return testMetaData.get(key, false).then(() => {
+        return metaData.get(key, false).then(() => {
             assert.fail('unknown error should have thrown');
         }).catch(error => {
             assert.match(error, /UNKNOWN_ERROR/, 'unknown error should have UNKNOWN_ERROR in error message');

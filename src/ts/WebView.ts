@@ -21,7 +21,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
-import { TestMetaData } from 'Utilities/TestMetaData';
+import { MetaData } from 'Utilities/MetaData';
 
 export class WebView {
 
@@ -493,18 +493,18 @@ export class WebView {
      */
 
     private setupTestEnvironment(): void {
-        let testMetaData: TestMetaData = new TestMetaData(this._nativeBridge);
+        let metaData: MetaData = new MetaData(this._nativeBridge);
 
-        testMetaData.get<string>('test.serverUrl', true).then((url) => {
-            if(url) {
+        metaData.get<string>('test.serverUrl', true).then(([found, url]) => {
+            if(found && url) {
                 ConfigManager.setTestBaseUrl(url);
                 CampaignManager.setTestBaseUrl(url);
                 SessionManager.setTestBaseUrl(url);
             }
         });
 
-        testMetaData.get<string>('test.kafkaUrl', true).then((url) => {
-            if(url) {
+        metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
+            if(found && url) {
                 Diagnostics.setTestBaseUrl(url);
             }
         });
