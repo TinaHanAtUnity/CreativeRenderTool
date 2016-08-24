@@ -3,6 +3,11 @@
     "module": "amd",
     "target": "es5",
     "inlineSourceMap": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise"
+    ],
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,

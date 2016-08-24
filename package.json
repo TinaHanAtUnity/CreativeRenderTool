@@ -10,7 +10,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@types/chai": "3.4.31",
-    "@types/es6-promise": "0.0.30",
     "@types/mocha": "2.2.30",
     "@types/sinon": "1.16.28",
     "@types/xmldom": "0.1.27",
@@ -21,6 +20,7 @@
     "requirejs-text": "2.0.12",
     "stylus": "0.54.5",
     "tslint": "3.15.1",
+    "typescript": "2.0.0",
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {

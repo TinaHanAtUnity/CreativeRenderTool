@@ -32,7 +32,7 @@ class TestStorageApi extends StorageApi {
         if(key === 'player') {
             delete this._storage.player;
         }
-        return Promise.resolve<void>();
+        return Promise.resolve();
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {

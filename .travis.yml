@@ -8,10 +8,6 @@ cache:
   directories:
     - node_modules
 
-install:
-  - npm install
-  - npm install typescript@next || true
-
 script:
   - make lint
   - make test-coveralls
