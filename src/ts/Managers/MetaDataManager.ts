@@ -29,7 +29,13 @@ export class MetaDataManager {
             if(!exists) {
                 return Promise.resolve(undefined);
             }
-            return Promise.all(keys.map((key) => nativeBridge.Storage.get<string>(StorageType.PUBLIC, category + '.' + key).catch(() => undefined)));
+            return Promise.all(keys.map((key) => metaData.get<string>(category + '.' + key, false).then(([found, value]) => {
+                if(found) {
+                    return value;
+                } else {
+                    return undefined;
+                }
+            })));
         });
     }
 
