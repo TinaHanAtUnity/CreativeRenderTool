@@ -30,8 +30,8 @@ export class AdUnitFactory {
     }
 
     private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): VideoAdUnit {
-        let overlay = new Overlay(placement.muteVideo());
-        let endScreen = new EndScreen(campaign, configuration.isCoppaCompliant());
+        let overlay = new Overlay(nativeBridge, placement.muteVideo());
+        let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
         let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
         let metaData = new MetaData(nativeBridge);
 
@@ -43,7 +43,7 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration): VideoAdUnit {
-        let overlay = new Overlay(placement.muteVideo());
+        let overlay = new Overlay(nativeBridge, placement.muteVideo());
         let vastAdUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
         let metaData = new MetaData(nativeBridge);
 
