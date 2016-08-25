@@ -40,7 +40,7 @@ build-dev: build-dir build-html build-css build-ts
 	cp src/index.html $(BUILD_DIR)/index.html
 
 build-release: BUILD_DIR = build/release
-build-release: clean build-dir build-ts build-js build-css
+build-release: clean build-dir build-html build-css build-ts build-js
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -63,7 +63,7 @@ build-release: clean build-dir build-ts build-js build-css
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/main.js
+	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/main.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -205,15 +205,14 @@ build-ts:
 	@echo
 
 	$(TYPESCRIPT) --project . --outDir $(BUILD_DIR)/js
-	$(ROLLUP) -c rollup.dev.js
-	$(CC) --js $(BUILD_DIR)/js/Main.js --js_output_file $(BUILD_DIR)/js/Main.min.js --formatting PRETTY_PRINT
 
 build-js:
 	@echo
 	@echo Bundling .js files
 	@echo
 
-	$(REQUIREJS) -o config/requirejs/release.js baseUrl=$(BUILD_DIR)/js/src/ts out=$(BUILD_DIR)/main.js
+	$(ROLLUP) -c rollup.js
+	$(CC) --js $(BUILD_DIR)/js/Main.js --js_output_file $(BUILD_DIR)/main.js --formatting PRETTY_PRINT --assume_function_wrapper
 
 build-css:
 	@echo
