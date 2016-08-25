@@ -1,6 +1,4 @@
-/// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
-
-declare var OverlayTemplate: string;
+import OverlayTemplate from 'Overlay.html';
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';

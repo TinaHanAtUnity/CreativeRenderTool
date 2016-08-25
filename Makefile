@@ -2,9 +2,9 @@
 BIN = node_modules/.bin
 TYPESCRIPT = $(BIN)/tsc
 TSLINT = $(BIN)/tslint
-REQUIREJS = $(BIN)/r.js
 STYLUS = $(BIN)/stylus
-BABEL = $(BIN)/babel
+ROLLUP = $(BIN)/rollup
+CC = java -jar node_modules/google-closure-compiler/compiler.jar
 
 MOCHA = $(BIN)/_mocha
 ISTANBUL = $(BIN)/istanbul
@@ -32,15 +32,15 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
+.PHONY: build-release build-test build-dir build-ts build-js build-css build-html clean lint test
 
 build-dev: BUILD_DIR = build/dev
-build-dev: build-ts build-css build-html
+build-dev: build-dir build-html build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
 build-release: BUILD_DIR = build/release
-build-release: clean build-dirs build-ts build-js build-css
+build-release: clean build-dir build-ts build-js build-css
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -99,7 +99,7 @@ build-release: clean build-dirs build-ts build-js build-css
 		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
-build-test: clean build-dirs build-css build-html
+build-test: clean build-dir build-css build-html
 	@echo
 	@echo Transpiling .ts to .js for remote tests
 	@echo
@@ -205,6 +205,8 @@ build-ts:
 	@echo
 
 	$(TYPESCRIPT) --project . --outDir $(BUILD_DIR)/js
+	$(ROLLUP) -c rollup.dev.js
+	$(CC) --js $(BUILD_DIR)/js/Main.js --js_output_file $(BUILD_DIR)/js/Main.min.js --formatting PRETTY_PRINT
 
 build-js:
 	@echo

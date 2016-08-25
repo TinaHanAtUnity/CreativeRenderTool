@@ -1,6 +1,4 @@
-/// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
-
-declare var EndScreenTemplate: string;
+import EndScreenTemplate from 'EndScreen.html';
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';

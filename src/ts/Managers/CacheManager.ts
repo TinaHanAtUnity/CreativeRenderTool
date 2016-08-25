@@ -62,7 +62,7 @@ export class CacheManager {
             if(isCaching) {
                 return Promise.reject(CacheError.FILE_ALREADY_CACHING);
             }
-            return Promise.all([
+            return Promise.all<boolean, string>([
                 this.shouldCache(url),
                 this.getFileId(url)
             ]).then(([shouldCache, fileId]) => {

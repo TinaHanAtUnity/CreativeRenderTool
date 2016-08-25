@@ -26,36 +26,15 @@
       origin = 'http://localhost:8000/';
     }
 
-    var require = {
-      baseUrl: origin + 'js/',
-      deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
-      paths: {
-        text: '../../../node_modules/requirejs-text/text',
-        html: '../html',
-        xmldom: '../../../node_modules/xmldom/dom-parser'
-      },
-      config: {
-        text: {
-          useXhr: function () {
-            return true;
-          }
-        }
-      }
-    };
+    var style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = origin + 'css/main.css';
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var requirejs = document.createElement('script');
-      requirejs.src = origin + '../../../node_modules/requirejs/require.js';
-      requirejs.setAttribute('data-main', 'Main.js');
+    var main = document.createElement('script');
+    main.src = origin + 'js/Main.min.js';
 
-      var style = document.createElement('link');
-      style.rel = 'stylesheet';
-      style.href = origin + 'css/main.css';
-
-      var head = document.getElementsByTagName('head')[0];
-      head.appendChild(style);
-      head.appendChild(requirejs);
-    }, false);
+    document.head.appendChild(style);
+    document.head.appendChild(main);
   </script>
 </head>
   <body></body>

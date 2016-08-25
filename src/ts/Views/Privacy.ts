@@ -1,5 +1,4 @@
-/// <amd-dependency path='text!html/Privacy.html' name='PrivacyTemplate' />
-declare var PrivacyTemplate: string;
+import PrivacyTemplate from 'Privacy.html';
 
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
