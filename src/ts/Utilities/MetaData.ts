@@ -31,4 +31,19 @@ export class MetaData {
             }
         });
     }
+
+    public hasCategory(category: string): Promise<boolean> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
+            return results.length > 0;
+        }).catch(([error]) => {
+            switch(error) {
+                case StorageError[StorageError.COULDNT_GET_STORAGE]:
+                    // it is normal that public metadata storage might not exist
+                    return false;
+
+                default:
+                    throw new Error(error);
+            }
+        });
+    }
 }
