@@ -132,4 +132,7 @@ export class Campaign {
         this._isVideoCached = value;
     }
 
+    public getTimeoutInSeconds(): number {
+        return 0;
+    }
 }

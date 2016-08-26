@@ -31,7 +31,7 @@ export class VastCampaign extends Campaign {
         }
     }
 
-    public getCacheTTLInSeconds(): number {
+    public getTimeoutInSeconds(): number {
         return this._cacheTTL;
     }
 
