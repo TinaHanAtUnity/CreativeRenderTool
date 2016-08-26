@@ -55,7 +55,15 @@ export class DeviceInfo extends Model {
         let promises: Promise<any>[] = [];
 
         promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then((limitAdTracking) => {
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                // iOS native implementation was accidentally implemented to give reverse values
+                // todo: fix this in native, then remove this hack from master
+                this._limitAdTracking = !limitAdTracking;
+            } else {
+                this._limitAdTracking = limitAdTracking;
+            }
+        }).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this._model = model).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth).catch(err => this.handleDeviceInfoError(err)));

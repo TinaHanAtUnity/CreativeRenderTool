@@ -11,7 +11,7 @@ export class MediationMetaData extends Model {
     }
 
     public static getKeys(): string[] {
-        return ['name.value', 'version.value', 'ordinal.value'];
+        return ['name', 'version', 'ordinal'];
     }
 
     constructor(data: string[]) {

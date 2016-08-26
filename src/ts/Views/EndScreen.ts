@@ -1,7 +1,7 @@
 /// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
-
 declare var EndScreenTemplate: string;
 
+import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0, Observable1 } from 'Utilities/Observable';
@@ -17,8 +17,8 @@ export class EndScreen extends View {
     private _coppaCompliant: boolean;
     private _gameName: string;
 
-    constructor(campaign: Campaign, coppaCompliant: boolean) {
-        super('end-screen');
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean) {
+        super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
 
@@ -80,7 +80,7 @@ export class EndScreen extends View {
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        let privacy = new Privacy(this._coppaCompliant);
+        let privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         privacy.render();
         document.body.appendChild(privacy.container());
         privacy.onPrivacy.subscribe((url) => {

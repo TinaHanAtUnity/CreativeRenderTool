@@ -10,7 +10,7 @@ export class AdapterMetaData extends Model {
     }
 
     public static getKeys(): string[] {
-        return ['name.value', 'version.value'];
+        return ['name', 'version'];
     }
 
     constructor(data: string[]) {
