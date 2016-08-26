@@ -4,7 +4,6 @@ import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { CacheManager, CacheStatus } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
