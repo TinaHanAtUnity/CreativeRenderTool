@@ -20,9 +20,10 @@ import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
-import { StorageType, StorageError } from 'Native/Api/Storage';
 import { JsonParser } from 'Utilities/JsonParser';
 import { VastSyntaxError } from 'Models/Vast/VastSyntaxError';
+import { MetaData } from 'Utilities/MetaData';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class WebView {
 
@@ -290,15 +291,6 @@ export class WebView {
         }
     }
 
-    // todo: remove this when CacheManager is refactored to support redirects
-    private getLocationFromHeaders(response: any): any {
-        let locationUrl: any = null;
-        if (response && response.headers ) {
-            locationUrl = response.headers.Location;
-        }
-        return locationUrl;
-    }
-
     private onVastCampaign(campaign: Campaign): void {
         this._campaign = campaign;
 
@@ -329,7 +321,7 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                let locationUrl = this.getLocationFromHeaders(response) || videoUrl;
+                let locationUrl = response.url || videoUrl;
                 cacheAsset(locationUrl).then(fileUrl => {
                     campaign.setVideoUrl(fileUrl);
                     campaign.setVideoCached(true);
@@ -381,11 +373,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof VastSyntaxError) {
-            error = error.toKafkaFormat();
-        }
-
-        if(error instanceof Error) {
+        if(error instanceof Error && !(error instanceof DiagnosticError)) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
@@ -507,41 +495,19 @@ export class WebView {
      */
 
     private setupTestEnvironment(): void {
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.serverUrl.value').then((url) => {
-            if(url) {
+        let metaData: MetaData = new MetaData(this._nativeBridge);
+
+        metaData.get<string>('test.serverUrl', true).then(([found, url]) => {
+            if(found && url) {
                 ConfigManager.setTestBaseUrl(url);
                 CampaignManager.setTestBaseUrl(url);
                 SessionManager.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.serverUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
 
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
-            if(url) {
+        metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
+            if(found && url) {
                 Diagnostics.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.kafkaUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
     }

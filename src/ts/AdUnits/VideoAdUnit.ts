@@ -11,6 +11,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
+import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -75,8 +77,14 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
-            if(!this._placement.useDeviceOrientationForVideo() && (this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            if(!this._placement.useDeviceOrientationForVideo()) {
+                if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+                } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
+                } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+                }
             }
 
             this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
@@ -118,7 +126,13 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     public hide(): Promise<void> {
         if(this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.stop();
+            this._nativeBridge.VideoPlayer.stop().catch(error => {
+                if(error === AndroidVideoPlayerError[AndroidVideoPlayerError.VIDEOVIEW_NULL]) {
+                    // sometimes system has already destroyed video view so just ignore this error
+                } else {
+                    throw new Error(error);
+                }
+            });
         }
         this.hideChildren();
         this.unsetReferences();
@@ -144,6 +158,14 @@ export class VideoAdUnit extends AbstractAdUnit {
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
                 this._showing = false;
                 this.onClose.trigger();
+            }).catch(error => {
+                // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
+                if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
+                    this._showing = false;
+                    this.onClose.trigger();
+                } else {
+                    throw new Error(error);
+                }
             });
         }
     }
