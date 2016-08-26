@@ -22,6 +22,7 @@ import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class WebView {
 
@@ -371,7 +372,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error) {
+        if(error instanceof Error && !(error instanceof DiagnosticError)) {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
