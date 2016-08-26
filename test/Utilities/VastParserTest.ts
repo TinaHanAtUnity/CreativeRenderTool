@@ -125,9 +125,10 @@ describe('VastParser', () => {
                 assert.fail('Should fail when parsing invalid VAST');
             });
         } catch (e) {
-            assert.deepEqual(e.failingContent, vastNoAdRaw);
-            assert.equal(e.name, 'VastSyntaxError');
-            assert.equal(e.wrapperDepth, 0);
+            /* tslint:disable:no-string-literal */
+            assert.deepEqual(e.diagnostic['vast'], vastNoAdRaw);
+            assert.equal(e.diagnostic['wrapperDepth'], 0);
+            /* tslint:enable */
         }
     });
 
@@ -197,10 +198,11 @@ describe('VastParser', () => {
         vastPromise.then(() => {
             assert.fail('Should fail when parsing invalid VAST');
         }).catch((e) => {
-            assert.deepEqual(e.failingContent, { data: 'invalid vast', tracking: {} });
-            assert.deepEqual(e.rootWrapperVast, rootVast);
-            assert.equal(e.name, 'VastSyntaxError');
-            assert.equal(e.wrapperDepth, 7);
+            /* tslint:disable:no-string-literal */
+            assert.deepEqual(e.diagnostic['vast'], { data: 'invalid vast', tracking: {} });
+            assert.equal(e.diagnostic['rootWrapperVast'], rootVast);
+            assert.equal(e.diagnostic['wrapperDepth'], 7);
+            /* tslint:enable */
         });
     });
 

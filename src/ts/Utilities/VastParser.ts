@@ -3,10 +3,10 @@ import { VastAd } from 'Models/Vast/VastAd';
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import { VastSyntaxError } from 'Models/Vast/VastSyntaxError';
 import { Request } from 'Utilities/Request';
 import * as xmldom from 'xmldom';
 import { NativeBridge } from 'Native/NativeBridge';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class VastParser {
 
@@ -89,11 +89,12 @@ export class VastParser {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            let error = new VastSyntaxError(e.message, vast, depth, e.stack);
+            let error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                error.rootWrapperVast = this._rootWrapperVast;
+                /* tslint:disable:no-string-literal */
+                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
+                /* tslint:enable */
             }
-
             throw error;
         }
 
