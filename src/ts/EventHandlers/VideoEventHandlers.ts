@@ -2,13 +2,13 @@ import { Double } from 'Utilities/Double';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
-import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { MetaData } from 'Utilities/MetaData';
 
 export class VideoEventHandlers {
 
@@ -16,7 +16,7 @@ export class VideoEventHandlers {
         return arg.getVast !== undefined;
     }
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
         let overlay = adUnit.getOverlay();
 
         adUnit.setVideoDuration(duration);
@@ -34,8 +34,8 @@ export class VideoEventHandlers {
             overlay.setCallButtonVisible(true);
         }
 
-        nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'test.debugOverlayEnabled.value').then(debugOverlayEnabled => {
-            if(debugOverlayEnabled === true) {
+        metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
+            if(found && debugOverlayEnabled) {
                 overlay.setDebugMessageVisible(true);
                 let debugMessage = '';
                 if (this.isVast(adUnit)) {
@@ -100,7 +100,7 @@ export class VideoEventHandlers {
         adUnit.newWatch();
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
@@ -113,8 +113,8 @@ export class VideoEventHandlers {
 
         this.afterVideoCompleted(nativeBridge, adUnit);
 
-        nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'integration_test.value').then(integrationTest => {
-            if(integrationTest) {
+        metaData.get<boolean>('integration_test', false).then(([found, integrationTest]) => {
+            if(found && integrationTest) {
                 if(nativeBridge.getPlatform() === Platform.ANDROID) {
                     nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
                 } else {

@@ -9,7 +9,7 @@ export class PlayerMetaData extends Model {
     }
 
     public static getKeys(): string[] {
-        return ['server_id.value'];
+        return ['server_id'];
     }
 
     constructor(data: string[]) {

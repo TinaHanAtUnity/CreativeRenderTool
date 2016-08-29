@@ -1,6 +1,4 @@
-export class JsonSyntaxError extends SyntaxError {
-    public failingContent: string;
-}
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class JsonParser {
 
@@ -8,10 +6,7 @@ export class JsonParser {
         try {
             return JSON.parse(text, reviver);
         } catch(e) {
-            let error = <JsonSyntaxError>e;
-            error.failingContent = text;
-            error.name = 'JsonSyntaxError';
-            throw error;
+            throw new DiagnosticError(e, { json: text });
         }
 
     }

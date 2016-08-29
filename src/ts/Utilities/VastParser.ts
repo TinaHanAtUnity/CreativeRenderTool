@@ -6,6 +6,7 @@ import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
 import * as xmldom from 'xmldom';
 import { NativeBridge } from 'Native/NativeBridge';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class VastParser {
 
@@ -13,6 +14,7 @@ export class VastParser {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
+    private _rootWrapperVast: any;
 
     private static createDOMParser() {
         return new xmldom.DOMParser();
@@ -78,7 +80,24 @@ export class VastParser {
     }
 
     public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
-        let parsedVast = this.parseVast(vast);
+        let parsedVast: Vast;
+
+        if (depth === 0) {
+            this._rootWrapperVast = vast;
+        }
+
+        try {
+            parsedVast = this.parseVast(vast);
+        } catch (e) {
+            let error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
+            if (depth > 0) {
+                /* tslint:disable:no-string-literal */
+                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
+                /* tslint:enable */
+            }
+            throw error;
+        }
+
         this.applyParentURLs(parsedVast, parent);
 
         let wrapperURL = parsedVast.getWrapperURL();
