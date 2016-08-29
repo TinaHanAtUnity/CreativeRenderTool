@@ -1,11 +1,17 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { ClientInfo } from 'Models/ClientInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class EventManager {
 
     private _nativeBridge: NativeBridge;
     private _request: Request;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
 
     private static getSessionKey(sessionId: string): string {
         return 'session.' + sessionId;
@@ -27,9 +33,11 @@ export class EventManager {
         return EventManager.getEventKey(sessionId, eventId) + '.data';
     }
 
-    constructor(nativeBridge: NativeBridge, request: Request) {
+    constructor(nativeBridge: NativeBridge, request: Request, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo) {
         this._nativeBridge = nativeBridge;
         this._request = request;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
     }
 
     public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void[]> {
@@ -72,6 +80,17 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
+        }).catch(([request, message]) => {
+            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+                event: event,
+                sessionId: sessionId,
+                url: url
+            });
+
+            return Diagnostics.trigger(this, {
+                'type': 'third_party_event_failed',
+                'error': error
+            }, this._clientInfo, this._deviceInfo);
         });
     }
 

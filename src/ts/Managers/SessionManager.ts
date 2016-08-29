@@ -180,6 +180,7 @@ export class SessionManager {
             this._currentSession.midpointSent = true;
         }
 
+        this._eventManager.thirdPartyEvent('midpointtest', '1234', 'http://127.0.0.1/not_existing');
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
