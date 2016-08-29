@@ -61,16 +61,24 @@ export class EventManager {
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
-        if(redirects) {
-            return this._request.get(url, [], {
-                retries: 0,
-                retryDelay: 0,
-                followRedirects: true,
-                retryWithConnectionEvents: false
+        return this._request.get(url, [], {
+            retries: 0,
+            retryDelay: 0,
+            followRedirects: redirects,
+            retryWithConnectionEvents: false
+        }).catch(([request, message]) => {
+            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+                request: request,
+                event: event,
+                sessionId: sessionId,
+                url: url
             });
-        } else {
-            return this._request.get(url);
-        }
+
+            return Diagnostics.trigger(this, {
+                'type': 'click_attribution_failed',
+                'error': error
+            }, this._clientInfo, this._deviceInfo);
+        });
     }
 
     public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
@@ -82,6 +90,7 @@ export class EventManager {
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
             let error: DiagnosticError = new DiagnosticError(new Error(message), {
+                request: request,
                 event: event,
                 sessionId: sessionId,
                 url: url
