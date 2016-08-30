@@ -69,7 +69,6 @@ export class WebView {
             this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
-            this._eventManager = new EventManager(this._nativeBridge, this._request);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -85,6 +84,7 @@ export class WebView {
                 }
             }
 
+            this._eventManager = new EventManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
