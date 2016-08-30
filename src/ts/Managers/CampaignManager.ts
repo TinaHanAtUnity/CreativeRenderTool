@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class CampaignManager {
 
@@ -75,7 +76,7 @@ export class CampaignManager {
                                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                             }
                             if (!campaign.getVideoUrl()) {
-                                this.onError.trigger(new Error('Campaign does not have a video url'));
+                                this.onError.trigger(new DiagnosticError(new Error('Campaign does not have a video url'), { vast: vast }));
                                 return;
                             }
                             this.onVastCampaign.trigger(campaign);
