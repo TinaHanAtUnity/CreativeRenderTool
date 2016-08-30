@@ -169,6 +169,18 @@ export class WebView {
             this._campaignTimeout = 0;
             this.showError(true, placementId, 'Campaign has expired');
             this.onCampaignExpired();
+
+            let error = new DiagnosticError(new Error('Campaign expired'), {
+                id: this._campaign.getId(),
+                appStoreId: this._campaign.getAppStoreId(),
+                timeoutInSeconds: this._campaign.getTimeoutInSeconds()
+            });
+
+            Diagnostics.trigger(this._eventManager, {
+                type: 'campaign_expired',
+                error: error
+            }, this._clientInfo, this._deviceInfo);
+
             return;
         }
 
