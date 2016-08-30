@@ -76,7 +76,11 @@ export class CampaignManager {
                                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                             }
                             if (!campaign.getVideoUrl()) {
-                                this.onError.trigger(new DiagnosticError(new Error('Campaign does not have a video url'), { vast: vast }));
+                                let videoUrlError = new DiagnosticError(
+                                    new Error('Campaign does not have a video url'),
+                                    { rootWrapperVast: campaignJson.vast }
+                                );
+                                this.onError.trigger(videoUrlError);
                                 return;
                             }
                             this.onVastCampaign.trigger(campaign);
