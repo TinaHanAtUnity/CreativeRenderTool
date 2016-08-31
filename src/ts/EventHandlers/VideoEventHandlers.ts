@@ -128,25 +128,25 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onAndroidVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, what: number, extra: number, url: string) {
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, what: number, extra: number, url: string) {
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.Sdk.logError('Unity Ads video player error ' + what + ' ' + extra + ' ' + url);
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
-        this.onVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+        this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
     }
 
-    public static onIosVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
+    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.Sdk.logError('Unity Ads video player error' + ' ' + url);
             nativeBridge.IosAdUnit.setViews(['webview']);
         }
 
-        this.onVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+        this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
     }
 
-    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
+    public static handleVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.ERROR);
         nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
@@ -167,7 +167,7 @@ export class VideoEventHandlers {
 
         Diagnostics.trigger(eventManager, {
             'type': errorType,
-            'error': url
+            'url': url
         }, clientInfo, deviceInfo);
     }
 

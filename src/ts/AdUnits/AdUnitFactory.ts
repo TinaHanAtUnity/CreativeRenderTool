@@ -118,24 +118,28 @@ export class AdUnitFactory {
     }
 
     private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
-        let onErrorObserver: IObserver4<string, number, number, string>;
+        let onVideoErrorObserver: IObserver2<string, string>;
+        let onGenericErrorObserver: IObserver4<string, number, number, string>;
         if (videoAdUnit instanceof VastAdUnit) {
-            onErrorObserver = nativeBridge.VideoPlayer.Android.onError.subscribe((errorType, what, extra, url) => VastVideoEventHandlers.onAndroidVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, what, extra, url));
+            onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((errorType, what, extra, url) => VastVideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, what, extra, url));
+            onVideoErrorObserver = nativeBridge.VideoPlayer.Android.onError.subscribe((errorType, url) => VastVideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
         } else {
-            onErrorObserver = nativeBridge.VideoPlayer.Android.onError.subscribe((errorType, what, extra, url) => VideoEventHandlers.onAndroidVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, what, extra, url));
+            onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((errorType, what, extra, url) => VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, what, extra, url));
+            onVideoErrorObserver = nativeBridge.VideoPlayer.Android.onError.subscribe((errorType, url) => VastVideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
         }
 
         videoAdUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.Android.onError.unsubscribe(onErrorObserver);
+            nativeBridge.VideoPlayer.Android.onGenericError.unsubscribe(onGenericErrorObserver);
+            nativeBridge.VideoPlayer.Android.onError.unsubscribe(onVideoErrorObserver);
         });
     }
 
     private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         let onErrorObserver: IObserver2<string, string>;
         if (videoAdUnit instanceof VastAdUnit) {
-            onErrorObserver = nativeBridge.VideoPlayer.Ios.onError.subscribe((errorType, url) => VastVideoEventHandlers.onIosVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
+            onErrorObserver = nativeBridge.VideoPlayer.Ios.onError.subscribe((errorType, url) => VastVideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
         } else {
-            onErrorObserver = nativeBridge.VideoPlayer.Ios.onError.subscribe((errorType, url) => VideoEventHandlers.onIosVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
+            onErrorObserver = nativeBridge.VideoPlayer.Ios.onError.subscribe((errorType, url) => VideoEventHandlers.onVideoError(nativeBridge, videoAdUnit, eventManager, clientInfo, deviceInfo, errorType, url));
         }
 
         let onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {

@@ -113,19 +113,6 @@ export class VideoPlayerApi extends NativeApi {
                 this.onStop.trigger(parameters[0]);
                 break;
 
-            case VideoPlayerEvent[VideoPlayerEvent.ILLEGAL_STATE]:
-                break;
-
-            case VideoPlayerEvent[VideoPlayerEvent.PAUSE_ERROR]:
-                break;
-
-            case VideoPlayerEvent[VideoPlayerEvent.PREPARE_ERROR]:
-                break;
-
-            case VideoPlayerEvent[VideoPlayerEvent.SEEKTO_ERROR]:
-
-                break;
-
             default:
                 if(this._nativeBridge.getPlatform() === Platform.IOS) {
                     this.Ios.handleEvent(event, parameters);
