@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable2, Observable1 } from 'Utilities/Observable';
+import { Observable2 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 enum IosVideoPlayerEvent {
@@ -14,7 +14,7 @@ export class IosVideoPlayerApi extends NativeApi {
     public onLikelyToKeepUp: Observable2<string, boolean> = new Observable2();
     public onBufferEmpty: Observable2<string, boolean> = new Observable2();
     public onBufferFull: Observable2<string, boolean> = new Observable2();
-    public onError: Observable1<string> = new Observable1();
+    public onError: Observable2<string, string> = new Observable2();
 
 
     constructor(nativeBridge: NativeBridge) {
@@ -36,7 +36,7 @@ export class IosVideoPlayerApi extends NativeApi {
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.GENERIC_ERROR]:
-                this.onError.trigger(parameters[0]);
+                this.onError.trigger('video_error', parameters[0]);
                 break;
 
             default:
