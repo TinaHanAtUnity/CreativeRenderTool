@@ -43,7 +43,7 @@ describe('Vast', () => {
     });
 
     it('should be case insensitive to mime type string', () => {
-        let vast = new Vast([vastAd], [], {});
+        let vast = new Vast([vastAd], []);
 
         sinon.stub(vastMediaFile, 'getFileURL').returns('http://static.scanscout.com/filemanager/vhs/partner364124_f00a7d93-0858-4b28-bf8e-e9af7a879f74.mp4');
         sinon.stub(vastMediaFile, 'getMIMEType').returns('Video/Mp4');
