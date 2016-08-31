@@ -399,8 +399,12 @@ export class WebView {
     }
 
     private setCampaignTimeout(campaignTimeout: number) {
-        this._nativeBridge.Sdk.logInfo('Campaign will expire in ' + campaignTimeout + ' seconds');
-        this._campaignTimeout = Date.now() + campaignTimeout * 1000;
+        if(campaignTimeout === 0) {
+            this._campaignTimeout = 0;
+        } else {
+            this._nativeBridge.Sdk.logInfo('Campaign will expire in ' + campaignTimeout + ' seconds');
+            this._campaignTimeout = Date.now() + campaignTimeout * 1000;
+        }
     }
 
     private onCampaignExpired() {
