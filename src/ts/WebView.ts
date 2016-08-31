@@ -52,6 +52,7 @@ export class WebView {
     private _configJsonCheckedAt: number;
     private _mustRefill: boolean;
     private _refillTimestamp: number;
+    private _campaignTimeout: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -68,7 +69,6 @@ export class WebView {
             this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
-            this._eventManager = new EventManager(this._nativeBridge, this._request);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -84,6 +84,7 @@ export class WebView {
                 }
             }
 
+            this._eventManager = new EventManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -119,6 +120,7 @@ export class WebView {
             this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._refillTimestamp = 0;
+            this._campaignTimeout = 0;
             return this._campaignManager.request();
         }).then(() => {
             this._initialized = true;
@@ -163,6 +165,25 @@ export class WebView {
             return;
         }
 
+        if(this.isCampaignExpired()) {
+            this._campaignTimeout = 0;
+            this.showError(true, placementId, 'Campaign has expired');
+            this.onCampaignExpired();
+
+            let error = new DiagnosticError(new Error('Campaign expired'), {
+                id: this._campaign.getId(),
+                appStoreId: this._campaign.getAppStoreId(),
+                timeoutInSeconds: this._campaign.getTimeoutInSeconds()
+            });
+
+            Diagnostics.trigger(this._eventManager, {
+                type: 'campaign_expired',
+                error: error
+            }, this._clientInfo, this._deviceInfo);
+
+            return;
+        }
+
         if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
             this._nativeBridge.AppSheet.prepare({
                 id: parseInt(this._campaign.getAppStoreId(), 10)
@@ -196,6 +217,7 @@ export class WebView {
             this._campaign = null;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
+            this._campaignTimeout = 0;
             this._mustRefill = true;
         });
     }
@@ -227,6 +249,8 @@ export class WebView {
 
     private onCampaign(campaign: Campaign): void {
         this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
         let cacheMode = this._configuration.getCacheMode();
 
@@ -292,6 +316,8 @@ export class WebView {
 
     private onVastCampaign(campaign: Campaign): void {
         this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
         let cacheMode = this._configuration.getCacheMode();
 
@@ -367,8 +393,24 @@ export class WebView {
 
     private onNoFill(retryTime: number) {
         this._refillTimestamp = Date.now() + retryTime * 1000;
+        this._campaignTimeout = 0;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.setPlacementStates(PlacementState.NO_FILL);
+    }
+
+    private setCampaignTimeout(campaignTimeout: number) {
+        if(campaignTimeout === 0) {
+            this._campaignTimeout = 0;
+        } else {
+            this._nativeBridge.Sdk.logInfo('Campaign will expire in ' + campaignTimeout + ' seconds');
+            this._campaignTimeout = Date.now() + campaignTimeout * 1000;
+        }
+    }
+
+    private onCampaignExpired() {
+        this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
+        this.setPlacementStates(PlacementState.NO_FILL);
+        this._campaignManager.request();
     }
 
     private onCampaignError(error: any) {
@@ -424,7 +466,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    this.checkRefill();
+                    this.checkCampaignStatus();
                     this._eventManager.sendUnsentSessions();
                 }
             });
@@ -432,18 +474,27 @@ export class WebView {
     }
 
     private onScreenOn(): void {
-        this.checkRefill();
+        this.checkCampaignStatus();
     }
 
     private onAppForeground(): void {
-        this.checkRefill();
+        this.checkCampaignStatus();
     }
 
-    private checkRefill(): void {
+    private checkCampaignStatus(): void {
         if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
             this._refillTimestamp = 0;
             this._campaignManager.request();
+        } else {
+            if(this.isCampaignExpired()) {
+                this._campaignTimeout = 0;
+                this.onCampaignExpired();
+            }
         }
+    }
+
+    private isCampaignExpired(): boolean {
+        return this._campaignTimeout !== 0 && Date.now() > this._campaignTimeout;
     }
 
     /*
