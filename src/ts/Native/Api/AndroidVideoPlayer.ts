@@ -8,12 +8,14 @@ enum AndroidVideoPlayerEvent {
 
 export enum AndroidVideoPlayerError {
     VIDEOVIEW_NULL,
-    API_LEVEL_ERROR
+    API_LEVEL_ERROR,
+    GENERIC_ERROR
 }
 
 export class AndroidVideoPlayerApi extends NativeApi {
 
     public onInfo: Observable3<number, number, string> = new Observable3();
+    public onError: Observable3<number, number, string> = new Observable3();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -29,6 +31,9 @@ export class AndroidVideoPlayerApi extends NativeApi {
                 this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
                 break;
 
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.GENERIC_ERROR]:
+                this.onError.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
             default:
                 throw new Error('VideoPlayer event ' + event + ' does not have an observable');
         }

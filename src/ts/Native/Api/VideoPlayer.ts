@@ -1,6 +1,6 @@
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable3, Observable1, Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable4 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 import { Platform } from 'Constants/Platform';
 import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
@@ -26,7 +26,6 @@ export class VideoPlayerApi extends NativeApi {
     public Ios: IosVideoPlayerApi;
     public Android: AndroidVideoPlayerApi;
 
-    public onError: Observable3<number, number, string> = new Observable3();
     public onProgress: Observable1<number> = new Observable1();
     public onCompleted: Observable1<string> = new Observable1();
     public onPrepared: Observable4<number, number, number, string> = new Observable4();
@@ -86,10 +85,6 @@ export class VideoPlayerApi extends NativeApi {
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
-            case VideoPlayerEvent[VideoPlayerEvent.GENERIC_ERROR]:
-                this.onError.trigger(parameters[0], parameters[1], parameters[2]);
-                break;
-
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
                 this.onProgress.trigger(parameters[0]);
                 break;
@@ -116,6 +111,19 @@ export class VideoPlayerApi extends NativeApi {
 
             case VideoPlayerEvent[VideoPlayerEvent.STOP]:
                 this.onStop.trigger(parameters[0]);
+                break;
+
+            case VideoPlayerEvent[VideoPlayerEvent.ILLEGAL_STATE]:
+                break;
+
+            case VideoPlayerEvent[VideoPlayerEvent.PAUSE_ERROR]:
+                break;
+
+            case VideoPlayerEvent[VideoPlayerEvent.PREPARE_ERROR]:
+                break;
+
+            case VideoPlayerEvent[VideoPlayerEvent.SEEKTO_ERROR]:
+
                 break;
 
             default:
