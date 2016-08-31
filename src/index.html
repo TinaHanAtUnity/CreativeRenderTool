@@ -18,9 +18,12 @@
       queryParams[param[0]] = param[1];
     }
 
+    console.dir(queryParams);
+
     var origin;
     if(queryParams['origin']) {
       var decodedOrigin = decodeURIComponent(queryParams['origin']);
+      console.log(decodedOrigin);
       origin = decodedOrigin.substring(0, decodedOrigin.lastIndexOf('/') + 1);
     } else {
       origin = 'http://localhost:8000/';
