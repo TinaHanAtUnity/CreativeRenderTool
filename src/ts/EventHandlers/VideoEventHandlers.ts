@@ -134,6 +134,13 @@ export class VideoEventHandlers {
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
         this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+
+        Diagnostics.trigger(eventManager, {
+            'type': errorType,
+            'url': url,
+            'what': what,
+            'extra': extra
+        }, clientInfo, deviceInfo);
     }
 
     public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
@@ -144,6 +151,11 @@ export class VideoEventHandlers {
         }
 
         this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+
+        Diagnostics.trigger(eventManager, {
+            'type': errorType,
+            'url': url
+        }, clientInfo, deviceInfo);
     }
 
     public static handleVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
@@ -164,11 +176,6 @@ export class VideoEventHandlers {
             adUnit.getEndScreen().show();
         }
         adUnit.onNewAdRequestAllowed.trigger();
-
-        Diagnostics.trigger(eventManager, {
-            'type': errorType,
-            'url': url
-        }, clientInfo, deviceInfo);
     }
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
