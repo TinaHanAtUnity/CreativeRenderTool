@@ -118,7 +118,8 @@ export class Vast {
     }
 
     private isPlayableMIMEType(MIMEType: string): boolean {
-        let playableMIMEType = 'video/mp4';
+        const playableMIMEType = 'video/mp4';
+        MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
     }
 }
