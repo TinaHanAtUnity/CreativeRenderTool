@@ -129,11 +129,9 @@ export class VideoEventHandlers {
     }
 
     public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, what: number, extra: number, url: string) {
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.Sdk.logError('Unity Ads video player error ' + what + ' ' + extra + ' ' + url);
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
-        this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+        nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + what + ' ' + extra + ' ' + url);
+
+        this.handleVideoError(nativeBridge, adUnit);
 
         Diagnostics.trigger(eventManager, {
             'type': errorType,
@@ -144,13 +142,9 @@ export class VideoEventHandlers {
     }
 
     public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + url);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.Sdk.logError('Unity Ads video player error' + ' ' + url);
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        }
-
-        this.handleVideoError(nativeBridge, adUnit, eventManager, clientInfo, deviceInfo, errorType, url);
+        this.handleVideoError(nativeBridge, adUnit);
 
         Diagnostics.trigger(eventManager, {
             'type': errorType,
@@ -158,7 +152,19 @@ export class VideoEventHandlers {
         }, clientInfo, deviceInfo);
     }
 
-    public static handleVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
+    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
+        adUnit.getOverlay().hide();
+        adUnit.getEndScreen().show();
+        adUnit.onNewAdRequestAllowed.trigger();
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
+        }
+    };
+
+    private static handleVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
         adUnit.setVideoActive(false);
         adUnit.setFinishState(FinishState.ERROR);
         nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
@@ -177,16 +183,4 @@ export class VideoEventHandlers {
         }
         adUnit.onNewAdRequestAllowed.trigger();
     }
-
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
-        adUnit.onNewAdRequestAllowed.trigger();
-
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-        }
-    };
 }
