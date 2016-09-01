@@ -1,13 +1,13 @@
 import 'mocha';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 
 describe('ConnectivityApi', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -19,14 +19,14 @@ describe('ConnectivityApi', () => {
 
     it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
         nativeBridge.Connectivity.setListeningStatus(true);
-        Sinon.assert.calledWith(handleInvocation, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
+        sinon.assert.calledWith(handleInvocation, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
     });
 
     it('should trigger onConnected', () => {
-        let spy = Sinon.spy();
+        let spy = sinon.spy();
         nativeBridge.Connectivity.onConnected.subscribe(spy);
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        Sinon.assert.calledWith(spy, true, 0);
+        sinon.assert.calledWith(spy, true, 0);
     });
 
     it('should throw', () => {

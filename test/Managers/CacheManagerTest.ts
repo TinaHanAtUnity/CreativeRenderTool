@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { CacheManager, CacheStatus } from 'Managers/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
@@ -143,8 +143,8 @@ class TestStorageApi extends StorageApi {
 }
 
 describe('CacheManagerTest', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     let cacheApi: TestCacheApi;
@@ -162,7 +162,7 @@ describe('CacheManagerTest', () => {
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
         cacheManager = new CacheManager(nativeBridge, wakeUpManager);
-        Sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
+        sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
     });
 
     it('Get local file url for cached file', () => {
@@ -181,7 +181,7 @@ describe('CacheManagerTest', () => {
         let testFileId: string = '-960478764.mp4';
         let testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-        let cacheSpy = Sinon.spy(cacheApi, 'download');
+        let cacheSpy = sinon.spy(cacheApi, 'download');
 
         return cacheManager.cache(testUrl).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK');
@@ -202,7 +202,7 @@ describe('CacheManagerTest', () => {
         let testFileUrl2: string = 'file:///test/cache/dir/UnityAdsCache-158720486.jpg';
         let testFileUrl3: string = 'file:///test/cache/dir/UnityAdsCache-929022075.jpg';
 
-        let cacheSpy = Sinon.spy(cacheApi, 'download');
+        let cacheSpy = sinon.spy(cacheApi, 'download');
 
         return cacheManager.cache(testUrl1).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for first test url');
@@ -307,7 +307,7 @@ describe('CacheManagerTest', () => {
 
         cacheApi.addFile(currentFile, currentTime, 1234);
 
-        let cacheSpy = Sinon.spy(cacheApi, 'deleteFile');
+        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(!cacheSpy.calledOnce, 'Clean cache tried to delete current files');
@@ -323,7 +323,7 @@ describe('CacheManagerTest', () => {
         cacheApi.addFile(currentFile, currentTime, 1234);
         cacheApi.addFile(oldFile, tenWeeksAgo, 1234);
 
-        let cacheSpy = Sinon.spy(cacheApi, 'deleteFile');
+        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(cacheSpy.calledOnce, 'Clean cache from old files did not delete files');
@@ -340,7 +340,7 @@ describe('CacheManagerTest', () => {
         cacheApi.addFile(olderFile, currentTime - 1, size);
         cacheApi.addFile(newerFile, currentTime, size);
 
-        let cacheSpy = Sinon.spy(cacheApi, 'deleteFile');
+        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(cacheSpy.calledOnce, 'Clean cache from large disk usage did not delete files');
@@ -349,7 +349,7 @@ describe('CacheManagerTest', () => {
     });
 
     it('Clean cache (nothing to clean)', () => {
-        let cacheSpy = Sinon.spy(cacheApi, 'deleteFile');
+        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert.equal(0, cacheSpy.callCount, 'Clean cache tried to delete files from empty cache');

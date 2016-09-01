@@ -1,5 +1,5 @@
 import 'mocha';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
@@ -22,12 +22,12 @@ describe('CampaignManager', () => {
     let nativeBridge: NativeBridge;
     let request: Request;
     let vastParser: VastParser;
-    let warningSpy: Sinon.SinonSpy;
+    let warningSpy: sinon.SinonSpy;
 
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -75,7 +75,7 @@ describe('CampaignManager', () => {
     it('should have data from inside and outside the wrapper for a wrapped VAST', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -213,7 +213,7 @@ describe('CampaignManager', () => {
     it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -362,7 +362,7 @@ describe('CampaignManager', () => {
     it('should fail when max depth is exceeded', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: `{
                 "abGroup": 3,
@@ -502,7 +502,7 @@ describe('CampaignManager', () => {
 
     let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -522,7 +522,7 @@ describe('CampaignManager', () => {
 
     let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
         // given a VAST placement that wraps another VAST
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
@@ -750,7 +750,7 @@ describe('CampaignManager', () => {
                 }`
             };
 
-            let mockRequest = Sinon.mock(request);
+            let mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -833,7 +833,7 @@ describe('CampaignManager', () => {
 
     let verifyCampaignForResponse = (response: {response: any}) => {
         // given a valid VAST placement
-        let mockRequest = Sinon.mock(request);
+        let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -925,27 +925,27 @@ describe('CampaignManager', () => {
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
-        warningSpy = Sinon.spy();
+        warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
                 get:
-                    Sinon.stub()
+                    sinon.stub()
                         .onCall(0).returns(Promise.resolve('mediation name'))
                         .onCall(1).returns(Promise.resolve('mediation version'))
                         .onCall(2).returns(Promise.resolve(42)),
-                getKeys: Sinon.stub().returns(Promise.resolve([]))
+                getKeys: sinon.stub().returns(Promise.resolve([]))
             },
             Request: {
                 onComplete: {
-                    subscribe: Sinon.spy()
+                    subscribe: sinon.spy()
                 },
                 onFailed: {
-                    subscribe: Sinon.spy()
+                    subscribe: sinon.spy()
                 }
             },
             Sdk: {
                 logWarning: warningSpy,
-                logInfo: Sinon.spy()
+                logInfo: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
@@ -957,8 +957,8 @@ describe('CampaignManager', () => {
                 onNotification: new Observable2()
             },
             DeviceInfo: {
-                getConnectionType: Sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: Sinon.stub().returns(Promise.resolve(0))
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0))
             },
             getPlatform: () => {
                 return Platform.TEST;
