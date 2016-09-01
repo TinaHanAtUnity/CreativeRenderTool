@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class CampaignManager {
 
@@ -58,14 +59,15 @@ export class CampaignManager {
                         this.onNoFill.trigger(3600);
                     } else {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                        this._vastParser.retrieveVast(campaignJson.vast, this._nativeBridge, this._request).then(vast => {
+                        let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
+                        this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
                             let campaignId: string = undefined;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                                 campaignId = '00005472656d6f7220694f53';
                             } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                                 campaignId = '005472656d6f7220416e6472';
                             }
-                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
                                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                                 return;
@@ -75,7 +77,11 @@ export class CampaignManager {
                                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                             }
                             if (!campaign.getVideoUrl()) {
-                                this.onError.trigger(new Error('Campaign does not have a video url'));
+                                let videoUrlError = new DiagnosticError(
+                                    new Error('Campaign does not have a video url'),
+                                    { rootWrapperVast: campaignJson.vast }
+                                );
+                                this.onError.trigger(videoUrlError);
                                 return;
                             }
                             this.onVastCampaign.trigger(campaign);

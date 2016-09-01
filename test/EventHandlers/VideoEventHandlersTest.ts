@@ -274,7 +274,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set debug message to programmatic ad if the ad unit is VAST', () => {
             let prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
-            let vastCampaign = new VastCampaign(new Vast([], [], {}), 'campaignId', 'gamerId', 12);
+            let vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
 

@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Platform } from 'Constants/Platform';
 
 const enum RequestStatus {
     COMPLETE,
@@ -189,7 +190,15 @@ export class Request {
             headers: headers
         };
         let nativeRequest = Request._requests[id];
-        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
+
+        // hack to work around iOS native bug
+        // if ios request api gets a response that is not valid utf-8, it will leave response null and omit all parameters
+        // after response, leaving responsecode and headers undefined
+        // since native returns request complete event, assume success in this case
+        // proper fix requires native update
+        if(this._nativeBridge.getPlatform() === Platform.IOS && typeof responseCode === 'undefined') {
+            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+        } else if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = nativeRequest.url = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {

@@ -6,10 +6,10 @@ export class Vast {
     private _errorURLTemplates: string[];
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(ads: VastAd[], errorURLTemplates: any[], additionalTrackingEvents: { [eventName: string]: string[] }) {
+    constructor(ads: VastAd[], errorURLTemplates: any[]) {
         this._ads = ads;
         this._errorURLTemplates = errorURLTemplates;
-        this._additionalTrackingEvents = additionalTrackingEvents;
+        this._additionalTrackingEvents = {};
     }
 
     public getAds(): VastAd[] {
@@ -118,7 +118,8 @@ export class Vast {
     }
 
     private isPlayableMIMEType(MIMEType: string): boolean {
-        let playableMIMEType = 'video/mp4';
+        const playableMIMEType = 'video/mp4';
+        MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
     }
 }

@@ -22,7 +22,7 @@ describe('VastAdUnit', () => {
 
     beforeEach(() => {
         let placement = TestFixtures.getPlacement();
-        let vast = new Vast([], [], {});
+        let vast = new Vast([], []);
         let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
         let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
         let nativeBridge = TestFixtures.getNativeBridge();
@@ -66,7 +66,7 @@ describe('VastAdUnit', () => {
         let vast;
 
         beforeEach(() => {
-            vast = new Vast([], [], {});
+            vast = new Vast([], []);
             let placement = TestFixtures.getPlacement();
             let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
