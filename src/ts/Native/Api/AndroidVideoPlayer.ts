@@ -12,7 +12,8 @@ export enum AndroidVideoPlayerError {
     GENERIC_ERROR,
     PAUSE_ERROR,
     PREPARE_ERROR,
-    SEEKTO_ERROR
+    SEEKTO_ERROR,
+    ILLEGAL_STATE
 }
 
 export class AndroidVideoPlayerApi extends NativeApi {
@@ -50,6 +51,11 @@ export class AndroidVideoPlayerApi extends NativeApi {
             case AndroidVideoPlayerError[AndroidVideoPlayerError.SEEKTO_ERROR]:
                 this.onError.trigger('video_seekto_error', parameters[0]);
                 break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.ILLEGAL_STATE]:
+                this.onError.trigger('video_illegal_state_error', '');
+                break;
+
             default:
                 throw new Error('VideoPlayer event ' + event + ' does not have an observable');
         }
