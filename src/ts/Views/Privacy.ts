@@ -1,6 +1,7 @@
 /// <amd-dependency path='text!html/Privacy.html' name='PrivacyTemplate' />
 declare var PrivacyTemplate: string;
 
+import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0, Observable1 } from 'Utilities/Observable';
@@ -10,8 +11,8 @@ export class Privacy extends View {
     public onPrivacy: Observable1<string> = new Observable1();
     public onClose: Observable0 = new Observable0();
 
-    constructor(isCoppaCompliant: boolean) {
-        super('privacy');
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
+        super(nativeBridge, 'privacy');
 
         this._template = new Template(PrivacyTemplate);
 

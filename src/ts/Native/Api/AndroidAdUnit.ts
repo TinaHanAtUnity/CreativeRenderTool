@@ -16,6 +16,13 @@ enum AdUnitEvent {
     ON_STOP,
 }
 
+export enum AndroidAdUnitError {
+    ACTIVITY_NULL,
+    ACTIVITY_ID,
+    CORRUPTED_VIEWLIST,
+    CORRUPTED_KEYEVENTLIST
+}
+
 export class AndroidAdUnitApi extends NativeApi {
 
     public onStart: Observable1<number> = new Observable1();

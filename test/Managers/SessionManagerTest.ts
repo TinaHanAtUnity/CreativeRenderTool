@@ -24,7 +24,7 @@ describe('SessionManager', () => {
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let overlay = new Overlay(false);
+    let overlay: Overlay;
 
     it('sends start events from VAST', () => {
         // given a VAST placement
@@ -186,6 +186,8 @@ describe('SessionManager', () => {
             handleInvocation,
             handleCallback
         });
+
+        overlay = new Overlay(nativeBridge, false);
 
         let vastParser = TestFixtures.getVastParser();
 

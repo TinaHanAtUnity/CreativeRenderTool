@@ -38,7 +38,7 @@ class TestStorageApi extends StorageApi {
         if(key === 'mediation') {
             delete this._storage.mediation;
         }
-        return Promise.resolve();
+        return Promise.resolve(void(0));
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {

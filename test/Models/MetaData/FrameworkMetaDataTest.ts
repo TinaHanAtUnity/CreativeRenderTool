@@ -35,7 +35,7 @@ class TestStorageApi extends StorageApi {
         if(key === 'framework') {
             delete this._storage.framework;
         }
-        return Promise.resolve();
+        return Promise.resolve(void(0));
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {

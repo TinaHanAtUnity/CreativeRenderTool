@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class CampaignManager {
 
@@ -67,7 +68,7 @@ export class CampaignManager {
                             } else {
                                 campaignId = 'UNKNOWN';
                             }
-                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup);
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
                                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                                 return;
@@ -77,7 +78,11 @@ export class CampaignManager {
                                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                             }
                             if (!campaign.getVideoUrl()) {
-                                this.onError.trigger(new Error('Campaign does not have a video url'));
+                                let videoUrlError = new DiagnosticError(
+                                    new Error('Campaign does not have a video url'),
+                                    { rootWrapperVast: campaignJson.vast }
+                                );
+                                this.onError.trigger(videoUrlError);
                                 return;
                             }
                             this.onVastCampaign.trigger(campaign);
