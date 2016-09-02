@@ -330,7 +330,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error', () => {
-            VideoEventHandlers.onVideoError(nativeBridge, adUnit, null, null, null, 'video_prepare_error', 'http://test.video.url');
+            VideoEventHandlers.onVideoError(nativeBridge, adUnit, 'video_prepare_error', 'http://test.video.url');
 
             assert.isFalse(adUnit.isVideoActive());
             assert.equal(adUnit.getFinishState(), FinishState.ERROR);
@@ -356,7 +356,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error', () => {
-            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, adUnit, null, null, null, 'video_prepare_error', 1, 0, 'http://test.video.url');
+            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, adUnit, 'video_prepare_error', 1, 0, 'http://test.video.url');
 
             assert.isFalse(adUnit.isVideoActive());
             assert.equal(adUnit.getFinishState(), FinishState.ERROR);

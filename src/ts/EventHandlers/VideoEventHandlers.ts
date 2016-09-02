@@ -10,9 +10,6 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { EventManager } from 'Managers/EventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class VideoEventHandlers {
 
@@ -128,28 +125,28 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, what: number, extra: number, url: string) {
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, errorType: string, what: number, extra: number, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + what + ' ' + extra + ' ' + url);
 
         this.handleVideoError(nativeBridge, adUnit);
 
-        Diagnostics.trigger(eventManager, {
+        Diagnostics.trigger({
             'type': errorType,
             'url': url,
             'what': what,
             'extra': extra
-        }, clientInfo, deviceInfo);
+        });
     }
 
-    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, errorType: string, url: string) {
+    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, errorType: string, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + url);
 
         this.handleVideoError(nativeBridge, adUnit);
 
-        Diagnostics.trigger(eventManager, {
+        Diagnostics.trigger({
             'type': errorType,
             'url': url
-        }, clientInfo, deviceInfo);
+        });
     }
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
