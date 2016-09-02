@@ -50,10 +50,12 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JsonParser.parse(response.response);
+                if(campaignJson.gamerId) {
+                    this.storeGamerId(campaignJson.gamerId);
+                }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                    this.storeGamerId(campaignJson.gamerId);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
