@@ -851,6 +851,12 @@ describe('CampaignManager', () => {
                 get: function(storageType, key) {
                     return Promise.resolve('123');
                 },
+                set: () => {
+                    return Promise.resolve();
+                },
+                write: () => {
+                    return Promise.resolve();
+                },
                 getKeys: sinon.stub().returns(Promise.resolve([]))
             },
             Request: {
