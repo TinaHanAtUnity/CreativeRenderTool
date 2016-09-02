@@ -15,7 +15,6 @@ import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
 import { Platform } from '../../src/ts/Constants/Platform';
-import { StorageType } from '../../src/ts/Native/Api/Storage';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
