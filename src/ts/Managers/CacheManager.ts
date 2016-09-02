@@ -3,6 +3,11 @@ import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { EventManager } from 'Managers/EventManager';
+import { ClientInfo } from 'Models/ClientInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export enum CacheStatus {
     OK,
@@ -36,6 +41,9 @@ export class CacheManager {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
+    private _eventManager: EventManager;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
 
@@ -45,9 +53,13 @@ export class CacheManager {
         };
     }
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
+    // todo: when diagnostics is refactored, remove eventmanager, clientinfo and deviceinfo
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+        this._eventManager = eventManager;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         this._nativeBridge.Cache.setProgressInterval(500);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
@@ -89,7 +101,7 @@ export class CacheManager {
             if(this._callbacks.hasOwnProperty(url)) {
                 let callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
-                    callback.reject([CacheStatus.STOPPED, callback.fileId]);
+                    callback.reject(CacheStatus.STOPPED);
                     delete this._callbacks[url];
                 } else {
                     activeDownload = true;
@@ -249,6 +261,11 @@ export class CacheManager {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
+    private deleteCacheResponse(url: string): void {
+        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + this._fileIds[url]);
+        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         if(size === 0) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
@@ -262,9 +279,33 @@ export class CacheManager {
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
-            this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
-            callback.resolve([CacheStatus.OK, callback.fileId]);
-            delete this._callbacks[url];
+            // todo: add redirect logic here
+            if(responseCode >= 400) {
+                let error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
+                    url: url,
+                    size: size,
+                    totalSize: totalSize,
+                    duration: duration,
+                    responseCode: responseCode,
+                    headers: JSON.stringify(headers)
+                });
+                Diagnostics.trigger(this._eventManager, {
+                    'type': 'cache_error',
+                    'error': error
+                }, this._clientInfo, this._deviceInfo);
+
+                this.deleteCacheResponse(url);
+                if(size > 0) {
+                    this._nativeBridge.Cache.deleteFile(callback.fileId);
+                }
+
+                callback.reject('HTTP ' + responseCode);
+                delete this._callbacks[url];
+            } else {
+                this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
+                callback.resolve([CacheStatus.OK, callback.fileId]);
+                delete this._callbacks[url];
+            }
         }
     }
 
