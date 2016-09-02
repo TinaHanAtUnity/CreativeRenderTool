@@ -11,7 +11,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { StorageType } from '../Native/Api/Storage';
+import { StorageType } from 'Native/Api/Storage';
 
 export class CampaignManager {
 
