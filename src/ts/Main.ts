@@ -34,7 +34,7 @@ switch(Url.getQueryParameter(location.search, 'platform')) {
         break;
 
     case 'ios':
-        nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS);
+        nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
         break;
 
     default:
