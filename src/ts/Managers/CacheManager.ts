@@ -11,7 +11,8 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export enum CacheStatus {
     OK,
-    STOPPED
+    STOPPED,
+    FAILED
 }
 
 export interface ICacheOptions {
@@ -76,7 +77,7 @@ export class CacheManager {
 
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
-                return Promise.reject(CacheError.FILE_ALREADY_CACHING);
+                return Promise.reject(CacheStatus.FAILED);
             }
             return Promise.all([
                 this.shouldCache(url),
@@ -215,7 +216,7 @@ export class CacheManager {
                 switch(error) {
                     case CacheError[CacheError.FILE_ALREADY_CACHING]:
                         this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
-                        callback.reject(error);
+                        callback.reject(CacheStatus.FAILED);
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
@@ -223,7 +224,7 @@ export class CacheManager {
                         return;
 
                     default:
-                        callback.reject(error);
+                        callback.reject(CacheStatus.FAILED);
                         return;
                 }
             }
@@ -299,7 +300,7 @@ export class CacheManager {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
                 }
 
-                callback.reject('HTTP ' + responseCode);
+                callback.reject(CacheStatus.FAILED);
                 delete this._callbacks[url];
             } else {
                 this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
@@ -327,7 +328,7 @@ export class CacheManager {
                     return;
 
                 default:
-                    callback.reject(error);
+                    callback.reject(CacheStatus.FAILED);
                     delete this._callbacks[url];
                     return;
             }
@@ -339,7 +340,7 @@ export class CacheManager {
             callback.retryCount++;
             callback.networkRetry = true;
         } else {
-            callback.reject(error);
+            callback.reject(CacheStatus.FAILED);
             delete this._callbacks[url];
         }
     }
