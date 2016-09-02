@@ -11,6 +11,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { StorageType } from '../Native/Api/Storage';
 
 export class CampaignManager {
 
@@ -52,6 +53,7 @@ export class CampaignManager {
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    this.storeGamerId(campaignJson.gamerId);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
@@ -151,12 +153,20 @@ export class CampaignManager {
         let promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
+        promises.push(this.fetchGamerId());
 
-        return Promise.all(promises).then(([connectionType, networkType]) => {
+        return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
             });
+
+            if(gamerId) {
+                url = Url.addParameters(url, {
+                    gamerId: gamerId
+                });
+            }
+
             return url;
         });
     }
@@ -189,6 +199,19 @@ export class CampaignManager {
         });
     }
 
+    private fetchGamerId(): Promise<string> {
+        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+            return gamerId;
+        }).catch(error => {
+            return undefined;
+        });
+    }
 
+    private storeGamerId(gamerId: string): Promise<void[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
 
 }

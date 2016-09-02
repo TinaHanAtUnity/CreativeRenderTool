@@ -15,6 +15,7 @@ import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
 import { Platform } from '../../src/ts/Constants/Platform';
+import { StorageType } from '../../src/ts/Native/Api/Storage';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -848,11 +849,9 @@ describe('CampaignManager', () => {
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
-                get:
-                    sinon.stub()
-                        .onCall(0).returns(Promise.resolve('mediation name'))
-                        .onCall(1).returns(Promise.resolve('mediation version'))
-                        .onCall(2).returns(Promise.resolve(42)),
+                get: function(storageType, key) {
+                    return Promise.resolve('123');
+                },
                 getKeys: sinon.stub().returns(Promise.resolve([]))
             },
             Request: {
