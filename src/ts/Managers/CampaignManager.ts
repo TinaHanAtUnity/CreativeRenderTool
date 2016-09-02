@@ -159,13 +159,8 @@ export class CampaignManager {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
+                gamerId: gamerId
             });
-
-            if(gamerId) {
-                url = Url.addParameters(url, {
-                    gamerId: gamerId
-                });
-            }
 
             return url;
         });
