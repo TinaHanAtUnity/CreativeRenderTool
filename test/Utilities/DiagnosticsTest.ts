@@ -29,7 +29,8 @@ describe('DiagnosticsTest', () => {
         let eventManager = new EventManager(nativeBridge, request);
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-        Diagnostics.trigger(eventManager, {'test': true}, null, null).then(value => {
+        Diagnostics.setEventManager(eventManager);
+        Diagnostics.trigger({'test': true}).then(value => {
             mockEventManager.verify();
         });
     });
@@ -54,7 +55,10 @@ describe('DiagnosticsTest', () => {
 
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-        Diagnostics.trigger(eventManager, {'test': true}, clientInfo, deviceInfo).then(value => {
+        Diagnostics.setEventManager(eventManager);
+        Diagnostics.setDeviceInfo(deviceInfo);
+        Diagnostics.setClientInfo(clientInfo);
+        Diagnostics.trigger({'test': true}).then(value => {
             mockEventManager.verify();
         });
     });
