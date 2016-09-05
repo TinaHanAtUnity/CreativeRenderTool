@@ -281,7 +281,7 @@ export class CacheManager {
         let callback = this._callbacks[url];
         if(callback) {
             // todo: add redirect logic here
-            if(responseCode >= 400) {
+            if(responseCode !== 200 && responseCode !== 206) {
                 let error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
                     url: url,
                     size: size,
