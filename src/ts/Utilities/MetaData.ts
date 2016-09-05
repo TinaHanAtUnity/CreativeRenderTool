@@ -17,13 +17,7 @@ export class MetaData {
             }
 
             return [true, value];
-        }).catch(error => {
-            // hack to work around API differences
-            // android returns error and key, ios returns only error
-            if(this._nativeBridge.getPlatform() !== Platform.IOS) {
-                error = error[0];
-            }
-
+        }).catch(([error]) => {
             switch(error) {
                 case StorageError[StorageError.COULDNT_GET_VALUE]:
                     // it is normal that a value is not found
@@ -42,13 +36,7 @@ export class MetaData {
     public hasCategory(category: string): Promise<boolean> {
         return this._nativeBridge.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
             return results.length > 0;
-        }).catch(error => {
-            // hack to work around API differences
-            // android returns error, storage type and key, ios returns only error
-            if(this._nativeBridge.getPlatform() !== Platform.IOS) {
-                error = error[0];
-            }
-
+        }).catch(([error]) => {
             switch(error) {
                 case StorageError[StorageError.COULDNT_GET_STORAGE]:
                     // it is normal that public metadata storage might not exist
