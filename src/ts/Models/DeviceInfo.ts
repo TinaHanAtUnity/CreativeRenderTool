@@ -223,17 +223,6 @@ export class DeviceInfo extends Model {
         return this._simulator;
     }
 
-    public isAppleWatchPaired(): Promise<boolean> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.DeviceInfo.Ios.isAppleWatchPaired().then(isPaired => {
-                this._appleWatchPaired = isPaired;
-                return this._appleWatchPaired;
-            });
-        } else {
-            return Promise.resolve(this._appleWatchPaired);
-        }
-    }
-
     public getHeadset(): Promise<boolean> {
         return this._nativeBridge.DeviceInfo.getHeadset().then(headset => {
             this._headset = headset;
@@ -313,10 +302,6 @@ export class DeviceInfo extends Model {
         promises.push(this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getFreeMemory().catch(err => this.handleDeviceInfoError(err)));
-
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            promises.push(this.isAppleWatchPaired().catch(err => this.handleDeviceInfoError(err)));
-        }
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             promises.push(this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)));
