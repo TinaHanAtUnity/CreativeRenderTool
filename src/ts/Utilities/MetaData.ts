@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType, StorageError } from 'Native/Api/Storage';
-import { Platform } from 'Constants/Platform';
 
 export class MetaData {
     private _nativeBridge: NativeBridge;
