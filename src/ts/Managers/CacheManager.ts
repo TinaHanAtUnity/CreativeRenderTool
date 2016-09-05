@@ -3,9 +3,6 @@ import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
-import { EventManager } from 'Managers/EventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 
@@ -42,9 +39,6 @@ export class CacheManager {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
-    private _eventManager: EventManager;
-    private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
 
@@ -54,13 +48,9 @@ export class CacheManager {
         };
     }
 
-    // todo: when diagnostics is refactored, remove eventmanager, clientinfo and deviceinfo
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
-        this._eventManager = eventManager;
-        this._clientInfo = clientInfo;
-        this._deviceInfo = deviceInfo;
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         this._nativeBridge.Cache.setProgressInterval(500);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
@@ -290,10 +280,10 @@ export class CacheManager {
                     responseCode: responseCode,
                     headers: JSON.stringify(headers)
                 });
-                Diagnostics.trigger(this._eventManager, {
+                Diagnostics.trigger({
                     'type': 'cache_error',
                     'error': error
-                }, this._clientInfo, this._deviceInfo);
+                });
 
                 this.deleteCacheResponse(url);
                 if(size > 0) {

@@ -66,9 +66,14 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
+            this._eventManager = new EventManager(this._nativeBridge, this._request);
+            Diagnostics.setEventManager(this._eventManager);
+            Diagnostics.setClientInfo(this._clientInfo);
+
             return this._deviceInfo.fetch();
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
@@ -83,8 +88,7 @@ export class WebView {
                 }
             }
 
-            this._eventManager = new EventManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
-            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager, this._eventManager, this._clientInfo, this._deviceInfo);
+            Diagnostics.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -134,10 +138,10 @@ export class WebView {
                 }
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger(this._eventManager, {
+            Diagnostics.trigger({
                 'type': 'initialization_error',
                 'error': error
-            }, this._clientInfo, this._deviceInfo);
+            });
         });
     }
 
@@ -176,10 +180,10 @@ export class WebView {
                 timeoutInSeconds: this._campaign.getTimeoutInSeconds()
             });
 
-            Diagnostics.trigger(this._eventManager, {
+            Diagnostics.trigger({
                 type: 'campaign_expired',
                 error: error
-            }, this._clientInfo, this._deviceInfo);
+            });
 
             return;
         }
@@ -420,10 +424,10 @@ export class WebView {
             error = {'message': error.message, 'name': error.name, 'stack': error.stack};
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger(this._eventManager, {
+        Diagnostics.trigger({
             'type': 'campaign_request_failed',
             'error': error
-        }, this._clientInfo, this._deviceInfo);
+        });
         this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
@@ -503,14 +507,14 @@ export class WebView {
      GENERIC ONERROR HANDLER
      */
     private onError(event: ErrorEvent): boolean {
-        Diagnostics.trigger(this._eventManager, {
+        Diagnostics.trigger({
             'type': 'js_error',
             'message': event.message,
             'url': event.filename,
             'line': event.lineno,
             'column': event.colno,
             'object': event.error
-        }, this._clientInfo, this._deviceInfo);
+        });
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
 
