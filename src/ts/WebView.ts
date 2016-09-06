@@ -87,7 +87,6 @@ export class WebView {
                     document.body.classList.add('ipad');
                 }
             }
-
             Diagnostics.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
