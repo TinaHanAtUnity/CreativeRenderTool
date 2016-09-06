@@ -33,6 +33,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _endScreen: EndScreen;
     private _videoDuration: number;
     private _videoPosition: number;
+    private _videoPositionRepeats: number;
     private _videoQuartile: number;
     private _videoActive: boolean;
     private _activityId: number;
@@ -62,6 +63,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
 
         this._videoPosition = 0;
+        this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
         this._watches = 0;
@@ -209,6 +211,14 @@ export class VideoAdUnit extends AbstractAdUnit {
         if(this._videoDuration) {
             this._videoQuartile = Math.floor((this._videoPosition * 4) / this._videoDuration);
         }
+    }
+
+    public getVideoPositionRepeats(): number {
+        return this._videoPositionRepeats;
+    }
+
+    public setVideoPositionRepeats(repeats: number): void {
+        this._videoPositionRepeats = repeats;
     }
 
     public getVideoQuartile(): number {
