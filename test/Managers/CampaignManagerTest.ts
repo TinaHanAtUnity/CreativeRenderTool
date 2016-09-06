@@ -848,11 +848,15 @@ describe('CampaignManager', () => {
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
-                get:
-                    sinon.stub()
-                        .onCall(0).returns(Promise.resolve('mediation name'))
-                        .onCall(1).returns(Promise.resolve('mediation version'))
-                        .onCall(2).returns(Promise.resolve(42)),
+                get: function(storageType, key) {
+                    return Promise.resolve('123');
+                },
+                set: () => {
+                    return Promise.resolve();
+                },
+                write: () => {
+                    return Promise.resolve();
+                },
                 getKeys: sinon.stub().returns(Promise.resolve([]))
             },
             Request: {

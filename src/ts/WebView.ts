@@ -73,7 +73,6 @@ export class WebView {
             this._eventManager = new EventManager(this._nativeBridge, this._request);
             Diagnostics.setEventManager(this._eventManager);
             Diagnostics.setClientInfo(this._clientInfo);
-            Diagnostics.setDeviceInfo(this._deviceInfo);
 
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -88,7 +87,7 @@ export class WebView {
                     document.body.classList.add('ipad');
                 }
             }
-
+            Diagnostics.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
