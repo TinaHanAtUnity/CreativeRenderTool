@@ -125,27 +125,72 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, errorType: string, what: number, extra: number, url: string) {
-        nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + what + ' ' + extra + ' ' + url);
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, what: number, extra: number, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
 
         this.handleVideoError(nativeBridge, adUnit);
 
         Diagnostics.trigger({
-            'type': errorType,
+            'type': 'video_player_generic_error',
             'url': url,
-            'what': what,
-            'extra': extra
+            'error': {
+                'what': what,
+                'extra': extra
+            }
         });
     }
 
-    public static onVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, errorType: string, url: string) {
-        nativeBridge.Sdk.logError('Unity Ads video player error ' + errorType + ' ' + url);
+    public static onIosGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 
         this.handleVideoError(nativeBridge, adUnit);
 
         Diagnostics.trigger({
-            'type': errorType,
+            'type': 'video_player_generic_error',
             'url': url
+        });
+    }
+
+    public static onPrepareError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
+
+        this.handleVideoError(nativeBridge, adUnit);
+
+        Diagnostics.trigger({
+            'type': 'video_player_prepare_error',
+            'url': url
+        });
+    }
+
+    public static onSeekToError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player seek to error '  + url);
+
+        this.handleVideoError(nativeBridge, adUnit);
+
+        Diagnostics.trigger({
+            'type': 'video_player_seek_to_error',
+            'url': url
+        });
+    }
+
+    public static onPauseError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player pause error '  + url);
+
+        this.handleVideoError(nativeBridge, adUnit);
+
+        Diagnostics.trigger({
+            'type': 'video_player_pause_error',
+            'url': url
+        });
+    }
+
+    public static onIllegalStateError(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
+        nativeBridge.Sdk.logError('Unity Ads video player illegal state error');
+
+        this.handleVideoError(nativeBridge, adUnit);
+
+        Diagnostics.trigger({
+            'type': 'video_player_illegal_state_error'
         });
     }
 

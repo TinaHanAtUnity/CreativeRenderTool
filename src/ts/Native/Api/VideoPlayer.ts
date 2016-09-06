@@ -7,18 +7,13 @@ import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
 import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
 
 enum VideoPlayerEvent {
-    GENERIC_ERROR,
     PROGRESS,
     COMPLETED,
     PREPARED,
-    PREPARE_ERROR,
     PLAY,
-    PAUSE_ERROR,
     PAUSE,
-    SEEKTO_ERROR,
     SEEKTO,
     STOP,
-    ILLEGAL_STATE
 }
 
 export class VideoPlayerApi extends NativeApi {
