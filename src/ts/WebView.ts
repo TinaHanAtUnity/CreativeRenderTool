@@ -257,31 +257,32 @@ export class WebView {
 
         let cacheMode = this._configuration.getCacheMode();
 
-        let cacheAsset = (url: string) => {
+        let cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 throw status;
             }).catch(error => {
-                if(error !== CacheStatus.STOPPED) {
-                    this.onError(error);
+                if(failAllowed === true && error === CacheStatus.FAILED) {
                     return url;
                 }
                 throw error;
             });
         };
 
-        let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
+        let cacheAssets = (failAllowed: boolean) => {
+            return cacheAsset(campaign.getVideoUrl(), failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
             }).then(() =>
-                cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
+                cacheAsset(campaign.getLandscapeUrl(), failAllowed)).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getPortraitUrl(), failAllowed)).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getGameIcon(), failAllowed)).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
                 }
             });
         };
@@ -291,7 +292,7 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
+            cacheAssets(false).then(() => {
                 if(this._showing) {
                     let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
@@ -300,16 +301,18 @@ export class WebView {
                 } else {
                     sendReady();
                 }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
             });
         } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets(true);
             if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
                     sendReady();
                 });
             } else {
-                cacheAssets();
                 sendReady();
             }
         } else {
@@ -332,7 +335,6 @@ export class WebView {
                 throw status;
             }).catch(error => {
                 if(error !== CacheStatus.STOPPED) {
-                    this.onError(error);
                     return url;
                 }
                 throw error;
