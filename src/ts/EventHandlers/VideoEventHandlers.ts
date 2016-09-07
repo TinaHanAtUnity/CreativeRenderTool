@@ -10,6 +10,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class VideoEventHandlers {
 
@@ -65,6 +66,53 @@ export class VideoEventHandlers {
 
         if(position > 0) {
             let lastPosition = adUnit.getVideoPosition();
+
+            // consider all leaps more than one million milliseconds (slightly more than 2,5 hours)
+            // bugs in native videoplayer that should be ignored, these have been seen in some Android 7 devices
+            let ignoreTreshold: number = lastPosition + 1000000;
+            if(position > ignoreTreshold) {
+                nativeBridge.Sdk.logError('Unity Ads video player ignoring too large progress from ' + lastPosition + ' to ' + position);
+
+                let error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
+                    position: position,
+                    lastPosition: lastPosition,
+                    duration: adUnit.getVideoDuration()
+                });
+                Diagnostics.trigger({
+                    type: 'video_player_too_large_progress',
+                    error: error
+                });
+
+                return;
+            }
+
+            if(position === lastPosition) {
+                let repeats: number = adUnit.getVideoPositionRepeats();
+                let repeatTreshold: number = 5000 / adUnit.getProgressInterval();
+
+                // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
+                if(repeats > repeatTreshold) {
+                    nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
+                    this.handleVideoError(nativeBridge, adUnit);
+
+                    let error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
+                        repeats: repeats,
+                        position: position,
+                        duration: adUnit.getVideoDuration()
+                    });
+                    Diagnostics.trigger({
+                        type: 'video_player_stuck',
+                        error: error
+                    });
+
+                    return;
+                } else {
+                    adUnit.setVideoPositionRepeats(repeats + 1);
+                }
+            } else {
+                 adUnit.setVideoPositionRepeats(0);
+            }
+
             if(lastPosition > 0 && position - lastPosition < 100) {
                 adUnit.getOverlay().setSpinnerEnabled(true);
             } else {
@@ -91,7 +139,7 @@ export class VideoEventHandlers {
         sessionManager.sendStart(adUnit);
 
         adUnit.getOverlay().setSpinnerEnabled(false);
-        nativeBridge.VideoPlayer.setProgressEventInterval(250);
+        nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
 
         if(adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
