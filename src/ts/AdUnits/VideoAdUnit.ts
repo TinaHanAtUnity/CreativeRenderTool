@@ -257,7 +257,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public getProgressInterval(): number {
-        return this._progressInterval;
+        return VideoAdUnit._progressInterval;
     }
 
     /*
