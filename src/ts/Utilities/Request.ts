@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Platform } from 'Constants/Platform';
 
 const enum RequestStatus {
     COMPLETE,
