@@ -88,8 +88,10 @@ export class VideoEventHandlers {
 
             if(position === lastPosition) {
                 let repeats: number = adUnit.getVideoPositionRepeats();
+                let repeatTreshold: number = 5000 / adUnit.getProgressInterval();
 
-                if(repeats > 20) {
+                // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
+                if(repeats > repeatTreshold) {
                     nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
                     this.handleVideoError(nativeBridge, adUnit);
 
@@ -137,7 +139,7 @@ export class VideoEventHandlers {
         sessionManager.sendStart(adUnit);
 
         adUnit.getOverlay().setSpinnerEnabled(false);
-        nativeBridge.VideoPlayer.setProgressEventInterval(250);
+        nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
 
         if(adUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches

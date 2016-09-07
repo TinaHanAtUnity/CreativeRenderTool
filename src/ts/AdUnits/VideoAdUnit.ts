@@ -29,6 +29,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
     private static _activityIdCounter: number = 1;
 
+    private static _progressInterval: number = 250;
+
     private _overlay: Overlay;
     private _endScreen: EndScreen;
     private _videoDuration: number;
@@ -252,6 +254,10 @@ export class VideoAdUnit extends AbstractAdUnit {
     public unsetReferences() {
         this._endScreen = null;
         this._overlay = null;
+    }
+
+    public getProgressInterval(): number {
+        return this._progressInterval;
     }
 
     /*
