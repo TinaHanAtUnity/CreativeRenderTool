@@ -188,14 +188,17 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIosGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
-        nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
+    public static onIosGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string, description: string) {
+        nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
         this.handleVideoError(nativeBridge, adUnit);
 
         Diagnostics.trigger({
             'type': 'video_player_generic_error',
-            'url': url
+            'url': url,
+            'error': {
+                'description': description
+            }
         });
     }
 

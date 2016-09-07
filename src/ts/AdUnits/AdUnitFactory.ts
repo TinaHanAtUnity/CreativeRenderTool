@@ -13,7 +13,7 @@ import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
-import { IObserver0, IObserver1, IObserver3 } from 'Utilities/IObserver';
+import { IObserver0, IObserver1, IObserver2, IObserver3 } from 'Utilities/IObserver';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { MetaData } from 'Utilities/MetaData';
@@ -146,15 +146,15 @@ export class AdUnitFactory {
     }
 
     private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        let onGenericErrorObserver: IObserver1<string>;
+        let onGenericErrorObserver: IObserver2<string, string>;
         let onVideoPrepareErrorObserver: IObserver1<string>;
 
         if (videoAdUnit instanceof VastAdUnit) {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url) => VastVideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url));
+            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VastVideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
             onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VastVideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
 
         } else {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url));
+            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
             onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
 
         }

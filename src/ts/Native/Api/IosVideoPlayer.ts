@@ -15,7 +15,7 @@ export class IosVideoPlayerApi extends NativeApi {
     public onLikelyToKeepUp: Observable2<string, boolean> = new Observable2();
     public onBufferEmpty: Observable2<string, boolean> = new Observable2();
     public onBufferFull: Observable2<string, boolean> = new Observable2();
-    public onGenericError: Observable1<string> = new Observable1();
+    public onGenericError: Observable2<string, string> = new Observable2();
     public onPrepareError: Observable1<string> = new Observable1();
 
 
@@ -39,7 +39,7 @@ export class IosVideoPlayerApi extends NativeApi {
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.GENERIC_ERROR]:
-                this.onGenericError.trigger(parameters[0]);
+                this.onGenericError.trigger(parameters[0], parameters[1]);
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.PREPARE_ERROR]:
