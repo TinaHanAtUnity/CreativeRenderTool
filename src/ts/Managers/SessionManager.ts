@@ -35,7 +35,7 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'cached': true, // todo: get actual value
+            'cached': adUnit.getCampaign().isVideoCached(),
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
