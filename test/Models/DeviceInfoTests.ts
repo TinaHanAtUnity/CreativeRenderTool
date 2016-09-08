@@ -174,7 +174,6 @@ describe('DeviceInfoTest iOS', () => {
                 Ios: {
                     getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
                     getScreenScale: sinon.stub().returns(Promise.resolve(2)),
-                    isAppleWatchPaired: sinon.stub().returns(Promise.resolve(true)),
                     isSimulator: sinon.stub().returns(Promise.resolve(true)),
                     getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
@@ -190,7 +189,6 @@ describe('DeviceInfoTest iOS', () => {
         deviceInfo.getDTO().then(dto => {
             assert.equal(dto.userInterfaceIdiom, 1);
             assert.equal(dto.screenScale, 2);
-            assert.equal(dto.appleWatchPaired, true);
             assert.equal(dto.simulator, true);
             assert.equal(dto.freeSpaceInternal, 16);
             assert.equal(dto.networkOperatorName, 'operatorName');

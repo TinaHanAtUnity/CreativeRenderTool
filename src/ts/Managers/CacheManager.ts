@@ -3,10 +3,13 @@ import { IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export enum CacheStatus {
     OK,
-    STOPPED
+    STOPPED,
+    FAILED
 }
 
 export interface ICacheOptions {
@@ -60,7 +63,7 @@ export class CacheManager {
     public cache(url: string, options?: ICacheOptions): Promise<[CacheStatus, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
-                return Promise.reject(CacheError.FILE_ALREADY_CACHING);
+                return Promise.reject(CacheStatus.FAILED);
             }
             return Promise.all([
                 this.shouldCache(url),
@@ -88,7 +91,7 @@ export class CacheManager {
             if(this._callbacks.hasOwnProperty(url)) {
                 let callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
-                    callback.reject([CacheStatus.STOPPED, callback.fileId]);
+                    callback.reject(CacheStatus.STOPPED);
                     delete this._callbacks[url];
                 } else {
                     activeDownload = true;
@@ -202,7 +205,7 @@ export class CacheManager {
                 switch(error) {
                     case CacheError[CacheError.FILE_ALREADY_CACHING]:
                         this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
-                        callback.reject(error);
+                        callback.reject(CacheStatus.FAILED);
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
@@ -210,7 +213,7 @@ export class CacheManager {
                         return;
 
                     default:
-                        callback.reject(error);
+                        callback.reject(CacheStatus.FAILED);
                         return;
                 }
             }
@@ -248,6 +251,11 @@ export class CacheManager {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
+    private deleteCacheResponse(url: string): void {
+        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + this._fileIds[url]);
+        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
         if(size === 0) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
@@ -261,9 +269,33 @@ export class CacheManager {
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         let callback = this._callbacks[url];
         if(callback) {
-            this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
-            callback.resolve([CacheStatus.OK, callback.fileId]);
-            delete this._callbacks[url];
+            // todo: add redirect logic here
+            if(responseCode !== 200 && responseCode !== 206) {
+                let error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
+                    url: url,
+                    size: size,
+                    totalSize: totalSize,
+                    duration: duration,
+                    responseCode: responseCode,
+                    headers: JSON.stringify(headers)
+                });
+                Diagnostics.trigger({
+                    'type': 'cache_error',
+                    'error': error
+                });
+
+                this.deleteCacheResponse(url);
+                if(size > 0) {
+                    this._nativeBridge.Cache.deleteFile(callback.fileId);
+                }
+
+                callback.reject(CacheStatus.FAILED);
+                delete this._callbacks[url];
+            } else {
+                this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
+                callback.resolve([CacheStatus.OK, callback.fileId]);
+                delete this._callbacks[url];
+            }
         }
     }
 
@@ -285,7 +317,7 @@ export class CacheManager {
                     return;
 
                 default:
-                    callback.reject(error);
+                    callback.reject(CacheStatus.FAILED);
                     delete this._callbacks[url];
                     return;
             }
@@ -297,7 +329,7 @@ export class CacheManager {
             callback.retryCount++;
             callback.networkRetry = true;
         } else {
-            callback.reject(error);
+            callback.reject(CacheStatus.FAILED);
             delete this._callbacks[url];
         }
     }
