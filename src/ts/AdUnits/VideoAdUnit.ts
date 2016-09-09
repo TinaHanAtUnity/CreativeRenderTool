@@ -261,10 +261,12 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     private getVideoUrl(): string {
-        if(!this.getCampaign().isVideoCached() && this.getCampaign().getStreamingVideoUrl()) {
-            return this.getCampaign().getStreamingVideoUrl();
+        const campaign: Campaign = this.getCampaign();
+
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
         } else {
-            return this.getCampaign().getVideoUrl();
+            return campaign.getVideoUrl();
         }
     }
 
