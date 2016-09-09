@@ -132,12 +132,6 @@ export class CampaignManager {
             screenSize: this._deviceInfo.getScreenLayout()
         });
 
-        if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            url = Url.addParameters(url, {
-                webviewUa: encodeURIComponent(navigator.userAgent)
-            });
-        }
-
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion()
@@ -180,6 +174,10 @@ export class CampaignManager {
             language: this._deviceInfo.getLanguage(),
             timeZone: this._deviceInfo.getTimeZone(),
         };
+
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            body.webviewUa = navigator.userAgent;
+        }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
             body.deviceFreeSpace = freeSpace;
