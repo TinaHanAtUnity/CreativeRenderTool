@@ -44,6 +44,10 @@ export class SessionManagerEventMetadataCreator {
             'deviceModel': this._deviceInfo.getModel()
         };
 
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            infoJson.webviewUa = navigator.userAgent;
+        }
+
         let promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
