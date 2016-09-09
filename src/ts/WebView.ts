@@ -316,7 +316,14 @@ export class WebView {
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
@@ -392,7 +399,14 @@ export class WebView {
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
