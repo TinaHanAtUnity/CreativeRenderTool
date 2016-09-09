@@ -45,7 +45,7 @@ export class SessionManagerEventMetadataCreator {
         };
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            infoJson.webviewUa = encodeURIComponent(navigator.userAgent);
+            infoJson.webviewUa = navigator.userAgent;
         }
 
         let promises: Promise<any>[] = [];
