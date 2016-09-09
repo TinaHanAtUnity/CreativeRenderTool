@@ -104,6 +104,10 @@ export class Campaign {
         this._video = videoUrl;
     }
 
+    public getStreamingVideoUrl(): string {
+        return this._streamingVideo;
+    }
+
     public getClickAttributionUrl(): string {
         return this._clickAttributionUrl;
     }
