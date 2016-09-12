@@ -1,5 +1,7 @@
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AndroidVideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { IosVideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
@@ -32,7 +34,15 @@ export class AdUnitFactory {
     private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): VideoAdUnit {
         let overlay = new Overlay(nativeBridge, placement.muteVideo());
         let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
+
+
+        let videoAdUnit: VideoAdUnit;
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            videoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            videoAdUnit = new IosVideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
+        }
+
         let metaData = new MetaData(nativeBridge);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);

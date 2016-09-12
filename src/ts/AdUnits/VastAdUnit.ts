@@ -5,6 +5,7 @@ import { Placement } from 'Models/Placement';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
+import { IosAdUnitApi } from "../Native/Api/IosAdUnit";
 
 export class VastAdUnit extends VideoAdUnit {
 
