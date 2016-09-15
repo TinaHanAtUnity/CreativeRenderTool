@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -64,7 +65,13 @@ export class CampaignManager {
                     } else {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
                         let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
+                        let vastUnwrapStart = Date.now();
                         this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
+                            let vastUnwrapTime = Date.now() - vastUnwrapStart;
+                            Diagnostics.trigger({
+                                'type': 'vast_unwrap_time',
+                                'vastUnwrapTime': vastUnwrapTime
+                            });
                             let campaignId: string = undefined;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                                 campaignId = '00005472656d6f7220694f53';
