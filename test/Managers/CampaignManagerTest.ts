@@ -481,7 +481,7 @@ describe('CampaignManager', () => {
         });
     };
 
-    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
+    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
         // given a VAST placement that wraps another VAST
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
@@ -508,11 +508,7 @@ describe('CampaignManager', () => {
             }
         });
 
-        // when the campaign manager requests the placement
-        return campaignManager.request().then(() => {
-            // then the onError observable is triggered with an appropriate error
-            verify();
-        });
+        campaignManager.request();
     };
 
     describe('VAST error handling', () => {
