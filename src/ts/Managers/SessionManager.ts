@@ -35,7 +35,7 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'cached': true, // todo: get actual value
+            'cached': adUnit.getCampaign().isVideoCached(),
             'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
             'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
@@ -43,6 +43,10 @@ export class SessionManagerEventMetadataCreator {
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel()
         };
+
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            infoJson.webviewUa = navigator.userAgent;
+        }
 
         let promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getNetworkType());
