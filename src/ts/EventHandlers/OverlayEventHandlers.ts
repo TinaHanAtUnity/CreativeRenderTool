@@ -1,5 +1,4 @@
 import { Double } from 'Utilities/Double';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -7,14 +6,16 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+  public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
       nativeBridge.VideoPlayer.pause();
-      adUnit.setVideoActive(false);
-      adUnit.setFinishState(FinishState.SKIPPED);
-      sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
+      videoAdUnit.setVideoActive(false);
+      videoAdUnit.setFinishState(FinishState.SKIPPED);
+      sessionManager.sendSkip(adUnit, videoAdUnit.getVideoPosition());
 
       if(nativeBridge.getPlatform() === Platform.IOS) {
           nativeBridge.IosAdUnit.setViews(['webview']);
@@ -28,16 +29,16 @@ export class OverlayEventHandlers {
           nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
       }
 
-      adUnit.getOverlay().hide();
-      this.afterSkip(adUnit);
+      videoAdUnit.getOverlay().hide();
+      this.afterSkip(videoAdUnit);
   }
 
-    protected static afterSkip(adUnit: VideoAdUnit) {
-        adUnit.getEndScreen().show();
-        adUnit.onNewAdRequestAllowed.trigger();
+    protected static afterSkip(videoAdUnit: VideoAdUnit) {
+        videoAdUnit.getEndScreen().show();
+        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
     };
 
-    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
+    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, muted: boolean): void {
         nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
         sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
     }

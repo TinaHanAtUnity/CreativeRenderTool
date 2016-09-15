@@ -4,8 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class VastVideoEventHandlers extends VideoEventHandlers {
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.hide();
+    protected static afterVideoCompleted(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+        videoAdUnit.hide();
     }
-
 }

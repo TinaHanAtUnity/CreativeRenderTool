@@ -3,8 +3,8 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 
 export class VastOverlayEventHandlers extends OverlayEventHandlers {
 
-    protected static afterSkip(adUnit: VideoAdUnit) {
-        adUnit.hide();
+    protected static afterSkip(videoAdUnit: VideoAdUnit) {
+        videoAdUnit.hide();
     }
 
 }

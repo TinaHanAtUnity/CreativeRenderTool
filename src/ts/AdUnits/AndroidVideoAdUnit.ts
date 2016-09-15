@@ -11,6 +11,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
+import { AdUnitObservables } from 'AdUnits/AdUnitObservables';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -28,8 +29,8 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        super(nativeBridge, placement, campaign, overlay, endScreen);
+    constructor(nativeBridge: NativeBridge, observables: AdUnitObservables, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
+        super(nativeBridge, observables, placement, campaign, overlay, endScreen);
 
         this._activityId = AndroidVideoAdUnit._activityIdCounter++;
 
@@ -40,7 +41,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this.onStart.trigger();
+        this._adUnitObservables.onStart.trigger();
         this.setVideoActive(true);
 
         let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
@@ -81,7 +82,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this.hideChildren();
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
         this._nativeBridge.AndroidAdUnit.onResume.unsubscribe(this._onResumeObserver);
         this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
@@ -90,12 +91,12 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
         return this._nativeBridge.AndroidAdUnit.close().then(() => {
             this._showing = false;
-            this.onClose.trigger();
+            this._adUnitObservables.onClose.trigger();
         }).catch(error => {
             // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
             if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
                 this._showing = false;
-                this.onClose.trigger();
+                this._adUnitObservables.onClose.trigger();
             } else {
                 throw new Error(error);
             }
@@ -112,7 +113,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     private onResume(activityId: number): void {
         if(this._showing && this.isVideoActive() && activityId === this._activityId) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this._campaign.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0));
         }
     }
 

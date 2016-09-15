@@ -1,15 +1,13 @@
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
-import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AdUnitObservables } from 'AdUnits/AdUnitObservables';
 
 
 interface IIosOptions {
@@ -28,8 +26,8 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        super(nativeBridge, placement, campaign, overlay, endScreen);
+    constructor(nativeBridge: NativeBridge, observables: AdUnitObservables, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
+        super(nativeBridge, observables, placement, campaign, overlay, endScreen);
 
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
@@ -37,7 +35,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this.onStart.trigger();
+        this._adUnitObservables.onStart.trigger();
         this.setVideoActive(true);
 
         let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
@@ -73,7 +71,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
         this.hideChildren();
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this.getPlacement().getId(), this.getFinishState());
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
         this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
         this._nativeBridge.Notification.onNotification.unsubscribe(this._onNotificationObserver);
@@ -82,7 +80,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
         return this._nativeBridge.IosAdUnit.close().then(() => {
             this._showing = false;
-            this.onClose.trigger();
+            this._adUnitObservables.onClose.trigger();
         });
     }
 
@@ -94,7 +92,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     private onViewDidAppear(): void {
         if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this._campaign.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0));
         }
     }
 

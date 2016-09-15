@@ -1,21 +1,36 @@
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { Overlay } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { Campaign } from 'Models/Campaign';
 import { EventManager } from 'Managers/EventManager';
-import { IosAdUnitApi } from "../Native/Api/IosAdUnit";
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 
-export class VastAdUnit extends VideoAdUnit {
+export class VastAdUnit extends AbstractAdUnit {
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: VastCampaign, overlay: Overlay) {
-        super(nativeBridge, placement, campaign, overlay, null);
+    private _videoAdUnit: VideoAdUnit;
+
+    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
+        super(nativeBridge, videoAdUnit.getAdunitObservables(), placement, campaign);
+        this._videoAdUnit = videoAdUnit;
     }
 
-    protected hideChildren() {
-        const overlay = this.getOverlay();
-        overlay.container().parentElement.removeChild(overlay.container());
+    public show(): Promise<void> {
+        return this._videoAdUnit.show();
+    }
+
+    public hide(): Promise<void> {
+        return this._videoAdUnit.hide();
+    }
+
+    public isShowing(): boolean {
+        return this._videoAdUnit.isShowing();
+    }
+
+    public setNativeOptions(options: any): void {
+        this._videoAdUnit.setNativeOptions(options);
+
     }
 
     public getVast(): Vast {

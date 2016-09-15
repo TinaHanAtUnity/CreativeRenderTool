@@ -1,14 +1,14 @@
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
 import { IAppSheetOptions } from 'Native/Api/AppSheet';
+import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
 
 export class EndScreenEventHandlers {
 
-    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
         let platform = nativeBridge.getPlatform();
         let campaign = adUnit.getCampaign();
 
@@ -60,7 +60,7 @@ export class EndScreenEventHandlers {
         }
     }
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+    public static onClose(nativeBridge: NativeBridge, adUnit: AbstractAdUnit): void {
         if(nativeBridge.getPlatform() === Platform.IOS && !adUnit.getCampaign().getBypassAppSheet()) {
             nativeBridge.AppSheet.destroy({
                 id: parseInt(adUnit.getCampaign().getAppStoreId(), 10)

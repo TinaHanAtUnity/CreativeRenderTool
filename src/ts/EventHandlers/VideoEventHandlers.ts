@@ -11,20 +11,21 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class VideoEventHandlers {
 
-    public static isVast(arg: any): arg is VastAdUnit {
-        return arg.getVast !== undefined;
-    }
+   // public static isVast(adUnitAbstractAdUnit): arg is VastAdUnit {
+   //     return arg.getVast !== undefined;
+   // }
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
-        let overlay = adUnit.getOverlay();
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+        let overlay = videoAdUnit.getOverlay();
 
-        adUnit.setVideoDuration(duration);
+        videoAdUnit.setVideoDuration(duration);
         overlay.setVideoDuration(duration);
-        if(adUnit.getVideoPosition() > 0) {
-            overlay.setVideoProgress(adUnit.getVideoPosition());
+        if(videoAdUnit.getVideoPosition() > 0) {
+            overlay.setVideoProgress(videoAdUnit.getVideoPosition());
         }
         if(adUnit.getPlacement().allowSkip()) {
             overlay.setSkipVisible(true);
@@ -32,7 +33,7 @@ export class VideoEventHandlers {
         overlay.setMuteEnabled(true);
         overlay.setVideoDurationEnabled(true);
 
-        if (this.isVast(adUnit) && adUnit.getVideoClickThroughURL()) {
+        if (adUnit instanceof VastAdUnit && (<VastAdUnit>adUnit).getVideoClickThroughURL()) {
             overlay.setCallButtonVisible(true);
         }
 
@@ -40,7 +41,7 @@ export class VideoEventHandlers {
             if(found && debugOverlayEnabled) {
                 overlay.setDebugMessageVisible(true);
                 let debugMessage = '';
-                if (this.isVast(adUnit)) {
+                if (adUnit instanceof VastAdUnit) {
                     debugMessage = 'Programmatic Ad';
                 } else {
                     debugMessage = 'Performance Ad';
@@ -50,8 +51,8 @@ export class VideoEventHandlers {
         });
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
-            if(adUnit.getVideoPosition() > 0) {
-                nativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
+            if(videoAdUnit.getVideoPosition() > 0) {
+                nativeBridge.VideoPlayer.seekTo(videoAdUnit.getVideoPosition()).then(() => {
                     nativeBridge.VideoPlayer.play();
                 });
             } else {
@@ -60,12 +61,12 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, position: number): void {
         // todo: video progress event should be handled here and not delegated to session manager
-        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoPosition());
+        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, videoAdUnit.getVideoPosition());
 
         if(position > 0) {
-            let lastPosition = adUnit.getVideoPosition();
+            let lastPosition = videoAdUnit.getVideoPosition();
 
             // consider all leaps more than one million milliseconds (slightly more than 2,5 hours)
             // bugs in native videoplayer that should be ignored, these have been seen in some Android 7 devices
@@ -76,7 +77,7 @@ export class VideoEventHandlers {
                 let error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
                     position: position,
                     lastPosition: lastPosition,
-                    duration: adUnit.getVideoDuration()
+                    duration: videoAdUnit.getVideoDuration()
                 });
                 Diagnostics.trigger({
                     type: 'video_player_too_large_progress',
@@ -87,18 +88,18 @@ export class VideoEventHandlers {
             }
 
             if(position === lastPosition) {
-                let repeats: number = adUnit.getVideoPositionRepeats();
-                let repeatTreshold: number = 5000 / adUnit.getProgressInterval();
+                let repeats: number = videoAdUnit.getVideoPositionRepeats();
+                let repeatTreshold: number = 5000 / videoAdUnit.getProgressInterval();
 
                 // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
                 if(repeats > repeatTreshold) {
                     nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
-                    this.handleVideoError(nativeBridge, adUnit);
+                    this.handleVideoError(nativeBridge, videoAdUnit);
 
                     let error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
                         repeats: repeats,
                         position: position,
-                        duration: adUnit.getVideoDuration()
+                        duration: videoAdUnit.getVideoDuration()
                     });
                     Diagnostics.trigger({
                         type: 'video_player_stuck',
@@ -107,51 +108,51 @@ export class VideoEventHandlers {
 
                     return;
                 } else {
-                    adUnit.setVideoPositionRepeats(repeats + 1);
+                    videoAdUnit.setVideoPositionRepeats(repeats + 1);
                 }
             } else {
-                 adUnit.setVideoPositionRepeats(0);
+                 videoAdUnit.setVideoPositionRepeats(0);
             }
 
             if(lastPosition > 0 && position - lastPosition < 100) {
-                adUnit.getOverlay().setSpinnerEnabled(true);
+                videoAdUnit.getOverlay().setSpinnerEnabled(true);
             } else {
-                adUnit.getOverlay().setSpinnerEnabled(false);
+                videoAdUnit.getOverlay().setSpinnerEnabled(false);
             }
 
-            let previousQuartile: number = adUnit.getVideoQuartile();
-            adUnit.setVideoPosition(position);
+            let previousQuartile: number = videoAdUnit.getVideoQuartile();
+            videoAdUnit.setVideoPosition(position);
 
-            if(previousQuartile === 0 && adUnit.getVideoQuartile() === 1) {
+            if(previousQuartile === 0 && videoAdUnit.getVideoQuartile() === 1) {
                 sessionManager.sendFirstQuartile(adUnit);
-            } else if(previousQuartile === 1 && adUnit.getVideoQuartile() === 2) {
+            } else if(previousQuartile === 1 && videoAdUnit.getVideoQuartile() === 2) {
                 sessionManager.sendMidpoint(adUnit);
-            } else if(previousQuartile === 2 && adUnit.getVideoQuartile() === 3) {
+            } else if(previousQuartile === 2 && videoAdUnit.getVideoQuartile() === 3) {
                 sessionManager.sendThirdQuartile(adUnit);
             }
         }
 
-        adUnit.getOverlay().setVideoProgress(position);
+        videoAdUnit.getOverlay().setVideoProgress(position);
     }
 
-    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
         sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
-        adUnit.getOverlay().setSpinnerEnabled(false);
-        nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
+        videoAdUnit.getOverlay().setSpinnerEnabled(false);
+        nativeBridge.VideoPlayer.setProgressEventInterval(videoAdUnit.getProgressInterval());
 
-        if(adUnit.getWatches() === 0) {
+        if(videoAdUnit.getWatches() === 0) {
             // send start callback only for first watch, never for rewatches
             nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
         }
 
-        adUnit.newWatch();
+        videoAdUnit.newWatch();
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
-        adUnit.setVideoActive(false);
-        adUnit.setFinishState(FinishState.COMPLETED);
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, metaData: MetaData): void {
+        videoAdUnit.setVideoActive(false);
+        videoAdUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -160,7 +161,7 @@ export class VideoEventHandlers {
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
 
-        this.afterVideoCompleted(nativeBridge, adUnit);
+        this.afterVideoCompleted(nativeBridge, videoAdUnit);
 
         metaData.get<boolean>('integration_test', false).then(([found, integrationTest]) => {
             if(found && integrationTest) {
@@ -173,10 +174,10 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, what: number, extra: number, url: string) {
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
 
-        this.handleVideoError(nativeBridge, adUnit);
+        this.handleVideoError(nativeBridge, videoAdUnit);
 
         Diagnostics.trigger({
             'type': 'video_player_generic_error',
@@ -188,10 +189,10 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIosGenericVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string, description: string) {
+    public static onIosGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string, description: string) {
         nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
-        this.handleVideoError(nativeBridge, adUnit);
+        this.handleVideoError(nativeBridge, videoAdUnit);
 
         Diagnostics.trigger({
             'type': 'video_player_generic_error',
@@ -224,10 +225,10 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onPauseError(nativeBridge: NativeBridge, adUnit: VideoAdUnit, url: string) {
+    public static onPauseError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player pause error '  + url);
 
-        this.handleVideoError(nativeBridge, adUnit);
+        this.handleVideoError(nativeBridge, videoAdUnit);
 
         Diagnostics.trigger({
             'type': 'video_player_pause_error',
@@ -245,10 +246,10 @@ export class VideoEventHandlers {
         });
     }
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
-        adUnit.onNewAdRequestAllowed.trigger();
+    protected static afterVideoCompleted(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+        videoAdUnit.getOverlay().hide();
+        videoAdUnit.getEndScreen().show();
+        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
@@ -257,9 +258,9 @@ export class VideoEventHandlers {
         }
     };
 
-    private static handleVideoError(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.setVideoActive(false);
-        adUnit.setFinishState(FinishState.ERROR);
+    private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+        videoAdUnit.setVideoActive(false);
+        videoAdUnit.setFinishState(FinishState.ERROR);
         nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -268,12 +269,12 @@ export class VideoEventHandlers {
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
 
-        adUnit.getOverlay().hide();
+        videoAdUnit.getOverlay().hide();
 
-        let endScreen = adUnit.getEndScreen();
+        let endScreen = videoAdUnit.getEndScreen();
         if(endScreen) {
-            adUnit.getEndScreen().show();
+            videoAdUnit.getEndScreen().show();
         }
-        adUnit.onNewAdRequestAllowed.trigger();
+        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
     }
 }
