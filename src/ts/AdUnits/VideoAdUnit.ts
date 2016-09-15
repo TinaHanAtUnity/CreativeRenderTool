@@ -14,7 +14,10 @@ export abstract class VideoAdUnit {
     protected _placement: Placement;
     protected _campaign: Campaign;
     protected _overlay: Overlay;
+
+    // todo: should be moved into PerformanceAdUnit
     protected _endScreen: EndScreen;
+
     protected _videoDuration: number;
     protected _videoPosition: number;
     protected _videoPositionRepeats: number;
