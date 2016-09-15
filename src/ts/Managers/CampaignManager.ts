@@ -70,7 +70,7 @@ export class CampaignManager {
                             let vastUnwrapTime = Date.now() - vastUnwrapStart;
                             Diagnostics.trigger({
                                 'type': 'vast_unwrap_time',
-                                'time': vastUnwrapTime
+                                'vastUnwrapTime': vastUnwrapTime
                             });
                             let campaignId: string = undefined;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
