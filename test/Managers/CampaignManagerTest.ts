@@ -15,6 +15,7 @@ import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Observable2 } from '../../src/ts/Utilities/Observable';
 import { Observable4 } from '../../src/ts/Utilities/Observable';
 import { Platform } from '../../src/ts/Constants/Platform';
+import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -890,6 +891,7 @@ describe('CampaignManager', () => {
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
+        Diagnostics.setEventManager(<any>{diagnosticEvent: sinon.spy()});
         deviceInfo = new DeviceInfo(nativeBridge);
     });
 
