@@ -12,7 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
-import {Diagnostics} from "../Utilities/Diagnostics";
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
