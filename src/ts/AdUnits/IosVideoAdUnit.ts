@@ -7,8 +7,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { AdUnitObservables } from 'AdUnits/AdUnitObservables';
-
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -26,8 +24,8 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, observables: AdUnitObservables, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        super(nativeBridge, observables, placement, campaign, overlay, endScreen);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+        super(nativeBridge, placement, campaign, overlay);
 
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
@@ -35,7 +33,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this._adUnitObservables.onStart.trigger();
+        this.onStart.trigger();
         this.setVideoActive(true);
 
         let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
@@ -80,7 +78,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
         return this._nativeBridge.IosAdUnit.close().then(() => {
             this._showing = false;
-            this._adUnitObservables.onClose.trigger();
+            this.onClose.trigger();
         });
     }
 

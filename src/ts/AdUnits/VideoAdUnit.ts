@@ -1,22 +1,14 @@
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import { FinishState } from 'Constants/FinishState';
-import { AdUnitObservables } from 'AdUnits/AdUnitObservables';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
-export abstract class VideoAdUnit {
+export abstract class VideoAdUnit extends AbstractAdUnit {
+
     private static _progressInterval: number = 250;
 
-    protected _nativeBridge: NativeBridge;
-    protected _adUnitObservables: AdUnitObservables;
-    protected _placement: Placement;
-    protected _campaign: Campaign;
     protected _overlay: Overlay;
-
-    // todo: should be moved into PerformanceAdUnit
-    protected _endScreen: EndScreen;
 
     protected _videoDuration: number;
     protected _videoPosition: number;
@@ -25,13 +17,10 @@ export abstract class VideoAdUnit {
     protected _videoActive: boolean;
     protected _watches: number;
     protected _showing: boolean = false;
-    protected _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, observables: AdUnitObservables, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        this._nativeBridge = nativeBridge;
-        this._adUnitObservables = observables;
-        this._placement = placement;
-        this._campaign = campaign;
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+        super(nativeBridge, placement, campaign);
+
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
@@ -39,35 +28,10 @@ export abstract class VideoAdUnit {
         this._watches = 0;
 
         this._overlay = overlay;
-        this._endScreen = endScreen;
-    }
-
-    public abstract show(): Promise<void>;
-
-    public abstract hide(): Promise<void>;
-
-    public abstract setNativeOptions(options: any): void;
-
-    public getAdunitObservables(): AdUnitObservables {
-        return this._adUnitObservables;
-    }
-
-    public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
-            this._finishState = finishState;
-        }
-    }
-
-    public getFinishState(): FinishState {
-        return this._finishState;
     }
 
     protected hideChildren() {
         this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-
-        if (this.getEndScreen()) {
-            this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
-        }
     };
 
     public isShowing(): boolean {
@@ -126,20 +90,16 @@ export abstract class VideoAdUnit {
         return this._overlay;
     }
 
-    public getEndScreen(): EndScreen {
-        return this._endScreen;
-    }
-
     public newWatch() {
         this._watches += 1;
     }
 
     public unsetReferences() {
-        this._endScreen = null;
         this._overlay = null;
     }
 
     public getProgressInterval(): number {
         return VideoAdUnit._progressInterval;
     }
+
 }

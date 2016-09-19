@@ -1,16 +1,17 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { EndScreen } from 'Views/EndScreen';
 
 export class PerformanceAdUnit extends AbstractAdUnit {
 
     private _videoAdUnit: VideoAdUnit;
+    private _endScreen: EndScreen;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
-        super(nativeBridge, videoAdUnit.getAdunitObservables(), placement, campaign);
+    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, endScreen: EndScreen) {
+        super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
         this._videoAdUnit = videoAdUnit;
+        this._endScreen = endScreen;
     }
 
     public show(): Promise<void> {
@@ -25,8 +26,8 @@ export class PerformanceAdUnit extends AbstractAdUnit {
         return this._videoAdUnit.isShowing();
     }
 
-    public setNativeOptions(options: any): void {
-        this._videoAdUnit.setNativeOptions(options);
+    public getEndScreen(): EndScreen {
+        return this._endScreen;
     }
 
 }

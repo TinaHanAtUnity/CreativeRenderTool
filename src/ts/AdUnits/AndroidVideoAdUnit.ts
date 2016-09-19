@@ -11,7 +11,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
-import { AdUnitObservables } from 'AdUnits/AdUnitObservables';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -29,8 +28,8 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, observables: AdUnitObservables, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
-        super(nativeBridge, observables, placement, campaign, overlay, endScreen);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+        super(nativeBridge, placement, campaign, overlay);
 
         this._activityId = AndroidVideoAdUnit._activityIdCounter++;
 
@@ -41,7 +40,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this._adUnitObservables.onStart.trigger();
+        this.onStart.trigger();
         this.setVideoActive(true);
 
         let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
@@ -91,12 +90,12 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
         return this._nativeBridge.AndroidAdUnit.close().then(() => {
             this._showing = false;
-            this._adUnitObservables.onClose.trigger();
+            this.onClose.trigger();
         }).catch(error => {
             // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
             if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
                 this._showing = false;
-                this._adUnitObservables.onClose.trigger();
+                this.onClose.trigger();
             } else {
                 throw new Error(error);
             }

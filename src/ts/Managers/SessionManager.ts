@@ -131,8 +131,8 @@ export class SessionManager {
             this._currentSession.impressionSent = true;
         }
 
-        adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId());
-        adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
+        //adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId());
+        //adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
@@ -145,7 +145,7 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
-            adUnit.sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
+            //adUnit.sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
@@ -153,7 +153,7 @@ export class SessionManager {
 
     public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
         if (session) {
-            adUnit.sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
+            //adUnit.sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
         }
     }
 
@@ -230,7 +230,7 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
-            adUnit.sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
+            //adUnit.sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
@@ -253,9 +253,9 @@ export class SessionManager {
 
     public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {
         if (muted) {
-            adUnit.sendTrackingEvent(this._eventManager, 'mute', session.getId());
+            //adUnit.sendTrackingEvent(this._eventManager, 'mute', session.getId());
         } else {
-            adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
+            //adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
         }
     }
 

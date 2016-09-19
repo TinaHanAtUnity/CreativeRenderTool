@@ -1,10 +1,8 @@
-import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { NativeBridge } from 'Native/NativeBridge';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
 
-export class VastVideoEventHandlers extends VideoEventHandlers {
+export class VastVideoEventHandlers {
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        videoAdUnit.hide();
+    public static onVideoCompleted(adUnit: VastAdUnit) {
+        adUnit.hide();
     }
 }

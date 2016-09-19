@@ -11,8 +11,8 @@ export class VastAdUnit extends AbstractAdUnit {
 
     private _videoAdUnit: VideoAdUnit;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
-        super(nativeBridge, videoAdUnit.getAdunitObservables(), placement, campaign);
+    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+        super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
         this._videoAdUnit = videoAdUnit;
     }
 
@@ -26,11 +26,6 @@ export class VastAdUnit extends AbstractAdUnit {
 
     public isShowing(): boolean {
         return this._videoAdUnit.isShowing();
-    }
-
-    public setNativeOptions(options: any): void {
-        this._videoAdUnit.setNativeOptions(options);
-
     }
 
     public getVast(): Vast {

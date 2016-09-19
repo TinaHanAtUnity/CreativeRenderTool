@@ -15,10 +15,6 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class VideoEventHandlers {
 
-   // public static isVast(adUnitAbstractAdUnit): arg is VastAdUnit {
-   //     return arg.getVast !== undefined;
-   // }
-
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
         let overlay = videoAdUnit.getOverlay();
 
@@ -248,8 +244,7 @@ export class VideoEventHandlers {
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         videoAdUnit.getOverlay().hide();
-        videoAdUnit.getEndScreen().show();
-        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
+        videoAdUnit.onFinish.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
@@ -270,11 +265,6 @@ export class VideoEventHandlers {
         }
 
         videoAdUnit.getOverlay().hide();
-
-        let endScreen = videoAdUnit.getEndScreen();
-        if(endScreen) {
-            videoAdUnit.getEndScreen().show();
-        }
-        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
+        videoAdUnit.onFinish.trigger();
     }
 }

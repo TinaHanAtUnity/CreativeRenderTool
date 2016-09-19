@@ -11,31 +11,30 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class OverlayEventHandlers {
 
-  public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
-      nativeBridge.VideoPlayer.pause();
-      videoAdUnit.setVideoActive(false);
-      videoAdUnit.setFinishState(FinishState.SKIPPED);
-      sessionManager.sendSkip(adUnit, videoAdUnit.getVideoPosition());
+    public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
+        nativeBridge.VideoPlayer.pause();
+        videoAdUnit.setVideoActive(false);
+        videoAdUnit.setFinishState(FinishState.SKIPPED);
+        sessionManager.sendSkip(adUnit, videoAdUnit.getVideoPosition());
 
-      if(nativeBridge.getPlatform() === Platform.IOS) {
-          nativeBridge.IosAdUnit.setViews(['webview']);
-      } else {
-          nativeBridge.AndroidAdUnit.setViews(['webview']);
-      }
+        if (nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setViews(['webview']);
+        } else {
+            nativeBridge.AndroidAdUnit.setViews(['webview']);
+        }
 
-      if(nativeBridge.getPlatform() === Platform.ANDROID) {
-          nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-      } else if(nativeBridge.getPlatform() === Platform.IOS) {
-          nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-      }
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
+        }
 
-      videoAdUnit.getOverlay().hide();
-      this.afterSkip(videoAdUnit);
-  }
+        videoAdUnit.getOverlay().hide();
+        this.afterSkip(videoAdUnit);
+    }
 
     protected static afterSkip(videoAdUnit: VideoAdUnit) {
-        videoAdUnit.getEndScreen().show();
-        videoAdUnit.getAdunitObservables().onNewAdRequestAllowed.trigger();
+        videoAdUnit.onFinish.trigger();
     };
 
     public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, muted: boolean): void {
@@ -47,7 +46,7 @@ export class OverlayEventHandlers {
         let clickThroughURL = adUnit.getVideoClickThroughURL();
         sessionManager.sendVideoClickTracking(adUnit, sessionManager.getSession());
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.UrlScheme.open(clickThroughURL);
         } else {
             nativeBridge.Intent.launch({
