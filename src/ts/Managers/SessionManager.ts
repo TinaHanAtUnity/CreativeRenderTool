@@ -138,7 +138,7 @@ export class SessionManager {
             this._currentSession.impressionSent = true;
         }
 
-        adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId());
+        adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId(), this._clientInfo.getSdkVersion());
         adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
     }
 
