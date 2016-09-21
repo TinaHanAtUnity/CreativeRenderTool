@@ -12,11 +12,13 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 export class SessionManagerEventMetadataCreator {
 
     private _eventManager: EventManager;
+    private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _nativeBridge: NativeBridge;
 
-    constructor(eventManager: EventManager, deviceInfo: DeviceInfo, nativeBridge: NativeBridge) {
+    constructor(eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, nativeBridge: NativeBridge) {
         this._eventManager = eventManager;
+        this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._nativeBridge = nativeBridge;
     }
@@ -41,7 +43,8 @@ export class SessionManagerEventMetadataCreator {
             'osVersion': this._deviceInfo.getOsVersion(),
             'sid': gamerSid,
             'deviceMake': this._deviceInfo.getManufacturer(),
-            'deviceModel': this._deviceInfo.getModel()
+            'deviceModel': this._deviceInfo.getModel(),
+            'sdkVersion': this._clientInfo.getSdkVersion()
         };
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -93,7 +96,7 @@ export class SessionManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._eventManager = eventManager;
-        this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._deviceInfo, this._nativeBridge);
+        this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge);
     }
 
     public create(): Promise<void[]> {

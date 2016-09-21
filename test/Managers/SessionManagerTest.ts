@@ -35,7 +35,7 @@ describe('SessionManager', () => {
         mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
         const metadataPromise = Promise.resolve(['42', {sessionId: '123'}]);
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
+        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
         let mockMetadataCreator = sinon.mock(metadataCreator);
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
@@ -59,7 +59,7 @@ describe('SessionManager', () => {
         mockEventManager.expects('thirdPartyEvent').withArgs('vast complete', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
         const metadataPromise = Promise.resolve(['42', {sessionId: '123'}]);
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
+        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
         let mockMetadataCreator = sinon.mock(metadataCreator);
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
@@ -100,7 +100,7 @@ describe('SessionManager', () => {
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '123', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
+        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
         let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
@@ -141,7 +141,7 @@ describe('SessionManager', () => {
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
+        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
         let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
@@ -180,7 +180,7 @@ describe('SessionManager', () => {
         let mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
-        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, deviceInfo, nativeBridge);
+        let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
         let adUnit = new VastAdUnit(nativeBridge, placement, campaign, null);
