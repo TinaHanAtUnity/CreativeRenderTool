@@ -52,7 +52,7 @@ export abstract class AbstractAdUnit {
         return this._showing;
     }
 
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string): void {
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         // do nothing; can be overridden in subclasses
     }
 
