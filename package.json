@@ -9,18 +9,18 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@types/chai": "3.4.32",
-    "@types/mocha": "2.2.31",
-    "@types/sinon": "1.16.29",
-    "@types/xmldom": "0.1.27",
+    "@types/chai": "3.4.33",
+    "@types/mocha": "2.2.32",
+    "@types/sinon": "1.16.30",
+    "@types/xmldom": "0.1.28",
     "akamai": "0.10.1",
     "amdclean": "2.7.0",
     "es6-promise": "3.3.1",
-    "requirejs": "2.3.1",
+    "requirejs": "2.3.2",
     "requirejs-text": "2.0.12",
     "stylus": "0.54.5",
     "tslint": "3.15.1",
-    "typescript": "^2.0.2",
+    "typescript": "2.0.3",
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
@@ -28,12 +28,12 @@
     "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
     "babel-plugin-transform-es3-property-literals": "6.8.0",
     "chai": "3.5.0",
-    "coveralls": "2.11.12",
+    "coveralls": "2.11.14",
     "istanbul": "0.4.5",
     "mocha": "3.0.2",
     "mocha-lcov-reporter": "1.2.0",
     "remap-istanbul": "0.6.4",
-    "sinon": "1.17.5"
+    "sinon": "1.17.6"
   },
   "optionalDependencies": {
     "fsevents": "1.0.14"
