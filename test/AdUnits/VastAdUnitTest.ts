@@ -49,17 +49,39 @@ describe('VastAdUnit', () => {
     });
 
     describe('sendImpressionEvent', () => {
-       it('should replace "%ZONE%" in the url with the placement id', () => {
-           let placement = adUnit.getPlacement();
-           let vast = (<VastCampaign> adUnit.getCampaign()).getVast();
-           let urlTemplate = 'http://foo.biz/%ZONE%/456';
-           sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-           sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
-           adUnit.sendImpressionEvent(eventManager, 'sessionId');
+        let placement;
+        let vast;
+        beforeEach(() => {
+            placement = adUnit.getPlacement();
+            vast = (<VastCampaign> adUnit.getCampaign()).getVast();
+            sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
+        });
 
-           sinon.assert.calledOnce(eventManager.thirdPartyEvent);
-           sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
-       });
+        it('should replace "%ZONE%" in the url with the placement id', () => {
+            let urlTemplate = 'http://foo.biz/%ZONE%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            adUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+            sinon.assert.calledOnce(eventManager.thirdPartyEvent);
+            sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
+        });
+
+        it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
+            let urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            adUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+
+            sinon.assert.calledOnce(eventManager.thirdPartyEvent);
+            sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/sdkVersion/456');
+        });
+
+        it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
+            let urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            adUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+
+            sinon.assert.calledOnce(eventManager.thirdPartyEvent);
+            sinon.assert.calledWith(eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/sdkVersion/456');
+        });
     });
 
     describe('with click through url', () => {
