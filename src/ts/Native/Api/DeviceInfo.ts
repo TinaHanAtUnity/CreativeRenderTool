@@ -51,14 +51,26 @@ export class DeviceInfoApi extends NativeApi {
     }
 
     public getNetworkType(): Promise<number> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            // disable broken native API on iOS, see ABT-22
+            return Promise.resolve(0);
+        }
         return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkType');
     }
 
     public getNetworkOperator(): Promise<string> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            // disable broken native API on iOS, see ABT-22
+            return Promise.resolve('UNKNOWN');
+        }
         return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator');
     }
 
     public getNetworkOperatorName(): Promise<string> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            // disable broken native API on iOS, see ABT-22
+            return Promise.resolve('UNKNOWN');
+        }
         return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName');
     }
 
