@@ -1,5 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
@@ -9,12 +10,12 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { assert } from 'chai';
 import { VastParser } from 'Utilities/VastParser';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable2 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -508,6 +509,7 @@ describe('CampaignManager', () => {
             }
         });
 
+        // when the campaign manager requests the placement
         campaignManager.request();
     };
 
@@ -886,6 +888,7 @@ describe('CampaignManager', () => {
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
+        Diagnostics.setEventManager(<any>{diagnosticEvent: sinon.spy()});
         deviceInfo = new DeviceInfo(nativeBridge);
     });
 

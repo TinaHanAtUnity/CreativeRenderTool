@@ -163,7 +163,7 @@
   {
     "key": "deviceModel",
     "type": "String",
-    "description": "Android device model",
+    "description": "Android or iOS device model, example 'iPhone7,1'",
     "provider": "SDK",
     "platforms": null
   },
@@ -192,13 +192,6 @@
     "key": "deviceTotalSpace",
     "type": "Integer",
     "description": "Total space in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceType",
-    "type": "String",
-    "description": "iOS raw device type",
     "provider": "SDK",
     "platforms": null
   },
