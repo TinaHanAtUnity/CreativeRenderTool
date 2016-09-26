@@ -11,6 +11,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { StorageType } from 'Native/Api/Storage';
 
 export class CampaignManager {
 
@@ -49,6 +50,9 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 let campaignJson: any = JsonParser.parse(response.response);
+                if(campaignJson.gamerId) {
+                    this.storeGamerId(campaignJson.gamerId);
+                }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
@@ -59,7 +63,8 @@ export class CampaignManager {
                         this.onNoFill.trigger(3600);
                     } else {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                        this._vastParser.retrieveVast(campaignJson.vast, this._nativeBridge, this._request).then(vast => {
+                        let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
+                        this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
                             let campaignId: string = undefined;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                                 campaignId = '00005472656d6f7220694f53';
@@ -127,12 +132,6 @@ export class CampaignManager {
             screenSize: this._deviceInfo.getScreenLayout()
         });
 
-        if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            url = Url.addParameters(url, {
-                webviewUa: encodeURIComponent(navigator.userAgent)
-            });
-        }
-
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion()
@@ -150,12 +149,15 @@ export class CampaignManager {
         let promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
+        promises.push(this.fetchGamerId());
 
-        return Promise.all(promises).then(([connectionType, networkType]) => {
+        return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
             url = Url.addParameters(url, {
                 connectionType: connectionType,
                 networkType: networkType,
+                gamerId: gamerId
             });
+
             return url;
         });
     }
@@ -173,6 +175,10 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
         };
 
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            body.webviewUa = navigator.userAgent;
+        }
+
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
@@ -188,6 +194,19 @@ export class CampaignManager {
         });
     }
 
+    private fetchGamerId(): Promise<string> {
+        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+            return gamerId;
+        }).catch(error => {
+            return undefined;
+        });
+    }
 
+    private storeGamerId(gamerId: string): Promise<void[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
 
 }

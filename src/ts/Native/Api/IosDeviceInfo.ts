@@ -30,8 +30,4 @@ export class IosDeviceInfoApi extends NativeApi {
     public isSimulator(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isSimulator');
     }
-
-    public isAppleWatchPaired(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isAppleWatchPaired');
-    }
 }

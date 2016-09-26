@@ -23,6 +23,7 @@ import { EndScreen } from '../../src/ts/Views/EndScreen';
 import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
 import { Session } from '../../src/ts/Models/Session';
 import { MetaData } from '../../src/ts/Utilities/MetaData';
+import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -273,7 +274,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set debug message to programmatic ad if the ad unit is VAST', () => {
             let prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
-            let vastCampaign = new VastCampaign(new Vast([], [], {}), 'campaignId', 'gamerId', 12);
+            let vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
             let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
 
@@ -315,4 +316,55 @@ describe('VideoEventHandlersTest', () => {
         });
     });
 
+    describe('with onPrepareError', () => {
+        let sandbox;
+
+        beforeEach(function() {
+            this.sinon = sandbox = sinon.sandbox.create();
+            this.sinon.stub(Diagnostics, 'trigger');
+            sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+        });
+
+        afterEach(function() {
+            sandbox.restore();
+        });
+
+        it('should set video to inactive and video to finish state to error', () => {
+            VideoEventHandlers.onPrepareError(nativeBridge, adUnit, 'http://test.video.url');
+
+            assert.isFalse(adUnit.isVideoActive());
+            assert.equal(adUnit.getFinishState(), FinishState.ERROR);
+
+            sinon.assert.called(adUnit.getOverlay().hide);
+
+            sinon.assert.called(adUnit.getEndScreen().show);
+            sinon.assert.calledWith(nativeBridge.AndroidAdUnit.setViews, ['webview']);
+        });
+    });
+
+    describe('with onAndroidGenericVideoError', () => {
+        let sandbox;
+
+        beforeEach(function() {
+            this.sinon = sandbox = sinon.sandbox.create();
+            this.sinon.stub(Diagnostics, 'trigger');
+            sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+        });
+
+        afterEach(function() {
+            sandbox.restore();
+        });
+
+        it('should set video to inactive and video to finish state to error', () => {
+            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, adUnit, 1, 0, 'http://test.video.url');
+
+            assert.isFalse(adUnit.isVideoActive());
+            assert.equal(adUnit.getFinishState(), FinishState.ERROR);
+
+            sinon.assert.called(adUnit.getOverlay().hide);
+
+            sinon.assert.called(adUnit.getEndScreen().show);
+            sinon.assert.calledWith(nativeBridge.AndroidAdUnit.setViews, ['webview']);
+        });
+    });
 });

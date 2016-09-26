@@ -29,10 +29,13 @@ export class VideoAdUnit extends AbstractAdUnit {
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
     private static _activityIdCounter: number = 1;
 
+    private static _progressInterval: number = 250;
+
     private _overlay: Overlay;
     private _endScreen: EndScreen;
     private _videoDuration: number;
     private _videoPosition: number;
+    private _videoPositionRepeats: number;
     private _videoQuartile: number;
     private _videoActive: boolean;
     private _activityId: number;
@@ -62,6 +65,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
 
         this._videoPosition = 0;
+        this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
         this._watches = 0;
@@ -91,7 +95,7 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange, []);
 
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
@@ -112,7 +116,7 @@ export class VideoAdUnit extends AbstractAdUnit {
                 hardwareAccel = false;
             }
 
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled') + ', playing from ' + this.getVideoUrl());
 
             return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         }
@@ -211,6 +215,14 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
     }
 
+    public getVideoPositionRepeats(): number {
+        return this._videoPositionRepeats;
+    }
+
+    public setVideoPositionRepeats(repeats: number): void {
+        this._videoPositionRepeats = repeats;
+    }
+
     public getVideoQuartile(): number {
         return this._videoQuartile;
     }
@@ -244,13 +256,27 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._overlay = null;
     }
 
+    public getProgressInterval(): number {
+        return VideoAdUnit._progressInterval;
+    }
+
+    private getVideoUrl(): string {
+        const campaign: Campaign = this.getCampaign();
+
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
+        } else {
+            return campaign.getVideoUrl();
+        }
+    }
+
     /*
      ANDROID ACTIVITY LIFECYCLE EVENTS
      */
 
     private onResume(activityId: number): void {
         if(this._showing && this.isVideoActive() && activityId === this._activityId) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
@@ -274,7 +300,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private onViewDidAppear(): void {
         if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 

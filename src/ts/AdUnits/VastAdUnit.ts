@@ -25,10 +25,11 @@ export class VastAdUnit extends VideoAdUnit {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string): void {
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (let impressionUrl of impressionUrls) {
+                impressionUrl = impressionUrl.replace(/%SDK_VERSION%/, sdkVersion);
                 this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
             }
         }

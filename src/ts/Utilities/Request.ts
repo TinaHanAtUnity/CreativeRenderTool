@@ -189,6 +189,7 @@ export class Request {
             headers: headers
         };
         let nativeRequest = Request._requests[id];
+
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = nativeRequest.url = Request.getHeader(headers, 'location');
