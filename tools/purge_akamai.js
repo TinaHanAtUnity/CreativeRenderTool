@@ -31,11 +31,19 @@ var getBuildPaths = function(root) {
     return paths;
 };
 
-var cdnHost = 'https://cdn.unityads.unity3d.com';
+var cdnConfigHost = 'https://config.unityads.unity3d.com';
+var cdnWebViewHost = 'https://webview.unityads.unity3d.com';
 var cdnRoot = '/webview/' + branch;
 
+var pickHost = function(path) {
+    if(path.match(/config\.json/)) {
+        return cdnConfigHost;
+    }
+    return cdnWebViewHost;
+};
+
 var paths = getBuildPaths('build').map(function(path) {
-    return cdnHost + cdnRoot + path.replace('build', '');
+    return pickHost(path) + cdnRoot + path.replace('build', '');
 });
 
 console.log('Starting Akamai purge of: ');
