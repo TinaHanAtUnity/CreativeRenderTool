@@ -72,7 +72,7 @@ export class EndScreenEventHandlers {
 
     private static getAppStoreUrl(platform: Platform, campaign: Campaign) {
         if(platform === Platform.IOS) {
-            return 'itms-apps://itunes.apple.com/' + campaign.getAppStoreCountry() + '/app/id' + campaign.getAppStoreId();
+            return 'https://itunes.apple.com/' + campaign.getAppStoreCountry() + '/app/id' + campaign.getAppStoreId();
         } else {
             return 'market://details?id=' + campaign.getAppStoreId();
         }
