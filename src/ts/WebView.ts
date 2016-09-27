@@ -131,7 +131,7 @@ export class WebView {
             return this._eventManager.sendUnsentSessions();
         }).catch(error => {
             if(error instanceof Error) {
-                error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+                error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
                 if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
@@ -187,12 +187,6 @@ export class WebView {
             return;
         }
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
-            this._nativeBridge.AppSheet.prepare({
-                id: parseInt(this._campaign.getAppStoreId(), 10)
-            });
-        }
-
         this._showing = true;
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -212,6 +206,20 @@ export class WebView {
             this._adUnit.setNativeOptions(options);
             this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
+
+            if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
+                const options = {
+                    id: parseInt(this._campaign.getAppStoreId(), 10)
+                };
+                this._nativeBridge.AppSheet.prepare(options).then(() => {
+                    this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.prepare(options);
+                    });
+                    this._adUnit.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.destroy(options);
+                    });
+                });
+            }
 
             this._adUnit.show().then(() => {
                 this._sessionManager.sendShow(this._adUnit);
@@ -434,7 +442,7 @@ export class WebView {
 
     private onCampaignError(error: any) {
         if(error instanceof Error && !(error instanceof DiagnosticError)) {
-            error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger({
