@@ -7,9 +7,9 @@ export class Tap {
     private _startX: number;
     private _startY: number;
 
-    private _onTouchMoveListener: (ev: TouchEvent) => any;
-    private _onTouchEndListener: (ev: TouchEvent) => any;
-    private _onTouchCancelListener: (ev: TouchEvent) => any;
+    private _onTouchMoveListener: ((event: TouchEvent) => any) | undefined;
+    private _onTouchEndListener: ((event: TouchEvent) => any) | undefined;
+    private _onTouchCancelListener: ((event: TouchEvent) => any) | undefined;
 
     constructor(element: HTMLElement) {
         this._element = element;
@@ -43,9 +43,9 @@ export class Tap {
         this._element.removeEventListener('touchmove', this._onTouchMoveListener, false);
         this._element.removeEventListener('touchend', this._onTouchEndListener, false);
         this._element.removeEventListener('touchcancel', this._onTouchCancelListener, false);
-        delete this._onTouchMoveListener;
-        delete this._onTouchEndListener;
-        delete this._onTouchCancelListener;
+        this._onTouchMoveListener = undefined;
+        this._onTouchEndListener = undefined;
+        this._onTouchCancelListener = undefined;
 
         if(!this._moved) {
             let fakeEvent = new MouseEvent('click', {
