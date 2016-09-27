@@ -212,10 +212,11 @@ export class WebView {
                     id: parseInt(this._campaign.getAppStoreId(), 10)
                 };
                 this._nativeBridge.AppSheet.prepare(options).then(() => {
-                    this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                    let onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
                         this._nativeBridge.AppSheet.prepare(options);
                     });
                     this._adUnit.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
                         this._nativeBridge.AppSheet.destroy(options);
                     });
                 });
