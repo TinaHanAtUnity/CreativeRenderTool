@@ -68,7 +68,10 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should hide overlay', () => {
-            sinon.assert.called(<sinon.SinonSpy>adUnit.getOverlay().hide);
+            const overlay = adUnit.getOverlay();
+            if(overlay) {
+                sinon.assert.called(<sinon.SinonSpy>overlay.hide);
+            }
         });
 
         it('should show endscreen', () => {
