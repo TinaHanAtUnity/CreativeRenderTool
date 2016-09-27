@@ -1,12 +1,10 @@
-/// <reference path="../../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { MetaDataManager } from '../../../src/ts/Managers/MetaDataManager';
-import { StorageApi, StorageType } from '../../../src/ts/Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
 
 class TestStorageApi extends StorageApi {
 
@@ -37,7 +35,7 @@ class TestStorageApi extends StorageApi {
         if(key === 'adapter') {
             delete this._storage.adapter;
         }
-        return Promise.resolve<void>();
+        return Promise.resolve(void(0));
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
@@ -45,6 +43,7 @@ class TestStorageApi extends StorageApi {
             if(key === 'adapter') {
                 return Promise.resolve(Object.keys(this._storage.adapter));
             }
+            return Promise.resolve([]);
         } catch(error) {
             return Promise.resolve([]);
         }
@@ -54,7 +53,7 @@ class TestStorageApi extends StorageApi {
 describe('AdapterMetaDataTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge, storageApi;
+    let nativeBridge: NativeBridge, storageApi: TestStorageApi;
 
     before(() => {
         nativeBridge = new NativeBridge({

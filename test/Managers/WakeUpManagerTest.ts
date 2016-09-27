@@ -2,11 +2,11 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
-import { ConnectivityApi } from '../../src/ts/Native/Api/Connectivity';
-import { BroadcastApi } from '../../src/ts/Native/Api/Broadcast';
-import { Platform } from '../../src/ts/Constants/Platform';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { ConnectivityApi } from 'Native/Api/Connectivity';
+import { BroadcastApi } from 'Native/Api/Broadcast';
+import { Platform } from 'Constants/Platform';
 
 class TestConnectivityApi extends ConnectivityApi {
     public setListeningStatus(status: boolean): Promise<void> {
@@ -27,7 +27,7 @@ class TestBroadcastApi extends BroadcastApi {
 describe('WakeUpManagerTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
+    let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
 
     beforeEach(() => {

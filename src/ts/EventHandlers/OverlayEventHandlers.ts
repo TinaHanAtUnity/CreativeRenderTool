@@ -28,12 +28,18 @@ export class OverlayEventHandlers {
           nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
       }
 
-      adUnit.getOverlay().hide();
+      const overlay = adUnit.getOverlay();
+      if(overlay) {
+          overlay.hide();
+      }
       this.afterSkip(adUnit);
   }
 
     protected static afterSkip(adUnit: VideoAdUnit) {
-        adUnit.getEndScreen().show();
+        let endScreen = adUnit.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        }
         adUnit.onNewAdRequestAllowed.trigger();
     };
 
@@ -43,16 +49,18 @@ export class OverlayEventHandlers {
     }
 
     public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
-        let clickThroughURL = adUnit.getVideoClickThroughURL();
         sessionManager.sendVideoClickTracking(adUnit, sessionManager.getSession());
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.UrlScheme.open(clickThroughURL);
-        } else {
-            nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': clickThroughURL
-            });
+        let clickThroughURL = adUnit.getVideoClickThroughURL();
+        if(clickThroughURL) {
+            if(nativeBridge.getPlatform() === Platform.IOS) {
+                nativeBridge.UrlScheme.open(clickThroughURL);
+            } else {
+                nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': clickThroughURL
+                });
+            }
         }
     }
 }

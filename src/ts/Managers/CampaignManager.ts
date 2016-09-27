@@ -65,11 +65,13 @@ export class CampaignManager {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
                         let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
                         this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-                            let campaignId: string = undefined;
+                            let campaignId: string;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                                 campaignId = '00005472656d6f7220694f53';
                             } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                                 campaignId = '005472656d6f7220416e6472';
+                            } else {
+                                campaignId = 'UNKNOWN';
                             }
                             let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {

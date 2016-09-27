@@ -1,12 +1,10 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 import { DiagnosticError } from '../../src/ts/Errors/DiagnosticError';
 
 describe('DiagnosticErrorTest', () => {
     describe('with existing error', () => {
-        let originalError;
+        let originalError: Error;
 
         before(() => {
             originalError = new SyntaxError('foo message');

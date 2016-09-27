@@ -31,8 +31,8 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private static _progressInterval: number = 250;
 
-    private _overlay: Overlay;
-    private _endScreen: EndScreen;
+    private _overlay: Overlay | undefined;
+    private _endScreen: EndScreen | undefined;
     private _videoDuration: number;
     private _videoPosition: number;
     private _videoPositionRepeats: number;
@@ -50,7 +50,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _androidOptions: IAndroidOptions;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen?: EndScreen) {
         super(nativeBridge, placement, campaign);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -129,6 +129,11 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
+        if(!this._showing) {
+            return Promise.resolve();
+        }
+        this._showing = false;
+
         if(this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop().catch(error => {
                 if(error === AndroidVideoPlayerError[AndroidVideoPlayerError.VIDEOVIEW_NULL]) {
@@ -138,6 +143,7 @@ export class VideoAdUnit extends AbstractAdUnit {
                 }
             });
         }
+
         this.hideChildren();
         this.unsetReferences();
 
@@ -150,7 +156,6 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._audioSessionRouteChange);
 
             return this._nativeBridge.IosAdUnit.close().then(() => {
-                this._showing = false;
                 this.onClose.trigger();
             });
         } else {
@@ -160,12 +165,10 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
-                this._showing = false;
                 this.onClose.trigger();
             }).catch(error => {
                 // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
                 if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
-                    this._showing = false;
                     this.onClose.trigger();
                 } else {
                     throw new Error(error);
@@ -175,8 +178,14 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     protected hideChildren() {
-        this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        this.getEndScreen().container().parentElement.removeChild(this.getEndScreen().container());
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
+        const endScreen = this.getEndScreen();
+        if(endScreen) {
+            endScreen.container().parentElement.removeChild(endScreen.container());
+        }
     };
 
     public setNativeOptions(options: any): void {
@@ -239,11 +248,11 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._watches = watches;
     }
 
-    public getOverlay(): Overlay {
+    public getOverlay(): Overlay | undefined {
         return this._overlay;
     }
 
-    public getEndScreen(): EndScreen {
+    public getEndScreen(): EndScreen | undefined {
         return this._endScreen;
     }
 
@@ -252,8 +261,8 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public unsetReferences() {
-        this._endScreen = null;
-        this._overlay = null;
+        delete this._endScreen;
+        delete this._overlay;
     }
 
     public getProgressInterval(): number {

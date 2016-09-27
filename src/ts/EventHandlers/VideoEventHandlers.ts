@@ -19,25 +19,27 @@ export class VideoEventHandlers {
     }
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
-        let overlay = adUnit.getOverlay();
+        const overlay = adUnit.getOverlay();
 
         adUnit.setVideoDuration(duration);
-        overlay.setVideoDuration(duration);
-        if(adUnit.getVideoPosition() > 0) {
-            overlay.setVideoProgress(adUnit.getVideoPosition());
-        }
-        if(adUnit.getPlacement().allowSkip()) {
-            overlay.setSkipVisible(true);
-        }
-        overlay.setMuteEnabled(true);
-        overlay.setVideoDurationEnabled(true);
+        if(overlay) {
+            overlay.setVideoDuration(duration);
+            if(adUnit.getVideoPosition() > 0) {
+                overlay.setVideoProgress(adUnit.getVideoPosition());
+            }
+            if(adUnit.getPlacement().allowSkip()) {
+                overlay.setSkipVisible(true);
+            }
+            overlay.setMuteEnabled(true);
+            overlay.setVideoDurationEnabled(true);
 
-        if (this.isVast(adUnit) && adUnit.getVideoClickThroughURL()) {
-            overlay.setCallButtonVisible(true);
+            if (this.isVast(adUnit) && adUnit.getVideoClickThroughURL()) {
+                overlay.setCallButtonVisible(true);
+            }
         }
 
         metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
-            if(found && debugOverlayEnabled) {
+            if(found && debugOverlayEnabled && overlay) {
                 overlay.setDebugMessageVisible(true);
                 let debugMessage = '';
                 if (this.isVast(adUnit)) {
@@ -49,7 +51,7 @@ export class VideoEventHandlers {
             }
         });
 
-        nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
+        nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideoPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(adUnit.getVideoPosition()).then(() => {
                     nativeBridge.VideoPlayer.play();
@@ -64,6 +66,7 @@ export class VideoEventHandlers {
         // todo: video progress event should be handled here and not delegated to session manager
         sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoPosition());
 
+        const overlay = adUnit.getOverlay();
         if(position > 0) {
             let lastPosition = adUnit.getVideoPosition();
 
@@ -113,10 +116,12 @@ export class VideoEventHandlers {
                  adUnit.setVideoPositionRepeats(0);
             }
 
-            if(lastPosition > 0 && position - lastPosition < 100) {
-                adUnit.getOverlay().setSpinnerEnabled(true);
-            } else {
-                adUnit.getOverlay().setSpinnerEnabled(false);
+            if(overlay) {
+                if(lastPosition > 0 && position - lastPosition < 100) {
+                    overlay.setSpinnerEnabled(true);
+                } else {
+                    overlay.setSpinnerEnabled(false);
+                }
             }
 
             let previousQuartile: number = adUnit.getVideoQuartile();
@@ -131,14 +136,19 @@ export class VideoEventHandlers {
             }
         }
 
-        adUnit.getOverlay().setVideoProgress(position);
+        if(overlay) {
+            overlay.setVideoProgress(position);
+        }
     }
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
-        adUnit.getOverlay().setSpinnerEnabled(false);
+        const overlay = adUnit.getOverlay();
+        if(overlay) {
+            overlay.setSpinnerEnabled(false);
+        }
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
 
         if(adUnit.getWatches() === 0) {
@@ -246,8 +256,14 @@ export class VideoEventHandlers {
     }
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.getOverlay().hide();
-        adUnit.getEndScreen().show();
+        const overlay = adUnit.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
+        const endScreen = adUnit.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        }
         adUnit.onNewAdRequestAllowed.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -268,12 +284,16 @@ export class VideoEventHandlers {
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
 
-        adUnit.getOverlay().hide();
+        const overlay = adUnit.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
 
         let endScreen = adUnit.getEndScreen();
         if(endScreen) {
-            adUnit.getEndScreen().show();
+            endScreen.show();
         }
+
         adUnit.onNewAdRequestAllowed.trigger();
     }
 }

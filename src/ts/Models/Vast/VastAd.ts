@@ -3,7 +3,7 @@ import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 
 export class VastAd {
 
-    private _id: string;
+    private _id: string | undefined;
     private _creatives: VastCreative[];
     private _errorURLTemplates: string[];
     private _impressionURLTemplates: string[];
@@ -11,14 +11,14 @@ export class VastAd {
 
     constructor();
     constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[]) {
-        this._id = id;
+        this._id = id || undefined;
         this._creatives = creatives || [];
         this._errorURLTemplates = errorURLTemplates || [];
         this._impressionURLTemplates = impressionURLTemplates || [];
         this._wrapperURLs = wrapperURLs || [];
     }
 
-    public getId(): string {
+    public getId(): string | undefined {
         return this._id;
     }
 
@@ -30,7 +30,7 @@ export class VastAd {
         return this._creatives;
     }
 
-    public getCreative(): VastCreative {
+    public getCreative(): VastCreative | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
         }
@@ -75,7 +75,7 @@ export class VastAd {
         return null;
     }
 
-    public getDuration(): number {
+    public getDuration(): number | null {
         let creative = this.getCreative();
         if (creative) {
             return creative.getDuration();
@@ -84,7 +84,7 @@ export class VastAd {
         }
     }
 
-    public getVideoClickThroughURLTemplate(): string {
+    public getVideoClickThroughURLTemplate(): string | null {
         let creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickThroughURLTemplate();
@@ -97,7 +97,7 @@ export class VastAd {
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickTrackingURLTemplates();
         }
-        return null;
+        return [];
     }
 
     public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {

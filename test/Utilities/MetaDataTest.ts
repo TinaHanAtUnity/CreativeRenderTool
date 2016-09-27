@@ -2,15 +2,15 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { StorageType, StorageError } from '../../src/ts/Native/Api/Storage';
-import { MetaData } from '../../src/ts/Utilities/MetaData';
+import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType, StorageError } from 'Native/Api/Storage';
+import { MetaData } from 'Utilities/MetaData';
 
 describe('MetaDataTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
-    let metaData;
+    let nativeBridge: NativeBridge;
+    let metaData: MetaData;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({handleInvocation, handleCallback});

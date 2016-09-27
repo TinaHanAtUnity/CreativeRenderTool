@@ -217,7 +217,7 @@ export class WebView {
                 this._sessionManager.sendShow(this._adUnit);
             });
 
-            this._campaign = null;
+            delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
             this._campaignTimeout = 0;

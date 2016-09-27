@@ -3,13 +3,27 @@
     "module": "amd",
     "target": "es5",
     "inlineSourceMap": true,
-    "moduleResolution": "classic",
-    "noImplicitReturns": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise"
+    ],
+    "moduleResolution": "node",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "rootDirs": [
+      "src/ts",
+      "test"
+    ],
+    "baseUrl": "src/ts",
+    "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true
   },
-  "exclude": [
-    "test",
-    "node_modules"
+  "include": [
+    "src/ts/**/*.ts",
+    "test/**/*.ts"
   ]
 }

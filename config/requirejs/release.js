@@ -1,10 +1,10 @@
 ({
   name: 'Main',
-  deps: ['../../../node_modules/es6-promise/dist/es6-promise'],
+  deps: ['../../../../../node_modules/es6-promise/dist/es6-promise'],
   paths: {
-    text: '../../../node_modules/requirejs-text/text',
-    html: '../../../src/html',
-    xmldom: '../../../node_modules/xmldom/dom-parser'
+    text: '../../../../../node_modules/requirejs-text/text',
+    html: '../../../../../src/html',
+    xmldom: '../../../../../node_modules/xmldom/dom-parser'
   },
   config: {
     text: {

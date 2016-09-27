@@ -1,17 +1,17 @@
 export class VastMediaFile {
 
-    private _fileURL: string;
+    private _fileURL: string | null;
     private _deliveryType: string;
-    private _mimeType: string;
-    private _codec: string;
+    private _mimeType: string | null;
+    private _codec: string | null;
     private _bitrate: number;
     private _minBitrate: number;
     private _maxBitrate: number;
     private _width: number;
     private _height: number;
-    private _apiFramework: string;
-    private _scalable: boolean;
-    private _maintainAspectRatio: boolean;
+    private _apiFramework: string | null;
+    private _scalable: boolean | null;
+    private _maintainAspectRatio: boolean | null;
 
     constructor();
     constructor(fileURL: string, deliveryType: string, codec: string, mimeType: string, bitrate: number,
@@ -32,11 +32,11 @@ export class VastMediaFile {
         this._maintainAspectRatio = null;
     }
 
-    public getFileURL(): string {
+    public getFileURL(): string | null {
         return this._fileURL;
     }
 
-    public getMIMEType(): string {
+    public getMIMEType(): string | null {
         return this._mimeType;
     }
 }

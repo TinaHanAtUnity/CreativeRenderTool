@@ -2,18 +2,18 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheManager, CacheStatus } from '../../src/ts/Managers/CacheManager';
-import { IFileInfo, CacheApi, CacheEvent, CacheError } from '../../src/ts/Native/Api/Cache';
-import { StorageApi, StorageType } from '../../src/ts/Native/Api/Storage';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { CacheManager, CacheStatus } from 'Managers/CacheManager';
+import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
+import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 class TestCacheApi extends CacheApi {
 
     private _filePrefix = '/test/cache/dir/UnityAdsCache-';
     private _internet: boolean = true;
     private _files: { [key: string]: IFileInfo } = {};
-    private _currentFile = undefined;
+    private _currentFile: string;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
@@ -33,7 +33,7 @@ class TestCacheApi extends CacheApi {
         if(this._internet) {
             this._currentFile = url;
             setTimeout(() => {
-                this._currentFile = undefined;
+                delete this._currentFile;
                 this._nativeBridge.handleEvent(['CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []]);
             }, 1);
             return Promise.resolve(void(0));
@@ -88,7 +88,7 @@ class TestCacheApi extends CacheApi {
     }
 
     public deleteFile(fileId: string): Promise<void> {
-        return;
+        return Promise.resolve(void(0));
     }
 
     public setInternet(internet: boolean): void {
@@ -126,7 +126,7 @@ class TestCacheApi extends CacheApi {
 
 class TestStorageApi extends StorageApi {
     public write(type: StorageType): Promise<void> {
-        return;
+        return Promise.resolve(void(0));
     }
 
     public get<T>(type: StorageType, key: string): Promise<T> {
@@ -134,18 +134,18 @@ class TestStorageApi extends StorageApi {
     }
 
     public set<T>(type: StorageType, key: string, value: T): Promise<void> {
-        return;
+        return Promise.resolve(void(0));
     }
 
     public delete(type: StorageType, key: string): Promise<void> {
-        return;
+        return Promise.resolve(void(0));
     }
 }
 
 describe('CacheManagerTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
+    let nativeBridge: NativeBridge;
 
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;

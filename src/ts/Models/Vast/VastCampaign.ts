@@ -27,7 +27,7 @@ export class VastCampaign extends Campaign {
         if (videoUrl) {
             return videoUrl;
         } else {
-            return this._vast.getVideoUrl();
+            return this._vast.getVideoUrl() || '';
         }
     }
 

@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
-import { Campaign } from '../../src/ts/Models/Campaign';
-import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
 
+import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('Campaign', () => {
 

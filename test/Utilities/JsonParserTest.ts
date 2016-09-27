@@ -1,9 +1,7 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 
-import { JsonParser } from '../../src/ts/Utilities/JsonParser';
+import { JsonParser } from 'Utilities/JsonParser';
 
 describe('JsonParserTest', () => {
     it('should contain diagnostic fields', () => {

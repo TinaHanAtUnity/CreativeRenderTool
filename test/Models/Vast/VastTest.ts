@@ -1,15 +1,16 @@
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { Vast } from '../../../src/ts/Models/Vast/Vast';
-import { VastAd } from '../../../src/ts/Models/Vast/VastAd';
-import { VastCreativeLinear } from '../../../src/ts/Models/Vast/VastCreativeLinear';
-import { VastMediaFile } from '../../../src/ts/Models/Vast/VastMediaFile';
+
+import { Vast } from 'Models/Vast/Vast';
+import { VastAd } from 'Models/Vast/VastAd';
+import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 describe('Vast', () => {
-    let vastCreative;
-    let vastMediaFile;
-    let vastAd;
+    let vastCreative: VastCreativeLinear;
+    let vastMediaFile: VastMediaFile;
+    let vastAd: VastAd;
 
     beforeEach(() => {
         vastCreative = new VastCreativeLinear();

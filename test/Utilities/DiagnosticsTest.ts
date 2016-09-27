@@ -1,21 +1,19 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { Request } from '../../src/ts/Utilities/Request';
-import { Diagnostics } from '../../src/ts/Utilities/Diagnostics';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { ClientInfo } from '../../src/ts/Models/ClientInfo';
-import { EventManager } from '../../src/ts/Managers/EventManager';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
-import { Platform } from '../../src/ts/Constants/Platform';
+import { Request } from 'Utilities/Request';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { EventManager } from 'Managers/EventManager';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Platform } from 'Constants/Platform';
 
 describe('DiagnosticsTest', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
+    let nativeBridge: NativeBridge;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

@@ -4,7 +4,6 @@ import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
-import * as xmldom from 'xmldom';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 
@@ -17,7 +16,7 @@ export class VastParser {
     private _rootWrapperVast: any;
 
     private static createDOMParser() {
-        return new xmldom.DOMParser();
+        return new DOMParser();
     };
 
     constructor();
@@ -31,7 +30,7 @@ export class VastParser {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
-    public parseVast(vast: string): Vast {
+    public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
         }
@@ -114,20 +113,24 @@ export class VastParser {
         });
     }
 
-    private applyParentURLs(parsedVast: Vast, parent: Vast) {
+    private applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
-            for (let errorUrl of parent.getAd().getErrorURLTemplates()) {
-                parsedVast.getAd().addErrorURLTemplate(errorUrl);
-            }
-            for (let impressionUrl of parent.getAd().getImpressionURLTemplates()) {
-                parsedVast.getAd().addImpressionURLTemplate(impressionUrl);
-            }
-            for (let clickTrackingUrl of parent.getAd().getVideoClickTrackingURLTemplates()) {
-                parsedVast.getAd().addVideoClickTrackingURLTemplate(clickTrackingUrl);
-            }
-            for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
-                for (let url of parent.getTrackingEventUrls(eventName)) {
-                    parsedVast.addTrackingEventUrl(eventName, url);
+            let ad = parent.getAd();
+            let parsedAd = parsedVast.getAd();
+            if(ad && parsedAd) {
+                for (let errorUrl of ad.getErrorURLTemplates()) {
+                    parsedAd.addErrorURLTemplate(errorUrl);
+                }
+                for (let impressionUrl of ad.getImpressionURLTemplates()) {
+                    parsedAd.addImpressionURLTemplate(impressionUrl);
+                }
+                for (let clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
+                    parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
+                }
+                for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                    for (let url of parent.getTrackingEventUrls(eventName)) {
+                        parsedVast.addTrackingEventUrl(eventName, url);
+                    }
                 }
             }
         }
@@ -137,8 +140,8 @@ export class VastParser {
         return node && (node.textContent || node.text);
     }
 
-    private parseAdElement(adElement: any): VastAd {
-        let ad: VastAd;
+    private parseAdElement(adElement: any): VastAd | undefined {
+        let ad: VastAd | undefined;
         let childNodes = adElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
             let adTypeElement = childNodes[i];

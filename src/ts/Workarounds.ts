@@ -1,7 +1,7 @@
 /* tslint:disable:no-bitwise no-unused-expression */
 
 if(!Array.prototype.forEach) {
-    Array.prototype.forEach = function(callback, thisArg) {
+    Array.prototype.forEach = function<T>(this: Array<T>, callback: Function, thisArg: any) {
         if(typeof(callback) !== 'function') {
             throw new TypeError(callback + ' is not a function!');
         }
@@ -14,7 +14,7 @@ if(!Array.prototype.forEach) {
 
 if(!('classList' in document.documentElement) && Object.defineProperty && typeof HTMLElement !== 'undefined') {
     Object.defineProperty(HTMLElement.prototype, 'classList', {
-        get: function() {
+        get: function(this: HTMLElement) {
             let self = this;
 
             function update(fn: Function) {
