@@ -4,6 +4,7 @@ export class PerformanceOverlayEventHandlers {
 
     public static onSkip(adUnit: PerformanceAdUnit) {
         adUnit.getEndScreen().show();
+        adUnit.onFinish.trigger();
     }
 
 }

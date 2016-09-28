@@ -24,9 +24,10 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
+        this._iosOptions = options;
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
 
@@ -81,12 +82,6 @@ export class IosVideoAdUnit extends VideoAdUnit {
             this.onClose.trigger();
         });
     }
-
-    public setNativeOptions(options: any): void {
-        this._iosOptions = options;
-    }
-
-
 
     private onViewDidAppear(): void {
         if(this._showing && this.isVideoActive()) {

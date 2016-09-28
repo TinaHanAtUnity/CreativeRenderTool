@@ -1,9 +1,8 @@
-import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 
-export class VastOverlayEventHandlers extends OverlayEventHandlers {
+export class VastOverlayEventHandlers {
 
-    protected static afterSkip(videoAdUnit: VideoAdUnit) {
+    public static onSkip(videoAdUnit: VideoAdUnit) {
         videoAdUnit.hide();
     }
 

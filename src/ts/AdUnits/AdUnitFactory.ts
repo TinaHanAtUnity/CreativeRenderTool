@@ -20,24 +20,26 @@ import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { MetaData } from 'Utilities/MetaData';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
+import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign);
+            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign, options);
         } else {
-            return this.createPerformanceAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
+            return this.createPerformanceAdUnit(nativeBridge, sessionManager, placement, campaign, configuration, options);
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         let overlay = new Overlay(nativeBridge, placement.muteVideo());
         let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
         let metaData = new MetaData(nativeBridge);
 
-        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay);
+        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay, options);
         let performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnit, endScreen);
 
         this.prepareOverlay(overlay, placement, campaign);
@@ -45,13 +47,18 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit);
 
+        let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
+        performanceAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+        });
+
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
         let overlay = new Overlay(nativeBridge, placement.muteVideo());
         let metaData = new MetaData(nativeBridge);
-        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay);
+        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay, options);
 
         let vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnit);
 
@@ -80,22 +87,25 @@ export class AdUnitFactory {
         }
     }
 
-    private static preparePerformanceOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit) {
+    private static preparePerformanceOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, videoAdUnit: VideoAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit, videoAdUnit));
+        overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(adUnit));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
     }
 
     private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit) {
-        overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit, videoAdUnit));
-        overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
-        overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, <VastAdUnit>adUnit));
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit, videoAdUnit));
+        overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(videoAdUnit));
+
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
+        overlay.onCallButton.subscribe(() => OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, <VastAdUnit>adUnit));
     };
 
-    private static createVideoUnit(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay): VideoAdUnit {
+    private static createVideoUnit(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnit {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            return new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay);
+            return new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, options);
         } else {
-            return new IosVideoAdUnit(nativeBridge, placement, campaign, overlay);
+            return new IosVideoAdUnit(nativeBridge, placement, campaign, overlay, options);
         }
     }
 

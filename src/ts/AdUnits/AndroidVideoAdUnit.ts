@@ -3,7 +3,6 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { FinishState } from 'Constants/FinishState';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { Double } from 'Utilities/Double';
@@ -28,8 +27,10 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
+
+        this._androidOptions = options;
 
         this._activityId = AndroidVideoAdUnit._activityIdCounter++;
 
@@ -100,10 +101,6 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
                 throw new Error(error);
             }
         });
-    }
-
-    public setNativeOptions(options: any): void {
-        this._androidOptions = options;
     }
 
     /*

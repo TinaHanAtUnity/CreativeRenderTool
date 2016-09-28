@@ -14,6 +14,10 @@ export class VastAdUnit extends AbstractAdUnit {
     constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
         this._videoAdUnit = videoAdUnit;
+
+        videoAdUnit.onClose.subscribe(() => this.onClose.trigger());
+        videoAdUnit.onFinish.subscribe(() => this.onFinish.trigger());
+        videoAdUnit.onStart.subscribe(() => this.onStart.trigger());
     }
 
     public show(): Promise<void> {

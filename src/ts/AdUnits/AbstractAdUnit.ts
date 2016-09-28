@@ -6,9 +6,9 @@ import { FinishState } from 'Constants/FinishState';
 
 export abstract class AbstractAdUnit {
 
-    public onStart: Observable0;
-    public onFinish: Observable0;
-    public onClose: Observable0;
+    public onStart: Observable0 = new Observable0();
+    public onFinish: Observable0 = new Observable0();
+    public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;
     protected _placement: Placement;

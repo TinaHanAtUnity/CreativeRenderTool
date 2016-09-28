@@ -12,6 +12,10 @@ export class PerformanceAdUnit extends AbstractAdUnit {
         super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
         this._videoAdUnit = videoAdUnit;
         this._endScreen = endScreen;
+
+        videoAdUnit.onClose.subscribe(() => this.onClose.trigger());
+        videoAdUnit.onFinish.subscribe(() => this.onFinish.trigger());
+        videoAdUnit.onStart.subscribe(() => this.onStart.trigger());
     }
 
     public show(): Promise<void> {
@@ -19,6 +23,11 @@ export class PerformanceAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
+        if (this._endScreen) {
+            this._endScreen.container().parentElement.removeChild(this._endScreen.container());
+            this._endScreen = null;
+        }
+
         return this._videoAdUnit.hide();
     }
 
