@@ -167,7 +167,7 @@ except Exception as e:
 
 
 print(document_type)
-# default to MD
+# Create both MD and HTML by default
 if not document_type or document_type.upper() == "MD":
     print("Markdown creator")
     this_creator = MarkdownCreator()
