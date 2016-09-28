@@ -5,6 +5,7 @@ import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class VastParser {
 
@@ -12,6 +13,7 @@ export class VastParser {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
+    private _rootWrapperVast: any;
 
     private static createDOMParser() {
         return new DOMParser();
@@ -28,12 +30,12 @@ export class VastParser {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
-    public parseVast(vast: any): Vast {
+    public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
         }
 
-        let xml = (this._domParser).parseFromString(decodeURIComponent(vast.data).trim(), 'text/xml');
+        let xml = (this._domParser).parseFromString(vast, 'text/xml');
         let ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (xml == null) {
@@ -73,11 +75,28 @@ export class VastParser {
             throw new Error('VAST Ad tag is missing');
         }
 
-        return new Vast(ads, errorURLTemplates, vast.tracking);
+        return new Vast(ads, errorURLTemplates);
     }
 
     public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
-        let parsedVast = this.parseVast(vast);
+        let parsedVast: Vast;
+
+        if (depth === 0) {
+            this._rootWrapperVast = vast;
+        }
+
+        try {
+            parsedVast = this.parseVast(vast);
+        } catch (e) {
+            let error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
+            if (depth > 0) {
+                /* tslint:disable:no-string-literal */
+                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
+                /* tslint:enable */
+            }
+            throw error;
+        }
+
         this.applyParentURLs(parsedVast, parent);
 
         let wrapperURL = parsedVast.getWrapperURL();
@@ -90,7 +109,7 @@ export class VastParser {
         nativeBridge.Sdk.logInfo('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
 
         return request.get(wrapperURL, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast({data: response.response, tracking: {}}, nativeBridge, request, parsedVast, depth + 1);
+            return this.retrieveVast(response.response, nativeBridge, request, parsedVast, depth + 1);
         });
     }
 

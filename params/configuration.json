@@ -158,12 +158,6 @@
       "body": null
     },
     {
-      "parameter": "deviceType",
-      "required": null,
-      "queryString": null,
-      "body": null
-    },
-    {
       "parameter": "deviceVolume",
       "required": null,
       "queryString": null,

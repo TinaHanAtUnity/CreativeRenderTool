@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { Request } from 'Utilities/Request';
 import { EventManager } from 'Managers/EventManager';
@@ -166,8 +166,8 @@ class TestDeviceInfoApi extends DeviceInfoApi {
 }
 
 describe('EventManagerTest', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     let storageApi: TestStorageApi;
@@ -193,7 +193,7 @@ describe('EventManagerTest', () => {
         let url: string = 'https://www.example.net/operative_event';
         let data: string = 'Test data';
 
-        let requestSpy = Sinon.spy(request, 'post');
+        let requestSpy = sinon.spy(request, 'post');
 
         return eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert(requestSpy.calledOnce, 'Operative event did not send POST request');
@@ -217,14 +217,14 @@ describe('EventManagerTest', () => {
     });
 
     it('Send failed operative event', () => {
-        let clock = Sinon.useFakeTimers();
+        let clock = sinon.useFakeTimers();
 
         let eventId: string = '1234';
         let sessionId: string = '5678';
         let url: string = 'https://www.example.net/fail';
         let data: string = 'Test data';
 
-        let requestSpy = Sinon.spy(request, 'post');
+        let requestSpy = sinon.spy(request, 'post');
 
         let event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
@@ -253,7 +253,7 @@ describe('EventManagerTest', () => {
         let sessionId: string = '1234';
         let url: string = 'https://www.example.net/third_party_event';
 
-        let requestSpy = Sinon.spy(request, 'get');
+        let requestSpy = sinon.spy(request, 'get');
 
         return eventManager.clickAttributionEvent(sessionId, url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
@@ -265,7 +265,7 @@ describe('EventManagerTest', () => {
         let url: string = 'https://www.example.net/diagnostic_event';
         let data: string = 'Test Data';
 
-        let requestSpy = Sinon.spy(request, 'post');
+        let requestSpy = sinon.spy(request, 'post');
 
         return eventManager.diagnosticEvent(url, data).then(() => {
             assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
@@ -288,7 +288,7 @@ describe('EventManagerTest', () => {
         storageApi.set(StorageType.PRIVATE, urlKey, url);
         storageApi.set(StorageType.PRIVATE, dataKey, data);
 
-        let requestSpy = Sinon.spy(request, 'post');
+        let requestSpy = sinon.spy(request, 'post');
 
         return eventManager.sendUnsentSessions().then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');

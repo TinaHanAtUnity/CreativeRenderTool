@@ -9,12 +9,14 @@ import { EventManager } from 'Managers/EventManager';
 export class VastAdUnit extends VideoAdUnit {
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: VastCampaign, overlay: Overlay) {
-        super(nativeBridge, placement, campaign, overlay, null);
+        super(nativeBridge, placement, campaign, overlay);
     }
 
     protected hideChildren() {
         const overlay = this.getOverlay();
-        overlay.container().parentElement.removeChild(overlay.container());
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
     }
 
     public getVast(): Vast {
@@ -25,10 +27,11 @@ export class VastAdUnit extends VideoAdUnit {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string): void {
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (let impressionUrl of impressionUrls) {
+                impressionUrl = impressionUrl.replace(/%SDK_VERSION%/, sdkVersion);
                 this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
             }
         }

@@ -1,5 +1,6 @@
 import OverlayTemplate from 'Overlay.html';
 
+import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable1 } from 'Utilities/Observable';
@@ -37,8 +38,8 @@ export class Overlay extends View {
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
 
-    constructor(muted: boolean) {
-        super('overlay');
+    constructor(nativeBridge: NativeBridge, muted: boolean) {
+        super(nativeBridge, 'overlay');
 
         if(typeof OverlayTemplate !== 'undefined') {
             this._template = new Template(OverlayTemplate);

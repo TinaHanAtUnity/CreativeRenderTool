@@ -4,12 +4,12 @@ import { assert } from 'chai';
 import { JsonParser } from 'Utilities/JsonParser';
 
 describe('JsonParserTest', () => {
-    it('should contain error fields', () => {
+    it('should contain diagnostic fields', () => {
         try {
             JsonParser.parse('bad content');
         } catch(e) {
-            assert.equal(e.failingContent, 'bad content');
-            assert.equal(e.name, 'JsonSyntaxError');
+            /* tslint:disable:no-string-literal */
+            assert.equal(e.diagnostic['json'], 'bad content');
         }
     });
 

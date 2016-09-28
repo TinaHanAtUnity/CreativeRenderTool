@@ -11,6 +11,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
+import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -27,10 +29,13 @@ export class VideoAdUnit extends AbstractAdUnit {
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
     private static _activityIdCounter: number = 1;
 
-    private _overlay: Overlay;
-    private _endScreen: EndScreen | null;
+    private static _progressInterval: number = 250;
+
+    private _overlay: Overlay | undefined;
+    private _endScreen: EndScreen | undefined;
     private _videoDuration: number;
     private _videoPosition: number;
+    private _videoPositionRepeats: number;
     private _videoQuartile: number;
     private _videoActive: boolean;
     private _activityId: number;
@@ -45,7 +50,7 @@ export class VideoAdUnit extends AbstractAdUnit {
     private _androidOptions: IAndroidOptions;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen: EndScreen | null) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, endScreen?: EndScreen) {
         super(nativeBridge, placement, campaign);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -60,6 +65,7 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
 
         this._videoPosition = 0;
+        this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
         this._watches = 0;
@@ -75,15 +81,21 @@ export class VideoAdUnit extends AbstractAdUnit {
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
-            if(!this._placement.useDeviceOrientationForVideo() && (this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            if(!this._placement.useDeviceOrientationForVideo()) {
+                if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+                } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
+                } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+                }
             }
 
             this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
             this._nativeBridge.Notification.addNotificationObserver(VideoAdUnit._audioSessionRouteChange, []);
 
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
 
             return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
         } else {
@@ -104,7 +116,7 @@ export class VideoAdUnit extends AbstractAdUnit {
                 hardwareAccel = false;
             }
 
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled') + ', playing from ' + this.getVideoUrl());
 
             return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         }
@@ -117,9 +129,21 @@ export class VideoAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
-        if(this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.stop();
+        if(!this._showing) {
+            return Promise.resolve();
         }
+        this._showing = false;
+
+        if(this.isVideoActive()) {
+            this._nativeBridge.VideoPlayer.stop().catch(error => {
+                if(error === AndroidVideoPlayerError[AndroidVideoPlayerError.VIDEOVIEW_NULL]) {
+                    // sometimes system has already destroyed video view so just ignore this error
+                } else {
+                    throw new Error(error);
+                }
+            });
+        }
+
         this.hideChildren();
         this.unsetReferences();
 
@@ -132,7 +156,6 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Notification.removeNotificationObserver(VideoAdUnit._audioSessionRouteChange);
 
             return this._nativeBridge.IosAdUnit.close().then(() => {
-                this._showing = false;
                 this.onClose.trigger();
             });
         } else {
@@ -142,15 +165,24 @@ export class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
-                this._showing = false;
                 this.onClose.trigger();
+            }).catch(error => {
+                // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
+                if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
+                    this.onClose.trigger();
+                } else {
+                    throw new Error(error);
+                }
             });
         }
     }
 
     protected hideChildren() {
-        this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
-        let endScreen = this.getEndScreen();
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
+        const endScreen = this.getEndScreen();
         if(endScreen) {
             endScreen.container().parentElement.removeChild(endScreen.container());
         }
@@ -192,6 +224,14 @@ export class VideoAdUnit extends AbstractAdUnit {
         }
     }
 
+    public getVideoPositionRepeats(): number {
+        return this._videoPositionRepeats;
+    }
+
+    public setVideoPositionRepeats(repeats: number): void {
+        this._videoPositionRepeats = repeats;
+    }
+
     public getVideoQuartile(): number {
         return this._videoQuartile;
     }
@@ -208,11 +248,11 @@ export class VideoAdUnit extends AbstractAdUnit {
         this._watches = watches;
     }
 
-    public getOverlay(): Overlay {
+    public getOverlay(): Overlay | undefined {
         return this._overlay;
     }
 
-    public getEndScreen(): EndScreen | null {
+    public getEndScreen(): EndScreen | undefined {
         return this._endScreen;
     }
 
@@ -225,13 +265,27 @@ export class VideoAdUnit extends AbstractAdUnit {
         delete this._overlay;
     }
 
+    public getProgressInterval(): number {
+        return VideoAdUnit._progressInterval;
+    }
+
+    private getVideoUrl(): string {
+        const campaign: Campaign = this.getCampaign();
+
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
+        } else {
+            return campaign.getVideoUrl();
+        }
+    }
+
     /*
      ANDROID ACTIVITY LIFECYCLE EVENTS
      */
 
     private onResume(activityId: number): void {
         if(this._showing && this.isVideoActive() && activityId === this._activityId) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 
@@ -255,7 +309,7 @@ export class VideoAdUnit extends AbstractAdUnit {
 
     private onViewDidAppear(): void {
         if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this.getCampaign().getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this.getPlacement().muteVideo() ? 0.0 : 1.0));
         }
     }
 

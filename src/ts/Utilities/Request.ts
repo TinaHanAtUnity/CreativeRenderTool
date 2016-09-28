@@ -50,25 +50,11 @@ export class Request {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
 
-    public static getHeader(headers: [string, string][] | { [key: string]: string }, headerName: string): string | null {
-        // todo: Fix this hack with a proper solution.
-        // due to a native side API mismatch Android and iOS send headers in a different way
-        // android sends headers as a JSON array, iOS as a JSON object
-        if (headers instanceof Array) {
-            for (let i = 0; i < headers.length; ++i) {
-                let header = headers[i];
-                if (header[0].match(new RegExp(headerName, 'i'))) {
-                    return header[1];
-                }
-            }
-        } else {
-            // todo: this is a hack due to the fact that headers in iOS are returned as a hashmap
-            for (let key in headers) {
-                if (headers.hasOwnProperty(key)) {
-                    if (key.match(new RegExp(headerName, 'i'))) {
-                        return headers[key].toString();
-                    }
-                }
+    public static getHeader(headers: [string, string][], headerName: string): string | null {
+        for(let i = 0; i < headers.length; ++i) {
+            let header = headers[i];
+            if(header[0].match(new RegExp(headerName, 'i'))) {
+                return header[1];
             }
         }
         return null;
@@ -203,6 +189,7 @@ export class Request {
             headers: headers
         };
         let nativeRequest = Request._requests[id];
+
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = Request.getHeader(headers, 'location');

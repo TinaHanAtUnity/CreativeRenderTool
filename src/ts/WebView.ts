@@ -20,8 +20,10 @@ import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
-import { StorageType, StorageError } from 'Native/Api/Storage';
 import { JsonParser } from 'Utilities/JsonParser';
+import { MetaData } from 'Utilities/MetaData';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class WebView {
 
@@ -51,6 +53,7 @@ export class WebView {
     private _configJsonCheckedAt: number;
     private _mustRefill: boolean;
     private _refillTimestamp: number;
+    private _campaignTimeout: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -67,8 +70,11 @@ export class WebView {
             this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
-            this._eventManager = new EventManager(this._nativeBridge, this._request);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
+            this._eventManager = new EventManager(this._nativeBridge, this._request);
+            Diagnostics.setEventManager(this._eventManager);
+            Diagnostics.setClientInfo(this._clientInfo);
+
             return this._deviceInfo.fetch();
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
@@ -82,7 +88,7 @@ export class WebView {
                     document.body.classList.add('ipad');
                 }
             }
-
+            Diagnostics.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -118,6 +124,7 @@ export class WebView {
             this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
             this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
             this._refillTimestamp = 0;
+            this._campaignTimeout = 0;
             return this._campaignManager.request();
         }).then(() => {
             this._initialized = true;
@@ -125,16 +132,16 @@ export class WebView {
             return this._eventManager.sendUnsentSessions();
         }).catch(error => {
             if(error instanceof Error) {
-                error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+                error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
                 if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger(this._eventManager, {
+            Diagnostics.trigger({
                 'type': 'initialization_error',
                 'error': error
-            }, this._clientInfo, this._deviceInfo);
+            });
         });
     }
 
@@ -162,10 +169,23 @@ export class WebView {
             return;
         }
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
-            this._nativeBridge.AppSheet.prepare({
-                id: parseInt(this._campaign.getAppStoreId(), 10)
+        if(this.isCampaignExpired()) {
+            this._campaignTimeout = 0;
+            this.showError(true, placementId, 'Campaign has expired');
+            this.onCampaignExpired();
+
+            let error = new DiagnosticError(new Error('Campaign expired'), {
+                id: this._campaign.getId(),
+                appStoreId: this._campaign.getAppStoreId(),
+                timeoutInSeconds: this._campaign.getTimeoutInSeconds()
             });
+
+            Diagnostics.trigger({
+                type: 'campaign_expired',
+                error: error
+            });
+
+            return;
         }
 
         this._showing = true;
@@ -188,6 +208,21 @@ export class WebView {
             this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
+            if(!(this._campaign instanceof VastCampaign) && this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
+                const options = {
+                    id: parseInt(this._campaign.getAppStoreId(), 10)
+                };
+                this._nativeBridge.AppSheet.prepare(options).then(() => {
+                    let onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.prepare(options);
+                    });
+                    this._adUnit.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                        this._nativeBridge.AppSheet.destroy(options);
+                    });
+                });
+            }
+
             this._adUnit.show().then(() => {
                 this._sessionManager.sendShow(this._adUnit);
             });
@@ -195,6 +230,7 @@ export class WebView {
             delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
+            this._campaignTimeout = 0;
             this._mustRefill = true;
         });
     }
@@ -226,34 +262,37 @@ export class WebView {
 
     private onCampaign(campaign: Campaign): void {
         this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
         let cacheMode = this._configuration.getCacheMode();
 
-        let cacheAsset = (url: string) => {
+        let cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 throw status;
             }).catch(error => {
-                if(error !== CacheStatus.STOPPED) {
-                    this.onError(error);
+                if(failAllowed === true && error === CacheStatus.FAILED) {
                     return url;
                 }
                 throw error;
             });
         };
 
-        let cacheAssets = () => {
-            return cacheAsset(campaign.getVideoUrl()).then(fileUrl => {
+        let cacheAssets = (failAllowed: boolean) => {
+            return cacheAsset(campaign.getVideoUrl(), failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
             }).then(() =>
-                cacheAsset(campaign.getLandscapeUrl())).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getPortraitUrl())).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getGameIcon())).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
+                cacheAsset(campaign.getLandscapeUrl(), failAllowed)).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getPortraitUrl(), failAllowed)).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
+                cacheAsset(campaign.getGameIcon(), failAllowed)).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
                 }
             });
         };
@@ -263,7 +302,7 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
+            cacheAssets(false).then(() => {
                 if(this._showing) {
                     let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
@@ -272,25 +311,36 @@ export class WebView {
                 } else {
                     sendReady();
                 }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
             });
         } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets(true);
             if(this._showing) {
                 let onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
                     sendReady();
                 });
             } else {
-                cacheAssets();
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
     private onVastCampaign(campaign: Campaign): void {
         this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
         let cacheMode = this._configuration.getCacheMode();
 
@@ -302,7 +352,6 @@ export class WebView {
                 throw status;
             }).catch(error => {
                 if(error !== CacheStatus.STOPPED) {
-                    this.onError(error);
                     return url;
                 }
                 throw error;
@@ -360,25 +409,48 @@ export class WebView {
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
     private onNoFill(retryTime: number) {
         this._refillTimestamp = Date.now() + retryTime * 1000;
+        this._campaignTimeout = 0;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.setPlacementStates(PlacementState.NO_FILL);
     }
 
+    private setCampaignTimeout(campaignTimeout: number) {
+        if(campaignTimeout === 0) {
+            this._campaignTimeout = 0;
+        } else {
+            this._nativeBridge.Sdk.logInfo('Campaign will expire in ' + campaignTimeout + ' seconds');
+            this._campaignTimeout = Date.now() + campaignTimeout * 1000;
+        }
+    }
+
+    private onCampaignExpired() {
+        this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
+        this.setPlacementStates(PlacementState.NO_FILL);
+        this._campaignManager.request();
+    }
+
     private onCampaignError(error: any) {
-        if(error instanceof Error) {
-            error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger(this._eventManager, {
+        Diagnostics.trigger({
             'type': 'campaign_request_failed',
             'error': error
-        }, this._clientInfo, this._deviceInfo);
+        });
         this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
@@ -423,7 +495,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    this.checkRefill();
+                    this.checkCampaignStatus();
                     this._eventManager.sendUnsentSessions();
                 }
             });
@@ -431,32 +503,41 @@ export class WebView {
     }
 
     private onScreenOn(): void {
-        this.checkRefill();
+        this.checkCampaignStatus();
     }
 
     private onAppForeground(): void {
-        this.checkRefill();
+        this.checkCampaignStatus();
     }
 
-    private checkRefill(): void {
+    private checkCampaignStatus(): void {
         if(this._refillTimestamp !== 0 && Date.now() > this._refillTimestamp) {
             this._refillTimestamp = 0;
             this._campaignManager.request();
+        } else {
+            if(this.isCampaignExpired()) {
+                this._campaignTimeout = 0;
+                this.onCampaignExpired();
+            }
         }
+    }
+
+    private isCampaignExpired(): boolean {
+        return this._campaignTimeout !== 0 && Date.now() > this._campaignTimeout;
     }
 
     /*
      GENERIC ONERROR HANDLER
      */
     private onError(event: ErrorEvent): boolean {
-        Diagnostics.trigger(this._eventManager, {
+        Diagnostics.trigger({
             'type': 'js_error',
             'message': event.message,
             'url': event.filename,
             'line': event.lineno,
             'column': event.colno,
             'object': event.error
-        }, this._clientInfo, this._deviceInfo);
+        });
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
 
@@ -493,41 +574,19 @@ export class WebView {
      */
 
     private setupTestEnvironment(): void {
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.serverUrl.value').then((url) => {
-            if(url) {
+        let metaData: MetaData = new MetaData(this._nativeBridge);
+
+        metaData.get<string>('test.serverUrl', true).then(([found, url]) => {
+            if(found && url) {
                 ConfigManager.setTestBaseUrl(url);
                 CampaignManager.setTestBaseUrl(url);
                 SessionManager.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.serverUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
 
-        this._nativeBridge.Storage.get<string>(StorageType.PUBLIC, 'test.kafkaUrl.value').then((url) => {
-            if(url) {
+        metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
+            if(found && url) {
                 Diagnostics.setTestBaseUrl(url);
-
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'test.kafkaUrl');
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
-            }
-        }).catch(([error]) => {
-            switch(error) {
-                case StorageError[StorageError.COULDNT_GET_VALUE]:
-                    // normal case, use default urls
-                    break;
-
-                default:
-                    throw new Error(error);
             }
         });
     }

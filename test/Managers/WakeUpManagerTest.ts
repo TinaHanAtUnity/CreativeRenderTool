@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -25,8 +25,8 @@ class TestBroadcastApi extends BroadcastApi {
 }
 
 describe('WakeUpManagerTest', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
 
@@ -38,69 +38,69 @@ describe('WakeUpManagerTest', () => {
         nativeBridge.Connectivity = new TestConnectivityApi(nativeBridge);
         nativeBridge.Broadcast = new TestBroadcastApi(nativeBridge);
 
-        let clock = Sinon.useFakeTimers();
+        let clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
         clock.restore();
     });
 
     it('should set connection listening status true', () => {
-        let spy = Sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
+        let spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
         return wakeUpManager.setListenConnectivity(true).then(() => {
-            Sinon.assert.calledOnce(spy);
-            Sinon.assert.calledWith(spy, true);
+            sinon.assert.calledOnce(spy);
+            sinon.assert.calledWith(spy, true);
         });
     });
 
     it('should set connection listening status false', () => {
-        let spy = Sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
+        let spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
         return wakeUpManager.setListenConnectivity(false).then(() => {
-            Sinon.assert.calledOnce(spy);
-            Sinon.assert.calledWith(spy, false);
+            sinon.assert.calledOnce(spy);
+            sinon.assert.calledWith(spy, false);
         });
     });
 
     it('should start listening to screen broadcasts', () => {
-        let spy = Sinon.spy(nativeBridge.Broadcast, 'addBroadcastListener');
+        let spy = sinon.spy(nativeBridge.Broadcast, 'addBroadcastListener');
         return wakeUpManager.setListenScreen(true).then(() => {
-            Sinon.assert.calledOnce(spy);
+            sinon.assert.calledOnce(spy);
             assert.deepEqual(spy.getCall(0).args[1], ['android.intent.action.SCREEN_ON', 'android.intent.action.SCREEN_OFF']);
         });
     });
 
     it('should stop listening to screen broadcasts', () => {
-        let spy = Sinon.spy(nativeBridge.Broadcast, 'removeBroadcastListener');
+        let spy = sinon.spy(nativeBridge.Broadcast, 'removeBroadcastListener');
         return wakeUpManager.setListenScreen(false).then(() => {
-            Sinon.assert.calledOnce(spy);
+            sinon.assert.calledOnce(spy);
         });
     });
 
     it('should trigger onNetworkConnected', () => {
-        let clock = Sinon.useFakeTimers();
-        let spy = Sinon.spy();
+        let clock = sinon.useFakeTimers();
+        let spy = sinon.spy();
         wakeUpManager.onNetworkConnected.subscribe(spy);
 
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        Sinon.assert.callCount(spy, 0);
+        sinon.assert.callCount(spy, 0);
 
         clock.tick(20 * 60 * 1000);
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        Sinon.assert.callCount(spy, 1);
+        sinon.assert.callCount(spy, 1);
         clock.restore();
     });
 
     it('should trigger onScreenOn', () => {
-        let spy = Sinon.spy();
+        let spy = sinon.spy();
         wakeUpManager.onScreenOn.subscribe(spy);
 
         nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_ON', '', {}]);
-        Sinon.assert.calledOnce(spy);
+        sinon.assert.calledOnce(spy);
     });
 
     it('should trigger onScreenOff', () => {
-        let spy = Sinon.spy();
+        let spy = sinon.spy();
         wakeUpManager.onScreenOff.subscribe(spy);
 
         nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_OFF', '', {}]);
-        Sinon.assert.calledOnce(spy);
+        sinon.assert.calledOnce(spy);
     });
 });

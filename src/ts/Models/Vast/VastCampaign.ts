@@ -3,13 +3,15 @@ import { Vast } from 'Models/Vast/Vast';
 
 export class VastCampaign extends Campaign {
 
+    private _cacheTTL: number;
     private _campaignId: string;
     private _vast: Vast;
 
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number) {
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number) {
         super({}, gamerId, abGroup);
         this._campaignId = campaignId;
         this._vast = vast;
+        this._cacheTTL = cacheTTL || 3600;
     }
 
     public getId(): string {
@@ -27,6 +29,10 @@ export class VastCampaign extends Campaign {
         } else {
             return this._vast.getVideoUrl() || '';
         }
+    }
+
+    public getTimeoutInSeconds(): number {
+        return this._cacheTTL;
     }
 
 }

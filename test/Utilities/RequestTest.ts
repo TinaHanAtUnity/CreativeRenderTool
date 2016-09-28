@@ -1,5 +1,5 @@
 import 'mocha';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { RequestApi } from 'Native/Api/Request';
@@ -87,8 +87,8 @@ class TestRequestApi extends RequestApi {
 }
 
 describe('RequestTest', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
 
     beforeEach(() => {
@@ -98,7 +98,7 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        let clock = Sinon.useFakeTimers();
+        let clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
         clock.restore();
         request = new Request(nativeBridge, wakeUpManager);
@@ -247,7 +247,7 @@ describe('RequestTest', () => {
     });
 
     it('Request should succeed only after connection event', () => {
-        let clock = Sinon.useFakeTimers();
+        let clock = sinon.useFakeTimers();
         let toggleUrl: string = 'http://www.example.org/toggle';
         let successMessage: string = 'Success response';
 

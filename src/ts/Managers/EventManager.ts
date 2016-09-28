@@ -1,6 +1,8 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class EventManager {
 
@@ -53,16 +55,24 @@ export class EventManager {
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
-        if(redirects) {
-            return this._request.get(url, [], {
-                retries: 0,
-                retryDelay: 0,
-                followRedirects: true,
-                retryWithConnectionEvents: false
+        return this._request.get(url, [], {
+            retries: 0,
+            retryDelay: 0,
+            followRedirects: redirects,
+            retryWithConnectionEvents: false
+        }).catch(([request, message]) => {
+            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+                request: request,
+                event: event,
+                sessionId: sessionId,
+                url: url
             });
-        } else {
-            return this._request.get(url);
-        }
+
+            return Diagnostics.trigger({
+                'type': 'click_attribution_failed',
+                'error': error
+            });
+        });
     }
 
     public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
@@ -72,6 +82,18 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
+        }).catch(([request, message]) => {
+            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+                request: request,
+                event: event,
+                sessionId: sessionId,
+                url: url
+            });
+
+            return Diagnostics.trigger({
+                'type': 'third_party_event_failed',
+                'error': error
+            });
         });
     }
 

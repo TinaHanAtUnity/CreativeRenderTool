@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as Sinon from 'sinon';
+import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -35,7 +35,7 @@ class TestStorageApi extends StorageApi {
         if(key === 'adapter') {
             delete this._storage.adapter;
         }
-        return Promise.resolve();
+        return Promise.resolve(void(0));
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
@@ -51,8 +51,8 @@ class TestStorageApi extends StorageApi {
 }
 
 describe('AdapterMetaDataTest', () => {
-    let handleInvocation = Sinon.spy();
-    let handleCallback = Sinon.spy();
+    let handleInvocation = sinon.spy();
+    let handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, storageApi: TestStorageApi;
 
     before(() => {

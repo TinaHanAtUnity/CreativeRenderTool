@@ -4,9 +4,6 @@
 ## Requirements
 
 - Node (`brew install node`)
-- TypeScript (`npm install -g typescript@1.8.10`)
-- TSLint (`npm install -g tslint`)
-- Typings (`npm install -g typings`)
 
 ### Optional
 
@@ -22,15 +19,15 @@
 		1. .idea
 		2. build
 		3. node_modules
-		4. typings
 	- Tests
 		1. test
 		2. test-utils
 2. Configure TypeScript (Preferences -> Languages & Frameworks -> TypeScript)
 	1. Enable TypeScript
-	2. Change compiler to `/usr/local/lib/node_modules/typescript/lib`
+	2. Change compiler to use TypeScript installation from your project directory `node_modules/typescript/lib`
 	3. Switch to use `tsconfig.json`
 3. Enable TSLint (Preferences -> Languages & Frameworks -> TypeScript -> TSLint)
+	1. Change TSLint package to use TSLint installation from your project directory `node_modules/tslint`
 
 ## Building
 

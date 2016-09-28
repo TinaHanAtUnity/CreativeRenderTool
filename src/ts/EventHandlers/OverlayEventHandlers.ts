@@ -28,7 +28,10 @@ export class OverlayEventHandlers {
           nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
       }
 
-      adUnit.getOverlay().hide();
+      const overlay = adUnit.getOverlay();
+      if(overlay) {
+          overlay.hide();
+      }
       this.afterSkip(adUnit);
   }
 

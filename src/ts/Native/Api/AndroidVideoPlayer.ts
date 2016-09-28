@@ -1,14 +1,30 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { Observable3 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable3 } from 'Utilities/Observable';
 
 enum AndroidVideoPlayerEvent {
     INFO
 }
 
+export enum AndroidVideoPlayerError {
+    VIDEOVIEW_NULL,
+    API_LEVEL_ERROR,
+    GENERIC_ERROR,
+    PAUSE_ERROR,
+    PREPARE_ERROR,
+    SEEKTO_ERROR,
+    ILLEGAL_STATE
+}
+
 export class AndroidVideoPlayerApi extends NativeApi {
 
     public onInfo: Observable3<number, number, string> = new Observable3();
+    public onGenericError: Observable3<number, number, string> = new Observable3();
+    public onPrepareError: Observable1<string> = new Observable1();
+    public onSeekToError: Observable1<string> = new Observable1();
+    public onPauseError: Observable1<string> = new Observable1();
+    public onIllegalStateError: Observable0 = new Observable0();
+
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -22,6 +38,26 @@ export class AndroidVideoPlayerApi extends NativeApi {
         switch(event) {
             case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
                 this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.GENERIC_ERROR]:
+                this.onGenericError.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.PAUSE_ERROR]:
+                this.onPauseError.trigger(parameters[0]);
+                break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.PREPARE_ERROR]:
+                this.onPrepareError.trigger(parameters[0]);
+                break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.SEEKTO_ERROR]:
+                this.onSeekToError.trigger(parameters[0]);
+                break;
+
+            case AndroidVideoPlayerError[AndroidVideoPlayerError.ILLEGAL_STATE]:
+                this.onIllegalStateError.trigger();
                 break;
 
             default:
