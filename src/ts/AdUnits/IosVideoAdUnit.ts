@@ -57,6 +57,11 @@ export class IosVideoAdUnit extends VideoAdUnit {
     }
 
     public hide(): Promise<void> {
+        if(!this._showing) {
+            return Promise.resolve();
+        }
+        this._showing = false;
+
         if(this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop().catch(error => {
                 if(error === IosVideoPlayerEvent[IosVideoPlayerEvent.VIDEOVIEW_NULL]) {
@@ -77,7 +82,6 @@ export class IosVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.Notification.removeNotificationObserver(IosVideoAdUnit._audioSessionRouteChange);
 
         return this._nativeBridge.IosAdUnit.close().then(() => {
-            this._showing = false;
             this.onClose.trigger();
         });
     }
