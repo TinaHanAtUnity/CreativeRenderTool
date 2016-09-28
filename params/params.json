@@ -21,6 +21,13 @@
     "platforms": "all"
   },
   {
+    "key": "advertisingId",
+    "type": "String",
+    "description": "Advertising identifier in raw format TODO: remove duplicate",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "advertisingTrackingId",
     "type": "String",
     "description": "Advertising identifier in raw format",
@@ -282,23 +289,23 @@
   {
     "key": "mediationOrdinal",
     "type": "Integer",
-    "description": "Order of ad shown in mediation waterfall? IIRC",
+    "description": "Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5",
     "provider": "Mediation",
-    "platforms": null
+    "platforms": "all"
   },
   {
-    "key": "mediationProvider",
+    "key": "mediationName",
     "type": "String",
     "description": "Mediation provider name",
     "provider": "Mediation",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "mediationVersion",
     "type": "String",
     "description": "Mediation SDK version",
     "provider": "Mediation",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "muted",
@@ -464,7 +471,7 @@
   {
     "key": "trackingEnabled",
     "type": "Boolean",
-    "description": "Boolean if user has limited tracking or not",
+    "description": "Boolean if user has limited tracking or not TODO: remove duplicate",
     "provider": "SDK",
     "platforms": null
   },
