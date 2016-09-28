@@ -26,7 +26,7 @@ class Creator(object):
         event_html_str = self.create_table_head(PARAM_FIELDS_IN_EVENT)
         for event_param in event_dict["parameters"]:
             try:
-                param = next(d for d in params if d['key'] == event_param['parameter'])
+                param = next(d for d in PARAMS if d['key'] == event_param['parameter'])
                 these_fields = {}
                 these_fields.update(event_param)
                 these_fields.update(param)
@@ -64,7 +64,7 @@ class HtmlCreator(Creator):
         return row_str
 
     def create_table(self, title, content_str):
-        anchor_name = markdown_link_name = self.header_to_anchor(title)
+        anchor_name = self.header_to_anchor(title)
         anchor_tag = "</h3> <a name=\"%s\"></a>" % anchor_name
         return "%s <h3> %s </h3> \n <table> %s </table>" % (anchor_tag,
                                                             title,
@@ -121,15 +121,50 @@ class MarkdownCreator(Creator):
         return combined_content
 
 
+def create_docs(creator, outfile):
+    params_html_str = creator.create_table_head(PARAM_ORDER)
+    for param in PARAMS:
+        values = []
+        for key in PARAM_ORDER:
+            values.append(param[key])
+        params_html_str += creator.create_table_row(values)
+
+    all_params_table = creator.create_table(ALL_PARAMS_HEAD, params_html_str)
+    configuration_table = creator.create_event_table(CONFIGURATION_HEAD,
+                                                     CONFIGURATION_JSON)
+    adPlan_table = creator.create_event_table(ADPLAN_REQ_HEAD,
+                                              ADPLAN_JSON)
+    video_events_table = creator.create_event_table(VIDEO_EVENTS_HEAD,
+                                                    VIDEO_EVENTS_JSON)
+    table_of_contents = creator.create_toc([ALL_PARAMS_HEAD,
+                                            CONFIGURATION_HEAD,
+                                            ADPLAN_REQ_HEAD,
+                                            VIDEO_EVENTS_HEAD])
+
+    f = open(outfile, 'w')
+    f.write(creator.create_page([table_of_contents,
+                                 all_params_table,
+                                 configuration_table,
+                                 adPlan_table,
+                                 video_events_table]))
+    f.close()
+
+
 parser = ArgumentParser(description="Generate Document based on json")
 parser.add_argument('-d',
                     '--documentType',
                     dest='document_type',
                     help='What Document type are we going to generate.\
-                    Possible values HTML or MD')
+                    Possible values HTML or MD. Will build both by default')
 args = parser.parse_args()
 
 document_type = args.document_type
+try:
+    PARAMS = json.load(open(PARAMS_JSON))
+except Exception as e:
+    print("Failed to parse file '%s', please check file integrity! '%s'" % (PARAMS_JSON, str(e)))
+    raise
+
 
 print(document_type)
 # default to MD
@@ -137,38 +172,9 @@ if not document_type or document_type.upper() == "MD":
     print("Markdown creator")
     this_creator = MarkdownCreator()
     outfile = MARKDOWN_OUTFILE
-elif document_type.upper() == "HTML":
+    create_docs(this_creator, outfile)
+if not document_type or document_type.upper() == "HTML":
     print("HTML Creator")
     this_creator = HtmlCreator()
     outfile = HTML_OUTFILE
-
-params = json.load(open(PARAMS_JSON))
-
-params_html_str = this_creator.create_table_head(PARAM_ORDER)
-for param in params:
-    values = []
-    for key in PARAM_ORDER:
-        values.append(param[key])
-    params_html_str += this_creator.create_table_row(values)
-
-all_params_table = this_creator.create_table(ALL_PARAMS_HEAD, params_html_str)
-
-configuration_table = this_creator.create_event_table(CONFIGURATION_HEAD,
-                                                      CONFIGURATION_JSON)
-adPlan_table = this_creator.create_event_table(ADPLAN_REQ_HEAD,
-                                               ADPLAN_JSON)
-video_events_table = this_creator.create_event_table(VIDEO_EVENTS_HEAD,
-                                                     VIDEO_EVENTS_JSON)
-
-table_of_contents = this_creator.create_toc([ALL_PARAMS_HEAD,
-                                            CONFIGURATION_HEAD,
-                                            ADPLAN_REQ_HEAD,
-                                            VIDEO_EVENTS_HEAD])
-
-f = open(outfile, 'w')
-f.write(this_creator.create_page([table_of_contents,
-                                  all_params_table,
-                                  configuration_table,
-                                  adPlan_table,
-                                  video_events_table]))
-f.close()
+    create_docs(this_creator, outfile)
