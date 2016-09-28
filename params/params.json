@@ -9,16 +9,16 @@
   {
     "key": "adapterName",
     "type": "String",
-    "description": "If there was an adapter between the framework and SDK native code, for instance: UnityAds AssetStore Plugin or UnityAds Engine Integration",
+    "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "adapterVersion",
     "type": "String",
-    "description": "For instance: 1.2.4",
+    "description": "SDK version name for adapter, should be in sync with SDK version",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "advertisingTrackingId",
@@ -198,9 +198,9 @@
   {
     "key": "encrypted",
     "type": "Boolean",
-    "description": "Basically is the application debuggable or not ",
+    "description": "If true, app is encrypted for app store distribution and game is live",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "eventId",
@@ -276,7 +276,7 @@
     "key": "mediation",
     "type": "JSONobject",
     "description": "mediation data in JSON object (Will get refactored)",
-    "provider": "app",
+    "provider": "App",
     "platforms": "all"
   },
   {
@@ -366,9 +366,9 @@
   {
     "key": "rooted",
     "type": "Boolean",
-    "description": "Was the device rooted/jailbroken or not according to check",
+    "description": "Is the device rooted or jailbroken",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "screenBrightness",
