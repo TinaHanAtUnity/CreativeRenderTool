@@ -273,6 +273,13 @@
     "platforms": "all"
   },
   {
+    "key": "mediation",
+    "type": "JSONobject",
+    "description": "mediation data in JSON object (Will get refactored)",
+    "provider": "app",
+    "platforms": "all"
+  },
+  {
     "key": "mediationOrdinal",
     "type": "Integer",
     "description": "Order of ad shown in mediation waterfall? IIRC",
@@ -448,7 +455,7 @@
     "platforms": null
   },
   {
-    "key": "timezone",
+    "key": "timeZone",
     "type": "String",
     "description": "Current timezone",
     "provider": "SDK",

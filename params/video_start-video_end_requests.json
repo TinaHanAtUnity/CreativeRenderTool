@@ -20,7 +20,7 @@
       "body": null
     },
     {
-      "parameter": "advertisingId",
+      "parameter": "advertisingTrackingId",
       "required": null,
       "queryString": null,
       "body": null
@@ -122,7 +122,7 @@
       "body": null
     },
     {
-      "parameter": "deviceFreeSpace",
+      "parameter": "freeSpace",
       "required": null,
       "queryString": null,
       "body": null
@@ -314,7 +314,7 @@
       "body": null
     },
     {
-      "parameter": "screenLayout",
+      "parameter": "screenSize",
       "required": null,
       "queryString": null,
       "body": null
@@ -356,7 +356,7 @@
       "body": null
     },
     {
-      "parameter": "testMode",
+      "parameter": "test",
       "required": null,
       "queryString": null,
       "body": null
@@ -368,7 +368,7 @@
       "body": null
     },
     {
-      "parameter": "timezone",
+      "parameter": "timeZone",
       "required": null,
       "queryString": null,
       "body": null
