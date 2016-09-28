@@ -23,6 +23,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class WebView {
 
@@ -207,7 +208,7 @@ export class WebView {
             this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
-            if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
+            if(!(this._campaign instanceof VastCampaign) && this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
                 const options = {
                     id: parseInt(this._campaign.getAppStoreId(), 10)
                 };
