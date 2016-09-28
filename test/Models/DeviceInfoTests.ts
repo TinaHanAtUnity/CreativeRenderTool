@@ -1,12 +1,12 @@
 import 'mocha';
 import * as sinon from 'sinon';
-
 import { assert } from 'chai';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { Platform } from '../../src/ts/Constants/Platform';
-import { RingerMode } from '../../src/ts/Constants/Android/RingerMode';
-import { UIUserInterfaceIdiom } from '../../src/ts/Constants/iOS/UIUserInterfaceIdiom';
+
+import { NativeBridge } from 'Native/NativeBridge';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Platform } from 'Constants/Platform';
+import { RingerMode } from 'Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 describe('DeviceInfoTest', () => {
 
@@ -212,7 +212,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg) => { return; },
+                logWarning: (msg: string) => { return; },
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
@@ -278,7 +278,7 @@ describe('DeviceInfoTest reject promises', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg) => { return; },
+                logWarning: (msg: string) => { return; },
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.reject(new Error('testError'))),

@@ -3,11 +3,17 @@ import { PerformanceAdUnit } from '../AdUnits/PerformanceAdUnit';
 export class PerformanceVideoEventHandlers {
 
     public static onVideoCompleted(adUnit: PerformanceAdUnit) {
-        adUnit.getEndScreen().show();
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        }
     }
 
     public static handleVideoError(adUnit: PerformanceAdUnit) {
-        adUnit.getEndScreen().show();
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        }
     }
 
 }

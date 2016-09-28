@@ -6,7 +6,7 @@ import { EndScreen } from 'Views/EndScreen';
 export class PerformanceAdUnit extends AbstractAdUnit {
 
     private _videoAdUnit: VideoAdUnit;
-    private _endScreen: EndScreen;
+    private _endScreen: EndScreen | undefined;
 
     constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, endScreen: EndScreen) {
         super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
@@ -23,11 +23,11 @@ export class PerformanceAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
-        if (this._endScreen) {
-            this._endScreen.container().parentElement.removeChild(this._endScreen.container());
-            this._endScreen = null;
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            endScreen.container().parentElement.removeChild(endScreen.container());
         }
-
+        this.unsetReferences();
         return this._videoAdUnit.hide();
     }
 
@@ -35,8 +35,12 @@ export class PerformanceAdUnit extends AbstractAdUnit {
         return this._videoAdUnit.isShowing();
     }
 
-    public getEndScreen(): EndScreen {
+    public getEndScreen(): EndScreen | undefined {
         return this._endScreen;
+    }
+
+    private unsetReferences() {
+        delete this._endScreen;
     }
 
 }

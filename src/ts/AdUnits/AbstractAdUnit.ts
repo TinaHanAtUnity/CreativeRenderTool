@@ -44,5 +44,4 @@ export abstract class AbstractAdUnit {
     public getFinishState(): FinishState {
         return this._finishState;
     }
-
 }

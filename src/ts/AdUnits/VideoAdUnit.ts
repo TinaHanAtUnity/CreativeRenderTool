@@ -8,7 +8,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
     private static _progressInterval: number = 250;
 
-    protected _overlay: Overlay;
+    protected _overlay: Overlay | undefined;
 
     protected _videoDuration: number;
     protected _videoPosition: number;
@@ -31,7 +31,11 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     }
 
     protected hideChildren() {
-        this.getOverlay().container().parentElement.removeChild(this.getOverlay().container());
+        const overlay = this.getOverlay();
+
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
     };
 
     public isShowing(): boolean {
@@ -86,7 +90,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._watches = watches;
     }
 
-    public getOverlay(): Overlay {
+    public getOverlay(): Overlay | undefined {
         return this._overlay;
     }
 
@@ -94,12 +98,11 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._watches += 1;
     }
 
-    public unsetReferences() {
-        this._overlay = null;
+    protected unsetReferences() {
+        delete this._overlay;
     }
 
     public getProgressInterval(): number {
         return VideoAdUnit._progressInterval;
     }
-
 }

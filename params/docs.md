@@ -33,12 +33,11 @@
 | deviceFreeSpace | Integer | Free space in kilobytes | SDK | NA |
 | deviceHeadset | Boolean | Boolean if user has headset plugged in | SDK | NA |
 | deviceMake | String | Android device manufacturer | SDK | NA |
-| deviceModel | String | Android device model | SDK | NA |
+| deviceModel | String | Android or iOS device model, example 'iPhone7,1' | SDK | NA |
 | deviceRingerMode | String | Silent / Vibrate / Sound () | SDK | NA |
 | deviceRingerMode | String | Silent / Vibrate / Sound | SDK | NA |
 | deviceTotalMemory | Integer | Total memory in kilobytes | SDK | NA |
 | deviceTotalSpace | Integer | Total space in kilobytes | SDK | NA |
-| deviceType | String | iOS raw device type | SDK | NA |
 | deviceVolume | Integer | Device volume | SDK | NA |
 | encrypted | Boolean | Basically is the application debuggable or not  | SDK | NA |
 | eventId | String | Unique event identifier | SDK | NA |
@@ -108,11 +107,10 @@
 | deviceFreeSpace | NA | NA | NA | Integer | Free space in kilobytes | SDK | NA |
 | deviceHeadset | NA | NA | NA | Boolean | Boolean if user has headset plugged in | SDK | NA |
 | deviceMake | NA | NA | NA | String | Android device manufacturer | SDK | NA |
-| deviceModel | NA | NA | NA | String | Android device model | SDK | NA |
+| deviceModel | NA | NA | NA | String | Android or iOS device model, example 'iPhone7,1' | SDK | NA |
 | deviceRingerMode | NA | NA | NA | String | Silent / Vibrate / Sound () | SDK | NA |
 | deviceTotalMemory | NA | NA | NA | Integer | Total memory in kilobytes | SDK | NA |
 | deviceTotalSpace | NA | NA | NA | Integer | Total space in kilobytes | SDK | NA |
-| deviceType | NA | NA | NA | String | iOS raw device type | SDK | NA |
 | deviceVolume | NA | NA | NA | Integer | Device volume | SDK | NA |
 | encrypted | NA | NA | NA | Boolean | Basically is the application debuggable or not  | SDK | NA |
 | eventId | NA | NA | NA | String | Unique event identifier | SDK | NA |
@@ -180,11 +178,10 @@
 | deviceFreeSpace | NA | NA | NA | Integer | Free space in kilobytes | SDK | NA |
 | deviceHeadset | NA | NA | NA | Boolean | Boolean if user has headset plugged in | SDK | NA |
 | deviceMake | NA | NA | NA | String | Android device manufacturer | SDK | NA |
-| deviceModel | NA | NA | NA | String | Android device model | SDK | NA |
+| deviceModel | NA | NA | NA | String | Android or iOS device model, example 'iPhone7,1' | SDK | NA |
 | deviceRingerMode | NA | NA | NA | String | Silent / Vibrate / Sound () | SDK | NA |
 | deviceTotalMemory | NA | NA | NA | Integer | Total memory in kilobytes | SDK | NA |
 | deviceTotalSpace | NA | NA | NA | Integer | Total space in kilobytes | SDK | NA |
-| deviceType | NA | NA | NA | String | iOS raw device type | SDK | NA |
 | deviceVolume | NA | NA | NA | Integer | Device volume | SDK | NA |
 | encrypted | NA | NA | NA | Boolean | Basically is the application debuggable or not  | SDK | NA |
 | eventId | NA | NA | NA | String | Unique event identifier | SDK | NA |
@@ -253,11 +250,10 @@
 | deviceFreeSpace | NA | NA | NA | Integer | Free space in kilobytes | SDK | NA |
 | deviceHeadset | NA | NA | NA | Boolean | Boolean if user has headset plugged in | SDK | NA |
 | deviceMake | NA | NA | NA | String | Android device manufacturer | SDK | NA |
-| deviceModel | NA | NA | NA | String | Android device model | SDK | NA |
+| deviceModel | NA | NA | NA | String | Android or iOS device model, example 'iPhone7,1' | SDK | NA |
 | deviceRingerMode | NA | NA | NA | String | Silent / Vibrate / Sound () | SDK | NA |
 | deviceTotalMemory | NA | NA | NA | Integer | Total memory in kilobytes | SDK | NA |
 | deviceTotalSpace | NA | NA | NA | Integer | Total space in kilobytes | SDK | NA |
-| deviceType | NA | NA | NA | String | iOS raw device type | SDK | NA |
 | deviceVolume | NA | NA | NA | Integer | Device volume | SDK | NA |
 | encrypted | NA | NA | NA | Boolean | Basically is the application debuggable or not  | SDK | NA |
 | eventId | NA | NA | NA | String | Unique event identifier | SDK | NA |

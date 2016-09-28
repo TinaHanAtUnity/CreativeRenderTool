@@ -1,8 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Campaign } from 'Models/Campaign';
 import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
@@ -36,14 +34,15 @@ export class VastAdUnit extends AbstractAdUnit {
         return (<VastCampaign> this.getCampaign()).getVast();
     }
 
-    public getDuration(): number {
+    public getDuration(): number | null {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string): void {
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (let impressionUrl of impressionUrls) {
+                impressionUrl = impressionUrl.replace(/%SDK_VERSION%/, sdkVersion);
                 this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
             }
         }
@@ -59,15 +58,15 @@ export class VastAdUnit extends AbstractAdUnit {
     }
 
     public sendProgressEvents(eventManager: EventManager, sessionId: string, position: number, oldPosition: number) {
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 1);
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 2);
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 3);
+        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 1, 'firstQuartile');
+        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 2, 'midpoint');
+        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 3, 'thirdQuartile');
     }
 
-    public getVideoClickThroughURL(): string {
+    public getVideoClickThroughURL(): string | null {
         let url = this.getVast().getVideoClickThroughURL();
         let reg = new RegExp('^(https?)://.+$');
-        if (reg.test(url)) {
+        if (url && reg.test(url)) {
             return url;
         } else {
             // in the future, we want to send this event to our server and notify the advertiser of a broken link
@@ -85,17 +84,7 @@ export class VastAdUnit extends AbstractAdUnit {
         }
     }
 
-    private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number) {
-        let quartileEventName: string;
-        if (quartile === 1) {
-            quartileEventName = 'firstQuartile';
-        }
-        if (quartile === 2) {
-            quartileEventName = 'midpoint';
-        }
-        if (quartile === 3) {
-            quartileEventName = 'thirdQuartile';
-        }
+    private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             let duration = this.getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
@@ -109,7 +98,7 @@ export class VastAdUnit extends AbstractAdUnit {
         eventManager.thirdPartyEvent(event, sessionId, url);
     }
 
-    private getTrackingEventUrls(eventName: string): string[] {
+    private getTrackingEventUrls(eventName: string): string[] | null {
         return this.getVast().getTrackingEventUrls(eventName);
     }
 

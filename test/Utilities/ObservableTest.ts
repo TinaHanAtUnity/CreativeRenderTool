@@ -1,9 +1,7 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 
-import { Observable1 } from '../../src/ts/Utilities/Observable';
+import { Observable1 } from 'Utilities/Observable';
 
 describe('ObservableTest', () => {
     it('should unsubscribe', () => {
@@ -23,7 +21,7 @@ describe('ObservableTest', () => {
 
     it('should unsubscribe from bound observer', () => {
         let triggered = 0;
-        let observer = (abc) => {
+        let observer = (abc: string) => {
             assert.equal(abc, 'abc');
             triggered++;
         };

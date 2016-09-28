@@ -7,8 +7,8 @@ export class Diagnostics {
 
     private static DiagnosticsBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
     private static _eventManager: EventManager;
-    private static _clientInfo: ClientInfo;
-    private static _deviceInfo: DeviceInfo;
+    private static _clientInfo: ClientInfo | undefined;
+    private static _deviceInfo: DeviceInfo | undefined;
 
     public static trigger(data: any): Promise<INativeResponse> {
         let messages: any[] = []; // todo: use a more specific type

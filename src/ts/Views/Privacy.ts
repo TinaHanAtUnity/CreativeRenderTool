@@ -23,12 +23,12 @@ export class Privacy extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event) => this.onOkEvent(event),
+                listener: (event: Event) => this.onOkEvent(event),
                 selector: '.ok-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onPrivacyEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: 'a'
             }
         ];

@@ -16,25 +16,27 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
-        let overlay = videoAdUnit.getOverlay();
+        const overlay = videoAdUnit.getOverlay();
 
         videoAdUnit.setVideoDuration(duration);
-        overlay.setVideoDuration(duration);
-        if(videoAdUnit.getVideoPosition() > 0) {
-            overlay.setVideoProgress(videoAdUnit.getVideoPosition());
-        }
-        if(adUnit.getPlacement().allowSkip()) {
-            overlay.setSkipVisible(true);
-        }
-        overlay.setMuteEnabled(true);
-        overlay.setVideoDurationEnabled(true);
+        if(overlay) {
+            overlay.setVideoDuration(duration);
+            if(videoAdUnit.getVideoPosition() > 0) {
+                overlay.setVideoProgress(videoAdUnit.getVideoPosition());
+            }
+            if(adUnit.getPlacement().allowSkip()) {
+                overlay.setSkipVisible(true);
+            }
+            overlay.setMuteEnabled(true);
+            overlay.setVideoDurationEnabled(true);
 
-        if (adUnit instanceof VastAdUnit && (<VastAdUnit>adUnit).getVideoClickThroughURL()) {
-            overlay.setCallButtonVisible(true);
+            if (adUnit instanceof VastAdUnit && (<VastAdUnit>adUnit).getVideoClickThroughURL()) {
+                overlay.setCallButtonVisible(true);
+            }
         }
 
         metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
-            if(found && debugOverlayEnabled) {
+            if(found && debugOverlayEnabled && overlay) {
                 overlay.setDebugMessageVisible(true);
                 let debugMessage = '';
                 if (adUnit instanceof VastAdUnit) {
@@ -46,7 +48,7 @@ export class VideoEventHandlers {
             }
         });
 
-        nativeBridge.VideoPlayer.setVolume(new Double(overlay.isMuted() ? 0.0 : 1.0)).then(() => {
+        nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(videoAdUnit.getVideoPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(videoAdUnit.getVideoPosition()).then(() => {
                     nativeBridge.VideoPlayer.play();
@@ -61,6 +63,7 @@ export class VideoEventHandlers {
         // todo: video progress event should be handled here and not delegated to session manager
         sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, videoAdUnit.getVideoPosition());
 
+        const overlay = videoAdUnit.getOverlay();
         if(position > 0) {
             let lastPosition = videoAdUnit.getVideoPosition();
 
@@ -107,13 +110,15 @@ export class VideoEventHandlers {
                     videoAdUnit.setVideoPositionRepeats(repeats + 1);
                 }
             } else {
-                 videoAdUnit.setVideoPositionRepeats(0);
+                videoAdUnit.setVideoPositionRepeats(0);
             }
 
-            if(lastPosition > 0 && position - lastPosition < 100) {
-                videoAdUnit.getOverlay().setSpinnerEnabled(true);
-            } else {
-                videoAdUnit.getOverlay().setSpinnerEnabled(false);
+            if (overlay) {
+                if(lastPosition > 0 && position - lastPosition < 100) {
+                    overlay.setSpinnerEnabled(true);
+                } else {
+                    overlay.setSpinnerEnabled(false);
+                }
             }
 
             let previousQuartile: number = videoAdUnit.getVideoQuartile();
@@ -128,14 +133,19 @@ export class VideoEventHandlers {
             }
         }
 
-        videoAdUnit.getOverlay().setVideoProgress(position);
+        if(overlay) {
+            overlay.setVideoProgress(position);
+        }
     }
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
         sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
-        videoAdUnit.getOverlay().setSpinnerEnabled(false);
+        const overlay = videoAdUnit.getOverlay();
+        if(overlay) {
+            overlay.setSpinnerEnabled(false);
+        }
         nativeBridge.VideoPlayer.setProgressEventInterval(videoAdUnit.getProgressInterval());
 
         if(videoAdUnit.getWatches() === 0) {
@@ -243,7 +253,10 @@ export class VideoEventHandlers {
     }
 
     protected static afterVideoCompleted(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        videoAdUnit.getOverlay().hide();
+        const overlay = videoAdUnit.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
         videoAdUnit.onFinish.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -264,7 +277,11 @@ export class VideoEventHandlers {
             nativeBridge.AndroidAdUnit.setViews(['webview']);
         }
 
-        videoAdUnit.getOverlay().hide();
+        const overlay = videoAdUnit.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
+
         videoAdUnit.onFinish.trigger();
     }
 }

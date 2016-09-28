@@ -1,26 +1,25 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import * as sinon from 'sinon';
-import { EndScreenEventHandlers } from '../../src/ts/EventHandlers/EndScreenEventHandlers';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { Overlay } from '../../src/ts/Views/Overlay';
-import { EndScreen } from '../../src/ts/Views/EndScreen';
-import { SessionManager } from '../../src/ts/Managers/SessionManager';
+
+import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Overlay } from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { EventManager } from '../../src/ts/Managers/EventManager';
-import { Request } from '../../src/ts/Utilities/Request';
-import { VideoAdUnit } from '../../src/ts/AdUnits/VideoAdUnit';
-import { Campaign } from '../../src/ts/Models/Campaign';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { EventManager } from 'Managers/EventManager';
+import { Request, INativeResponse } from 'Utilities/Request';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { Campaign } from 'Models/Campaign';
+import { WakeUpManager } from 'Managers/WakeUpManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge, adUnit, overlay, endScreen;
-    let sessionManager;
+    let nativeBridge: NativeBridge, adUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let sessionManager: SessionManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -48,7 +47,7 @@ describe('EndScreenEventHandlersTest', () => {
     });
 
     describe('with onDownload', () => {
-        let resolvedPromise;
+        let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -60,7 +59,7 @@ describe('EndScreenEventHandlersTest', () => {
         it('should send a click with session manager', () => {
             EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
-            sinon.assert.calledWith(sessionManager.sendClick, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, adUnit);
         });
 
         describe('with follow redirects', () => {
@@ -68,7 +67,7 @@ describe('EndScreenEventHandlersTest', () => {
                 EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
                 return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(nativeBridge.Intent.launch, {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': 'http://foobar.com'
                     });
@@ -79,13 +78,13 @@ describe('EndScreenEventHandlersTest', () => {
                 let response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
-                sessionManager.sendClick.restore();
+                (<sinon.SinonSpy>sessionManager.sendClick).restore();
                 sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
 
                 EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
 
                 return resolvedPromise.then(() => {
-                    sinon.assert.notCalled(nativeBridge.Intent.launch);
+                    sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
             });
 
@@ -100,7 +99,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should launch market view', () => {
-                sinon.assert.calledWith(nativeBridge.Intent.launch, {
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
                     'uri': 'market://details?id=fooAppId'
                 });

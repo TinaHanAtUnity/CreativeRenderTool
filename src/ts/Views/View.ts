@@ -1,5 +1,5 @@
 import { Template } from 'Utilities/Template';
-import { IViewBinding } from 'IViewBinding';
+import { IViewBinding } from 'Views/IViewBinding';
 import { Tap } from 'Utilities/Tap';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';

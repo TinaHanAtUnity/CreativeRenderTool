@@ -2,13 +2,13 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from '../../../src/ts/Native/NativeBridge';
-import { Platform } from '../../../src/ts/Constants/Platform';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Platform } from 'Constants/Platform';
 
 describe('BroadcastApi', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
+    let nativeBridge: NativeBridge;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

@@ -65,11 +65,13 @@ export class CampaignManager {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
                         let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
                         this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-                            let campaignId: string = undefined;
+                            let campaignId: string;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                                 campaignId = '00005472656d6f7220694f53';
                             } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                                 campaignId = '005472656d6f7220416e6472';
+                            } else {
+                                campaignId = 'UNKNOWN';
                             }
                             let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
@@ -132,12 +134,6 @@ export class CampaignManager {
             screenSize: this._deviceInfo.getScreenLayout()
         });
 
-        if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            url = Url.addParameters(url, {
-                webviewUa: encodeURIComponent(navigator.userAgent)
-            });
-        }
-
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion()
@@ -180,6 +176,10 @@ export class CampaignManager {
             language: this._deviceInfo.getLanguage(),
             timeZone: this._deviceInfo.getTimeZone(),
         };
+
+        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            body.webviewUa = navigator.userAgent;
+        }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
             body.deviceFreeSpace = freeSpace;

@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'Workarounds';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';
@@ -12,8 +10,8 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
-let resizeHandler: EventListener = (event: Event) => {
-    let currentOrientation: string = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+let resizeHandler = (event?: Event) => {
+    let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
     let newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
     if(currentOrientation) {
         if(currentOrientation !== newOrientation) {
@@ -24,10 +22,10 @@ let resizeHandler: EventListener = (event: Event) => {
         document.body.classList.add(newOrientation);
     }
 };
-resizeHandler(null);
+resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
-let nativeBridge: NativeBridge = null;
+let nativeBridge: NativeBridge;
 switch(Url.getQueryParameter(location.search, 'platform')) {
     case 'android':
         nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);

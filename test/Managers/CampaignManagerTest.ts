@@ -1,20 +1,21 @@
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { Campaign } from '../../src/ts/Models/Campaign';
-import { VastCampaign } from '../../src/ts/Models/Vast/VastCampaign';
-import { ClientInfo } from '../../src/ts/Models/ClientInfo';
-import { DeviceInfo } from '../../src/ts/Models/DeviceInfo';
-import { Request } from '../../src/ts/Utilities/Request';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { CampaignManager } from '../../src/ts/Managers/CampaignManager';
 import { assert } from 'chai';
-import { VastParser } from '../../src/ts/Utilities/VastParser';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
-import { Observable2 } from '../../src/ts/Utilities/Observable';
-import { Observable4 } from '../../src/ts/Utilities/Observable';
-import { Platform } from '../../src/ts/Constants/Platform';
+
+import { NativeBridge } from 'Native/NativeBridge';
+import { Campaign } from 'Models/Campaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Request } from 'Utilities/Request';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { VastParser } from 'Utilities/VastParser';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Observable2 } from 'Utilities/Observable';
+import { Observable4 } from 'Utilities/Observable';
+import { Platform } from 'Constants/Platform';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -22,7 +23,7 @@ describe('CampaignManager', () => {
     let nativeBridge: NativeBridge;
     let request: Request;
     let vastParser: VastParser;
-    let warningSpy;
+    let warningSpy: sinon.SinonSpy;
 
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
@@ -138,7 +139,7 @@ describe('CampaignManager', () => {
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
-            assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
+            assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'http://myErrorURL/error',
                 'http://myErrorURL/wrapper/error'
             ]);
@@ -255,7 +256,7 @@ describe('CampaignManager', () => {
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideoUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
-            assert.deepEqual(triggeredCampaign.getVast().getAd().getErrorURLTemplates(), [
+            assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
                 'http://events.tremorhub.com/diag?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&rid=fd53cdbe934c44c68c57467d184160d7&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=rwd19-1059849-video&seatId=60673&pbid=1585&brid=3418&sid=9755&sdom=demo.app.com&asid=5097&nid=3&lid=3&adom=nissanusa.com&crid=17282869&aid=13457'
             ]);
@@ -481,7 +482,7 @@ describe('CampaignManager', () => {
         });
     };
 
-    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): Promise<void> => {
+    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
         // given a VAST placement that wraps another VAST
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
@@ -509,10 +510,7 @@ describe('CampaignManager', () => {
         });
 
         // when the campaign manager requests the placement
-        return campaignManager.request().then(() => {
-            // then the onError observable is triggered with an appropriate error
-            verify();
-        });
+        campaignManager.request();
     };
 
     describe('VAST error handling', () => {
@@ -848,7 +846,7 @@ describe('CampaignManager', () => {
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
-                get: function(storageType, key) {
+                get: function(storageType: number, key: string) {
                     return Promise.resolve('123');
                 },
                 set: () => {
@@ -890,6 +888,7 @@ describe('CampaignManager', () => {
         };
         let wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
+        Diagnostics.setEventManager(<any>{diagnosticEvent: sinon.spy()});
         deviceInfo = new DeviceInfo(nativeBridge);
     });
 

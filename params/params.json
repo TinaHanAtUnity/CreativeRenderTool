@@ -21,25 +21,25 @@
     "platforms": null
   },
   {
-    "key": "advertisingId",
+    "key": "advertisingTrackingId",
     "type": "String",
     "description": "Advertising identifier in raw format",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "androidId",
-    "type": null,
-    "description": null,
-    "provider": null,
-    "platforms": null
+    "type": "String",
+    "description": "Android ID",
+    "provider": "SDK",
+    "platforms": "android"
   },
   {
     "key": "apiLevel",
     "type": "Integer",
     "description": "Android device API level",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "android"
   },
   {
     "key": "applicationMuted",
@@ -74,14 +74,14 @@
     "type": "String",
     "description": "Bundle identifier for the app",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "bundleVersion",
     "type": "String",
     "description": "Game version",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "cached",
@@ -116,7 +116,7 @@
     "type": "String",
     "description": "\"wifi\", \"cellular\" or \"none\"",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "country",
@@ -140,13 +140,6 @@
     "platforms": null
   },
   {
-    "key": "deviceFreeSpace",
-    "type": "Integer",
-    "description": "Free space in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "deviceHeadset",
     "type": "Boolean",
     "description": "Boolean if user has headset plugged in",
@@ -158,14 +151,14 @@
     "type": "String",
     "description": "Android device manufacturer",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "android"
   },
   {
     "key": "deviceModel",
     "type": "String",
-    "description": "Android device model",
+    "description": "Android or iOS device model, example 'iPhone7,1'",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "deviceRingerMode",
@@ -192,13 +185,6 @@
     "key": "deviceTotalSpace",
     "type": "Integer",
     "description": "Total space in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceType",
-    "type": "String",
-    "description": "iOS raw device type",
     "provider": "SDK",
     "platforms": null
   },
@@ -245,6 +231,13 @@
     "platforms": null
   },
   {
+    "key": "freeSpace",
+    "type": "Integer",
+    "description": "Free space in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "gameId",
     "type": "String",
     "description": "Source game identifier",
@@ -256,7 +249,7 @@
     "type": "String",
     "description": "Internal gamer identifier",
     "provider": "Server",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "integrationType",
@@ -270,14 +263,14 @@
     "type": "String",
     "description": "Device language code (e.g. en_US or fr_CA)",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "limitAdTracking",
     "type": "Boolean",
     "description": "Boolean if user has limited tracking or not",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "mediationOrdinal",
@@ -312,28 +305,28 @@
     "type": "Integer",
     "description": "MCC + MNC codes",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "networkOperatorName",
     "type": "Integer",
     "description": "Cell network operator name",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "networkType",
     "type": "String",
     "description": "Detailed cellular network type",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "osVersion",
     "type": "String",
     "description": "Device operating system version",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "placementId",
@@ -354,7 +347,7 @@
     "type": "String",
     "description": "\"android\" or \"ios\"",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "retryCount",
@@ -380,37 +373,37 @@
   {
     "key": "screenDensity",
     "type": "Integer",
-    "description": "In DPI",
+    "description": "Screen density in DPI",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "android"
   },
   {
     "key": "screenHeight",
     "type": "Integer",
     "description": "Screen height in pixels",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
-    "key": "screenLayout",
+    "key": "screenSize",
     "type": "Integer",
     "description": "Android raw screen layout value",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "android"
   },
   {
     "key": "screenWidth",
     "type": "Integer",
     "description": "Screen width in pixels",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "sdkVersion",
     "type": "String",
-    "description": "SDK version",
+    "description": "SDK version in four digits",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "sessionId",
@@ -441,11 +434,11 @@
     "platforms": null
   },
   {
-    "key": "testMode",
+    "key": "test",
     "type": "Boolean",
     "description": "Test mode",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "timestamp",
@@ -457,9 +450,9 @@
   {
     "key": "timezone",
     "type": "String",
-    "description": "How many hours is the local time offset from UTC. For instance PST would be \"-8:00\", India would be \"+5:30\" ",
+    "description": "Current timezone",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "trackingEnabled",
@@ -482,6 +475,13 @@
     "provider": "Admin",
     "platforms": null
   },
+  {
+    "key": "webviewUa",
+    "type": "String",
+    "description": "WebView user agent string",
+    "provider": "SDK",
+    "platforms": "all"
+  }
   {
     "key": "webviewVersion",
     "type": "String",

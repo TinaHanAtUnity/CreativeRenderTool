@@ -3,12 +3,12 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Request } from '../../src/ts/Utilities/Request';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { WakeUpManager } from '../../src/ts/Managers/WakeUpManager';
-import { Observable2 } from '../../src/ts/Utilities/Observable';
-import { Observable4 } from '../../src/ts/Utilities/Observable';
-import { Platform } from '../../src/ts/Constants/Platform';
+import { Request } from 'Utilities/Request';
+import { NativeBridge } from 'Native/NativeBridge';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Observable2 } from 'Utilities/Observable';
+import { Observable4 } from 'Utilities/Observable';
+import { Platform } from 'Constants/Platform';
 
 describe('VastParser', () => {
     let request: Request;

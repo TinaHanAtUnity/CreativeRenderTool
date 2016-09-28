@@ -1,11 +1,11 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { ConfigManager } from '../../src/ts/Managers/ConfigManager';
-import { NativeBridge } from '../../src/ts/Native/NativeBridge';
-import { StorageType, StorageApi } from '../../src/ts/Native/Api/Storage';
+
+import { ConfigManager } from 'Managers/ConfigManager';
+import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType, StorageApi } from 'Native/Api/Storage';
+import { INativeResponse } from 'Utilities/Request';
 
 class TestStorageApi extends StorageApi {
 
@@ -31,6 +31,7 @@ class TestStorageApi extends StorageApi {
             if(key === 'adapter') {
                 return Promise.resolve(['name', 'version']);
             }
+            return Promise.resolve([]);
         } catch(error) {
             return Promise.resolve([]);
         }
@@ -42,9 +43,9 @@ describe('ConfigManagerTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge;
-    let requestMock, clientInfoMock, deviceInfoMock;
-    let configPromise;
+    let nativeBridge: NativeBridge;
+    let requestMock: any, clientInfoMock: any, deviceInfoMock: any;
+    let configPromise: Promise<INativeResponse>;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

@@ -70,6 +70,11 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
     }
 
     public hide(): Promise<void> {
+        if(!this._showing) {
+            return Promise.resolve();
+        }
+        this._showing = false;
+
         if(this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.stop().catch(error => {
                 if(error === AndroidVideoPlayerError[AndroidVideoPlayerError.VIDEOVIEW_NULL]) {
@@ -90,12 +95,10 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
         return this._nativeBridge.AndroidAdUnit.close().then(() => {
-            this._showing = false;
             this.onClose.trigger();
         }).catch(error => {
             // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
             if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
-                this._showing = false;
                 this.onClose.trigger();
             } else {
                 throw new Error(error);

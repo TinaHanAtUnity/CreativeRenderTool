@@ -27,19 +27,20 @@ export class Vast {
         return this._errorURLTemplates;
     }
 
-    public getAd(): VastAd {
+    public getAd(): VastAd | null {
         if (this.getAds() && this.getAds().length > 0) {
             return this.getAds()[0];
         }
         return null;
     }
 
-    public getVideoUrl(): string {
+    public getVideoUrl(): string | null {
         let ad = this.getAd();
         if (ad) {
             for (let creative of ad.getCreatives()) {
                 for (let mediaFile of creative.getMediaFiles()) {
-                    let playable = this.isPlayableMIMEType(mediaFile.getMIMEType());
+                    let mimeType = mediaFile.getMIMEType();
+                    let playable = mimeType && this.isPlayableMIMEType(mimeType);
                     if (mediaFile.getFileURL() && playable) {
                         return mediaFile.getFileURL();
                     }
@@ -72,7 +73,7 @@ export class Vast {
                 return additionalTrackingEventUrls;
             }
         }
-        return null;
+        return [];
     }
 
     public addTrackingEventUrl(eventName: string, url: string) {
@@ -85,7 +86,7 @@ export class Vast {
         this._additionalTrackingEvents[eventName].push(url);
     }
 
-    public getDuration(): number {
+    public getDuration(): number | null {
         let ad = this.getAd();
         if (ad) {
             return ad.getDuration();
@@ -93,7 +94,7 @@ export class Vast {
         return null;
     }
 
-    public getWrapperURL(): string {
+    public getWrapperURL(): string | null {
         let ad = this.getAd();
         if (ad) {
             return ad.getWrapperURL();
@@ -101,7 +102,7 @@ export class Vast {
         return null;
     }
 
-    public getVideoClickThroughURL(): string {
+    public getVideoClickThroughURL(): string | null {
         let ad = this.getAd();
         if (ad) {
             return ad.getVideoClickThroughURLTemplate();
@@ -109,7 +110,7 @@ export class Vast {
         return null;
     }
 
-    public getVideoClickTrackingURLs(): string[] {
+    public getVideoClickTrackingURLs(): string[] | null {
         let ad = this.getAd();
         if (ad) {
             return ad.getVideoClickTrackingURLTemplates();

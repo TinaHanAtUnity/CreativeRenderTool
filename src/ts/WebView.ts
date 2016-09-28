@@ -216,7 +216,7 @@ export class WebView {
                 this._sessionManager.sendShow(this._adUnit);
             });
 
-            this._campaign = null;
+            delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
             this._campaignTimeout = 0;
@@ -315,7 +315,14 @@ export class WebView {
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
@@ -391,7 +398,14 @@ export class WebView {
                 sendReady();
             }
         } else {
-            sendReady();
+            if(this._showing) {
+                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
         }
     }
 
