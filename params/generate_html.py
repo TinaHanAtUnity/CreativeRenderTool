@@ -25,15 +25,18 @@ class Creator(object):
         event_dict = json.load(open(json_path))
         event_html_str = self.create_table_head(PARAM_FIELDS_IN_EVENT)
         for event_param in event_dict["parameters"]:
-            param = next(d for d in params if d['key'] == event_param['parameter'])
-            these_fields = {}
-            these_fields.update(event_param)
-            these_fields.update(param)
-            values = []
-            for key in PARAM_FIELDS_IN_EVENT:
-                values.append(these_fields[key])
-            event_html_str += self.create_table_row(values)
-
+            try:
+                param = next(d for d in params if d['key'] == event_param['parameter'])
+                these_fields = {}
+                these_fields.update(event_param)
+                these_fields.update(param)
+                values = []
+                for key in PARAM_FIELDS_IN_EVENT:
+                    values.append(these_fields[key])
+                event_html_str += self.create_table_row(values)
+            except Exception as e:
+                print("Exeption when parsing event_table. event_name='%s', json_file='%s', param='%s' , Exception='%s'" % (event_name, json_path, event_param, str(e)))
+                raise
         return self.create_table(event_name, event_html_str)
 
 
@@ -56,7 +59,7 @@ class HtmlCreator(Creator):
     def create_table_row(self, values_array):
         row_str = "<tr>"
         for value in values_array:
-            row_str += "<td>" + (value or "<UNDEFINED!>") + "</td>"
+            row_str += "<td>" + (str(value) or "<UNDEFINED!>") + "</td>"
         row_str += "</tr>\n"
         return row_str
 
@@ -103,7 +106,7 @@ class MarkdownCreator(Creator):
     def create_table_row(self, values_array):
         row_str = "|"
         for value in values_array:
-            row_str += " " + (value or "NA") + " |"
+            row_str += " " + (str(value) or "NA") + " |"
         row_str += "\n"
         return row_str
 
