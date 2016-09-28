@@ -481,7 +481,7 @@
     "description": "WebView user agent string",
     "provider": "SDK",
     "platforms": "all"
-  }
+  },
   {
     "key": "webviewVersion",
     "type": "String",
