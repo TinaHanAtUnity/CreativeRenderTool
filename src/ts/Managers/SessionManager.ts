@@ -138,8 +138,11 @@ export class SessionManager {
             this._currentSession.impressionSent = true;
         }
 
-        //adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId(), this._clientInfo.getSdkVersion());
-        //adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
+        if(adUnit instanceof VastAdUnit) {
+            (<VastAdUnit>adUnit).sendImpressionEvent(this._eventManager, this._currentSession.getId(), this._clientInfo.getSdkVersion());
+            (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
+        }
+
 
     }
 
@@ -153,15 +156,17 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
-            //adUnit.sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
+            if(adUnit instanceof VastAdUnit) {
+                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
+            }
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
-        if (session) {
-            //adUnit.sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
+        if (session && adUnit instanceof VastAdUnit) {
+            (<VastAdUnit>adUnit).sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
         }
     }
 
@@ -238,7 +243,9 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
-            //adUnit.sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
+            if(adUnit instanceof VastAdUnit) {
+                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
+            }
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
@@ -260,10 +267,12 @@ export class SessionManager {
     }
 
     public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {
-        if (muted) {
-            //adUnit.sendTrackingEvent(this._eventManager, 'mute', session.getId());
-        } else {
-            //adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
+        if(adUnit instanceof VastAdUnit) {
+            if (muted) {
+                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'mute', session.getId());
+            } else {
+                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'unmute', session.getId());
+            }
         }
     }
 
