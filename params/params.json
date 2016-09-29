@@ -248,7 +248,7 @@
     "key": "gameId",
     "type": "String",
     "description": "Source game identifier",
-    "provider": "Admin",
+    "provider": "App",
     "platforms": null
   },
   {
@@ -360,6 +360,13 @@
     "key": "platform",
     "type": "String",
     "description": "\"android\" or \"ios\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "redirect",
+    "type": "Boolean",
+    "description": "TODO: What does this do?",
     "provider": "SDK",
     "platforms": "all"
   },

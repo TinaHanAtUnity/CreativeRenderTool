@@ -5,6 +5,7 @@ PARAMS_JSON = "params.json"
 CONFIGURATION_JSON = "configuration.json"
 ADPLAN_JSON = "adPlan_requests.json"
 VIDEO_EVENTS_JSON = "video_start-video_end_requests.json"
+CLICK_EVENT_JSON = "click_event.json"
 HTML_OUTFILE = "docs.html"
 MARKDOWN_OUTFILE = "docs.md"
 PARAM_ORDER = ["key", "type", "description", "provider", "platforms"]
@@ -12,9 +13,10 @@ PARAM_ORDER = ["key", "type", "description", "provider", "platforms"]
 PARAM_FIELDS_IN_EVENT = ["key", "required", "queryString", "body", "type",
                          "description", "provider", "platforms"]
 ALL_PARAMS_HEAD = "All Parameters"
-CONFIGURATION_HEAD = "Configuration"
-ADPLAN_REQ_HEAD = "adPlan Requests"
+CONFIGURATION_HEAD = "Configuration request"
+ADPLAN_REQ_HEAD = "Ad request"
 VIDEO_EVENTS_HEAD = "Video events"
+CLICK_EVENT_HEAD = "Click event"
 
 
 class Creator(object):
@@ -136,17 +138,21 @@ def create_docs(creator, outfile):
                                               ADPLAN_JSON)
     video_events_table = creator.create_event_table(VIDEO_EVENTS_HEAD,
                                                     VIDEO_EVENTS_JSON)
+    click_event_table = creator.create_event_table(CLICK_EVENT_HEAD,
+                                                   CLICK_EVENT_JSON)
     table_of_contents = creator.create_toc([ALL_PARAMS_HEAD,
                                             CONFIGURATION_HEAD,
                                             ADPLAN_REQ_HEAD,
-                                            VIDEO_EVENTS_HEAD])
+                                            VIDEO_EVENTS_HEAD,
+                                            CLICK_EVENT_HEAD])
 
     f = open(outfile, 'w')
     f.write(creator.create_page([table_of_contents,
                                  all_params_table,
                                  configuration_table,
                                  adPlan_table,
-                                 video_events_table]))
+                                 video_events_table,
+                                 click_event_table]))
     f.close()
 
 

@@ -2,9 +2,10 @@
 
 ### TOC
 [All Parameters](#all-parameters)  
-[Configuration](#configuration)  
-[adPlan Requests](#adplan-requests)  
+[Configuration request](#configuration-request)  
+[Ad request](#ad-request)  
 [Video events](#video-events)  
+[Click event](#click-event)  
 
 
 ### All Parameters
@@ -45,7 +46,7 @@
 | frameworkName | String | The framework/game toolkit used to build the game, for example: Unity | App | None |
 | frameworkVersion | String | For instance: 5.3.1p3 | App | None |
 | freeSpace | Integer | Free space in kilobytes | SDK | all |
-| gameId | String | Source game identifier | Admin | None |
+| gameId | String | Source game identifier | App | None |
 | gamerId | String | Internal gamer identifier | Server | all |
 | integrationType | string | "AssetStore","Engine","native","mediation" | SDK | None |
 | language | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -62,6 +63,7 @@
 | placementId | String | Internal placement identifier | Admin | None |
 | placementType | String | "rewarded" or "interstitial" | Admin | None |
 | platform | String | "android" or "ios" | SDK | all |
+| redirect | Boolean | TODO: What does this do? | SDK | all |
 | retryCount | Integer | How many times this event_id has been retried | SDK | None |
 | rooted | Boolean | Is the device rooted or jailbroken | SDK | all |
 | screenBrightness | Integer | Brightness value | SDK | None |
@@ -77,7 +79,7 @@
 | test | Boolean | Test mode | App | all |
 | timestamp | Integer | Local time of triggering the event | SDK | None |
 | timeZone | String | Current timezone | SDK | all |
-| trackingEnabled | Boolean | Boolean if user has limited tracking or not | SDK | None |
+| trackingEnabled | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
 | userAgent | String | WebView user agent | SDK | None |
 | videoLength | Integer | Video length in milliseconds | Admin | None |
 | webviewUa | String | WebView user agent string | SDK | all |
@@ -85,7 +87,7 @@
 
 
 
-### Configuration
+### Configuration request
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
 | bundleId | all | True | False | String | Bundle identifier for the app | SDK | all |
@@ -96,7 +98,7 @@
 
 
 
-### adPlan Requests
+### Ad request
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
 | advertisingTrackingId | no | True | False | String | Advertising identifier in raw format | SDK | all |
@@ -139,7 +141,35 @@
 | apiLevel | android | False | True | Integer | Android device API level | SDK | android |
 | cached | all | False | True | Boolean | If video is cached or streamed | SDK | None |
 | advertisingId | no | False | True | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
-| trackingEnabled | no | False | True | Boolean | Boolean if user has limited tracking or not | SDK | None |
+| trackingEnabled | no | False | True | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
+| osVersion | yes | False | True | String | Device operating system version | SDK | all |
+| sid | no | False | True | String | Server side reward callback id | App | None |
+| deviceMake | android | False | True | String | Android device manufacturer | SDK | android |
+| deviceModel | all | False | True | String | Android or iOS device model, example 'iPhone7,1' | SDK | all |
+| sdkVersion | all | False | True | String | SDK version in four digits | SDK | all |
+| webviewUa | no | False | True | String | WebView user agent string | SDK | all |
+| networkType | no | False | True | String | Detailed cellular network type | SDK | all |
+| connectionType | all | False | True | String | "wifi", "cellular" or "none" | SDK | all |
+| mediationName | no | False | True | String | Mediation provider name | Mediation | all |
+| mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
+| mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+
+
+
+### Click event
+| key | required | queryString | body | type | description | provider | platforms |
+|---|---|---|---|---|---|---|---|
+| gameId | all | True | False | String | Source game identifier | App | None |
+| redirect | all | True | False | Boolean | TODO: What does this do? | SDK | all |
+| eventId | all | False | True | String | Unique event identifier | SDK | None |
+| sessionId | all | False | True | String | Unique session identifier | SDK | None |
+| gamerId | all | False | True | String | Internal gamer identifier | Server | all |
+| campaignId | all | False | True | String | Internal campaign identifier | Server | None |
+| placementId | all | False | True | String | Internal placement identifier | Admin | None |
+| apiLevel | android | False | True | Integer | Android device API level | SDK | android |
+| cached | all | False | True | Boolean | If video is cached or streamed | SDK | None |
+| advertisingId | no | False | True | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
+| trackingEnabled | no | False | True | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
 | osVersion | yes | False | True | String | Device operating system version | SDK | all |
 | sid | no | False | True | String | Server side reward callback id | App | None |
 | deviceMake | android | False | True | String | Android device manufacturer | SDK | android |
