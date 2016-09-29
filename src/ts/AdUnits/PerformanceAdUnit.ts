@@ -13,9 +13,9 @@ export class PerformanceAdUnit extends AbstractAdUnit {
         this._videoAdUnit = videoAdUnit;
         this._endScreen = endScreen;
 
-        videoAdUnit.onClose.subscribe(() => this.onClose.trigger());
-        videoAdUnit.onFinish.subscribe(() => this.onFinish.trigger());
-        videoAdUnit.onStart.subscribe(() => this.onStart.trigger());
+        videoAdUnit.onVideoClose.subscribe(() => this.onClose.trigger());
+        videoAdUnit.onVideoFinish.subscribe(() => this.onFinish.trigger());
+        videoAdUnit.onVideoStart.subscribe(() => this.onStart.trigger());
     }
 
     public show(): Promise<void> {

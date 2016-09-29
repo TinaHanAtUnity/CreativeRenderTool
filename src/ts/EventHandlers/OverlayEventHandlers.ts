@@ -37,7 +37,7 @@ export class OverlayEventHandlers {
     }
 
     protected static afterSkip(videoAdUnit: VideoAdUnit) {
-        videoAdUnit.onFinish.trigger();
+        videoAdUnit.onVideoFinish.trigger();
     };
 
     public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, muted: boolean): void {

@@ -257,7 +257,7 @@ export class VideoEventHandlers {
         if(overlay) {
             overlay.hide();
         }
-        videoAdUnit.onFinish.trigger();
+        videoAdUnit.onVideoFinish.trigger();
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
@@ -282,6 +282,7 @@ export class VideoEventHandlers {
             overlay.hide();
         }
 
-        videoAdUnit.onFinish.trigger();
+        videoAdUnit.onVideoError.trigger();
+        //videoAdUnit.onVideoFinish.trigger();
     }
 }

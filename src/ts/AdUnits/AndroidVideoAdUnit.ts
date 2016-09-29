@@ -41,7 +41,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this.onStart.trigger();
+        this.onVideoStart.trigger();
         this.setVideoActive(true);
 
         let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
@@ -95,11 +95,11 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
         return this._nativeBridge.AndroidAdUnit.close().then(() => {
-            this.onClose.trigger();
+            this.onVideoClose.trigger();
         }).catch(error => {
             // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
             if(error === AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
-                this.onClose.trigger();
+                this.onVideoClose.trigger();
             } else {
                 throw new Error(error);
             }

@@ -2,12 +2,23 @@ import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Observable0 } from 'Utilities/Observable';
+import { FinishState } from 'Constants/FinishState';
 
-export abstract class VideoAdUnit extends AbstractAdUnit {
+export abstract class VideoAdUnit {
 
     private static _progressInterval: number = 250;
 
+    public onVideoStart: Observable0 = new Observable0();
+    public onVideoFinish: Observable0 = new Observable0();
+    public onVideoClose: Observable0 = new Observable0();
+    public onVideoError: Observable0 = new Observable0();
+
+    protected _finishState: FinishState;
+
+    protected _nativeBridge: NativeBridge;
+    protected _placement: Placement;
+    protected _campaign: Campaign;
     protected _overlay: Overlay | undefined;
 
     protected _videoDuration: number;
@@ -18,17 +29,23 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     protected _watches: number;
     protected _showing: boolean = false;
 
+
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
-        super(nativeBridge, placement, campaign);
+        this._nativeBridge = nativeBridge;
+        this._placement = placement;
+        this._campaign = campaign;
+        this._overlay = overlay;
 
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
         this._watches = 0;
-
-        this._overlay = overlay;
     }
+
+    public abstract show(): Promise<void>;
+
+    public abstract hide(): Promise<void>;
 
     protected hideChildren() {
         const overlay = this.getOverlay();
@@ -104,5 +121,23 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
     public getProgressInterval(): number {
         return VideoAdUnit._progressInterval;
+    }
+
+    public setFinishState(finishState: FinishState) {
+        if(this._finishState !== FinishState.COMPLETED) {
+            this._finishState = finishState;
+        }
+    }
+
+    public getFinishState(): FinishState {
+        return this._finishState;
+    }
+
+    public getPlacement(): Placement {
+        return this._placement;
+    }
+
+    public getCampaign(): Campaign {
+        return this._campaign;
     }
 }

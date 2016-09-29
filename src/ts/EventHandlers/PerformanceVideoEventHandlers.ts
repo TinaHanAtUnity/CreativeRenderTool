@@ -9,7 +9,7 @@ export class PerformanceVideoEventHandlers {
         }
     }
 
-    public static handleVideoError(adUnit: PerformanceAdUnit) {
+    public static onVideoError(adUnit: PerformanceAdUnit) {
         const endScreen = adUnit.getEndScreen();
         if (endScreen) {
             endScreen.show();

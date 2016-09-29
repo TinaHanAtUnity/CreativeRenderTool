@@ -2,7 +2,6 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { FinishState } from 'Constants/FinishState';
 
 export abstract class AbstractAdUnit {
 
@@ -13,7 +12,6 @@ export abstract class AbstractAdUnit {
     protected _nativeBridge: NativeBridge;
     protected _placement: Placement;
     protected _campaign: Campaign;
-    protected _finishState: FinishState;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
@@ -33,15 +31,5 @@ export abstract class AbstractAdUnit {
 
     public getCampaign(): Campaign {
         return this._campaign;
-    }
-
-    public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
-            this._finishState = finishState;
-        }
-    }
-
-    public getFinishState(): FinishState {
-        return this._finishState;
     }
 }

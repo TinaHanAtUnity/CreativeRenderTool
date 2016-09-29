@@ -33,7 +33,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
 
     public show(): Promise<void> {
         this._showing = true;
-        this.onStart.trigger();
+        this.onVideoStart.trigger();
         this.setVideoActive(true);
 
         let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
@@ -82,7 +82,7 @@ export class IosVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.Notification.removeNotificationObserver(IosVideoAdUnit._audioSessionRouteChange);
 
         return this._nativeBridge.IosAdUnit.close().then(() => {
-            this.onClose.trigger();
+            this.onVideoClose.trigger();
         });
     }
 
