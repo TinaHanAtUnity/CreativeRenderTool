@@ -155,12 +155,6 @@ build-test: clean build-dir build-css build-html
 		$(BUILD_DIR)/vendor
 
 	@echo
-	@echo Running through babel for ES3 compatibility
-	@echo
-
-	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
-
-	@echo
 	@echo Copying test config to build
 	@echo
 
@@ -278,7 +272,7 @@ test-coveralls: test-coverage
 	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
 
 watch:
-	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
+	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
 
 setup: clean
 	rm -rf node_modules && npm install
