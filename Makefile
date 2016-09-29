@@ -198,7 +198,7 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-	$(TYPESCRIPT) --project . --outDir $(BUILD_DIR)/js
+	$(TYPESCRIPT) --project . --module system --target es3 --outDir $(BUILD_DIR)/js
 
 build-js:
 	@echo
