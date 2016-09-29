@@ -10,7 +10,7 @@
     <meta name="format-detection" content="telephone=no"/>
 
     <script>
-        var origin = 'http://localhost:8000/';
+        var origin = 'http://localhost:8000';
         if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
             var queryString = location.search.split('?')[1].split('&');
             var queryParams = {};
@@ -19,7 +19,10 @@
                 queryParams[param[0]] = param[1];
             }
             if('origin' in queryParams) {
-                origin = queryParams.origin;
+                var decodedOrigin = decodeURIComponent(queryParams['origin']);
+                var parser = document.createElement('a');
+                parser.href = decodedOrigin;
+                origin = parser.origin;
             }
         }
 
@@ -31,16 +34,17 @@
         system.src = origin + '/node_modules/systemjs/dist/system.js';
 
         system.addEventListener('load', function() {
+            console.log('origin: ' + origin);
             System.config({
-                baseURL: origin + 'build/dev/js/src/ts',
+                baseURL: origin + '/build/dev/js/src/ts',
                 defaultJSExtensions: true,
                 map: {
-                    text: '/node_modules/systemjs-plugin-text/text.js',
-                    'es6-promise': '/node_modules/es6-promise/dist/es6-promise.js',
-                    xmldom: '/node_modules/xmldom/dom-parser.js'
+                    text: origin + '/node_modules/systemjs-plugin-text/text.js',
+                    'es6-promise': origin + '/node_modules/es6-promise/dist/es6-promise.js',
+                    xmldom: origin + '/node_modules/xmldom/dom-parser.js'
                 },
                 paths: {
-                    '*.html': '/build/dev/html/*.html'
+                    '*.html': origin + '/build/dev/html/*.html'
                 }
             });
             System.import('Main');
