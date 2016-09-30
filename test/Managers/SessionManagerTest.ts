@@ -15,6 +15,7 @@ import { Session } from 'Models/Session';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
+import { AndroidVideoAdUnit } from 'AdUnits/AndroidVideoAdUnit';
 
 describe('SessionManager', () => {
     let handleInvocation = sinon.spy();
@@ -42,7 +43,8 @@ describe('SessionManager', () => {
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         return sessionManager.sendStart(adUnit).then(() => {
             mockMetadataCreator.verify();
@@ -64,9 +66,9 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
         let mockMetadataCreator = sinon.mock(metadataCreator);
         mockMetadataCreator.expects('createUniqueEventMetadata').returns(metadataPromise);
-
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         return sessionManager.sendView(adUnit).then(() => {
             mockMetadataCreator.verify();
@@ -87,7 +89,8 @@ describe('SessionManager', () => {
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager);
         sessionManager.setSession(new Session('123'));
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         sessionManager.sendImpressionEvent(adUnit);
 
@@ -105,7 +108,8 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         sessionManager.sendMute(adUnit, new Session('123'), muted);
         mockEventManager.verify();
@@ -135,7 +139,8 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         const session = new Session('123');
         const quartilePosition = campaign.getVast().getDuration() * 0.25 * quartile * 1000;
@@ -174,7 +179,8 @@ describe('SessionManager', () => {
         let metadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
 
         let sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metadataCreator);
-        let adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        let adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
         const session = new Session('123');
         sessionManager.sendVideoClickTracking(adUnit, session);

@@ -11,6 +11,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from '../../src/ts/Models/Placement';
+import { AndroidVideoAdUnit } from 'AdUnits/AndroidVideoAdUnit';
 
 describe('VastAdUnit', () => {
 
@@ -31,7 +32,8 @@ describe('VastAdUnit', () => {
         let wakeUpManager = new WakeUpManager(nativeBridge);
         let request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
-        adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+        let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+        adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
     });
 
     afterEach(() => sandbox.restore);
@@ -96,7 +98,8 @@ describe('VastAdUnit', () => {
             let campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             let overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             let nativeBridge = TestFixtures.getNativeBridge();
-            adUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
+            let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, placement, campaign, overlay, null);
+            adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
         });
 
         it('should return correct http:// url', () => {

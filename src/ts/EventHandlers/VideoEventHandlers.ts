@@ -283,6 +283,6 @@ export class VideoEventHandlers {
         }
 
         videoAdUnit.onVideoError.trigger();
-        //videoAdUnit.onVideoFinish.trigger();
+        videoAdUnit.onVideoFinish.trigger();
     }
 }

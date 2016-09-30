@@ -4,6 +4,7 @@ import { assert } from 'chai';
 
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { Double } from 'Utilities/Double';
+import { AndroidVideoAdUnit } from 'AdUnits/AndroidVideoAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -22,12 +23,14 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Session } from 'Models/Session';
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 describe('VideoEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, adUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
 
     beforeEach(() => {
@@ -56,64 +59,65 @@ describe('VideoEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
+        videoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnit, endScreen);
     });
 
     describe('with onVideoProgress', () => {
         beforeEach(() => {
-            adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
-            sinon.spy(adUnit, 'setVideoPosition');
+//            adUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
+            sinon.spy(videoAdUnit, 'setVideoPosition');
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, 5);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setVideoPosition, 5);
+            sinon.assert.calledWith(<sinon.SinonSpy>videoAdUnit.setVideoPosition, 5);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, -5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, -5);
 
-            sinon.assert.notCalled(<sinon.SinonSpy>adUnit.setVideoPosition);
+            sinon.assert.notCalled(<sinon.SinonSpy>videoAdUnit.setVideoPosition);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, -5);
         });
 
         it('should send progress event with SessionManager', () => {
             sinon.spy(sessionManager, 'sendProgress');
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, 5);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendProgress, adUnit, sessionManager.getSession(), 5, 0);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendProgress, performanceAdUnit, sessionManager.getSession(), 5, 0);
         });
 
         it('should send first quartile event', () => {
             sinon.spy(sessionManager, 'sendFirstQuartile');
 
-            adUnit.setVideoDuration(20000);
-            adUnit.setVideoPosition(4000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 6000);
+            videoAdUnit.setVideoDuration(20000);
+            videoAdUnit.setVideoPosition(4000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, 6000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendFirstQuartile, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendFirstQuartile, performanceAdUnit);
         });
 
         it('should send midpoint event', () => {
             sinon.spy(sessionManager, 'sendMidpoint');
 
-            adUnit.setVideoDuration(20000);
-            adUnit.setVideoPosition(9000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 11000);
+            videoAdUnit.setVideoDuration(20000);
+            videoAdUnit.setVideoPosition(9000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, 11000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendMidpoint, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendMidpoint, performanceAdUnit);
         });
 
         it('should send third quartile event', () => {
             sinon.spy(sessionManager, 'sendThirdQuartile');
 
-            adUnit.setVideoDuration(20000);
-            adUnit.setVideoPosition(14000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, 16000);
+            videoAdUnit.setVideoDuration(20000);
+            videoAdUnit.setVideoPosition(14000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, 16000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, performanceAdUnit);
         });
     });
 
@@ -125,29 +129,29 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send start event with SessionManager', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, adUnit);
+            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
         });
 
         it('should call newWatch', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, adUnit);
+            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
 
-            assert.equal(adUnit.getWatches(), 1);
+            assert.equal(videoAdUnit.getWatches(), 1);
         });
 
         it('on first watch, should call sendStartEvent callback', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, adUnit);
+            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
         });
 
         it('on second watch, should not call sendStartEvent', () => {
-            adUnit.newWatch();
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, adUnit);
+            videoAdUnit.newWatch();
+            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
 
             sinon.assert.neverCalledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
-            assert.equal(adUnit.getWatches(), 2);
+            assert.equal(videoAdUnit.getWatches(), 2);
         });
     });
 
@@ -166,38 +170,29 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
 
-            assert.isFalse(adUnit.isVideoActive());
+            assert.isFalse(videoAdUnit.isVideoActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
 
-            assert.equal(adUnit.getFinishState(), FinishState.COMPLETED);
+            assert.equal(videoAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendView, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendView, performanceAdUnit);
         });
 
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
 
-            const overlay = adUnit.getOverlay();
+            const overlay = videoAdUnit.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
-            }
-        });
-
-        it('should show endscreen', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData);
-
-            let endScreen = adUnit.getEndScreen();
-            if(endScreen) {
-                sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
         });
     });
@@ -218,26 +213,26 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video duration for overlay', () => {
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoDuration, 10);
         });
 
         it('should set video volume to 1.0 by default', () => {
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1.0));
         });
 
         it('should set video volume to 0.0 when overlay says it is muted', () => {
             overlay.isMuted = sinon.mock().returns(true);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0.0));
         });
 
         it('should just play when video position is set to 0', () => {
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             return volumeResolved.then(() => {
                 sinon.assert.called(<sinon.SinonSpy>nativeBridge.VideoPlayer.play);
@@ -246,9 +241,9 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should seek and play when video position is set to greater than 0', () => {
-            adUnit.setVideoPosition(123);
+            videoAdUnit.setVideoPosition(123);
 
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
             return volumeResolved.then(() => seekResolved).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.seekTo, 123);
                 sinon.assert.called(<sinon.SinonSpy>nativeBridge.VideoPlayer.play);
@@ -258,7 +253,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set debug message visibility to true if the debug overlay is enabled in the metadata', () => {
             let prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             return prom.then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessageVisible, true);
@@ -268,7 +263,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set debug message to performance ad if the ad unit is not VAST', () => {
             let prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             return prom.then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Performance Ad');
@@ -279,8 +274,9 @@ describe('VideoEventHandlersTest', () => {
             let prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
             let vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
-            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
+            let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            let vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, androidVideoAdUnit, 10, metaData);
 
             return prom.then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Programmatic Ad');
@@ -291,7 +287,7 @@ describe('VideoEventHandlersTest', () => {
             let prom = Promise.resolve(false);
 
             sinon.stub(metaData, 'get').returns(prom);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             return prom.then(() => {
                 sinon.assert.notCalled(<sinon.SinonSpy>overlay.setDebugMessage);
@@ -299,25 +295,31 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
-            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            let vastCampaign = <VastCampaign><any>{};
+            let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+
+            let vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
-            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setCallButtonVisible, true);
         });
 
         it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
-            let vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{}, overlay);
+            let vastCampaign = <VastCampaign><any>{};
+            let androidVideoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+
+            let vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnit);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
-            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setCallButtonVisible);
         });
 
         it('should not set call button visibility to true if the ad unit is not VAST', () => {
-            VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, 10, metaData);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, videoAdUnit, 10, metaData);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setCallButtonVisible);
         });
@@ -337,19 +339,14 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error', () => {
-            VideoEventHandlers.onPrepareError(nativeBridge, adUnit, 'http://test.video.url');
+            VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, 'http://test.video.url');
 
-            assert.isFalse(adUnit.isVideoActive());
-            assert.equal(adUnit.getFinishState(), FinishState.ERROR);
+            assert.isFalse(videoAdUnit.isVideoActive());
+            assert.equal(videoAdUnit.getFinishState(), FinishState.ERROR);
 
-            const overlay = adUnit.getOverlay();
+            const overlay = videoAdUnit.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
-            }
-
-            let endScreen = adUnit.getEndScreen();
-            if(endScreen) {
-                sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
         });
@@ -369,20 +366,16 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error', () => {
-            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, adUnit, 1, 0, 'http://test.video.url');
+            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, 1, 0, 'http://test.video.url');
 
-            assert.isFalse(adUnit.isVideoActive());
-            assert.equal(adUnit.getFinishState(), FinishState.ERROR);
+            assert.isFalse(videoAdUnit.isVideoActive());
+            assert.equal(videoAdUnit.getFinishState(), FinishState.ERROR);
 
-            const overlay = adUnit.getOverlay();
+            const overlay = videoAdUnit.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
             }
 
-            let endScreen = adUnit.getEndScreen();
-            if(endScreen) {
-                sinon.assert.called(<sinon.SinonSpy>endScreen.show);
-            }
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
         });
     });
