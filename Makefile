@@ -245,13 +245,13 @@ test: clean
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project . --module commonjs
+	$(TYPESCRIPT) --project . --module system
 
 	@echo
 	@echo Running local tests
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive --check-leaks --require test-utils/unhandled_rejection
+	node test-utils/node_runner.js
 
 test-coverage: clean
 	@echo

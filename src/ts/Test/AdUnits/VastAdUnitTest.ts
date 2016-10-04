@@ -10,7 +10,7 @@ import { EventManager } from 'Managers/EventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Placement } from '../../src/ts/Models/Placement';
+import { Placement } from 'Models/Placement';
 
 describe('VastAdUnit', () => {
 

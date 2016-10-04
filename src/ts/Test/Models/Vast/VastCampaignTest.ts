@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
-import { VastCampaign } from '../../../src/ts/Models/Vast/VastCampaign';
-import { Vast } from '../../../src/ts/Models/Vast/Vast';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { Vast } from 'Models/Vast/Vast';
 
 describe('VastCampaign', () => {
     it('should return default cache TTL of 1 hour represented in seconds', () => {

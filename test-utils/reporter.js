@@ -66,7 +66,7 @@ define([], function() {
             suite.root || stats.suites++;
         });
 
-        runner.on('test end', function (test) {
+        runner.on('Test end', function (test) {
             stats.tests = stats.tests || 0;
             stats.tests++;
         });
