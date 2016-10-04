@@ -45,8 +45,7 @@ export class AdUnitFactory {
         this.prepareOverlay(overlay, placement, campaign);
         this.preparePerformanceOverlayEventHandlers(overlay, nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, videoAdUnit, metaData);
-        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit);
-
+        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, videoAdUnit);
 
         let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
         let onVideoErrorObserver = videoAdUnit.onVideoError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
@@ -114,13 +113,20 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, videoAdUnit: VideoAdUnit) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit));
         endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
-        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, adUnit));
+        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            let onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit, videoAdUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        }
     }
 
     private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit, metaData: MetaData) {

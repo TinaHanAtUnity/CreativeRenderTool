@@ -4,6 +4,8 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
 import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export class EndScreenEventHandlers {
 
@@ -66,8 +68,14 @@ export class EndScreenEventHandlers {
         }
     }
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: AbstractAdUnit): void {
+    public static onClose(adUnit: AbstractAdUnit): void {
         adUnit.hide();
+    }
+
+    public static onKeyEvent(keyCode: number, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
+        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !videoAdUnit.isVideoActive()) {
+            adUnit.hide();
+        }
     }
 
     private static getAppStoreUrl(platform: Platform, campaign: Campaign) {
@@ -77,5 +85,4 @@ export class EndScreenEventHandlers {
             return 'market://details?id=' + campaign.getAppStoreId();
         }
     }
-
 }

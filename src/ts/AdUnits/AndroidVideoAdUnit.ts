@@ -23,7 +23,6 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
     private _onResumeObserver: any;
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
-    private _onBackKeyObserver: any;
 
     private _androidOptions: IAndroidOptions;
 
@@ -45,15 +44,16 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this.setVideoActive(true);
 
         let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
-        if (!this._placement.useDeviceOrientationForVideo()) {
+        if(!this._placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }
 
         let keyEvents: any[] = [];
-
+        if(this._placement.disableBackButton()) {
+            keyEvents = [KeyCode.BACK];
+        }
 
         let hardwareAccel: boolean = true;
-
         if(this._nativeBridge.getApiLevel() < 17) {
             hardwareAccel = false;
         }
@@ -61,12 +61,6 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['videoplayer', 'webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
-    }
-
-    public onKeyEvent(keyCode: number): void {
-        if (keyCode === KeyCode.BACK && !this.isVideoActive()) {
-            this.hide();
-        }
     }
 
     public hide(): Promise<void> {
@@ -92,7 +86,6 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
         this._nativeBridge.AndroidAdUnit.onResume.unsubscribe(this._onResumeObserver);
         this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
         this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
-        this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._onBackKeyObserver);
 
         return this._nativeBridge.AndroidAdUnit.close().then(() => {
             this.onVideoClose.trigger();
