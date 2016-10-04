@@ -201,11 +201,14 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-ifdef BUILD_DIR
 	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
-else
+
+build-test-ts:
+	@echo
+	@echo Transpiling .ts to .js
+	@echo
+
 	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-endif
 
 build-js:
 	@echo
@@ -247,7 +250,7 @@ lint:
 
 test: MODULE = system
 test: TARGET = es5
-test: clean build-dir build-ts
+test: clean build-dir build-test-ts
 	@echo
 	@echo Running local tests
 	@echo
