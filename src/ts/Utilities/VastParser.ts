@@ -137,7 +137,13 @@ export class VastParser {
     };
 
     private parseNodeText(node: any): string {
-        return node && (node.textContent || node.text);
+        let parsedText = node && (node.textContent || node.text);
+
+        if (parsedText) {
+            parsedText = parsedText.trim();
+        }
+
+        return parsedText;
     }
 
     private parseAdElement(adElement: any): VastAd | undefined {
@@ -206,7 +212,7 @@ export class VastParser {
                     break;
                 case 'VASTAdTagURI':
                     if (url) {
-                        ad.addWrapperURL(url.trim());
+                        ad.addWrapperURL(url);
                     }
                     break;
                 default:
@@ -268,7 +274,7 @@ export class VastParser {
             for (let i = 0; i < mediaFileElements.length; i++) {
                 let mediaFileElement = mediaFileElements[i];
                 let mediaFile = new VastMediaFile(
-                    this.parseNodeText(mediaFileElement).trim(),
+                    this.parseNodeText(mediaFileElement),
                     mediaFileElement.getAttribute('delivery'),
                     mediaFileElement.getAttribute('codec'),
                     mediaFileElement.getAttribute('type'),
