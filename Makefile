@@ -251,7 +251,7 @@ test: clean build-dir
 	@cat $(BUILD_DIR)/coverage/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
 
-test-coveralls: test-coverage
+test-coveralls: test
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
 
