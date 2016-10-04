@@ -230,7 +230,6 @@ clean:
 
 	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
-	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
 
 lint:
 	@echo
@@ -238,7 +237,6 @@ lint:
 	@echo
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
-	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
 
 test: clean
 	@echo

@@ -46,7 +46,6 @@ let runner = new Mocha({
 runner.suite.emit('pre-require', global, 'global-mocha-context', runner);
 
 Promise.all(getTestPaths('src/ts/Test').map((testPath) => {
-    console.log(testPath);
     return System.import(testPath);
 })).then(() => {
     return new Promise((resolve, reject) => {
