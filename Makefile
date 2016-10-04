@@ -4,12 +4,10 @@ TYPESCRIPT = $(BIN)/tsc
 TSLINT = $(BIN)/tslint
 STYLUS = $(BIN)/stylus
 ROLLUP = $(BIN)/rollup
-CC = java -jar node_modules/google-closure-compiler/compiler.jar
-
-MOCHA = $(BIN)/_mocha
 ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
+CC = java -jar node_modules/google-closure-compiler/compiler.jar
 
 # Sources
 TS_SRC = src/ts
@@ -18,7 +16,6 @@ PROD_INDEX_SRC = src/prod-index.html
 TEST_INDEX_SRC = src/test-index.html
 PROD_CONFIG_SRC = src/config.json
 TEST_CONFIG_SRC = src/test-config.json
-TEST_SRC = test
 
 # Branch and commit id
 ifeq ($(TRAVIS), true)
@@ -238,7 +235,7 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
-test: clean
+test: clean build-dir
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -249,28 +246,17 @@ test: clean
 	@echo Running local tests
 	@echo
 
-	node test-utils/node_runner.js
-
-test-coverage: clean
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module commonjs
-
-	@echo
-	@echo Running local tests with coverage
-	@echo
-
-	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive --check-leaks --require test-utils/unhandled_rejection
-	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
+	COVERAGE_DIR=$(BUILD_DIR)/coverage node test-utils/node_runner.js
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/summary -t text-summary
+	@cat $(BUILD_DIR)/coverage/summary && echo \n
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
 
 test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
 
 watch:
-	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
+	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
 setup: clean
 	rm -rf node_modules && npm install
