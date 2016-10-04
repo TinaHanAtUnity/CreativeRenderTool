@@ -32,11 +32,15 @@ BUILD_DIR = build
 .PHONY: build-release build-test build-dir build-ts build-js build-css build-html clean lint test
 
 build-dev: BUILD_DIR = build/dev
+build-dev: MODULE = system
+build-dev: TARGET = es2015
 build-dev: build-dir build-html build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
 build-release: BUILD_DIR = build/release
+build-release: MODULE = es2015
+build-release: TARGET = es2015
 build-release: clean build-dir build-html build-css build-ts build-js
 	@echo
 	@echo Copying release index.html to build
@@ -52,7 +56,7 @@ build-release: clean build-dir build-html build-css build-ts build-js
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
 		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
-		var j=fs.readFileSync('$(BUILD_DIR)/main.js', o);\
+		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
@@ -60,7 +64,7 @@ build-release: clean build-dir build-html build-css build-ts build-js
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/main.js
+	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -96,6 +100,8 @@ build-release: clean build-dir build-html build-css build-ts build-js
 		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
+build-test: MODULE = es2015
+build-test: TARGET = es2015
 build-test: clean build-dir build-css build-html
 	@echo
 	@echo Transpiling .ts to .js for remote tests
@@ -195,7 +201,11 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-	$(TYPESCRIPT) --project . --module system --target es3 --outDir $(BUILD_DIR)/js
+ifdef BUILD_DIR
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
+else
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+endif
 
 build-js:
 	@echo
@@ -203,7 +213,7 @@ build-js:
 	@echo
 
 	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/js/Main.js --js_output_file $(BUILD_DIR)/main.js --formatting PRETTY_PRINT --assume_function_wrapper
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper
 
 build-css:
 	@echo
@@ -235,13 +245,9 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
-test: clean build-dir
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module system
-
+test: MODULE = system
+test: TARGET = es5
+test: clean build-dir build-ts
 	@echo
 	@echo Running local tests
 	@echo

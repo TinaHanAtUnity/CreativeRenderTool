@@ -3,18 +3,19 @@ import string from 'rollup-plugin-string';
 import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
-    entry: 'build/release/js/src/ts/Main.js',
+    entry: 'build/release/js/Main.js',
     format: 'iife',
-    dest: 'build/release/js/Main.js',
+    dest: 'build/release/bundle.js',
     plugins: [
-        string({
-            include: '**/*.html'
-        }),
         includePaths({
             paths: [
-                'build/release/js/src/ts',
+                'build/release/js',
                 'build/release/html'
-            ]
+            ],
+            extensions: ['.js', '.html']
+        }),
+        string({
+            include: '**/*.html'
         }),
         nodeResolve()
     ],

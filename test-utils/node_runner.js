@@ -23,7 +23,6 @@ let getPaths = (root) => {
 
 System.config({
     baseURL: 'src/ts',
-    defaultJSExtensions: true,
     map: {
         'mocha': './node_modules/mocha/mocha.js',
         'sinon': './node_modules/sinon/pkg/sinon.js',
@@ -35,6 +34,14 @@ System.config({
     meta: {
         'mocha': {
             format: 'global'
+        },
+        '*.html': {
+            loader: 'text'
+        }
+    },
+    packages: {
+        '.': {
+            defaultExtension: 'js'
         }
     },
     paths: {

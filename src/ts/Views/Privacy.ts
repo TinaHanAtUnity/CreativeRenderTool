@@ -1,4 +1,4 @@
-import PrivacyTemplate from 'Privacy.html!text';
+import PrivacyTemplate from 'Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';

@@ -1,4 +1,4 @@
-import OverlayTemplate from 'Overlay.html!text';
+import OverlayTemplate from 'Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';

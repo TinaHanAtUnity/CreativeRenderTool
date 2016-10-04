@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import EndScreenFixture from 'EndScreenFixture.html!text';
+import EndScreenFixture from 'EndScreenFixture.html';
 
 describe('EndScreen', () => {
     it('should render', () => {
