@@ -1,7 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { AndroidVideoAdUnit } from 'AdUnits/AndroidVideoAdUnit';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Campaign } from 'Models/Campaign';
@@ -14,7 +13,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
     let performanceAdUnit: PerformanceAdUnit;
 
     beforeEach(() => {
@@ -29,8 +28,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        videoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnit, endScreen);
+        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
     describe('with onVideoCompleted', () => {

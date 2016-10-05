@@ -40,21 +40,21 @@ export class AdUnitFactory {
         let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
         let metaData = new MetaData(nativeBridge);
 
-        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay, options);
-        let performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnit, endScreen);
+        let videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
+        let performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
 
-        this.prepareOverlay(overlay, placement, campaign);
-        this.preparePerformanceOverlayEventHandlers(overlay, nativeBridge, sessionManager, performanceAdUnit);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
+        this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, metaData);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit);
 
         let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
-        let onVideoErrorObserver = videoAdUnit.onVideoError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
+        let onVideoErrorObserver = videoAdUnitController.onVideoError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
 
 
         performanceAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
-            videoAdUnit.onVideoError.unsubscribe(onVideoErrorObserver);
+            videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
         });
 
         return performanceAdUnit;
@@ -63,11 +63,11 @@ export class AdUnitFactory {
     private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
         let overlay = new Overlay(nativeBridge, placement.muteVideo());
         let metaData = new MetaData(nativeBridge);
-        let videoAdUnit = this.createVideoUnit(nativeBridge, placement, campaign, overlay, options);
+        let videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
 
-        let vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnit);
+        let vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
-        this.prepareOverlay(overlay, placement, campaign);
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, metaData);
 
@@ -79,34 +79,32 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, placement: Placement, campaign: Campaign) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
         overlay.render();
         document.body.appendChild(overlay.container());
-        overlay.setSpinnerEnabled(!campaign.isVideoCached());
+        overlay.setSpinnerEnabled(!adUnit.getCampaign().isVideoCached());
 
-        if(!placement.allowSkip()) {
+        if(!adUnit.getPlacement().allowSkip()) {
             overlay.setSkipEnabled(false);
         } else {
             overlay.setSkipEnabled(true);
-            overlay.setSkipDuration(placement.allowSkipInSeconds());
+            overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
         }
+
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
     }
 
-    private static preparePerformanceOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit) {
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit));
+    private static preparePerformanceOverlayEventHandlers(overlay: Overlay, adUnit: PerformanceAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(adUnit));
-        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
     }
 
-    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit));
+    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
-
-        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, adUnit, muted));
-        overlay.onCallButton.subscribe(() => OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, <VastAdUnit>adUnit));
+        overlay.onCallButton.subscribe(() => OverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit));
     };
 
-    private static createVideoUnit(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             return new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
         } else {

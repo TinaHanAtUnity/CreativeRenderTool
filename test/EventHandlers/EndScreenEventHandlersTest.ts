@@ -10,17 +10,17 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventManager } from 'Managers/EventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Campaign } from 'Models/Campaign';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { AndroidVideoAdUnit } from 'AdUnits/AndroidVideoAdUnit';
+import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 describe('EndScreenEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -42,13 +42,13 @@ describe('EndScreenEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        videoAdUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
             getVideoUrl: () => 'fake url',
             getAppStoreId: () => 'fooAppId',
             getClickAttributionUrlFollowsRedirects: () => true
         }, overlay, null);
 
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnit, endScreen);
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
     describe('with onDownload', () => {
