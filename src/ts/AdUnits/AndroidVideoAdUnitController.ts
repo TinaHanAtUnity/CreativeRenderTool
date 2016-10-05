@@ -4,7 +4,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
 import { FinishState } from 'Constants/FinishState';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
@@ -15,7 +15,7 @@ interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
 }
 
-export class AndroidVideoAdUnit extends VideoAdUnit {
+export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private static _activityIdCounter: number = 1;
 
     private _activityId: number;
@@ -31,7 +31,7 @@ export class AndroidVideoAdUnit extends VideoAdUnit {
 
         this._androidOptions = options;
 
-        this._activityId = AndroidVideoAdUnit._activityIdCounter++;
+        this._activityId = AndroidVideoAdUnitController._activityIdCounter++;
 
         this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
         this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));

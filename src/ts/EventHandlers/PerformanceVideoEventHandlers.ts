@@ -1,4 +1,4 @@
-import { PerformanceAdUnit } from '../AdUnits/PerformanceAdUnit';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class PerformanceVideoEventHandlers {
 

@@ -2,32 +2,25 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 
-export class VastAdUnit extends AbstractAdUnit {
+export class VastAdUnit extends VideoAdUnit {
 
-    private _videoAdUnit: VideoAdUnit;
-
-    constructor(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        super(nativeBridge, videoAdUnit.getPlacement(), videoAdUnit.getCampaign());
-        this._videoAdUnit = videoAdUnit;
-
-        videoAdUnit.onVideoClose.subscribe(() => this.onClose.trigger());
-        videoAdUnit.onVideoFinish.subscribe(() => this.onFinish.trigger());
-        videoAdUnit.onVideoStart.subscribe(() => this.onStart.trigger());
+    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        super(nativeBridge, videoAdUnitController);
     }
 
     public show(): Promise<void> {
-        return this._videoAdUnit.show();
+        return this._videoAdUnitController.show();
     }
 
     public hide(): Promise<void> {
-        return this._videoAdUnit.hide();
+        return this._videoAdUnitController.hide();
     }
 
     public isShowing(): boolean {
-        return this._videoAdUnit.isShowing();
+        return this._videoAdUnitController.isShowing();
     }
 
     public getVast(): Vast {

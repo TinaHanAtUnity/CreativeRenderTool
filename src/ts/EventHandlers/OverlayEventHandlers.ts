@@ -7,15 +7,14 @@ import { Platform } from 'Constants/Platform';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class OverlayEventHandlers {
 
-    public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, videoAdUnit: VideoAdUnit): void {
+    public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.pause();
-        videoAdUnit.setVideoActive(false);
-        videoAdUnit.setFinishState(FinishState.SKIPPED);
-        sessionManager.sendSkip(adUnit, videoAdUnit.getVideoPosition());
+        adUnit.getVideoAdUnitController().setVideoActive(false);
+        adUnit.getVideoAdUnitController().setFinishState(FinishState.SKIPPED);
+        sessionManager.sendSkip(adUnit, adUnit.getVideoAdUnitController().getVideoPosition());
 
         if (nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.IosAdUnit.setViews(['webview']);
@@ -29,15 +28,15 @@ export class OverlayEventHandlers {
             nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
         }
 
-        const overlay = videoAdUnit.getOverlay();
+        const overlay = adUnit.getVideoAdUnitController().getOverlay();
         if (overlay) {
             overlay.hide();
         }
 
-        videoAdUnit.onVideoFinish.trigger();
+        adUnit.getVideoAdUnitController().onVideoFinish.trigger();
     }
 
-    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, muted: boolean): void {
+    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
         nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
         sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
     }
