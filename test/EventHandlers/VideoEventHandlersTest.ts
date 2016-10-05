@@ -65,7 +65,6 @@ describe('VideoEventHandlersTest', () => {
 
     describe('with onVideoProgress', () => {
         beforeEach(() => {
-//            adUnit = new AndroidVideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, overlay, endScreen);
             sinon.spy(videoAdUnit, 'setVideoPosition');
         });
 
