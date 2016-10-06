@@ -8,34 +8,28 @@ define([], function() {
     }
 
     Logger.prototype.time = function(label) {
-        console.time(label);
         this.timers[label] = Date.now();
     };
 
     Logger.prototype.timeEnd = function(label) {
-        console.timeEnd(label);
         this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label + ': ' + Date.now() - this.timers[label] + 'ms']);
         delete this.timers[label];
     };
 
     Logger.prototype.group = function(label) {
-        console.group(label);
         this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label]);
         this.level++;
     };
 
     Logger.prototype.groupEnd = function() {
-        console.groupEnd();
         this.level--;
     };
 
     Logger.prototype.log = function(message) {
-        console.log(message);
         this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + message]);
     };
 
     Logger.prototype.error = function(message) {
-        console.error(message);
         this.callNative('Sdk', 'logError', [(new Array(this.level)).join('\t') + message]);
     };
 

@@ -10,7 +10,7 @@
     <meta name="format-detection" content="telephone=no"/>
 
     <script>
-        var origin = 'http://localhost:8000';
+        var origin = 'http://localhost:8000/';
         if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
             var queryString = location.search.split('?')[1].split('&');
             var queryParams = {};
@@ -26,10 +26,10 @@
 
         var style = document.createElement('link');
         style.rel = 'stylesheet';
-        style.href = origin + '/css/main.css';
+        style.href = origin + 'css/main.css';
 
         var system = document.createElement('script');
-        system.src = origin + '/vendor/system.js';
+        system.src = origin + 'vendor/system.js';
 
         system.addEventListener('load', function() {
             var config = {
@@ -62,9 +62,16 @@
                 defaultExtension: 'js'
             };
             System.config(config);
-            System.import('mocha').then(function() {
+            Promise.all([
+                System.import('mocha'),
+                System.import('reporter')
+            ]).then(function(results) {
                 window.runner = new Mocha({
-                    ui: 'bdd'
+                    ui: 'bdd',
+                    checkLeaks: true,
+                    fullTrace: true,
+                    globals: ['nativebridge', 'webviewbridge'],
+                    reporter: results[1]
                 });
                 window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
                 System.import(origin + 'runner');

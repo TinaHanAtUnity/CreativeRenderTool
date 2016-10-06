@@ -25,6 +25,9 @@
   },
   "devDependencies": {
     "@types/jsdom": "^2.0.29",
+    "babel-cli": "6.16.0",
+    "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
+    "babel-plugin-transform-es3-property-literals": "6.8.0",
     "chai": "3.5.0",
     "coveralls": "2.11.14",
     "istanbul": "0.4.5",

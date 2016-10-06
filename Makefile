@@ -3,6 +3,7 @@ BIN = node_modules/.bin
 TYPESCRIPT = $(BIN)/tsc
 TSLINT = $(BIN)/tslint
 STYLUS = $(BIN)/stylus
+BABEL = $(BIN)/babel
 ROLLUP = $(BIN)/rollup
 ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
@@ -131,6 +132,12 @@ build-test: clean build-dir build-css build-html build-ts
 		node_modules/xmldom/dom-parser.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
+
+	@echo
+	@echo Running through babel for ES3 compatibility
+	@echo
+
+	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
 
 	@echo
 	@echo Copying test config to build
