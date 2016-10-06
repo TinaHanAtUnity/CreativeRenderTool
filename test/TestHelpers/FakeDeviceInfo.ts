@@ -42,6 +42,66 @@ interface IDeviceData {
 }
 
 export class FakeDeviceInfo extends DeviceInfo {
+    private static AndroidDefaults: IDeviceData = {
+        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
+        trackingEnabled: false,
+        osVersion: '1.0',
+        deviceModel: 'TestModel',
+        screenWidth: 567,
+        screenHeight: 1234,
+        language: 'en_US',
+        rooted: false,
+        timeZone: '+0200',
+        totalMemory: 12345678,
+        androidId: '1234567890abcdef',
+        apiLevel: 20,
+        totalSpaceExternal: 123456789,
+        totalSpaceInternal: 12345678,
+        deviceMake: 'Test manufacturer',
+        screenDensity: 320,
+        screenLayout: 268435796,
+        connectionType: 'cellular',
+        networkType: 1,
+        networkOperator: '00101',
+        networkOperatorName: 'Test operator',
+        headset: false,
+        deviceVolume: 1,
+        screenBrightness: 100,
+        freeSpaceInternal: 1234567,
+        batteryLevel: 0.5,
+        batteryStatus: 1,
+        freeMemory: 1234567,
+        freeSpaceExternal: 12345678,
+        ringerMode: 2
+    };
+    private static IosDefaults: IDeviceData = {
+        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
+        trackingEnabled: false,
+        osVersion: '1.0',
+        deviceModel: 'TestModel',
+        screenWidth: 567,
+        screenHeight: 1234,
+        language: 'en_US',
+        rooted: false,
+        timeZone: '+0200',
+        totalMemory: 12345678,
+        userInterfaceIdiom: 1,
+        screenScale: 2,
+        simulator: false,
+        totalSpaceInternal: 123456789,
+        connectionType: 'cellular',
+        networkType: 1,
+        networkOperator: '00101',
+        networkOperatorName: 'Test operator',
+        headset: false,
+        deviceVolume: 1,
+        screenBrightness: 100,
+        freeSpaceInternal: 1234567,
+        batteryLevel: 0.5,
+        batteryStatus: 1,
+        freeMemory: 1234567,
+    };
+
     private _platform: Platform;
     private _fakeDevice: any;
 
@@ -194,117 +254,4 @@ export class FakeDeviceInfo extends DeviceInfo {
     public getDTO(): Promise<any> {
         return Promise.resolve(this._fakeDevice);
     }
-
-    private static AndroidDefaults: IDeviceData = {
-        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
-        trackingEnabled: false,
-        osVersion: '1.0',
-        deviceModel: 'TestModel',
-        screenWidth: 567,
-        screenHeight: 1234,
-        language: 'en_US',
-        rooted: false,
-        timeZone: '+0200',
-        totalMemory: 12345678,
-        androidId: '1234567890abcdef',
-        apiLevel: 20,
-        totalSpaceExternal: 123456789,
-        totalSpaceInternal: 12345678,
-        deviceMake: 'Test manufacturer',
-        screenDensity: 320,
-        screenLayout: 268435796,
-        connectionType: 'cellular',
-        networkType: 1,
-        networkOperator: '00101',
-        networkOperatorName: 'Test operator',
-        headset: false,
-        deviceVolume: 1,
-        screenBrightness: 100,
-        freeSpaceInternal: 1234567,
-        batteryLevel: 0.5,
-        batteryStatus: 1,
-        freeMemory: 1234567,
-        freeSpaceExternal: 12345678,
-        ringerMode: 2
-    };
-    private static IosDefaults: IDeviceData = {
-        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
-        trackingEnabled: false,
-        osVersion: '1.0',
-        deviceModel: 'TestModel',
-        screenWidth: 567,
-        screenHeight: 1234,
-        language: 'en_US',
-        rooted: false,
-        timeZone: '+0200',
-        totalMemory: 12345678,
-        userInterfaceIdiom: 1,
-        screenScale: 2,
-        simulator: false,
-        totalSpaceInternal: 123456789,
-        connectionType: 'cellular',
-        networkType: 1,
-        networkOperator: '00101',
-        networkOperatorName: 'Test operator',
-        headset: false,
-        deviceVolume: 1,
-        screenBrightness: 100,
-        freeSpaceInternal: 1234567,
-        batteryLevel: 0.5,
-        batteryStatus: 1,
-        freeMemory: 1234567,
-    };
-
-    /*
-    private getDefaults(platform: Platform): IDeviceData {
-        let deviceData: IDeviceData = new IDeviceData();
-
-        // static properties
-        deviceData.advertisingId = '12345678-9ABC-DEF0-1234-56789ABCDEF0';
-        deviceData.trackingEnabled = false;
-        deviceData.osVersion = '1.0';
-        deviceData.deviceModel = 'TestModel';
-        deviceData.screenWidth = 567;
-        deviceData.screenHeight = 1234;
-        deviceData.language = 'en_US';
-        deviceData.rooted = false;
-        deviceData.timeZone = '+0200';
-        deviceData.totalMemory = 12345678;
-
-        if(platform === Platform.IOS) {
-            deviceData.userInterfaceIdiom = 1;
-            deviceData.screenScale = 2;
-            deviceData.simulator = false;
-            deviceData.totalSpaceInternal = 123456789;
-        } else if(platform === Platform.ANDROID) {
-            deviceData.androidId = '1234567890abcdef';
-            deviceData.apiLevel = 20;
-            deviceData.totalSpaceExternal = 123456789;
-            deviceData.totalSpaceInternal = 12345678;
-            deviceData.deviceMake = 'Test manufacturer';
-            deviceData.screenDensity = 320;
-            deviceData.screenLayout = 268435796;
-        }
-
-        // dynamic properties, hardcoded for testing purposes
-        deviceData.connectionType = 'cellular';
-        deviceData.networkType = 1;
-        deviceData.networkOperator = '00101';
-        deviceData.networkOperatorName = 'Test operator';
-        deviceData.headset = false;
-        deviceData.deviceVolume = 1;
-        deviceData.screenBrightness = 100;
-        deviceData.freeSpaceInternal = 1234567;
-        deviceData.batteryLevel = 0.5;
-        deviceData.batteryStatus = 1;
-        deviceData.freeMemory = 1234567;
-
-        if(platform === Platform.ANDROID) {
-            deviceData.freeSpaceExternal = 12345678;
-            deviceData.ringerMode = 2;
-        }
-
-        return deviceData;
-    }
-    */
 }
