@@ -5,6 +5,8 @@ import { Platform } from 'Constants/Platform';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import * as xmldom from 'xmldom';
+import { FakeDeviceInfo } from './FakeDeviceInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class TestFixtures {
 
@@ -33,6 +35,10 @@ export class TestFixtures {
             'http://example.com/index.html',
             null
         ]);
+    }
+
+    public static getDeviceInfo(platform: Platform): DeviceInfo {
+        return new FakeDeviceInfo(TestFixtures.getNativeBridge(), platform);
     }
 
     public static getOkNativeResponse(): INativeResponse {
