@@ -1,31 +1,3 @@
-if(!Function.prototype.bind) {
-    Function.prototype.bind = function(oThis) {
-        if (typeof this !== 'function') {
-            // closest thing possible to the ECMAScript 5
-            // internal IsCallable function
-            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-        }
-
-        var aArgs   = Array.prototype.slice.call(arguments, 1),
-            fToBind = this,
-            fNOP    = function() {},
-            fBound  = function() {
-                return fToBind.apply(this instanceof fNOP
-                        ? this
-                        : oThis,
-                    aArgs.concat(Array.prototype.slice.call(arguments)));
-            };
-
-        if (this.prototype) {
-            // native functions don't have a prototype
-            fNOP.prototype = this.prototype;
-        }
-        fBound.prototype = new fNOP();
-
-        return fBound;
-    };
-}
-
 if(!Array.prototype.forEach) {
     Array.prototype.forEach = function(callback, thisArg) {
         if(typeof(callback) !== 'function') {
@@ -83,21 +55,19 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
     });
 }
 
-var getPlatform = function() {
-    var queryString = window.location.search.split('?')[1].split('&');
-    for(var i = 0; i < queryString.length; i++) {
-        var queryParam = queryString[i].split('=');
-        if(queryParam[0] === 'platform') {
-            return queryParam[1];
+define({TEST_LIST}, function() {
+    var getPlatform = function() {
+        var queryString = window.location.search.split('?')[1].split('&');
+        for(var i = 0; i < queryString.length; i++) {
+            var queryParam = queryString[i].split('=');
+            if(queryParam[0] === 'platform') {
+                return queryParam[1];
+            }
         }
-    }
-    return undefined;
-};
+        return undefined;
+    };
 
-Promise.all({TEST_LIST}.map(function(testPath) {
-    return System.import(testPath);
-})).then(() => {
-    window.runner.run(function(failures) {
+    mocha.run(function(failures) {
         var platform = getPlatform();
         if(platform === 'android') {
             window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));

@@ -44,28 +44,28 @@ define([], function() {
     };
 
     function BaseReporter(runner) {
-        if (!runner) return;
+        if(!runner) return;
 
         var stats = this.stats = {suites: 0, tests: 0, passes: 0, pending: 0, failures: 0};
         var failures = this.failures = [];
 
         runner.stats = stats;
 
-        runner.on('start', function () {
+        runner.on('start', function() {
             stats.start = new Date;
         });
 
-        runner.on('suite', function (suite) {
+        runner.on('suite', function(suite) {
             stats.suites = stats.suites || 0;
             suite.root || stats.suites++;
         });
 
-        runner.on('Test end', function (test) {
+        runner.on('Test end', function(test) {
             stats.tests = stats.tests || 0;
             stats.tests++;
         });
 
-        runner.on('pass', function (test) {
+        runner.on('pass', function(test) {
             stats.passes = stats.passes || 0;
 
             var medium = test.slow() / 2;
@@ -78,19 +78,19 @@ define([], function() {
             stats.passes++;
         });
 
-        runner.on('fail', function (test, err) {
+        runner.on('fail', function(test, err) {
             stats.failures = stats.failures || 0;
             stats.failures++;
             test.err = err;
             failures.push(test);
         });
 
-        runner.on('end', function () {
+        runner.on('end', function() {
             stats.end = new Date;
             stats.duration = new Date - stats.start;
         });
 
-        runner.on('pending', function () {
+        runner.on('pending', function() {
             stats.pending++;
         });
     }
@@ -112,29 +112,29 @@ define([], function() {
         var failures = 0;
         var logger = new Logger(getPlatform());
 
-        runner.on('start', function () {
+        runner.on('start', function() {
             logger.time('duration');
         });
 
-        runner.on('suite', function (suite) {
-            if (suite.root) return;
+        runner.on('suite', function(suite) {
+            if(suite.root) return;
             logger.group(suite.title);
         });
 
-        runner.on('suite end', function (suite) {
-            if (suite.root) return;
+        runner.on('suite end', function(suite) {
+            if(suite.root) return;
             logger.groupEnd();
         });
 
-        runner.on('pending', function (test) {
+        runner.on('pending', function(test) {
             logger.log(test.title);
         });
 
-        runner.on('pass', function (test) {
-            if ('fast' == test.speed) {
+        runner.on('pass', function(test) {
+            if('fast' == test.speed) {
                 logger.log('passed: ' + test.title);
             }
-            else if ('medium' == test.speed) {
+            else if('medium' == test.speed) {
                 logger.log('passed: ' + test.title + ' in: ' + test.duration);
             }
             else {
@@ -142,11 +142,11 @@ define([], function() {
             }
         });
 
-        runner.on('fail', function (test, err) {
+        runner.on('fail', function(test, err) {
             logger.error(++failures + ') ' + test.title, err);
         });
 
-        runner.on('end', function () {
+        runner.on('end', function() {
             var stats = this.stats;
 
             // duration
@@ -156,19 +156,19 @@ define([], function() {
             logger.log((stats.passes || 0) + ' passing');
 
             // pending
-            if (stats.pending) {
+            if(stats.pending) {
                 logger.log(stats.pending + ' pending');
             }
 
             // failures
-            if (stats.failures) {
+            if(stats.failures) {
                 logger.log(stats.failures + ' failing');
                 errors.call(this, this.failures);
             }
         }.bind(this));
 
         function errors(failures) {
-            failures.forEach(function (test, i) {
+            failures.forEach(function(test, i) {
                 // msg
                 var err = test.err
                     , message = err.message || ''
@@ -180,7 +180,7 @@ define([], function() {
                     , escape = true;
 
                 // uncaught
-                if (err.uncaught) {
+                if(err.uncaught) {
                     msg = 'Uncaught ' + msg;
                 }
 

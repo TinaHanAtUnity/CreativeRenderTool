@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import EndScreenFixture from 'EndScreenFixture.html';
+import EndScreenFixture from 'text!html/EndScreenFixture.html';
 
 describe('EndScreen', () => {
     it('should render', () => {
@@ -33,7 +33,6 @@ describe('EndScreen', () => {
         }, '', 0), true);
 
         endScreen.render();
-
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 });

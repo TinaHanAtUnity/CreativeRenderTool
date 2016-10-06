@@ -45,7 +45,7 @@ System.config({
         }
     },
     paths: {
-        '*.html': './src/html/*.html'
+        '*.html': './src/*.html'
     }
 });
 
@@ -67,6 +67,15 @@ System.translate = (load) => {
         }
         return instrumenter.instrumentSync(source, 'src/ts/' + load.address.substr(System.baseURL.length));
     });
+};
+
+// DONT FUCKING ASK!
+let SystemLocate = System.locate;
+System.locate = function(load) {
+    if(load.name.indexOf('text.js!') !== -1) {
+        load.name = load.name.split('!')[1];
+    }
+    return SystemLocate.call(this, load);
 };
 
 Promise.all(getPaths('src/ts').map((testPath) => {

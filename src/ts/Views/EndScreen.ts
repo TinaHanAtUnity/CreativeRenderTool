@@ -1,4 +1,4 @@
-import EndScreenTemplate from 'EndScreen.html';
+import EndScreenTemplate from 'text!html/EndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';

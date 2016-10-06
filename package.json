@@ -16,9 +16,11 @@
     "akamai": "0.10.1",
     "es6-promise": "3.3.1",
     "google-closure-compiler": "20160911.0.0",
-    "stylus": "0.54.5",
+    "requirejs": "2.3.2",
+    "requirejs-text": "2.0.12",
     "systemjs": "0.19.39",
     "systemjs-plugin-text": "0.0.9",
+    "stylus": "0.54.5",
     "tslint": "3.15.1",
     "typescript": "2.0.3",
     "xmldom": "git@github.com:Applifier/xmldom.git"

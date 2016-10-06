@@ -28,58 +28,50 @@
         style.rel = 'stylesheet';
         style.href = origin + 'css/main.css';
 
-        var system = document.createElement('script');
-        system.src = origin + 'vendor/system.js';
-
-        system.addEventListener('load', function() {
-            var config = {
-                baseURL: origin + 'js',
-                map: {
-                    text: origin + 'vendor/systemjs-plugin-text/text.js',
-                    'es6-promise': origin + 'vendor/es6-promise.js',
-                    xmldom: origin + 'vendor/dom-parser.js',
-                    mocha: origin + 'vendor/mocha.js',
-                    chai: origin + 'vendor/chai.js',
-                    sinon: origin + 'vendor/sinon.js',
-                    text: origin + 'vendor/text.js',
-                    reporter: origin + 'vendor/reporter.js',
-                    html: origin + '../html',
-                },
-                meta: {
-                    'mocha': {
-                        format: 'global'
-                    },
-                    '*.html': {
-                        loader: 'text'
+        var require = {
+            baseUrl: origin + 'js',
+            deps: ['es6-promise', 'mocha'],
+            paths: {
+                'es6-promise': origin + 'vendor/es6-promise',
+                mocha: origin + 'vendor/mocha',
+                chai: origin + 'vendor/chai',
+                sinon: origin + 'vendor/sinon',
+                text: origin + 'vendor/text',
+                reporter: origin + 'vendor/reporter',
+                html: origin + 'html',
+                xmldom: origin + 'vendor/dom-parser'
+            },
+            shim: {
+                mocha: {
+                    deps: ['reporter'],
+                    init: function(reporter) {
+                        this.mocha.setup({
+                            ui: 'bdd',
+                            checkLeaks: true,
+                            fullTrace: true,
+                            globals: ['nativebridge', 'webviewbridge'],
+                            reporter: reporter
+                        });
+                        this.mocha.suite.emit('pre-require', window, null, this.mocha);
+                        return this.mocha;
                     }
-                },
-                packages: {},
-                paths: {
-                    '*.html': origin + 'html/*.html'
                 }
-            };
-            config.packages[origin] = {
-                defaultExtension: 'js'
-            };
-            System.config(config);
-            Promise.all([
-                System.import('mocha'),
-                System.import('reporter')
-            ]).then(function(results) {
-                window.runner = new Mocha({
-                    ui: 'bdd',
-                    checkLeaks: true,
-                    fullTrace: true,
-                    globals: ['nativebridge', 'webviewbridge'],
-                    reporter: results[1]
-                });
-                window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
-                System.import(origin + 'runner');
-            });
-        }, false);
+            },
+            config: {
+                text: {
+                    useXhr: function () {
+                        return true;
+                    }
+                }
+            }
+        };
+
+        var requirejs = document.createElement('script');
+        requirejs.src = origin + 'vendor/require.js';
+        requirejs.setAttribute('data-main', origin + 'runner.js');
 
         document.head.appendChild(style);
-        document.head.appendChild(system);
+        document.head.appendChild(requirejs);
     </script>
 </head>
 <body></body>

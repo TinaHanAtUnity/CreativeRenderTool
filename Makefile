@@ -33,9 +33,16 @@ BUILD_DIR = build
 .PHONY: build-release build-test build-dir build-ts build-js build-css build-html clean lint test
 
 build-dev: BUILD_DIR = build/dev
-build-dev: MODULE = system
-build-dev: TARGET = es2015
+build-dev: MODULE = amd
+build-dev: TARGET = es5
 build-dev: build-dir build-html build-css build-ts
+ifdef USE_BABEL
+	@echo
+	@echo Running through babel for ES3 compatibility
+	@echo
+
+	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
+endif
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
@@ -101,8 +108,8 @@ build-release: clean build-dir build-html build-css build-ts build-js
 		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
-build-test: MODULE = system
-build-test: TARGET = es3
+build-test: MODULE = amd
+build-test: TARGET = es5
 build-test: clean build-dir build-css build-html build-ts
 	@echo
 	@echo Generating test runner
@@ -124,11 +131,11 @@ build-test: clean build-dir build-css build-html build-ts
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
 		node_modules/es6-promise/dist/es6-promise.js \
-		node_modules/systemjs/dist/system.js \
+		node_modules/requirejs/require.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
-		node_modules/systemjs-plugin-text/text.js \
+		node_modules/requirejs-text/text.js \
 		node_modules/xmldom/dom-parser.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
