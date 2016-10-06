@@ -67,66 +67,12 @@
                     ui: 'bdd'
                 });
                 window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
-                System.import('./runner');
+                System.import(origin + 'runner');
             });
         }, false);
 
         document.head.appendChild(style);
         document.head.appendChild(system);
-
-        /*var require = {
-         baseUrl: origin + 'src/ts/',
-         deps: ['es6-promise', 'mocha'],
-         paths: {
-         'src/ts': '../../src/ts',
-         test: '../../test',
-         'es6-promise': '../../vendor/es6-promise',
-         mocha: '../../vendor/mocha',
-         chai: '../../vendor/chai',
-         sinon: '../../vendor/sinon',
-         text: '../../vendor/text',
-         reporter: '../../vendor/reporter',
-         html: '../../html',
-         xmldom: '../../vendor/dom-parser'
-         },
-         shim: {
-         mocha: {
-         deps: ['reporter'],
-         init: function(reporter) {
-         this.mocha.setup({
-         ui: 'bdd',
-         checkLeaks: true,
-         fullTrace: true,
-         globals: ['nativebridge', 'webviewbridge'],
-         reporter: reporter
-         });
-         this.mocha.suite.emit('pre-require', window, null, this.mocha);
-         return this.mocha;
-         }
-         }
-         },
-         config: {
-         text: {
-         useXhr: function () {
-         return true;
-         }
-         }
-         }
-         };
-
-         document.addEventListener('DOMContentLoaded', function() {
-         var requirejs = document.createElement('script');
-         requirejs.src = origin + 'vendor/require.js';
-         requirejs.setAttribute('data-main', origin + 'runner.js');
-
-         var style = document.createElement('link');
-         style.rel = 'stylesheet';
-         style.href = origin + 'css/main.css';
-
-         var head = document.getElementsByTagName('head')[0];
-         head.appendChild(style);
-         head.appendChild(requirejs);
-         }, false);*/
     </script>
 </head>
 <body></body>
