@@ -10,16 +10,19 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventManager } from 'Managers/EventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Campaign } from 'Models/Campaign';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 describe('EndScreenEventHandlersTest', () => {
 
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, adUnit: VideoAdUnit, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
+    let performanceAdUnit: PerformanceAdUnit;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -39,11 +42,13 @@ describe('EndScreenEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        adUnit = new VideoAdUnit(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
             getVideoUrl: () => 'fake url',
             getAppStoreId: () => 'fooAppId',
             getClickAttributionUrlFollowsRedirects: () => true
-        }, overlay, endScreen);
+        }, overlay, null);
+
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
     describe('with onDownload', () => {
@@ -57,14 +62,14 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
+            EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, adUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
+                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -81,7 +86,7 @@ describe('EndScreenEventHandlersTest', () => {
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
                 sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
+                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
@@ -92,9 +97,9 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects', () => {
             beforeEach(() => {
-                sinon.stub(adUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
 
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit);
+                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
 
             });
 

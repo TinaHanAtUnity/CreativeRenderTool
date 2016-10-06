@@ -1,13 +1,15 @@
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
+import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export class EndScreenEventHandlers {
 
-    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
         let platform = nativeBridge.getPlatform();
         let campaign = adUnit.getCampaign();
 
@@ -66,8 +68,14 @@ export class EndScreenEventHandlers {
         }
     }
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+    public static onClose(adUnit: AbstractAdUnit): void {
         adUnit.hide();
+    }
+
+    public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
+        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideoAdUnitController().isVideoActive()) {
+            adUnit.hide();
+        }
     }
 
     private static getAppStoreUrl(platform: Platform, campaign: Campaign) {
@@ -77,5 +85,4 @@ export class EndScreenEventHandlers {
             return 'market://details?id=' + campaign.getAppStoreId();
         }
     }
-
 }
