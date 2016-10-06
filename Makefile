@@ -100,40 +100,15 @@ build-release: clean build-dir build-html build-css build-ts build-js
 		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
-build-test: MODULE = es2015
-build-test: TARGET = es2015
-build-test: clean build-dir build-css build-html
-	@echo
-	@echo Transpiling .ts to .js for remote tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module amd --outDir $(BUILD_DIR)
-
+build-test: MODULE = system
+build-test: TARGET = es3
+build-test: clean build-dir build-css build-html build-ts
 	@echo
 	@echo Generating test runner
 	@echo
 
 	cp test-utils/runner.js $(BUILD_DIR)
-	node -e "\
-		var fs = require('fs');\
-		var path = require('path');\
-		var getTestPaths = function(root) {\
-		    var paths = [];\
-            fs.readdirSync(root).forEach(function(file) {\
-                var fullPath = path.join(root, file);\
-                if(fs.statSync(fullPath).isDirectory()) {\
-                    paths = paths.concat(getTestPaths(fullPath));\
-                } else if(fullPath.indexOf('Test.ts') !== -1) {\
-                    paths.push(fullPath.replace('.ts', ''));\
-                }\
-            });\
-            return paths;\
-        };\
-		var testList = JSON.stringify(getTestPaths('test'));\
-        console.log(testList);\
-		var o = {encoding:'utf-8'};\
-		var f = fs.readFileSync('$(BUILD_DIR)/runner.js', o);\
-		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
+	BUILD_DIR=$(BUILD_DIR) node test-utils/generate_runner.js
 
 	@echo
 	@echo Copying test index.html to build
@@ -148,11 +123,11 @@ build-test: clean build-dir build-css build-html
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
 		node_modules/es6-promise/dist/es6-promise.js \
-		node_modules/requirejs/require.js \
+		node_modules/systemjs/dist/system.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
-		node_modules/requirejs-text/text.js \
+		node_modules/systemjs-plugin-text/text.js \
 		node_modules/xmldom/dom-parser.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor

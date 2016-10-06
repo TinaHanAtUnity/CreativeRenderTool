@@ -83,19 +83,21 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
     });
 }
 
-define({TEST_LIST}, function() {
-    function getPlatform() {
-        var queryString = window.location.search.split('?')[1].split('&');
-        for(var i = 0; i < queryString.length; i++) {
-            var queryParam = queryString[i].split('=');
-            if(queryParam[0] === 'platform') {
-                return queryParam[1];
-            }
+var getPlatform = function() {
+    var queryString = window.location.search.split('?')[1].split('&');
+    for(var i = 0; i < queryString.length; i++) {
+        var queryParam = queryString[i].split('=');
+        if(queryParam[0] === 'platform') {
+            return queryParam[1];
         }
-        return undefined;
     }
+    return undefined;
+};
 
-    mocha.run(function(failures) {
+Promise.all({TEST_LIST}.map(function(testPath) {
+    return System.import(testPath);
+})).then(() => {
+    window.runner.run(function(failures) {
         var platform = getPlatform();
         if(platform === 'android') {
             window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));
