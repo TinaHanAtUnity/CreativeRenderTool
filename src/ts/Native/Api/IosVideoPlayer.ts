@@ -2,12 +2,13 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Observable1, Observable2 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
-enum IosVideoPlayerEvent {
+export enum IosVideoPlayerEvent {
     LIKELY_TO_KEEP_UP,
     BUFFER_EMPTY,
     BUFFER_FULL,
     GENERIC_ERROR,
-    PREPARE_ERROR
+    PREPARE_ERROR,
+    VIDEOVIEW_NULL
 }
 
 export class IosVideoPlayerApi extends NativeApi {

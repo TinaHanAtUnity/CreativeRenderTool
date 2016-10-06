@@ -1,22 +1,26 @@
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { Overlay } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 
 export class VastAdUnit extends VideoAdUnit {
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: VastCampaign, overlay: Overlay) {
-        super(nativeBridge, placement, campaign, overlay);
+    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        super(nativeBridge, videoAdUnitController);
     }
 
-    protected hideChildren() {
-        const overlay = this.getOverlay();
-        if(overlay) {
-            overlay.container().parentElement.removeChild(overlay.container());
-        }
+    public show(): Promise<void> {
+        return this._videoAdUnitController.show();
+    }
+
+    public hide(): Promise<void> {
+        return this._videoAdUnitController.hide();
+    }
+
+    public isShowing(): boolean {
+        return this._videoAdUnitController.isShowing();
     }
 
     public getVast(): Vast {
