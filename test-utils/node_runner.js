@@ -37,6 +37,9 @@ System.config({
         },
         '*.html': {
             loader: 'text'
+        },
+        '*.xml': {
+            loader: 'text'
         }
     },
     packages: {
@@ -45,7 +48,8 @@ System.config({
         }
     },
     paths: {
-        '*.html': './src/*.html'
+        '*.html': './src/*.html',
+        '*.xml': './src/*.xml'
     }
 });
 

@@ -110,7 +110,7 @@ build-release: clean build-dir build-html build-css build-ts build-js
 build-test: BUILD_DIR = build/test
 build-test: MODULE = amd
 build-test: TARGET = es5
-build-test: clean build-dir build-css build-html build-ts
+build-test: clean build-dir build-css build-html build-xml build-ts
 	@echo
 	@echo Generating test runner
 	@echo
@@ -217,10 +217,17 @@ build-css:
 
 build-html:
 	@echo
-	@echo Copying templates to build
+	@echo Copying html to build
 	@echo
 
 	cp -r src/html $(BUILD_DIR)
+
+build-xml:
+	@echo
+	@echo Copying xml to build
+	@echo
+
+	cp -r src/xml $(BUILD_DIR)
 
 clean:
 	@echo
