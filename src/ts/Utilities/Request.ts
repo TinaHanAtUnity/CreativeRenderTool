@@ -190,6 +190,11 @@ export class Request {
         };
         let nativeRequest = Request._requests[id];
 
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 let location = Request.getHeader(headers, 'location');
@@ -210,6 +215,12 @@ export class Request {
     private onRequestFailed(rawId: string, url: string, error: string): void {
         let id = parseInt(rawId, 10);
         let nativeRequest = Request._requests[id];
+
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+
         this.handleFailedRequest(id, nativeRequest, error);
     }
 
