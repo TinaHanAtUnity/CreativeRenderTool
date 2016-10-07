@@ -26,7 +26,7 @@ describe('ObservableTest', () => {
             triggered++;
         };
         let observable = new Observable1();
-        let boundObserver = observable.subscribe(observer.bind(undefined, 'abc'));
+        let boundObserver = observable.subscribe(() => observer('abc'));
         assert.equal(triggered, 0);
         observable.trigger('abc');
         assert.equal(triggered, 1);

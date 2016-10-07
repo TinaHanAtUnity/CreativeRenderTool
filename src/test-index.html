@@ -40,6 +40,7 @@
                 reporter: origin + 'vendor/reporter',
                 html: origin + 'html',
                 xml: origin + 'xml',
+                json: origin + 'json',
                 xmldom: origin + 'vendor/dom-parser'
             },
             shim: {
@@ -51,7 +52,8 @@
                             checkLeaks: true,
                             fullTrace: true,
                             globals: ['nativebridge', 'webviewbridge'],
-                            reporter: reporter
+                            reporter: reporter,
+                            timeout: 5000
                         });
                         this.mocha.suite.emit('pre-require', window, null, this.mocha);
                         return this.mocha;

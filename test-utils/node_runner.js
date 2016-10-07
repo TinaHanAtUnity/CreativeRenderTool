@@ -40,6 +40,9 @@ System.config({
         },
         '*.xml': {
             loader: 'text'
+        },
+        '*.json': {
+            loader: 'text'
         }
     },
     packages: {
@@ -49,7 +52,8 @@ System.config({
     },
     paths: {
         '*.html': './src/*.html',
-        '*.xml': './src/*.xml'
+        '*.xml': './src/*.xml',
+        '*.json': './src/*.json'
     }
 });
 

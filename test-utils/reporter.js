@@ -146,8 +146,9 @@ define([], function() {
             logger.error(++failures + ') ' + test.title, err);
         });
 
+        var self = this;
         runner.on('end', function() {
-            var stats = this.stats;
+            var stats = self.stats;
 
             // duration
             logger.timeEnd('duration');
@@ -163,9 +164,9 @@ define([], function() {
             // failures
             if(stats.failures) {
                 logger.log(stats.failures + ' failing');
-                errors.call(this, this.failures);
+                errors.call(self, self.failures);
             }
-        }.bind(this));
+        });
 
         function errors(failures) {
             failures.forEach(function(test, i) {

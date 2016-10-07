@@ -10,13 +10,13 @@ import { Observable2 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 
-import VastRaw from 'text!xml/VastRaw.xml';
+import * as VastRaw from 'text!xml/VastRaw.xml';
 
 describe('VastParser', () => {
     let request: Request;
     let nativeBridge: NativeBridge;
 
-    let vastRaw = VastRaw;
+    let vastRaw = <string>(typeof VastRaw === 'string' ? VastRaw : VastRaw.default);
 
     it('should throw when given null', () => {
         assert.throws(() => {

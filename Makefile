@@ -30,12 +30,12 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-release build-test build-dir build-ts build-js build-css build-html clean lint test
+.PHONY: build-dev build-release build-test build-dir build-ts build-test-ts build-js build-css build-static clean lint test test-coveralls watch setup
 
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = amd
 build-dev: TARGET = es5
-build-dev: build-dir build-html build-css build-ts
+build-dev: build-dir build-static build-css build-ts
 ifdef USE_BABEL
 	@echo
 	@echo Running through babel for ES3 compatibility
@@ -49,7 +49,7 @@ endif
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
 build-release: TARGET = es2015
-build-release: clean build-dir build-html build-css build-ts build-js
+build-release: clean build-dir build-static build-css build-ts build-js
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -72,7 +72,7 @@ build-release: clean build-dir build-html build-css build-ts build-js
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
+	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -110,7 +110,7 @@ build-release: clean build-dir build-html build-css build-ts build-js
 build-test: BUILD_DIR = build/test
 build-test: MODULE = amd
 build-test: TARGET = es5
-build-test: clean build-dir build-css build-html build-xml build-ts
+build-test: clean build-dir build-css build-static build-ts
 	@echo
 	@echo Generating test runner
 	@echo
@@ -215,19 +215,14 @@ build-css:
 	mkdir -p $(BUILD_DIR)/css
 	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
 
-build-html:
+build-static:
 	@echo
-	@echo Copying html to build
+	@echo Copying static files to build
 	@echo
 
 	cp -r src/html $(BUILD_DIR)
-
-build-xml:
-	@echo
-	@echo Copying xml to build
-	@echo
-
 	cp -r src/xml $(BUILD_DIR)
+	cp -r src/json $(BUILD_DIR)
 
 clean:
 	@echo
@@ -244,7 +239,7 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
-test: MODULE = system
+test: MODULE = amd
 test: TARGET = es5
 test: clean build-dir build-test-ts
 	@echo

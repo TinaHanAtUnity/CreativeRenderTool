@@ -1,4 +1,4 @@
-import PrivacyTemplate from 'text!html/Privacy.html';
+import * as PrivacyTemplate from 'text!html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -13,7 +13,7 @@ export class Privacy extends View {
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
         super(nativeBridge, 'privacy');
 
-        this._template = new Template(PrivacyTemplate);
+        this._template = new Template(<string>(typeof PrivacyTemplate === 'string' ? PrivacyTemplate : PrivacyTemplate.default));
 
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant
