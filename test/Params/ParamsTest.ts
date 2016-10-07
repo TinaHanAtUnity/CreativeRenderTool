@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { RequestApi } from 'Native/Api/Request';
+import { ParamsTestData } from './ParamsTestData';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -44,6 +45,7 @@ describe('Parameter specification test', () => {
         return campaignManager.request().then(() => {
             // todo: assert arguments
             console.log('args ' + requestSpy.getCall(0).args[0]);
+            console.log(ParamsTestData.Params);
         });
     });
 });
