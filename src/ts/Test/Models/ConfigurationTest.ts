@@ -3,13 +3,15 @@ import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
 
+import * as ConfigurationJson from 'text!json/Configuration.json';
+
 describe('configurationTest', () => {
 
     let configuration: Configuration;
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse('{ "enabled": true, "country": "fi", "assetCaching": "forced", "placements": [ { "id": "1", "name": "placementName1", "default": false }, { "id": "2", "name": "placementName2", "default": true } ] }'));
+            configuration = new Configuration(JSON.parse(<string>(typeof ConfigurationJson === 'string' ? ConfigurationJson : ConfigurationJson.default)));
         });
 
         it('should have enabled parameter from configuration', () => {

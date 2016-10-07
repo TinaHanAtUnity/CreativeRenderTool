@@ -1,0 +1,19 @@
+{
+  "abGroup": 3,
+  "campaign": {
+    "appStoreId": "12345678",
+    "bypassAppSheet": false,
+    "endScreenLandscape": "dummyEndScreenLandscape",
+    "endScreenPortrait": "dummyEndScreenPortrait",
+    "gameIcon": "dummyGameIcon",
+    "gameId": 1234,
+    "gameName": "dummyGameName",
+    "id": "12345",
+    "rating": "5",
+    "ratingCount": "123456",
+    "trailerDownloadable": "dummyTrailerDownloadable",
+    "trailerDownloadableSize": 123,
+    "trailerStreaming": "dummyTrailerStreaming"
+  },
+  "gamerId": "5712983c481291b16e1be03b"
+}

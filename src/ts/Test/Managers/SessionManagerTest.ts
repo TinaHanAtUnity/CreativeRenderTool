@@ -17,6 +17,8 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 
+import * as SessionManagerVast from 'text!xml/SessionManagerVast.xml';
+
 describe('SessionManager', () => {
     let handleInvocation = sinon.spy();
     let handleCallback = sinon.spy();
@@ -197,52 +199,7 @@ describe('SessionManager', () => {
 
         let vastParser = TestFixtures.getVastParser();
 
-        let vastXml = `
-            <?xml version="1.0" encoding="UTF-8"?>
-            <VAST version="2.0">
-              <Ad id="preroll-1">
-                <InLine>
-                  <AdSystem>2.0</AdSystem>
-                  <AdTitle>5748406</AdTitle>
-                  <Impression id="blah"><![CDATA[http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=%ZONE%]]></Impression>
-                  <Creatives>
-                    <Creative>
-                      <Linear>
-                        <Duration>00:00:30</Duration>
-                        <TrackingEvents>
-                          <Tracking event="complete"><![CDATA[http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="firstQuartile"><![CDATA[http://localhost:3500/brands/14851/firstQuartile?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="midpoint"><![CDATA[http://localhost:3500/brands/14851/midpoint?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="start"><![CDATA[http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="thirdQuartile"><![CDATA[http://localhost:3500/brands/14851/thirdQuartile?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="creativeView"><![CDATA[http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="mute"><![CDATA[http://localhost:3500/brands/14851/mute?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                          <Tracking event="unmute"><![CDATA[http://localhost:3500/brands/14851/unmute?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%]]></Tracking>
-                        </TrackingEvents>
-                        <VideoClicks>
-                          <ClickThrough id="scanscout"><![CDATA[http://www.target.com]]></ClickThrough>
-            <ClickTracking>http://myTrackingURL.com/click</ClickTracking>
-                        </VideoClicks>
-                        <MediaFiles>
-                            <MediaFile height="396" width="600" bitrate="496" type="video/mp4" delivery="progressive"><![CDATA[http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4]]></MediaFile>
-                        </MediaFiles>
-                      </Linear>
-                </Creative>
-                <Creative>
-                      <CompanionAds>
-                        <Companion height="250" width="300" id="555750">
-                          <HTMLResource><![CDATA[<A onClick="var i= new Image(1,1); i.src='http://app.scanscout.com/ssframework/log/log.png?a=logitemaction&RI=555750&CbC=1&CbF=true&EC=0&RC=0&SmC=2&CbM=1.0E-5&VI=736e6b13bad531dc476bc3612749bc35&admode=preroll&PRI=-4827170214961170629&RprC=0&ADsn=17&VcaI=192,197&RrC=1&VgI=736e6b13bad531dc476bc3612749bc35&AVI=142&Ust=ma&Uctry=us&CI=1223187&AC=4&PI=567&Udma=506&ADI=5748406&VclF=true';" HREF="http://target.com" target="_blank">
-            <IMG SRC="http://media.scanscout.com/ads/target300x250Companion.jpg" BORDER=0 WIDTH=300 HEIGHT=250 ALT="Click Here">
-            </A>
-            <img src="http://app.scanscout.com/ssframework/log/log.png?a=logitemaction&RI=555750&CbC=1&CbF=true&EC=1&RC=0&SmC=2&CbM=1.0E-5&VI=736e6b13bad531dc476bc3612749bc35&admode=preroll&PRI=-4827170214961170629&RprC=0&ADsn=17&VcaI=192,197&RrC=1&VgI=736e6b13bad531dc476bc3612749bc35&AVI=142&Ust=ma&Uctry=us&CI=1223187&AC=4&PI=567&Udma=506&ADI=5748406&VclF=true" height="1" width="1">
-            ]]></HTMLResource>
-                        </Companion>
-                      </CompanionAds>
-                    </Creative>
-                  </Creatives>
-                </InLine>
-              </Ad>
-            </VAST>`;
+        let vastXml = <string>(typeof SessionManagerVast === 'string' ? SessionManagerVast : SessionManagerVast.default);
 
         let vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);

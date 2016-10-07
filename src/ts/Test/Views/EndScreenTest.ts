@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 
 import * as TestCampaign from 'text!json/TestCampaign.json';
-import * as EndScreenFixture from 'text!html/EndScreenFixture.html';
+import * as EndScreenFixture from 'text!html/fixtures/EndScreenFixture.html';
 
 describe('EndScreen', () => {
     it('should render', () => {

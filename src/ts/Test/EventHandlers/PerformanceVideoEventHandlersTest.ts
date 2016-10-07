@@ -1,13 +1,13 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { AndroidVideoAdUnitController } from '../../AdUnits/AndroidVideoAdUnitController';
-import { NativeBridge } from '../../Native/NativeBridge';
+import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Campaign } from '../../Models/Campaign';
-import { Overlay } from '../../Views/Overlay';
-import { EndScreen } from '../../Views/EndScreen';
-import { PerformanceAdUnit } from '../../AdUnits/PerformanceAdUnit';
-import { PerformanceVideoEventHandlers } from '../../EventHandlers/PerformanceVideoEventHandlers';
+import { Campaign } from 'Models/Campaign';
+import { Overlay } from 'Views/Overlay';
+import { EndScreen } from 'Views/EndScreen';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
