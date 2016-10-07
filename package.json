@@ -26,14 +26,14 @@
     "xmldom": "git@github.com:Applifier/xmldom.git"
   },
   "devDependencies": {
-    "@types/jsdom": "^2.0.29",
+    "@types/jsdom": "2.0.29",
     "babel-cli": "6.16.0",
     "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
     "babel-plugin-transform-es3-property-literals": "6.8.0",
     "chai": "3.5.0",
     "coveralls": "2.11.14",
     "istanbul": "0.4.5",
-    "jsdom": "^9.6.0",
+    "jsdom": "9.6.0",
     "mocha": "3.1.0",
     "mocha-lcov-reporter": "1.2.0",
     "remap-istanbul": "0.6.4",
