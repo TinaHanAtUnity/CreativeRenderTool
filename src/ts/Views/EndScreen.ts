@@ -1,5 +1,4 @@
-/// <amd-dependency path='text!html/EndScreen.html' name='EndScreenTemplate' />
-declare var EndScreenTemplate: string;
+import EndScreenTemplate from 'html/EndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';

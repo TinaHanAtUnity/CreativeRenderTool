@@ -25,22 +25,24 @@ let resizeHandler = (event?: Event) => {
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
-let nativeBridge: NativeBridge;
-switch(Url.getQueryParameter(location.search, 'platform')) {
-    case 'android':
-        nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
-        break;
+if(typeof location !== 'undefined') {
+    let nativeBridge: NativeBridge;
+    switch(Url.getQueryParameter(location.search, 'platform')) {
+        case 'android':
+            nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
+            break;
 
-    case 'ios':
-        nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
-        break;
+        case 'ios':
+            nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
+            break;
 
-    default:
-        throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
+        default:
+            throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
+    }
+
+    let extWindow = <IExtendedWindow> window;
+    extWindow.nativebridge = nativeBridge;
+    extWindow.webview = new WebView(nativeBridge);
+
+    extWindow.webview.initialize();
 }
-
-let extWindow = <IExtendedWindow> window;
-extWindow.nativebridge = nativeBridge;
-extWindow.webview = new WebView(nativeBridge);
-
-extWindow.webview.initialize();

@@ -1,5 +1,4 @@
-/// <amd-dependency path='text!html/Privacy.html' name='PrivacyTemplate' />
-declare var PrivacyTemplate: string;
+import PrivacyTemplate from 'html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';

@@ -1,5 +1,4 @@
-/// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
-declare var OverlayTemplate: string;
+import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -42,9 +41,7 @@ export class Overlay extends View {
     constructor(nativeBridge: NativeBridge, muted: boolean) {
         super(nativeBridge, 'overlay');
 
-        if(typeof OverlayTemplate !== 'undefined') {
-            this._template = new Template(OverlayTemplate);
-        }
+        this._template = new Template(OverlayTemplate);
 
         this._muted = muted;
 

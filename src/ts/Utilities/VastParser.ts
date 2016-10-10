@@ -38,16 +38,8 @@ export class VastParser {
         let xml = (this._domParser).parseFromString(vast, 'text/xml');
         let ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
-        if (xml == null) {
+        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');
-        }
-
-        if (xml.documentElement == null) {
-            throw new Error('VAST xml data is missing');
-        }
-
-        if (xml.documentElement.nodeName !== 'VAST') {
-            throw new Error(`VAST xml is invalid - document element must be VAST but was ${xml.documentElement.nodeName}`);
         }
 
         let childNodes = xml.documentElement.childNodes;
