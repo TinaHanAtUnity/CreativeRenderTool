@@ -220,7 +220,7 @@ lint:
 
 test: MODULE = system
 test: TARGET = es5
-test:
+test: build-dir
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
