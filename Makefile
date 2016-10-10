@@ -218,6 +218,7 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
+test: BUILD_DIR = build/coverage
 test: MODULE = system
 test: TARGET = es5
 test: build-dir
@@ -231,14 +232,15 @@ test: build-dir
 	@echo Running local tests
 	@echo
 
-	COVERAGE_DIR=$(BUILD_DIR)/coverage node test-utils/node_runner.js
-	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/summary -t text-summary
-	@cat $(BUILD_DIR)/coverage/summary && echo \n
-	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
+	COVERAGE_DIR=$(BUILD_DIR) node test-utils/node_runner.js
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
+	@cat $(BUILD_DIR)/summary && echo \n
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
 
+test-coveralls: BUILD_DIR = build/coverage
 test-coveralls: test
-	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
-	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
+	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
+	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test

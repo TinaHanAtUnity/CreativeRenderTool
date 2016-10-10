@@ -59,7 +59,9 @@ System.config({
 });
 
 let runner = new Mocha({
-    ui: 'bdd'
+    ui: 'bdd',
+    checkLeaks: true,
+    fullTrace: true
 });
 runner.suite.emit('pre-require', global, 'global-mocha-context', runner);
 
@@ -78,15 +80,6 @@ System.translate = (load) => {
     });
 };
 
-// DONT FUCKING ASK!
-let SystemLocate = System.locate;
-System.locate = function(load) {
-    if(load.name.indexOf('text.js!') !== -1) {
-        load.name = load.name.split('!')[1];
-    }
-    return SystemLocate.call(this, load);
-};
-
 Promise.all(getPaths('src/ts').map((testPath) => {
     return System.import(testPath);
 })).then(() => {
@@ -96,6 +89,5 @@ Promise.all(getPaths('src/ts').map((testPath) => {
         });
     });
 }).then(() => {
-    fs.mkdirSync(process.env.COVERAGE_DIR);
     fs.writeFileSync(process.env.COVERAGE_DIR + '/coverage.json', JSON.stringify(__coverage__));
 }).catch(console.error.bind(console));
