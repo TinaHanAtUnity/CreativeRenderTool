@@ -10,17 +10,17 @@ import { Observable2 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 
-import * as VastRaw from 'text!xml/VastRaw.xml';
-import * as RootVastClean from 'text!xml/RootVastClean.xml';
-import * as WrappedVast from 'text!xml/WrappedVast.xml';
-import * as RootVastDirty from 'text!xml/RootVastDirty.xml';
-import * as VastWithSpaces from 'text!xml/VastWithSpaces.xml';
+import VastRaw from 'xml/VastRaw.xml';
+import RootVastClean from 'xml/RootVastClean.xml';
+import WrappedVast from 'xml/WrappedVast.xml';
+import RootVastDirty from 'xml/RootVastDirty.xml';
+import VastWithSpaces from 'xml/VastWithSpaces.xml';
 
 describe('VastParser', () => {
     let request: Request;
     let nativeBridge: NativeBridge;
 
-    let vastRaw = <string>(typeof VastRaw === 'string' ? VastRaw : VastRaw.default);
+    let vastRaw = VastRaw;
 
     it('should throw when given null', () => {
         assert.throws(() => {
@@ -118,8 +118,8 @@ describe('VastParser', () => {
     it('should throw an error with appropriate information when there is a problem with parsing a wrapped VAST', () => {
         let mockRequest = sinon.mock(request);
 
-        let rootVast = <string>(typeof RootVastClean === 'string' ? RootVastClean : RootVastClean.default);
-        let wrappedVAST = <string>(typeof WrappedVast === 'string' ? WrappedVast : WrappedVast.default);
+        let rootVast = RootVastClean;
+        let wrappedVAST = WrappedVast;
 
         for (let i = 0; i < 6; i++) {
             mockRequest.expects('get').returns(Promise.resolve({
@@ -145,14 +145,14 @@ describe('VastParser', () => {
     });
 
     it('should trim spaces around VASTAdTagURI', () => {
-        let rootVast = <string>(typeof RootVastDirty === 'string' ? RootVastDirty : RootVastDirty.default);
+        let rootVast = RootVastDirty;
 
         let vast = TestFixtures.getVastParser().parseVast(rootVast);
         assert.equal(vast.getWrapperURL(), 'http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_1.xml');
     });
 
     it('should have all extra spaces in urls trimmed', () => {
-        let vastWithSpaces = <string>(typeof VastWithSpaces === 'string' ? VastWithSpaces : VastWithSpaces.default);
+        let vastWithSpaces = VastWithSpaces;
         let vast = TestFixtures.getVastParser().parseVast(vastWithSpaces);
 
         assert.deepEqual(vast.getImpressionUrls(), [

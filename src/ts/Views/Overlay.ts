@@ -1,4 +1,4 @@
-import * as OverlayTemplate from 'text!html/Overlay.html';
+import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -41,7 +41,7 @@ export class Overlay extends View {
     constructor(nativeBridge: NativeBridge, muted: boolean) {
         super(nativeBridge, 'overlay');
 
-        this._template = new Template(<string>(typeof OverlayTemplate === 'string' ? OverlayTemplate : OverlayTemplate.default));
+        this._template = new Template(OverlayTemplate);
 
         this._muted = muted;
 

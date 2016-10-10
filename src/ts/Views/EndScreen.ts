@@ -1,4 +1,4 @@
-import * as EndScreenTemplate from 'text!html/EndScreen.html';
+import EndScreenTemplate from 'html/EndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -21,7 +21,7 @@ export class EndScreen extends View {
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
 
-        this._template = new Template(<string>(typeof EndScreenTemplate === 'string' ? EndScreenTemplate : EndScreenTemplate.default));
+        this._template = new Template(EndScreenTemplate);
 
         if (campaign) {
             let adjustedRating: number = campaign.getRating() * 20;

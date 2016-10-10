@@ -5,15 +5,15 @@ import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 
-import * as DummyAdPlan from 'text!json/DummyAdPlan.json';
-import * as SimpleVast from 'text!xml/SimpleVast.xml';
-import * as CacheSimpleVast from 'text!xml/CacheSimpleVast.xml';
+import DummyAdPlan from 'json/DummyAdPlan.json';
+import SimpleVast from 'xml/SimpleVast.xml';
+import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
 
 describe('Campaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            let json = JSON.parse(<string>(typeof DummyAdPlan === 'string' ? DummyAdPlan : DummyAdPlan.default));
+            let json = JSON.parse(DummyAdPlan);
             let campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
@@ -31,7 +31,7 @@ describe('Campaign', () => {
 
     describe('when created with VAST json', () => {
         it('should have correct data from the json', () => {
-            let vastXml = <string>(typeof SimpleVast === 'string' ? SimpleVast : SimpleVast.default);
+            let vastXml = SimpleVast;
             let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(vastXml);
             let campaign = new VastCampaign(parsedVast, '12345', 'gamerId', 1);
@@ -66,7 +66,7 @@ describe('Campaign', () => {
         });
 
         it('should return cached video url when set', () => {
-            let vastXml = <string>(typeof CacheSimpleVast === 'string' ? CacheSimpleVast : CacheSimpleVast.default);
+            let vastXml = CacheSimpleVast;
             let vastParser = TestFixtures.getVastParser();
             let parsedVast = vastParser.parseVast(vastXml);
             let campaign = new Campaign({vast: parsedVast}, 'gamerId', 1);

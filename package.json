@@ -9,14 +9,9 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@types/chai": "3.4.34",
-    "@types/mocha": "2.2.32",
-    "@types/sinon": "1.16.31",
     "akamai": "0.10.1",
     "es6-promise": "3.3.1",
     "google-closure-compiler": "20160911.0.0",
-    "requirejs": "2.3.2",
-    "requirejs-text": "2.0.12",
     "systemjs": "0.19.39",
     "systemjs-plugin-text": "0.0.9",
     "stylus": "0.54.5",
@@ -24,10 +19,10 @@
     "typescript": "2.0.3"
   },
   "devDependencies": {
+    "@types/chai": "3.4.34",
+    "@types/mocha": "2.2.32",
+    "@types/sinon": "1.16.31",
     "@types/jsdom": "2.0.29",
-    "babel-cli": "6.16.0",
-    "babel-plugin-transform-es3-member-expression-literals": "6.8.0",
-    "babel-plugin-transform-es3-property-literals": "6.8.0",
     "chai": "3.5.0",
     "coveralls": "2.11.14",
     "istanbul": "0.4.5",
@@ -38,10 +33,9 @@
     "rollup": "0.36.3",
     "rollup-plugin-includepaths": "0.1.6",
     "rollup-plugin-node-resolve": "2.0.0",
-    "rollup-plugin-replace": "1.1.1",
     "rollup-plugin-string": "2.0.2",
     "sinon": "1.17.6",
-    "xmldom": "^0.1.22"
+    "xmldom": "0.1.22"
   },
   "optionalDependencies": {
     "fsevents": "1.0.14"

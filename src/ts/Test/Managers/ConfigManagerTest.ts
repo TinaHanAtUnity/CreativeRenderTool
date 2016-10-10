@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { INativeResponse } from 'Utilities/Request';
 
-import * as ConfigurationJson from 'text!json/Configuration.json';
+import ConfigurationJson from 'json/Configuration.json';
 
 class TestStorageApi extends StorageApi {
 
@@ -70,7 +70,7 @@ describe('ConfigManagerTest', () => {
 
         beforeEach(() => {
             let nativeResponse = {
-                response: <string>(typeof ConfigurationJson === 'string' ? ConfigurationJson : ConfigurationJson.default)
+                response: ConfigurationJson
             };
             configPromise = Promise.resolve(nativeResponse);
 

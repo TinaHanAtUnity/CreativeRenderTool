@@ -6,8 +6,8 @@ import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 
-import * as TestCampaign from 'text!json/TestCampaign.json';
-import * as EndScreenFixture from 'text!html/fixtures/EndScreenFixture.html';
+import TestCampaign from 'json/TestCampaign.json';
+import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 
 describe('EndScreen', () => {
     it('should render', () => {
@@ -18,8 +18,8 @@ describe('EndScreen', () => {
             handleCallback
         });
 
-        let endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(<string>(typeof TestCampaign === 'string' ? TestCampaign : TestCampaign.default)), '', 0), true);
+        let endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true);
         endScreen.render();
-        assert.equal(endScreen.container().innerHTML, <string>(typeof EndScreenFixture === 'string' ? EndScreenFixture : EndScreenFixture.default));
+        assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 });

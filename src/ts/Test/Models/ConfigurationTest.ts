@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
 
-import * as ConfigurationJson from 'text!json/Configuration.json';
+import ConfigurationJson from 'json/Configuration.json';
 
 describe('configurationTest', () => {
 
@@ -11,7 +11,7 @@ describe('configurationTest', () => {
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(<string>(typeof ConfigurationJson === 'string' ? ConfigurationJson : ConfigurationJson.default)));
+            configuration = new Configuration(JSON.parse(ConfigurationJson));
         });
 
         it('should have enabled parameter from configuration', () => {

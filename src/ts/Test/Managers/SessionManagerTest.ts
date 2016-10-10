@@ -17,7 +17,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 
-import * as SessionManagerVast from 'text!xml/SessionManagerVast.xml';
+import SessionManagerVast from 'xml/SessionManagerVast.xml';
 
 describe('SessionManager', () => {
     let handleInvocation = sinon.spy();
@@ -199,7 +199,7 @@ describe('SessionManager', () => {
 
         let vastParser = TestFixtures.getVastParser();
 
-        let vastXml = <string>(typeof SessionManagerVast === 'string' ? SessionManagerVast : SessionManagerVast.default);
+        let vastXml = SessionManagerVast;
 
         let vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);

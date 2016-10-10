@@ -30,25 +30,18 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-dev build-release build-test build-dir build-ts build-test-ts build-js build-css build-static clean lint test test-coveralls watch setup
+.PHONY: build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
 
 build-dev: BUILD_DIR = build/dev
-build-dev: MODULE = amd
+build-dev: MODULE = system
 build-dev: TARGET = es5
 build-dev: build-dir build-static build-css build-ts
-ifdef USE_BABEL
-	@echo
-	@echo Running through babel for ES3 compatibility
-	@echo
-
-	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
-endif
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
 
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
-build-release: TARGET = es2015
+build-release: TARGET = es5
 build-release: clean build-dir build-static build-css build-ts build-js
 	@echo
 	@echo Copying release index.html to build
@@ -108,7 +101,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
-build-test: MODULE = amd
+build-test: MODULE = system
 build-test: TARGET = es5
 build-test: clean build-dir build-css build-static build-ts
 	@echo
@@ -131,19 +124,13 @@ build-test: clean build-dir build-css build-static build-ts
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
 		node_modules/es6-promise/dist/es6-promise.js \
-		node_modules/requirejs/require.js \
+		node_modules/systemjs/dist/system.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
-		node_modules/requirejs-text/text.js \
+		node_modules/systemjs-plugin-text/text.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
-
-	@echo
-	@echo Running through babel for ES3 compatibility
-	@echo
-
-	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
 
 	@echo
 	@echo Copying test config to build
@@ -191,13 +178,6 @@ build-ts:
 
 	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
 
-build-test-ts:
-	@echo
-	@echo Transpiling .ts to .js
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-
 build-js:
 	@echo
 	@echo Bundling .js files
@@ -238,9 +218,15 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
 
-test: MODULE = amd
+test: MODULE = system
 test: TARGET = es5
-test: clean build-dir build-test-ts
+test:
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
 	@echo
 	@echo Running local tests
 	@echo

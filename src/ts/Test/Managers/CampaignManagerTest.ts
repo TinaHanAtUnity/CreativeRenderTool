@@ -17,26 +17,26 @@ import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
-import * as OnVastCampaignJson from 'text!json/OnVastCampaign.json';
-import * as InsideOutsideJson from 'text!json/InsideOutside.json';
-import * as VastInlineLinear from 'text!xml/VastInlineLinear.xml';
-import * as WrappedVastJson from 'text!json/WrappedVast.json';
-import * as WrappedVast1 from 'text!xml/WrappedVast1.xml';
-import * as WrappedVast2 from 'text!xml/WrappedVast2.xml';
-import * as MaxDepthVastJson from 'text!json/MaxDepthVast.json';
-import * as NonWrappedVast from 'text!xml/NonWrappedVast.xml';
-import * as WrappedVast3 from 'text!xml/WrappedVast3.xml';
-import * as NoVideoVastJson from 'text!json/NoVideoVast.json';
-import * as NoVideoWrappedVastJson from 'text!json/NoVideoWrappedVast.json';
-import * as NoVideoWrappedVast from 'text!xml/NoVideoWrappedVast.xml';
-import * as IncorrectVastJson from 'text!json/IncorrectVast.json';
-import * as IncorrectWrappedVastJson from 'text!json/IncorrectWrappedVast.json';
-import * as IncorrectWrappedVast from 'text!xml/IncorrectWrappedVast.xml';
-import * as FailingVastJson from 'text!json/FailingVast.json';
-import * as NoImpressionVastJson from 'text!json/NoImpressionVast.json';
-import * as TooMuchWrappingVastJson from 'text!json/TooMuchWrappingVast.json';
-import * as MissingErrorUrlsVastJson from 'text!json/MissingErrorUrlsVast.json';
-import * as AdLevelErrorUrlsVastJson from 'text!json/AdLevelErrorUrlsVast.json';
+import OnVastCampaignJson from 'json/OnVastCampaign.json';
+import InsideOutsideJson from 'json/InsideOutside.json';
+import VastInlineLinear from 'xml/VastInlineLinear.xml';
+import WrappedVastJson from 'json/WrappedVast.json';
+import WrappedVast1 from 'xml/WrappedVast1.xml';
+import WrappedVast2 from 'xml/WrappedVast2.xml';
+import MaxDepthVastJson from 'json/MaxDepthVast.json';
+import NonWrappedVast from 'xml/NonWrappedVast.xml';
+import WrappedVast3 from 'xml/WrappedVast3.xml';
+import NoVideoVastJson from 'json/NoVideoVast.json';
+import NoVideoWrappedVastJson from 'json/NoVideoWrappedVast.json';
+import NoVideoWrappedVast from 'xml/NoVideoWrappedVast.xml';
+import IncorrectVastJson from 'json/IncorrectVast.json';
+import IncorrectWrappedVastJson from 'json/IncorrectWrappedVast.json';
+import IncorrectWrappedVast from 'xml/IncorrectWrappedVast.xml';
+import FailingVastJson from 'json/FailingVast.json';
+import NoImpressionVastJson from 'json/NoImpressionVast.json';
+import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
+import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
+import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -51,7 +51,7 @@ describe('CampaignManager', () => {
         // given a valid VAST placement
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
-            response: <string>(typeof OnVastCampaignJson === 'string' ? OnVastCampaignJson : OnVastCampaignJson.default)
+            response: OnVastCampaignJson
         }));
 
         let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
@@ -83,10 +83,10 @@ describe('CampaignManager', () => {
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
-            response: <string>(typeof InsideOutsideJson === 'string' ? InsideOutsideJson : InsideOutsideJson.default)
+            response: InsideOutsideJson
         }));
         mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
-            response: <string>(typeof VastInlineLinear === 'string' ? VastInlineLinear : VastInlineLinear.default)
+            response: VastInlineLinear
         }));
 
         vastParser.setMaxWrapperDepth(1);
@@ -155,13 +155,13 @@ describe('CampaignManager', () => {
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
-            response: <string>(typeof WrappedVastJson === 'string' ? WrappedVastJson : WrappedVastJson.default)
+            response: WrappedVastJson
         }));
         mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
-            response: <string>(typeof WrappedVast1 === 'string' ? WrappedVast1 : WrappedVast1.default)
+            response: WrappedVast1
         }));
         mockRequest.expects('get').withArgs('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
-            response: <string>(typeof WrappedVast2 === 'string' ? WrappedVast2 : WrappedVast2.default)
+            response: WrappedVast2
         }));
 
         vastParser.setMaxWrapperDepth(2);
@@ -254,11 +254,11 @@ describe('CampaignManager', () => {
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
         let mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
-            response: <string>(typeof MaxDepthVastJson === 'string' ? MaxDepthVastJson : MaxDepthVastJson.default)
+            response: MaxDepthVastJson
         }));
 
-        let nonWrappedVAST = <string>(typeof NonWrappedVast === 'string' ? NonWrappedVast : NonWrappedVast.default);
-        let wrappedVAST = <string>(typeof WrappedVast3 === 'string' ? WrappedVast3 : WrappedVast3.default);
+        let nonWrappedVAST = NonWrappedVast;
+        let wrappedVAST = WrappedVast3;
 
         // create intermediate wrappers
         for(let i = 0; i < 8; i++) {
@@ -337,36 +337,36 @@ describe('CampaignManager', () => {
 
         it('should trigger onError after requesting a vast placement without a video url', () => {
             const response = {
-                response: <string>(typeof NoVideoVastJson === 'string' ? NoVideoVastJson : NoVideoVastJson.default)
+                response: NoVideoVastJson
             };
             return verifyErrorForResponse(response, 'Campaign does not have a video url');
         });
 
         it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
             const response = {
-                response: <string>(typeof NoVideoWrappedVastJson === 'string' ? NoVideoWrappedVastJson : NoVideoWrappedVastJson.default)
+                response: NoVideoWrappedVastJson
             };
             const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
             const wrappedResponse = Promise.resolve({
-                response: <string>(typeof NoVideoWrappedVast === 'string' ? NoVideoWrappedVast : NoVideoWrappedVast.default)
+                response: NoVideoWrappedVast
             });
             return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Campaign does not have a video url', done);
         });
 
         it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
             const response = {
-                response: <string>(typeof IncorrectVastJson === 'string' ? IncorrectVastJson : IncorrectVastJson.default)
+                response: IncorrectVastJson
             };
-            return verifyErrorForResponse(response, 'VAST xml is invalid - document element must be VAST but was VASTy');
+            return verifyErrorForResponse(response, 'VAST xml data is missing');
         });
 
         it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
             const response = {
-                response: <string>(typeof IncorrectWrappedVastJson === 'string' ? IncorrectWrappedVastJson : IncorrectWrappedVastJson.default)
+                response: IncorrectWrappedVastJson
             };
             const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
             const wrappedResponse = Promise.resolve({
-                response: <string>(typeof IncorrectWrappedVast === 'string' ? IncorrectWrappedVast : IncorrectWrappedVast.default)
+                response: IncorrectWrappedVast
             });
 
             return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'VAST xml is invalid - document element must be VAST but was foo');
@@ -385,7 +385,7 @@ describe('CampaignManager', () => {
 
         it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
             const response = {
-                response: <string>(typeof FailingVastJson === 'string' ? FailingVastJson : FailingVastJson.default)
+                response: FailingVastJson
             };
             const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
             const wrappedResponse = Promise.reject('Some kind of request error happened');
@@ -430,7 +430,7 @@ describe('CampaignManager', () => {
 
         it('should trigger onError after requesting a vast placement without an impression url', () => {
             const response = {
-                    response: <string>(typeof NoImpressionVastJson === 'string' ? NoImpressionVastJson : NoImpressionVastJson.default)
+                    response: NoImpressionVastJson
             };
             return verifyErrorForResponse(response, 'Campaign does not have an impression url');
         });
@@ -439,7 +439,7 @@ describe('CampaignManager', () => {
 
             // given a valid VAST response containing a wrapper
             const response = {
-                response: <string>(typeof TooMuchWrappingVastJson === 'string' ? TooMuchWrappingVastJson : TooMuchWrappingVastJson.default)
+                response: TooMuchWrappingVastJson
             };
 
             // when the parser's max wrapper depth is set to 0 to disallow wrapping
@@ -485,7 +485,7 @@ describe('CampaignManager', () => {
         it('should warn about missing error urls', () => {
             // given a VAST response that has no error URLs
             const response = {
-                    response: <string>(typeof MissingErrorUrlsVastJson === 'string' ? MissingErrorUrlsVastJson : MissingErrorUrlsVastJson.default)
+                    response: MissingErrorUrlsVastJson
             };
 
             // when the campaign manager requests the placement
@@ -499,7 +499,7 @@ describe('CampaignManager', () => {
         it('should not warn about missing error urls if error url exists at ad level', () => {
             // given a VAST response that an error URL in the ad
             const response = {
-                response: <string>(typeof AdLevelErrorUrlsVastJson === 'string' ? AdLevelErrorUrlsVastJson : AdLevelErrorUrlsVastJson.default)
+                response: AdLevelErrorUrlsVastJson
             };
 
             // when the campaign manager requests the placement
