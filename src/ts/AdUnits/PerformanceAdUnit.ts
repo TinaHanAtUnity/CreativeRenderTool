@@ -20,6 +20,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
     public hide(): Promise<void> {
         const endScreen = this.getEndScreen();
         if (endScreen) {
+            endScreen.hide();
             endScreen.container().parentElement.removeChild(endScreen.container());
         }
         this.unsetReferences();

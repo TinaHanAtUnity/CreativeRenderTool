@@ -16,6 +16,7 @@ export class EndScreen extends View {
 
     private _coppaCompliant: boolean;
     private _gameName: string;
+    private _privacy: Privacy;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean) {
         super(nativeBridge, 'end-screen');
@@ -68,6 +69,16 @@ export class EndScreen extends View {
         nameContainer.innerHTML = this._gameName + ' ';
     }
 
+    public hide(): void {
+        super.hide();
+
+        if(this._privacy) {
+            this._privacy.hide();
+            this._privacy.container().parentElement.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
+    }
+
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
         this.onDownload.trigger();
@@ -80,15 +91,16 @@ export class EndScreen extends View {
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        let privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
-        privacy.render();
-        document.body.appendChild(privacy.container());
-        privacy.onPrivacy.subscribe((url) => {
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy.render();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.onPrivacy.subscribe((url) => {
             this.onPrivacy.trigger(url);
         });
-        privacy.onClose.subscribe(() => {
-            privacy.hide();
-            privacy.container().parentElement.removeChild(privacy.container());
+        this._privacy.onClose.subscribe(() => {
+            this._privacy.hide();
+            this._privacy.container().parentElement.removeChild(this._privacy.container());
+            delete this._privacy;
         });
     }
 
