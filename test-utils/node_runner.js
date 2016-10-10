@@ -4,9 +4,11 @@ const Mocha = require('mocha');
 const System = require('systemjs');
 const Istanbul = require('istanbul');
 const jsdom = require('jsdom').jsdom;
+const DOMParser = require('xmldom').DOMParser;
 
 global.document = jsdom('');
 global.window = document.defaultView;
+global.DOMParser = DOMParser;
 
 let getPaths = (root) => {
     let paths = [];
@@ -28,7 +30,6 @@ System.config({
         'sinon': './node_modules/sinon/pkg/sinon.js',
         'chai': './node_modules/chai/chai.js',
         'text': './node_modules/systemjs-plugin-text/text.js',
-        'xmldom': './node_modules/xmldom/dom-parser.js',
         'es6-promise': './node_modules/es6-promise/dist/es6-promise.js'
     },
     meta: {

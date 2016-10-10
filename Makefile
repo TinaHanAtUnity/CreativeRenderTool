@@ -136,7 +136,6 @@ build-test: clean build-dir build-css build-static build-ts
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
 		node_modules/requirejs-text/text.js \
-		node_modules/xmldom/dom-parser.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
 

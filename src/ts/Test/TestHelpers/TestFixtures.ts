@@ -4,7 +4,6 @@ import { INativeResponse } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
-import * as xmldom from 'xmldom';
 
 export class TestFixtures {
 
@@ -46,7 +45,7 @@ export class TestFixtures {
 
     public static getVastParser(): VastParser {
         let vastParser: VastParser;
-        let domParser = new xmldom.DOMParser({errorHandler: {}});
+        let domParser = new DOMParser();
         vastParser = new VastParser(domParser);
         return vastParser;
     }

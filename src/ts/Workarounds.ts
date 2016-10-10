@@ -1,5 +1,4 @@
 import 'es6-promise';
-import 'xmldom';
 
 /* tslint:disable:no-unused-expression */
 
