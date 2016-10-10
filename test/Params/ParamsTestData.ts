@@ -1,3 +1,14 @@
+export interface EventParameter {
+    parameter: string;
+    required: string;
+    queryString: boolean;
+    body: boolean;
+}
+
+export interface EventSpec {
+    [parameter: string]: EventParameter
+}
+
 export class ParamsTestData {
     public static Params: string = `[
 {
@@ -10,7 +21,7 @@ export class ParamsTestData {
 {
     "key": "adapterName",
     "type": "String",
-    "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
+    "description": "Unity adapter between game code and SDK, \\"AssetStore\\" for Asset Store package and \\"Engine\\" for Unity engine integration layer",
     "provider": "App",
     "platforms": "all"
 },
@@ -122,7 +133,7 @@ export class ParamsTestData {
 {
     "key": "connectionType",
     "type": "String",
-    "description": "\"wifi\", \"cellular\" or \"none\"",
+    "description": "\\"wifi\\", \\"cellular\\" or \\"none\\"",
     "provider": "SDK",
     "platforms": "all"
 },
@@ -262,7 +273,7 @@ export class ParamsTestData {
 {
     "key": "integrationType",
     "type": "string",
-    "description": "\"AssetStore\",\"Engine\",\"native\",\"mediation\"",
+    "description": "\\"AssetStore\\",\\"Engine\\",\\"native\\",\\"mediation\\"",
     "provider": "SDK",
     "platforms": null
 },
@@ -353,14 +364,14 @@ export class ParamsTestData {
 {
     "key": "placementType",
     "type": "String",
-    "description": "\"rewarded\" or \"interstitial\"",
+    "description": "\\"rewarded\\" or \\"interstitial\\"",
     "provider": "Admin",
     "platforms": null
 },
 {
     "key": "platform",
     "type": "String",
-    "description": "\"android\" or \"ios\"",
+    "description": "\\"android\\" or \\"ios\\"",
     "provider": "SDK",
     "platforms": "all"
 },
@@ -673,4 +684,15 @@ export class ParamsTestData {
     }
   ]
 }`;
+
+    public static getAdRequestParams(): EventSpec  {
+        let spec: EventSpec = { };
+        let params: EventParameter[] = JSON.parse(ParamsTestData.AdRequest)['parameters'];
+
+        for(let i: number = 0; i < params.length; i++) {
+            spec[params[i].parameter] = params[i];
+        }
+
+        return spec;
+    }
 }

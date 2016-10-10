@@ -1,6 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
-// import { assert } from 'chai';
+import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
@@ -10,7 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { RequestApi } from 'Native/Api/Request';
-import { ParamsTestData } from './ParamsTestData';
+import { ParamsTestData, EventSpec } from './ParamsTestData';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -36,6 +36,8 @@ describe('Parameter specification test', () => {
     let request: Request;
 
     it('Ad request', () => {
+        let spec: EventSpec = ParamsTestData.getAdRequestParams();
+
         nativeBridge = TestFixtures.getNativeBridge();
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
         nativeBridge.Request = new TestRequestApi(nativeBridge);
@@ -43,9 +45,31 @@ describe('Parameter specification test', () => {
         let requestSpy = sinon.spy(request, 'post');
         let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
         return campaignManager.request().then(() => {
-            // todo: assert arguments
-            console.log('args ' + requestSpy.getCall(0).args[0]);
-            console.log(ParamsTestData.Params);
-        });
+            let url: string = requestSpy.getCall(0).args[0];
+            let query = url.split('?')[1];
+            let queryParams = query.split('&');
+
+            for(let i: number = 0; i < queryParams.length; i++) {
+                let paramName: string = queryParams[i].split('=')[0];
+
+                console.log('Checking query parameter ' + paramName);
+                assert.isDefined(spec[paramName], 'Unspecified query parameter: ' + paramName);
+                assert.isTrue(spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName)
+            }
+
+            let body: string = requestSpy.getCall(0).args[1];
+            let bodyParams = JSON.parse(body);
+
+            let key: string;
+            for(key in bodyParams) {
+                if(bodyParams.hasOwnProperty(key)) {
+                    console.log('Checking body parameter ' + key);
+                    assert.isDefined(spec[key], 'Unspecified body parameter: ' + key);
+                    assert.isTrue(spec[key].body, 'Parameter should not be in request body: ' + key);
+                }
+            }
+
+            // todo: check that all required parameters are included
+       });
     });
 });
