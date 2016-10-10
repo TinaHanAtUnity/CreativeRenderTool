@@ -13,17 +13,12 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "rootDirs": [
-      "src/html",
-      "src/ts",
-      "test"
-    ],
+    "rootDir": "src/ts",
     "baseUrl": "src/ts",
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true
   },
   "include": [
-    "src/ts/**/*.ts",
-    "test/**/*.ts"
+    "src/ts/**/*.ts"
   ]
 }
