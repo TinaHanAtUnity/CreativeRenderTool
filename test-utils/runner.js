@@ -1,6 +1,6 @@
 Promise.all({TEST_LIST}.map(function(testPath) {
     return System.import(testPath);
-})).then(() => {
+})).then(function() {
     window.runner.run(function(failures) {
         var platform = (function() {
             var queryString = window.location.search.split('?')[1].split('&');
@@ -21,3 +21,4 @@ Promise.all({TEST_LIST}.map(function(testPath) {
         }
     });
 });
+

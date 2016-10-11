@@ -9,6 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
+    <script>{ES6_PROMISE}</script>
+    <script>{SYSTEM_JS}</script>
     <script>
         var origin = 'http://localhost:8000';
         if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
@@ -29,44 +31,37 @@
         var style = document.createElement('link');
         style.rel = 'stylesheet';
         style.href = origin + '/build/dev/css/main.css';
-
-        var system = document.createElement('script');
-        system.src = origin + '/node_modules/systemjs/dist/system.js';
-
-        system.addEventListener('load', function() {
-            var config = {
-                baseURL: origin + '/build/dev/js',
-                map: {
-                    'text': origin + '/node_modules/systemjs-plugin-text/text.js',
-                    'es6-promise': origin + '/node_modules/es6-promise/dist/es6-promise.js'
-                },
-                meta: {
-                    '*.html': {
-                        loader: 'text'
-                    },
-                    '*.xml': {
-                        loader: 'text'
-                    },
-                    '*.json': {
-                        loader: 'text'
-                    }
-                },
-                packages: {},
-                paths: {
-                    '*.html': origin + '/build/dev/*.html',
-                    '*.xml': origin + '/build/dev/*.xml',
-                    '*.json': origin + '/build/dev/*.json'
-                }
-            };
-            config.packages[origin] = {
-                defaultExtension: 'js'
-            };
-            System.config(config);
-            System.import('Main');
-        }, false);
-
         document.head.appendChild(style);
-        document.head.appendChild(system);
+
+        var config = {
+            baseURL: origin + '/build/dev/js',
+            map: {
+                'es6-promise': '@empty',
+                'text': origin + '/node_modules/systemjs-plugin-text/text.js'
+            },
+            meta: {
+                '*.html': {
+                    loader: 'text'
+                },
+                '*.xml': {
+                    loader: 'text'
+                },
+                '*.json': {
+                    loader: 'text'
+                }
+            },
+            packages: {},
+            paths: {
+                '*.html': origin + '/build/dev/*.html',
+                '*.xml': origin + '/build/dev/*.xml',
+                '*.json': origin + '/build/dev/*.json'
+            }
+        };
+        config.packages[origin] = {
+            defaultExtension: 'js'
+        };
+        System.config(config);
+        System.import('Main');
     </script>
 </head>
 <body></body>
