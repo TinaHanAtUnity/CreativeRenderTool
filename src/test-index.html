@@ -9,6 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
+    <script type="text/javascript">{ES6_PROMISE}</script>
+    <script type="text/javascript">{SYSTEM_JS}</script>
     <script>
         var origin = 'http://localhost:8000/';
         if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
@@ -27,64 +29,58 @@
         var style = document.createElement('link');
         style.rel = 'stylesheet';
         style.href = origin + 'css/main.css';
-
-        var system = document.createElement('script');
-        system.src = origin + 'vendor/system.js';
-
-        system.addEventListener('load', function() {
-            var config = {
-                baseURL: origin + 'js',
-                map: {
-                    text: origin + 'vendor/systemjs-plugin-text/text.js',
-                    mocha: origin + 'vendor/mocha.js',
-                    chai: origin + 'vendor/chai.js',
-                    sinon: origin + 'vendor/sinon.js',
-                    text: origin + 'vendor/text.js',
-                    reporter: origin + 'vendor/reporter.js'
-                },
-                meta: {
-                    'mocha': {
-                        format: 'global'
-                    },
-                    '*.html': {
-                        loader: 'text'
-                    },
-                    '*.xml': {
-                        loader: 'text'
-                    },
-                    '*.json': {
-                        loader: 'text'
-                    }
-                },
-                packages: {},
-                paths: {
-                    '*.html': origin + '*.html',
-                    '*.xml': origin + '*.xml',
-                    '*.json': origin + '*.json'
-                }
-            };
-            config.packages[origin] = {
-                defaultExtension: 'js'
-            };
-            System.config(config);
-            Promise.all([
-                System.import('mocha'),
-                System.import('reporter')
-            ]).then(function(results) {
-                window.runner = new Mocha({
-                    ui: 'bdd',
-                    checkLeaks: true,
-                    fullTrace: true,
-                    globals: ['nativebridge', 'webviewbridge'],
-                    reporter: results[1]
-                });
-                window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
-                System.import(origin + 'runner');
-            });
-        }, false);
-
         document.head.appendChild(style);
-        document.head.appendChild(system);
+
+        var config = {
+            baseURL: origin + 'js',
+            map: {
+                'es6-promise': '@empty',
+                text: origin + 'vendor/systemjs-plugin-text/text.js',
+                mocha: origin + 'vendor/mocha.js',
+                chai: origin + 'vendor/chai.js',
+                sinon: origin + 'vendor/sinon.js',
+                text: origin + 'vendor/text.js',
+                reporter: origin + 'vendor/reporter.js'
+            },
+            meta: {
+                'mocha': {
+                    format: 'global'
+                },
+                '*.html': {
+                    loader: 'text'
+                },
+                '*.xml': {
+                    loader: 'text'
+                },
+                '*.json': {
+                    loader: 'text'
+                }
+            },
+            packages: {},
+            paths: {
+                '*.html': origin + '*.html',
+                '*.xml': origin + '*.xml',
+                '*.json': origin + '*.json'
+            }
+        };
+        config.packages[origin] = {
+            defaultExtension: 'js'
+        };
+        System.config(config);
+        Promise.all([
+            System.import('mocha'),
+            System.import('reporter')
+        ]).then(function(results) {
+            window.runner = new Mocha({
+                ui: 'bdd',
+                checkLeaks: true,
+                fullTrace: true,
+                globals: ['nativebridge', 'webviewbridge'],
+                reporter: results[1]
+            });
+            window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
+            System.import(origin + 'runner');
+        });
     </script>
 </head>
 <body></body>

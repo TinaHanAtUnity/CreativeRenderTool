@@ -9,6 +9,8 @@ ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
+ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.js
+SYSTEM_JS = node_modules/systemjs/dist/system.src.js
 
 # Sources
 TS_SRC = src/ts
@@ -38,6 +40,13 @@ build-dev: TARGET = es5
 build-dev: build-dir build-static build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/index.html $(BUILD_DIR)/index.html
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
+		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
+		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
 
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
@@ -116,6 +125,13 @@ build-test: clean build-dir build-css build-static build-ts
 	@echo
 
 	cp $(TEST_INDEX_SRC) $(BUILD_DIR)/index.html
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
+		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
+		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
 
 	@echo
 	@echo Copying vendor libraries to build
