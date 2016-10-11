@@ -10,7 +10,7 @@ import { Platform } from '../../Constants/Platform';
 import { WakeUpManager } from '../../Managers/WakeUpManager';
 import { StorageType, StorageApi } from '../../Native/Api/Storage';
 import { RequestApi } from '../../Native/Api/Request';
-import { ParamsTestData, EventSpec } from './ParamsTestData';
+import { ParamsTestData, IEventSpec } from './ParamsTestData';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -36,7 +36,7 @@ describe('Parameter specification test', () => {
     let request: Request;
 
     it('Ad request', () => {
-        let spec: EventSpec = ParamsTestData.getAdRequestParams();
+        let spec: IEventSpec = ParamsTestData.getAdRequestParams();
 
         nativeBridge = TestFixtures.getNativeBridge();
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
@@ -54,7 +54,7 @@ describe('Parameter specification test', () => {
 
                 console.log('Checking query parameter ' + paramName);
                 assert.isDefined(spec[paramName], 'Unspecified query parameter: ' + paramName);
-                assert.isTrue(spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName)
+                assert.isTrue(spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
             }
 
             let body: string = requestSpy.getCall(0).args[1];
