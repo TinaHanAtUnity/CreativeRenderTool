@@ -6,6 +6,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Campaign } from 'Models/Campaign';
 
 export class TestFixtures {
 
@@ -20,6 +21,27 @@ export class TestFixtures {
             useDeviceOrientationForVideo: false,
             muteVideo: false,
         });
+    }
+
+    public static getCampaign(): Campaign {
+        return new Campaign({
+            id: '123abc',
+            appStoreId: 'com.test',
+            appStoreCountry: 'us',
+            gameId: 1234,
+            gameName: 'Test game',
+            gameIcon: 'https://www.example.net/icon.png',
+            rating: 1,
+            ratingCount: 12345,
+            endScreenLandscape: 'https://www.example.net/landscape.png',
+            endScreenPortrait: 'https://www.example.net/portrait.png',
+            trailerDownloadable: 'https://www.example.net/hdvideo.mp4',
+            trailerDownloadableSize: 1234567,
+            trailerStreaming: 'https://www.example.net/streamingvideo.mp4',
+            clickAttributionUrl: 'https://www.example.net/click_attribution',
+            clickAttributionUrlFollowsRedirects: false,
+            bypassAppSheet: false
+        }, 'abc123', 123);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
@@ -64,7 +86,10 @@ export class TestFixtures {
         return vastParser;
     }
 
-    public static getNativeBridge(): NativeBridge {
+    public static getNativeBridge(platform?: Platform): NativeBridge {
+        if(typeof platform === 'undefined') {
+            platform = Platform.TEST;
+        }
         let backend = {
             handleInvocation: function() {
                 // no-op
@@ -73,6 +98,6 @@ export class TestFixtures {
                 // no-op
             }
         };
-        return new NativeBridge(backend);
+        return new NativeBridge(backend, platform);
     }
 }
