@@ -22,8 +22,12 @@ export class TestFixtures {
         });
     }
 
-    public static getClientInfo(): ClientInfo {
-        return new ClientInfo(Platform.ANDROID, [
+    public static getClientInfo(platform?: Platform): ClientInfo {
+        if(typeof platform === 'undefined') {
+            platform = Platform.ANDROID;
+        }
+
+        return new ClientInfo(platform, [
             '12345',
             false,
             'com.unity3d.ads.example',
@@ -36,7 +40,11 @@ export class TestFixtures {
         ]);
     }
 
-    public static getDeviceInfo(platform: Platform): DeviceInfo {
+    public static getDeviceInfo(platform?: Platform): DeviceInfo {
+        if(typeof platform === 'undefined') {
+            platform = Platform.ANDROID;
+        }
+
         return new FakeDeviceInfo(TestFixtures.getNativeBridge(), platform);
     }
 

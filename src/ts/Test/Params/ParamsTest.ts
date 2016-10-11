@@ -31,71 +31,114 @@ class TestRequestApi extends RequestApi {
     }
 }
 
-describe('Parameter specification test', () => {
-    let nativeBridge: NativeBridge;
-    let request: Request;
+class SpecVerifier {
+    private _platform: Platform;
+    private _spec: IEventSpec;
+    private _queryParams: string[];
+    private _bodyParams: any;
 
-    it('Ad request (Android)', () => {
-        let spec: IEventSpec = ParamsTestData.getAdRequestParams();
+    constructor(platform: Platform, spec: IEventSpec, url: string, body?: string) {
+        this._platform = platform;
+        this._spec = spec;
+        this._queryParams = url.split('?')[1].split('&');
+        if(body) {
+            this._bodyParams = JSON.parse(body);
+        }
+    }
 
-        nativeBridge = TestFixtures.getNativeBridge();
-        nativeBridge.Storage = new TestStorageApi(nativeBridge);
-        nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-        let requestSpy = sinon.spy(request, 'post');
-        let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
-        return campaignManager.request().then(() => {
-            let url: string = requestSpy.getCall(0).args[0];
-            let query = url.split('?')[1];
-            let queryParams = query.split('&');
+    public assert(): void {
+        this.assertUnspecifiedParams();
+        this.assertRequiredParams();
+    }
 
-            for(let i: number = 0; i < queryParams.length; i++) {
-                let paramName: string = queryParams[i].split('=')[0];
+    private assertUnspecifiedParams(): void {
+        for (let i: number = 0; i < this._queryParams.length; i++) {
+            let paramName: string = this._queryParams[i].split('=')[0];
 
-                assert.isDefined(spec[paramName], 'Unspecified query parameter: ' + paramName);
-                assert.isTrue(spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
-            }
+            assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
+            assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
+        }
 
-            let body: string = requestSpy.getCall(0).args[1];
-            let bodyParams = JSON.parse(body);
-
+        if(this._bodyParams) {
             let key: string;
-            for(key in bodyParams) {
-                if(bodyParams.hasOwnProperty(key)) {
-                    assert.isDefined(spec[key], 'Unspecified body parameter: ' + key);
-                    assert.isTrue(spec[key].body, 'Parameter should not be in request body: ' + key);
+            for(key in this._bodyParams) {
+                if(this._bodyParams.hasOwnProperty(key)) {
+                    assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
+                    assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
                 }
             }
+        }
+    }
 
-            let param: string;
-            for(param in spec) {
-                if(spec.hasOwnProperty(param)) {
-                    if(spec[param].required === 'all' || spec[param].required === 'android') {
-                        if(spec[param].queryString) {
-                            let found: boolean = false;
+    private assertRequiredParams(): void {
+        let param: string;
+        for(param in this._spec) {
+            if(this._spec.hasOwnProperty(param)) {
+                if(this.isRequired(this._spec[param].required)) {
+                    if(this._spec[param].queryString) {
+                        let found: boolean = false;
 
-                            for(let i: number = 0; i < queryParams.length; i++) {
-                                let paramName: string = queryParams[i].split('=')[0];
-                                if(paramName === param) {
-                                    found = true;
-                                }
-                            }
-
-                            assert.isTrue(found, 'Required parameter not found in query string: ' + param);
-                        }
-
-                        if(spec[param].body) {
-                            let found: boolean = false;
-
-                            if(bodyParams.hasOwnProperty(param)) {
+                        for(let i: number = 0; i < this._queryParams.length; i++) {
+                            let paramName: string = this._queryParams[i].split('=')[0];
+                            if(paramName === param) {
                                 found = true;
                             }
-
-                            assert.isTrue(found, 'Required parameter not found in body: ' + param);
                         }
+
+                        assert.isTrue(found, 'Required parameter not found in query string: ' + param);
+                    }
+
+                    if(this._spec[param].body) {
+                        assert.isTrue(this._bodyParams.hasOwnProperty(param), 'Required parameter not found in body: ' + param);
                     }
                 }
             }
+        }
+    }
+
+    private isRequired(required: string): boolean {
+        return required === 'all' || (required === 'android' && this._platform === Platform.ANDROID) || (required === 'ios' && this._platform === Platform.IOS);
+    }
+}
+
+describe('Event parameters should match specifications', () => {
+    describe('with ad request', () => {
+        let nativeBridge: NativeBridge;
+        let request: Request;
+        let requestSpy: any;
+
+        let spec: IEventSpec;
+
+        beforeEach(() => {
+            nativeBridge = TestFixtures.getNativeBridge();
+            nativeBridge.Storage = new TestStorageApi(nativeBridge);
+            nativeBridge.Request = new TestRequestApi(nativeBridge);
+            request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            requestSpy = sinon.spy(request, 'post');
+
+            spec = ParamsTestData.getAdRequestParams();
+        });
+
+        it('on Android', () => {
+            let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
+            return campaignManager.request().then(() => {
+                let url: string = requestSpy.getCall(0).args[0];
+                let body: string = requestSpy.getCall(0).args[1];
+
+                let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, spec, url, body);
+                verifier.assert();
+            });
        });
+
+        it('on iOS', () => {
+            let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
+            return campaignManager.request().then(() => {
+                let url: string = requestSpy.getCall(0).args[0];
+                let body: string = requestSpy.getCall(0).args[1];
+
+                let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, spec, url, body);
+                verifier.assert();
+            });
+        });
     });
 });
