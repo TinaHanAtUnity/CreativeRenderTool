@@ -1,4 +1,3 @@
-// import ParamsSpec from '../../../../params/params.json';
 import ConfigRequestSpec from '../../../../params/configuration.json';
 import AdRequestSpec from '../../../../params/adPlan_requests.json';
 import VideoEventSpec from '../../../../params/video_start-video_end_requests.json';
