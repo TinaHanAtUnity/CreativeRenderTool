@@ -149,7 +149,7 @@ class TestHelper {
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
-        let config: Configuration = new Configuration({"assetCaching": "forced", "placements": []});
+        let config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
         return AdUnitFactory.createAdUnit(nativeBridge, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
