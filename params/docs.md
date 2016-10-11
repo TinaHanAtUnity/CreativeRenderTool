@@ -45,7 +45,7 @@
 | eventType | String | Event type | SDK | None |
 | frameworkName | String | The framework/game toolkit used to build the game, for example: Unity | App | None |
 | frameworkVersion | String | For instance: 5.3.1p3 | App | None |
-| freeSpace | Integer | Free space in kilobytes | SDK | all |
+| deviceFreeSpace | Integer | Free space in kilobytes | SDK | all |
 | gameId | String | Source game identifier | App | None |
 | gamerId | String | Internal gamer identifier | Server | all |
 | integrationType | string | "AssetStore","Engine","native","mediation" | SDK | None |
@@ -123,7 +123,7 @@
 | language | all | False | True | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | timeZone | all | False | True | String | Current timezone | SDK | all |
 | webviewUa | no | False | True | String | WebView user agent string | SDK | all |
-| freeSpace | all | False | True | Integer | Free space in kilobytes | SDK | all |
+| deviceFreeSpace | all | False | True | Integer | Free space in kilobytes | SDK | all |
 | networkOperator | no | False | True | Integer | MCC + MNC codes | SDK | all |
 | networkOperatorName | no | False | True | Integer | Cell network operator name | SDK | all |
 | mediation | no | False | True | JSONobject | mediation data in JSON object (Will get refactored) | App | all |

@@ -2,14 +2,14 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Request } from 'Utilities/Request';
+import { NativeBridge } from '../../Native/NativeBridge';
+import { Request } from '../../Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { Platform } from 'Constants/Platform';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { StorageType, StorageApi } from 'Native/Api/Storage';
-import { RequestApi } from 'Native/Api/Request';
+import { CampaignManager } from '../../Managers/CampaignManager';
+import { Platform } from '../../Constants/Platform';
+import { WakeUpManager } from '../../Managers/WakeUpManager';
+import { StorageType, StorageApi } from '../../Native/Api/Storage';
+import { RequestApi } from '../../Native/Api/Request';
 import { ParamsTestData, EventSpec } from './ParamsTestData';
 
 class TestStorageApi extends StorageApi {

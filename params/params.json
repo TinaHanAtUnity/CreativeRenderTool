@@ -238,7 +238,7 @@
     "platforms": null
   },
   {
-    "key": "freeSpace",
+    "key": "deviceFreeSpace",
     "type": "Integer",
     "description": "Free space in kilobytes",
     "provider": "SDK",
