@@ -1,4 +1,6 @@
-/* tslint:disable:no-bitwise no-unused-expression */
+import 'es6-promise';
+
+/* tslint:disable:no-unused-expression */
 
 if(!Array.prototype.forEach) {
     Array.prototype.forEach = function<T>(this: Array<T>, callback: Function, thisArg: any) {

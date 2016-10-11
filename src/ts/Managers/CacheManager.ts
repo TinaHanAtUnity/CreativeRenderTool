@@ -65,7 +65,7 @@ export class CacheManager {
             if(isCaching) {
                 return Promise.reject(CacheStatus.FAILED);
             }
-            return Promise.all([
+            return Promise.all<boolean, string>([
                 this.shouldCache(url),
                 this.getFileId(url)
             ]).then(([shouldCache, fileId]) => {

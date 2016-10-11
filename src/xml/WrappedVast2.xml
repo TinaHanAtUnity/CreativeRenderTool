@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<VAST version="2.0">
+    <Ad id="2810492_2183676">
+        <InLine>
+            <AdSystem>PointRoll</AdSystem>
+            <AdTitle>Nissan_VAST_FY15_SalesEvent_Altima_MSRP_15_DERIVE</AdTitle>
+            <Impression id="pointroll"><![CDATA[https://ads.pointroll.com/PortalServe/?secure=1&pid=2810492V01420160323193924&pos=o&oimp=C0350500-4E6E-9A6D-0314-A20018D20101&fcook=~&actid=-1206&cid=2183676&playmode=$PLAYMODE$&r=1466475479]]></Impression>
+            <Impression id="Redirect"><![CDATA[https://ad.doubleclick.net/ddm/ad/N3340.1922318VIANTINC.COM/B9495003.129068239;sz=1x1;ord=1466475479;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=?]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:15</Duration>
+                        <TrackingEvents>
+                            <Tracking event="firstQuartile"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-201&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-202&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-203&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="complete"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-204&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="resume"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1001&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="pause"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1002&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="rewind"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1003&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="mute"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1004&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="unmute"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1005&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                            <Tracking event="fullscreen"><![CDATA[https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1010&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[https://www.tremor.com/click-last-wrapped]]></ClickTracking>
+                            <ClickThrough id="pointroll"><![CDATA[http://clk.pointroll.com/bc/?a=2183676&c=9001&i=C0350500-4E6E-9A6D-0314-A20018D20101&clickurl=https://ad.doubleclick.net/ddm/clk/302764234%3B129068239%3Bg%3Fhttp://www.choosenissan.com/altima/%3Fdcp=zmm.%25epid!.%26dcc=%25ecid!.%25eaid!%26utm_source=%25esid!%26utm_medium=%25epid!%26utm_content=%25ecid!.%25eaid!%26dcn=1]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile width="1280" height="720" bitrate="400" type="video/mp4" delivery="progressive" id=""><![CDATA[https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>

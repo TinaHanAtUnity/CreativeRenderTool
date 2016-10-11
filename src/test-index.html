@@ -1,85 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Unity Ads WebView</title>
+    <title>Unity Ads WebView</title>
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="format-detection" content="telephone=no" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
 
-  <script>
-    var queryString = location.search.split('?')[1].split('&');
-    var queryParams = {};
+    <script>
+        var origin = 'http://localhost:8000/';
+        if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
+            var queryString = location.search.split('?')[1].split('&');
+            var queryParams = {};
+            for(i = 0; i < queryString.length; i++) {
+                var param = queryString[i].split('=');
+                queryParams[param[0]] = param[1];
+            }
+            if('origin' in queryParams) {
+                var decodedOrigin = decodeURIComponent(queryParams['origin']);
+                origin = decodedOrigin.substring(0, decodedOrigin.lastIndexOf('/') + 1);
+            }
+        }
 
-    for(i = 0; i < queryString.length; i++) {
-      var param = queryString[i].split('=');
-      queryParams[param[0]] = param[1];
-    }
+        var style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = origin + 'css/main.css';
 
-    var origin;
-    if(queryParams['origin']) {
-      var decodedOrigin = decodeURIComponent(queryParams['origin']);
-      origin = decodedOrigin.substring(0, decodedOrigin.lastIndexOf('/') + 1);
-    } else {
-      origin = 'http://localhost:8000/';
-    }
+        var system = document.createElement('script');
+        system.src = origin + 'vendor/system.js';
 
-    var require = {
-      baseUrl: origin + 'src/ts/',
-      deps: ['es6-promise', 'mocha'],
-      paths: {
-        'src/ts': '../../src/ts',
-        test: '../../test',
-        'es6-promise': '../../vendor/es6-promise',
-        mocha: '../../vendor/mocha',
-        chai: '../../vendor/chai',
-        sinon: '../../vendor/sinon',
-        text: '../../vendor/text',
-        reporter: '../../vendor/reporter',
-        html: '../../html',
-        xmldom: '../../vendor/dom-parser'
-      },
-      shim: {
-        mocha: {
-          deps: ['reporter'],
-          init: function(reporter) {
-            this.mocha.setup({
-              ui: 'bdd',
-              checkLeaks: true,
-              fullTrace: true,
-              globals: ['nativebridge', 'webviewbridge'],
-              reporter: reporter
+        system.addEventListener('load', function() {
+            var config = {
+                baseURL: origin + 'js',
+                map: {
+                    text: origin + 'vendor/systemjs-plugin-text/text.js',
+                    mocha: origin + 'vendor/mocha.js',
+                    chai: origin + 'vendor/chai.js',
+                    sinon: origin + 'vendor/sinon.js',
+                    text: origin + 'vendor/text.js',
+                    reporter: origin + 'vendor/reporter.js'
+                },
+                meta: {
+                    'mocha': {
+                        format: 'global'
+                    },
+                    '*.html': {
+                        loader: 'text'
+                    },
+                    '*.xml': {
+                        loader: 'text'
+                    },
+                    '*.json': {
+                        loader: 'text'
+                    }
+                },
+                packages: {},
+                paths: {
+                    '*.html': origin + '*.html',
+                    '*.xml': origin + '*.xml',
+                    '*.json': origin + '*.json'
+                }
+            };
+            config.packages[origin] = {
+                defaultExtension: 'js'
+            };
+            System.config(config);
+            Promise.all([
+                System.import('mocha'),
+                System.import('reporter')
+            ]).then(function(results) {
+                window.runner = new Mocha({
+                    ui: 'bdd',
+                    checkLeaks: true,
+                    fullTrace: true,
+                    globals: ['nativebridge', 'webviewbridge'],
+                    reporter: results[1]
+                });
+                window.runner.suite.emit('pre-require', window, 'global-mocha-context', window.runner);
+                System.import(origin + 'runner');
             });
-            this.mocha.suite.emit('pre-require', window, null, this.mocha);
-            return this.mocha;
-          }
-        }
-      },
-      config: {
-        text: {
-          useXhr: function () {
-            return true;
-          }
-        }
-      }
-    };
+        }, false);
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var requirejs = document.createElement('script');
-      requirejs.src = origin + 'vendor/require.js';
-      requirejs.setAttribute('data-main', origin + 'runner.js');
-
-      var style = document.createElement('link');
-      style.rel = 'stylesheet';
-      style.href = origin + 'css/main.css';
-
-      var head = document.getElementsByTagName('head')[0];
-      head.appendChild(style);
-      head.appendChild(requirejs);
-    }, false);
-  </script>
+        document.head.appendChild(style);
+        document.head.appendChild(system);
+    </script>
 </head>
 <body></body>
 </html>
