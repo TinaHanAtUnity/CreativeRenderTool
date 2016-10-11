@@ -35,7 +35,7 @@ describe('Parameter specification test', () => {
     let nativeBridge: NativeBridge;
     let request: Request;
 
-    it('Ad request', () => {
+    it('Ad request (Android)', () => {
         let spec: IEventSpec = ParamsTestData.getAdRequestParams();
 
         nativeBridge = TestFixtures.getNativeBridge();
@@ -52,7 +52,6 @@ describe('Parameter specification test', () => {
             for(let i: number = 0; i < queryParams.length; i++) {
                 let paramName: string = queryParams[i].split('=')[0];
 
-                console.log('Checking query parameter ' + paramName);
                 assert.isDefined(spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
             }
@@ -63,13 +62,40 @@ describe('Parameter specification test', () => {
             let key: string;
             for(key in bodyParams) {
                 if(bodyParams.hasOwnProperty(key)) {
-                    console.log('Checking body parameter ' + key);
                     assert.isDefined(spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(spec[key].body, 'Parameter should not be in request body: ' + key);
                 }
             }
 
-            // todo: check that all required parameters are included
+            let param: string;
+            for(param in spec) {
+                if(spec.hasOwnProperty(param)) {
+                    if(spec[param].required === 'all' || spec[param].required === 'android') {
+                        if(spec[param].queryString) {
+                            let found: boolean = false;
+
+                            for(let i: number = 0; i < queryParams.length; i++) {
+                                let paramName: string = queryParams[i].split('=')[0];
+                                if(paramName === param) {
+                                    found = true;
+                                }
+                            }
+
+                            assert.isTrue(found, 'Required parameter not found in query string: ' + param);
+                        }
+
+                        if(spec[param].body) {
+                            let found: boolean = false;
+
+                            if(bodyParams.hasOwnProperty(param)) {
+                                found = true;
+                            }
+
+                            assert.isTrue(found, 'Required parameter not found in body: ' + param);
+                        }
+                    }
+                }
+            }
        });
     });
 });
