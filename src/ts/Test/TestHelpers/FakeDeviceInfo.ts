@@ -4,104 +4,10 @@ import { Platform } from 'Constants/Platform';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
-
-interface IDeviceData {
-    androidId?: string;
-    advertisingId: string;
-    trackingEnabled: boolean;
-    apiLevel?: number;
-    osVersion: string;
-    deviceMake?: string;
-    deviceModel: string;
-    connectionType: string;
-    networkType: number;
-    screenLayout?: number;
-    screenDensity?: number;
-    screenWidth: number;
-    screenHeight: number;
-    screenScale?: number;
-    userInterfaceIdiom?: UIUserInterfaceIdiom;
-    networkOperator: string;
-    networkOperatorName: string;
-    timeZone: string;
-    headset: boolean;
-    ringerMode?: RingerMode;
-    language: string;
-    deviceVolume: number;
-    screenBrightness: number;
-    freeSpaceInternal: number;
-    totalSpaceInternal: number;
-    freeSpaceExternal?: number;
-    totalSpaceExternal?: number;
-    batteryLevel: number;
-    batteryStatus: BatteryStatus;
-    freeMemory: number;
-    totalMemory: number;
-    rooted: boolean;
-    simulator?: boolean;
-}
+import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
+import IosDefaults from 'json/FakeIosDeviceInfo.json';
 
 export class FakeDeviceInfo extends DeviceInfo {
-    private static AndroidDefaults: IDeviceData = {
-        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
-        trackingEnabled: false,
-        osVersion: '1.0',
-        deviceModel: 'TestModel',
-        screenWidth: 567,
-        screenHeight: 1234,
-        language: 'en_US',
-        rooted: false,
-        timeZone: '+0200',
-        totalMemory: 12345678,
-        androidId: '1234567890abcdef',
-        apiLevel: 20,
-        totalSpaceExternal: 123456789,
-        totalSpaceInternal: 12345678,
-        deviceMake: 'Test manufacturer',
-        screenDensity: 320,
-        screenLayout: 268435796,
-        connectionType: 'cellular',
-        networkType: 1,
-        networkOperator: '00101',
-        networkOperatorName: 'Test operator',
-        headset: false,
-        deviceVolume: 1,
-        screenBrightness: 100,
-        freeSpaceInternal: 1234567,
-        batteryLevel: 0.5,
-        batteryStatus: 1,
-        freeMemory: 1234567,
-        freeSpaceExternal: 12345678,
-        ringerMode: 2
-    };
-    private static IosDefaults: IDeviceData = {
-        advertisingId: '12345678-9ABC-DEF0-1234-56789ABCDEF0',
-        trackingEnabled: false,
-        osVersion: '1.0',
-        deviceModel: 'TestModel',
-        screenWidth: 567,
-        screenHeight: 1234,
-        language: 'en_US',
-        rooted: false,
-        timeZone: '+0200',
-        totalMemory: 12345678,
-        userInterfaceIdiom: 1,
-        screenScale: 2,
-        simulator: false,
-        totalSpaceInternal: 123456789,
-        connectionType: 'cellular',
-        networkType: 1,
-        networkOperator: '00101',
-        networkOperatorName: 'Test operator',
-        headset: false,
-        deviceVolume: 1,
-        screenBrightness: 100,
-        freeSpaceInternal: 1234567,
-        batteryLevel: 0.5,
-        batteryStatus: 1,
-        freeMemory: 1234567,
-    };
-
     private _platform: Platform;
     private _fakeDevice: any;
 
@@ -109,9 +15,9 @@ export class FakeDeviceInfo extends DeviceInfo {
         super(nativeBridge);
         this._platform = platform;
         if(platform === Platform.IOS) {
-            this._fakeDevice = FakeDeviceInfo.IosDefaults;
+            this._fakeDevice = JSON.parse(IosDefaults);
         } else {
-            this._fakeDevice = FakeDeviceInfo.AndroidDefaults;
+            this._fakeDevice = JSON.parse(AndroidDefaults);
         }
     }
 
