@@ -45,7 +45,7 @@ export class Overlay extends View {
         super(nativeBridge, 'overlay');
 
         this._localization = new Localization(language, 'overlay');
-        this._template = new Template(OverlayTemplate);
+        this._template = new Template(OverlayTemplate, this._localization);
 
         this._muted = muted;
 
