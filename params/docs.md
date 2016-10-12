@@ -11,62 +11,38 @@
 ### All Parameters
 | key | type | description | provider | platforms |
 |---|---|---|---|---|
-| abGroup | Integer | Integer from 0 to 19 | Server | None |
 | adapterName | String | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | App | all |
 | adapterVersion | String | SDK version name for adapter, should be in sync with SDK version | App | all |
 | advertisingId | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
 | advertisingTrackingId | String | Advertising identifier in raw format | SDK | all |
 | androidId | String | Android ID | SDK | android |
 | apiLevel | Integer | Android device API level | SDK | android |
-| applicationMuted | Boolean | If game has been muted | App | None |
-| applicationOrientation | String | Configured/Allowed orientations for the app | SDK | None |
-| batteryLevel | Integer | Precentage of battery charging status | SDK | None |
-| batteryStatus | String | Charging / Full / Draining etc. | SDK | None |
 | bundleId | String | Bundle identifier for the app | SDK | all |
 | bundleVersion | String | Game version | SDK | all |
 | cached | Boolean | If video is cached or streamed | SDK | None |
-| cachingDuration | Integer | Milliseconds taken to cache | SDK | None |
-| cachingSize | Integer | Size of the asset cached | SDK | None |
 | campaignId | String | Internal campaign identifier | Server | None |
 | connectionType | String | "wifi", "cellular" or "none" | SDK | all |
-| country | String | 2 character country code | Server | None |
-| currentOrientation | String | Current orientation at the time of the event | SDK | None |
-| deviceFreeMemory | Integer | Free memory in kilobytes | SDK | None |
-| deviceHeadset | Boolean | Boolean if user has headset plugged in | SDK | None |
 | deviceMake | String | Android device manufacturer | SDK | android |
 | deviceModel | String | Android or iOS device model, example 'iPhone7,1' | SDK | all |
-| deviceRingerMode | String | Silent / Vibrate / Sound () | SDK | None |
-| deviceRingerMode | String | Silent / Vibrate / Sound | SDK | None |
-| deviceTotalMemory | Integer | Total memory in kilobytes | SDK | None |
-| deviceTotalSpace | Integer | Total space in kilobytes | SDK | None |
-| deviceVolume | Integer | Device volume | SDK | None |
 | encrypted | Boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | eventId | String | Unique event identifier | SDK | None |
-| eventType | String | Event type | SDK | None |
-| frameworkName | String | The framework/game toolkit used to build the game, for example: Unity | App | None |
-| frameworkVersion | String | For instance: 5.3.1p3 | App | None |
-| freeSpace | Integer | Free space in kilobytes | SDK | all |
+| deviceFreeSpace | Integer | Free space in kilobytes | SDK | all |
 | gameId | String | Source game identifier | App | None |
 | gamerId | String | Internal gamer identifier | Server | all |
-| integrationType | string | "AssetStore","Engine","native","mediation" | SDK | None |
 | language | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | Boolean | Boolean if user has limited tracking or not | SDK | all |
 | mediation | JSONobject | mediation data in JSON object (Will get refactored) | App | all |
 | mediationOrdinal | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | mediationName | String | Mediation provider name | Mediation | all |
 | mediationVersion | String | Mediation SDK version | Mediation | all |
-| muted | Boolean | Is the video muted from the UI | SDK | None |
 | networkOperator | Integer | MCC + MNC codes | SDK | all |
 | networkOperatorName | Integer | Cell network operator name | SDK | all |
 | networkType | String | Detailed cellular network type | SDK | all |
 | osVersion | String | Device operating system version | SDK | all |
 | placementId | String | Internal placement identifier | Admin | None |
-| placementType | String | "rewarded" or "interstitial" | Admin | None |
 | platform | String | "android" or "ios" | SDK | all |
 | redirect | Boolean | TODO: What does this do? | SDK | all |
-| retryCount | Integer | How many times this event_id has been retried | SDK | None |
 | rooted | Boolean | Is the device rooted or jailbroken | SDK | all |
-| screenBrightness | Integer | Brightness value | SDK | None |
 | screenDensity | Integer | Screen density in DPI | SDK | android |
 | screenHeight | Integer | Screen height in pixels | SDK | all |
 | screenSize | Integer | Android raw screen layout value | SDK | android |
@@ -74,16 +50,10 @@
 | sdkVersion | String | SDK version in four digits | SDK | all |
 | sessionId | String | Unique session identifier | SDK | None |
 | sid | String | Server side reward callback id | App | None |
-| skippableAt | Integer | Milliseconds when user can skip | Admin | None |
-| skippedAt | Integer | Milliseconds from video start when it was skipped | SDK | None |
 | test | Boolean | Test mode | App | all |
-| timestamp | Integer | Local time of triggering the event | SDK | None |
 | timeZone | String | Current timezone | SDK | all |
 | trackingEnabled | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
-| userAgent | String | WebView user agent | SDK | None |
-| videoLength | Integer | Video length in milliseconds | Admin | None |
 | webviewUa | String | WebView user agent string | SDK | all |
-| webviewVersion | String | WebView version | SDK | None |
 
 
 
@@ -123,7 +93,7 @@
 | language | all | False | True | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | timeZone | all | False | True | String | Current timezone | SDK | all |
 | webviewUa | no | False | True | String | WebView user agent string | SDK | all |
-| freeSpace | all | False | True | Integer | Free space in kilobytes | SDK | all |
+| deviceFreeSpace | all | False | True | Integer | Free space in kilobytes | SDK | all |
 | networkOperator | no | False | True | Integer | MCC + MNC codes | SDK | all |
 | networkOperatorName | no | False | True | Integer | Cell network operator name | SDK | all |
 | mediation | no | False | True | JSONobject | mediation data in JSON object (Will get refactored) | App | all |

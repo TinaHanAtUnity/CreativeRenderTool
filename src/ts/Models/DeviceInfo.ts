@@ -42,7 +42,6 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
     private _simulator: boolean;
-    private _appleWatchPaired: boolean;
 
     private _nativeBridge: NativeBridge;
 
@@ -343,7 +342,6 @@ export class DeviceInfo extends Model {
                 'totalMemory': this._totalMemory,
                 'rooted': this._rooted,
                 'simulator': this._simulator,
-                'appleWatchPaired': this._appleWatchPaired
             };
         });
 

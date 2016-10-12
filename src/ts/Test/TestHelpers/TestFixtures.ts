@@ -4,6 +4,10 @@ import { INativeResponse } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
+import { FakeDeviceInfo } from './FakeDeviceInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Campaign } from 'Models/Campaign';
+import DummyCampaign from 'json/DummyCampaign.json';
 
 export class TestFixtures {
 
@@ -20,8 +24,16 @@ export class TestFixtures {
         });
     }
 
-    public static getClientInfo(): ClientInfo {
-        return new ClientInfo(Platform.ANDROID, [
+    public static getCampaign(): Campaign {
+        return new Campaign(JSON.parse(DummyCampaign), 'abc123', 123);
+    }
+
+    public static getClientInfo(platform?: Platform): ClientInfo {
+        if(typeof platform === 'undefined') {
+            platform = Platform.ANDROID;
+        }
+
+        return new ClientInfo(platform, [
             '12345',
             false,
             'com.unity3d.ads.example',
@@ -32,6 +44,14 @@ export class TestFixtures {
             'http://example.com/index.html',
             null
         ]);
+    }
+
+    public static getDeviceInfo(platform?: Platform): DeviceInfo {
+        if(typeof platform === 'undefined') {
+            platform = Platform.ANDROID;
+        }
+
+        return new FakeDeviceInfo(TestFixtures.getNativeBridge(), platform);
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -50,7 +70,10 @@ export class TestFixtures {
         return vastParser;
     }
 
-    public static getNativeBridge(): NativeBridge {
+    public static getNativeBridge(platform?: Platform): NativeBridge {
+        if(typeof platform === 'undefined') {
+            platform = Platform.TEST;
+        }
         let backend = {
             handleInvocation: function() {
                 // no-op
@@ -59,6 +82,6 @@ export class TestFixtures {
                 // no-op
             }
         };
-        return new NativeBridge(backend);
+        return new NativeBridge(backend, platform);
     }
 }
