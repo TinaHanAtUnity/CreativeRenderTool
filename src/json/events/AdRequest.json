@@ -134,7 +134,7 @@
       "body": true
     },
     {
-      "parameter": "freeSpace",
+      "parameter": "deviceFreeSpace",
       "required": "all",
       "queryString": false,
       "body": true

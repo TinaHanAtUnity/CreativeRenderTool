@@ -9,62 +9,38 @@
                <body><br><br><h3> TOC <h3>
 <a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3> 
  <table> <tr><th>key</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
-<tr><td>abGroup</td><td>Integer</td><td>Integer from 0 to 19</td><td>Server</td><td>None</td></tr>
 <tr><td>adapterName</td><td>String</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>App</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>String</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>App</td><td>all</td></tr>
 <tr><td>advertisingId</td><td>String</td><td>Advertising identifier in raw format TODO: remove duplicate</td><td>SDK</td><td>all</td></tr>
 <tr><td>advertisingTrackingId</td><td>String</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>androidId</td><td>String</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
 <tr><td>apiLevel</td><td>Integer</td><td>Android device API level</td><td>SDK</td><td>android</td></tr>
-<tr><td>applicationMuted</td><td>Boolean</td><td>If game has been muted</td><td>App</td><td>None</td></tr>
-<tr><td>applicationOrientation</td><td>String</td><td>Configured/Allowed orientations for the app</td><td>SDK</td><td>None</td></tr>
-<tr><td>batteryLevel</td><td>Integer</td><td>Precentage of battery charging status</td><td>SDK</td><td>None</td></tr>
-<tr><td>batteryStatus</td><td>String</td><td>Charging / Full / Draining etc.</td><td>SDK</td><td>None</td></tr>
 <tr><td>bundleId</td><td>String</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleVersion</td><td>String</td><td>Game version</td><td>SDK</td><td>all</td></tr>
 <tr><td>cached</td><td>Boolean</td><td>If video is cached or streamed</td><td>SDK</td><td>None</td></tr>
-<tr><td>cachingDuration</td><td>Integer</td><td>Milliseconds taken to cache</td><td>SDK</td><td>None</td></tr>
-<tr><td>cachingSize</td><td>Integer</td><td>Size of the asset cached</td><td>SDK</td><td>None</td></tr>
 <tr><td>campaignId</td><td>String</td><td>Internal campaign identifier</td><td>Server</td><td>None</td></tr>
 <tr><td>connectionType</td><td>String</td><td>"wifi", "cellular" or "none"</td><td>SDK</td><td>all</td></tr>
-<tr><td>country</td><td>String</td><td>2 character country code</td><td>Server</td><td>None</td></tr>
-<tr><td>currentOrientation</td><td>String</td><td>Current orientation at the time of the event</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceFreeMemory</td><td>Integer</td><td>Free memory in kilobytes</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceHeadset</td><td>Boolean</td><td>Boolean if user has headset plugged in</td><td>SDK</td><td>None</td></tr>
 <tr><td>deviceMake</td><td>String</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
 <tr><td>deviceModel</td><td>String</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
-<tr><td>deviceRingerMode</td><td>String</td><td>Silent / Vibrate / Sound ()</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceRingerMode</td><td>String</td><td>Silent / Vibrate / Sound</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceTotalMemory</td><td>Integer</td><td>Total memory in kilobytes</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceTotalSpace</td><td>Integer</td><td>Total space in kilobytes</td><td>SDK</td><td>None</td></tr>
-<tr><td>deviceVolume</td><td>Integer</td><td>Device volume</td><td>SDK</td><td>None</td></tr>
 <tr><td>encrypted</td><td>Boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
 <tr><td>eventId</td><td>String</td><td>Unique event identifier</td><td>SDK</td><td>None</td></tr>
-<tr><td>eventType</td><td>String</td><td>Event type</td><td>SDK</td><td>None</td></tr>
-<tr><td>frameworkName</td><td>String</td><td>The framework/game toolkit used to build the game, for example: Unity</td><td>App</td><td>None</td></tr>
-<tr><td>frameworkVersion</td><td>String</td><td>For instance: 5.3.1p3</td><td>App</td><td>None</td></tr>
-<tr><td>freeSpace</td><td>Integer</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
+<tr><td>deviceFreeSpace</td><td>Integer</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameId</td><td>String</td><td>Source game identifier</td><td>App</td><td>None</td></tr>
 <tr><td>gamerId</td><td>String</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
-<tr><td>integrationType</td><td>string</td><td>"AssetStore","Engine","native","mediation"</td><td>SDK</td><td>None</td></tr>
 <tr><td>language</td><td>String</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>Boolean</td><td>Boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
 <tr><td>mediation</td><td>JSONobject</td><td>mediation data in JSON object (Will get refactored)</td><td>App</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationName</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
-<tr><td>muted</td><td>Boolean</td><td>Is the video muted from the UI</td><td>SDK</td><td>None</td></tr>
 <tr><td>networkOperator</td><td>Integer</td><td>MCC + MNC codes</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkOperatorName</td><td>Integer</td><td>Cell network operator name</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkType</td><td>String</td><td>Detailed cellular network type</td><td>SDK</td><td>all</td></tr>
 <tr><td>osVersion</td><td>String</td><td>Device operating system version</td><td>SDK</td><td>all</td></tr>
 <tr><td>placementId</td><td>String</td><td>Internal placement identifier</td><td>Admin</td><td>None</td></tr>
-<tr><td>placementType</td><td>String</td><td>"rewarded" or "interstitial"</td><td>Admin</td><td>None</td></tr>
 <tr><td>platform</td><td>String</td><td>"android" or "ios"</td><td>SDK</td><td>all</td></tr>
 <tr><td>redirect</td><td>Boolean</td><td>TODO: What does this do?</td><td>SDK</td><td>all</td></tr>
-<tr><td>retryCount</td><td>Integer</td><td>How many times this event_id has been retried</td><td>SDK</td><td>None</td></tr>
 <tr><td>rooted</td><td>Boolean</td><td>Is the device rooted or jailbroken</td><td>SDK</td><td>all</td></tr>
-<tr><td>screenBrightness</td><td>Integer</td><td>Brightness value</td><td>SDK</td><td>None</td></tr>
 <tr><td>screenDensity</td><td>Integer</td><td>Screen density in DPI</td><td>SDK</td><td>android</td></tr>
 <tr><td>screenHeight</td><td>Integer</td><td>Screen height in pixels</td><td>SDK</td><td>all</td></tr>
 <tr><td>screenSize</td><td>Integer</td><td>Android raw screen layout value</td><td>SDK</td><td>android</td></tr>
@@ -72,16 +48,10 @@
 <tr><td>sdkVersion</td><td>String</td><td>SDK version in four digits</td><td>SDK</td><td>all</td></tr>
 <tr><td>sessionId</td><td>String</td><td>Unique session identifier</td><td>SDK</td><td>None</td></tr>
 <tr><td>sid</td><td>String</td><td>Server side reward callback id</td><td>App</td><td>None</td></tr>
-<tr><td>skippableAt</td><td>Integer</td><td>Milliseconds when user can skip</td><td>Admin</td><td>None</td></tr>
-<tr><td>skippedAt</td><td>Integer</td><td>Milliseconds from video start when it was skipped</td><td>SDK</td><td>None</td></tr>
 <tr><td>test</td><td>Boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
-<tr><td>timestamp</td><td>Integer</td><td>Local time of triggering the event</td><td>SDK</td><td>None</td></tr>
 <tr><td>timeZone</td><td>String</td><td>Current timezone</td><td>SDK</td><td>all</td></tr>
 <tr><td>trackingEnabled</td><td>Boolean</td><td>Boolean if user has limited tracking or not TODO: remove duplicate</td><td>SDK</td><td>None</td></tr>
-<tr><td>userAgent</td><td>String</td><td>WebView user agent</td><td>SDK</td><td>None</td></tr>
-<tr><td>videoLength</td><td>Integer</td><td>Video length in milliseconds</td><td>Admin</td><td>None</td></tr>
 <tr><td>webviewUa</td><td>String</td><td>WebView user agent string</td><td>SDK</td><td>all</td></tr>
-<tr><td>webviewVersion</td><td>String</td><td>WebView version</td><td>SDK</td><td>None</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>String</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -113,7 +83,7 @@
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>timeZone</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Current timezone</td><td>SDK</td><td>all</td></tr>
 <tr><td>webviewUa</td><td>no</td><td>False</td><td>True</td><td>String</td><td>WebView user agent string</td><td>SDK</td><td>all</td></tr>
-<tr><td>freeSpace</td><td>all</td><td>False</td><td>True</td><td>Integer</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
+<tr><td>deviceFreeSpace</td><td>all</td><td>False</td><td>True</td><td>Integer</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkOperator</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>MCC + MNC codes</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkOperatorName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Cell network operator name</td><td>SDK</td><td>all</td></tr>
 <tr><td>mediation</td><td>no</td><td>False</td><td>True</td><td>JSONobject</td><td>mediation data in JSON object (Will get refactored)</td><td>App</td><td>all</td></tr>

@@ -1,12 +1,5 @@
 [
   {
-    "key": "abGroup",
-    "type": "Integer",
-    "description": "Integer from 0 to 19",
-    "provider": "Server",
-    "platforms": null
-  },
-  {
     "key": "adapterName",
     "type": "String",
     "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
@@ -49,34 +42,6 @@
     "platforms": "android"
   },
   {
-    "key": "applicationMuted",
-    "type": "Boolean",
-    "description": "If game has been muted",
-    "provider": "App",
-    "platforms": null
-  },
-  {
-    "key": "applicationOrientation",
-    "type": "String",
-    "description": "Configured/Allowed orientations for the app",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "batteryLevel",
-    "type": "Integer",
-    "description": "Precentage of battery charging status",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "batteryStatus",
-    "type": "String",
-    "description": "Charging / Full / Draining etc.",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "bundleId",
     "type": "String",
     "description": "Bundle identifier for the app",
@@ -98,20 +63,6 @@
     "platforms": null
   },
   {
-    "key": "cachingDuration",
-    "type": "Integer",
-    "description": "Milliseconds taken to cache",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "cachingSize",
-    "type": "Integer",
-    "description": "Size of the asset cached",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "campaignId",
     "type": "String",
     "description": "Internal campaign identifier",
@@ -124,34 +75,6 @@
     "description": "\"wifi\", \"cellular\" or \"none\"",
     "provider": "SDK",
     "platforms": "all"
-  },
-  {
-    "key": "country",
-    "type": "String",
-    "description": "2 character country code",
-    "provider": "Server",
-    "platforms": null
-  },
-  {
-    "key": "currentOrientation",
-    "type": "String",
-    "description": "Current orientation at the time of the event",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceFreeMemory",
-    "type": "Integer",
-    "description": "Free memory in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceHeadset",
-    "type": "Boolean",
-    "description": "Boolean if user has headset plugged in",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "deviceMake",
@@ -168,41 +91,6 @@
     "platforms": "all"
   },
   {
-    "key": "deviceRingerMode",
-    "type": "String",
-    "description": "Silent / Vibrate / Sound ()",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceRingerMode",
-    "type": "String",
-    "description": "Silent / Vibrate / Sound",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceTotalMemory",
-    "type": "Integer",
-    "description": "Total memory in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceTotalSpace",
-    "type": "Integer",
-    "description": "Total space in kilobytes",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "deviceVolume",
-    "type": "Integer",
-    "description": "Device volume",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "encrypted",
     "type": "Boolean",
     "description": "If true, app is encrypted for app store distribution and game is live",
@@ -217,28 +105,7 @@
     "platforms": null
   },
   {
-    "key": "eventType",
-    "type": "String",
-    "description": "Event type",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "frameworkName",
-    "type": "String",
-    "description": "The framework/game toolkit used to build the game, for example: Unity",
-    "provider": "App",
-    "platforms": null
-  },
-  {
-    "key": "frameworkVersion",
-    "type": "String",
-    "description": "For instance: 5.3.1p3",
-    "provider": "App",
-    "platforms": null
-  },
-  {
-    "key": "freeSpace",
+    "key": "deviceFreeSpace",
     "type": "Integer",
     "description": "Free space in kilobytes",
     "provider": "SDK",
@@ -257,13 +124,6 @@
     "description": "Internal gamer identifier",
     "provider": "Server",
     "platforms": "all"
-  },
-  {
-    "key": "integrationType",
-    "type": "string",
-    "description": "\"AssetStore\",\"Engine\",\"native\",\"mediation\"",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "language",
@@ -308,13 +168,6 @@
     "platforms": "all"
   },
   {
-    "key": "muted",
-    "type": "Boolean",
-    "description": "Is the video muted from the UI",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "networkOperator",
     "type": "Integer",
     "description": "MCC + MNC codes",
@@ -350,13 +203,6 @@
     "platforms": null
   },
   {
-    "key": "placementType",
-    "type": "String",
-    "description": "\"rewarded\" or \"interstitial\"",
-    "provider": "Admin",
-    "platforms": null
-  },
-  {
     "key": "platform",
     "type": "String",
     "description": "\"android\" or \"ios\"",
@@ -371,25 +217,11 @@
     "platforms": "all"
   },
   {
-    "key": "retryCount",
-    "type": "Integer",
-    "description": "How many times this event_id has been retried",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "rooted",
     "type": "Boolean",
     "description": "Is the device rooted or jailbroken",
     "provider": "SDK",
     "platforms": "all"
-  },
-  {
-    "key": "screenBrightness",
-    "type": "Integer",
-    "description": "Brightness value",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "screenDensity",
@@ -441,32 +273,11 @@
     "platforms": null
   },
   {
-    "key": "skippableAt",
-    "type": "Integer",
-    "description": "Milliseconds when user can skip",
-    "provider": "Admin",
-    "platforms": null
-  },
-  {
-    "key": "skippedAt",
-    "type": "Integer",
-    "description": "Milliseconds from video start when it was skipped",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
     "key": "test",
     "type": "Boolean",
     "description": "Test mode",
     "provider": "App",
     "platforms": "all"
-  },
-  {
-    "key": "timestamp",
-    "type": "Integer",
-    "description": "Local time of triggering the event",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "timeZone",
@@ -483,31 +294,10 @@
     "platforms": null
   },
   {
-    "key": "userAgent",
-    "type": "String",
-    "description": "WebView user agent",
-    "provider": "SDK",
-    "platforms": null
-  },
-  {
-    "key": "videoLength",
-    "type": "Integer",
-    "description": "Video length in milliseconds",
-    "provider": "Admin",
-    "platforms": null
-  },
-  {
     "key": "webviewUa",
     "type": "String",
     "description": "WebView user agent string",
     "provider": "SDK",
     "platforms": "all"
-  },
-  {
-    "key": "webviewVersion",
-    "type": "String",
-    "description": "WebView version",
-    "provider": "SDK",
-    "platforms": null
   }
 ]

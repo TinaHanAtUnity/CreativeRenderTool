@@ -215,10 +215,10 @@ export class SessionManager {
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
+    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.skipSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.skipSent = true;
         }
@@ -230,7 +230,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {

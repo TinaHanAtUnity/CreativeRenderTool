@@ -1,11 +1,11 @@
 import json
 from argparse import ArgumentParser
 
-PARAMS_JSON = "params.json"
-CONFIGURATION_JSON = "configuration.json"
-ADPLAN_JSON = "adPlan_requests.json"
-VIDEO_EVENTS_JSON = "video_start-video_end_requests.json"
-CLICK_EVENT_JSON = "click_event.json"
+PARAMS_JSON = "../src/json/events/Parameters.json"
+CONFIGURATION_JSON = "../src/json/events/ConfigRequest.json"
+ADPLAN_JSON = "../src/json/events/AdRequest.json"
+VIDEO_EVENTS_JSON = "../src/json/events/VideoEvents.json"
+CLICK_EVENT_JSON = "../src/json/events/ClickEvent.json"
 HTML_OUTFILE = "docs.html"
 MARKDOWN_OUTFILE = "docs.md"
 PARAM_ORDER = ["key", "type", "description", "provider", "platforms"]
