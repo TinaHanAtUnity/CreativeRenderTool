@@ -10,7 +10,7 @@ export class Localization {
             'endscreen': JSON.parse(EnglishEndscreen),
             'overlay': JSON.parse(EnglishOverlay)
         },
-        'fi': {
+        'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),
             'overlay': JSON.parse(FinnishOverlay)
         }
