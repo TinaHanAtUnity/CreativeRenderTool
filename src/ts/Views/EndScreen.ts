@@ -18,12 +18,12 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
 
-        this._template = new Template(EndScreenTemplate, new Localization('en', 'endscreen'));
+        this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
 
         if (campaign) {
             let adjustedRating: number = campaign.getRating() * 20;

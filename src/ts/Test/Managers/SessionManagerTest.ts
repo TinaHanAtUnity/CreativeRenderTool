@@ -195,7 +195,7 @@ describe('SessionManager', () => {
             handleCallback
         });
 
-        overlay = new Overlay(nativeBridge, false);
+        overlay = new Overlay(nativeBridge, false, 'en');
 
         let vastParser = TestFixtures.getVastParser();
 

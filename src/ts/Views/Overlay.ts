@@ -41,10 +41,10 @@ export class Overlay extends View {
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
 
-        this._localization = new Localization('en', 'overlay');
+        this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate);
 
         this._muted = muted;
