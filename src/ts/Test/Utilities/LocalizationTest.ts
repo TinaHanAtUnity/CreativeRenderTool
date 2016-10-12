@@ -29,4 +29,10 @@ describe('LocalizationTest', () => {
         assert.equal(localization.translate(phrase), 'Lataa ilmaiseksi', 'Localization did not translate');
     });
 
+    it('should translate partial match', () => {
+        let localization = new Localization('en_GB', 'endscreen');
+        let phrase = 'Download For Free';
+        assert.equal(localization.translate(phrase), phrase, 'Localization did not translate partial match');
+    });
+
 });

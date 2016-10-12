@@ -56,7 +56,11 @@ export class Template {
     }
 
     public render(data: any): string {
-        data.t = this._localization ? this._localization.translate : (phrase: string) => phrase;
+        if(this._localization) {
+            data.t = (phrase: string) => this._localization!.translate(phrase);
+        } else {
+            data.t = (phrase: string) => phrase;
+        }
         return this._templateFunction(data);
     }
 

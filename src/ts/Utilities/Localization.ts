@@ -6,7 +6,7 @@ import FinnishOverlay from 'json/locale/fi/overlay.json';
 export class Localization {
 
     private static _languageMap = {
-        'en': {
+        'en.*': {
             'endscreen': JSON.parse(EnglishEndscreen),
             'overlay': JSON.parse(EnglishOverlay)
         },
@@ -25,15 +25,26 @@ export class Localization {
     }
 
     public translate(phrase: string): string {
-        const languageMap = Localization._languageMap[this._language];
-        if(!languageMap) {
+        const languageMap = this.getLanguageMap(this._language, this._namespace);
+        if(!languageMap || !(phrase in languageMap)) {
             return phrase;
         }
-        const namespaceMap = languageMap[this._namespace];
-        if(!namespaceMap || !(phrase in namespaceMap)) {
-            return phrase;
+        return languageMap[phrase];
+    }
+
+    private getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
+        const languageMap = Localization._languageMap[language];
+        if(languageMap) {
+            return languageMap[namespace];
         }
-        return namespaceMap[phrase];
+        for(let key in Localization._languageMap) {
+            if(Localization._languageMap.hasOwnProperty(key)) {
+                if(language.match(key)) {
+                    return Localization._languageMap[key][namespace];
+                }
+            }
+        }
+        return undefined;
     }
 
 }
