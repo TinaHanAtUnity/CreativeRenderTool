@@ -1,7 +1,7 @@
-import ConfigRequestSpec from '../../../../params/configuration.json';
-import AdRequestSpec from '../../../../params/adPlan_requests.json';
-import VideoEventSpec from '../../../../params/video_start-video_end_requests.json';
-import ClickEventSpec from '../../../../params/click_event.json';
+import ConfigRequestSpec from 'json/events/ConfigRequest.json';
+import AdRequestSpec from 'json/events/AdRequest.json';
+import VideoEventSpec from 'json/events/VideoEvents.json';
+import ClickEventSpec from 'json/events/ClickEvent.json';
 
 export interface IEventParameter {
     parameter: string;
