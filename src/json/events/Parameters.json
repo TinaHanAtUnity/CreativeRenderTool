@@ -1,12 +1,5 @@
 [
   {
-    "key": "abGroup",
-    "type": "Integer",
-    "description": "Integer from 0 to 19",
-    "provider": "Server",
-    "platforms": null
-  },
-  {
     "key": "adapterName",
     "type": "String",
     "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
