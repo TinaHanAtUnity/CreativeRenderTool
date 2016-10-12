@@ -2,6 +2,8 @@ import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
+import TaiwanEndscreen from 'json/locale/zh_TW/endscreen.json';
+import TaiwanOverlay from 'json/locale/zh_TW/overlay.json';
 
 export class Localization {
 
@@ -13,6 +15,10 @@ export class Localization {
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),
             'overlay': JSON.parse(FinnishOverlay)
+        },
+        'zh_TW': {
+            'endscreen': JSON.parse(TaiwanEndscreen),
+            'overlay': JSON.parse(TaiwanOverlay)
         }
     };
 

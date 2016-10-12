@@ -35,4 +35,10 @@ describe('LocalizationTest', () => {
         assert.equal(localization.translate(phrase), phrase, 'Localization did not translate partial match');
     });
 
+    it('should translate exact match', () => {
+        let localization = new Localization('zh_TW', 'endscreen');
+        let phrase = 'Download For Free';
+        assert.equal(localization.translate(phrase), '免費下載', 'Localization did not translate exact match');
+    });
+
 });
