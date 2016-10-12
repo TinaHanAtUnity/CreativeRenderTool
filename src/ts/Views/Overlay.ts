@@ -4,12 +4,15 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable1 } from 'Utilities/Observable';
+import { Localization } from 'Utilities/Localization';
 
 export class Overlay extends View {
 
     public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
     public onCallButton: Observable1<boolean> = new Observable1();
+
+    private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
 
@@ -41,6 +44,7 @@ export class Overlay extends View {
     constructor(nativeBridge: NativeBridge, muted: boolean) {
         super(nativeBridge, 'overlay');
 
+        this._localization = new Localization('en', 'overlay');
         this._template = new Template(OverlayTemplate);
 
         this._muted = muted;
@@ -159,7 +163,7 @@ export class Overlay extends View {
 
     private setSkipText(skipRemaining: number): void {
         if(skipRemaining <= 0) {
-            this._skipElement.innerHTML = 'Skip Video';
+            this._skipElement.innerHTML = this._localization.translate('Skip Video');
         } else {
             this._skipDurationElement.innerHTML = skipRemaining.toString();
         }

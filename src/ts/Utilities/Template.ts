@@ -1,6 +1,7 @@
 /* tslint:disable:quotemark */
 // based on underscore.js templates
 
+import { Localization } from 'Utilities/Localization';
 export class Template {
 
     private static _matcher: RegExp = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
@@ -16,13 +17,15 @@ export class Template {
 
     private static _escapeRegExp: RegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
+    private _localization?: Localization;
     private _templateFunction: (data: any) => string;
 
     private static _escapeChar: (substring: string, ...args: any[]) => string = (match: string): string => {
         return '\\' + Template._escapes[match];
     };
 
-    constructor(templateString: string) {
+    constructor(templateString: string, localization?: Localization) {
+        this._localization = localization;
         let index: number = 0;
         let source: string = "__p+='";
         templateString.replace(Template._matcher, (match: string, interpolate: string, evaluate: string, offset: number): string => {
@@ -53,6 +56,7 @@ export class Template {
     }
 
     public render(data: any): string {
+        data.t = this._localization ? this._localization.translate : (phrase: string) => phrase;
         return this._templateFunction(data);
     }
 
