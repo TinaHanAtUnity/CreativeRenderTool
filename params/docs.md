@@ -11,7 +11,6 @@
 ### All Parameters
 | key | type | description | provider | platforms |
 |---|---|---|---|---|
-| abGroup | Integer | Integer from 0 to 19 | Server | None |
 | adapterName | String | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | App | all |
 | adapterVersion | String | SDK version name for adapter, should be in sync with SDK version | App | all |
 | advertisingId | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
