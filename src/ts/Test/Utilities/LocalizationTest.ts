@@ -5,6 +5,18 @@ import { Localization } from 'Utilities/Localization';
 
 describe('LocalizationTest', () => {
 
+    beforeEach(() => {
+        Localization.setLanguageMap('en.*', 'endscreen', {
+            'Download For Free': 'Download For Free'
+        });
+        Localization.setLanguageMap('fi.*', 'endscreen', {
+            'Download For Free': 'Lataa ilmaiseksi'
+        });
+        Localization.setLanguageMap('zh_TW', 'endscreen', {
+            'Download For Free': '免費下載'
+        });
+    });
+
     it('should return phrase if language is not found', () => {
         let localization = new Localization('asdasd', 'asdasd');
         let phrase = 'foobar';

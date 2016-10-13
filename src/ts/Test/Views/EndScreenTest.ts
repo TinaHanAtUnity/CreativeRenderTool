@@ -5,6 +5,7 @@ import { assert } from 'chai';
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
+import { Localization } from 'Utilities/Localization';
 
 import TestCampaign from 'json/TestCampaign.json';
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
@@ -20,6 +21,9 @@ describe('EndScreen', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
+        });
+        Localization.setLanguageMap('fi.*', 'endscreen', {
+            'Download For Free': 'Lataa ilmaiseksi'
         });
     });
 

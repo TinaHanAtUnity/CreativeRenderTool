@@ -4,6 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
+import { Localization } from 'Utilities/Localization';
 
 describe('Overlay', () => {
     let handleInvocation: Sinon.SinonSpy;
@@ -16,6 +17,9 @@ describe('Overlay', () => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
+        });
+        Localization.setLanguageMap('fi.*', 'overlay', {
+            'You can skip this video in <span class=\"skip-duration\">0</span> seconds': 'Voit ohittaa videon <span class="skip-duration">0</span> sekunnin päästä'
         });
     });
 
