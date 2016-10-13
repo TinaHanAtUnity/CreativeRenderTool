@@ -53,14 +53,14 @@
     "type": "Boolean",
     "description": "If video is cached or streamed",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "campaignId",
     "type": "String",
     "description": "Internal campaign identifier",
     "provider": "Server",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "connectionType",
@@ -95,7 +95,7 @@
     "type": "String",
     "description": "Unique event identifier",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "deviceFreeSpace",
@@ -109,7 +109,7 @@
     "type": "String",
     "description": "Source game identifier",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "gamerId",
@@ -162,14 +162,14 @@
   },
   {
     "key": "networkOperator",
-    "type": "Integer",
+    "type": "String",
     "description": "MCC + MNC codes",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "networkOperatorName",
-    "type": "Integer",
+    "type": "String",
     "description": "Cell network operator name",
     "provider": "SDK",
     "platforms": "all"
@@ -193,7 +193,7 @@
     "type": "String",
     "description": "Internal placement identifier",
     "provider": "Admin",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "platform",
@@ -256,14 +256,14 @@
     "type": "String",
     "description": "Unique session identifier",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "sid",
     "type": "String",
     "description": "Server side reward callback id",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "test",

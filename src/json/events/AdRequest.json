@@ -152,7 +152,19 @@
       "body": true
     },
     {
-      "parameter": "mediation",
+      "parameter": "mediationName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationOrdinal",
       "required": "no",
       "queryString": false,
       "body": true
