@@ -14,13 +14,6 @@
     "platforms": "all"
   },
   {
-    "key": "advertisingId",
-    "type": "String",
-    "description": "Advertising identifier in raw format TODO: remove duplicate",
-    "provider": "SDK",
-    "platforms": "all"
-  },
-  {
     "key": "advertisingTrackingId",
     "type": "String",
     "description": "Advertising identifier in raw format",
@@ -285,13 +278,6 @@
     "description": "Current timezone",
     "provider": "SDK",
     "platforms": "all"
-  },
-  {
-    "key": "trackingEnabled",
-    "type": "Boolean",
-    "description": "Boolean if user has limited tracking or not TODO: remove duplicate",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "webviewUa",
