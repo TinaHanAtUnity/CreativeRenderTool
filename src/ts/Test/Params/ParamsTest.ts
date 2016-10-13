@@ -21,6 +21,7 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -150,7 +151,8 @@ class TestHelper {
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
         let config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
-        return AdUnitFactory.createAdUnit(nativeBridge, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        let deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
+        return AdUnitFactory.createAdUnit(nativeBridge, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 

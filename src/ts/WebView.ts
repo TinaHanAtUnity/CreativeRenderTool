@@ -203,7 +203,7 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
             this._adUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
