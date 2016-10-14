@@ -21,6 +21,7 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -171,6 +172,10 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
+    beforeEach(() => {
+        MetaDataManager.clearCaches();
+    });
+
     describe('with config request', () => {
         it('on Android', () => {
             let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);

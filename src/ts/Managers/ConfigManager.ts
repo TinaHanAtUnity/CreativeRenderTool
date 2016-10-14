@@ -14,9 +14,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        let promises: any[] = [];
-        promises.push(MetaDataManager.fetchFrameworkMetaData(nativeBridge));
-        promises.push(MetaDataManager.fetchAdapterMetaData(nativeBridge));
+        let promises: [Promise<FrameworkMetaData>, Promise<AdapterMetaData>] = [MetaDataManager.fetchFrameworkMetaData(nativeBridge), MetaDataManager.fetchAdapterMetaData(nativeBridge)];
         return Promise.all(promises).then(([framework, adapter]) => {
             let url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
