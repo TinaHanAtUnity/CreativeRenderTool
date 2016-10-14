@@ -254,7 +254,7 @@
   {
     "key": "sessionId",
     "type": "String",
-    "description": "Unique session identifier",
+    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
     "provider": "SDK",
     "platforms": "all"
   },
