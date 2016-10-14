@@ -326,11 +326,11 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit).then(() => {
+                return sessionManager.sendSkip(adUnit, 12345).then(() => {
                     let url: string = requestSpy.getCall(0).args[0];
                     let body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });
@@ -406,11 +406,11 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit).then(() => {
+                return sessionManager.sendSkip(adUnit, 12345).then(() => {
                     let url: string = requestSpy.getCall(0).args[0];
                     let body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });

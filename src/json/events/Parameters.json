@@ -3,14 +3,14 @@
     "key": "adapterName",
     "type": "String",
     "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
-    "provider": "App",
+    "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "adapterVersion",
     "type": "String",
     "description": "SDK version name for adapter, should be in sync with SDK version",
-    "provider": "App",
+    "provider": "SDK",
     "platforms": "all"
   },
   {
@@ -277,6 +277,13 @@
     "type": "String",
     "description": "Server side reward callback id",
     "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "skippedAt",
+    "type": "Integer",
+    "description": "Milliseconds from video start to video skip",
+    "provider": "SDK",
     "platforms": "all"
   },
   {
