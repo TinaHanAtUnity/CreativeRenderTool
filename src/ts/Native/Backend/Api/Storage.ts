@@ -8,6 +8,10 @@ export class Storage {
         
     }
 
+    public static delete(storage: string, key: string) {
+
+    }
+
     public static getKeys(storage: string, key: string, recursive: boolean) {
         return [];
     }

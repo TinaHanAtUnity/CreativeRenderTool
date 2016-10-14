@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Unity Ads WebView</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
+
+    <link rel="stylesheet" href="css/main.css"/>
+    <script src="/node_modules/systemjs/dist/system.js"></script>
+    <script>
+        System.config({
+            baseURL: 'js',
+            map: {
+                'es6-promise': '@empty',
+                'text': '/node_modules/systemjs-plugin-text/text.js'
+            },
+            meta: {
+                '*.html': {
+                    loader: 'text'
+                },
+                '*.xml': {
+                    loader: 'text'
+                },
+                '*.json': {
+                    loader: 'text'
+                }
+            },
+            packages: {
+                '.': {
+                    defaultExtension: 'js'
+                }
+            },
+            paths: {
+                '*.html': './*.html',
+                '*.xml': './*.xml',
+                '*.json': './*.json'
+            }
+        });
+        System.import('Browser');
+    </script>
+</head>
+<body></body>
+</html>

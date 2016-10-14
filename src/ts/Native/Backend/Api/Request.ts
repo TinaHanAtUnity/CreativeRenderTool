@@ -1,11 +1,11 @@
+import { Backend } from 'Native/Backend/Backend';
+
 export class Request {
 
     public static get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         let xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
-            // tslint:disable:no-string-literal
-            window['nativebridge']['handleEvent'](['REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders()]);
-            // tslint:enable:no-string-literal
+            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
         };
         xhr.open('GET', url);
         xhr.send();
@@ -38,9 +38,7 @@ export class Request {
 
         let xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
-            // tslint:disable:no-string-literal
-            window['nativebridge']['handleEvent'](['REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders()]);
-            // tslint:enable:no-string-literal
+            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
         };
         xhr.open('POST', url);
         xhr.send(body);

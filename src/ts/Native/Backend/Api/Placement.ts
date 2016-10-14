@@ -5,7 +5,7 @@ export class Placement {
     }
 
     public static setPlacementState(placement: string, state: string) {
-        let button = <HTMLButtonElement>document.getElementById(placement);
+        let button = <HTMLButtonElement>window.parent.document.getElementById(placement);
         let listener = (event: Event) => {
             event.preventDefault();
             // tslint:disable:no-string-literal

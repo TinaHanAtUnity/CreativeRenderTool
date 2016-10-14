@@ -7,4 +7,8 @@ export class Listener {
 
     }
 
+    public static sendFinishEvent(placement: string, state: string) {
+
+    }
+
 }

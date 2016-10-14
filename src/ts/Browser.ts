@@ -30,7 +30,7 @@ let extWindow = <IExtendedWindow> window;
 extWindow.nativebridge = nativeBridge;
 extWindow.webview = new WebView(nativeBridge);
 
-let initializeButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('initialize');
+let initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
 initializeButton.addEventListener('click', () => {
     initializeButton.disabled = true;
     extWindow.webview.initialize();

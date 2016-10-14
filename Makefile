@@ -39,6 +39,7 @@ build-browser: MODULE = system
 build-browser: TARGET = es5
 build-browser: build-dir build-static build-css build-ts
 	cp src/browser-index.html $(BUILD_DIR)/index.html
+	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
 
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = system

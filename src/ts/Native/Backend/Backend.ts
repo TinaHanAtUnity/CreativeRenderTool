@@ -8,6 +8,8 @@ import { Storage } from 'Native/Backend/Api/Storage';
 import { Request } from 'Native/Backend/Api/Request';
 import { Placement } from 'Native/Backend/Api/Placement';
 import { Listener } from 'Native/Backend/Api/Listener';
+import { AdUnit } from 'Native/Backend/Api/AdUnit';
+import { VideoPlayer } from 'Native/Backend/Api/VideoPlayer';
 
 interface IInvocation {
     className: string;
@@ -25,6 +27,7 @@ interface IResult {
 export class Backend implements IWebViewBridge {
 
     private static _apiMap = {
+        '.*AdUnit': AdUnit,
         '.*Broadcast': Broadcast,
         '.*Cache': Cache,
         '.*Connectivity': Connectivity,
@@ -33,8 +36,16 @@ export class Backend implements IWebViewBridge {
         '.*Placement': Placement,
         '.*Request': Request,
         '.*Sdk': Sdk,
-        '.*Storage': Storage
+        '.*Storage': Storage,
+        '.*VideoPlayer': VideoPlayer
     };
+
+    public static sendEvent(category: string, name: string, ...parameters: any[]) {
+        console.log(category + '_' + name + ': ' + JSON.stringify(parameters));
+        // tslint:disable:no-string-literal
+        window['nativebridge']['handleEvent']([category, name].concat(parameters));
+        // tslint:enable:no-string-literal
+    }
 
     public handleInvocation(rawInvocations: string): void {
         let invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
