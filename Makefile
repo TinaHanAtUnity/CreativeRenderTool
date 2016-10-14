@@ -32,7 +32,13 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
+
+build-browser: BUILD_DIR = build/browser
+build-browser: MODULE = system
+build-browser: TARGET = es5
+build-browser: build-dir build-static build-css build-ts
+	cp src/browser-index.html $(BUILD_DIR)/index.html
 
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = system
