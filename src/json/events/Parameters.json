@@ -105,6 +105,20 @@
     "platforms": "all"
   },
   {
+    "key": "frameworkName",
+    "type": "Integer",
+    "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkVersion",
+    "type": "Integer",
+    "description": "Unity engine version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "gameId",
     "type": "String",
     "description": "Source game identifier",

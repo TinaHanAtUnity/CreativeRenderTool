@@ -13,21 +13,22 @@
 |---|---|---|---|---|
 | adapterName | String | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | App | all |
 | adapterVersion | String | SDK version name for adapter, should be in sync with SDK version | App | all |
-| advertisingId | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
 | advertisingTrackingId | String | Advertising identifier in raw format | SDK | all |
 | androidId | String | Android ID | SDK | android |
 | apiLevel | Integer | Android device API level | SDK | android |
 | bundleId | String | Bundle identifier for the app | SDK | all |
 | bundleVersion | String | Game version | SDK | all |
-| cached | Boolean | If video is cached or streamed | SDK | None |
-| campaignId | String | Internal campaign identifier | Server | None |
+| cached | Boolean | If video is cached or streamed | SDK | all |
+| campaignId | String | Internal campaign identifier | Server | all |
 | connectionType | String | "wifi", "cellular" or "none" | SDK | all |
 | deviceMake | String | Android device manufacturer | SDK | android |
 | deviceModel | String | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | encrypted | Boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
-| eventId | String | Unique event identifier | SDK | None |
+| eventId | String | Unique event identifier | SDK | all |
 | deviceFreeSpace | Integer | Free space in kilobytes | SDK | all |
-| gameId | String | Source game identifier | App | None |
+| frameworkName | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | Integer | Unity engine version | SDK | all |
+| gameId | String | Source game identifier | App | all |
 | gamerId | String | Internal gamer identifier | Server | all |
 | language | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | Boolean | Boolean if user has limited tracking or not | SDK | all |
@@ -35,24 +36,23 @@
 | mediationOrdinal | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | mediationName | String | Mediation provider name | Mediation | all |
 | mediationVersion | String | Mediation SDK version | Mediation | all |
-| networkOperator | Integer | MCC + MNC codes | SDK | all |
-| networkOperatorName | Integer | Cell network operator name | SDK | all |
+| networkOperator | String | MCC + MNC codes | SDK | all |
+| networkOperatorName | String | Cell network operator name | SDK | all |
 | networkType | String | Detailed cellular network type | SDK | all |
 | osVersion | String | Device operating system version | SDK | all |
-| placementId | String | Internal placement identifier | Admin | None |
+| placementId | String | Internal placement identifier | Admin | all |
 | platform | String | "android" or "ios" | SDK | all |
-| redirect | Boolean | TODO: What does this do? | SDK | all |
+| redirect | Boolean | Legacy parameter, always false | SDK | all |
 | rooted | Boolean | Is the device rooted or jailbroken | SDK | all |
 | screenDensity | Integer | Screen density in DPI | SDK | android |
 | screenHeight | Integer | Screen height in pixels | SDK | all |
 | screenSize | Integer | Android raw screen layout value | SDK | android |
 | screenWidth | Integer | Screen width in pixels | SDK | all |
 | sdkVersion | String | SDK version in four digits | SDK | all |
-| sessionId | String | Unique session identifier | SDK | None |
-| sid | String | Server side reward callback id | App | None |
+| sessionId | String | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
+| sid | String | Server side reward callback id | App | all |
 | test | Boolean | Test mode | App | all |
 | timeZone | String | Current timezone | SDK | all |
-| trackingEnabled | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
 | webviewUa | String | WebView user agent string | SDK | all |
 
 
@@ -63,6 +63,8 @@
 | bundleId | all | True | False | String | Bundle identifier for the app | SDK | all |
 | encrypted | all | True | False | Boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | rooted | all | True | False | Boolean | Is the device rooted or jailbroken | SDK | all |
+| frameworkName | no | True | False | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | True | False | Integer | Unity engine version | SDK | all |
 | adapterName | no | True | False | String | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | App | all |
 | adapterVersion | no | True | False | String | SDK version name for adapter, should be in sync with SDK version | App | all |
 
@@ -94,26 +96,28 @@
 | timeZone | all | False | True | String | Current timezone | SDK | all |
 | webviewUa | no | False | True | String | WebView user agent string | SDK | all |
 | deviceFreeSpace | all | False | True | Integer | Free space in kilobytes | SDK | all |
-| networkOperator | no | False | True | Integer | MCC + MNC codes | SDK | all |
-| networkOperatorName | no | False | True | Integer | Cell network operator name | SDK | all |
-| mediation | no | False | True | JSONobject | mediation data in JSON object (Will get refactored) | App | all |
+| networkOperator | no | False | True | String | MCC + MNC codes | SDK | all |
+| networkOperatorName | no | False | True | String | Cell network operator name | SDK | all |
+| mediationName | no | False | True | String | Mediation provider name | Mediation | all |
+| mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
+| mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 
 
 
 ### Video events
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
-| eventId | all | False | True | String | Unique event identifier | SDK | None |
-| sessionId | all | False | True | String | Unique session identifier | SDK | None |
+| eventId | all | False | True | String | Unique event identifier | SDK | all |
+| sessionId | all | False | True | String | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
 | gamerId | all | False | True | String | Internal gamer identifier | Server | all |
-| campaignId | all | False | True | String | Internal campaign identifier | Server | None |
-| placementId | all | False | True | String | Internal placement identifier | Admin | None |
+| campaignId | all | False | True | String | Internal campaign identifier | Server | all |
+| placementId | all | False | True | String | Internal placement identifier | Admin | all |
 | apiLevel | android | False | True | Integer | Android device API level | SDK | android |
-| cached | all | False | True | Boolean | If video is cached or streamed | SDK | None |
-| advertisingId | no | False | True | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
-| trackingEnabled | no | False | True | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
+| cached | all | False | True | Boolean | If video is cached or streamed | SDK | all |
+| advertisingTrackingId | no | False | True | String | Advertising identifier in raw format | SDK | all |
+| limitAdTracking | no | False | True | Boolean | Boolean if user has limited tracking or not | SDK | all |
 | osVersion | yes | False | True | String | Device operating system version | SDK | all |
-| sid | no | False | True | String | Server side reward callback id | App | None |
+| sid | no | False | True | String | Server side reward callback id | App | all |
 | deviceMake | android | False | True | String | Android device manufacturer | SDK | android |
 | deviceModel | all | False | True | String | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | sdkVersion | all | False | True | String | SDK version in four digits | SDK | all |
@@ -129,19 +133,19 @@
 ### Click event
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
-| gameId | all | True | False | String | Source game identifier | App | None |
-| redirect | all | True | False | Boolean | TODO: What does this do? | SDK | all |
-| eventId | all | False | True | String | Unique event identifier | SDK | None |
-| sessionId | all | False | True | String | Unique session identifier | SDK | None |
+| gameId | all | True | False | String | Source game identifier | App | all |
+| redirect | all | True | False | Boolean | Legacy parameter, always false | SDK | all |
+| eventId | all | False | True | String | Unique event identifier | SDK | all |
+| sessionId | all | False | True | String | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
 | gamerId | all | False | True | String | Internal gamer identifier | Server | all |
-| campaignId | all | False | True | String | Internal campaign identifier | Server | None |
-| placementId | all | False | True | String | Internal placement identifier | Admin | None |
+| campaignId | all | False | True | String | Internal campaign identifier | Server | all |
+| placementId | all | False | True | String | Internal placement identifier | Admin | all |
 | apiLevel | android | False | True | Integer | Android device API level | SDK | android |
-| cached | all | False | True | Boolean | If video is cached or streamed | SDK | None |
-| advertisingId | no | False | True | String | Advertising identifier in raw format TODO: remove duplicate | SDK | all |
-| trackingEnabled | no | False | True | Boolean | Boolean if user has limited tracking or not TODO: remove duplicate | SDK | None |
+| cached | all | False | True | Boolean | If video is cached or streamed | SDK | all |
+| advertisingTrackingId | no | False | True | String | Advertising identifier in raw format | SDK | all |
+| limitAdTracking | no | False | True | Boolean | Boolean if user has limited tracking or not | SDK | all |
 | osVersion | yes | False | True | String | Device operating system version | SDK | all |
-| sid | no | False | True | String | Server side reward callback id | App | None |
+| sid | no | False | True | String | Server side reward callback id | App | all |
 | deviceMake | android | False | True | String | Android device manufacturer | SDK | android |
 | deviceModel | all | False | True | String | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | sdkVersion | all | False | True | String | SDK version in four digits | SDK | all |

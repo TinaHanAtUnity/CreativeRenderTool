@@ -24,10 +24,26 @@ import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
+        if(storageType === StorageType.PUBLIC) {
+            if(key === 'framework.name.value') {
+                return Promise.resolve(['Unity']);
+            } else if(key === 'framework.version.value') {
+                return Promise.resolve(['1.2.3']);
+            } else if(key === 'adapter.name.value') {
+                return Promise.resolve(['AssetStore']);
+            } else if(key === 'adapter.version.value') {
+                return Promise.resolve(['2.0.0']);
+            }
+        }
         return Promise.reject(['COULDNT_GET_VALUE', key]);
     }
 
     public getKeys(type: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        if(type === StorageType.PUBLIC) {
+            if(key === 'framework' || key === 'adapter') {
+                return Promise.resolve(['name', 'version']);
+            }
+        }
         return Promise.resolve([]);
     }
 }
