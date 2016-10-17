@@ -8,6 +8,8 @@ import { Localization } from 'Utilities/Localization';
 
 export class Overlay extends View {
 
+    private static AutoSkip: boolean = false;
+
     public onSkip: Observable1<number> = new Observable1();
     public onMute: Observable1<boolean> = new Observable1();
     public onCallButton: Observable1<boolean> = new Observable1();
@@ -40,6 +42,10 @@ export class Overlay extends View {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+
+    public static setAutoSkip(value: boolean) {
+        Overlay.AutoSkip = value;
+    }
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
@@ -121,6 +127,9 @@ export class Overlay extends View {
     }
 
     public setVideoProgress(value: number): void {
+        if(Overlay.AutoSkip) {
+            this.onSkip.trigger(value);
+        }
         this._videoProgress = value;
         if(this._skipEnabled && this._skipRemaining > 0) {
             this._skipRemaining = Math.round((this._skipDuration - value) / 1000);

@@ -29,18 +29,27 @@ initializeButton.addEventListener('click', (event: Event) => {
     event.preventDefault();
     initializeButton.disabled = true;
 
-    window.sessionStorage.clear();
     let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+    let autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+    let publicStorage: any = {
+        test: {}
+    };
+
     if(abGroupElement.value.length) {
-        window.sessionStorage.setItem('PUBLIC', JSON.stringify({
-            test: {
-                abGroup: {
-                    value: abGroupElement.value,
-                    ts: Date.now()
-                }
-            }
-        }));
+        publicStorage.test.abGroup = {
+            value: abGroupElement.value,
+            ts: Date.now()
+        };
     }
+    if(autoSkipElement.checked) {
+        publicStorage.test.autoSkip = {
+            value: true,
+            ts: Date.now()
+        };
+    }
+
+    window.sessionStorage.clear();
+    window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
     let nativeBridge: NativeBridge;
     let platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
