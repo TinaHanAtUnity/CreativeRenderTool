@@ -37,15 +37,15 @@ export class AdUnit {
     }
 
     public static setViews(views: string[]) {
-
+        return;
     }
 
     public static setOrientation(orientation: number) {
-
+        return;
     }
 
     public static setSupportedOrientations(orientations: number) {
-
+        return;
     }
 
 }

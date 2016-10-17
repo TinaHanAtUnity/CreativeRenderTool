@@ -17,10 +17,11 @@ export class Storage {
     }
 
     public static set(storage: string, key: string, value: any) {
+        return;
     }
 
     public static delete(storage: string, key: string) {
-
+        return;
     }
 
     public static getKeys(storage: string, key: string, recursive: boolean) {
@@ -28,6 +29,7 @@ export class Storage {
     }
 
     public static write(storage: string) {
+        return;
     }
 
     private static findObject(storage: any, key: string) {

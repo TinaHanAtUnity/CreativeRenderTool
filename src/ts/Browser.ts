@@ -24,50 +24,52 @@ let resizeHandler = (event?: Event) => {
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
-let initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
-initializeButton.addEventListener('click', (event: Event) => {
-    event.preventDefault();
-    initializeButton.disabled = true;
+if(window.parent !== window) {
+    let initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    initializeButton.addEventListener('click', (event: Event) => {
+        event.preventDefault();
+        initializeButton.disabled = true;
 
-    let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
-    let autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
-    let publicStorage: any = {
-        test: {}
-    };
-
-    if(abGroupElement.value.length) {
-        publicStorage.test.abGroup = {
-            value: abGroupElement.value,
-            ts: Date.now()
+        let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+        let autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+        let publicStorage: any = {
+            test: {}
         };
-    }
-    if(autoSkipElement.checked) {
-        publicStorage.test.autoSkip = {
-            value: true,
-            ts: Date.now()
-        };
-    }
 
-    window.sessionStorage.clear();
-    window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
+        if(abGroupElement.value.length) {
+            publicStorage.test.abGroup = {
+                value: abGroupElement.value,
+                ts: Date.now()
+            };
+        }
+        if(autoSkipElement.checked) {
+            publicStorage.test.autoSkip = {
+                value: true,
+                ts: Date.now()
+            };
+        }
 
-    let nativeBridge: NativeBridge;
-    let platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
-    switch(platformElement.value) {
-        case 'android':
-            nativeBridge = new NativeBridge(new Backend(), Platform.ANDROID);
-            break;
+        window.sessionStorage.clear();
+        window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
-        case 'ios':
-            nativeBridge = new NativeBridge(new Backend(), Platform.IOS, false);
-            break;
+        let nativeBridge: NativeBridge;
+        let platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
+        switch(platformElement.value) {
+            case 'android':
+                nativeBridge = new NativeBridge(new Backend(), Platform.ANDROID);
+                break;
 
-        default:
-            throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
-    }
+            case 'ios':
+                nativeBridge = new NativeBridge(new Backend(), Platform.IOS, false);
+                break;
 
-    let extWindow = <IExtendedWindow> window;
-    extWindow.nativebridge = nativeBridge;
-    extWindow.webview = new WebView(nativeBridge);
-    extWindow.webview.initialize();
-}, false);
+            default:
+                throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
+        }
+
+        let extWindow = <IExtendedWindow> window;
+        extWindow.nativebridge = nativeBridge;
+        extWindow.webview = new WebView(nativeBridge);
+        extWindow.webview.initialize();
+    }, false);
+}

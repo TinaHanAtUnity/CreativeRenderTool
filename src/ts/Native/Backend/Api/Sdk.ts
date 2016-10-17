@@ -17,7 +17,7 @@ export class Sdk {
     }
 
     public static initComplete() {
-
+        return;
     }
 
     public static logError(message: string) {
@@ -25,7 +25,9 @@ export class Sdk {
     }
 
     public static logInfo(message: string) {
+        // tslint:disable:no-console
         console.info(message);
+        // tslint:enable:no-console
     }
 
 }

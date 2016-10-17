@@ -1,7 +1,7 @@
 export class Placement {
 
     public static setDefaultPlacement(placement: string) {
-
+        return;
     }
 
     public static setPlacementState(placement: string, state: string) {
@@ -9,7 +9,9 @@ export class Placement {
         let listener = (event: Event) => {
             event.preventDefault();
             // tslint:disable:no-string-literal
-            window['webview']['show'](placement, {}, () => {});
+            window['webview']['show'](placement, {}, () => {
+                return;
+            });
             // tslint:enable:no-string-literal
         };
         if(state === 'READY') {

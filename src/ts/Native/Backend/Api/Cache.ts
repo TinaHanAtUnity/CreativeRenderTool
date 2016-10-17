@@ -1,6 +1,8 @@
 export class Cache {
 
-    public static setProgressInterval() {}
+    public static setProgressInterval() {
+        return;
+    }
 
     public static getFiles() {
         return [];
@@ -24,7 +26,7 @@ export class Cache {
     }
 
     public static getFileInfo(fileId: string) {
-
+        return;
     }
 
 }
