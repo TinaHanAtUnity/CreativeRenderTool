@@ -17,7 +17,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 
-import SessionManagerVast from 'xml/SessionManagerVast.xml';
+import EventTestVast from 'xml/EventTestVast.xml';
 
 describe('VastVideoEventHandlers tests', () => {
     let handleInvocation = sinon.spy();
@@ -79,7 +79,7 @@ describe('VastVideoEventHandlers tests', () => {
 
         let vastParser = TestFixtures.getVastParser();
 
-        let vastXml = SessionManagerVast;
+        let vastXml = EventTestVast;
 
         let vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);

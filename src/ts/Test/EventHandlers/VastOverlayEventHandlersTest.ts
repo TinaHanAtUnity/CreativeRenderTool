@@ -19,7 +19,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
 
-import SessionManagerVast from 'xml/SessionManagerVast.xml';
+import EventTestVast from 'xml/EventTestVast.xml';
 
 
 describe('VastOverlayEventHandlersTest', () => {
@@ -43,7 +43,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         let vastParser = TestFixtures.getVastParser();
 
-        let vastXml = SessionManagerVast;
+        let vastXml = EventTestVast;
 
         let vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
