@@ -29,6 +29,7 @@ initializeButton.addEventListener('click', (event: Event) => {
     event.preventDefault();
     initializeButton.disabled = true;
 
+    window.sessionStorage.clear();
     let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
     if(abGroupElement.value.length) {
         window.sessionStorage.setItem('PUBLIC', JSON.stringify({
