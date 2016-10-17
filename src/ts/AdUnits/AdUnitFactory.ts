@@ -23,21 +23,22 @@ import { MetaData } from 'Utilities/MetaData';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign, options);
+            return this.createVastAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, options);
         } else {
-            return this.createPerformanceAdUnit(nativeBridge, sessionManager, placement, campaign, configuration, options);
+            return this.createPerformanceAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, configuration, options);
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
-        let overlay = new Overlay(nativeBridge, placement.muteVideo());
-        let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+        let overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         let metaData = new MetaData(nativeBridge);
 
         let videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
@@ -60,8 +61,8 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
-        let overlay = new Overlay(nativeBridge, placement.muteVideo());
+    private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
+        let overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         let metaData = new MetaData(nativeBridge);
         let videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
 
