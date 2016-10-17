@@ -3,20 +3,13 @@
     "key": "adapterName",
     "type": "String",
     "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
-    "provider": "App",
+    "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "adapterVersion",
     "type": "String",
     "description": "SDK version name for adapter, should be in sync with SDK version",
-    "provider": "App",
-    "platforms": "all"
-  },
-  {
-    "key": "advertisingId",
-    "type": "String",
-    "description": "Advertising identifier in raw format TODO: remove duplicate",
     "provider": "SDK",
     "platforms": "all"
   },
@@ -60,14 +53,14 @@
     "type": "Boolean",
     "description": "If video is cached or streamed",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "campaignId",
     "type": "String",
     "description": "Internal campaign identifier",
     "provider": "Server",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "connectionType",
@@ -102,7 +95,7 @@
     "type": "String",
     "description": "Unique event identifier",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "deviceFreeSpace",
@@ -112,11 +105,25 @@
     "platforms": "all"
   },
   {
+    "key": "frameworkName",
+    "type": "Integer",
+    "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkVersion",
+    "type": "Integer",
+    "description": "Unity engine version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "gameId",
     "type": "String",
     "description": "Source game identifier",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "gamerId",
@@ -169,14 +176,14 @@
   },
   {
     "key": "networkOperator",
-    "type": "Integer",
+    "type": "String",
     "description": "MCC + MNC codes",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "networkOperatorName",
-    "type": "Integer",
+    "type": "String",
     "description": "Cell network operator name",
     "provider": "SDK",
     "platforms": "all"
@@ -200,7 +207,7 @@
     "type": "String",
     "description": "Internal placement identifier",
     "provider": "Admin",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "platform",
@@ -212,7 +219,7 @@
   {
     "key": "redirect",
     "type": "Boolean",
-    "description": "TODO: What does this do?",
+    "description": "Legacy parameter, always false",
     "provider": "SDK",
     "platforms": "all"
   },
@@ -261,16 +268,23 @@
   {
     "key": "sessionId",
     "type": "String",
-    "description": "Unique session identifier",
+    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
     "provider": "SDK",
-    "platforms": null
+    "platforms": "all"
   },
   {
     "key": "sid",
     "type": "String",
     "description": "Server side reward callback id",
     "provider": "App",
-    "platforms": null
+    "platforms": "all"
+  },
+  {
+    "key": "skippedAt",
+    "type": "Integer",
+    "description": "Milliseconds from video start to video skip",
+    "provider": "SDK",
+    "platforms": "all"
   },
   {
     "key": "test",
@@ -285,13 +299,6 @@
     "description": "Current timezone",
     "provider": "SDK",
     "platforms": "all"
-  },
-  {
-    "key": "trackingEnabled",
-    "type": "Boolean",
-    "description": "Boolean if user has limited tracking or not TODO: remove duplicate",
-    "provider": "SDK",
-    "platforms": null
   },
   {
     "key": "webviewUa",
