@@ -7,7 +7,6 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -114,6 +113,14 @@ export class SessionManager {
         this._currentSession = session;
     }
 
+    public getEventManager() {
+        return this._eventManager;
+    }
+
+    public getClientInfo() {
+        return this._clientInfo;
+    }
+
     public sendShow(adUnit: AbstractAdUnit): Promise<void> {
         // todo: this pattern is rather bad and it's used only to allow tests to temporarily pass without having to create a new session for each test
         if(this._currentSession) {
@@ -130,22 +137,6 @@ export class SessionManager {
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendImpressionEvent(adUnit: AbstractAdUnit): void {
-        if(this._currentSession) {
-            if(this._currentSession.impressionSent) {
-                return;
-            }
-            this._currentSession.impressionSent = true;
-        }
-
-        if(adUnit instanceof VastAdUnit) {
-            (<VastAdUnit>adUnit).sendImpressionEvent(this._eventManager, this._currentSession.getId(), this._clientInfo.getSdkVersion());
-            (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
-        }
-
-
-    }
-
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.startSent) {
@@ -156,18 +147,9 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
-            if(adUnit instanceof VastAdUnit) {
-                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
-            }
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
-    }
-
-    public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
-        if (session && adUnit instanceof VastAdUnit) {
-            (<VastAdUnit>adUnit).sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
-        }
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
@@ -243,9 +225,6 @@ export class SessionManager {
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
-            if(adUnit instanceof VastAdUnit) {
-                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
-            }
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
@@ -264,20 +243,6 @@ export class SessionManager {
             return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
         }
         return Promise.reject('Missing click attribution url');
-    }
-
-    public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {
-        if(adUnit instanceof VastAdUnit) {
-            if (muted) {
-                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'mute', session.getId());
-            } else {
-                (<VastAdUnit>adUnit).sendTrackingEvent(this._eventManager, 'unmute', session.getId());
-            }
-        }
-    }
-
-    public sendVideoClickTracking(adUnit: VastAdUnit, session: Session): void {
-        adUnit.sendVideoClickTrackingEvent(this._eventManager, session.getId());
     }
 
     public setGamerServerId(serverId: string): void {

@@ -6,7 +6,9 @@ export class Session {
     public thirdQuartileSent: boolean = false;
     public viewSent: boolean = false;
     public skipSent: boolean = false;
+
     public impressionSent: boolean = false;
+    public vastCompleteSent: boolean = false;
 
     private _id: string;
 

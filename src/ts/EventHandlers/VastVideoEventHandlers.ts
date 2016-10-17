@@ -1,8 +1,29 @@
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class VastVideoEventHandlers {
 
-    public static onVideoCompleted(adUnit: VastAdUnit) {
+    public static onVideoStart(sessionManager: SessionManager, adUnit: VastAdUnit): void {
+        if (sessionManager.getSession()) {
+            if (sessionManager.getSession().impressionSent) {
+                return;
+            }
+            sessionManager.getSession().impressionSent = true;
+        }
+        adUnit.sendImpressionEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'creativeView', sessionManager.getSession().getId());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'start', sessionManager.getSession().getId());
+    }
+
+    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VastAdUnit) {
+        if (sessionManager.getSession()) {
+            if (sessionManager.getSession().vastCompleteSent) {
+                return;
+            }
+            sessionManager.getSession().vastCompleteSent = true;
+        }
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId());
+
         adUnit.hide();
     }
 }

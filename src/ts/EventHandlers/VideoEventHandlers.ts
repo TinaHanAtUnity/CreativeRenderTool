@@ -60,8 +60,13 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
-        // todo: video progress event should be handled here and not delegated to session manager
-        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoAdUnitController().getVideoPosition());
+        if (sessionManager.getSession() && adUnit instanceof VastAdUnit) {
+            (<VastAdUnit>adUnit).sendProgressEvents(
+                sessionManager.getEventManager(),
+                sessionManager.getSession().getId(),
+                position,
+                adUnit.getVideoAdUnitController().getVideoPosition());
+        }
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
         if(position > 0) {
@@ -139,7 +144,6 @@ export class VideoEventHandlers {
     }
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
