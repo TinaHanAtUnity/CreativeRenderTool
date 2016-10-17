@@ -29,6 +29,18 @@ initializeButton.addEventListener('click', (event: Event) => {
     event.preventDefault();
     initializeButton.disabled = true;
 
+    let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+    if(abGroupElement.value.length) {
+        window.sessionStorage.setItem('PUBLIC', JSON.stringify({
+            test: {
+                abGroup: {
+                    value: abGroupElement.value,
+                    ts: Date.now()
+                }
+            }
+        }));
+    }
+
     let nativeBridge: NativeBridge;
     let platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
     switch(platformElement.value) {

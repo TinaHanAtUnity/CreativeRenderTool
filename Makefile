@@ -17,7 +17,7 @@ TS_SRC = src/ts
 STYL_SRC = src/styl
 PROD_INDEX_SRC = src/prod-index.html
 TEST_INDEX_SRC = src/test-index.html
-PROD_CONFIG_SRC = src/config.json
+PROD_CONFIG_SRC = src/prod-config.json
 TEST_CONFIG_SRC = src/test-config.json
 
 # Branch and commit id
@@ -46,7 +46,7 @@ build-dev: MODULE = system
 build-dev: TARGET = es5
 build-dev: build-dir build-static build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
-	cp src/index.html $(BUILD_DIR)/index.html
+	cp src/dev-index.html $(BUILD_DIR)/index.html
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
