@@ -1,4 +1,5 @@
 import { Backend } from 'Native/Backend/Backend';
+import { Platform } from 'Constants/Platform';
 
 export class AdUnit {
 
@@ -9,11 +10,20 @@ export class AdUnit {
         videoView.style.display = 'block';
         webView.style.display = 'block';
 
-        setTimeout(() => {
-            Backend.sendEvent('ADUNIT', 'ON_CREATE', activityId);
-            Backend.sendEvent('ADUNIT', 'ON_START', activityId);
-            Backend.sendEvent('ADUNIT', 'ON_RESUME', activityId);
-        }, 0);
+        let platform = Backend.getPlatform();
+        if(platform === Platform.ANDROID) {
+            setTimeout(() => {
+                Backend.sendEvent('ADUNIT', 'ON_CREATE', activityId);
+                Backend.sendEvent('ADUNIT', 'ON_START', activityId);
+                Backend.sendEvent('ADUNIT', 'ON_RESUME', activityId);
+            }, 0);
+        } else if(platform === Platform.IOS) {
+            setTimeout(() => {
+                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_LOAD');
+                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_INIT');
+                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_APPEAR');
+            }, 0);
+        }
 
         return [];
     }
@@ -31,6 +41,10 @@ export class AdUnit {
     }
 
     public static setOrientation(orientation: number) {
+
+    }
+
+    public static setSupportedOrientations(orientations: number) {
 
     }
 

@@ -2,9 +2,12 @@ import { Backend } from 'Native/Backend/Backend';
 
 export class VideoPlayer {
 
+    private static _currentUrl: string | undefined;
+
     public static prepare(url: string) {
         let videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         videoView.addEventListener('canplay', () => {
+            VideoPlayer._currentUrl = url;
             Backend.sendEvent('VIDEOPLAYER', 'PREPARED', Math.round(videoView.duration * 1000), videoView.videoWidth, videoView.videoHeight, url);
         }, false);
         videoView.src = url;
@@ -26,6 +29,10 @@ export class VideoPlayer {
     public static pause() {
         let videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         videoView.pause();
+        setTimeout(() => {
+            Backend.sendEvent('VIDEOPLAYER', 'PAUSE', VideoPlayer._currentUrl);
+            Backend.sendEvent('VIDEOPLAYER', 'STOP', VideoPlayer._currentUrl);
+        }, 0);
     }
 
 }

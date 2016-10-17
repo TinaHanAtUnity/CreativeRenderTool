@@ -1,3 +1,6 @@
+import { Platform } from 'Constants/Platform';
+import { Backend } from 'Native/Backend/Backend';
+
 export class DeviceInfo {
 
     public static getAdvertisingTrackingId() {
@@ -13,7 +16,11 @@ export class DeviceInfo {
     }
 
     public static getModel() {
-        return 'fake';
+        if(Backend.getPlatform() === Platform.ANDROID) {
+            return 'Nexus 5';
+        } else {
+            return 'iPhone7,2';
+        }
     }
 
     public static getScreenWidth() {
@@ -118,6 +125,18 @@ export class DeviceInfo {
             let value = char === 'x' ? randomValue : (randomValue & 0x3 | 0x8);
             return value.toString(16);
         });
+    }
+
+    public static getUserInterfaceIdiom() {
+        return 0;
+    }
+
+    public static getScreenScale() {
+        return 100;
+    }
+
+    public static isSimulator() {
+        return false;
     }
 
 }

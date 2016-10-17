@@ -7,10 +7,19 @@
 </head>
 <body>
 <form>
+    <label for="platform">Platform:</label>
+    <select id="platform">
+        <option value="android">Android</option>
+        <option value="ios">iOS</option>
+    </select>
+    <br />
     <label for="gameId">GameId:</label>
     <input id="gameId" type="number" value="14851"/>
-    <button id="initialize">Initialize</button>
+    <br />
+    <button id="initialize" disabled="disabled">Initialize</button>
+    <br />
     <button id="defaultVideoAndPictureZone" disabled="disabled">Interstitial</button>
+    <br />
     <button id="incentivizedZone" disabled="disabled">Incentivized</button>
 </form>
 <video id="videoView"></video>

@@ -10,6 +10,9 @@ import { Placement } from 'Native/Backend/Api/Placement';
 import { Listener } from 'Native/Backend/Api/Listener';
 import { AdUnit } from 'Native/Backend/Api/AdUnit';
 import { VideoPlayer } from 'Native/Backend/Api/VideoPlayer';
+import { Notification } from 'Native/Backend/Api/Notification';
+import { AppSheet } from 'Native/Backend/Api/AppSheet';
+import { Platform } from '../../Constants/Platform';
 
 interface IInvocation {
     className: string;
@@ -28,11 +31,13 @@ export class Backend implements IWebViewBridge {
 
     private static _apiMap = {
         '.*AdUnit': AdUnit,
+        '.*AppSheet': AppSheet,
         '.*Broadcast': Broadcast,
         '.*Cache': Cache,
         '.*Connectivity': Connectivity,
         '.*DeviceInfo': DeviceInfo,
         '.*Listener': Listener,
+        '.*Notification': Notification,
         '.*Placement': Placement,
         '.*Request': Request,
         '.*Sdk': Sdk,
@@ -44,6 +49,12 @@ export class Backend implements IWebViewBridge {
         console.log(category + '_' + name + ': ' + JSON.stringify(parameters));
         // tslint:disable:no-string-literal
         window['nativebridge']['handleEvent']([category, name].concat(parameters));
+        // tslint:enable:no-string-literal
+    }
+
+    public static getPlatform(): Platform {
+        // tslint:disable:no-string-literal
+        return window['nativebridge']['getPlatform']();
         // tslint:enable:no-string-literal
     }
 
