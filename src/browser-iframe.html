@@ -40,7 +40,9 @@
                 '*.json': './*.json'
             }
         });
-        System.import('Browser');
+        System.import('Browser').then(() => {
+            window.parent.document.getElementById('initialize').disabled = false;
+        });
     </script>
 </head>
 <body></body>
