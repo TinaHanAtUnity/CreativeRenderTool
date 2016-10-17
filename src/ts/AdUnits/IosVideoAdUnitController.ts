@@ -51,7 +51,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
         this._nativeBridge.Notification.addNotificationObserver(IosVideoAdUnitController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addNotificationObserver(IosVideoAdUnitController._audioSessionRouteChange, []);
 
-        this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
+        this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
 
         return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
     }
@@ -88,7 +88,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
 
     private onViewDidAppear(): void {
         if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this._campaign.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0));
         }
     }
 
