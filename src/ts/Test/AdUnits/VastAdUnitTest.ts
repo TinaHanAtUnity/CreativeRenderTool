@@ -196,7 +196,7 @@ describe('VastAdUnit', () => {
             let mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
-            adUnit.sendVideoClickTrackingEvent(eventManager, '123')
+            adUnit.sendVideoClickTrackingEvent(eventManager, '123');
             mockEventManager.verify();
         });
     });
