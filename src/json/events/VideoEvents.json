@@ -44,13 +44,13 @@
       "body": true
     },
     {
-      "parameter": "advertisingId",
+      "parameter": "advertisingTrackingId",
       "required": "no",
       "queryString": false,
       "body": true
     },
     {
-      "parameter": "trackingEnabled",
+      "parameter": "limitAdTracking",
       "required": "no",
       "queryString": false,
       "body": true

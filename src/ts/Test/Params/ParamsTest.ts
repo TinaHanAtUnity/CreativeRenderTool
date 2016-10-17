@@ -21,14 +21,31 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
+        if(storageType === StorageType.PUBLIC) {
+            if(key === 'framework.name.value') {
+                return Promise.resolve(['Unity']);
+            } else if(key === 'framework.version.value') {
+                return Promise.resolve(['1.2.3']);
+            } else if(key === 'adapter.name.value') {
+                return Promise.resolve(['AssetStore']);
+            } else if(key === 'adapter.version.value') {
+                return Promise.resolve(['2.0.0']);
+            }
+        }
         return Promise.reject(['COULDNT_GET_VALUE', key]);
     }
 
     public getKeys(type: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        if(type === StorageType.PUBLIC) {
+            if(key === 'framework' || key === 'adapter') {
+                return Promise.resolve(['name', 'version']);
+            }
+        }
         return Promise.resolve([]);
     }
 }
@@ -157,6 +174,10 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
+    beforeEach(() => {
+        MetaDataManager.clearCaches();
+    });
+
     describe('with config request', () => {
         it('on Android', () => {
             let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
@@ -312,11 +333,11 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit).then(() => {
+                return sessionManager.sendSkip(adUnit, 12345).then(() => {
                     let url: string = requestSpy.getCall(0).args[0];
                     let body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });
@@ -392,11 +413,11 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit).then(() => {
+                return sessionManager.sendSkip(adUnit, 12345).then(() => {
                     let url: string = requestSpy.getCall(0).args[0];
                     let body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });

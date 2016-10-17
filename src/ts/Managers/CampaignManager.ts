@@ -188,7 +188,11 @@ export class CampaignManager {
 
             return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
                 if(mediation) {
-                    body.mediation = mediation.getDTO();
+                    body.mediationName = mediation.getName();
+                    body.mediationVersion = mediation.getVersion();
+                    if(mediation.getOrdinal()) {
+                        body.mediationOrdinal = mediation.getOrdinal();
+                    }
                 }
 
                 return JSON.stringify(body);

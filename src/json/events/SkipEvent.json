@@ -1,18 +1,6 @@
 {
-  "event": "Click event",
+  "event": "Video events: show, start, first quartile, midpoint, third quartile, end and skip",
   "parameters": [
-    {
-      "parameter": "gameId",
-      "required": "all",
-      "queryString": true,
-      "body": false
-    },
-    {
-      "parameter": "redirect",
-      "required": "all",
-      "queryString": true,
-      "body": false
-    },
     {
       "parameter": "eventId",
       "required": "all",
@@ -130,6 +118,12 @@
     {
       "parameter": "mediationOrdinal",
       "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "skippedAt",
+      "required": "all",
       "queryString": false,
       "body": true
     }
