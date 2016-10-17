@@ -5,6 +5,7 @@ PARAMS_JSON = "../src/json/events/Parameters.json"
 CONFIGURATION_JSON = "../src/json/events/ConfigRequest.json"
 ADPLAN_JSON = "../src/json/events/AdRequest.json"
 VIDEO_EVENTS_JSON = "../src/json/events/VideoEvents.json"
+SKIP_EVENT_JSON = "../src/json/events/SkipEvent.json"
 CLICK_EVENT_JSON = "../src/json/events/ClickEvent.json"
 HTML_OUTFILE = "docs.html"
 MARKDOWN_OUTFILE = "docs.md"
@@ -16,6 +17,7 @@ ALL_PARAMS_HEAD = "All Parameters"
 CONFIGURATION_HEAD = "Configuration request"
 ADPLAN_REQ_HEAD = "Ad request"
 VIDEO_EVENTS_HEAD = "Video events"
+SKIP_EVENT_HEAD = "Skip event"
 CLICK_EVENT_HEAD = "Click event"
 
 
@@ -138,12 +140,15 @@ def create_docs(creator, outfile):
                                               ADPLAN_JSON)
     video_events_table = creator.create_event_table(VIDEO_EVENTS_HEAD,
                                                     VIDEO_EVENTS_JSON)
+    skip_event_table = creator.create_event_table(SKIP_EVENT_HEAD,
+                                                   SKIP_EVENT_JSON)
     click_event_table = creator.create_event_table(CLICK_EVENT_HEAD,
                                                    CLICK_EVENT_JSON)
     table_of_contents = creator.create_toc([ALL_PARAMS_HEAD,
                                             CONFIGURATION_HEAD,
                                             ADPLAN_REQ_HEAD,
                                             VIDEO_EVENTS_HEAD,
+                                            SKIP_EVENT_HEAD,
                                             CLICK_EVENT_HEAD])
 
     f = open(outfile, 'w')
@@ -152,6 +157,7 @@ def create_docs(creator, outfile):
                                  configuration_table,
                                  adPlan_table,
                                  video_events_table,
+                                 skip_event_table,
                                  click_event_table]))
     f.close()
 
