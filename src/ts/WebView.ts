@@ -588,5 +588,11 @@ export class WebView {
                 Diagnostics.setTestBaseUrl(url);
             }
         });
+
+        metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
+            if(found && abGroup) {
+                CampaignManager.setAbGroup(abGroup);
+            }
+        });
     }
 }

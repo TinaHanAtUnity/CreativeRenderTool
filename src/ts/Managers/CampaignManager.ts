@@ -16,6 +16,7 @@ import { StorageType } from 'Native/Api/Storage';
 export class CampaignManager {
 
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static AbGroup: string | undefined;
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
@@ -30,6 +31,10 @@ export class CampaignManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
+    }
+
+    public static setAbGroup(abGroup: string) {
+        CampaignManager.AbGroup = abGroup;
     }
 
     constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
@@ -55,7 +60,7 @@ export class CampaignManager {
                 }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
@@ -73,7 +78,7 @@ export class CampaignManager {
                             } else {
                                 campaignId = 'UNKNOWN';
                             }
-                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, campaignJson.abGroup, campaignJson.cacheTTL);
+                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
                                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                                 return;
