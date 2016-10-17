@@ -12,7 +12,9 @@ import { AdUnit } from 'Native/Backend/Api/AdUnit';
 import { VideoPlayer } from 'Native/Backend/Api/VideoPlayer';
 import { Notification } from 'Native/Backend/Api/Notification';
 import { AppSheet } from 'Native/Backend/Api/AppSheet';
-import { Platform } from '../../Constants/Platform';
+import { Platform } from 'Constants/Platform';
+import { Intent } from 'Native/Backend/Api/Intent';
+import { UrlScheme } from 'Native/Backend/Api/UrlScheme';
 
 interface IInvocation {
     className: string;
@@ -36,12 +38,14 @@ export class Backend implements IWebViewBridge {
         '.*Cache': Cache,
         '.*Connectivity': Connectivity,
         '.*DeviceInfo': DeviceInfo,
+        '.*Intent': Intent,
         '.*Listener': Listener,
         '.*Notification': Notification,
         '.*Placement': Placement,
         '.*Request': Request,
         '.*Sdk': Sdk,
         '.*Storage': Storage,
+        '.*UrlScheme': UrlScheme,
         '.*VideoPlayer': VideoPlayer
     };
 
