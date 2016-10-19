@@ -232,7 +232,7 @@ clean:
 	@echo
 
 	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
+	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
 
 lint:
 	@echo

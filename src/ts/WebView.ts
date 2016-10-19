@@ -24,7 +24,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Overlay } from './Views/Overlay';
+import { Overlay } from 'Views/Overlay';
 
 export class WebView {
 
