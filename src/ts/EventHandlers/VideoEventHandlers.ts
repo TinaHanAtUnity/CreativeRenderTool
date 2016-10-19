@@ -69,7 +69,7 @@ export class VideoEventHandlers {
         }
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
-        if(position > 0) {
+        if(position >= 0) {
             let lastPosition = adUnit.getVideoAdUnitController().getVideoPosition();
 
             // consider all leaps more than one million milliseconds (slightly more than 2,5 hours)
