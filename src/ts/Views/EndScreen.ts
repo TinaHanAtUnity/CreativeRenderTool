@@ -98,9 +98,11 @@ export class EndScreen extends View {
             this.onPrivacy.trigger(url);
         });
         this._privacy.onClose.subscribe(() => {
-            this._privacy.hide();
-            this._privacy.container().parentElement.removeChild(this._privacy.container());
-            delete this._privacy;
+            if(this._privacy) {
+                this._privacy.hide();
+                this._privacy.container().parentElement.removeChild(this._privacy.container());
+                delete this._privacy;
+            }
         });
     }
 
