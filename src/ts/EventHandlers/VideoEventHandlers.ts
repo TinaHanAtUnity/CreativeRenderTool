@@ -213,6 +213,17 @@ export class VideoEventHandlers {
         });
     }
 
+    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, url: string): void {
+        nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
+
+        this.handleVideoError(nativeBridge, videoAdUnitController);
+
+        Diagnostics.trigger({
+            'type': 'video_player_prepare_timeout',
+            'url': url
+        });
+    }
+
     public static onPrepareError(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 

@@ -105,7 +105,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
 
     private onResume(activityId: number): void {
         if(this._showing && this.isVideoActive() && activityId === this._activityId) {
-            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0));
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 5000);
         }
     }
 
