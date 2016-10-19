@@ -50,7 +50,6 @@ export class Backend implements IWebViewBridge {
     };
 
     public static sendEvent(category: string, name: string, ...parameters: any[]) {
-        console.log(category + '_' + name + ': ' + JSON.stringify(parameters));
         // tslint:disable:no-string-literal
         window['nativebridge']['handleEvent']([category, name].concat(parameters));
         // tslint:enable:no-string-literal
@@ -66,17 +65,12 @@ export class Backend implements IWebViewBridge {
         let invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
         let results = invocations.map((invocation) => this.executeInvocation(invocation));
         // tslint:disable:no-string-literal
-        window['nativebridge']['handleCallback'](results.map(result => {
-            console.log(result.parameters);
-            return [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters];
-        }));
+        window['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
         // tslint:enable:no-string-literal
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
-        console.log(id);
-        console.log(status);
-        console.log(parameters);
+        return;
     }
 
     private parseInvocation(invocation: any): IInvocation {
@@ -89,7 +83,6 @@ export class Backend implements IWebViewBridge {
     }
 
     private executeInvocation(invocation: IInvocation): IResult {
-        console.log(invocation.className + '.' + invocation.method + '(' + JSON.stringify(invocation.parameters) + ');');
         let api = (() => {
             for(let apiKey in Backend._apiMap) {
                 if(Backend._apiMap.hasOwnProperty(apiKey) && invocation.className.match(apiKey)) {
