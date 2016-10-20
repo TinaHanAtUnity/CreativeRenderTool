@@ -7,6 +7,7 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
+import { Platform } from 'Constants/Platform';
 
 export class EndScreen extends View {
 
@@ -67,6 +68,21 @@ export class EndScreen extends View {
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
         let nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
+
+        let playableUrl: string | undefined;
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            playableUrl = 'https://d1ovo20x1yw5yz.cloudfront.net/creatives/SMA_web/ua/index_android.html';
+            // playableUrl = 'https://d1ovo20x1yw5yz.cloudfront.net/creatives/SG_web/ua/index_android.html';
+        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            playableUrl = 'https://d1ovo20x1yw5yz.cloudfront.net/creatives/SMA_web/ua/index_ios.html';
+            // playableUrl = 'https://d1ovo20x1yw5yz.cloudfront.net/creatives/SG_web/ua/index_ios.html';
+        }
+        if(playableUrl) {
+            let iframe = document.createElement('iframe');
+            iframe.id = 'playable';
+            iframe.src = playableUrl;
+            this._container.appendChild(iframe);
+        }
     }
 
     public hide(): void {
