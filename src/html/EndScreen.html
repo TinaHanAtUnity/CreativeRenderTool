@@ -1,4 +1,5 @@
 <div class="btn-close-region"><a class="btn-close"><span class="icon-close"></span></a></div>
+<% if(!data.mz) { %>
 <div class="campaign-container">
   <div class="game-background game-background-landscape" style="background-image: url(<%= data.endScreenLandscape %>)"></div>
   <div class="game-background game-background-portrait" style="background-image: url(<%= data.endScreenPortrait %>)"></div>
@@ -37,3 +38,6 @@
     <div class="privacy-button"><span class="icon-info"></span></div>
   </div>
 </div>
+<% } else { %>
+<iframe id="playable"></iframe>
+<% } %>

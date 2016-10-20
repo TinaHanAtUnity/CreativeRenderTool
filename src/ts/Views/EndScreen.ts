@@ -25,8 +25,15 @@ export class EndScreen extends View {
         this._gameName = campaign.getGameName();
 
         this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.btn-close-region'
+            }
+        ];
 
-        if (campaign) {
+        if(campaign) {
             let adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
@@ -36,25 +43,22 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString()
             };
-        }
-
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
+            let cid = '123';
+            if(cid === '123') {
+                this._templateData['mz'] = true;
+            } else {
+                this._bindings.push({
+                    event: 'click',
+                    listener: (event: Event) => this.onDownloadEvent(event),
+                    selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                });
+                this._bindings.push({
+                    event: 'click',
+                    listener: (event: Event) => this.onPrivacyEvent(event),
+                    selector: '.privacy-button'
+                });
             }
-        ];
+        }
     }
 
     public show(): void {
@@ -67,7 +71,9 @@ export class EndScreen extends View {
         // would prevent download button from showing which completely breaks layout and monetization
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
         let nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
-        nameContainer.innerHTML = this._gameName + ' ';
+        if(nameContainer) {
+            nameContainer.innerHTML = this._gameName + ' ';
+        }
 
         let playableUrl: string | undefined;
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -78,10 +84,8 @@ export class EndScreen extends View {
             // playableUrl = 'https://d1ovo20x1yw5yz.cloudfront.net/creatives/SG_web/ua/index_ios.html';
         }
         if(playableUrl) {
-            let iframe = document.createElement('iframe');
-            iframe.id = 'playable';
+            let iframe = <HTMLIFrameElement>document.getElementById('playable');
             iframe.src = playableUrl;
-            this._container.appendChild(iframe);
         }
     }
 
