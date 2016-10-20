@@ -208,7 +208,7 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo
@@ -225,14 +225,14 @@ clean:
 	@echo
 
 	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
+	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
 
 lint:
 	@echo
 	@echo Running linter
 	@echo
 
-	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name "*.ts" | xargs`
 
 test: BUILD_DIR = build/coverage
 test: MODULE = system
