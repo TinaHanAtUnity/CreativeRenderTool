@@ -70,11 +70,20 @@ const flatten = (array) => {
 
 const checkConfigJson = (url, version) => {
     console.log('Checking "' + url + '"');
-    fetch(url).then(res => res.json()).then(configJson => {
-         if(configJson.version !== version) {
-             throw new Error('Invalid version "' + configJson.version + '" from "' + url + '"');
-         }
-    });
+    let doFetch = () => {
+        return fetch(url).then(res => res.json()).then(configJson => {
+            if(configJson.version !== version) {
+                console.log('Invalid version "' + configJson.version + '" from "' + url + '"');
+                let timeoutPromise = new Promise((resolve) => {
+                    setTimeout(() => {
+                        doFetch().then(() => resolve());
+                    }, 1000);
+                });
+                return timeoutPromise;
+            }
+        });
+    };
+    return doFetch();
 };
 
 let purgeAkamai = () => {
@@ -107,6 +116,7 @@ let purgeAkamai = () => {
     }).then(body => {
         console.dir(body);
         console.log('Akamai purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.akamai.check_url + urlRoot + path, commit)));
     });
 };
 
@@ -141,6 +151,7 @@ let purgeHighwinds = () => {
     }).then(body => {
         console.dir(body);
         console.log('Highwinds purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.highwinds.check_url + urlRoot + path, commit)));
     });
 };
 
@@ -172,6 +183,7 @@ let purgeChinaNetCenter = () => {
     }).then(body => {
         console.dir(body);
         console.log('ChinaNetCenter purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.chinanetcenter.check_url + urlRoot + path, commit)));
     });
 };
 
