@@ -16,6 +16,11 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+        if(adUnit.getVideoAdUnitController().getVideoErrorStatus()) {
+            // there can be a small race condition window with prepare timeout and canceling video prepare
+            return;
+        }
+
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
 
         adUnit.getVideoAdUnitController().setVideoDuration(duration);
@@ -282,6 +287,7 @@ export class VideoEventHandlers {
     };
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        videoAdUnitController.setVideoErrorStatus(true);
         videoAdUnitController.setVideoActive(false);
         videoAdUnitController.setFinishState(FinishState.ERROR);
         nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
