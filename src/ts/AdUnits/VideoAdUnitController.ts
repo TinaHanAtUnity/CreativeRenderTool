@@ -21,12 +21,12 @@ export abstract class VideoAdUnitController {
     protected _campaign: Campaign;
     protected _overlay: Overlay | undefined;
 
+    protected _videoStarted: boolean;
     protected _videoDuration: number;
     protected _videoPosition: number;
     protected _videoPositionRepeats: number;
     protected _videoQuartile: number;
     protected _videoActive: boolean;
-    protected _watches: number;
     protected _showing: boolean = false;
 
 
@@ -36,11 +36,11 @@ export abstract class VideoAdUnitController {
         this._campaign = campaign;
         this._overlay = overlay;
 
+        this._videoStarted = false;
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
-        this._watches = 0;
     }
 
     public abstract show(): Promise<void>;
@@ -68,8 +68,12 @@ export abstract class VideoAdUnitController {
         return this._showing;
     }
 
-    public getWatches(): number {
-        return this._watches;
+    public isVideoStarted(): boolean {
+        return this._videoStarted;
+    }
+
+    public setVideoStarted(started: boolean): void {
+        this._videoStarted = started;
     }
 
     public getVideoDuration(): number {
@@ -112,16 +116,8 @@ export abstract class VideoAdUnitController {
         this._videoActive = active;
     }
 
-    public setWatches(watches: number): void {
-        this._watches = watches;
-    }
-
     public getOverlay(): Overlay | undefined {
         return this._overlay;
-    }
-
-    public newWatch() {
-        this._watches += 1;
     }
 
     protected unsetReferences() {

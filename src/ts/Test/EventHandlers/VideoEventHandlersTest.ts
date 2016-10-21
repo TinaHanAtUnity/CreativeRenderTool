@@ -66,6 +66,7 @@ describe('VideoEventHandlersTest', () => {
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(videoAdUnitController, 'setVideoPosition');
+            sessionManager.setSession(new Session('123'))
         });
 
         it('with positive position, should set video position and video progress', () => {
@@ -110,40 +111,6 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 16000);
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, performanceAdUnit);
-        });
-    });
-
-    describe('with onVideoStart', () => {
-        beforeEach(() => {
-            sinon.spy(nativeBridge, 'invoke');
-            sinon.spy(sessionManager, 'sendStart');
-            sessionManager.setSession(new Session('123'));
-        });
-
-        it('should send start event with SessionManager', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
-        });
-
-        it('should call newWatch', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            assert.equal(videoAdUnitController.getWatches(), 1);
-        });
-
-        it('on first watch, should call sendStartEvent callback', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
-        });
-
-        it('on second watch, should not call sendStartEvent', () => {
-            videoAdUnitController.newWatch();
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.neverCalledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
-            assert.equal(videoAdUnitController.getWatches(), 2);
         });
     });
 
