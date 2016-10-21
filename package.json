@@ -9,7 +9,6 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "akamai": "0.10.1",
     "es6-promise": "3.3.1",
     "google-closure-compiler": "20160911.0.0",
     "systemjs": "0.19.39",
@@ -29,6 +28,7 @@
     "jsdom": "9.6.0",
     "mocha": "3.1.1",
     "mocha-lcov-reporter": "1.2.0",
+    "node-fetch": "1.6.3",
     "remap-istanbul": "0.6.4",
     "rollup": "0.36.3",
     "rollup-plugin-html": "0.2.1",
