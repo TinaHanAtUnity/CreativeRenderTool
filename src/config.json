@@ -1,1 +1,1 @@
-{"url":"https://webview.unityads.unity3d.com/webview/{BRANCH}/release/index.html?version={VERSION}","hash":"{COMPILED_HASH}","version":"{VERSION}"}
+{"url":"https://webview.unityads.unity3d.com/webview/{BRANCH}/{VERSION}/release/index.html","hash":"{COMPILED_HASH}","version":"{VERSION}"}

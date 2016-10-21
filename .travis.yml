@@ -22,6 +22,8 @@ notifications:
     on_failure: always
     on_start: never
 
+before_deploy: rm -rf build/coverage
+
 deploy:
   provider: s3
   access_key_id: AKIAI5V7ATZVXQHBGHYA
@@ -35,5 +37,4 @@ deploy:
   on:
     all_branches: true
 
-after_deploy:
-- node tools/purge_akamai.js
+after_deploy: node tools/purge.js
