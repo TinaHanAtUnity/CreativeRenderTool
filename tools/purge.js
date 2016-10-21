@@ -77,7 +77,7 @@ const checkConfigJson = (url, version) => {
                 let timeoutPromise = new Promise((resolve) => {
                     setTimeout(() => {
                         doFetch().then(() => resolve());
-                    }, 1000);
+                    }, 5000);
                 });
                 return timeoutPromise;
             }
