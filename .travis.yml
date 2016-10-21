@@ -22,7 +22,10 @@ notifications:
     on_failure: always
     on_start: never
 
-before_deploy: rm -rf build/coverage
+before_deploy:
+  - rm -rf build/coverage
+  - find build/test/* -not -name "config.json" | xargs rm -rf
+  - find build/release/* -not -name "config.json" | xargs rm -rf
 
 deploy:
   provider: s3
