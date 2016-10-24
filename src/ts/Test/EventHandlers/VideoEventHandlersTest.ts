@@ -63,6 +63,14 @@ describe('VideoEventHandlersTest', () => {
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
+    describe('with onVideoPlay', () => {
+        it('should set progress interval', () => {
+            sinon.stub(nativeBridge.VideoPlayer, 'setProgressEventInterval').returns(Promise.resolve(void(0)));
+            VideoEventHandlers.onVideoPlay(nativeBridge, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setProgressEventInterval, videoAdUnitController.getProgressInterval());
+        });
+    });
+
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(videoAdUnitController, 'setVideoPosition');
