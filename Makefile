@@ -102,12 +102,6 @@ build-release: clean build-dir build-static build-css build-ts build-js
 	mkdir build/$(COMMIT_ID) | true
 	rsync -r build/release build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('build/$(COMMIT_ID)/release/config.json', o);\
-		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
-		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
 build-test: MODULE = system
@@ -173,12 +167,6 @@ build-test: clean build-dir build-css build-static build-ts
 	mkdir build/$(COMMIT_ID) | true
 	rsync -r build/test build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('build/$(COMMIT_ID)/test/config.json', o);\
-		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
-		fs.writeFileSync('build/$(COMMIT_ID)/test/config.json', c, o);"
 
 build-dir:
 	@echo
@@ -208,7 +196,7 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo
@@ -225,14 +213,14 @@ clean:
 	@echo
 
 	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
+	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
 
 lint:
 	@echo
 	@echo Running linter
 	@echo
 
-	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name "*.ts" | xargs`
 
 test: BUILD_DIR = build/coverage
 test: MODULE = system
