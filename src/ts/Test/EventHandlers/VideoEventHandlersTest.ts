@@ -66,7 +66,7 @@ describe('VideoEventHandlersTest', () => {
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(videoAdUnitController, 'setVideoPosition');
-            sessionManager.setSession(new Session('123'))
+            sessionManager.setSession(new Session('123'));
         });
 
         it('with positive position, should set video position and video progress', () => {
