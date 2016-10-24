@@ -1,5 +1,4 @@
 import { Double } from 'Utilities/Double';
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
@@ -36,24 +35,7 @@ export class OverlayEventHandlers {
         adUnit.getVideoAdUnitController().onVideoFinish.trigger();
     }
 
-    public static onMute(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, muted: boolean): void {
+    public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
         nativeBridge.VideoPlayer.setVolume(new Double(muted ? 0.0 : 1.0));
-        sessionManager.sendMute(adUnit, sessionManager.getSession(), muted);
-    }
-
-    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
-        sessionManager.sendVideoClickTracking(adUnit, sessionManager.getSession());
-
-        let clickThroughURL = adUnit.getVideoClickThroughURL();
-        if(clickThroughURL) {
-            if(nativeBridge.getPlatform() === Platform.IOS) {
-                nativeBridge.UrlScheme.open(clickThroughURL);
-            } else {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': clickThroughURL
-                });
-            }
-        }
     }
 }

@@ -10,6 +10,7 @@ enum VideoPlayerEvent {
     PROGRESS,
     COMPLETED,
     PREPARED,
+    PREPARE_TIMEOUT,
     PLAY,
     PAUSE,
     SEEKTO,
@@ -24,6 +25,7 @@ export class VideoPlayerApi extends NativeApi {
     public onProgress: Observable1<number> = new Observable1();
     public onCompleted: Observable1<string> = new Observable1();
     public onPrepared: Observable4<number, number, number, string> = new Observable4();
+    public onPrepareTimeout: Observable1<string> = new Observable1();
     public onPlay: Observable1<string> = new Observable1();
     public onPause: Observable1<string> = new Observable1();
     public onSeek: Observable1<string> = new Observable1();
@@ -46,8 +48,8 @@ export class VideoPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getProgressEventInterval');
     }
 
-    public prepare(url: string, initialVolume: Double): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'prepare', [url, initialVolume]);
+    public prepare(url: string, initialVolume: Double, timeout: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'prepare', [url, initialVolume, timeout]);
     }
 
     public play(): Promise<void> {
@@ -90,6 +92,10 @@ export class VideoPlayerApi extends NativeApi {
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARED]:
                 this.onPrepared.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                break;
+
+            case VideoPlayerEvent[VideoPlayerEvent.PREPARE_TIMEOUT]:
+                this.onPrepareTimeout.trigger(parameters[0]);
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PLAY]:

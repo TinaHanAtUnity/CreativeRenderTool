@@ -16,6 +16,11 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+        if(adUnit.getVideoAdUnitController().getVideoErrorStatus()) {
+            // there can be a small race condition window with prepare timeout and canceling video prepare
+            return;
+        }
+
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
 
         adUnit.getVideoAdUnitController().setVideoDuration(duration);
@@ -60,11 +65,16 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
-        // todo: video progress event should be handled here and not delegated to session manager
-        sessionManager.sendProgress(adUnit, sessionManager.getSession(), position, adUnit.getVideoAdUnitController().getVideoPosition());
+        if (sessionManager.getSession() && adUnit instanceof VastAdUnit) {
+            (<VastAdUnit>adUnit).sendProgressEvents(
+                sessionManager.getEventManager(),
+                sessionManager.getSession().getId(),
+                position,
+                adUnit.getVideoAdUnitController().getVideoPosition());
+        }
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
-        if(position > 0) {
+        if(position >= 0) {
             let lastPosition = adUnit.getVideoAdUnitController().getVideoPosition();
 
             // consider all leaps more than one million milliseconds (slightly more than 2,5 hours)
@@ -139,7 +149,6 @@ export class VideoEventHandlers {
     }
 
     public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        sessionManager.sendImpressionEvent(adUnit);
         sessionManager.sendStart(adUnit);
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
@@ -209,6 +218,17 @@ export class VideoEventHandlers {
         });
     }
 
+    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, url: string): void {
+        nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
+
+        this.handleVideoError(nativeBridge, videoAdUnitController);
+
+        Diagnostics.trigger({
+            'type': 'video_player_prepare_timeout',
+            'url': url
+        });
+    }
+
     public static onPrepareError(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, url: string) {
         nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 
@@ -267,6 +287,7 @@ export class VideoEventHandlers {
     };
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        videoAdUnitController.setVideoErrorStatus(true);
         videoAdUnitController.setVideoActive(false);
         videoAdUnitController.setFinishState(FinishState.ERROR);
         nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');

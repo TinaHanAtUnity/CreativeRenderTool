@@ -21,6 +21,7 @@ export abstract class VideoAdUnitController {
     protected _campaign: Campaign;
     protected _overlay: Overlay | undefined;
 
+    protected _videoErrorStatus: boolean;
     protected _videoDuration: number;
     protected _videoPosition: number;
     protected _videoPositionRepeats: number;
@@ -36,6 +37,7 @@ export abstract class VideoAdUnitController {
         this._campaign = campaign;
         this._overlay = overlay;
 
+        this._videoErrorStatus = false;
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
@@ -55,8 +57,25 @@ export abstract class VideoAdUnitController {
         }
     };
 
+    protected getVideoUrl(): string {
+        const campaign: Campaign = this.getCampaign();
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
+        } else {
+            return campaign.getVideoUrl();
+        }
+    }
+
     public isShowing(): boolean {
         return this._showing;
+    }
+
+    public getVideoErrorStatus(): boolean {
+        return this._videoErrorStatus;
+    }
+
+    public setVideoErrorStatus(status: boolean): void {
+        this._videoErrorStatus = status;
     }
 
     public getWatches(): number {
