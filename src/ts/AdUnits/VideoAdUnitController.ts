@@ -22,6 +22,7 @@ export abstract class VideoAdUnitController {
     protected _overlay: Overlay | undefined;
 
     protected _videoStarted: boolean;
+    protected _videoErrorStatus: boolean;
     protected _videoDuration: number;
     protected _videoPosition: number;
     protected _videoPositionRepeats: number;
@@ -37,6 +38,7 @@ export abstract class VideoAdUnitController {
         this._overlay = overlay;
 
         this._videoStarted = false;
+        this._videoErrorStatus = false;
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
@@ -74,6 +76,14 @@ export abstract class VideoAdUnitController {
 
     public setVideoStarted(started: boolean): void {
         this._videoStarted = started;
+    }
+
+    public getVideoErrorStatus(): boolean {
+        return this._videoErrorStatus;
+    }
+
+    public setVideoErrorStatus(status: boolean): void {
+        this._videoErrorStatus = status;
     }
 
     public getVideoDuration(): number {
