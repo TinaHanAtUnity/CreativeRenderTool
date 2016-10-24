@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game of War</title>
+	
+	<meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no, minimal-ui"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+
+	<script>
+		document.addEventListener('click', function(event) {
+		    if(event && event.target && event.target.parentElement && event.target.parentElement.href && event.target.parentElement.href.match(/kochava/)) {
+                event.preventDefault();
+                var xhr = new XMLHttpRequest();
+                xhr.addEventListener('load', function() {
+                    window.parent.postMessage('playableClick', '*');
+                }, false);
+                xhr.open('GET', event.target.parentElement.href);
+                xhr.send();
+			}
+		}, false);
+	</script>
+</head>
+<body>		
+	<script charset="utf-8" type="text/javascript">
+	
+	    var clickurl = "https://control.kochava.com/v1/cpi/click?creative_id={creative_pack}&campaign_tier1_name={campaign_name}&appstore_id={source_game_store_id}&campaign_tier1_value={campaign_id}&cp_value1={os}&cp_name1={device_type}&campaign_id=kogameofwarfireage1541528ae4547febb0eadd450eeb84&network_id=335&adid={ifa}&device_hash_method=md5&device_id={android_id_md5}&device_id_is_hashed=true&device_id_type=android_id&site_id={source_game_id}&append_app_conv_trk_params=1&bid_price={cpi}&pbr=1";
+
+		var adInfo = {
+		    fps             : {
+		        frames        : [],
+		        recentFrames  : [],
+		        curr          : 0,
+		        max           : 0,
+		        min           : 0
+		    },
+			
+		    bucket          	: "",
+		    lastMraidState  	: "",
+		    bidId           	: "",
+		    campaignId      	: "",
+		    creative_id      	: "{creative_pack}",
+			campaign_tier1_name	: "{campaign_name}",
+		    appstore_id     	: "{source_game_store_id}",
+		    campaign_tier1_value: "{campaign_id}",
+		    cp_value1         	: "{os}",
+		    cp_name1        	: "{device_type}",
+		    bid_price       	: "{cpi}",
+		    ssp             	: "",
+		    gameVersion     	: "SG",
+		    difficulty      	: "",
+			useCustomClickUrl   : true,
+		    useProxy            : false,
+		    useErrorCallback    : false,
+		    debugOutput         : false,
+		    disableTracking	    : false,
+			node                : "{SERVER_NODE}",
+		    logToken            : "c55a7e0e6270f68425b7dd19c03d056d"
+		};
+		
+		var GameOptions = {
+			milestone: [10, 30],
+			hideCloseButtonTime: 5,
+			countDownCloseButton: true,
+			preloaderStartCountdown: true,
+			didInteractTimeLimit: 15, 
+			didInteractTimeLimitEnabled: false,
+			
+			DISCLAIMER: {
+				Enabled:false, 
+				en: ""
+			},
+		};
+
+		var GameSettings = {
+			Portrait: {},
+			Landscape: {}
+		};
+		
+	</script>
+	<script charset="utf-8" id="gameloader" type="text/javascript" src="https://static.applifier.com/playables/SG_android/game.js"></script>
+	
+	<div id="gamebox">
+		<div id="preloader" align="center" style="display: block;">Connecting to Game Server...</div>
+		<canvas id="canvas"></canvas>
+	</div>
+</body>
+</html>

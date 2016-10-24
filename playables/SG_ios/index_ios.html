@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game of War</title>
+	
+	<meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no, minimal-ui"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+</head>
+<body>		
+	<script charset="utf-8" type="text/javascript">
+	
+	    var clickurl = "https://control.kochava.com/v1/cpi/click?creative_id={creative_pack}&campaign_tier1_name={campaign_name}&appstore_id={source_game_store_id}&campaign_tier1_value={campaign_id}&cp_value1={os}&cp_name1={device_type}&campaign_id=kogameofwariosmachinezone74551a82d050c164100c6ae56a336&network_id=190&device_id={ifa}&device_id_type=idfa&site_id={source_game_id}&bid_price={cpi}";
+
+		var adInfo = {
+		    fps             : {
+		        frames        : [],
+		        recentFrames  : [],
+		        curr          : 0,
+		        max           : 0,
+		        min           : 0
+		    },
+			
+		    bucket          	: "",
+		    lastMraidState  	: "",
+		    bidId           	: "",
+		    campaignId      	: "",
+		    creative_id      	: "{creative_pack}",
+			campaign_tier1_name	: "{campaign_name}",
+		    appstore_id     	: "{source_game_store_id}",
+		    campaign_tier1_value: "{campaign_id}",
+		    cp_value1         	: "{os}",
+		    cp_name1        	: "{device_type}",
+		    bid_price       	: "{cpi}",
+		    ssp             	: "",
+		    gameVersion     	: "SG",
+		    difficulty      	: "",
+			useCustomClickUrl   : true,
+		    useProxy            : false,
+		    useErrorCallback    : false,
+		    debugOutput         : false,
+		    disableTracking	    : false,
+			node                : "{SERVER_NODE}",
+		    logToken            : "c55a7e0e6270f68425b7dd19c03d056d"
+		};
+		
+		var GameOptions = {
+			milestone: [10, 30],
+			hideCloseButtonTime: 5,
+			countDownCloseButton: true,
+			preloaderStartCountdown: true,
+			didInteractTimeLimit: 15, 
+			didInteractTimeLimitEnabled: false,
+			
+			DISCLAIMER: {
+				Enabled:false, 
+				en: ""
+			},
+		};
+
+		var GameSettings = {
+			Portrait: {},
+			Landscape: {}
+		};
+		
+	</script>
+	<script charset="utf-8" id="gameloader" type="text/javascript" src="https://secure.applifier.com/playables/SG_ios/game.js"></script>
+	
+	<div id="gamebox">
+		<div id="preloader" align="center" style="display: block;">Connecting to Game Server...</div>
+		<canvas id="canvas"></canvas>
+	</div>
+</body>
+</html>
