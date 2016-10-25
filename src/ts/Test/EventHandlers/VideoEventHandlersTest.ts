@@ -71,10 +71,39 @@ describe('VideoEventHandlersTest', () => {
         });
     });
 
+    describe('with video start', () => {
+        beforeEach(() => {
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+            sessionManager.setSession(new Session('123'));
+        });
+
+        it('should set video started', () => {
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            assert.isTrue(videoAdUnitController.isVideoStarted());
+        });
+
+        it('should send start event to backend', () => {
+            sinon.spy(sessionManager, 'sendStart');
+
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
+        });
+
+        it('should invoke onUnityAdsStart callback ', () => {
+            sinon.stub(nativeBridge.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
+
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, TestFixtures.getPlacement().getId());
+        });
+    });
+
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(videoAdUnitController, 'setVideoPosition');
-            sessionManager.setSession(new Session('123'));
         });
 
         it('with positive position, should set video position and video progress', () => {
