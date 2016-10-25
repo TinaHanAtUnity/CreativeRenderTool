@@ -12,7 +12,7 @@
                 event.preventDefault();
                 var xhr = new XMLHttpRequest();
                 xhr.addEventListener('load', function() {
-                    window.parent.postMessage('playableClick', '*');
+                    window.parent.postMessage('market://details?id=com.machinezone.gow', '*');
                 }, false);
                 xhr.open('GET', event.target.parentElement.href);
                 xhr.send();

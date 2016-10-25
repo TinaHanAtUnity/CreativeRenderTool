@@ -7,13 +7,13 @@
 
 	<script>
         document.addEventListener('click', function(event) {
-            if(event && event.target && event.target.parentElement && event.target.parentElement.href && event.target.parentElement.href.match(/kochava/)) {
+            if(event && event.target && event.target.href && event.target.href.match(/kochava/)) {
                 event.preventDefault();
                 var xhr = new XMLHttpRequest();
                 xhr.addEventListener('load', function() {
-                    window.parent.postMessage('playableClick', '*');
+                    window.parent.postMessage('market://details?id=com.epicwaronline.ms', '*');
                 }, false);
-                xhr.open('GET', event.target.parentElement.href);
+                xhr.open('GET', event.target.href);
                 xhr.send();
             }
         }, false);

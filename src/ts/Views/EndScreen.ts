@@ -77,21 +77,21 @@ export class EndScreen extends View {
 
         let playableUrl: string | undefined;
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            // playableUrl = 'https://static.applifier.com/playables/SMA_android/index_android.html';
-            playableUrl = 'https://static.applifier.com/playables/SG_android/index_android.html';
+            playableUrl = 'https://static.applifier.com/playables/SMA_android/index_android.html';
+            // playableUrl = 'https://static.applifier.com/playables/SG_android/index_android.html';
         } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            // playableUrl = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
-            playableUrl = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
+            playableUrl = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+            // playableUrl = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
         }
         if(playableUrl) {
             let iframe = <HTMLIFrameElement>document.getElementById('playable');
             iframe.src = playableUrl;
 
             window.addEventListener('message', (event: MessageEvent) => {
-                if(event.data && event.data === 'playableClick') {
+                if(event.data) {
                     this._nativeBridge.Intent.launch({
                         'action': 'android.intent.action.VIEW',
-                        'uri': 'market://details?id=com.machinezone.gow'
+                        'uri': event.data
                     });
                 }
             }, false);
