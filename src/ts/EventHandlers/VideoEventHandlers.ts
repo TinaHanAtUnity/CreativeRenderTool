@@ -65,6 +65,19 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+        if(position > 0 && !adUnit.getVideoAdUnitController().isVideoStarted()) {
+            adUnit.getVideoAdUnitController().setVideoStarted(true);
+
+            sessionManager.sendStart(adUnit);
+
+            const overlay = adUnit.getVideoAdUnitController().getOverlay();
+            if(overlay) {
+                overlay.setSpinnerEnabled(false);
+            }
+
+            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
+        }
+
         if (sessionManager.getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
@@ -148,21 +161,8 @@ export class VideoEventHandlers {
         }
     }
 
-    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        sessionManager.sendStart(adUnit);
-
-        const overlay = adUnit.getVideoAdUnitController().getOverlay();
-        if(overlay) {
-            overlay.setSpinnerEnabled(false);
-        }
+    public static onVideoPlay(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getVideoAdUnitController().getProgressInterval());
-
-        if(adUnit.getVideoAdUnitController().getWatches() === 0) {
-            // send start callback only for first watch, never for rewatches
-            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
-        }
-
-        adUnit.getVideoAdUnitController().newWatch();
     }
 
     public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
