@@ -95,6 +95,13 @@ export class EndScreen extends View {
                     });
                 }
             }, false);
+
+            window.addEventListener('resize', (event: Event) => {
+                iframe.contentWindow.postMessage({
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight
+                }, '*');
+            }, false);
         }
     }
 
