@@ -24,6 +24,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class WebView {
 
@@ -194,7 +195,14 @@ export class WebView {
             this._mustReinitialize = reinitialize;
         });
 
-        if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
+        let cacheMode: CacheMode;
+        if(AbTestHelper.isCacheModeAbTestActive(this._campaign.getAbGroup())) {
+            cacheMode = AbTestHelper.getCacheMode(this._campaign.getAbGroup(), this._configuration);
+        } else {
+            cacheMode = this._configuration.getCacheMode();
+        }
+
+        if(cacheMode === CacheMode.ALLOWED) {
             this._cacheManager.stop();
         }
 
@@ -264,7 +272,12 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode = this._configuration.getCacheMode();
+        let cacheMode: CacheMode;
+        if (AbTestHelper.isCacheModeAbTestActive(campaign.getAbGroup())) {
+            cacheMode = AbTestHelper.getCacheMode(campaign.getAbGroup(), this._configuration);
+        } else {
+            cacheMode = this._configuration.getCacheMode();
+        }
 
         let cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
@@ -341,7 +354,12 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode = this._configuration.getCacheMode();
+        let cacheMode: CacheMode;
+        if (AbTestHelper.isCacheModeAbTestActive(campaign.getAbGroup())) {
+            cacheMode = AbTestHelper.getCacheMode(campaign.getAbGroup(), this._configuration);
+        } else {
+            cacheMode = this._configuration.getCacheMode();
+        }
 
         let cacheAsset = (url: string) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
