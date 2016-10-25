@@ -5,6 +5,18 @@
 	
 	<meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no, minimal-ui"/>
 	<meta name="apple-mobile-web-app-capable" content="yes" />
+
+	<script>
+		window.addEventListener('message', function(event) {
+		    if(event && event.data && event.data.innerWidth && event.data.innerHeight) {
+                window.innerWidth = event.data.innerWidth;
+                window.innerHeight= event.data.innerHeight;
+                if(orientationHandler) {
+                    orientationHandler();
+                }
+			}
+		}, false);
+	</script>
 </head>
 <body>		
 	<script charset="utf-8" type="text/javascript">
@@ -63,7 +75,7 @@
 		};
 		
 	</script>
-	<script charset="utf-8" id="gameloader" type="text/javascript" src="https://secure.applifier.com/playables/SG_ios/game.js"></script>
+	<script charset="utf-8" id="gameloader" type="text/javascript" src="https://static.applifier.com/playables/SG_ios/game.js"></script>
 	
 	<div id="gamebox">
 		<div id="preloader" align="center" style="display: block;">Connecting to Game Server...</div>
