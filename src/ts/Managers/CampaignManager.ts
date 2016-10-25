@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
+import { ThirdPartyCampaign } from 'Models/ThirdPartyCampaign';
 
 export class CampaignManager {
 
@@ -19,6 +20,7 @@ export class CampaignManager {
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
+    public onThirdPartyCampaign: Observable1<ThirdPartyCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
@@ -55,8 +57,10 @@ export class CampaignManager {
                 }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                    this.onCampaign.trigger(campaign);
+                    /*let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    this.onCampaign.trigger(campaign);*/
+                    let campaign = new ThirdPartyCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, 'https://static.applifier.com/playables/SMA_android/index_android.html');
+                    this.onThirdPartyCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');

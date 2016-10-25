@@ -24,6 +24,9 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { ThirdPartyCampaign } from 'Models/ThirdPartyCampaign';
+import { ThirdParty } from 'Views/ThirdParty';
+import { ThirdPartyAdUnit } from './ThirdPartyAdUnit';
 
 export class AdUnitFactory {
 
@@ -31,6 +34,8 @@ export class AdUnitFactory {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, options);
+        } else if(campaign instanceof ThirdPartyCampaign) {
+            return this.createThirdPartyAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, options);
         } else {
             return this.createPerformanceAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, configuration, options);
         }
@@ -81,6 +86,17 @@ export class AdUnitFactory {
         });
 
         return vastAdUnit;
+    }
+
+    private static createThirdPartyAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: ThirdPartyCampaign, options: any): AbstractAdUnit {
+        let thirdParty = new ThirdParty(nativeBridge, campaign);
+        let thirdPartyAdUnit = new ThirdPartyAdUnit(nativeBridge, placement, campaign, thirdParty);
+
+        thirdParty.render();
+        document.body.appendChild(thirdParty.container());
+        thirdPartyAdUnit.onClose.subscribe(() => thirdPartyAdUnit.hide());
+
+        return thirdPartyAdUnit;
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {

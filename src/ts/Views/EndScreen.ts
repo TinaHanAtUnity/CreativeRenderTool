@@ -7,7 +7,6 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
-import { Platform } from 'Constants/Platform';
 
 export class EndScreen extends View {
 
@@ -25,15 +24,8 @@ export class EndScreen extends View {
         this._gameName = campaign.getGameName();
 
         this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
-            }
-        ];
 
-        if(campaign) {
+        if (campaign) {
             let adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
@@ -43,22 +35,25 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString()
             };
-            let cid = '123';
-            if(cid === '123') {
-                this._templateData['mz'] = true;
-            } else {
-                this._bindings.push({
-                    event: 'click',
-                    listener: (event: Event) => this.onDownloadEvent(event),
-                    selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
-                });
-                this._bindings.push({
-                    event: 'click',
-                    listener: (event: Event) => this.onPrivacyEvent(event),
-                    selector: '.privacy-button'
-                });
-            }
         }
+
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDownloadEvent(event),
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.btn-close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
+            }
+        ];
     }
 
     public show(): void {
@@ -71,38 +66,7 @@ export class EndScreen extends View {
         // would prevent download button from showing which completely breaks layout and monetization
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
         let nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
-        if(nameContainer) {
-            nameContainer.innerHTML = this._gameName + ' ';
-        }
-
-        let playableUrl: string | undefined;
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            playableUrl = 'https://static.applifier.com/playables/SMA_android/index_android.html';
-            // playableUrl = 'https://static.applifier.com/playables/SG_android/index_android.html';
-        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            playableUrl = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
-            // playableUrl = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
-        }
-        if(playableUrl) {
-            let iframe = <HTMLIFrameElement>document.getElementById('playable');
-            iframe.src = playableUrl;
-
-            window.addEventListener('message', (event: MessageEvent) => {
-                if(event.data) {
-                    this._nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': event.data
-                    });
-                }
-            }, false);
-
-            window.addEventListener('resize', (event: Event) => {
-                iframe.contentWindow.postMessage({
-                    innerWidth: window.innerWidth,
-                    innerHeight: window.innerHeight
-                }, '*');
-            }, false);
-        }
+        nameContainer.innerHTML = this._gameName + ' ';
     }
 
     public hide(): void {
