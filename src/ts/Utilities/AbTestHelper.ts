@@ -2,8 +2,8 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 
 export class AbTestHelper {
 
-    private static _cacheModeForcedAbGroup: number = -1;
-    private static _cacheModeAllowedAbGroup: number = -1;
+    private static _cacheModeForcedAbGroup: number = 12;
+    private static _cacheModeAllowedAbGroup: number = 13;
 
 
     public static isCacheModeAbTestActive(abGroup: number): boolean {
