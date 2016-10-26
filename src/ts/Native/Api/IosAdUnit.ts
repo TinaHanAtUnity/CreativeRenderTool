@@ -71,7 +71,19 @@ export class IosAdUnitApi extends NativeApi {
     }
 
     public setTransform(rotation: Double): Promise<void> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'setTransform', [rotation]);
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setTransform', [rotation]);
+    }
+
+    public getTransform(): Promise<Double> {
+        return this._nativeBridge.invoke<Double>(this._apiClass, 'getTransform');
+    }
+
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+    }
+
+    public getViewFrame(view: string): Promise<Double[]> {
+        return this._nativeBridge.invoke<Double[]>(this._apiClass, 'getViewFrame', [view]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

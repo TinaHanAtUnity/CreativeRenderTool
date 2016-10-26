@@ -9,7 +9,9 @@ import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
+    supportedOrientationsPlist: UIInterfaceOrientationMask;
     shouldAutorotate: boolean;
+    statusBarOrientation: number;
 }
 
 export class IosVideoAdUnitController extends VideoAdUnitController {
