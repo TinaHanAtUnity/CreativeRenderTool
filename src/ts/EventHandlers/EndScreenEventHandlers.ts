@@ -7,7 +7,7 @@ import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import {IosUtils} from 'Utilities/IosUtils';
+import { IosUtils } from 'Utilities/IosUtils';
 
 export class EndScreenEventHandlers {
 
