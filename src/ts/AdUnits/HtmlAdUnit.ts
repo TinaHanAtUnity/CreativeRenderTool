@@ -4,7 +4,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 
-export class ThirdPartyAdUnit extends AbstractAdUnit {
+export class HtmlAdUnit extends AbstractAdUnit {
 
     private _thirdParty: ThirdParty;
     private _isShowing: boolean;

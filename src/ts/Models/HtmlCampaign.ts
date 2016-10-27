@@ -1,6 +1,6 @@
 import { Campaign } from 'Models/Campaign';
 
-export class ThirdPartyCampaign extends Campaign {
+export class HtmlCampaign extends Campaign {
 
     private _resource: string;
 

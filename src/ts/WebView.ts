@@ -24,7 +24,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { ThirdPartyCampaign } from './Models/ThirdPartyCampaign';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
 
 export class WebView {
 
@@ -421,7 +421,7 @@ export class WebView {
         }
     }
 
-    private onThirdPartyCampaign(campaign: ThirdPartyCampaign): void {
+    private onThirdPartyCampaign(campaign: HtmlCampaign): void {
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());

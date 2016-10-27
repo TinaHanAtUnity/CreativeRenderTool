@@ -4,15 +4,15 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0 } from 'Utilities/Observable';
-import { ThirdPartyCampaign } from 'Models/ThirdPartyCampaign';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
 
 export class ThirdParty extends View {
 
     public onClose: Observable0 = new Observable0();
 
-    private _campaign: ThirdPartyCampaign;
+    private _campaign: HtmlCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: ThirdPartyCampaign) {
+    constructor(nativeBridge: NativeBridge, campaign: HtmlCampaign) {
         super(nativeBridge, 'empty');
 
         this._campaign = campaign;
