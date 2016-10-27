@@ -210,6 +210,7 @@ build-static:
 	@echo Copying static files to build
 	@echo
 
+	cp -r src/img $(BUILD_DIR)
 	cp -r src/html $(BUILD_DIR)
 	cp -r src/xml $(BUILD_DIR)
 	cp -r src/json $(BUILD_DIR)
