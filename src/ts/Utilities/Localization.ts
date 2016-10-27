@@ -2,6 +2,8 @@ import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
+import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
+import JapaneseOverlay from 'json/locale/ja/overlay.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -21,6 +23,10 @@ export class Localization {
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
             'overlay': JSON.parse(RussianOverlay)
+        },
+        'ja.*': {
+            'endscreen': JSON.parse(JapaneseEndscreen),
+            'overlay': JSON.parse(JapaneseOverlay)
         }
     };
 
