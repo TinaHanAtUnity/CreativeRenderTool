@@ -16,7 +16,7 @@ import { StorageType } from 'Native/Api/Storage';
 export class CampaignManager {
 
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AbGroup: string | undefined;
+    private static AbGroup: number | undefined;
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
@@ -33,7 +33,7 @@ export class CampaignManager {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
     }
 
-    public static setAbGroup(abGroup: string) {
+    public static setAbGroup(abGroup: number) {
         CampaignManager.AbGroup = abGroup;
     }
 
@@ -60,7 +60,7 @@ export class CampaignManager {
                 }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup);
+                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, typeof CampaignManager.AbGroup === 'number' ? CampaignManager.AbGroup : campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
