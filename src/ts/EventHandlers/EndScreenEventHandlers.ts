@@ -6,10 +6,12 @@ import { Campaign } from 'Models/Campaign';
 import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import {IosUtils} from 'Utilities/IosUtils';
 
 export class EndScreenEventHandlers {
 
-    public static onDownload(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
+    public static onDownloadAndroid(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
         let platform = nativeBridge.getPlatform();
         let campaign = adUnit.getCampaign();
 
@@ -17,23 +19,42 @@ export class EndScreenEventHandlers {
             sessionManager.sendClick(adUnit).then(response => {
                 let location = Request.getHeader(response.headers, 'location');
                 if(location) {
-                    if(platform === Platform.IOS) {
-                        nativeBridge.UrlScheme.open(location);
-                    } else {
-                        nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
-                        });
-                    }
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': location
+                    });
+                } else {
+                    throw new Error('No location found');
+                }
+            });
+        } else {
+            nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': EndScreenEventHandlers.getAppStoreUrl(platform, campaign)
+            });
+        }
+    }
+
+    public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
+        let platform = nativeBridge.getPlatform();
+        let campaign = adUnit.getCampaign();
+
+        if(campaign.getClickAttributionUrlFollowsRedirects()) {
+            sessionManager.sendClick(adUnit).then(response => {
+                let location = Request.getHeader(response.headers, 'location');
+                if(location) {
+                    nativeBridge.UrlScheme.open(location);
                 } else {
                     throw new Error('No location found');
                 }
             });
         } else {
             sessionManager.sendClick(adUnit);
-            if(platform === Platform.IOS) {
+            if(IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()) || campaign.getBypassAppSheet()) {
+                nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
+            } else {
                 nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
-                    if(canOpenAppSheet && !campaign.getBypassAppSheet()) {
+                    if(canOpenAppSheet) {
                         const options = {
                             id: parseInt(campaign.getAppStoreId(), 10)
                         };
@@ -47,11 +68,6 @@ export class EndScreenEventHandlers {
                     } else {
                         nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
                     }
-                });
-            } else {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': EndScreenEventHandlers.getAppStoreUrl(platform, campaign)
                 });
             }
         }

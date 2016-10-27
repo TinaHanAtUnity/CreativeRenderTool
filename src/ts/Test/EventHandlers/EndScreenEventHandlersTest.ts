@@ -62,14 +62,14 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
+            EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -86,7 +86,7 @@ describe('EndScreenEventHandlersTest', () => {
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
                 sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
@@ -99,7 +99,7 @@ describe('EndScreenEventHandlersTest', () => {
             beforeEach(() => {
                 sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
 
-                EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
             });
 
