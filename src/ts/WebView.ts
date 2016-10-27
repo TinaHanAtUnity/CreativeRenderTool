@@ -24,6 +24,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class WebView {
@@ -604,6 +605,18 @@ export class WebView {
         metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
             if(found && url) {
                 Diagnostics.setTestBaseUrl(url);
+            }
+        });
+
+        metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
+            if(found && abGroup) {
+                CampaignManager.setAbGroup(abGroup);
+            }
+        });
+
+        metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
+            if(found && autoSkip !== null) {
+                Overlay.setAutoSkip(autoSkip);
             }
         });
     }
