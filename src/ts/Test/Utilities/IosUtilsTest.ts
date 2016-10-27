@@ -16,8 +16,12 @@ describe('IosUtilsTest', () => {
         assert(IosUtils.isAppSheetBroken('8.01'), 'Should return true with string 8.01');
     });
 
-    it('isAppSheetBroken should return false with strings (8., 8.4, 9.0 etc.) should not match ', () => {
+    it('isAppSheetBroken should return false with strings (8., 8.4, 9.0 etc.)', () => {
         assert(!IosUtils.isAppSheetBroken('8'), 'Should return false with string 8');
+        assert(!IosUtils.isAppSheetBroken('8..1'), 'Should return false with string 8..1');
+        assert(!IosUtils.isAppSheetBroken('8!1'), 'Should return false with string 8!1');
+        assert(!IosUtils.isAppSheetBroken('8.!1'), 'Should return false with string 8.!1');
+
         assert(!IosUtils.isAppSheetBroken('8.'), 'Should return false with string 8.');
         assert(!IosUtils.isAppSheetBroken('8.4'), 'Should return false with string 9.0');
         assert(!IosUtils.isAppSheetBroken('9.0'), 'Should return false with string 9.0');
