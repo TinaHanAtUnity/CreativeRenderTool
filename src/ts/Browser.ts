@@ -38,7 +38,7 @@ if(window.parent !== window) {
 
         if(abGroupElement.value.length) {
             publicStorage.test.abGroup = {
-                value: abGroupElement.value,
+                value: parseInt(abGroupElement.value, 10),
                 ts: Date.now()
             };
         }
