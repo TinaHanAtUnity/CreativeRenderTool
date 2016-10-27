@@ -63,6 +63,44 @@ describe('VideoEventHandlersTest', () => {
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
+    describe('with onVideoPlay', () => {
+        it('should set progress interval', () => {
+            sinon.stub(nativeBridge.VideoPlayer, 'setProgressEventInterval').returns(Promise.resolve(void(0)));
+            VideoEventHandlers.onVideoPlay(nativeBridge, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setProgressEventInterval, videoAdUnitController.getProgressInterval());
+        });
+    });
+
+    describe('with video start', () => {
+        beforeEach(() => {
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+            sessionManager.setSession(new Session('123'));
+        });
+
+        it('should set video started', () => {
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            assert.isTrue(videoAdUnitController.isVideoStarted());
+        });
+
+        it('should send start event to backend', () => {
+            sinon.spy(sessionManager, 'sendStart');
+
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
+        });
+
+        it('should invoke onUnityAdsStart callback ', () => {
+            sinon.stub(nativeBridge.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
+
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, TestFixtures.getPlacement().getId());
+        });
+    });
+
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(videoAdUnitController, 'setVideoPosition');
@@ -110,40 +148,6 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 16000);
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, performanceAdUnit);
-        });
-    });
-
-    describe('with onVideoStart', () => {
-        beforeEach(() => {
-            sinon.spy(nativeBridge, 'invoke');
-            sinon.spy(sessionManager, 'sendStart');
-            sessionManager.setSession(new Session('123'));
-        });
-
-        it('should send start event with SessionManager', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
-        });
-
-        it('should call newWatch', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            assert.equal(videoAdUnitController.getWatches(), 1);
-        });
-
-        it('on first watch, should call sendStartEvent callback', () => {
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
-        });
-
-        it('on second watch, should not call sendStartEvent', () => {
-            videoAdUnitController.newWatch();
-            VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, performanceAdUnit);
-
-            sinon.assert.neverCalledWith(<sinon.SinonSpy>nativeBridge.invoke, 'Listener', 'sendStartEvent', ['fooId']);
-            assert.equal(videoAdUnitController.getWatches(), 2);
         });
     });
 

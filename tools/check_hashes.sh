@@ -7,11 +7,11 @@ fi
 
 BRANCH=$1
 CONFIG_URL="https://config.unityads.unity3d.com/webview/$BRANCH/release/config.json"
-WEBVIEW_URL="https://webview.unityads.unity3d.com/webview/$BRANCH/release/index.html"
 
 CONFIG_JSON=`curl -s $CONFIG_URL`
 CONFIG_HASH=`echo $CONFIG_JSON | jq -r .hash`
 CONFIG_VERSION=`echo $CONFIG_JSON | jq -r .version`
+WEBVIEW_URL=`echo $CONFIG_JSON | jq -r .url`
 WEBVIEW_HASH=`curl -s $WEBVIEW_URL | openssl dgst -sha256 | sed 's/^.*= //'`
 
 echo "Version: $CONFIG_VERSION"

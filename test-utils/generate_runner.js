@@ -7,8 +7,8 @@ let getPaths = (root) => {
         let fullPath = path.join(root, file);
         if (fs.statSync(fullPath).isDirectory()) {
             paths = paths.concat(getPaths(fullPath));
-        } else if(fullPath.indexOf('.js') !== -1) {
-            paths.push(fullPath.replace('src/ts/', '').replace('.js', ''));
+        } else if(fullPath.indexOf('Test.ts') !== -1) {
+            paths.push(fullPath.replace('src/ts/', '').replace('.ts', ''));
         }
     });
     return paths;
