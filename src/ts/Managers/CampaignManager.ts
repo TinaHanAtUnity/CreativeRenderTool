@@ -59,7 +59,8 @@ export class CampaignManager {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
                     /*let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);*/
-                    let campaign = new HtmlCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, 'https://static.applifier.com/playables/SMA_android/index_android.html');
+                    let resource = this._nativeBridge.getPlatform() === Platform.ANDROID ? 'https://static.applifier.com/playables/SMA_android/index_android.html' : 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+                    let campaign = new HtmlCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, resource);
                     this.onThirdPartyCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {

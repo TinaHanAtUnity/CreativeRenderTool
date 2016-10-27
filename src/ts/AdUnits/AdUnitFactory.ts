@@ -90,11 +90,11 @@ export class AdUnitFactory {
 
     private static createHtmlAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: HtmlCampaign, options: any): AbstractAdUnit {
         let thirdParty = new ThirdParty(nativeBridge, campaign);
-        let thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, placement, campaign, thirdParty);
+        let thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, placement, campaign, thirdParty, options);
 
         thirdParty.render();
         document.body.appendChild(thirdParty.container());
-        thirdPartyAdUnit.onClose.subscribe(() => thirdPartyAdUnit.hide());
+        thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
 
         return thirdPartyAdUnit;
     }
