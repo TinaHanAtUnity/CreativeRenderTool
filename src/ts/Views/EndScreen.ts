@@ -34,7 +34,10 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString()
+                'ratingCount': campaign.getRatingCount().toString(),
+                'endscreenAlt': (() => {
+                    return undefined;
+                })()
             };
         }
 
