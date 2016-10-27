@@ -25,10 +25,9 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
 
-        if (campaign) {
+        if(campaign) {
             let adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
-                'abGroup': campaign.getAbGroup(),
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon(),
                 'endScreenLandscape': campaign.getLandscapeUrl(),
@@ -36,6 +35,9 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
                 'endscreenAlt': (() => {
+                    if(campaign.getAbGroup() !== 0) {
+                        return 'halloween';
+                    }
                     return undefined;
                 })()
             };
