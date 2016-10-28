@@ -78,7 +78,7 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<Double>(this._apiClass, 'getTransform');
     }
 
-    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+    public setViewFrame(view: string, x: Double, y: Double, width: Double, height: Double): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
     }
 
