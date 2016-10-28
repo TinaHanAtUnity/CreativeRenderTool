@@ -47,7 +47,7 @@ export class AdUnitFactory {
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, metaData);
-        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit);
+        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
         let onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
         let onVideoErrorObserver = videoAdUnitController.onVideoError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
@@ -118,19 +118,21 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, adUnit));
         endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
             let onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
             adUnit.onClose.subscribe(() => {
                 nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
             });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
         }
     }
 
