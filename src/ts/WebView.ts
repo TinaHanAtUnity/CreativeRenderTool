@@ -26,6 +26,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
+import { IosUtils } from 'Utilities/IosUtils';
 
 export class WebView {
 
@@ -216,19 +217,21 @@ export class WebView {
             this._adUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
-            if(!(this._campaign instanceof VastCampaign) && this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
-                const options = {
-                    id: parseInt(this._campaign.getAppStoreId(), 10)
-                };
-                this._nativeBridge.AppSheet.prepare(options).then(() => {
-                    let onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.prepare(options);
+            if (this._nativeBridge.getPlatform() === Platform.IOS && !(this._campaign instanceof VastCampaign)) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
+                    const options = {
+                        id: parseInt(this._campaign.getAppStoreId(), 10)
+                    };
+                    this._nativeBridge.AppSheet.prepare(options).then(() => {
+                        let onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.prepare(options);
+                        });
+                        this._adUnit.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._nativeBridge.AppSheet.destroy(options);
+                        });
                     });
-                    this._adUnit.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                        this._nativeBridge.AppSheet.destroy(options);
-                    });
-                });
+                }
             }
 
             this._adUnit.show().then(() => {
