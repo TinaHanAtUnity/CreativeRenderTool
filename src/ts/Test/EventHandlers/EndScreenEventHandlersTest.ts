@@ -146,9 +146,10 @@ describe('EndScreenEventHandlersTest', () => {
 
             videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
-                getAppStoreId: () => '1appId1',
+                getAppStoreId: () => '11111',
                 getClickAttributionUrlFollowsRedirects: () => true,
-                getBypassAppSheet: () => false
+                getBypassAppSheet: () => false,
+                getClickAttributionUrl: () => ''
             }, overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
@@ -198,7 +199,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should launch app store view', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://itunes.apple.com/app/id1appId1');
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://itunes.apple.com/app/id11111');
             });
 
         });
@@ -214,12 +215,35 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should launch app store view', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://itunes.apple.com/app/id1appId1');
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://itunes.apple.com/app/id11111');
             });
 
         });
 
+        describe('open app sheet', () => {
+            beforeEach(() => {
+                deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
+                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+
+            });
+
+            it('should open app sheet', () => {
+                let resolved = Promise.resolve();
+                sinon.stub(nativeBridge.AppSheet, 'present').returns(resolved);
+                sinon.spy(nativeBridge.AppSheet, 'destroy');
+
+
+                resolved.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AppSheet.present, {id: 11111});
+                    sinon.assert.called(<sinon.SinonSpy>nativeBridge.AppSheet.destroy);
+
+                });
+            });
+
+        });
 
     });
-
 });
