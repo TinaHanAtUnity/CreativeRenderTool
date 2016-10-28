@@ -43,6 +43,8 @@ export class Overlay extends View {
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
 
+    private _fadeTimer: any;
+
     public static setAutoSkip(value: boolean) {
         Overlay.AutoSkip = value;
     }
@@ -74,6 +76,10 @@ export class Overlay extends View {
                 event: 'click',
                 listener: (event: Event) => this.onCallButtonEvent(event),
                 selector: '.call-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onClick(event)
             }
         ];
     }
@@ -130,6 +136,14 @@ export class Overlay extends View {
         if(Overlay.AutoSkip) {
             this.onSkip.trigger(value);
         }
+
+        if(!this._fadeTimer) {
+            this._fadeTimer = setTimeout(() => {
+                this.fade(true);
+                this._fadeTimer = undefined;
+            }, 3000);
+        }
+
         this._videoProgress = value;
         if(this._skipEnabled && this._skipRemaining > 0) {
             this._skipRemaining = Math.round((this._skipDuration - value) / 1000);
@@ -200,6 +214,22 @@ export class Overlay extends View {
     private onCallButtonEvent(event: Event): void {
         event.preventDefault();
         this.onCallButton.trigger(true);
+    }
+
+    private onClick(event: Event) {
+        if(this._fadeTimer) {
+            clearTimeout(this._fadeTimer);
+            this._fadeTimer = undefined;
+        }
+        this.fade(false);
+    }
+
+    private fade(value: boolean) {
+        if(value) {
+            this._container.classList.add('fade');
+        } else {
+            this._container.classList.remove('fade');
+        }
     }
 
 }
