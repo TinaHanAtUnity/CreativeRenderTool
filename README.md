@@ -3,7 +3,7 @@
 
 ## Requirements
 
-- Node (`brew install node`)
+- Node (`brew install node`) (Latest or at least Node 6+)
 
 ### Optional
 
@@ -34,6 +34,12 @@
 ### Dependencies
 
 - `make setup`
+
+### Browser Build
+
+- `make build-browser`
+
+Suggested testing browser is Google Chrome
 
 ### Development Build
 

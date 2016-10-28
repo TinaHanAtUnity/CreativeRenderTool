@@ -612,7 +612,7 @@ export class WebView {
         });
 
         metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
-            if(found && abGroup) {
+            if(found && typeof abGroup === 'number') {
                 CampaignManager.setAbGroup(abGroup);
             }
         });
