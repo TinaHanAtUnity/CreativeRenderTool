@@ -10,6 +10,10 @@ import ItalianEndscreen from 'json/locale/it/endscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
 import GermanEndscreen from 'json/locale/de/endscreen.json';
 import GermanOverlay from 'json/locale/de/overlay.json';
+import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
+import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
+import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
+import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -45,7 +49,15 @@ export class Localization {
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
             'overlay': JSON.parse(GermanOverlay)
-        }
+        },
+        'zh(_Hant)?(_TW|_HK|_MO|_Hant)+$': {
+            'endscreen': JSON.parse(ChineseTraditionalEndscreen),
+            'overlay': JSON.parse(ChineseTraditionalOverlay)
+        },
+        'zh(_Hans)?(_\\D\\D)?$': {
+            'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
+            'overlay': JSON.parse(ChineseSimplifiedOverlay)
+        },
     };
 
     private _language: string;
