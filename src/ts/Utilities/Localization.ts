@@ -14,6 +14,8 @@ import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
+import FinnishEndscreen from 'json/locale/fi/endscreen.json';
+import FinnishOverlay from 'json/locale/fi/overlay.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -57,6 +59,10 @@ export class Localization {
         'zh(_Hans)?(_\\D\\D)?$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay)
+        },
+        'fi.*': {
+            'endscreen': JSON.parse(FinnishEndscreen),
+            'overlay': JSON.parse(FinnishOverlay)
         },
     };
 

@@ -5,15 +5,6 @@ import { Localization } from 'Utilities/Localization';
 
 describe('LocalizationTest', () => {
 
-    beforeEach(() => {
-        Localization.setLanguageMap('en.*', 'endscreen', {
-            'Download For Free': 'Download For Free'
-        });
-        Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Download For Free': 'Lataa ilmaiseksi'
-        });
-    });
-
     it('should return phrase if language is not found', () => {
         let localization = new Localization('asdasd', 'asdasd');
         let phrase = 'foobar';
