@@ -104,6 +104,10 @@ describe('EndScreenEventHandlersTest', () => {
 
             });
 
+            it('should send a click with session manager', () => {
+                sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
+            });
+
             it('should launch market view', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
@@ -241,6 +245,10 @@ describe('EndScreenEventHandlersTest', () => {
                     sinon.assert.called(<sinon.SinonSpy>nativeBridge.AppSheet.destroy);
 
                 });
+            });
+
+            it('should send a click with session manager', () => {
+                sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
             });
 
         });
