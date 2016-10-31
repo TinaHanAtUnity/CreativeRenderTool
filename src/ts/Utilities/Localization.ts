@@ -26,6 +26,8 @@ import DanishEndscreen from 'json/locale/da_DK/endscreen.json';
 import DanishOverlay from 'json/locale/da_DK/overlay.json';
 import NorwegianEndscreen from 'json/locale/nb/endscreen.json';
 import NorwegianOverlay from 'json/locale/nb/overlay.json';
+import LithuanianEndscreen from 'json/locale/lt/endscreen.json';
+import LithuanianOverlay from 'json/locale/lt/overlay.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -93,6 +95,10 @@ export class Localization {
         'nb.*': {
             'endscreen': JSON.parse(NorwegianEndscreen),
             'overlay': JSON.parse(NorwegianOverlay)
+        },
+        'lt.*': {
+            'endscreen': JSON.parse(LithuanianEndscreen),
+            'overlay': JSON.parse(LithuanianOverlay)
         },
     };
 
