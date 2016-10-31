@@ -52,7 +52,7 @@ export class Request {
 
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
-            let header = headers[i];
+            const header = headers[i];
             if(header[0].match(new RegExp(headerName, 'i'))) {
                 return header[1];
             }
@@ -83,8 +83,8 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
@@ -102,8 +102,8 @@ export class Request {
 
         headers.push(['Content-Type', 'application/json']);
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.POST,
             url: url,
@@ -120,8 +120,8 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.HEAD,
             url: url,
@@ -134,7 +134,7 @@ export class Request {
 
     private registerCallback(id: number): Promise<INativeResponse> {
         return new Promise<INativeResponse>((resolve, reject) => {
-            let callbackObject: { [key: number]: Function } = {};
+            const callbackObject: { [key: number]: Function } = {};
             callbackObject[RequestStatus.COMPLETE] = resolve;
             callbackObject[RequestStatus.FAILED] = reject;
             Request._callbacks[id] = callbackObject;
@@ -159,7 +159,7 @@ export class Request {
     }
 
     private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
-        let callbackObject = Request._callbacks[id];
+        const callbackObject = Request._callbacks[id];
         if(callbackObject) {
             callbackObject[status](...parameters);
             delete Request._callbacks[id];
@@ -181,14 +181,14 @@ export class Request {
     }
 
     private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
-        let id = parseInt(rawId, 10);
-        let nativeResponse: INativeResponse = {
+        const id = parseInt(rawId, 10);
+        const nativeResponse: INativeResponse = {
             url: url,
             response: response,
             responseCode: responseCode,
             headers: headers
         };
-        let nativeRequest = Request._requests[id];
+        const nativeRequest = Request._requests[id];
 
         if(!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
@@ -197,7 +197,7 @@ export class Request {
 
         if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
-                let location = Request.getHeader(headers, 'location');
+                const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
@@ -213,8 +213,8 @@ export class Request {
     }
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
-        let id = parseInt(rawId, 10);
-        let nativeRequest = Request._requests[id];
+        const id = parseInt(rawId, 10);
+        const nativeRequest = Request._requests[id];
 
         if(!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
@@ -228,7 +228,7 @@ export class Request {
         let id: any;
         for(id in Request._requests) {
             if(Request._requests.hasOwnProperty(id)) {
-                let request: INativeRequest = Request._requests[id];
+                const request: INativeRequest = Request._requests[id];
                 if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
                     this.invokeRequest(id, request);
                 }

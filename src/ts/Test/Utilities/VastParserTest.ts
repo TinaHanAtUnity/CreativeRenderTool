@@ -20,7 +20,7 @@ describe('VastParser', () => {
     let request: Request;
     let nativeBridge: NativeBridge;
 
-    let vastRaw = VastRaw;
+    const vastRaw = VastRaw;
 
     it('should throw when given null', () => {
         assert.throws(() => {
@@ -43,7 +43,7 @@ describe('VastParser', () => {
     });
 
     it('should have correct data given url encoded data string and additional tracking events', () => {
-        let vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
         assert.equal(1, vast.getAds().length);
         assert.deepEqual(vast.getImpressionUrls(), [
             'http://dt.videohub2.tv/ssframework/tvuid?a=set&UI=ef20e47b94a670839943ad4d9f933016&ss_rand=1848887672',
@@ -88,22 +88,22 @@ describe('VastParser', () => {
     });
 
     it('should have correct click trough url', () => {
-        let vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
         assert.equal(vast.getVideoClickThroughURL(), 'www.tremorvideo.com');
     });
 
     it('should have correct video click trough tracking url', () => {
-        let vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
         assert.deepEqual(vast.getVideoClickTrackingURLs(), ['http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&EC=2&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=624905135', 'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=click&vastcrtype=linear&crid=7286756']);
     });
 
     it('should throw when given vast has no Ad element', () => {
-        let vastNoAdRaw = `
+        const vastNoAdRaw = `
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <VAST version="2.0"></VAST>`;
 
         try {
-            let vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, nativeBridge, request);
+            const vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, nativeBridge, request);
             vastPromise.then(() => {
                 assert.fail('Should fail when parsing invalid VAST');
             });
@@ -116,10 +116,10 @@ describe('VastParser', () => {
     });
 
     it('should throw an error with appropriate information when there is a problem with parsing a wrapped VAST', () => {
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
 
-        let rootVast = RootVastClean;
-        let wrappedVAST = WrappedVast;
+        const rootVast = RootVastClean;
+        const wrappedVAST = WrappedVast;
 
         for (let i = 0; i < 6; i++) {
             mockRequest.expects('get').returns(Promise.resolve({
@@ -131,7 +131,7 @@ describe('VastParser', () => {
             response: 'invalid vast'
         }));
 
-        let vastPromise = TestFixtures.getVastParser().retrieveVast(rootVast, nativeBridge, request);
+        const vastPromise = TestFixtures.getVastParser().retrieveVast(rootVast, nativeBridge, request);
 
         vastPromise.then(() => {
             assert.fail('Should fail when parsing invalid VAST');
@@ -145,15 +145,15 @@ describe('VastParser', () => {
     });
 
     it('should trim spaces around VASTAdTagURI', () => {
-        let rootVast = RootVastDirty;
+        const rootVast = RootVastDirty;
 
-        let vast = TestFixtures.getVastParser().parseVast(rootVast);
+        const vast = TestFixtures.getVastParser().parseVast(rootVast);
         assert.equal(vast.getWrapperURL(), 'http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_1.xml');
     });
 
     it('should have all extra spaces in urls trimmed', () => {
-        let vastWithSpaces = VastWithSpaces;
-        let vast = TestFixtures.getVastParser().parseVast(vastWithSpaces);
+        const vastWithSpaces = VastWithSpaces;
+        const vast = TestFixtures.getVastParser().parseVast(vastWithSpaces);
 
         assert.deepEqual(vast.getImpressionUrls(), [
             'http://dt.videohub2.tv/ssframework/tvuid?a=set&UI=ef20e47b94a670839943ad4d9f933016&ss_rand=1848887672',
@@ -226,7 +226,7 @@ describe('VastParser', () => {
                 return Platform.TEST;
             }
         };
-        let wakeUpManager = new WakeUpManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
     });
 });

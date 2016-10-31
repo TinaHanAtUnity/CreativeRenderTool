@@ -24,8 +24,8 @@ class TestResolveApi extends ResolveApi {
 }
 
 describe('ResolveTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, resolveApi: TestResolveApi, resolve: Resolve;
 
     beforeEach(() => {
@@ -39,8 +39,8 @@ describe('ResolveTest', () => {
     });
 
     it('Resolve host with success', () => {
-        let testHost: string = 'www.example.net';
-        let testIp: string = '1.2.3.4';
+        const testHost: string = 'www.example.net';
+        const testIp: string = '1.2.3.4';
 
         return resolve.resolve(testHost).then(([host, ip]) => {
             assert.equal(testHost, host, 'Hostname does not match the request');
@@ -49,9 +49,9 @@ describe('ResolveTest', () => {
     });
 
     it('Resolve host with failure', () => {
-        let failHost: string = 'www.fail.com';
-        let expectedError: string = 'Error';
-        let expectedErrorMsg: string = 'Error message';
+        const failHost: string = 'www.fail.com';
+        const expectedError: string = 'Error';
+        const expectedErrorMsg: string = 'Error message';
 
         return resolve.resolve(failHost).then(() => {
             assert.fail('Failed resolve must not be successful');

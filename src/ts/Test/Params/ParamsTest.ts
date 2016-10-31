@@ -82,7 +82,7 @@ class SpecVerifier {
     constructor(platform: Platform, spec: IEventSpec, url: string, body?: string) {
         this._platform = platform;
         this._spec = spec;
-        let parsedUrl: string[] = url.split('?');
+        const parsedUrl: string[] = url.split('?');
         if(parsedUrl.length > 1) {
             this._queryParams = parsedUrl[1].split('&');
         }
@@ -99,7 +99,7 @@ class SpecVerifier {
     private assertUnspecifiedParams(): void {
         if(this._queryParams) {
             for(let i: number = 0; i < this._queryParams.length; i++) {
-                let paramName: string = this._queryParams[i].split('=')[0];
+                const paramName: string = this._queryParams[i].split('=')[0];
 
                 assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
@@ -107,8 +107,7 @@ class SpecVerifier {
         }
 
         if(this._bodyParams) {
-            let key: string;
-            for(key in this._bodyParams) {
+            for(let key in this._bodyParams) {
                 if(this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
@@ -118,15 +117,14 @@ class SpecVerifier {
     }
 
     private assertRequiredParams(): void {
-        let param: string;
-        for(param in this._spec) {
+        for(let param in this._spec) {
             if(this._spec.hasOwnProperty(param)) {
                 if(this.isRequired(this._spec[param].required)) {
                     if(this._spec[param].queryString) {
                         let found: boolean = false;
 
                         for(let i: number = 0; i < this._queryParams.length; i++) {
-                            let paramName: string = this._queryParams[i].split('=')[0];
+                            const paramName: string = this._queryParams[i].split('=')[0];
                             if(paramName === param) {
                                 found = true;
                             }
@@ -150,7 +148,7 @@ class SpecVerifier {
 
 class TestHelper {
     public static getNativeBridge(platform: Platform) {
-        let nativeBridge: NativeBridge = TestFixtures.getNativeBridge(platform);
+        const nativeBridge: NativeBridge = TestFixtures.getNativeBridge(platform);
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
         nativeBridge.Request = new TestRequestApi(nativeBridge);
         nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
@@ -160,15 +158,15 @@ class TestHelper {
     }
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
-        let eventManager: EventManager = new EventManager(nativeBridge, request);
-        let sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager);
+        const eventManager: EventManager = new EventManager(nativeBridge, request);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager);
         sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
-        let config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
-        let deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
+        const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
+        const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
         return AdUnitFactory.createAdUnit(nativeBridge, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
@@ -180,25 +178,25 @@ describe('Event parameters should match specifications', () => {
 
     describe('with config request', () => {
         it('on Android', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'get');
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'get');
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID)).then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
+                const url: string = requestSpy.getCall(0).args[0];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
                 verifier.assert();
             });
         });
 
         it('on iOS', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'get');
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'get');
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS)).then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
+                const url: string = requestSpy.getCall(0).args[0];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
                 verifier.assert();
             });
         });
@@ -206,29 +204,29 @@ describe('Event parameters should match specifications', () => {
 
     describe('with ad request', () => {
         it('on Android', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'post');
-            let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'post');
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
             return campaignManager.request().then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
-                let body: string = requestSpy.getCall(0).args[1];
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
             });
        });
 
         it('on iOS', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'post');
-            let campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'post');
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
             return campaignManager.request().then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
-                let body: string = requestSpy.getCall(0).args[1];
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getAdRequestParams(), url, body);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
             });
         });
@@ -236,31 +234,31 @@ describe('Event parameters should match specifications', () => {
 
     describe('with click event', () => {
         it('on Android', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'post');
-            let sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
-            let adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'post');
+            const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             return sessionManager.sendClick(adUnit).then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
-                let body: string = requestSpy.getCall(0).args[1];
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getClickEventParams(), url, body);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getClickEventParams(), url, body);
                 verifier.assert();
             });
         });
 
         it('on iOS', () => {
-            let nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
-            let request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-            let requestSpy: any = sinon.spy(request, 'post');
-            let sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
-            let adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+            const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const requestSpy: any = sinon.spy(request, 'post');
+            const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             return sessionManager.sendClick(adUnit).then(() => {
-                let url: string = requestSpy.getCall(0).args[0];
-                let body: string = requestSpy.getCall(0).args[1];
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
 
-                let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getClickEventParams(), url, body);
+                const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getClickEventParams(), url, body);
                 verifier.assert();
             });
         });
@@ -284,70 +282,70 @@ describe('Event parameters should match specifications', () => {
 
             it('with show event', () => {
                 return sessionManager.sendShow(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with start event', () => {
                 return sessionManager.sendStart(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with first quartile event', () => {
                 return sessionManager.sendFirstQuartile(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with midpoint event', () => {
                 return sessionManager.sendMidpoint(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with third quartile event', () => {
                 return sessionManager.sendThirdQuartile(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with skip event', () => {
                 return sessionManager.sendSkip(adUnit, 12345).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getSkipEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with end event', () => {
                 return sessionManager.sendView(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
@@ -364,70 +362,70 @@ describe('Event parameters should match specifications', () => {
 
             it('with show event', () => {
                 return sessionManager.sendShow(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with start event', () => {
                 return sessionManager.sendStart(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with first quartile event', () => {
                 return sessionManager.sendFirstQuartile(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with midpoint event', () => {
                 return sessionManager.sendMidpoint(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with third quartile event', () => {
                 return sessionManager.sendThirdQuartile(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with skip event', () => {
                 return sessionManager.sendSkip(adUnit, 12345).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getSkipEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });
 
             it('with end event', () => {
                 return sessionManager.sendView(adUnit).then(() => {
-                    let url: string = requestSpy.getCall(0).args[0];
-                    let body: string = requestSpy.getCall(0).args[1];
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
 
-                    let verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
                     verifier.assert();
                 });
             });

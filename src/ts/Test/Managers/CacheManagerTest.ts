@@ -20,9 +20,9 @@ class TestCacheApi extends CacheApi {
     }
 
     public download(url: string, fileId: string): Promise<void> {
-        let byteCount: number = 12345;
-        let duration: number = 6789;
-        let responseCode: number = 200;
+        const byteCount: number = 12345;
+        const duration: number = 6789;
+        const responseCode: number = 200;
 
         if(this._currentFile !== undefined) {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
@@ -54,8 +54,8 @@ class TestCacheApi extends CacheApi {
     }
 
     public getFiles(): Promise<IFileInfo[]> {
-        let files: IFileInfo[] = [];
-        for(let key in this._files) {
+        const files: IFileInfo[] = [];
+        for(const key in this._files) {
             if(this._files.hasOwnProperty(key)) {
                 files.push(this._files[key]);
             }
@@ -79,8 +79,8 @@ class TestCacheApi extends CacheApi {
         if(!value.length) {
             return hash.toString();
         }
-        for(let i = 0; i < value.length; ++i) {
-            let char = value.charCodeAt(i);
+        for(let i = 0; i < value.length; i++) {
+            const char = value.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash;
         }
@@ -96,12 +96,12 @@ class TestCacheApi extends CacheApi {
     }
 
     public addFile(id: string, mtime: number, size: number): void {
-        let fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
+        const fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
         this._files[id] = fileInfo;
     }
 
     public getExtension(url: string): string {
-        let splittedUrl = url.split('.');
+        const splittedUrl = url.split('.');
         let extension: string = '';
         if(splittedUrl.length > 1) {
             extension = splittedUrl[splittedUrl.length - 1];
@@ -115,7 +115,7 @@ class TestCacheApi extends CacheApi {
 
     public getDownloadedFilesCount(): number {
         let fileCount = 0;
-        for(let key in this._files) {
+        for(const key in this._files) {
             if(this._files.hasOwnProperty(key)) {
                 ++fileCount;
             }
@@ -143,8 +143,8 @@ class TestStorageApi extends StorageApi {
 }
 
 describe('CacheManagerTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     let cacheApi: TestCacheApi;
@@ -166,8 +166,8 @@ describe('CacheManagerTest', () => {
     });
 
     it('Get local file url for cached file', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
+        const testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
@@ -177,11 +177,11 @@ describe('CacheManagerTest', () => {
     });
 
     it('Cache one file with success', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileId: string = '-960478764.mp4';
-        let testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
+        const testFileId: string = '-960478764.mp4';
+        const testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-        let cacheSpy = sinon.spy(cacheApi, 'download');
+        const cacheSpy = sinon.spy(cacheApi, 'download');
 
         return cacheManager.cache(testUrl).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK');
@@ -195,14 +195,14 @@ describe('CacheManagerTest', () => {
     });
 
     it('Cache three files with success', () => {
-        let testUrl1: string = 'http://www.example.net/first.jpg';
-        let testUrl2: string = 'http://www.example.net/second.jpg';
-        let testUrl3: string = 'http://www.example.net/third.jpg';
-        let testFileUrl1: string = 'file:///test/cache/dir/UnityAdsCache-1647395140.jpg';
-        let testFileUrl2: string = 'file:///test/cache/dir/UnityAdsCache-158720486.jpg';
-        let testFileUrl3: string = 'file:///test/cache/dir/UnityAdsCache-929022075.jpg';
+        const testUrl1: string = 'http://www.example.net/first.jpg';
+        const testUrl2: string = 'http://www.example.net/second.jpg';
+        const testUrl3: string = 'http://www.example.net/third.jpg';
+        const testFileUrl1: string = 'file:///test/cache/dir/UnityAdsCache-1647395140.jpg';
+        const testFileUrl2: string = 'file:///test/cache/dir/UnityAdsCache-158720486.jpg';
+        const testFileUrl3: string = 'file:///test/cache/dir/UnityAdsCache-929022075.jpg';
 
-        let cacheSpy = sinon.spy(cacheApi, 'download');
+        const cacheSpy = sinon.spy(cacheApi, 'download');
 
         return cacheManager.cache(testUrl1).then(([status, fileId]) => {
             assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for first test url');
@@ -231,8 +231,8 @@ describe('CacheManagerTest', () => {
     });
 
     it('Cache one file with network failure', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileId: string = '-960478764.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
+        const testFileId: string = '-960478764.mp4';
         let networkTriggered: boolean = false;
 
         cacheApi.setInternet(false);
@@ -251,10 +251,10 @@ describe('CacheManagerTest', () => {
 
     // todo: these two tests are unstable in hybrid tests on old Androids and should be refactored
     xit('Cache one file with repeated network failures (expect to fail)', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
-        let triggerNetwork: Function = () => {
+        const triggerNetwork: Function = () => {
             networkTriggers++;
             wakeUpManager.onNetworkConnected.trigger();
         };
@@ -272,8 +272,8 @@ describe('CacheManagerTest', () => {
     });
 
     xit('Stop caching', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileId: string = '-960478764.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
+        const testFileId: string = '-960478764.mp4';
 
         cacheApi.setInternet(false);
 
@@ -288,8 +288,8 @@ describe('CacheManagerTest', () => {
     });
 
     it('Cache one already downloaded file', () => {
-        let testUrl: string = 'http://www.example.net/test.mp4';
-        let testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
+        const testUrl: string = 'http://www.example.net/test.mp4';
+        const testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
@@ -302,12 +302,12 @@ describe('CacheManagerTest', () => {
     });
 
     it('Clean cache from current files', () => {
-        let currentFile: string = 'current';
-        let currentTime = new Date().getTime();
+        const currentFile: string = 'current';
+        const currentTime = new Date().getTime();
 
         cacheApi.addFile(currentFile, currentTime, 1234);
 
-        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(!cacheSpy.calledOnce, 'Clean cache tried to delete current files');
@@ -315,15 +315,15 @@ describe('CacheManagerTest', () => {
     });
 
     it('Clean cache from old files', () => {
-        let currentFile: string = 'current';
-        let oldFile: string = 'old';
-        let currentTime = new Date().getTime();
-        let tenWeeksAgo = currentTime - 10 * 7 * 24 * 60 * 60 * 1000;
+        const currentFile: string = 'current';
+        const oldFile: string = 'old';
+        const currentTime = new Date().getTime();
+        const tenWeeksAgo = currentTime - 10 * 7 * 24 * 60 * 60 * 1000;
 
         cacheApi.addFile(currentFile, currentTime, 1234);
         cacheApi.addFile(oldFile, tenWeeksAgo, 1234);
 
-        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(cacheSpy.calledOnce, 'Clean cache from old files did not delete files');
@@ -332,15 +332,15 @@ describe('CacheManagerTest', () => {
     });
 
     it('Clean cache from large disk usage', () => {
-        let olderFile: string = 'older';
-        let newerFile: string = 'newer';
-        let currentTime = new Date().getTime();
-        let size: number = 30 * 1024 * 1024;
+        const olderFile: string = 'older';
+        const newerFile: string = 'newer';
+        const currentTime = new Date().getTime();
+        const size: number = 30 * 1024 * 1024;
 
         cacheApi.addFile(olderFile, currentTime - 1, size);
         cacheApi.addFile(newerFile, currentTime, size);
 
-        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert(cacheSpy.calledOnce, 'Clean cache from large disk usage did not delete files');
@@ -349,7 +349,7 @@ describe('CacheManagerTest', () => {
     });
 
     it('Clean cache (nothing to clean)', () => {
-        let cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         return cacheManager.cleanCache().then(() => {
             assert.equal(0, cacheSpy.callCount, 'Clean cache tried to delete files from empty cache');

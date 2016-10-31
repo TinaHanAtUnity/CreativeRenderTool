@@ -65,7 +65,7 @@ export class TestFixtures {
 
     public static getVastParser(): VastParser {
         let vastParser: VastParser;
-        let domParser = new DOMParser();
+        const domParser = new DOMParser();
         vastParser = new VastParser(domParser);
         return vastParser;
     }
@@ -74,7 +74,7 @@ export class TestFixtures {
         if(typeof platform === 'undefined') {
             platform = Platform.TEST;
         }
-        let backend = {
+        const backend = {
             handleInvocation: function() {
                 // no-op
             },

@@ -45,7 +45,7 @@ export class WakeUpManager {
     }
 
     private onConnected(wifi: boolean, networkType: number) {
-        let fifteenMinutes: number = 15 * 60 * 1000;
+        const fifteenMinutes: number = 15 * 60 * 1000;
 
         if(this._lastConnected + fifteenMinutes < Date.now()) {
             this._lastConnected = Date.now();

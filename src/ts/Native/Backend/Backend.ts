@@ -62,8 +62,8 @@ export class Backend implements IWebViewBridge {
     }
 
     public handleInvocation(rawInvocations: string): void {
-        let invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
-        let results = invocations.map((invocation) => this.executeInvocation(invocation));
+        const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
+        const results = invocations.map((invocation) => this.executeInvocation(invocation));
         // tslint:disable:no-string-literal
         window['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
         // tslint:enable:no-string-literal
@@ -83,8 +83,8 @@ export class Backend implements IWebViewBridge {
     }
 
     private executeInvocation(invocation: IInvocation): IResult {
-        let api = (() => {
-            for(let apiKey in Backend._apiMap) {
+        const api = (() => {
+            for(const apiKey in Backend._apiMap) {
                 if(Backend._apiMap.hasOwnProperty(apiKey) && invocation.className.match(apiKey)) {
                     return Backend._apiMap[apiKey];
                 }

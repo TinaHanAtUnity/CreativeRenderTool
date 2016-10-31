@@ -32,8 +32,8 @@ export class Tap {
     }
 
     private onTouchMove(event: TouchEvent) {
-        let x = event.touches[0].clientX;
-        let y = event.touches[0].clientY;
+        const x = event.touches[0].clientX;
+        const y = event.touches[0].clientY;
         if(Math.abs(x - this._startX) > Tap._moveTolerance || Math.abs(y - this._startY) > Tap._moveTolerance) {
             this._moved = true;
         }
@@ -48,7 +48,7 @@ export class Tap {
         this._onTouchCancelListener = undefined;
 
         if(!this._moved) {
-            let fakeEvent = new MouseEvent('click', {
+            const fakeEvent = new MouseEvent('click', {
                 view: window,
                 bubbles: true,
                 cancelable: true

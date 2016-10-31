@@ -76,7 +76,7 @@ export class CacheManager {
                 if(typeof options === 'undefined') {
                     options = CacheManager.getDefaultCacheOptions();
                 }
-                let promise = this.registerCallback(url, fileId, options);
+                const promise = this.registerCallback(url, fileId, options);
                 this.downloadFile(url, fileId);
                 return promise;
             });
@@ -86,10 +86,9 @@ export class CacheManager {
     public stop(): void {
         let activeDownload: boolean = false;
 
-        let url: any;
-        for(url in this._callbacks) {
+        for(let url in this._callbacks) {
             if(this._callbacks.hasOwnProperty(url)) {
-                let callback: ICallbackObject = this._callbacks[url];
+                const callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
                     callback.reject(CacheStatus.STOPPED);
                     delete this._callbacks[url];
@@ -111,10 +110,10 @@ export class CacheManager {
             }
 
             // clean files older than three weeks and limit cache size to 50 megabytes
-            let timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
-            let sizeThreshold: number = 50 * 1024 * 1024;
+            const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
+            const sizeThreshold: number = 50 * 1024 * 1024;
 
-            let deleteFiles: string[] = [];
+            const deleteFiles: string[] = [];
             let totalSize: number = 0;
 
             // sort files from newest to oldest
@@ -122,8 +121,8 @@ export class CacheManager {
                 return n2.mtime - n1.mtime;
             });
 
-            for(let i: number = 0; i < files.length; i++) {
-                let file: IFileInfo = files[i];
+            for(let i = 0; i < files.length; i++) {
+                const file: IFileInfo = files[i];
                 totalSize += file.size;
 
                 if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
@@ -137,7 +136,7 @@ export class CacheManager {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
             }
 
-            let promises: Promise<any>[] = [];
+            const promises: Promise<any>[] = [];
 
             deleteFiles.map(file => {
                 promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file));
@@ -157,11 +156,11 @@ export class CacheManager {
 
         let extension: string;
         let urlFilename: string = url;
-        let urlPaths = url.split('/');
+        const urlPaths = url.split('/');
         if(urlPaths.length > 1) {
             urlFilename = urlPaths[urlPaths.length - 1];
         }
-        let fileExtensions = urlFilename.split('.');
+        const fileExtensions = urlFilename.split('.');
         if(fileExtensions.length > 1) {
             extension = fileExtensions[fileExtensions.length - 1];
         }
@@ -188,7 +187,7 @@ export class CacheManager {
             return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
                 if(fileInfo.found && fileInfo.size > 0) {
                     return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
-                        let storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
+                        const storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
                         return !storedCacheResponse.fullyDownloaded;
                     });
                 } else {
@@ -200,7 +199,7 @@ export class CacheManager {
 
     private downloadFile(url: string, fileId: string): void {
         this._nativeBridge.Cache.download(url, fileId).catch(error => {
-            let callback = this._callbacks[url];
+            const callback = this._callbacks[url];
             if(callback) {
                 switch(error) {
                     case CacheError[CacheError.FILE_ALREADY_CACHING]:
@@ -222,7 +221,7 @@ export class CacheManager {
 
     private registerCallback(url: string, fileId: string, options: ICacheOptions): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
-            let callbackObject: ICallbackObject = {
+            const callbackObject: ICallbackObject = {
                 fileId: fileId,
                 networkRetry: false,
                 retryCount: 0,
@@ -267,11 +266,11 @@ export class CacheManager {
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
-        let callback = this._callbacks[url];
+        const callback = this._callbacks[url];
         if(callback) {
             // todo: add redirect logic here
             if(responseCode !== 200 && responseCode !== 206) {
-                let error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
+                const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
                     url: url,
                     size: size,
                     totalSize: totalSize,
@@ -300,7 +299,7 @@ export class CacheManager {
     }
 
     private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
-        let callback = this._callbacks[url];
+        const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
             callback.resolve([CacheStatus.STOPPED, callback.fileId]);
@@ -309,7 +308,7 @@ export class CacheManager {
     }
 
     private onDownloadError(error: string, url: string, message: string): void {
-        let callback = this._callbacks[url];
+        const callback = this._callbacks[url];
         if(callback) {
             switch(error) {
                 case CacheError[CacheError.FILE_IO_ERROR]:
@@ -335,10 +334,9 @@ export class CacheManager {
     }
 
     private onNetworkConnected(): void {
-        let url: any;
-        for(url in this._callbacks) {
+        for(let url in this._callbacks) {
             if(this._callbacks.hasOwnProperty(url)) {
-                let callback: ICallbackObject = this._callbacks[url];
+                const callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
                     callback.networkRetry = false;
                     this.downloadFile(url, callback.fileId);

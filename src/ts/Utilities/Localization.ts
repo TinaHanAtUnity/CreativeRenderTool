@@ -122,7 +122,7 @@ export class Localization {
         if(languageMap) {
             return languageMap[namespace];
         }
-        for(let key in Localization._languageMap) {
+        for(const key in Localization._languageMap) {
             if(Localization._languageMap.hasOwnProperty(key)) {
                 if(language.match(key)) {
                     return Localization._languageMap[key][namespace];

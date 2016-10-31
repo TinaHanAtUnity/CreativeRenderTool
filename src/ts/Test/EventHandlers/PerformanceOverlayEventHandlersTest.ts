@@ -12,8 +12,8 @@ import { Observable0 } from 'Utilities/Observable';
 
 describe('PerformanceOverlayEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -29,7 +29,7 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 

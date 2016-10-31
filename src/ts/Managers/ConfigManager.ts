@@ -18,7 +18,7 @@ export class ConfigManager {
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
             MetaDataManager.fetchAdapterMetaData(nativeBridge)
         ]).then(([framework, adapter]) => {
-            let url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
+            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 5,
@@ -27,8 +27,8 @@ export class ConfigManager {
                 retryWithConnectionEvents: true
             }).then(response => {
                 try {
-                    let configJson = JsonParser.parse(response.response);
-                    let config: Configuration = new Configuration(configJson);
+                    const configJson = JsonParser.parse(response.response);
+                    const config: Configuration = new Configuration(configJson);
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
                     return config;
                 } catch(error) {

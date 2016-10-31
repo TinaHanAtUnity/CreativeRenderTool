@@ -24,7 +24,7 @@ export class MetaDataManager {
     };
 
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
-        let metaData: MetaData = new MetaData(nativeBridge);
+        const metaData: MetaData = new MetaData(nativeBridge);
         return metaData.hasCategory(category).then(exists => {
             if(!exists) {
                 return Promise.resolve([]);

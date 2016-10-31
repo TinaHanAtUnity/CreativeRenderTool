@@ -11,8 +11,8 @@ import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEve
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -28,7 +28,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 

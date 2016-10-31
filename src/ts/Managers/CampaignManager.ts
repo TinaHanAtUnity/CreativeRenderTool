@@ -54,13 +54,13 @@ export class CampaignManager {
                 followRedirects: false,
                 retryWithConnectionEvents: true
             }).then(response => {
-                let campaignJson: any = JsonParser.parse(response.response);
+                const campaignJson: any = JsonParser.parse(response.response);
                 if(campaignJson.gamerId) {
                     this.storeGamerId(campaignJson.gamerId);
                 }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    let campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, typeof CampaignManager.AbGroup === 'number' ? CampaignManager.AbGroup : campaignJson.abGroup);
+                    const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, typeof CampaignManager.AbGroup === 'number' ? CampaignManager.AbGroup : campaignJson.abGroup);
                     this.onCampaign.trigger(campaign);
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
@@ -68,7 +68,7 @@ export class CampaignManager {
                         this.onNoFill.trigger(3600);
                     } else {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                        let decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
+                        const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
                         this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
                             let campaignId: string;
                             if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -78,7 +78,7 @@ export class CampaignManager {
                             } else {
                                 campaignId = 'UNKNOWN';
                             }
-                            let campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
+                            const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
                             if (campaign.getVast().getImpressionUrls().length === 0) {
                                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                                 return;
@@ -88,7 +88,7 @@ export class CampaignManager {
                                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
                             }
                             if (!campaign.getVideoUrl()) {
-                                let videoUrlError = new DiagnosticError(
+                                const videoUrlError = new DiagnosticError(
                                     new Error('Campaign does not have a video url'),
                                     { rootWrapperVast: campaignJson.vast }
                                 );
@@ -153,7 +153,7 @@ export class CampaignManager {
             url = Url.addParameters(url, {test: true});
         }
 
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this.fetchGamerId());
@@ -170,12 +170,12 @@ export class CampaignManager {
     }
 
     private createRequestBody(): Promise<string> {
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
 
-        let body: any = {
+        const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             language: this._deviceInfo.getLanguage(),

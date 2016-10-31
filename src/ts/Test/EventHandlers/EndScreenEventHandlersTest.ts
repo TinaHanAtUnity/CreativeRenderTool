@@ -81,7 +81,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should throw error', () => {
-                let response = TestFixtures.getOkNativeResponse();
+                const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
@@ -177,7 +177,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should throw error', () => {
-                let response = TestFixtures.getOkNativeResponse();
+                const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
@@ -235,7 +235,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should open app sheet', () => {
-                let resolved = Promise.resolve();
+                const resolved = Promise.resolve();
                 sinon.stub(nativeBridge.AppSheet, 'present').returns(resolved);
                 sinon.spy(nativeBridge.AppSheet, 'destroy');
 

@@ -29,8 +29,8 @@ describe('VastOverlayEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let overlay: Overlay;
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, adUnit: VastAdUnit;
     let sessionManager: SessionManager;
 
@@ -41,11 +41,11 @@ describe('VastOverlayEventHandlersTest', () => {
         });
         overlay = new Overlay(nativeBridge, false, 'en');
 
-        let vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParser();
 
-        let vastXml = EventTestVast;
+        const vastXml = EventTestVast;
 
-        let vast = vastParser.parseVast(vastXml);
+        const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
 
         placement = new Placement({
@@ -65,7 +65,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
         adUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
     });
@@ -84,8 +84,8 @@ describe('VastOverlayEventHandlersTest', () => {
 
     describe('When calling onMute', () => {
         const testMuteEvent = function (muted: boolean) {
-            let eventName = muted ? 'mute' : 'unmute';
-            let mockEventManager = sinon.mock(sessionManager.getEventManager());
+            const eventName = muted ? 'mute' : 'unmute';
+            const mockEventManager = sinon.mock(sessionManager.getEventManager());
             mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '123', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=testPlacement`);
 
             VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted);

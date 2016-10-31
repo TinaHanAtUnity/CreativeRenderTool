@@ -29,7 +29,7 @@ export class SessionManagerEventMetadataCreator {
     };
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string): Promise<[string, any]> {
-        let infoJson: any = {
+        const infoJson: any = {
             'eventId': id,
             'sessionId': currentSession.getId(),
             'gamerId': adUnit.getCampaign().getGamerId(),
@@ -50,7 +50,7 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
 
@@ -231,7 +231,7 @@ export class SessionManager {
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
-        let campaign = adUnit.getCampaign();
+        const campaign = adUnit.getCampaign();
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
@@ -274,7 +274,7 @@ export class SessionManager {
 
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
-        let url = [
+        const url = [
             SessionManager.ClickEventBaseUrl,
             campaign.getId(),
             'click',

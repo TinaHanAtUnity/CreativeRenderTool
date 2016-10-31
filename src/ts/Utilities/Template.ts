@@ -2,6 +2,7 @@
 // based on underscore.js templates
 
 import { Localization } from 'Utilities/Localization';
+
 export class Template {
 
     private static _matcher: RegExp = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
@@ -45,7 +46,7 @@ export class Template {
         source = "var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};\n" + source + 'return __p;\n';
 
         try {
-            let templateFunction: Function = new Function('data', source);
+            const templateFunction: Function = new Function('data', source);
             this._templateFunction = (data: any) => {
                 return templateFunction.call(this, data);
             };

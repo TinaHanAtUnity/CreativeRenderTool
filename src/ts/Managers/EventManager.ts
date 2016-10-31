@@ -61,7 +61,7 @@ export class EventManager {
             followRedirects: redirects,
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
-            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
                 request: request,
                 event: event,
                 sessionId: sessionId,
@@ -83,7 +83,7 @@ export class EventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
-            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
                 request: request,
                 event: event,
                 sessionId: sessionId,
@@ -110,7 +110,7 @@ export class EventManager {
 
     public sendUnsentSessions(): Promise<any[]> {
         return this.getUnsentSessions().then(sessions => {
-            let promises = sessions.map(sessionId => {
+            const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
                     if(outdated) {
                         return this.deleteSession(sessionId);
@@ -137,8 +137,8 @@ export class EventManager {
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
         return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, EventManager.getSessionTimestampKey(sessionId)).then(timestamp => {
-            let timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
-            let timeThresholdMax: number = new Date().getTime();
+            const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
+            const timeThresholdMax: number = new Date().getTime();
 
             return !(timestamp > timeThresholdMin && timestamp < timeThresholdMax);
         }).catch(() => {
