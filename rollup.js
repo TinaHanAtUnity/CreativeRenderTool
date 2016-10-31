@@ -4,7 +4,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import html from 'rollup-plugin-html';
 
 export default {
-    entry: 'build/release/js/Main.js',
+    entry: 'build/release/js/Device.js',
     format: 'iife',
     dest: 'build/release/bundle.js',
     plugins: [

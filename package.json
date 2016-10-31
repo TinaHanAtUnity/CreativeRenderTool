@@ -10,12 +10,12 @@
   "license": "Apache-2.0",
   "dependencies": {
     "es6-promise": "3.3.1",
-    "google-closure-compiler": "20160911.0.0",
-    "systemjs": "0.19.39",
+    "google-closure-compiler": "20161024.0.0",
+    "systemjs": "0.19.40",
     "systemjs-plugin-text": "0.0.9",
     "stylus": "0.54.5",
     "tslint": "3.15.1",
-    "typescript": "2.0.3"
+    "typescript": "2.0.6"
   },
   "devDependencies": {
     "@types/chai": "3.4.34",
@@ -25,11 +25,11 @@
     "chai": "3.5.0",
     "coveralls": "2.11.14",
     "istanbul": "0.4.5",
-    "jsdom": "9.6.0",
-    "mocha": "3.1.1",
+    "jsdom": "9.8.3",
+    "mocha": "3.1.2",
     "mocha-lcov-reporter": "1.2.0",
     "node-fetch": "1.6.3",
-    "remap-istanbul": "0.6.4",
+    "remap-istanbul": "0.7.0",
     "rollup": "0.36.3",
     "rollup-plugin-html": "0.2.1",
     "rollup-plugin-includepaths": "0.1.6",
