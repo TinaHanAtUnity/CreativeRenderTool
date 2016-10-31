@@ -82,18 +82,8 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).catch(([request, message]) => {
-            const error: DiagnosticError = new DiagnosticError(new Error(message), {
-                request: request,
-                event: event,
-                sessionId: sessionId,
-                url: url
-            });
-
-            return Diagnostics.trigger({
-                'type': 'third_party_event_failed',
-                'error': error
-            });
+        }).catch(() => {
+            return; // ignore third party event errors because no one cares
         });
     }
 
