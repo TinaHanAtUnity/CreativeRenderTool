@@ -67,8 +67,8 @@ export class Localization {
             'overlay': JSON.parse(FinnishOverlay)
         },
         'es.*': {
-            'endscreen': JSON.parse(EnglishEndscreen),
-            'overlay': JSON.parse(EnglishOverlay)
+            'endscreen': JSON.parse(SpanishEndscreen),
+            'overlay': JSON.parse(SpanishOverlay)
         },
     };
 
