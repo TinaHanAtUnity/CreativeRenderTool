@@ -13,8 +13,8 @@ describe('Campaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            let json = JSON.parse(DummyAdPlan);
-            let campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+            const json = JSON.parse(DummyAdPlan);
+            const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
@@ -31,10 +31,10 @@ describe('Campaign', () => {
 
     describe('when created with VAST json', () => {
         it('should have correct data from the json', () => {
-            let vastXml = SimpleVast;
-            let vastParser = TestFixtures.getVastParser();
-            let parsedVast = vastParser.parseVast(vastXml);
-            let campaign = new VastCampaign(parsedVast, '12345', 'gamerId', 1);
+            const vastXml = SimpleVast;
+            const vastParser = TestFixtures.getVastParser();
+            const parsedVast = vastParser.parseVast(vastXml);
+            const campaign = new VastCampaign(parsedVast, '12345', 'gamerId', 1);
             assert.equal(campaign.getAbGroup(), 1);
             assert.equal(campaign.getGamerId(), 'gamerId');
             assert.equal(campaign.getAppStoreId(), null);
@@ -66,10 +66,10 @@ describe('Campaign', () => {
         });
 
         it('should return cached video url when set', () => {
-            let vastXml = CacheSimpleVast;
-            let vastParser = TestFixtures.getVastParser();
-            let parsedVast = vastParser.parseVast(vastXml);
-            let campaign = new Campaign({vast: parsedVast}, 'gamerId', 1);
+            const vastXml = CacheSimpleVast;
+            const vastParser = TestFixtures.getVastParser();
+            const parsedVast = vastParser.parseVast(vastXml);
+            const campaign = new Campaign({vast: parsedVast}, 'gamerId', 1);
             campaign.setVideoUrl('file://some/cache/path.mp4');
             assert.equal(campaign.getVideoUrl(), 'file://some/cache/path.mp4');
         });

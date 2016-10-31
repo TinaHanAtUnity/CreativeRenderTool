@@ -2,8 +2,6 @@ import { Model } from 'Models/Model';
 
 export class PlayerMetaData extends Model {
 
-    private _serverId: string;
-
     public static getCategory(): string {
         return 'player';
     }
@@ -11,6 +9,8 @@ export class PlayerMetaData extends Model {
     public static getKeys(): string[] {
         return ['server_id'];
     }
+
+    private _serverId: string;
 
     constructor(data: string[]) {
         super();

@@ -7,8 +7,8 @@ import { StorageType, StorageError } from 'Native/Api/Storage';
 import { MetaData } from 'Utilities/MetaData';
 
 describe('MetaDataTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let metaData: MetaData;
 
@@ -19,10 +19,10 @@ describe('MetaDataTest', () => {
 
     describe(('get'), () => {
         it('should return value successfully and not delete', () => {
-            let key: string = 'testkey';
-            let value: string = 'foo';
+            const key: string = 'testkey';
+            const value: string = 'foo';
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.resolve([value]));
-            let deleteStub = sinon.stub(nativeBridge.Storage, 'delete');
+            const deleteStub = sinon.stub(nativeBridge.Storage, 'delete');
 
             return metaData.get(key, false).then(([found, result]) => {
                 assert.equal(true, found, 'existing value was not found');
@@ -32,11 +32,11 @@ describe('MetaDataTest', () => {
         });
 
         it('should return value successfully, delete and write', () => {
-            let key: string = 'testkey';
-            let value: string = 'foo';
+            const key: string = 'testkey';
+            const value: string = 'foo';
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.resolve([value]));
-            let deleteStub = sinon.stub(nativeBridge.Storage, 'delete').withArgs(StorageType.PUBLIC, key);
-            let writeStub = sinon.stub(nativeBridge.Storage, 'write').withArgs(StorageType.PUBLIC);
+            const deleteStub = sinon.stub(nativeBridge.Storage, 'delete').withArgs(StorageType.PUBLIC, key);
+            const writeStub = sinon.stub(nativeBridge.Storage, 'write').withArgs(StorageType.PUBLIC);
 
             return metaData.get(key, true).then(([found, result]) => {
                 assert.equal(true, found, 'existing value was not found');
@@ -47,7 +47,7 @@ describe('MetaDataTest', () => {
         });
 
         it('should handle value not found error', () => {
-            let key: string = 'testkey';
+            const key: string = 'testkey';
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([StorageError[StorageError.COULDNT_GET_VALUE]]));
 
             return metaData.get(key, false).then(([found, result]) => {
@@ -57,7 +57,7 @@ describe('MetaDataTest', () => {
         });
 
         it('should handle storage not found error', () => {
-            let key: string = 'testkey';
+            const key: string = 'testkey';
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([StorageError[StorageError.COULDNT_GET_STORAGE]]));
 
             return metaData.get(key, false).then(([found, result]) => {
@@ -67,8 +67,8 @@ describe('MetaDataTest', () => {
         });
 
         it('should throw on unknown error', () => {
-            let key: string = 'testkey';
-            let errorMsg: string = 'UNKNOWN_ERROR';
+            const key: string = 'testkey';
+            const errorMsg: string = 'UNKNOWN_ERROR';
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').returns(Promise.reject([errorMsg]));
 
             return metaData.get(key, false).then(() => {
@@ -81,8 +81,8 @@ describe('MetaDataTest', () => {
 
     describe('hasCategory', () => {
         it('should return existing category', () => {
-            let category: string = 'testcategory';
-            let subKeys: string[] = ['a', 'b', 'c'];
+            const category: string = 'testcategory';
+            const subKeys: string[] = ['a', 'b', 'c'];
             sinon.stub(nativeBridge.Storage, 'getKeys').withArgs(StorageType.PUBLIC, category, false).returns(Promise.resolve(subKeys));
 
             return metaData.hasCategory(category).then(exists => {
@@ -91,7 +91,7 @@ describe('MetaDataTest', () => {
         });
 
         it('should not return category with no subkeys', () => {
-            let category: string = 'testcategory';
+            const category: string = 'testcategory';
             sinon.stub(nativeBridge.Storage, 'getKeys').withArgs(StorageType.PUBLIC, category, false).returns(Promise.resolve([]));
 
             return metaData.hasCategory(category).then(exists => {
@@ -100,7 +100,7 @@ describe('MetaDataTest', () => {
         });
 
         it('should handle storage not found error', () => {
-            let category: string = 'testcategory';
+            const category: string = 'testcategory';
             sinon.stub(nativeBridge.Storage, 'getKeys').withArgs(StorageType.PUBLIC, category, false).returns(Promise.reject([StorageError[StorageError.COULDNT_GET_STORAGE]]));
 
             return metaData.hasCategory(category).then(exists => {
@@ -109,8 +109,8 @@ describe('MetaDataTest', () => {
         });
 
         it('should throw on unknown error', () => {
-            let category: string = 'testcategory';
-            let errorMsg: string = 'UNKNOWN_ERROR';
+            const category: string = 'testcategory';
+            const errorMsg: string = 'UNKNOWN_ERROR';
             sinon.stub(nativeBridge.Storage, 'getKeys').withArgs(StorageType.PUBLIC, category, false).returns(Promise.reject([errorMsg]));
 
             return metaData.hasCategory(category).then(() => {

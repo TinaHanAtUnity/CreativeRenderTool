@@ -1,11 +1,11 @@
 export class Storage {
 
     public static get(storageType: string, key: string) {
-        let rawStorage = window.sessionStorage.getItem(storageType);
+        const rawStorage = window.sessionStorage.getItem(storageType);
         if(rawStorage) {
-            let splitKeys = key.split('.');
-            let lastKey = splitKeys[splitKeys.length - 1];
-            let object = Storage.findObject(JSON.parse(rawStorage), Storage.getParentKey(key));
+            const splitKeys = key.split('.');
+            const lastKey = splitKeys[splitKeys.length - 1];
+            const object = Storage.findObject(JSON.parse(rawStorage), Storage.getParentKey(key));
             if(!object) {
                 throw ['COULDNT_GET_VALUE', key];
             }
@@ -37,7 +37,7 @@ export class Storage {
             return storage;
         }
 
-        let objects = key.split('.');
+        const objects = key.split('.');
         let parentObject = storage;
 
         for(let i = 0; i < objects.length; ++i) {
@@ -52,7 +52,7 @@ export class Storage {
     }
 
     private static getParentKey(key: string) {
-        let splitKey = key.split('.');
+        const splitKey = key.split('.');
         splitKey.pop();
         return splitKey.join('.');
     }

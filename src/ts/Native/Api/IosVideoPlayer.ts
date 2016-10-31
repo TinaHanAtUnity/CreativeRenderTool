@@ -19,8 +19,6 @@ export class IosVideoPlayerApi extends NativeApi {
     public onGenericError: Observable2<string, string> = new Observable2();
     public onPrepareError: Observable1<string> = new Observable1();
 
-
-
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
     }

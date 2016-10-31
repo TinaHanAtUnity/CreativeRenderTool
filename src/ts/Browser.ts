@@ -9,9 +9,9 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
-let resizeHandler = (event?: Event) => {
-    let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
-    let newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+const resizeHandler = (event?: Event) => {
+    const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+    const newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
     if(currentOrientation) {
         if(currentOrientation !== newOrientation) {
             document.body.classList.remove(currentOrientation);
@@ -25,14 +25,14 @@ resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
 if(window.parent !== window) {
-    let initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    const initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
     initializeButton.addEventListener('click', (event: Event) => {
         event.preventDefault();
         initializeButton.disabled = true;
 
-        let abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
-        let autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
-        let publicStorage: any = {
+        const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+        const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+        const publicStorage: any = {
             test: {}
         };
 
@@ -53,7 +53,7 @@ if(window.parent !== window) {
         window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
         let nativeBridge: NativeBridge;
-        let platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
+        const platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
         switch(platformElement.value) {
             case 'android':
                 nativeBridge = new NativeBridge(new Backend(), Platform.ANDROID);
@@ -67,7 +67,7 @@ if(window.parent !== window) {
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
 
-        let extWindow = <IExtendedWindow> window;
+        const extWindow = <IExtendedWindow> window;
         extWindow.nativebridge = nativeBridge;
         extWindow.webview = new WebView(nativeBridge);
         extWindow.webview.initialize();

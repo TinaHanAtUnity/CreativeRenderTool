@@ -17,9 +17,9 @@ export class Vast {
     }
 
     public getErrorURLTemplates(): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
-            let adErrorUrls = ad.getErrorURLTemplates();
+            const adErrorUrls = ad.getErrorURLTemplates();
             if (adErrorUrls instanceof Array) {
                 return adErrorUrls.concat(this._errorURLTemplates || []);
             }
@@ -35,12 +35,12 @@ export class Vast {
     }
 
     public getVideoUrl(): string | null {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
-            for (let creative of ad.getCreatives()) {
-                for (let mediaFile of creative.getMediaFiles()) {
-                    let mimeType = mediaFile.getMIMEType();
-                    let playable = mimeType && this.isPlayableMIMEType(mimeType);
+            for (const creative of ad.getCreatives()) {
+                for (const mediaFile of creative.getMediaFiles()) {
+                    const mimeType = mediaFile.getMIMEType();
+                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
                     if (mediaFile.getFileURL() && playable) {
                         return mediaFile.getFileURL();
                     }
@@ -52,7 +52,7 @@ export class Vast {
     }
 
     public getImpressionUrls(): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getImpressionURLTemplates();
         }
@@ -60,9 +60,9 @@ export class Vast {
     }
 
     public getTrackingEventUrls(eventName: string): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
-            let adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
+            const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
             let additionalTrackingEventUrls: string[] = [];
             if (this._additionalTrackingEvents) {
                 additionalTrackingEventUrls = this._additionalTrackingEvents[eventName] || [];
@@ -87,7 +87,7 @@ export class Vast {
     }
 
     public getDuration(): number | null {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getDuration();
         }
@@ -95,7 +95,7 @@ export class Vast {
     }
 
     public getWrapperURL(): string | null {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getWrapperURL();
         }
@@ -103,7 +103,7 @@ export class Vast {
     }
 
     public getVideoClickThroughURL(): string | null {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getVideoClickThroughURLTemplate();
         }
@@ -111,7 +111,7 @@ export class Vast {
     }
 
     public getVideoClickTrackingURLs(): string[] | null {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getVideoClickTrackingURLTemplates();
         }

@@ -10,9 +10,9 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
-let resizeHandler = (event?: Event) => {
-    let currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
-    let newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+const resizeHandler = (event?: Event) => {
+    const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
+    const newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
     if(currentOrientation) {
         if(currentOrientation !== newOrientation) {
             document.body.classList.remove(currentOrientation);
@@ -40,7 +40,7 @@ if(typeof location !== 'undefined') {
             throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
     }
 
-    let extWindow = <IExtendedWindow> window;
+    const extWindow = <IExtendedWindow> window;
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
 

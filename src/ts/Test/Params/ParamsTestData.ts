@@ -42,9 +42,9 @@ export class ParamsTestData {
     }
 
     private static getEventSpec(rawData: any): IEventSpec {
-        let spec: IEventSpec = { };
-        let parsedSpec: IEventJson = JSON.parse(rawData);
-        let params: IEventParameter[] = parsedSpec.parameters;
+        const spec: IEventSpec = { };
+        const parsedSpec: IEventJson = JSON.parse(rawData);
+        const params: IEventParameter[] = parsedSpec.parameters;
 
         for(let i: number = 0; i < params.length; i++) {
             spec[params[i].parameter] = params[i];
