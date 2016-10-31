@@ -11,13 +11,13 @@ export class VastParser {
 
     private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
 
-    private _domParser: DOMParser;
-    private _maxWrapperDepth: number;
-    private _rootWrapperVast: any;
-
     private static createDOMParser() {
         return new DOMParser();
     };
+
+    private _domParser: DOMParser;
+    private _maxWrapperDepth: number;
+    private _rootWrapperVast: any;
 
     constructor();
     constructor(domParser: DOMParser);

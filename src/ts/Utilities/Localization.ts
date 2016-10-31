@@ -43,6 +43,31 @@ interface ILanguageMap {
 
 export class Localization {
 
+    public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
+        const languageMap = Localization._languageMap[language];
+        if(languageMap) {
+            return languageMap[namespace];
+        }
+        for(const key in Localization._languageMap) {
+            if(Localization._languageMap.hasOwnProperty(key)) {
+                if(language.match(key)) {
+                    return Localization._languageMap[key][namespace];
+                }
+            }
+        }
+        return undefined;
+    }
+
+    public static setLanguageMap(language: string, namespace: string, map: { [key: string]: string }) {
+        if(!Localization._languageMap) {
+            Localization._languageMap = {};
+        }
+        if(!Localization._languageMap[language]) {
+            Localization._languageMap[language] = {};
+        }
+        Localization._languageMap[language][namespace] = map;
+    }
+
     private static _languageMap: ILanguageMap = {
         'en.*': {
             'endscreen': JSON.parse(EnglishEndscreen),
@@ -116,31 +141,6 @@ export class Localization {
 
     private _language: string;
     private _namespace: string;
-
-    public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
-        const languageMap = Localization._languageMap[language];
-        if(languageMap) {
-            return languageMap[namespace];
-        }
-        for(const key in Localization._languageMap) {
-            if(Localization._languageMap.hasOwnProperty(key)) {
-                if(language.match(key)) {
-                    return Localization._languageMap[key][namespace];
-                }
-            }
-        }
-        return undefined;
-    }
-
-    public static setLanguageMap(language: string, namespace: string, map: { [key: string]: string }) {
-        if(!Localization._languageMap) {
-            Localization._languageMap = {};
-        }
-        if(!Localization._languageMap[language]) {
-            Localization._languageMap[language] = {};
-        }
-        Localization._languageMap[language][namespace] = map;
-    }
 
     constructor(language: string, namespace: string) {
         this._language = language;

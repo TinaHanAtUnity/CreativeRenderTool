@@ -72,6 +72,11 @@ export class SessionManagerEventMetadataCreator {
 
 export class SessionManager {
 
+    public static setTestBaseUrl(baseUrl: string): void {
+        SessionManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
+        SessionManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
+    }
+
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
@@ -84,11 +89,6 @@ export class SessionManager {
     private _currentSession: Session;
 
     private _gamerServerId: string;
-
-    public static setTestBaseUrl(baseUrl: string): void {
-        SessionManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
-        SessionManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
-    }
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;

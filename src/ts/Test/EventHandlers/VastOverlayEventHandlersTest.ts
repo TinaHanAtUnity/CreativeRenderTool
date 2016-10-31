@@ -21,7 +21,6 @@ import { Session } from 'Models/Session';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
-
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
     let placement: Placement;

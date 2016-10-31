@@ -30,7 +30,6 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
 
-
     public show(): Promise<void> {
         this._showing = true;
         this.onVideoStart.trigger();

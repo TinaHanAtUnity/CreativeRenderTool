@@ -16,13 +16,6 @@ interface IMetaDataCaches {
 
 export class MetaDataManager {
 
-    private static caches: IMetaDataCaches = {
-        framework: undefined,
-        adapter: undefined,
-        mediation: undefined,
-        player: undefined,
-    };
-
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
         const metaData: MetaData = new MetaData(nativeBridge);
         return metaData.hasCategory(category).then(exists => {
@@ -117,5 +110,12 @@ export class MetaDataManager {
             player: undefined,
         };
     }
+
+    private static caches: IMetaDataCaches = {
+        framework: undefined,
+        adapter: undefined,
+        mediation: undefined,
+        player: undefined,
+    };
 
 }

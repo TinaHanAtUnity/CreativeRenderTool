@@ -6,6 +6,13 @@ import { Platform } from 'Constants/Platform';
 
 export class View {
 
+    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
+        if(attachTap && binding.event === 'click') {
+            binding.tap = new Tap(<HTMLElement>element);
+        }
+        element.addEventListener(binding.event, binding.listener, false);
+    }
+
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
@@ -14,13 +21,6 @@ export class View {
     protected _container: HTMLElement;
 
     protected _id: string;
-
-    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
-        if(attachTap && binding.event === 'click') {
-            binding.tap = new Tap(<HTMLElement>element);
-        }
-        element.addEventListener(binding.event, binding.listener, false);
-    }
 
     constructor(nativeBridge: NativeBridge, id: string) {
         this._nativeBridge = nativeBridge;

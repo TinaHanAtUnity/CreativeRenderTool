@@ -61,9 +61,9 @@ describe('ClientInfoTest', () => {
             null
         ];
 
-        // tslint:disable-next-line
+        // tslint:disable:no-unused-new
         const clientInfoConstructor = () => { new ClientInfo(Platform.TEST, data); };
         assert.throw(clientInfoConstructor, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
-
+        // tslint:enable:no-unused-new
     });
 });

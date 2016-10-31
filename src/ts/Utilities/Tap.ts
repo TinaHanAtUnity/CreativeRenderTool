@@ -20,9 +20,9 @@ export class Tap {
     }
 
     private onTouchStart(event: TouchEvent) {
-        this._onTouchMoveListener = (event) => this.onTouchMove(event);
-        this._onTouchEndListener = (event) => this.onTouchEnd(event);
-        this._onTouchCancelListener = (event) => this.onTouchCancel(event);
+        this._onTouchMoveListener = (touchEvent) => this.onTouchMove(touchEvent);
+        this._onTouchEndListener = (touchEvent) => this.onTouchEnd(touchEvent);
+        this._onTouchCancelListener = (touchEvent) => this.onTouchCancel(touchEvent);
         this._element.addEventListener('touchmove', this._onTouchMoveListener, false);
         this._element.addEventListener('touchend', this._onTouchEndListener, false);
         this._element.addEventListener('touchcancel', this._onTouchCancelListener, false);

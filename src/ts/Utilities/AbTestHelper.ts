@@ -2,10 +2,6 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 
 export class AbTestHelper {
 
-    private static _cacheModeForcedAbGroup: number = 12;
-    private static _cacheModeAllowedAbGroup: number = 13;
-
-
     public static isCacheModeAbTestActive(abGroup: number): boolean {
         if (abGroup === this._cacheModeAllowedAbGroup || abGroup === this._cacheModeForcedAbGroup) {
             return true;
@@ -22,4 +18,8 @@ export class AbTestHelper {
             return configuration.getCacheMode();
         }
     }
+
+    private static _cacheModeForcedAbGroup: number = 12;
+    private static _cacheModeAllowedAbGroup: number = 13;
+
 }

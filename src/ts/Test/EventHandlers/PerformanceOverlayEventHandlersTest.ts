@@ -1,5 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
+
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -37,7 +38,7 @@ describe('PerformanceOverlayEventHandlersTest', () => {
         it('should show end screen', () => {
             PerformanceOverlayEventHandlers.onSkip(performanceAdUnit);
 
-            const endScreen = performanceAdUnit.getEndScreen();
+            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
@@ -53,6 +54,5 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.onFinish.trigger);
         });
     });
-
 
 });

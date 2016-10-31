@@ -108,10 +108,10 @@ describe('VastParser', () => {
                 assert.fail('Should fail when parsing invalid VAST');
             });
         } catch (e) {
-            /* tslint:disable:no-string-literal */
+            // tslint:disable:no-string-literal
             assert.deepEqual(e.diagnostic['vast'], vastNoAdRaw);
             assert.equal(e.diagnostic['wrapperDepth'], 0);
-            /* tslint:enable */
+            // tslint:enable:no-string-literal
         }
     });
 
@@ -136,11 +136,11 @@ describe('VastParser', () => {
         vastPromise.then(() => {
             assert.fail('Should fail when parsing invalid VAST');
         }).catch((e) => {
-            /* tslint:disable:no-string-literal */
+            // tslint:disable:no-string-literal
             assert.deepEqual(e.diagnostic['vast'], 'invalid vast');
             assert.equal(e.diagnostic['rootWrapperVast'], rootVast);
             assert.equal(e.diagnostic['wrapperDepth'], 7);
-            /* tslint:enable */
+            // tslint:enable:no-string-literal
         });
     });
 

@@ -117,7 +117,6 @@ describe('EndScreenEventHandlersTest', () => {
 
         });
 
-
     });
 
     describe('with onDownloadIos', () => {
@@ -238,7 +237,6 @@ describe('EndScreenEventHandlersTest', () => {
                 const resolved = Promise.resolve();
                 sinon.stub(nativeBridge.AppSheet, 'present').returns(resolved);
                 sinon.spy(nativeBridge.AppSheet, 'destroy');
-
 
                 resolved.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AppSheet.present, {id: 11111});

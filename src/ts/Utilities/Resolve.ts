@@ -10,8 +10,6 @@ export class Resolve {
     private static _callbackId = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
 
-    private _nativeBridge: NativeBridge;
-
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
@@ -27,6 +25,8 @@ export class Resolve {
             delete Resolve._callbacks[id];
         }
     }
+
+    private _nativeBridge: NativeBridge;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;

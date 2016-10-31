@@ -60,3 +60,5 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
         }
     });
 }
+
+/* tslint:enable:no-unused-expression */

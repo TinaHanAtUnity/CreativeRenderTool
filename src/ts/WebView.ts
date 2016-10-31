@@ -219,16 +219,16 @@ export class WebView {
 
             if (this._nativeBridge.getPlatform() === Platform.IOS && !(this._campaign instanceof VastCampaign)) {
                 if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
-                    const options = {
+                    const appSheetOptions = {
                         id: parseInt(this._campaign.getAppStoreId(), 10)
                     };
-                    this._nativeBridge.AppSheet.prepare(options).then(() => {
+                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
                         const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                            this._nativeBridge.AppSheet.prepare(options);
+                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
                         });
                         this._adUnit.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                            this._nativeBridge.AppSheet.destroy(options);
+                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
                         });
                     });
                 }

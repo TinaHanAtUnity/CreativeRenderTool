@@ -1,5 +1,3 @@
-/// <reference path="WebViewBridge.d.ts" />
-
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { BroadcastApi } from 'Native/Api/Broadcast';
@@ -36,6 +34,17 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
+    private static convertStatus(status: string): CallbackStatus {
+        switch(status) {
+            case CallbackStatus[CallbackStatus.OK]:
+                return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]:
+                return CallbackStatus.ERROR;
+            default:
+                throw new Error('Status string is not valid: ' + status);
+        }
+    }
+
     public AppSheet: AppSheetApi;
     public AndroidAdUnit: AndroidAdUnitApi;
     public Broadcast: BroadcastApi;
@@ -65,17 +74,6 @@ export class NativeBridge implements INativeBridge {
     private _autoBatch: BatchInvocation;
     private _autoBatchTimer: any; // todo: should be number but causes naming clash with nodejs Timer
     private _autoBatchInterval = 50;
-
-    private static convertStatus(status: string): CallbackStatus {
-        switch(status) {
-            case CallbackStatus[CallbackStatus.OK]:
-                return CallbackStatus.OK;
-            case CallbackStatus[CallbackStatus.ERROR]:
-                return CallbackStatus.ERROR;
-            default:
-                throw new Error('Status string is not valid: ' + status);
-        }
-    }
 
     constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
@@ -141,7 +139,6 @@ export class NativeBridge implements INativeBridge {
         return promise;
     }
 
-    /* tslint:disable:switch-default */
     public handleCallback(results: any[][]): void {
         results.forEach((result: any[]): void => {
             const id: number = parseInt(result.shift(), 10);
@@ -161,6 +158,8 @@ export class NativeBridge implements INativeBridge {
                 case CallbackStatus.ERROR:
                     callbackObject.reject(parameters);
                     break;
+                default:
+                    throw new Error('Unknown callback status');
             }
             delete this._callbackTable[id];
         });

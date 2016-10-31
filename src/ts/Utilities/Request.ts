@@ -37,19 +37,6 @@ export interface INativeResponse {
 
 export class Request {
 
-    private static _connectTimeout = 30000;
-    private static _readTimeout = 30000;
-
-    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
-    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
-
-    private static _callbackId: number = 1;
-    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
-    private static _requests: { [key: number]: INativeRequest } = {};
-
-    private _nativeBridge: NativeBridge;
-    private _wakeUpManager: WakeUpManager;
-
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
@@ -60,6 +47,16 @@ export class Request {
         return null;
     }
 
+    private static _connectTimeout = 30000;
+    private static _readTimeout = 30000;
+
+    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
+
+    private static _callbackId: number = 1;
+    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
+    private static _requests: { [key: number]: INativeRequest } = {};
+
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
             retries: 0,
@@ -68,6 +65,9 @@ export class Request {
             retryWithConnectionEvents: false
         };
     }
+
+    private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;

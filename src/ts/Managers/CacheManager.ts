@@ -37,16 +37,16 @@ interface ICallbackObject {
 
 export class CacheManager {
 
-    private _nativeBridge: NativeBridge;
-    private _wakeUpManager: WakeUpManager;
-    private _callbacks: { [url: string]: ICallbackObject } = {};
-    private _fileIds: { [key: string]: string } = {};
-
     private static getDefaultCacheOptions(): ICacheOptions {
         return {
             retries: 0
         };
     }
+
+    private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
+    private _callbacks: { [url: string]: ICallbackObject } = {};
+    private _fileIds: { [key: string]: string } = {};
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;

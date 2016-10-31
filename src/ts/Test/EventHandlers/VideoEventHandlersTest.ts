@@ -186,7 +186,7 @@ describe('VideoEventHandlersTest', () => {
         it('should hide overlay', () => {
             VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
 
-            const overlay = videoAdUnitController.getOverlay();
+            overlay = videoAdUnitController.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
             }
@@ -340,7 +340,7 @@ describe('VideoEventHandlersTest', () => {
             assert.isFalse(videoAdUnitController.isVideoActive());
             assert.equal(videoAdUnitController.getFinishState(), FinishState.ERROR);
 
-            const overlay = videoAdUnitController.getOverlay();
+            overlay = videoAdUnitController.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
             }
@@ -367,7 +367,7 @@ describe('VideoEventHandlersTest', () => {
             assert.isFalse(videoAdUnitController.isVideoActive());
             assert.equal(videoAdUnitController.getFinishState(), FinishState.ERROR);
 
-            const overlay = videoAdUnitController.getOverlay();
+            overlay = videoAdUnitController.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
             }

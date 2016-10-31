@@ -18,12 +18,12 @@ export class Template {
 
     private static _escapeRegExp: RegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
-    private _localization?: Localization;
-    private _templateFunction: (data: any) => string;
-
     private static _escapeChar: (substring: string, ...args: any[]) => string = (match: string): string => {
         return '\\' + Template._escapes[match];
     };
+
+    private _localization?: Localization;
+    private _templateFunction: (data: any) => string;
 
     constructor(templateString: string, localization?: Localization) {
         this._localization = localization;

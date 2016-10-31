@@ -149,7 +149,6 @@ describe('CampaignManager', () => {
         campaignManager.request();
     });
 
-
     it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad

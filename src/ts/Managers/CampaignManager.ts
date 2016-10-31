@@ -15,6 +15,14 @@ import { StorageType } from 'Native/Api/Storage';
 
 export class CampaignManager {
 
+    public static setTestBaseUrl(baseUrl: string): void {
+        CampaignManager.CampaignBaseUrl = baseUrl + '/games';
+    }
+
+    public static setAbGroup(abGroup: number) {
+        CampaignManager.AbGroup = abGroup;
+    }
+
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
@@ -28,14 +36,6 @@ export class CampaignManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
-
-    public static setTestBaseUrl(baseUrl: string): void {
-        CampaignManager.CampaignBaseUrl = baseUrl + '/games';
-    }
-
-    public static setAbGroup(abGroup: number) {
-        CampaignManager.AbGroup = abGroup;
-    }
 
     constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;

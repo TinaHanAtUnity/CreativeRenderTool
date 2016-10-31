@@ -21,9 +21,10 @@ describe('DiagnosticErrorTest', () => {
         it('should contain the diagnostic data', () => {
             const diagnosticError = new DiagnosticError(originalError, {foo: 'foo1', bar: 'bar2'});
 
-            /* tslint:disable:no-string-literal */
+            // tslint:disable:no-string-literal
             assert.equal(diagnosticError.diagnostic['foo'], 'foo1');
             assert.equal(diagnosticError.diagnostic['bar'], 'bar2');
+            // tslint:enable:no-string-literal
         });
 
         it('should serialize correctly', () => {

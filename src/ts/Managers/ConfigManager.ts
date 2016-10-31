@@ -11,8 +11,6 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 
 export class ConfigManager {
 
-    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
         return Promise.all<FrameworkMetaData, AdapterMetaData>([
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
@@ -42,6 +40,8 @@ export class ConfigManager {
     public static setTestBaseUrl(baseUrl: string): void {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
+
+    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData): string {
         let url: string = [

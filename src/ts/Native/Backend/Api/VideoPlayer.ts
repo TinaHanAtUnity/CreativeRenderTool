@@ -2,8 +2,6 @@ import { Backend } from 'Native/Backend/Backend';
 
 export class VideoPlayer {
 
-    private static _currentUrl: string | undefined;
-
     public static prepare(url: string) {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         videoView.addEventListener('canplay', () => {
@@ -34,5 +32,7 @@ export class VideoPlayer {
             Backend.sendEvent('VIDEOPLAYER', 'STOP', VideoPlayer._currentUrl);
         }, 0);
     }
+
+    private static _currentUrl: string | undefined;
 
 }

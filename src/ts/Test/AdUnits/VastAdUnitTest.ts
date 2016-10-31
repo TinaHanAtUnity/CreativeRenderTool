@@ -15,7 +15,6 @@ import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitControll
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
-
 describe('VastAdUnit', () => {
 
     let sandbox: sinon.SinonSandbox;
@@ -113,7 +112,7 @@ describe('VastAdUnit', () => {
         beforeEach(() => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
-            const campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
@@ -201,5 +200,3 @@ describe('VastAdUnit', () => {
         });
     });
 });
-
-

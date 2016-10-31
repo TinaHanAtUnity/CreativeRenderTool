@@ -88,7 +88,6 @@ describe('ConfigManagerTest', () => {
         });
     });
 
-
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {

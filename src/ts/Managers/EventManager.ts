@@ -6,9 +6,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class EventManager {
 
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
-
     private static getSessionKey(sessionId: string): string {
         return 'session.' + sessionId;
     }
@@ -28,6 +25,9 @@ export class EventManager {
     private static getDataKey(sessionId: string, eventId: string): string {
         return EventManager.getEventKey(sessionId, eventId) + '.data';
     }
+
+    private _nativeBridge: NativeBridge;
+    private _request: Request;
 
     constructor(nativeBridge: NativeBridge, request: Request) {
         this._nativeBridge = nativeBridge;

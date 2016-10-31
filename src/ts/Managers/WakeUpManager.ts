@@ -2,6 +2,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class WakeUpManager {
+
     private static _appForegroundNotification: string = 'UIApplicationDidBecomeActiveNotification';
 
     public onNetworkConnected: Observable0 = new Observable0();
@@ -77,4 +78,5 @@ export class WakeUpManager {
             this.onAppForeground.trigger();
         }
     }
+
 }

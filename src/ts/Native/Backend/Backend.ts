@@ -31,6 +31,18 @@ interface IResult {
 
 export class Backend implements IWebViewBridge {
 
+    public static sendEvent(category: string, name: string, ...parameters: any[]) {
+        // tslint:disable:no-string-literal
+        window['nativebridge']['handleEvent']([category, name].concat(parameters));
+        // tslint:enable:no-string-literal
+    }
+
+    public static getPlatform(): Platform {
+        // tslint:disable:no-string-literal
+        return window['nativebridge']['getPlatform']();
+        // tslint:enable:no-string-literal
+    }
+
     private static _apiMap = {
         '.*AdUnit': AdUnit,
         '.*AppSheet': AppSheet,
@@ -48,18 +60,6 @@ export class Backend implements IWebViewBridge {
         '.*UrlScheme': UrlScheme,
         '.*VideoPlayer': VideoPlayer
     };
-
-    public static sendEvent(category: string, name: string, ...parameters: any[]) {
-        // tslint:disable:no-string-literal
-        window['nativebridge']['handleEvent']([category, name].concat(parameters));
-        // tslint:enable:no-string-literal
-    }
-
-    public static getPlatform(): Platform {
-        // tslint:disable:no-string-literal
-        return window['nativebridge']['getPlatform']();
-        // tslint:enable:no-string-literal
-    }
 
     public handleInvocation(rawInvocations: string): void {
         const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));

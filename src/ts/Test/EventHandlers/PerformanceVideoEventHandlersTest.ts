@@ -36,7 +36,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit);
 
-            const endScreen = performanceAdUnit.getEndScreen();
+            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
@@ -47,7 +47,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             PerformanceVideoEventHandlers.onVideoError(performanceAdUnit);
 
-            const endScreen = performanceAdUnit.getEndScreen();
+            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }

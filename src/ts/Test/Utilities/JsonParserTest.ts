@@ -8,8 +8,9 @@ describe('JsonParserTest', () => {
         try {
             JsonParser.parse('bad content');
         } catch(e) {
-            /* tslint:disable:no-string-literal */
+            // tslint:disable:no-string-literal
             assert.equal(e.diagnostic['json'], 'bad content');
+            // tslint:enable:no-string-literal
         }
     });
 

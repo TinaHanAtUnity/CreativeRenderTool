@@ -5,11 +5,6 @@ import { INativeResponse } from 'Utilities/Request';
 
 export class Diagnostics {
 
-    private static DiagnosticsBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
-    private static _eventManager: EventManager;
-    private static _clientInfo: ClientInfo | undefined;
-    private static _deviceInfo: DeviceInfo | undefined;
-
     public static trigger(data: any): Promise<INativeResponse> {
         const messages: any[] = []; // todo: use a more specific type
         messages.push({
@@ -40,6 +35,11 @@ export class Diagnostics {
     public static setTestBaseUrl(baseUrl: string) {
         Diagnostics.DiagnosticsBaseUrl = baseUrl + '/v1/events';
     }
+
+    private static DiagnosticsBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
+    private static _eventManager: EventManager;
+    private static _clientInfo: ClientInfo | undefined;
+    private static _deviceInfo: DeviceInfo | undefined;
 
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any> {
         const common: any = {

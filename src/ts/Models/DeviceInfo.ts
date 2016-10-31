@@ -213,7 +213,6 @@ export class DeviceInfo extends Model {
         return this._totalExternalSpace;
     }
 
-
     public getLanguage(): string {
         return this._language;
     }
@@ -344,8 +343,6 @@ export class DeviceInfo extends Model {
                 'simulator': this._simulator,
             };
         });
-
-
     }
 
     private handleDeviceInfoError(error: any) {
