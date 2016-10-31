@@ -20,8 +20,8 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 describe('OverlayEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
     let endScreen: EndScreen;
@@ -38,7 +38,7 @@ describe('OverlayEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
 
     });

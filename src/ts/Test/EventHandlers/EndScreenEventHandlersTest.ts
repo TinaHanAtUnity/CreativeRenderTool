@@ -20,8 +20,8 @@ import { Platform } from 'Constants/Platform';
 
 describe('EndScreenEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
@@ -81,7 +81,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should throw error', () => {
-                let response = TestFixtures.getOkNativeResponse();
+                const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
@@ -116,7 +116,6 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
         });
-
 
     });
 
@@ -177,7 +176,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should throw error', () => {
-                let response = TestFixtures.getOkNativeResponse();
+                const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
                 (<sinon.SinonSpy>sessionManager.sendClick).restore();
@@ -235,10 +234,9 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should open app sheet', () => {
-                let resolved = Promise.resolve();
+                const resolved = Promise.resolve();
                 sinon.stub(nativeBridge.AppSheet, 'present').returns(resolved);
                 sinon.spy(nativeBridge.AppSheet, 'destroy');
-
 
                 resolved.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AppSheet.present, {id: 11111});

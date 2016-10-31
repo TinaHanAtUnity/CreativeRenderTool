@@ -11,13 +11,13 @@ export class VastParser {
 
     private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
 
-    private _domParser: DOMParser;
-    private _maxWrapperDepth: number;
-    private _rootWrapperVast: any;
-
     private static createDOMParser() {
         return new DOMParser();
     };
+
+    private _domParser: DOMParser;
+    private _maxWrapperDepth: number;
+    private _rootWrapperVast: any;
 
     constructor();
     constructor(domParser: DOMParser);
@@ -35,18 +35,18 @@ export class VastParser {
             throw new Error('VAST data is missing');
         }
 
-        let xml = (this._domParser).parseFromString(vast, 'text/xml');
-        let ads: VastAd[] = [], errorURLTemplates: string[] = [];
+        const xml = (this._domParser).parseFromString(vast, 'text/xml');
+        const ads: VastAd[] = [], errorURLTemplates: string[] = [];
 
         if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');
         }
 
-        let childNodes = xml.documentElement.childNodes;
+        const childNodes = xml.documentElement.childNodes;
 
         // collect error URLs before moving on to ads
         for (let i = 0; i < childNodes.length; i++) {
-            let node = childNodes[i];
+            const node = childNodes[i];
 
             if (node.nodeName === 'Error') {
                 errorURLTemplates.push(this.parseNodeText(node));
@@ -54,9 +54,9 @@ export class VastParser {
         }
 
         for (let i = 0; i < childNodes.length; i++) {
-            let node = childNodes[i];
+            const node = childNodes[i];
             if (ads.length === 0 && node.nodeName === 'Ad') {
-                let ad = this.parseAdElement(node);
+                const ad = this.parseAdElement(node);
                 if (ad != null) {
                     ads.push(ad);
                 }
@@ -80,7 +80,7 @@ export class VastParser {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            let error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
+            const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
                 /* tslint:disable:no-string-literal */
                 error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
@@ -91,7 +91,7 @@ export class VastParser {
 
         this.applyParentURLs(parsedVast, parent);
 
-        let wrapperURL = parsedVast.getWrapperURL();
+        const wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         } else if (depth >= this._maxWrapperDepth) {
@@ -107,20 +107,20 @@ export class VastParser {
 
     private applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
-            let ad = parent.getAd();
-            let parsedAd = parsedVast.getAd();
+            const ad = parent.getAd();
+            const parsedAd = parsedVast.getAd();
             if(ad && parsedAd) {
-                for (let errorUrl of ad.getErrorURLTemplates()) {
+                for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }
-                for (let impressionUrl of ad.getImpressionURLTemplates()) {
+                for (const impressionUrl of ad.getImpressionURLTemplates()) {
                     parsedAd.addImpressionURLTemplate(impressionUrl);
                 }
-                for (let clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
+                for (const clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
                     parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
                 }
-                for (let eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
-                    for (let url of parent.getTrackingEventUrls(eventName)) {
+                for (const eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                    for (const url of parent.getTrackingEventUrls(eventName)) {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
                 }
@@ -140,9 +140,9 @@ export class VastParser {
 
     private parseAdElement(adElement: any): VastAd | undefined {
         let ad: VastAd | undefined;
-        let childNodes = adElement.childNodes;
+        const childNodes = adElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
-            let adTypeElement = childNodes[i];
+            const adTypeElement = childNodes[i];
             if (adTypeElement.nodeName === 'Wrapper') {
                 ad = this.parseWrapperElement(adTypeElement);
                 break;
@@ -163,11 +163,11 @@ export class VastParser {
     }
 
     private parseInLineElement(inLineElement: any): VastAd {
-        let ad = new VastAd();
-        let childNodes = inLineElement.childNodes;
+        const ad = new VastAd();
+        const childNodes = inLineElement.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
-            let node = childNodes[i];
-            let url = this.parseNodeText(node);
+            const node = childNodes[i];
+            const url = this.parseNodeText(node);
             switch (node.nodeName) {
                 case 'Error':
                     if (url) {
@@ -180,12 +180,12 @@ export class VastParser {
                     }
                     break;
                 case 'Creatives':
-                    let childCreatives = this.childsByName(node, 'Creative');
+                    const childCreatives = this.childsByName(node, 'Creative');
                     for (let j = 0; j < childCreatives.length; j++) {
-                        let creativeElement = childCreatives[j];
-                        let creativeChildren = creativeElement.childNodes;
+                        const creativeElement = childCreatives[j];
+                        const creativeChildren = creativeElement.childNodes;
                         for (let k = 0; k < creativeChildren.length; k++) {
-                            let creativeTypeElement = creativeChildren[k];
+                            const creativeTypeElement = creativeChildren[k];
                             let creative: VastCreative;
                             switch (creativeTypeElement.nodeName) {
                                 case 'Linear':
@@ -215,57 +215,57 @@ export class VastParser {
     }
 
     private parseCreativeLinearElement(creativeElement: any): any {
-        let creative = new VastCreativeLinear();
+        const creative = new VastCreativeLinear();
 
         creative.setDuration(this.parseDuration(this.parseNodeText(this.childByName(creativeElement, 'Duration'))));
         if (creative.getDuration() === -1 && creativeElement.parentNode.parentNode.parentNode.nodeName !== 'Wrapper') {
             return null;
         }
 
-        let skipOffset = creativeElement.getAttribute('skipoffset');
+        const skipOffset = creativeElement.getAttribute('skipoffset');
         if (skipOffset == null) {
             creative.setSkipDelay(null);
         } else if (skipOffset.charAt(skipOffset.length - 1) === '%') {
-            let percent = parseInt(skipOffset, 10);
+            const percent = parseInt(skipOffset, 10);
             creative.setSkipDelay(creative.getDuration() * (percent / 100));
         } else {
             creative.setSkipDelay(this.parseDuration(skipOffset));
         }
 
-        let videoClicksElement = this.childByName(creativeElement, 'VideoClicks');
+        const videoClicksElement = this.childByName(creativeElement, 'VideoClicks');
         if (videoClicksElement != null) {
             creative.setVideoClickThroughURLTemplate(this.parseNodeText(this.childByName(videoClicksElement, 'ClickThrough')));
-            let trackingVideoClickEventsElements = this.childsByName(videoClicksElement, 'ClickTracking');
+            const trackingVideoClickEventsElements = this.childsByName(videoClicksElement, 'ClickTracking');
             for (let i = 0; i < trackingVideoClickEventsElements.length; i++) {
-                let trackingVideoClickEventsElement = trackingVideoClickEventsElements[i];
-                let trackingVideoClickURLTemplate = this.parseNodeText(trackingVideoClickEventsElement);
+                const trackingVideoClickEventsElement = trackingVideoClickEventsElements[i];
+                const trackingVideoClickURLTemplate = this.parseNodeText(trackingVideoClickEventsElement);
                 if (trackingVideoClickURLTemplate != null) {
                     creative.addVideoClickTrackingURLTemplate(trackingVideoClickURLTemplate);
                 }
             }
         }
 
-        let trackingEventsElements = this.childsByName(creativeElement, 'TrackingEvents');
+        const trackingEventsElements = this.childsByName(creativeElement, 'TrackingEvents');
         for (let i = 0; i < trackingEventsElements.length; i++) {
-            let trackingEventsElement = trackingEventsElements[i];
-            let trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
+            const trackingEventsElement = trackingEventsElements[i];
+            const trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
             for (let j = 0; j < trackingElements.length; j++) {
-                let trackingElement = trackingElements[j];
-                let eventName = trackingElement.getAttribute('event');
-                let trackingURLTemplate = this.parseNodeText(trackingElement);
+                const trackingElement = trackingElements[j];
+                const eventName = trackingElement.getAttribute('event');
+                const trackingURLTemplate = this.parseNodeText(trackingElement);
                 if ((eventName != null) && (trackingURLTemplate != null)) {
                     creative.addTrackingEvent(eventName, trackingURLTemplate);
                 }
             }
         }
 
-        let mediaFilesElements = this.childsByName(creativeElement, 'MediaFiles');
+        const mediaFilesElements = this.childsByName(creativeElement, 'MediaFiles');
         if (mediaFilesElements.length > 0) {
-            let mediaFilesElement = mediaFilesElements[0];
-            let mediaFileElements = this.childsByName(mediaFilesElement, 'MediaFile');
+            const mediaFilesElement = mediaFilesElements[0];
+            const mediaFileElements = this.childsByName(mediaFilesElement, 'MediaFile');
             for (let i = 0; i < mediaFileElements.length; i++) {
-                let mediaFileElement = mediaFileElements[i];
-                let mediaFile = new VastMediaFile(
+                const mediaFileElement = mediaFileElements[i];
+                const mediaFile = new VastMediaFile(
                     this.parseNodeText(mediaFileElement),
                     mediaFileElement.getAttribute('delivery'),
                     mediaFileElement.getAttribute('codec'),
@@ -287,20 +287,20 @@ export class VastParser {
             return -1;
         }
 
-        let durationComponents = durationString.split(':');
+        const durationComponents = durationString.split(':');
         if (durationComponents.length !== 3) {
             return -1;
         }
 
-        let secondsAndMS = durationComponents[2].split('.');
+        const secondsAndMS = durationComponents[2].split('.');
         let seconds = parseInt(secondsAndMS[0], 10);
         if (secondsAndMS.length === 2) {
             seconds += parseFloat('0.' + secondsAndMS[1]);
         }
 
-        let minutes = parseInt(durationComponents[1], 10) * 60;
+        const minutes = parseInt(durationComponents[1], 10) * 60;
 
-        let hours = parseInt(durationComponents[0], 10) * 60 * 60;
+        const hours = parseInt(durationComponents[0], 10) * 60 * 60;
 
         if (isNaN(hours) || isNaN(minutes) || isNaN(seconds) || (minutes > 60 * 60) || (seconds > 60)) {
             return -1;
@@ -310,9 +310,9 @@ export class VastParser {
     }
 
     private childByName(node: any, name: string): any {
-        let childNodes = node.childNodes;
+        const childNodes = node.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
-            let child = childNodes[i];
+            const child = childNodes[i];
             if (child.nodeName === name) {
                 return child;
             }
@@ -320,10 +320,10 @@ export class VastParser {
     }
 
     private childsByName(node: any, name: string): any {
-        let matches: Node[] = [];
-        let childNodes = node.childNodes;
+        const matches: Node[] = [];
+        const childNodes = node.childNodes;
         for (let i = 0; i < childNodes.length; i++) {
-            let child = childNodes[i];
+            const child = childNodes[i];
             if (child.nodeName === name) {
                 matches.push(child);
             }

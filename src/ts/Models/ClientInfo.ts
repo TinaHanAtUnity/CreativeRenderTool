@@ -26,7 +26,7 @@ export class ClientInfo extends Model {
 
         this._platform = platform;
 
-        let gameIdString = data.shift();
+        const gameIdString = data.shift();
         if(typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
             this._gameId = gameIdString;
         } else {

@@ -6,8 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 
 describe('BroadcastApi', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('BroadcastApi', () => {
     });
 
     it('should handle SCREEN_ON event', () => {
-        let spy = sinon.spy();
+        const spy = sinon.spy();
         nativeBridge.Broadcast.onBroadcastAction.subscribe(spy);
         nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_ON', '', {}]);
         sinon.assert.calledWith(spy, 'screenListener', 'android.intent.action.SCREEN_ON', '', {});

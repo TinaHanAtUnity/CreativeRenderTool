@@ -36,6 +36,7 @@
     "rollup-plugin-node-resolve": "2.0.0",
     "rollup-plugin-string": "2.0.2",
     "sinon": "1.17.6",
+    "tslint-microsoft-contrib": "2.0.13",
     "xmldom": "0.1.22"
   },
   "optionalDependencies": {

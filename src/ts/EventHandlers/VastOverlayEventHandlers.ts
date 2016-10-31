@@ -20,7 +20,7 @@ export class VastOverlayEventHandlers {
     public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
         adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId());
 
-        let clickThroughURL = adUnit.getVideoClickThroughURL();
+        const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             if(nativeBridge.getPlatform() === Platform.IOS) {
                 nativeBridge.UrlScheme.open(clickThroughURL);
@@ -32,4 +32,5 @@ export class VastOverlayEventHandlers {
             }
         }
     }
+
 }

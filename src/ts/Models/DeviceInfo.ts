@@ -51,7 +51,7 @@ export class DeviceInfo extends Model {
     }
 
     public fetch(): Promise<any[]> {
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
 
         promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking).catch(err => this.handleDeviceInfoError(err)));
@@ -213,7 +213,6 @@ export class DeviceInfo extends Model {
         return this._totalExternalSpace;
     }
 
-
     public getLanguage(): string {
         return this._language;
     }
@@ -289,7 +288,7 @@ export class DeviceInfo extends Model {
     }
 
     public getDTO(): Promise<any> {
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this.getConnectionType().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getNetworkType().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)));
@@ -344,8 +343,6 @@ export class DeviceInfo extends Model {
                 'simulator': this._simulator,
             };
         });
-
-
     }
 
     private handleDeviceInfoError(error: any) {

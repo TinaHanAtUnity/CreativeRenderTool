@@ -25,8 +25,8 @@ class TestBroadcastApi extends BroadcastApi {
 }
 
 describe('WakeUpManagerTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
 
@@ -38,13 +38,13 @@ describe('WakeUpManagerTest', () => {
         nativeBridge.Connectivity = new TestConnectivityApi(nativeBridge);
         nativeBridge.Broadcast = new TestBroadcastApi(nativeBridge);
 
-        let clock = sinon.useFakeTimers();
+        const clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
         clock.restore();
     });
 
     it('should set connection listening status true', () => {
-        let spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
+        const spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
         return wakeUpManager.setListenConnectivity(true).then(() => {
             sinon.assert.calledOnce(spy);
             sinon.assert.calledWith(spy, true);
@@ -52,7 +52,7 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should set connection listening status false', () => {
-        let spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
+        const spy = sinon.spy(nativeBridge.Connectivity, 'setListeningStatus');
         return wakeUpManager.setListenConnectivity(false).then(() => {
             sinon.assert.calledOnce(spy);
             sinon.assert.calledWith(spy, false);
@@ -60,7 +60,7 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should start listening to screen broadcasts', () => {
-        let spy = sinon.spy(nativeBridge.Broadcast, 'addBroadcastListener');
+        const spy = sinon.spy(nativeBridge.Broadcast, 'addBroadcastListener');
         return wakeUpManager.setListenScreen(true).then(() => {
             sinon.assert.calledOnce(spy);
             assert.deepEqual(spy.getCall(0).args[1], ['android.intent.action.SCREEN_ON', 'android.intent.action.SCREEN_OFF']);
@@ -68,15 +68,15 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should stop listening to screen broadcasts', () => {
-        let spy = sinon.spy(nativeBridge.Broadcast, 'removeBroadcastListener');
+        const spy = sinon.spy(nativeBridge.Broadcast, 'removeBroadcastListener');
         return wakeUpManager.setListenScreen(false).then(() => {
             sinon.assert.calledOnce(spy);
         });
     });
 
     it('should trigger onNetworkConnected', () => {
-        let clock = sinon.useFakeTimers();
-        let spy = sinon.spy();
+        const clock = sinon.useFakeTimers();
+        const spy = sinon.spy();
         wakeUpManager.onNetworkConnected.subscribe(spy);
 
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
@@ -89,7 +89,7 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should trigger onScreenOn', () => {
-        let spy = sinon.spy();
+        const spy = sinon.spy();
         wakeUpManager.onScreenOn.subscribe(spy);
 
         nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_ON', '', {}]);
@@ -97,7 +97,7 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should trigger onScreenOff', () => {
-        let spy = sinon.spy();
+        const spy = sinon.spy();
         wakeUpManager.onScreenOff.subscribe(spy);
 
         nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_OFF', '', {}]);

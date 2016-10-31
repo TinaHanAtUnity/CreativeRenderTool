@@ -66,7 +66,7 @@ export class VastAd {
     }
 
     public getTrackingEventUrls(eventName: string) {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative) {
             if (creative.getTrackingEvents()) {
                 return creative.getTrackingEvents()[eventName];
@@ -76,7 +76,7 @@ export class VastAd {
     }
 
     public getDuration(): number | null {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative) {
             return creative.getDuration();
         } else {
@@ -85,7 +85,7 @@ export class VastAd {
     }
 
     public getVideoClickThroughURLTemplate(): string | null {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickThroughURLTemplate();
         }
@@ -93,7 +93,7 @@ export class VastAd {
     }
 
     public getVideoClickTrackingURLTemplates(): string[] {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickTrackingURLTemplates();
         }
@@ -101,7 +101,7 @@ export class VastAd {
     }
 
     public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             creative.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
         }

@@ -6,6 +6,13 @@ import { Platform } from 'Constants/Platform';
 
 export class View {
 
+    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
+        if(attachTap && binding.event === 'click') {
+            binding.tap = new Tap(<HTMLElement>element);
+        }
+        element.addEventListener(binding.event, binding.listener, false);
+    }
+
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
@@ -14,13 +21,6 @@ export class View {
     protected _container: HTMLElement;
 
     protected _id: string;
-
-    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
-        if(attachTap && binding.event === 'click') {
-            binding.tap = new Tap(<HTMLElement>element);
-        }
-        element.addEventListener(binding.event, binding.listener, false);
-    }
 
     constructor(nativeBridge: NativeBridge, id: string) {
         this._nativeBridge = nativeBridge;
@@ -32,13 +32,13 @@ export class View {
         this._container.id = this._id;
         this._container.innerHTML = this._template.render(this._templateData);
 
-        let attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
+        const attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
 
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
-                let elements: NodeList = this._container.querySelectorAll(binding.selector);
+                const elements: NodeList = this._container.querySelectorAll(binding.selector);
                 for(let i: number = 0; i < elements.length; ++i) {
-                    let element: Node = elements[i];
+                    const element: Node = elements[i];
                     View.addEventListener(binding, <HTMLElement>element, attachTap);
                 }
             } else {

@@ -144,7 +144,6 @@ describe('DeviceInfoTest iOS', () => {
     let deviceInfo: DeviceInfo;
     let nativeBridge: NativeBridge;
 
-
     beforeEach(() => {
         nativeBridge = <NativeBridge><any>{
             getPlatform: () => {

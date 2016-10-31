@@ -22,7 +22,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public get<T>(storageType: StorageType, key: string): Promise<T> {
-        let retValue = this.getInMemoryValue(this._storage, key);
+        const retValue = this.getInMemoryValue(this._storage, key);
         if(!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
@@ -49,7 +49,7 @@ class TestStorageApi extends StorageApi {
     }
 
     private setInMemoryValue(storage: {}, key: string, value: any): {} {
-        let keyArray: string[] = key.split('.');
+        const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
             if(!storage[keyArray[0]]) {
@@ -65,7 +65,7 @@ class TestStorageApi extends StorageApi {
     }
 
     private getInMemoryValue(storage: {}, key: string): any {
-        let keyArray: string[] = key.split('.');
+        const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
             if(!storage[keyArray[0]]) {
@@ -79,7 +79,7 @@ class TestStorageApi extends StorageApi {
     }
 
     private getInMemoryKeys(storage: {}, key: string): string[] {
-        let keyArray: string[] = key.split('.');
+        const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
             if(!storage[keyArray[0]]) {
@@ -92,8 +92,8 @@ class TestStorageApi extends StorageApi {
                 return [];
             }
 
-            let retArray: string[] = [];
-            for(let property in storage[key]) {
+            const retArray: string[] = [];
+            for(const property in storage[key]) {
                 if(storage.hasOwnProperty(key)) {
                     retArray.push(property);
                 }
@@ -104,7 +104,7 @@ class TestStorageApi extends StorageApi {
     }
 
     private deleteInMemoryValue(storage: {}, key: string): {} {
-        let keyArray: string[] = key.split('.');
+        const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
             if(!storage[keyArray[0]]) {
@@ -166,8 +166,8 @@ class TestDeviceInfoApi extends DeviceInfoApi {
 }
 
 describe('EventManagerTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     let storageApi: TestStorageApi;
@@ -188,27 +188,27 @@ describe('EventManagerTest', () => {
     });
 
     it('Send successful operative event', () => {
-        let eventId: string = '1234';
-        let sessionId: string = '5678';
-        let url: string = 'https://www.example.net/operative_event';
-        let data: string = 'Test data';
+        const eventId: string = '1234';
+        const sessionId: string = '5678';
+        const url: string = 'https://www.example.net/operative_event';
+        const data: string = 'Test data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        const requestSpy = sinon.spy(request, 'post');
 
         return eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert(requestSpy.calledOnce, 'Operative event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
 
-            let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
-            let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
+            const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
+            const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
             return storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
-                let errorCode = error.shift();
+                const errorCode = error.shift();
                 assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event url should be deleted');
             }).then(() => {
                 return storageApi.get(StorageType.PRIVATE, dataKey);
             }).catch(error => {
-                let errorCode = error.shift();
+                const errorCode = error.shift();
                 assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event data should be deleted');
             }).then(() => {
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after successful operative event');
@@ -217,24 +217,24 @@ describe('EventManagerTest', () => {
     });
 
     it('Send failed operative event', () => {
-        let clock = sinon.useFakeTimers();
+        const clock = sinon.useFakeTimers();
 
-        let eventId: string = '1234';
-        let sessionId: string = '5678';
-        let url: string = 'https://www.example.net/fail';
-        let data: string = 'Test data';
+        const eventId: string = '1234';
+        const sessionId: string = '5678';
+        const url: string = 'https://www.example.net/fail';
+        const data: string = 'Test data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        const requestSpy = sinon.spy(request, 'post');
 
-        let event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
+        const event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
         }).catch(() => {
             assert(requestSpy.calledOnce, 'Failed operative event did not try sending POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
 
-            let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
-            let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
+            const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
+            const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
             return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
                 assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
@@ -250,10 +250,10 @@ describe('EventManagerTest', () => {
     });
 
     it('Send click attribution event', () => {
-        let sessionId: string = '1234';
-        let url: string = 'https://www.example.net/third_party_event';
+        const sessionId: string = '1234';
+        const url: string = 'https://www.example.net/third_party_event';
 
-        let requestSpy = sinon.spy(request, 'get');
+        const requestSpy = sinon.spy(request, 'get');
 
         return eventManager.clickAttributionEvent(sessionId, url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
@@ -262,10 +262,10 @@ describe('EventManagerTest', () => {
     });
 
     it('Send diagnostic event', () => {
-        let url: string = 'https://www.example.net/diagnostic_event';
-        let data: string = 'Test Data';
+        const url: string = 'https://www.example.net/diagnostic_event';
+        const data: string = 'Test Data';
 
-        let requestSpy = sinon.spy(request, 'post');
+        const requestSpy = sinon.spy(request, 'post');
 
         return eventManager.diagnosticEvent(url, data).then(() => {
             assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
@@ -275,20 +275,20 @@ describe('EventManagerTest', () => {
     });
 
     it('Retry failed event', () => {
-        let url: string = 'https://www.example.net/retry_event';
-        let data: string = 'Retry test';
-        let sessionId: string = 'abcd-1234';
-        let eventId: string = '5678-efgh';
+        const url: string = 'https://www.example.net/retry_event';
+        const data: string = 'Retry test';
+        const sessionId: string = 'abcd-1234';
+        const eventId: string = '5678-efgh';
 
-        let sessionTsKey: string = 'session.' + sessionId + '.ts';
-        let urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
-        let dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
+        const sessionTsKey: string = 'session.' + sessionId + '.ts';
+        const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
+        const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, Date.now() - 100);
         storageApi.set(StorageType.PRIVATE, urlKey, url);
         storageApi.set(StorageType.PRIVATE, dataKey, data);
 
-        let requestSpy = sinon.spy(request, 'post');
+        const requestSpy = sinon.spy(request, 'post');
 
         return eventManager.sendUnsentSessions().then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
@@ -311,8 +311,8 @@ describe('EventManagerTest', () => {
     });
 
     it('Start new session', () => {
-        let sessionId: string = 'new-12345';
-        let sessionTsKey: string = 'session.' + sessionId + '.ts';
+        const sessionId: string = 'new-12345';
+        const sessionTsKey: string = 'session.' + sessionId + '.ts';
 
         return eventManager.startNewSession(sessionId).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(timestamp => {
@@ -323,9 +323,9 @@ describe('EventManagerTest', () => {
     });
 
     it('Delete old session', () => {
-        let sessionId: string = 'old-1234';
-        let sessionTsKey: string = 'session.' + sessionId + '.ts';
-        let threeMonthsAgo: number = Date.now() - 90 * 24 * 60 * 60 * 1000;
+        const sessionId: string = 'old-1234';
+        const sessionTsKey: string = 'session.' + sessionId + '.ts';
+        const threeMonthsAgo: number = Date.now() - 90 * 24 * 60 * 60 * 1000;
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
 
@@ -341,7 +341,7 @@ describe('EventManagerTest', () => {
     });
 
     it('Delete session without timestamp', () => {
-        let randomKey: string = 'session.random123.operative.456.test';
+        const randomKey: string = 'session.random123.operative.456.test';
 
         storageApi.set(StorageType.PRIVATE, randomKey, 'test');
 
@@ -357,8 +357,8 @@ describe('EventManagerTest', () => {
     });
 
     it('Get unique event id', () => {
-        let testId: string = '1234-5678';
-        let deviceInfoApi: TestDeviceInfoApi = nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
+        const testId: string = '1234-5678';
+        const deviceInfoApi: TestDeviceInfoApi = nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
         deviceInfoApi.setTestId(testId);
 
         return eventManager.getUniqueEventId().then(uniqueId => {
