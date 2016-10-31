@@ -12,12 +12,12 @@ import { IosUtils } from 'Utilities/IosUtils';
 export class EndScreenEventHandlers {
 
     public static onDownloadAndroid(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
-        let platform = nativeBridge.getPlatform();
-        let campaign = adUnit.getCampaign();
+        const platform = nativeBridge.getPlatform();
+        const campaign = adUnit.getCampaign();
 
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
-                let location = Request.getHeader(response.headers, 'location');
+                const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     nativeBridge.Intent.launch({
                         'action': 'android.intent.action.VIEW',
@@ -37,12 +37,12 @@ export class EndScreenEventHandlers {
     }
 
     public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
-        let platform = nativeBridge.getPlatform();
-        let campaign = adUnit.getCampaign();
+        const platform = nativeBridge.getPlatform();
+        const campaign = adUnit.getCampaign();
 
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
-                let location = Request.getHeader(response.headers, 'location');
+                const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     nativeBridge.UrlScheme.open(location);
                 } else {

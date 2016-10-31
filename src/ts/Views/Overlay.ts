@@ -8,6 +8,10 @@ import { Localization } from 'Utilities/Localization';
 
 export class Overlay extends View {
 
+    public static setAutoSkip(value: boolean) {
+        Overlay.AutoSkip = value;
+    }
+
     private static AutoSkip: boolean = false;
 
     public onSkip: Observable1<number> = new Observable1();
@@ -44,10 +48,6 @@ export class Overlay extends View {
     private _callButtonElement: HTMLElement;
 
     private _fadeTimer: any;
-
-    public static setAutoSkip(value: boolean) {
-        Overlay.AutoSkip = value;
-    }
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');

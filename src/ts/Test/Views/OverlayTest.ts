@@ -24,9 +24,9 @@ describe('Overlay', () => {
     });
 
     it('should render with translations', () => {
-        let overlay = new Overlay(nativeBridge, true, 'fi');
+        const overlay = new Overlay(nativeBridge, true, 'fi');
         overlay.render();
-        let skipButtonElement = overlay.container().querySelectorAll('.skip-button')[0];
+        const skipButtonElement = overlay.container().querySelectorAll('.skip-button')[0];
         assert.equal(skipButtonElement.innerHTML, 'Voit ohittaa videon <span class="skip-duration">0</span> sekunnin päästä');
     });
 });

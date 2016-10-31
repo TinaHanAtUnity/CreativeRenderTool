@@ -2,9 +2,6 @@ import { Model } from 'Models/Model';
 
 export class AdapterMetaData extends Model {
 
-    private _name: string;
-    private _version: string;
-
     public static getCategory(): string {
         return 'adapter';
     }
@@ -12,6 +9,9 @@ export class AdapterMetaData extends Model {
     public static getKeys(): string[] {
         return ['name', 'version'];
     }
+
+    private _name: string;
+    private _version: string;
 
     constructor(data: string[]) {
         super();

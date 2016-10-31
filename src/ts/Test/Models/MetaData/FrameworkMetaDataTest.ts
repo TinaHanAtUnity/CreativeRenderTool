@@ -51,8 +51,8 @@ class TestStorageApi extends StorageApi {
 }
 
 describe('FrameworkMetaDataTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, storageApi: TestStorageApi;
 
     before(() => {

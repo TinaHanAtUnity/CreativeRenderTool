@@ -5,13 +5,8 @@ import { INativeResponse } from 'Utilities/Request';
 
 export class Diagnostics {
 
-    private static DiagnosticsBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
-    private static _eventManager: EventManager;
-    private static _clientInfo: ClientInfo | undefined;
-    private static _deviceInfo: DeviceInfo | undefined;
-
     public static trigger(data: any): Promise<INativeResponse> {
-        let messages: any[] = []; // todo: use a more specific type
+        const messages: any[] = []; // todo: use a more specific type
         messages.push({
             'type': 'ads.sdk2.diagnostics',
             'msg': data
@@ -20,7 +15,7 @@ export class Diagnostics {
         return Diagnostics.createCommonObject(this._clientInfo, this._deviceInfo).then(commonObject => {
             messages.unshift(commonObject);
 
-            let rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
+            const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
             return this._eventManager.diagnosticEvent(Diagnostics.DiagnosticsBaseUrl, rawData);
         });
     }
@@ -41,8 +36,13 @@ export class Diagnostics {
         Diagnostics.DiagnosticsBaseUrl = baseUrl + '/v1/events';
     }
 
+    private static DiagnosticsBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
+    private static _eventManager: EventManager;
+    private static _clientInfo: ClientInfo | undefined;
+    private static _deviceInfo: DeviceInfo | undefined;
+
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any> {
-        let common: any = {
+        const common: any = {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
                 'device': null,

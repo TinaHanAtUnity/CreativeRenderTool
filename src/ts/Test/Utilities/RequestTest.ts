@@ -87,8 +87,8 @@ class TestRequestApi extends RequestApi {
 }
 
 describe('RequestTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
 
     beforeEach(() => {
@@ -98,15 +98,15 @@ describe('RequestTest', () => {
         });
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        let clock = sinon.useFakeTimers();
+        const clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
         clock.restore();
         request = new Request(nativeBridge, wakeUpManager);
     });
 
     it('Request get without headers (expect success)', () => {
-        let successUrl: string = 'http://www.example.org/success';
-        let successMessage: string = 'Success response';
+        const successUrl: string = 'http://www.example.org/success';
+        const successMessage: string = 'Success response';
 
         return request.get(successUrl).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
@@ -117,8 +117,8 @@ describe('RequestTest', () => {
     });
 
     it('Request get without headers (expect failure)', () => {
-        let failUrl: string = 'http://www.example.org/fail';
-        let failMessage: string = 'Fail response';
+        const failUrl: string = 'http://www.example.org/fail';
+        const failMessage: string = 'Fail response';
 
         return request.get(failUrl).then(response => {
             throw new Error('Request should have failed but got response: ' + response);
@@ -129,9 +129,9 @@ describe('RequestTest', () => {
     });
 
     it('Request get with header', () => {
-        let headerUrl: string = 'http://www.example.org/forwardheader';
-        let headerField: string = 'X-Test';
-        let headerMessage: string = 'Header message';
+        const headerUrl: string = 'http://www.example.org/forwardheader';
+        const headerField: string = 'X-Test';
+        const headerMessage: string = 'Header message';
 
         return request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
@@ -142,10 +142,10 @@ describe('RequestTest', () => {
     });
 
     it('Request get with three retries', () => {
-        let retryUrl: string = 'http://www.example.org/retry';
-        let successMessage: string = 'Success response';
-        let retryAttempts: number = 3;
-        let retryDelay: number = 10;
+        const retryUrl: string = 'http://www.example.org/retry';
+        const successMessage: string = 'Success response';
+        const retryAttempts: number = 3;
+        const retryDelay: number = 10;
 
         return request.get(retryUrl, [], {
             retries: retryAttempts,
@@ -161,8 +161,8 @@ describe('RequestTest', () => {
     });
 
     it('Request post without headers (expect success)', () => {
-        let successUrl: string = 'http://www.example.org/success';
-        let successMessage: string = 'Success response';
+        const successUrl: string = 'http://www.example.org/success';
+        const successMessage: string = 'Success response';
 
         return request.post(successUrl, 'Test').then(response => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
@@ -173,8 +173,8 @@ describe('RequestTest', () => {
     });
 
     it('Request post without headers (expect failure)', () => {
-        let failUrl: string = 'http://www.example.org/fail';
-        let failMessage: string = 'Fail response';
+        const failUrl: string = 'http://www.example.org/fail';
+        const failMessage: string = 'Fail response';
 
         return request.post(failUrl, 'Test').then(response => {
             throw new Error('Request should have failed but got response: ' + response);
@@ -185,9 +185,9 @@ describe('RequestTest', () => {
     });
 
     it('Request post with header', () => {
-        let headerUrl: string = 'http://www.example.org/forwardheader';
-        let headerField: string = 'X-Test';
-        let headerMessage: string = 'Header message';
+        const headerUrl: string = 'http://www.example.org/forwardheader';
+        const headerField: string = 'X-Test';
+        const headerMessage: string = 'Header message';
 
         return request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
@@ -198,8 +198,8 @@ describe('RequestTest', () => {
     });
 
     it('Request post with forwarded body', () => {
-        let testUrl: string = 'http://www.example.org/forwardbody';
-        let bodyMessage: string = 'Body message';
+        const testUrl: string = 'http://www.example.org/forwardbody';
+        const bodyMessage: string = 'Body message';
 
         return request.post(testUrl, bodyMessage).then(response => {
             assert.equal(bodyMessage, response.response, 'Did not get correctly forwarded body');
@@ -210,10 +210,10 @@ describe('RequestTest', () => {
     });
 
     it('Request post with three retries', () => {
-        let retryUrl: string = 'http://www.example.org/retry';
-        let successMessage: string = 'Success response';
-        let retryAttempts: number = 3;
-        let retryDelay: number = 10;
+        const retryUrl: string = 'http://www.example.org/retry';
+        const successMessage: string = 'Success response';
+        const retryAttempts: number = 3;
+        const retryDelay: number = 10;
 
         return request.post(retryUrl, 'Test', [], {
             retries: retryAttempts,
@@ -229,9 +229,9 @@ describe('RequestTest', () => {
     });
 
     it('Request should fail after retry attempts', () => {
-        let retryUrl: string = 'http://www.example.org/alwaysRetry';
-        let retryAttempts: number = 5;
-        let retryDelay: number = 10;
+        const retryUrl: string = 'http://www.example.org/alwaysRetry';
+        const retryAttempts: number = 5;
+        const retryDelay: number = 10;
 
         return request.get(retryUrl, [], {
             retries: retryAttempts,
@@ -247,13 +247,13 @@ describe('RequestTest', () => {
     });
 
     it('Request should succeed only after connection event', () => {
-        let clock = sinon.useFakeTimers();
-        let toggleUrl: string = 'http://www.example.org/toggle';
-        let successMessage: string = 'Success response';
+        const clock = sinon.useFakeTimers();
+        const toggleUrl: string = 'http://www.example.org/toggle';
+        const successMessage: string = 'Success response';
 
         requestApi.setToggleUrl(false);
 
-        let promise = request.get(toggleUrl, [], {
+        const promise = request.get(toggleUrl, [], {
             retries: 0,
             retryDelay: 0,
             followRedirects: false,

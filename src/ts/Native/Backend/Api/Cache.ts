@@ -18,7 +18,7 @@ export class Cache {
             return hash.toString();
         }
         for(let i = 0; i < url.length; i++) {
-            let char = url.charCodeAt(i);
+            const char = url.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash;
         }

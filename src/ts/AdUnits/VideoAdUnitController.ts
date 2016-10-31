@@ -30,7 +30,6 @@ export abstract class VideoAdUnitController {
     protected _videoActive: boolean;
     protected _showing: boolean = false;
 
-
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
         this._nativeBridge = nativeBridge;
         this._placement = placement;
@@ -48,23 +47,6 @@ export abstract class VideoAdUnitController {
     public abstract show(): Promise<void>;
 
     public abstract hide(): Promise<void>;
-
-    protected hideChildren() {
-        const overlay = this.getOverlay();
-
-        if(overlay) {
-            overlay.container().parentElement.removeChild(overlay.container());
-        }
-    };
-
-    protected getVideoUrl(): string {
-        const campaign: Campaign = this.getCampaign();
-        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
-            return campaign.getStreamingVideoUrl();
-        } else {
-            return campaign.getVideoUrl();
-        }
-    }
 
     public isShowing(): boolean {
         return this._showing;
@@ -130,10 +112,6 @@ export abstract class VideoAdUnitController {
         return this._overlay;
     }
 
-    protected unsetReferences() {
-        delete this._overlay;
-    }
-
     public getProgressInterval(): number {
         return VideoAdUnitController._progressInterval;
     }
@@ -154,5 +132,26 @@ export abstract class VideoAdUnitController {
 
     public getCampaign(): Campaign {
         return this._campaign;
+    }
+
+    protected unsetReferences() {
+        delete this._overlay;
+    }
+
+    protected hideChildren() {
+        const overlay = this.getOverlay();
+
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
+    };
+
+    protected getVideoUrl(): string {
+        const campaign: Campaign = this.getCampaign();
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
+        } else {
+            return campaign.getVideoUrl();
+        }
     }
 }

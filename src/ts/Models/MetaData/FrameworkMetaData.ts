@@ -2,9 +2,6 @@ import { Model } from 'Models/Model';
 
 export class FrameworkMetaData extends Model {
 
-    private _name: string;
-    private _version: string;
-
     public static getCategory(): string {
         return 'framework';
     }
@@ -12,6 +9,9 @@ export class FrameworkMetaData extends Model {
     public static getKeys(): string[] {
         return ['name', 'version'];
     }
+
+    private _name: string;
+    private _version: string;
 
     constructor(data: string[]) {
         super();
