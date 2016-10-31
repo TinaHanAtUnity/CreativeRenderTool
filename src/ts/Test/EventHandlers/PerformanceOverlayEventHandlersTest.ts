@@ -15,7 +15,7 @@ describe('PerformanceOverlayEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
     let performanceAdUnit: PerformanceAdUnit;
 
     beforeEach(() => {

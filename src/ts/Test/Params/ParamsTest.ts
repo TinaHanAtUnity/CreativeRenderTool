@@ -107,7 +107,7 @@ class SpecVerifier {
         }
 
         if(this._bodyParams) {
-            for(let key in this._bodyParams) {
+            for(const key in this._bodyParams) {
                 if(this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
@@ -117,7 +117,7 @@ class SpecVerifier {
     }
 
     private assertRequiredParams(): void {
-        for(let param in this._spec) {
+        for(const param in this._spec) {
             if(this._spec.hasOwnProperty(param)) {
                 if(this.isRequired(this._spec[param].required)) {
                     if(this._spec[param].queryString) {

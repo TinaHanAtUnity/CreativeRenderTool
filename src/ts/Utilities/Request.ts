@@ -225,12 +225,11 @@ export class Request {
     }
 
     private onNetworkConnected(): void {
-        let id: any;
-        for(id in Request._requests) {
+        for(const id in Request._requests) {
             if(Request._requests.hasOwnProperty(id)) {
                 const request: INativeRequest = Request._requests[id];
                 if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
-                    this.invokeRequest(id, request);
+                    this.invokeRequest(parseInt(id, 10), request);
                 }
             }
         }

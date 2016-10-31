@@ -186,9 +186,9 @@ describe('VideoEventHandlersTest', () => {
         it('should hide overlay', () => {
             VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
 
-            overlay = videoAdUnitController.getOverlay();
-            if(overlay) {
-                sinon.assert.called(<sinon.SinonSpy>overlay.hide);
+            const adUnitOverlay = videoAdUnitController.getOverlay();
+            if(adUnitOverlay) {
+                sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
         });
     });
@@ -340,9 +340,9 @@ describe('VideoEventHandlersTest', () => {
             assert.isFalse(videoAdUnitController.isVideoActive());
             assert.equal(videoAdUnitController.getFinishState(), FinishState.ERROR);
 
-            overlay = videoAdUnitController.getOverlay();
-            if(overlay) {
-                sinon.assert.called(<sinon.SinonSpy>overlay.hide);
+            const adUnitOverlay = videoAdUnitController.getOverlay();
+            if(adUnitOverlay) {
+                sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
         });
@@ -367,9 +367,9 @@ describe('VideoEventHandlersTest', () => {
             assert.isFalse(videoAdUnitController.isVideoActive());
             assert.equal(videoAdUnitController.getFinishState(), FinishState.ERROR);
 
-            overlay = videoAdUnitController.getOverlay();
-            if(overlay) {
-                sinon.assert.called(<sinon.SinonSpy>overlay.hide);
+            const adUnitOverlay = videoAdUnitController.getOverlay();
+            if(adUnitOverlay) {
+                sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);

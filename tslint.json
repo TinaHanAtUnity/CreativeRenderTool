@@ -1,5 +1,6 @@
 {
   "extends": "tslint:recommended",
+  "rulesDirectory": ["node_modules/tslint-microsoft-contrib"],
   "rules": {
     "quotemark": ["single"],
     "variable-name": false,
@@ -14,6 +15,7 @@
     "max-line-length": false,
     "no-bitwise": false,
     "object-literal-sort-keys": false,
-    "one-variable-per-declaration": false
+    "one-variable-per-declaration": false,
+    "prefer-const": true
   }
 }

@@ -86,7 +86,7 @@ export class CacheManager {
     public stop(): void {
         let activeDownload: boolean = false;
 
-        for(let url in this._callbacks) {
+        for(const url in this._callbacks) {
             if(this._callbacks.hasOwnProperty(url)) {
                 const callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
@@ -334,7 +334,7 @@ export class CacheManager {
     }
 
     private onNetworkConnected(): void {
-        for(let url in this._callbacks) {
+        for(const url in this._callbacks) {
             if(this._callbacks.hasOwnProperty(url)) {
                 const callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
