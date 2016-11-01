@@ -27,6 +27,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class WebView {
 
@@ -75,8 +76,8 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
-            Diagnostics.setEventManager(this._eventManager);
-            Diagnostics.setClientInfo(this._clientInfo);
+            HttpKafka.setRequest(this._request);
+            HttpKafka.setClientInfo(this._clientInfo);
 
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -91,7 +92,7 @@ export class WebView {
                     document.body.classList.add('ipad');
                 }
             }
-            Diagnostics.setDeviceInfo(this._deviceInfo);
+            HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -607,7 +608,7 @@ export class WebView {
 
         metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
             if(found && url) {
-                Diagnostics.setTestBaseUrl(url);
+                HttpKafka.setTestBaseUrl(url);
             }
         });
 
