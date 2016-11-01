@@ -97,10 +97,6 @@ export class EventManager {
         });
     }
 
-    public diagnosticEvent(url: string, data: string): Promise<INativeResponse> {
-        return this._request.post(url, data);
-    }
-
     public startNewSession(sessionId: string): Promise<void[]> {
         return Promise.all([
             this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, EventManager.getSessionTimestampKey(sessionId), Date.now()),
