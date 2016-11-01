@@ -3,7 +3,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class Analytics {
     public static trigger(data: any): Promise<INativeResponse> {
-        return HttpKafka.sendEvent(Analytics.AnalyticsBaseUrl, 'diagnostics', data);
+        return HttpKafka.sendEvent(Analytics.AnalyticsBaseUrl, 'analytics', data);
     }
 
     public static setTestBaseUrl(baseUrl: string) {
