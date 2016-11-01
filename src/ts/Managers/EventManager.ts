@@ -83,7 +83,7 @@ export class EventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
-            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
                 request: request,
                 event: event,
                 sessionId: sessionId,
