@@ -15,7 +15,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable2 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
 import InsideOutsideJson from 'json/InsideOutside.json';
@@ -558,7 +557,6 @@ describe('CampaignManager', () => {
         };
         const wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
-        Diagnostics.setEventManager(<any>{diagnosticEvent: sinon.spy()});
         deviceInfo = new DeviceInfo(nativeBridge);
     });
 

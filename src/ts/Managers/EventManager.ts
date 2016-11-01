@@ -3,6 +3,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Analytics } from 'Utilities/Analytics';
 
 export class EventManager {
 
@@ -82,13 +83,19 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).catch(() => {
-            return; // ignore third party event errors because no one cares
-        });
-    }
+        }).catch(([request, message]) => {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
+                request: request,
+                event: event,
+                sessionId: sessionId,
+                url: url
+            });
 
-    public diagnosticEvent(url: string, data: string): Promise<INativeResponse> {
-        return this._request.post(url, data);
+            return Analytics.trigger({
+                'type': 'third_party_event_failed',
+                'error': error
+            });
+        });
     }
 
     public startNewSession(sessionId: string): Promise<void[]> {

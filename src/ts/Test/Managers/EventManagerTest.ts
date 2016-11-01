@@ -261,19 +261,6 @@ describe('EventManagerTest', () => {
         });
     });
 
-    it('Send diagnostic event', () => {
-        const url: string = 'https://www.example.net/diagnostic_event';
-        const data: string = 'Test Data';
-
-        const requestSpy = sinon.spy(request, 'post');
-
-        return eventManager.diagnosticEvent(url, data).then(() => {
-            assert(requestSpy.calledOnce, 'Diagnostic event did not try sending POST request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Diagnostic event url does not match');
-            assert.equal(data, requestSpy.getCall(0).args[1], 'Diagnostic event data does not match');
-        });
-    });
-
     it('Retry failed event', () => {
         const url: string = 'https://www.example.net/retry_event';
         const data: string = 'Retry test';
