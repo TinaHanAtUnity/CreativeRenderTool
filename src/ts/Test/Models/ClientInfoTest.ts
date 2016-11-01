@@ -12,7 +12,7 @@ describe('ClientInfoTest', () => {
     it('Get ClientInfo DTO', () => {
         // gameId, testMode, applicationName, applicationVersion, sdkVersion, sdkVersionName
         // debuggable, configUrl, webviewUrl, webviewHash, webviewVersion
-        let data: any[] = [
+        const data: any[] = [
             '11111',
             true,
             'com.unity3d.ads.test',
@@ -28,7 +28,7 @@ describe('ClientInfoTest', () => {
         ];
 
         clientInfo = new ClientInfo(Platform.TEST, data);
-        let dto: any = clientInfo.getDTO();
+        const dto: any = clientInfo.getDTO();
 
         assert.equal(dto.gameId, '11111');
         assert.equal(dto.testMode, true);
@@ -46,7 +46,7 @@ describe('ClientInfoTest', () => {
     });
 
     it('Construct with invalid gameId', () => {
-        let data: any[] = [
+        const data: any[] = [
             'abc1111',
             true,
             'com.unity3d.ads.test',
@@ -61,9 +61,9 @@ describe('ClientInfoTest', () => {
             null
         ];
 
-        // tslint:disable-next-line
-        let clientInfoConstructor = () => { new ClientInfo(Platform.TEST, data); };
+        // tslint:disable:no-unused-new
+        const clientInfoConstructor = () => { new ClientInfo(Platform.TEST, data); };
         assert.throw(clientInfoConstructor, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
-
+        // tslint:enable:no-unused-new
     });
 });

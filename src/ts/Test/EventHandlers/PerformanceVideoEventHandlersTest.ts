@@ -11,9 +11,9 @@ import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEve
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
     let performanceAdUnit: PerformanceAdUnit;
 
     beforeEach(() => {
@@ -28,7 +28,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        let videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
@@ -36,7 +36,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit);
 
-            const endScreen = performanceAdUnit.getEndScreen();
+            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
@@ -47,7 +47,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             PerformanceVideoEventHandlers.onVideoError(performanceAdUnit);
 
-            const endScreen = performanceAdUnit.getEndScreen();
+            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }

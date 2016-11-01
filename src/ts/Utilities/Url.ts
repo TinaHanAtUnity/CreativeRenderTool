@@ -8,10 +8,10 @@ export class Url {
             newUrl += '?';
         }
 
-        let pairs: Object[] = [];
-        for(let key in parameters) {
+        const pairs: Object[] = [];
+        for(const key in parameters) {
             if(parameters.hasOwnProperty(key)) {
-                let value: string = parameters[key];
+                const value: string = parameters[key];
                 if(value !== undefined) {
                     pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                 }
@@ -23,10 +23,10 @@ export class Url {
     }
 
     public static getQueryParameter(locationString: string, parameter: string): string | null {
-        let queryString: string[] = locationString.split('?')[1].split('&');
+        const queryString: string[] = locationString.split('?')[1].split('&');
 
         for(let i: number = 0; i < queryString.length; i++) {
-            let queryParam = queryString[i].split('=');
+            const queryParam = queryString[i].split('=');
             if(queryParam[0] === parameter) {
                 return queryParam[1];
             }

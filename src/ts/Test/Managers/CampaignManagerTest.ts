@@ -49,12 +49,12 @@ describe('CampaignManager', () => {
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: OnVastCampaignJson
         }));
 
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
@@ -81,7 +81,7 @@ describe('CampaignManager', () => {
     it('should have data from inside and outside the wrapper for a wrapped VAST', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: InsideOutsideJson
         }));
@@ -90,7 +90,7 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(1);
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
@@ -149,11 +149,10 @@ describe('CampaignManager', () => {
         campaignManager.request();
     });
 
-
     it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: WrappedVastJson
         }));
@@ -165,7 +164,7 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(2);
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
@@ -252,13 +251,13 @@ describe('CampaignManager', () => {
     it('should fail when max depth is exceeded', (done) => {
 
         // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve({
             response: MaxDepthVastJson
         }));
 
-        let nonWrappedVAST = NonWrappedVast;
-        let wrappedVAST = WrappedVast3;
+        const nonWrappedVAST = NonWrappedVast;
+        const wrappedVAST = WrappedVast3;
 
         // create intermediate wrappers
         for(let i = 0; i < 8; i++) {
@@ -272,7 +271,7 @@ describe('CampaignManager', () => {
             response: nonWrappedVAST
         }));
 
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         campaignManager.onError.subscribe((err: Error) => {
             assert.equal(err.message, 'VAST wrapper depth exceeded');
             done();
@@ -282,12 +281,12 @@ describe('CampaignManager', () => {
         campaignManager.request();
     });
 
-    let verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
+    const verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
         // given a VAST placement with invalid XML
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
             triggeredError = error;
@@ -302,15 +301,15 @@ describe('CampaignManager', () => {
         });
     };
 
-    let verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
+    const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
         // given a VAST placement that wraps another VAST
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
-        let verify = () => {
+        const verify = () => {
             // then the onError observable is triggered with an appropriate error
             mockRequest.verify();
             if (triggeredError instanceof Error) {
@@ -403,10 +402,10 @@ describe('CampaignManager', () => {
                 }`
             };
 
-            let mockRequest = sinon.mock(request);
+            const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+            const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
             let triggeredRetryTime: number;
             let triggeredError: any;
             campaignManager.onNoFill.subscribe((retryTime: number) => {
@@ -452,12 +451,12 @@ describe('CampaignManager', () => {
 
     });
 
-    let verifyCampaignForResponse = (response: {response: any}) => {
+    const verifyCampaignForResponse = (response: {response: any}) => {
         // given a valid VAST placement
-        let mockRequest = sinon.mock(request);
+        const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        let campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: Campaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
@@ -557,7 +556,7 @@ describe('CampaignManager', () => {
                 return Platform.TEST;
             }
         };
-        let wakeUpManager = new WakeUpManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
         Diagnostics.setEventManager(<any>{diagnosticEvent: sinon.spy()});
         deviceInfo = new DeviceInfo(nativeBridge);

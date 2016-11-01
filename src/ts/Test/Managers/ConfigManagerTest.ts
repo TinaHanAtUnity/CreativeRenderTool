@@ -43,8 +43,8 @@ class TestStorageApi extends StorageApi {
 
 describe('ConfigManagerTest', () => {
 
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let requestMock: any, clientInfoMock: any, deviceInfoMock: any;
     let configPromise: Promise<INativeResponse>;
@@ -69,7 +69,7 @@ describe('ConfigManagerTest', () => {
     describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            let nativeResponse = {
+            const nativeResponse = {
                 response: ConfigurationJson
             };
             configPromise = Promise.resolve(nativeResponse);
@@ -88,11 +88,10 @@ describe('ConfigManagerTest', () => {
         });
     });
 
-
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            let nativeResponse = {
+            const nativeResponse = {
                 response: '{bad json here,'
             };
             configPromise = Promise.resolve(nativeResponse);

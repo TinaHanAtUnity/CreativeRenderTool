@@ -48,5 +48,4 @@ export class SdkApi extends NativeApi {
         this._nativeBridge.invoke<void>(this._apiClass, 'reinitialize');
     }
 
-
 }
