@@ -3,6 +3,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Analytics } from 'Utilities/Analytics';
 
 export class EventManager {
 
@@ -90,7 +91,7 @@ export class EventManager {
                 url: url
             });
 
-            return Diagnostics.trigger({
+            return Analytics.trigger({
                 'type': 'third_party_event_failed',
                 'error': error
             });
