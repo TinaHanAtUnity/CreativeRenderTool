@@ -3,6 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { Backend } from 'Native/Backend/Backend';
 import { WebView } from 'WebView';
+import { Sdk } from 'Native/Backend/Api/Sdk';
 
 export class UnityAds {
 
@@ -21,6 +22,8 @@ export class UnityAds {
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
 
+        Sdk.setGameId(gameId);
+        Sdk.setTestMode(testMode);
         UnityAds._listener = listener;
 
         // tslint:disable:no-string-literal
