@@ -16,6 +16,11 @@ export class HttpKafka {
     }
 
     public static sendEvent(url: string, type: string, data: any): Promise<INativeResponse> {
+        if(!HttpKafka._request) {
+            // if request is not set, this is likely a test that does not care about analytics or diagnostics
+            return Promise.resolve({url: url, response: '', responseCode: 200, headers: null});
+        }
+
         const messages: any[] = [];
         messages.push({
             'type': 'ads.sdk2.' + type,
@@ -26,7 +31,7 @@ export class HttpKafka {
             messages.unshift(commonObject);
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-            return this._request.post(url, rawData);
+            return HttpKafka._request.post(url, rawData);
         });
     }
 
