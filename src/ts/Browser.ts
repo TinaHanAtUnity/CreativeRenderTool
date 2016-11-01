@@ -86,11 +86,11 @@ if(window.parent !== window) {
 
         switch(platformElement.value) {
             case 'android':
-                UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener);
+                UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
             case 'ios':
-                UnityAds.initialize(Platform.IOS, gameIdElement.value, listener);
+                UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
             default:
