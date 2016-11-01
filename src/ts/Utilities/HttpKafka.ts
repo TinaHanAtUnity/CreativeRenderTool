@@ -16,11 +16,6 @@ export class HttpKafka {
     }
 
     public static sendEvent(type: string, data: any): Promise<INativeResponse> {
-        if(!HttpKafka._request) {
-            // if request is not set, this is likely a test that does not care about analytics or diagnostics
-            return Promise.resolve({url: HttpKafka.KafkaBaseUrl, response: '', responseCode: 200, headers: null});
-        }
-
         const messages: any[] = [];
         messages.push({
             'type': 'ads.sdk2.' + type,
