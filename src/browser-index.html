@@ -2,36 +2,61 @@
 <html lang="en">
 <head>
     <title>Unity Ads WebView</title>
-    <meta charset="utf-8"/>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous" />
     <link rel="stylesheet" href="css/browser.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>
 </head>
 <body>
-<form>
-    <label for="abGroup">AB Group:</label>
-    <input id="abGroup" type="text" />
-    <br/>
-    <label for="platform">Platform:</label>
-    <select id="platform">
-        <option value="android">Android</option>
-        <option value="ios">iOS</option>
-    </select>
-    <br />
-    <label for="gameId">GameId:</label>
-    <input id="gameId" type="text" value="14851"/>
-    <br />
-    <label for="testMode">Test Mode?:</label>
-    <input id="testMode" type="checkbox" />
-    <br />
-    <label for="autoSkip">Auto Skip?:</label>
-    <input id="autoSkip" type="checkbox" />
-    <br />
-    <button id="initialize" disabled="disabled">Initialize</button>
-    <br />
-    <button id="defaultVideoAndPictureZone" disabled="disabled">Interstitial</button>
-    <br />
-    <button id="incentivizedZone" disabled="disabled">Incentivized</button>
-</form>
-<video id="videoView"></video>
-<iframe id="webView" src="iframe.html"></iframe>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs">
+                <div class="jumbotron">
+                    <h1>Unity Ads Browser Build</h1>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label for="abGroup">AB Group:</label>
+                        <input id="abGroup" class="form-control" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label for="platform">Platform:</label>
+                        <select id="platform" class="form-control">
+                            <option value="android">Android</option>
+                            <option value="ios">iOS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameId">GameId:</label>
+                        <input id="gameId" class="form-control" type="text" value="14851"/>
+                    </div>
+                    <div class="form-check">
+                        <label for="testMode" class="form-check-label">
+                            <input id="testMode" class="form-check-input" type="checkbox" />
+                            Test Mode
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label for="autoSkip" class="form-check-label">
+                            <input id="autoSkip" class="form-check-input" type="checkbox" />
+                            Auto Skip
+                        </label>
+                    </div>
+                    <button id="initialize" class="btn btn-primary btn-block" disabled="disabled">Initialize</button>
+                    <button id="defaultVideoAndPictureZone" class="btn btn-secondary btn-block" disabled="disabled">Interstitial</button>
+                    <button id="incentivizedZone" class="btn btn-secondary btn-block" disabled="disabled">Incentivized</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <video id="videoView"></video>
+    <iframe id="webView" src="iframe.html"></iframe>
 </body>
 </html>
