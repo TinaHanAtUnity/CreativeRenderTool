@@ -28,7 +28,6 @@ import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
-import { Analytics } from 'Utilities/Analytics';
 
 export class WebView {
 
@@ -609,8 +608,7 @@ export class WebView {
 
         metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
             if(found && url) {
-                Diagnostics.setTestBaseUrl(url);
-                Analytics.setTestBaseUrl(url);
+                HttpKafka.setTestBaseUrl(url);
             }
         });
 

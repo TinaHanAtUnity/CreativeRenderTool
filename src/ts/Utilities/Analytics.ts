@@ -3,12 +3,6 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class Analytics {
     public static trigger(data: any): Promise<INativeResponse> {
-        return HttpKafka.sendEvent(Analytics.AnalyticsBaseUrl, 'analytics', data);
+        return HttpKafka.sendEvent('analytics', data);
     }
-
-    public static setTestBaseUrl(baseUrl: string) {
-        Analytics.AnalyticsBaseUrl = baseUrl + '/v1/events';
-    }
-
-    private static AnalyticsBaseUrl: string = 'TODO';
 }

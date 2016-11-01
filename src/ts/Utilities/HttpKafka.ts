@@ -15,10 +15,10 @@ export class HttpKafka {
         HttpKafka._deviceInfo = deviceInfo;
     }
 
-    public static sendEvent(url: string, type: string, data: any): Promise<INativeResponse> {
+    public static sendEvent(type: string, data: any): Promise<INativeResponse> {
         if(!HttpKafka._request) {
             // if request is not set, this is likely a test that does not care about analytics or diagnostics
-            return Promise.resolve({url: url, response: '', responseCode: 200, headers: null});
+            return Promise.resolve({url: HttpKafka.KafkaBaseUrl, response: '', responseCode: 200, headers: null});
         }
 
         const messages: any[] = [];
@@ -31,10 +31,15 @@ export class HttpKafka {
             messages.unshift(commonObject);
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-            return HttpKafka._request.post(url, rawData);
+            return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
         });
     }
 
+    public static setTestBaseUrl(baseUrl: string) {
+        HttpKafka.KafkaBaseUrl = baseUrl + '/v1/events';
+    }
+
+    private static KafkaBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
     private static _request: Request;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
