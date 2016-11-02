@@ -49,15 +49,6 @@ export class ThirdParty extends View {
             }, 15000);
         }
 
-        /*let playableUrl: string | undefined;
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            playableUrl = 'https://static.applifier.com/playables/SMA_android/index_android.html';
-            // playableUrl = 'https://static.applifier.com/playables/SG_android/index_android.html';
-        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            playableUrl = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
-            // playableUrl = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
-        }*/
-
         const iframe = <HTMLIFrameElement>this._container.querySelector('#thirdParty');
         iframe.src = this._campaign.getResource();
 
