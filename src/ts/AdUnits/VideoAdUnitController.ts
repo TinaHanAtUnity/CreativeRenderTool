@@ -21,15 +21,14 @@ export abstract class VideoAdUnitController {
     protected _campaign: Campaign;
     protected _overlay: Overlay | undefined;
 
+    protected _videoStarted: boolean;
     protected _videoErrorStatus: boolean;
     protected _videoDuration: number;
     protected _videoPosition: number;
     protected _videoPositionRepeats: number;
     protected _videoQuartile: number;
     protected _videoActive: boolean;
-    protected _watches: number;
     protected _showing: boolean = false;
-
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
         this._nativeBridge = nativeBridge;
@@ -37,37 +36,28 @@ export abstract class VideoAdUnitController {
         this._campaign = campaign;
         this._overlay = overlay;
 
+        this._videoStarted = false;
         this._videoErrorStatus = false;
         this._videoPosition = 0;
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
-        this._watches = 0;
     }
 
     public abstract show(): Promise<void>;
 
     public abstract hide(): Promise<void>;
 
-    protected hideChildren() {
-        const overlay = this.getOverlay();
-
-        if(overlay) {
-            overlay.container().parentElement.removeChild(overlay.container());
-        }
-    };
-
-    protected getVideoUrl(): string {
-        const campaign: Campaign = this.getCampaign();
-        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
-            return campaign.getStreamingVideoUrl();
-        } else {
-            return campaign.getVideoUrl();
-        }
-    }
-
     public isShowing(): boolean {
         return this._showing;
+    }
+
+    public isVideoStarted(): boolean {
+        return this._videoStarted;
+    }
+
+    public setVideoStarted(started: boolean): void {
+        this._videoStarted = started;
     }
 
     public getVideoErrorStatus(): boolean {
@@ -76,10 +66,6 @@ export abstract class VideoAdUnitController {
 
     public setVideoErrorStatus(status: boolean): void {
         this._videoErrorStatus = status;
-    }
-
-    public getWatches(): number {
-        return this._watches;
     }
 
     public getVideoDuration(): number {
@@ -122,20 +108,8 @@ export abstract class VideoAdUnitController {
         this._videoActive = active;
     }
 
-    public setWatches(watches: number): void {
-        this._watches = watches;
-    }
-
     public getOverlay(): Overlay | undefined {
         return this._overlay;
-    }
-
-    public newWatch() {
-        this._watches += 1;
-    }
-
-    protected unsetReferences() {
-        delete this._overlay;
     }
 
     public getProgressInterval(): number {
@@ -158,5 +132,26 @@ export abstract class VideoAdUnitController {
 
     public getCampaign(): Campaign {
         return this._campaign;
+    }
+
+    protected unsetReferences() {
+        delete this._overlay;
+    }
+
+    protected hideChildren() {
+        const overlay = this.getOverlay();
+
+        if(overlay) {
+            overlay.container().parentElement.removeChild(overlay.container());
+        }
+    };
+
+    protected getVideoUrl(): string {
+        const campaign: Campaign = this.getCampaign();
+        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
+            return campaign.getStreamingVideoUrl();
+        } else {
+            return campaign.getVideoUrl();
+        }
     }
 }

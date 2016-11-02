@@ -17,7 +17,7 @@ TS_SRC = src/ts
 STYL_SRC = src/styl
 PROD_INDEX_SRC = src/prod-index.html
 TEST_INDEX_SRC = src/test-index.html
-PROD_CONFIG_SRC = src/config.json
+PROD_CONFIG_SRC = src/prod-config.json
 TEST_CONFIG_SRC = src/test-config.json
 
 # Branch and commit id
@@ -32,14 +32,21 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
+
+build-browser: BUILD_DIR = build/browser
+build-browser: MODULE = system
+build-browser: TARGET = es5
+build-browser: build-dir build-static build-css build-ts
+	cp src/browser-index.html $(BUILD_DIR)/index.html
+	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
 
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = system
 build-dev: TARGET = es5
 build-dev: build-dir build-static build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
-	cp src/index.html $(BUILD_DIR)/index.html
+	cp src/dev-index.html $(BUILD_DIR)/index.html
 	node -e "\
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
@@ -74,7 +81,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
+	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -188,7 +195,7 @@ build-js:
 	@echo
 
 	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
 	@echo
@@ -196,13 +203,14 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name "*.styl" | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo
 	@echo Copying static files to build
 	@echo
 
+	cp -r src/img $(BUILD_DIR)
 	cp -r src/html $(BUILD_DIR)
 	cp -r src/xml $(BUILD_DIR)
 	cp -r src/json $(BUILD_DIR)

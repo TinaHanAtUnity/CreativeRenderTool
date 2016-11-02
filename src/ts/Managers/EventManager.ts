@@ -3,11 +3,9 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Analytics } from 'Utilities/Analytics';
 
 export class EventManager {
-
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
 
     private static getSessionKey(sessionId: string): string {
         return 'session.' + sessionId;
@@ -28,6 +26,9 @@ export class EventManager {
     private static getDataKey(sessionId: string, eventId: string): string {
         return EventManager.getEventKey(sessionId, eventId) + '.data';
     }
+
+    private _nativeBridge: NativeBridge;
+    private _request: Request;
 
     constructor(nativeBridge: NativeBridge, request: Request) {
         this._nativeBridge = nativeBridge;
@@ -61,7 +62,7 @@ export class EventManager {
             followRedirects: redirects,
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
-            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
                 request: request,
                 event: event,
                 sessionId: sessionId,
@@ -83,22 +84,18 @@ export class EventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         }).catch(([request, message]) => {
-            let error: DiagnosticError = new DiagnosticError(new Error(message), {
+            const error: DiagnosticError = new DiagnosticError(new Error(message), {
                 request: request,
                 event: event,
                 sessionId: sessionId,
                 url: url
             });
 
-            return Diagnostics.trigger({
+            return Analytics.trigger({
                 'type': 'third_party_event_failed',
                 'error': error
             });
         });
-    }
-
-    public diagnosticEvent(url: string, data: string): Promise<INativeResponse> {
-        return this._request.post(url, data);
     }
 
     public startNewSession(sessionId: string): Promise<void[]> {
@@ -110,7 +107,7 @@ export class EventManager {
 
     public sendUnsentSessions(): Promise<any[]> {
         return this.getUnsentSessions().then(sessions => {
-            let promises = sessions.map(sessionId => {
+            const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
                     if(outdated) {
                         return this.deleteSession(sessionId);
@@ -137,8 +134,8 @@ export class EventManager {
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
         return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, EventManager.getSessionTimestampKey(sessionId)).then(timestamp => {
-            let timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
-            let timeThresholdMax: number = new Date().getTime();
+            const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
+            const timeThresholdMax: number = new Date().getTime();
 
             return !(timestamp > timeThresholdMin && timestamp < timeThresholdMax);
         }).catch(() => {

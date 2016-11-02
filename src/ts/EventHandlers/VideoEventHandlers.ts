@@ -65,6 +65,19 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+        if(position > 0 && !adUnit.getVideoAdUnitController().isVideoStarted()) {
+            adUnit.getVideoAdUnitController().setVideoStarted(true);
+
+            sessionManager.sendStart(adUnit);
+
+            const overlay = adUnit.getVideoAdUnitController().getOverlay();
+            if(overlay) {
+                overlay.setSpinnerEnabled(false);
+            }
+
+            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
+        }
+
         if (sessionManager.getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
@@ -75,15 +88,15 @@ export class VideoEventHandlers {
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
         if(position >= 0) {
-            let lastPosition = adUnit.getVideoAdUnitController().getVideoPosition();
+            const lastPosition = adUnit.getVideoAdUnitController().getVideoPosition();
 
             // consider all leaps more than one million milliseconds (slightly more than 2,5 hours)
             // bugs in native videoplayer that should be ignored, these have been seen in some Android 7 devices
-            let ignoreTreshold: number = lastPosition + 1000000;
+            const ignoreTreshold: number = lastPosition + 1000000;
             if(position > ignoreTreshold) {
                 nativeBridge.Sdk.logError('Unity Ads video player ignoring too large progress from ' + lastPosition + ' to ' + position);
 
-                let error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
+                const error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
                     position: position,
                     lastPosition: lastPosition,
                     duration: adUnit.getVideoAdUnitController().getVideoDuration()
@@ -97,15 +110,15 @@ export class VideoEventHandlers {
             }
 
             if(position === lastPosition) {
-                let repeats: number = adUnit.getVideoAdUnitController().getVideoPositionRepeats();
-                let repeatTreshold: number = 5000 / adUnit.getVideoAdUnitController().getProgressInterval();
+                const repeats: number = adUnit.getVideoAdUnitController().getVideoPositionRepeats();
+                const repeatTreshold: number = 5000 / adUnit.getVideoAdUnitController().getProgressInterval();
 
                 // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
                 if(repeats > repeatTreshold) {
                     nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
                     this.handleVideoError(nativeBridge, adUnit.getVideoAdUnitController());
 
-                    let error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
+                    const error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
                         repeats: repeats,
                         position: position,
                         duration: adUnit.getVideoAdUnitController().getVideoDuration()
@@ -131,7 +144,7 @@ export class VideoEventHandlers {
                 }
             }
 
-            let previousQuartile: number = adUnit.getVideoAdUnitController().getVideoQuartile();
+            const previousQuartile: number = adUnit.getVideoAdUnitController().getVideoQuartile();
             adUnit.getVideoAdUnitController().setVideoPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideoAdUnitController().getVideoQuartile() === 1) {
@@ -148,21 +161,8 @@ export class VideoEventHandlers {
         }
     }
 
-    public static onVideoStart(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        sessionManager.sendStart(adUnit);
-
-        const overlay = adUnit.getVideoAdUnitController().getOverlay();
-        if(overlay) {
-            overlay.setSpinnerEnabled(false);
-        }
+    public static onVideoPlay(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getVideoAdUnitController().getProgressInterval());
-
-        if(adUnit.getVideoAdUnitController().getWatches() === 0) {
-            // send start callback only for first watch, never for rewatches
-            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
-        }
-
-        adUnit.getVideoAdUnitController().newWatch();
     }
 
     public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {

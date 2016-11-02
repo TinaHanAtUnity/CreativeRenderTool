@@ -39,7 +39,7 @@ export class ThirdParty extends View {
             // playableUrl = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
         }*/
 
-        let iframe = <HTMLIFrameElement>this._container.querySelector('#thirdParty');
+        const iframe = <HTMLIFrameElement>this._container.querySelector('#thirdParty');
         iframe.src = this._campaign.getResource();
 
         window.addEventListener('message', (event: MessageEvent) => {

@@ -25,15 +25,21 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
 
-        if (campaign) {
-            let adjustedRating: number = campaign.getRating() * 20;
+        if(campaign) {
+            const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon(),
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString()
+                'ratingCount': campaign.getRatingCount().toString(),
+                'endscreenAlt': (() => {
+                    if(campaign.getAbGroup() !== 0) {
+                        return 'halloween';
+                    }
+                    return undefined;
+                })()
             };
         }
 
@@ -65,7 +71,7 @@ export class EndScreen extends View {
         // this is most certainly not a proper solution to this problem but without this hack, sometimes game name
         // would prevent download button from showing which completely breaks layout and monetization
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
-        let nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
+        const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
     }
 

@@ -5,14 +5,14 @@ import { Request } from 'Utilities/Request';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { EventManager } from 'Managers/EventManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 describe('DiagnosticsTest', () => {
-    let handleInvocation = sinon.spy();
-    let handleCallback = sinon.spy();
+    const handleInvocation = sinon.spy();
+    const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -23,22 +23,20 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request', () => {
-        let request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-        let eventManager = new EventManager(nativeBridge, request);
-        let mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-        Diagnostics.setEventManager(eventManager);
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        const mockRequest = sinon.mock(request);
+        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        HttpKafka.setRequest(request);
         Diagnostics.trigger({'test': true}).then(value => {
-            mockEventManager.verify();
+            mockRequest.verify();
         });
     });
 
     it('should generate proper request with info', () => {
-        let request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
-        let eventManager = new EventManager(nativeBridge, request);
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
 
-        let deviceInfo = new DeviceInfo(nativeBridge);
-        let clientInfo = new ClientInfo(Platform.ANDROID, [
+        const deviceInfo = new DeviceInfo(nativeBridge);
+        const clientInfo = new ClientInfo(Platform.ANDROID, [
             '12345',
             false,
             'com.unity3d.ads.example',
@@ -51,13 +49,13 @@ describe('DiagnosticsTest', () => {
             null
         ]);
 
-        let mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('diagnosticEvent').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-        Diagnostics.setEventManager(eventManager);
-        Diagnostics.setDeviceInfo(deviceInfo);
-        Diagnostics.setClientInfo(clientInfo);
+        const mockRequest = sinon.mock(request);
+        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        HttpKafka.setRequest(request);
+        HttpKafka.setDeviceInfo(deviceInfo);
+        HttpKafka.setClientInfo(clientInfo);
         Diagnostics.trigger({'test': true}).then(value => {
-            mockEventManager.verify();
+            mockRequest.verify();
         });
     });
 });

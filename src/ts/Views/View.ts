@@ -6,6 +6,13 @@ import { Platform } from 'Constants/Platform';
 
 export class View {
 
+    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
+        if(attachTap && binding.event === 'click') {
+            binding.tap = new Tap(<HTMLElement>element);
+        }
+        element.addEventListener(binding.event, binding.listener, false);
+    }
+
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
@@ -25,16 +32,17 @@ export class View {
         this._container.id = this._id;
         this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
-        let attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
+        const attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
 
         this._bindings.forEach((binding: IViewBinding) => {
-            let elements: NodeList = this._container.querySelectorAll(binding.selector);
-            for(let i: number = 0; i < elements.length; ++i) {
-                let element: Node = elements[i];
-                if(attachTap && binding.event === 'click') {
-                    binding.tap = new Tap(<HTMLElement>element);
+            if(binding.selector) {
+                const elements: NodeList = this._container.querySelectorAll(binding.selector);
+                for(let i: number = 0; i < elements.length; ++i) {
+                    const element: Node = elements[i];
+                    View.addEventListener(binding, <HTMLElement>element, attachTap);
                 }
-                element.addEventListener(binding.event, binding.listener, false);
+            } else {
+                View.addEventListener(binding, this._container, attachTap);
             }
         });
     }
@@ -50,4 +58,5 @@ export class View {
     public hide(): void {
         this._container.style.visibility = 'hidden';
     }
+
 }

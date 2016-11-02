@@ -28,15 +28,15 @@ describe('EndScreen', () => {
     });
 
     it('should render', () => {
-        let endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true, 'en');
+        const endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true, 'en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        let endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true, 'fi');
+        const endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true, 'fi');
         endScreen.render();
-        let downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
+        const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
     });
 });
