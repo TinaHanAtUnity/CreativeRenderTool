@@ -3,6 +3,130 @@ import { Backend } from 'Native/Backend/Backend';
 
 export class DeviceInfo {
 
+    public static setAdvertisingTrackingId(value: string) {
+        DeviceInfo._advertisingTrackingId = value;
+    }
+
+    public static setLimitAdTrackingFlag(value: boolean) {
+        DeviceInfo._limitAdTrackingFlag = value;
+    }
+
+    public static setOsVersion(value: string) {
+        DeviceInfo._osVersion = value;
+    }
+
+    public static setModel(value: string) {
+        DeviceInfo._model = value;
+    }
+
+    public static setScreenWidth(value: number) {
+        DeviceInfo._screenWidth = value;
+    }
+
+    public static setScreenHeight(value: number) {
+        DeviceInfo._screenHeight = value;
+    }
+
+    public static setSystemLanguage(value: string) {
+        DeviceInfo._systemLanguage = value;
+    }
+
+    public static setRooted(value: boolean) {
+        DeviceInfo._rooted = value;
+    }
+
+    public static setTimeZone(value: string) {
+        DeviceInfo._timeZone = value;
+    }
+
+    public static setTotalMemory(value: number) {
+        DeviceInfo._totalMemory = value;
+    }
+
+    public static setAndroidId(value: string) {
+        DeviceInfo._androidId = value;
+    }
+
+    public static setApiLevel(value: number) {
+        DeviceInfo._apiLevel = value;
+    }
+
+    public static setTotalSpace(value: number) {
+        DeviceInfo._totalSpace = value;
+    }
+
+    public static setManufacturer(value: string) {
+        DeviceInfo._manufacturer = value;
+    }
+
+    public static setScreenDensity(value: number) {
+        DeviceInfo._screenDensity = value;
+    }
+
+    public static setScreenLayout(value: number) {
+        DeviceInfo._screenLayout = value;
+    }
+
+    public static setConnectionType(value: string) {
+        DeviceInfo._connectionType = value;
+    }
+
+    public static setNetworkType(value: number) {
+        DeviceInfo._networkType = value;
+    }
+
+    public static setNetworkOperator(value: number) {
+        DeviceInfo._networkOperator = value;
+    }
+
+    public static setNetworkOperatorName(value: string) {
+        DeviceInfo._networkOperatorName = value;
+    }
+
+    public static setHeadset(value: boolean) {
+        DeviceInfo._headset = value;
+    }
+
+    public static setDeviceVolume(value: number) {
+        DeviceInfo._deviceVolume = value;
+    }
+
+    public static setScreenBrightness(value: number) {
+        DeviceInfo._screenBrightness = value;
+    }
+
+    public static setFreeSpace(value: number) {
+        DeviceInfo._freeSpace = value;
+    }
+
+    public static setBatteryLevel(value: number) {
+        DeviceInfo._batteryLevel = value;
+    }
+
+    public static setBatteryStatus(value: string) {
+        DeviceInfo._batteryStatus = value;
+    }
+
+    public static setFreeMemory(value: number) {
+        DeviceInfo._freeMemory = value;
+    }
+
+    public static setRingerMode(value: number) {
+        DeviceInfo._ringerMode = value;
+    }
+
+    public static setUserInterfaceIdiom(value: number) {
+        DeviceInfo._userInterfaceIdiom = value;
+    }
+
+    public static setScreenScale(value: number) {
+        DeviceInfo._screenScale = value;
+    }
+
+    public static setSimulator(value: boolean) {
+        DeviceInfo._simulator = value;
+    }
+
     public static getAdvertisingTrackingId() {
         return DeviceInfo.getGuid();
     }
@@ -134,6 +258,38 @@ export class DeviceInfo {
     public static isSimulator() {
         return false;
     }
+
+    private static _advertisingTrackingId: string;
+    private static _limitAdTrackingFlag: boolean;
+    private static _osVersion: string;
+    private static _model: string;
+    private static _screenWidth: number;
+    private static _screenHeight: number;
+    private static _systemLanguage: string;
+    private static _rooted: boolean;
+    private static _timeZone: string;
+    private static _totalMemory: number;
+    private static _androidId: string;
+    private static _apiLevel: number;
+    private static _totalSpace: number;
+    private static _manufacturer: string;
+    private static _screenDensity: number;
+    private static _screenLayout: number;
+    private static _connectionType: string;
+    private static _networkType: number;
+    private static _networkOperator: number;
+    private static _networkOperatorName: string;
+    private static _headset: boolean;
+    private static _deviceVolume: number;
+    private static _screenBrightness: number;
+    private static _freeSpace: number;
+    private static _batteryLevel: number;
+    private static _batteryStatus: string;
+    private static _freeMemory: number;
+    private static _ringerMode: number;
+    private static _userInterfaceIdiom: number;
+    private static _screenScale: number;
+    private static _simulator: boolean;
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
