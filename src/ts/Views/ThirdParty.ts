@@ -5,16 +5,21 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0 } from 'Utilities/Observable';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
+import { Placement } from 'Models/Placement';
 
 export class ThirdParty extends View {
 
     public onClose: Observable0 = new Observable0();
 
+    private _placement: Placement;
     private _campaign: HtmlCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: HtmlCampaign) {
+    private _closeElement: HTMLElement;
+
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: HtmlCampaign) {
         super(nativeBridge, 'empty');
 
+        this._placement = placement;
         this._campaign = campaign;
 
         this._template = new Template(ThirdPartyTemplate);
@@ -27,8 +32,22 @@ export class ThirdParty extends View {
         ];
     }
 
+    public render() {
+        super.render();
+        this._closeElement = <HTMLElement>this._container.querySelector('.btn-close-region');
+        this._closeElement.style.display = 'none';
+    }
+
     public show(): void {
         super.show();
+
+        if(this._placement.allowSkip()) {
+            this._closeElement.style.display = 'block';
+        } else {
+            setTimeout(() => {
+                this._closeElement.style.display = 'block';
+            }, 15000);
+        }
 
         /*let playableUrl: string | undefined;
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {

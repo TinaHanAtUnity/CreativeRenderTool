@@ -3,13 +3,13 @@ import { ThirdParty } from 'Views/ThirdParty';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
-import { Platform } from '../Constants/Platform';
-import { ScreenOrientation } from '../Constants/Android/ScreenOrientation';
-import { KeyCode } from '../Constants/Android/KeyCode';
-import { SystemUiVisibility } from '../Constants/Android/SystemUiVisibility';
-import { UIInterfaceOrientationMask } from '../Constants/iOS/UIInterfaceOrientationMask';
-import { FinishState } from '../Constants/FinishState';
-import { AndroidAdUnitError } from '../Native/Api/AndroidAdUnit';
+import { Platform } from 'Constants/Platform';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { FinishState } from 'Constants/FinishState';
+import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
@@ -79,10 +79,10 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._thirdParty.container().parentElement.removeChild(this._thirdParty.container());
         this.unsetReferences();
 
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), FinishState.COMPLETED);
+
         const platform = this._nativeBridge.getPlatform();
         if(platform === Platform.ANDROID) {
-            this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), FinishState.COMPLETED);
-
             return this._nativeBridge.AndroidAdUnit.close().catch(error => {
                 // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
                 if(error !== AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {

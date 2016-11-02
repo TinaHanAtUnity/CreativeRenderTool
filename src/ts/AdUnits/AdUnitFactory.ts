@@ -87,7 +87,7 @@ export class AdUnitFactory {
     }
 
     private static createHtmlAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: HtmlCampaign, options: any): AbstractAdUnit {
-        const thirdParty = new ThirdParty(nativeBridge, campaign);
+        const thirdParty = new ThirdParty(nativeBridge, placement, campaign);
         const thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, placement, campaign, thirdParty, options);
 
         thirdParty.render();
