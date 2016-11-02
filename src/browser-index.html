@@ -21,6 +21,86 @@
                 <div class="jumbotron">
                     <h1>Unity Ads Browser Build</h1>
                 </div>
+                <div id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingOne">
+                            <h5 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Client Info
+                                </a>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                            <div class="card-block">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="appName">App Name:</label>
+                                        <input id="appName" class="form-control" type="text" value="com.unity3d.ads.example" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="appVersion">App Version:</label>
+                                        <input id="appVersion" class="form-control" type="text" value="2.0.5" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sdkVersion">SDK Version:</label>
+                                        <input id="sdkVersion" class="form-control" type="number" value="2005" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sdkVersionName">SDK Version Name:</label>
+                                        <input id="sdkVersionName" class="form-control" type="text" value="2.0.5" />
+                                    </div>
+                                    <div class="form-check">
+                                        <label for="debuggable" class="form-check-label">
+                                            <input id="debuggable" class="form-check-input" type="checkbox" checked="checked" />
+                                            Debuggable
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="configUrl">Config URL:</label>
+                                        <input id="configUrl" class="form-control" type="text" value="https://config.unityads.unity3d.com/webview/master/release/config.json" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="webViewUrl">WebView URL:</label>
+                                        <input id="webViewUrl" class="form-control" type="text" value="https://webview.unityads.unity3d.com/webview/master/14074b3e2814a1ce9b560821dc6f16f0b045413d/release/index.html" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="webViewHash">WebView Hash:</label>
+                                        <input id="webViewHash" class="form-control" type="text" value="f87a80ca1665bb5dbe2a6083fcef6008a96876e9c44f9046f33795ae3ffd663e" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="webViewVersion">WebView Version:</label>
+                                        <input id="webViewVersion" class="form-control" type="text" value="14074b3e2814a1ce9b560821dc6f16f0b045413d" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingTwo">
+                            <h5 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Android Device Info
+                                </a>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="card-block"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingThree">
+                            <h5 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    iOS Device Info
+                                </a>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
+                            <div class="card-block">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <form>
                     <div class="form-group">
                         <label for="abGroup">AB Group:</label>

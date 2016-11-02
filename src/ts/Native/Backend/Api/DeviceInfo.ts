@@ -7,7 +7,7 @@ export class DeviceInfo {
         return DeviceInfo.getGuid();
     }
 
-    public static  getLimitAdTrackingFlag() {
+    public static getLimitAdTrackingFlag() {
         return false;
     }
 

@@ -4,6 +4,7 @@ import { UnityAds } from 'Native/Backend/UnityAds';
 import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
 import { FinishState } from 'Constants/FinishState';
 import { UnityAdsError } from 'Constants/UnityAdsError';
+import { Sdk } from 'Native/Backend/Api/Sdk';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -19,6 +20,24 @@ const resizeHandler = (event?: Event) => {
 };
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
+
+const setClientInfo = () => {
+    const fields = [
+        ['appName', 'setAppName'],
+        ['appVersion', 'setAppVersion'],
+        ['sdkVersion', 'setSdkVersion'],
+        ['sdkVersionName', 'setSdkVersionName'],
+        ['debuggable', 'setDebuggable', true],
+        ['configUrl', 'setConfigUrl'],
+        ['webViewUrl', 'setWebViewUrl'],
+        ['webViewHash', 'setWebViewHash'],
+        ['webViewVersion', 'setWebViewVersion']
+    ];
+    fields.forEach(([field, setter, flag]: [string, string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById(field);
+        Sdk[setter](flag ? element.checked : element.value);
+    });
+};
 
 if(window.parent !== window) {
     const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
@@ -57,6 +76,8 @@ if(window.parent !== window) {
 
         window.sessionStorage.clear();
         window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
+
+        setClientInfo();
 
         // tslint:disable:no-console
         const listener: IUnityAdsListener = {

@@ -38,16 +38,52 @@ export class Sdk {
         Sdk._testMode = testMode;
     }
 
-    private static _gameId: string = '14851';
-    private static _testMode: boolean = false;
-    private static _appName: string = 'com.unity3d.ads.example';
-    private static _appVersion: string = '2.0.5';
-    private static _sdkVersion: number = 2005;
-    private static _sdkVersionName: string = '2.0.5';
-    private static _debuggable: boolean = true;
-    private static _configUrl: string = 'https://config.unityads.unity3d.com/webview/master/release/config.json';
-    private static _webViewUrl: string = 'https://webview.unityads.unity3d.com/webview/master/14074b3e2814a1ce9b560821dc6f16f0b045413d/release/index.html';
-    private static _webViewHash: string = 'f87a80ca1665bb5dbe2a6083fcef6008a96876e9c44f9046f33795ae3ffd663e';
-    private static _webViewVersion: string = '14074b3e2814a1ce9b560821dc6f16f0b045413d';
+    public static setAppName(appName: string) {
+        Sdk._appName = appName;
+    }
+
+    public static setAppVersion(appVersion: string) {
+        Sdk._appVersion = appVersion;
+    }
+
+    public static setSdkVersion(sdkVersion: number) {
+        Sdk._sdkVersion = sdkVersion;
+    }
+
+    public static setSdkVersionName(sdkVersionName: string) {
+        Sdk._sdkVersionName = sdkVersionName;
+    }
+
+    public static setDebuggable(debuggable: boolean) {
+        Sdk._debuggable = debuggable;
+    }
+
+    public static setConfigUrl(configUrl: string) {
+        Sdk._configUrl = configUrl;
+    }
+
+    public static setWebViewUrl(webViewUrl: string) {
+        Sdk._webViewUrl = webViewUrl;
+    }
+
+    public static setWebViewHash(webViewHash: string) {
+        Sdk._webViewHash = webViewHash;
+    }
+
+    public static setWebViewVersion(webViewVersion: string) {
+        Sdk._webViewVersion = webViewVersion;
+    }
+
+    private static _gameId: string;
+    private static _testMode: boolean;
+    private static _appName: string;
+    private static _appVersion: string;
+    private static _sdkVersion: number;
+    private static _sdkVersionName: string;
+    private static _debuggable: boolean;
+    private static _configUrl: string;
+    private static _webViewUrl: string;
+    private static _webViewHash: string;
+    private static _webViewVersion: string;
 
 }
