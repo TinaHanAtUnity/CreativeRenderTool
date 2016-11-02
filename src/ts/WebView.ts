@@ -466,9 +466,9 @@ export class WebView {
         };
 
         const cacheAssets = () => {
-            const resourceUrl = campaign.getResource();
+            const resourceUrl = campaign.getResourceUrl();
             return cacheAsset(resourceUrl).then(fileUrl => {
-                campaign.setResource(fileUrl);
+                campaign.setResourceUrl(fileUrl);
                 campaign.setVideoCached(true);
             }).catch(error => {
                 if(error === CacheStatus.STOPPED) {

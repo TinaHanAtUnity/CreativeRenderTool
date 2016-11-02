@@ -50,7 +50,7 @@ export class ThirdParty extends View {
         }
 
         const iframe = <HTMLIFrameElement>this._container.querySelector('#thirdParty');
-        iframe.src = this._campaign.getResource();
+        iframe.src = this._campaign.getResourceUrl();
 
         window.addEventListener('message', (event: MessageEvent) => {
             if(event.data) {

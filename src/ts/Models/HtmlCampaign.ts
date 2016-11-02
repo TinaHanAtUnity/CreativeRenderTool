@@ -2,19 +2,19 @@ import { Campaign } from 'Models/Campaign';
 
 export class HtmlCampaign extends Campaign {
 
-    private _resource: string;
+    private _resourceUrl: string;
 
-    constructor(campaign: any, gamerId: string, abGroup: number, thirdPartyResource: string) {
+    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl: string) {
         super(campaign, gamerId, abGroup);
-        this._resource = thirdPartyResource;
+        this._resourceUrl = resourceUrl;
     }
 
-    public getResource(): string {
-        return this._resource;
+    public getResourceUrl(): string {
+        return this._resourceUrl;
     }
 
-    public setResource(resource: string): void {
-        this._resource = resource;
+    public setResourceUrl(url: string): void {
+        this._resourceUrl = url;
     }
 
 }
