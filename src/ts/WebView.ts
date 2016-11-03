@@ -136,11 +136,12 @@ export class WebView {
 
             return this._eventManager.sendUnsentSessions();
         }).catch(error => {
-            if(error instanceof Error) {
+            if(error instanceof ConfigError) {
+                error = { 'message': error.message, 'name': error.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error) {
                 error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-                if(error instanceof ConfigError) {
-                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-                } else if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
             }
