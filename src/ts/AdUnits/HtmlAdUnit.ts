@@ -13,7 +13,7 @@ import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 
 export class HtmlAdUnit extends AbstractAdUnit {
-    
+
     private _thirdParty: ThirdParty;
     private _isShowing: boolean;
     private _options: any;
@@ -37,15 +37,8 @@ export class HtmlAdUnit extends AbstractAdUnit {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
             }
 
-            let keyEvents: any[] = [];
-            if(this._placement.disableBackButton()) {
-                keyEvents = [KeyCode.BACK];
-            }
-
-            let hardwareAccel: boolean = true;
-            if(this._nativeBridge.getApiLevel() < 17) {
-                hardwareAccel = false;
-            }
+            const keyEvents: KeyCode[] = [KeyCode.BACK];
+            const hardwareAccel: boolean = true;
 
             this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
