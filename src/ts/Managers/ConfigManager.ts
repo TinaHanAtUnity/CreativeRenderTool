@@ -36,7 +36,7 @@ export class ConfigManager {
                 }
             }, error => {
                 if(error[2] instanceof Error) {
-                    throw new ConfigError(error);
+                    throw new ConfigError(error[2]);
                 }
             });
         });
