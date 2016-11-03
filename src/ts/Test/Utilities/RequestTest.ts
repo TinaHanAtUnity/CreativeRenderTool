@@ -38,6 +38,14 @@ class TestRequestApi extends RequestApi {
             } else {
                 this.sendFailResponse(id, url, 'URL toggled off');
             }
+        } else if (url.indexOf('/responsecode') !== -1) {
+            const responseCodes = url.match(/2[0-9]{2}/);
+            if (responseCodes && responseCodes.length > 0) {
+                const responseCode = responseCodes[0];
+                this.sendSuccessResponse(id, url, 'Success response', parseInt(responseCode, 10), []);
+            } else {
+                this.sendFailResponse(id, url, 'Fail response');
+            }
         }
 
         return Promise.resolve(id);
@@ -272,5 +280,21 @@ describe('RequestTest', () => {
         clock.restore();
 
         return promise;
+    });
+
+    describe('Request get should succeed for all status codes in the 2xx range', () => {
+        for (let i = 200; i <= 206; i++) {
+            it('Request get should succeed for response code ' + i.toString(), () => {
+                const successUrl: string = 'http://www.example.org/responsecode/' + i.toString();
+                const successMessage: string = 'Success response';
+
+                return request.get(successUrl).then((response) => {
+                    assert.equal(successMessage, response.response, 'Did not receive correct response');
+                }).catch(error => {
+                    error = error[1];
+                    throw new Error('Get without headers failed: ' + error);
+                });
+            });
+        }
     });
 });
