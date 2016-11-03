@@ -10,11 +10,10 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { FinishState } from 'Constants/FinishState';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
+import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 
 export class HtmlAdUnit extends AbstractAdUnit {
-
-    private static ActivityId = 1;
-
+    
     private _thirdParty: ThirdParty;
     private _isShowing: boolean;
     private _options: any;
@@ -30,7 +29,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._isShowing = true;
         this._thirdParty.show();
         this.onStart.trigger();
-
+        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         const platform = this._nativeBridge.getPlatform();
         if(platform === Platform.ANDROID) {
             let orientation: ScreenOrientation = this._options.requestedOrientation;
@@ -50,7 +49,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
             this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-            return this._nativeBridge.AndroidAdUnit.open(HtmlAdUnit.ActivityId++, ['webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+            return this._nativeBridge.AndroidAdUnit.open(AndroidVideoAdUnitController.ActivityId++, ['webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
         } else if(platform === Platform.IOS) {
             let orientation: UIInterfaceOrientationMask = this._options.supportedOrientations;
             if(!this._placement.useDeviceOrientationForVideo()) {
