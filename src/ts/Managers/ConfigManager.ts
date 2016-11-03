@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { ConfigError } from 'Errors/ConfigError';
 
 export class ConfigManager {
 
@@ -32,6 +33,10 @@ export class ConfigManager {
                 } catch(error) {
                     nativeBridge.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
+                }
+            }, error => {
+                if(error[2] instanceof Error) {
+                    throw new ConfigError(error);
                 }
             });
         });

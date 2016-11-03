@@ -28,6 +28,7 @@ import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { ConfigError } from 'Errors/ConfigError';
 
 export class WebView {
 
@@ -137,7 +138,9 @@ export class WebView {
         }).catch(error => {
             if(error instanceof Error) {
                 error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-                if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
+                if(error instanceof ConfigError) {
+                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+                } else if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
             }
