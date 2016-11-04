@@ -6,6 +6,8 @@ import { RequestApi } from 'Native/Api/Request';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { RequestError } from 'Errors/RequestError';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
@@ -45,6 +47,18 @@ class TestRequestApi extends RequestApi {
                 this.sendSuccessResponse(id, url, 'Success response', parseInt(responseCode, 10), []);
             } else {
                 this.sendFailResponse(id, url, 'Fail response');
+            }
+        } else if (url.indexOf('/errorresponsecode') !== -1) {
+            const responseCodes = url.match(/4[0-9]{2}/);
+            if (responseCodes && responseCodes.length > 0) {
+                const responseCode = responseCodes[0];
+                this.sendSuccessResponse(id, url, '{"error": "Failure response"}', parseInt(responseCode, 10), []);
+            }
+        } else if (url.indexOf('/404invalidjson') !== -1) {
+            const responseCodes = url.match(/4[0-9]{2}/);
+            if (responseCodes && responseCodes.length > 0) {
+                const responseCode = responseCodes[0];
+                this.sendSuccessResponse(id, url, '{{error Faisdflure response"', parseInt(responseCode, 10), []);
             }
         }
 
@@ -297,4 +311,39 @@ describe('RequestTest', () => {
             });
         }
     });
+
+    describe('Request get should fail for all status codes in the 4xx range', () => {
+        for (let i = 400; i <= 405; i++) {
+            it('Request get should fail for response code ' + i.toString(), () => {
+                const failureUrl: string = 'http://www.example.org/errorresponsecode/' + i.toString();
+                const reason = 'FAILED_WITH_ERROR_RESPONSE';
+                const failureMessage: string = 'Failure response';
+
+                return request.get(failureUrl).then((response) => {
+                    assert.fail('Should not resolve');
+                }, errorResponse => {
+                    assert.equal(errorResponse[1], reason);
+                    assert.instanceOf(errorResponse[2], RequestError);
+                    assert.equal(errorResponse[2].message, failureMessage);
+                }).catch(error => {
+                    throw new Error('Handling error response failed: ' + error);
+                });
+            });
+
+            it('Request get should return proper exception if json parsing fails ' + i.toString(), () => {
+                const failureUrl: string = 'http://www.example.org/404invalidjson/' + i.toString();
+                const reason = 'FAILED_WITH_ERROR_RESPONSE';
+
+                return request.get(failureUrl).then((response) => {
+                    assert.fail('Should not resolve');
+                }, errorResponse => {
+                    assert.equal(errorResponse[1], reason);
+                    assert.instanceOf(errorResponse[2], DiagnosticError);
+                }).catch(error => {
+                    throw new Error('Handling error response failed: ' + error);
+                });
+            });
+        }
+    });
+
 });

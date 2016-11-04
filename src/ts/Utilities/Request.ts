@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
+import { RequestError } from 'Errors/RequestError';
 
 const enum RequestStatus {
     COMPLETE,
@@ -54,7 +55,7 @@ export class Request {
     private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
     private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
-    private static _errorResponseCodes = [404];
+    private static _errorResponseCodes = new RegExp('4[0-9]{2}');
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
@@ -210,10 +211,15 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
-        } else if (Request._errorResponseCodes.indexOf(responseCode) !== -1) {
-            const responseObj = JsonParser.parse(nativeResponse.response);
-            this.finishRequest(id, RequestStatus.FAILED,
-                [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', new Error(responseObj.error)]);
+        } else if (Request._errorResponseCodes.exec(responseCode.toString())) {
+            try {
+                const responseObj = JsonParser.parse(nativeResponse.response);
+                this.finishRequest(id, RequestStatus.FAILED,
+                    [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error(responseObj.error), responseCode)]);
+            } catch(e) {
+                this.finishRequest(id, RequestStatus.FAILED,
+                [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', e]);
+            }
         } else {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
         }
