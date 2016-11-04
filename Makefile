@@ -81,7 +81,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
+	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -195,7 +195,7 @@ build-js:
 	@echo
 
 	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
 	@echo
@@ -203,7 +203,7 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name "*.styl" | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo
