@@ -391,7 +391,7 @@ export class WebView {
                 retryWithConnectionEvents: false
             }).then(response => {
                 const locationUrl = response.url || videoUrl;
-                cacheAsset(locationUrl).then(fileUrl => {
+                return cacheAsset(locationUrl).then(fileUrl => {
                     campaign.setVideoUrl(fileUrl);
                     campaign.setVideoCached(true);
                 }).catch(error => {
