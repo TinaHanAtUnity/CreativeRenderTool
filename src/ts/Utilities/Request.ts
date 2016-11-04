@@ -52,6 +52,7 @@ export class Request {
     private static _readTimeout = 30000;
 
     private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
     private static _errorResponseCodes = [404];
 
@@ -197,7 +198,7 @@ export class Request {
             return;
         }
 
-        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
+        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1 || Request._allowedResponseCodeRange.exec(responseCode.toString())) {
             if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
