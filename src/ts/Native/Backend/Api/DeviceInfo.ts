@@ -1,6 +1,3 @@
-import { Platform } from 'Constants/Platform';
-import { Backend } from 'Native/Backend/Backend';
-
 export class DeviceInfo {
 
     public static setAdvertisingTrackingId(value: string) {
@@ -128,119 +125,115 @@ export class DeviceInfo {
     }
 
     public static getAdvertisingTrackingId() {
-        return DeviceInfo.getGuid();
+        return DeviceInfo._advertisingTrackingId;
     }
 
     public static getLimitAdTrackingFlag() {
-        return false;
+        return DeviceInfo._limitAdTrackingFlag;
     }
 
     public static getOsVersion() {
-        return '6.0.1';
+        return DeviceInfo._osVersion;
     }
 
     public static getModel() {
-        if(Backend.getPlatform() === Platform.ANDROID) {
-            return 'Nexus 5';
-        } else {
-            return 'iPhone7,2';
-        }
+        return DeviceInfo._model;
     }
 
     public static getScreenWidth() {
-        return 800;
+        return DeviceInfo._screenWidth;
     }
 
     public static getScreenHeight() {
-        return 600;
+        return DeviceInfo._screenHeight;
     }
 
     public static getSystemLanguage() {
-        return 'en_US';
+        return DeviceInfo._systemLanguage;
     }
 
     public static isRooted() {
-        return false;
+        return DeviceInfo._rooted;
     }
 
     public static getTimeZone(dst: boolean) {
-        return 'GMT';
+        return DeviceInfo._timeZone;
     }
 
     public static getTotalMemory() {
-        return 10000000;
+        return DeviceInfo._totalMemory;
     }
 
     public static getAndroidId() {
-        return '';
+        return DeviceInfo._androidId;
     }
 
     public static getApiLevel() {
-        return 16;
+        return DeviceInfo._apiLevel;
     }
 
     public static getTotalSpace(storageType: string) {
-        return 10000000;
+        return DeviceInfo._totalSpace;
     }
 
     public static getManufacturer() {
-        return 'Unity';
+        return DeviceInfo._manufacturer;
     }
 
     public static getScreenDensity() {
-        return 123;
+        return DeviceInfo._screenDensity;
     }
 
     public static getScreenLayout() {
-        return 123;
+        return DeviceInfo._screenLayout;
     }
 
     public static getConnectionType() {
-        return 'wifi';
+        return DeviceInfo._connectionType;
     }
 
     public static getNetworkType() {
-        return 123;
+        return DeviceInfo._networkType;
     }
 
     public static getNetworkOperator() {
-        return 123123;
+        return DeviceInfo._networkOperator;
     }
 
     public static getNetworkOperatorName() {
-        return 'Sonera';
+        return DeviceInfo._networkOperatorName;
     }
 
     public static getHeadset() {
-        return false;
+        return DeviceInfo._headset;
     }
 
     public static getDeviceVolume(volumeStream: number) {
-        return 1;
+        return DeviceInfo._deviceVolume;
     }
 
     public static getScreenBrightness() {
-        return 100;
+        return DeviceInfo._screenBrightness;
     }
 
     public static getFreeSpace(storageType: string) {
-        return 10000000;
+        return DeviceInfo._freeSpace;
     }
 
     public static getBatteryLevel() {
-        return 10;
+        return DeviceInfo._batteryLevel;
     }
 
     public static getBatteryStatus() {
-        return 'ok';
+        return DeviceInfo._batteryStatus;
     }
 
     public static getFreeMemory() {
-        return 1000000;
+        return DeviceInfo._freeMemory;
     }
 
     public static getRingerMode() {
-        return 10;
+        return DeviceInfo._ringerMode;
     }
 
     public static getUniqueEventId() {
@@ -248,15 +241,15 @@ export class DeviceInfo {
     }
 
     public static getUserInterfaceIdiom() {
-        return 0;
+        return DeviceInfo._userInterfaceIdiom;
     }
 
     public static getScreenScale() {
-        return 100;
+        return DeviceInfo._screenScale;
     }
 
     public static isSimulator() {
-        return false;
+        return DeviceInfo._simulator;
     }
 
     private static _advertisingTrackingId: string;

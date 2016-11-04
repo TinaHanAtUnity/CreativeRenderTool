@@ -5,6 +5,7 @@ import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
 import { FinishState } from 'Constants/FinishState';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Sdk } from 'Native/Backend/Api/Sdk';
+import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -36,6 +37,78 @@ const setClientInfo = () => {
     fields.forEach(([field, setter, flag]: [string, string, boolean]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById(field);
         Sdk[setter](flag ? element.checked : element.value);
+    });
+};
+
+const setAndroidDeviceInfo = () => {
+    const fields = [
+        ['AdvertisingTrackingId'],
+        ['LimitAdTrackingFlag'],
+        ['AndroidId'],
+        ['Manufacturer'],
+        ['Model'],
+        ['OsVersion'],
+        ['ApiLevel'],
+        ['Rooted', true],
+        ['ScreenWidth'],
+        ['ScreenHeight'],
+        ['ScreenDensity'],
+        ['ScreenLayout'],
+        ['ScreenBrightness'],
+        ['SystemLanguage'],
+        ['TimeZone'],
+        ['TotalSpace'],
+        ['FreeSpace'],
+        ['TotalMemory'],
+        ['FreeMemory'],
+        ['ConnectionType'],
+        ['NetworkType'],
+        ['NetworkOperator'],
+        ['NetworkOperatorName'],
+        ['Headset', true],
+        ['DeviceVolume'],
+        ['BatteryLevel'],
+        ['BatteryStatus'],
+        ['RingerMode']
+    ];
+    fields.forEach(([field, flag]: [string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
+        DeviceInfo['set' + field](flag ? element.checked : element.value);
+    });
+};
+
+const setIosDeviceInfo = () => {
+    const fields = [
+        ['AdvertisingTrackingId'],
+        ['LimitAdTrackingFlag'],
+        ['Manufacturer'],
+        ['Model'],
+        ['OsVersion'],
+        ['Rooted', true],
+        ['ScreenWidth'],
+        ['ScreenHeight'],
+        ['ScreenScale'],
+        ['ScreenBrightness'],
+        ['SystemLanguage'],
+        ['TimeZone'],
+        ['TotalSpace'],
+        ['FreeSpace'],
+        ['TotalMemory'],
+        ['FreeMemory'],
+        ['ConnectionType'],
+        ['NetworkType'],
+        ['NetworkOperator'],
+        ['NetworkOperatorName'],
+        ['Headset', true],
+        ['DeviceVolume'],
+        ['BatteryLevel'],
+        ['BatteryStatus'],
+        ['UserInterfaceIdiom'],
+        ['Simulator', true]
+    ];
+    fields.forEach(([field, flag]: [string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
+        DeviceInfo['set' + field](flag ? element.checked : element.value);
     });
 };
 
@@ -107,10 +180,12 @@ if(window.parent !== window) {
 
         switch(platformElement.value) {
             case 'android':
+                setAndroidDeviceInfo();
                 UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
             case 'ios':
+                setIosDeviceInfo();
                 UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
