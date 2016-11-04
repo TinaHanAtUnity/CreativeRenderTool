@@ -27,6 +27,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
+import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class WebView {
@@ -621,6 +622,12 @@ export class WebView {
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
                 Overlay.setAutoSkip(autoSkip);
+            }
+        });
+
+        metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
+            if(found && autoClose) {
+                EndScreen.setAutoClose(autoClose);
             }
         });
     }
