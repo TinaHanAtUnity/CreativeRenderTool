@@ -1,11 +1,13 @@
+import { INativeResponse } from 'Utilities/Request';
 export class RequestError extends Error {
 
-    public responseCode: number;
+    public nativeResponse: INativeResponse;
 
-    constructor(error: Error, responseCode: number) {
+    constructor(error: Error, nativeResponse: INativeResponse) {
         super();
+
         this.name = error.name;
         this.message = error.message;
-        this.responseCode = responseCode;
+        this.nativeResponse = nativeResponse;
     }
 }

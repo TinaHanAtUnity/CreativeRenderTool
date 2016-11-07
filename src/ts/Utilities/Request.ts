@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { JsonParser } from 'Utilities/JsonParser';
 import { RequestError } from 'Errors/RequestError';
 
 const enum RequestStatus {
@@ -212,14 +211,7 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else if (Request._errorResponseCodes.exec(responseCode.toString())) {
-            try {
-                const responseObj = JsonParser.parse(nativeResponse.response);
-                this.finishRequest(id, RequestStatus.FAILED,
-                    [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error(responseObj.error), responseCode)]);
-            } catch(e) {
-                this.finishRequest(id, RequestStatus.FAILED,
-                [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', e]);
-            }
+            this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeResponse)]);
         } else {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
         }
