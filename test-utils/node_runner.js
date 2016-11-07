@@ -6,11 +6,16 @@ const Istanbul = require('istanbul');
 const jsdom = require('jsdom').jsdom;
 const DOMParser = require('xmldom').DOMParser;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+const LocalStorage = require('node-localstorage').LocalStorage;
+const exec = require('child_process').exec;
 
 global.document = jsdom('');
 global.window = document.defaultView;
 global.DOMParser = DOMParser;
 global.XMLHttpRequest = XMLHttpRequest;
+global.window.localStorage = new LocalStorage('./localStorage');
+global.window.sessionStorage = new LocalStorage('./sessionStorage');
+global.window.exec = exec;
 
 let getPaths = (root) => {
     let paths = [];
