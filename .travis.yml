@@ -4,6 +4,11 @@ language: node_js
 node_js:
   - 6.7.0
 
+addons:
+  apt:
+    packages:
+    - ffmpeg
+
 cache:
   directories:
     - node_modules
