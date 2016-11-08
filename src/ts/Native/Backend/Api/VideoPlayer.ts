@@ -16,17 +16,15 @@ export class VideoPlayer {
         } else {
             // tslint:disable:no-string-literal
             const exec = window['exec'];
-            exec('ffprobe -v quiet -of json=compact=1 -show_streams "' + url + '"', (err: Error, stdout: string, stderr: string) => {
-                const streams = JSON.parse(stdout).streams;
-                streams.forEach((stream: any) => {
-                    if(stream.codec_type === 'video') {
-                        const duration = VideoPlayer._duration = Math.round(parseFloat(stream.duration) * 1000);
-                        const width = VideoPlayer._width = stream.width;
-                        const height = VideoPlayer._height = stream.height;
-                        VideoPlayer._url = url;
-                        Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
-                    }
-                });
+            exec('curl -s "' + url + '" | exiftool -j -', (err: Error, stdout: string, stderr: string) => {
+                const stream = JSON.parse(stdout)[0];
+                console.dir(stream);
+                const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
+                const splitImageSize = stream.ImageSize.split('x');
+                const width = VideoPlayer._width = splitImageSize[0];
+                const height = VideoPlayer._height = splitImageSize[1];
+                VideoPlayer._url = url;
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
             });
             // tslint:enable:no-string-literal
         }
