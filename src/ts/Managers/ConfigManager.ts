@@ -35,17 +35,16 @@ export class ConfigManager {
                     nativeBridge.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
                 }
-            }, errorResponse => {
-                const error = errorResponse[2];
-                if(error instanceof RequestError) {
+            }).catch(([failedRequest, msg, error]) => {
+                if (error instanceof RequestError) {
                     try {
                         const responseObj = JsonParser.parse((<RequestError>error).nativeResponse.response);
                         throw new ConfigError((new Error(responseObj.error)));
-                    } catch(e) {
+                    } catch (e) {
                         throw new ConfigError(e);
                     }
                 } else {
-                    throw new ConfigError(errorResponse[1]);
+                    Promise.reject([failedRequest, msg, error]);
                 }
             });
         });
