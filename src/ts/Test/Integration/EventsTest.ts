@@ -87,7 +87,7 @@ describe('EventsTest', () => {
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
     });
 
-    it('should handle happy path on iOS', function(this: Mocha.ITestDefinition, done: MochaDone) {
+    it('should include all operational events on iOS', function(this: Mocha.ITestDefinition, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
