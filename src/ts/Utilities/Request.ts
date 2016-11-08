@@ -51,9 +51,9 @@ export class Request {
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
 
-    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _allowedResponseCodes = new RegExp('200|501|30[0-8]');
     private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
-    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
+    private static _redirectResponseCodes = new RegExp('30[0-8]');
     private static _errorResponseCodes = new RegExp('4[0-9]{2}');
 
     private static _callbackId: number = 1;
@@ -198,8 +198,8 @@ export class Request {
             return;
         }
 
-        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1 || Request._allowedResponseCodeRange.exec(responseCode.toString())) {
-            if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
+        if(Request._allowedResponseCodes.exec(responseCode.toString()) || Request._allowedResponseCodeRange.exec(responseCode.toString())) {
+            if(Request._redirectResponseCodes.exec(responseCode.toString()) && nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
                     nativeRequest.url = location;
