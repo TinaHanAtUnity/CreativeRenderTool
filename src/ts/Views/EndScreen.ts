@@ -41,9 +41,6 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
                 'endscreenAlt': (() => {
-                    if(campaign.getAbGroup() !== 0) {
-                        return 'halloween';
-                    }
                     return undefined;
                 })()
             };
