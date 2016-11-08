@@ -18,7 +18,6 @@ export class VideoPlayer {
             const exec = window['exec'];
             exec('curl -s "' + url + '" | exiftool -j -', (err: Error, stdout: string, stderr: string) => {
                 const stream = JSON.parse(stdout)[0];
-                console.dir(stream);
                 const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
                 const splitImageSize = stream.ImageSize.split('x');
                 const width = VideoPlayer._width = splitImageSize[0];

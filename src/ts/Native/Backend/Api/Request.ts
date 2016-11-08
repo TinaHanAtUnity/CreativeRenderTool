@@ -6,6 +6,10 @@ export class Request {
         return Request._requestLog;
     }
 
+    public static setLog(requestLog: string[]) {
+        Request._requestLog = requestLog;
+    }
+
     public static get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         Request._requestLog.push(url);
         const xhr = new XMLHttpRequest();
