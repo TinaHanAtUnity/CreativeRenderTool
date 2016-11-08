@@ -170,7 +170,7 @@ export class Request {
         }
     }
 
-    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
         if(nativeRequest.retryCount < nativeRequest.options.retries) {
             nativeRequest.retryCount++;
             setTimeout(() => {
@@ -178,7 +178,7 @@ export class Request {
             }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error(errorMessage), nativeRequest, nativeResponse));
             }
         }
     }
@@ -211,9 +211,9 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else if (Request._errorResponseCodes.exec(responseCode.toString())) {
-            this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeResponse)]);
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeRequest, nativeResponse));
         } else {
-            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
+            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         }
     }
 

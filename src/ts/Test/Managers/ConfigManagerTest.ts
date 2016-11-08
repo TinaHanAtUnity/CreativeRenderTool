@@ -10,6 +10,7 @@ import { INativeResponse } from 'Utilities/Request';
 import ConfigurationJson from 'json/Configuration.json';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
+import {DiagnosticError} from "../../Errors/DiagnosticError";
 
 class TestStorageApi extends StorageApi {
 
@@ -121,7 +122,7 @@ describe('ConfigManagerTest', () => {
                 headers: []
             };
 
-            configPromise = Promise.reject([{}, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeResponse)]);
+            configPromise = Promise.reject(new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), {}, nativeResponse));
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };
@@ -145,7 +146,7 @@ describe('ConfigManagerTest', () => {
                 responseCode: 405,
                 headers: []
             };
-            configPromise = Promise.reject([{}, 'FAILED_WITH_ERROR_RESPONSE', new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeResponse)]);
+            configPromise = Promise.reject(new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), {}, nativeResponse));
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };
@@ -155,22 +156,8 @@ describe('ConfigManagerTest', () => {
             return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
-                assert.instanceOf(error, ConfigError);
+                assert.instanceOf(error, DiagnosticError);
             });
         });
     });
 });
-
-// it('Request get should return proper exception if json parsing fails ' + i.toString(), () => {
-//     const failureUrl: string = 'http://www.example.org/404invalidjson/' + i.toString();
-//     const reason = 'FAILED_WITH_ERROR_RESPONSE';
-//
-//     return request.get(failureUrl).then((response) => {
-//         assert.fail('Should not resolve');
-//     }, errorResponse => {
-//         assert.equal(errorResponse[1], reason);
-//         assert.instanceOf(errorResponse[2], DiagnosticError);
-//     }).catch(error => {
-//         throw new Error('Handling error response failed: ' + error);
-//     });
-// });
