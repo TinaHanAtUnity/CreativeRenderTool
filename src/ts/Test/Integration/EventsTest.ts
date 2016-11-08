@@ -12,6 +12,19 @@ import { Request } from 'Native/Backend/Api/Request';
 
 describe('EventsTest', () => {
 
+    const validateRequestLog = (requestLog: string[]) => {
+        assert.equal(requestLog.length, 9, 'Request log length should be 9 for showing one ad');
+        assert(requestLog[0].match('configuration'), '1st request was not a configuration request');
+        assert(requestLog[1].match('fill'), '2nd request was not a fill request');
+        assert(requestLog[2].match('show'), '3rd request was not a show event');
+        assert(requestLog[3].match('video_start'), '4th request was not a video_start event');
+        assert(requestLog[4].match('first_quartile'), '5th request was not a first_quartile event');
+        assert(requestLog[5].match('midpoint'), '6th request was not a midpoint event');
+        assert(requestLog[6].match('third_quartile'), '7th request was not a third_quartile event');
+        assert(requestLog[7].match('fill'), '8th request was not a fill request');
+        assert(requestLog[8].match('video_end'), '9th request was not a video_end event');
+    };
+
     it('should include all operational events on Android', function(this: Mocha.ITestDefinition, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
@@ -27,9 +40,7 @@ describe('EventsTest', () => {
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
                     setTimeout(() => {
-                        const requestLog = Request.getLog();
-                        console.dir(requestLog);
-                        assert.equal(requestLog.length, 9, 'Request amount should be 9 after showing 1 ad');
+                        validateRequestLog(Request.getLog());
                         done();
                     }, 2500);
                 }
@@ -91,9 +102,7 @@ describe('EventsTest', () => {
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
                     setTimeout(() => {
-                        const requestLog = Request.getLog();
-                        console.dir(requestLog);
-                        assert.equal(requestLog.length, 9, 'Request amount should be 9 after showing 1 ad');
+                        validateRequestLog(Request.getLog());
                         done();
                     }, 2500);
                 }
