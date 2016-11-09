@@ -100,6 +100,9 @@ if(coverageDir) {
             if(load.address.match(/src\/ts\/Test/)) {
                 return source;
             }
+            if(load.address.match(/src\/ts\/Native\/Backend/)) {
+                return source;
+            }
             return instrumenter.instrumentSync(source, 'src/ts/' + load.address.substr(System.baseURL.length));
         });
     };
