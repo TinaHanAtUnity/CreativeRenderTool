@@ -9,6 +9,7 @@
 
 - Python (`brew install python3`)
 - Watchman (`brew install watchman`)
+- exiftool (`brew install exiftool`) for integration tests
 
 ## IDE
 
