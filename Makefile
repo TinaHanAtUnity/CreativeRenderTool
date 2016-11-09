@@ -32,7 +32,7 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-coveralls watch setup
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -230,10 +230,11 @@ lint:
 
 	$(TSLINT) -c tslint.json `find $(TS_SRC) -name "*.ts" | xargs`
 
-test: BUILD_DIR = build/coverage
-test: MODULE = system
-test: TARGET = es5
-test: build-dir
+test: test-unit test-integration
+
+test-unit: MODULE = system
+test-unit: TARGET = es5
+test-unit:
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -241,16 +242,46 @@ test: build-dir
 	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
 
 	@echo
-	@echo Running local tests
+	@echo Running unit tests
 	@echo
 
-	COVERAGE_DIR=$(BUILD_DIR) node test-utils/node_runner.js
+	TEST_FILTER=Unit node test-utils/node_runner.js
+
+test-integration: MODULE = system
+test-integration: TARGET = es5
+test-integration:
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
+	@echo
+	@echo Running integration tests
+	@echo
+
+	TEST_FILTER=Integration node test-utils/node_runner.js
+
+test-coverage: BUILD_DIR = build/coverage
+test-coverage: MODULE = system
+test-coverage: TARGET = es5
+test-coverage: build-dir
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
+	@echo
+	@echo Running unit tests with coverage
+	@echo
+
+	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Unit node test-utils/node_runner.js
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
 	@cat $(BUILD_DIR)/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
 
-test-coveralls: BUILD_DIR = build/coverage
-test-coveralls: test
+test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
