@@ -10,6 +10,12 @@ import { Localization } from 'Utilities/Localization';
 
 export class EndScreen extends View {
 
+    public static setAutoClose(autoClose: boolean) {
+        EndScreen.AutoClose = autoClose;
+    }
+
+    private static AutoClose: boolean = false;
+
     public onDownload: Observable0 = new Observable0();
     public onPrivacy: Observable1<string> = new Observable1();
     public onClose: Observable0 = new Observable0();
@@ -35,9 +41,6 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
                 'endscreenAlt': (() => {
-                    if(campaign.getAbGroup() !== 0) {
-                        return 'halloween';
-                    }
                     return undefined;
                 })()
             };
@@ -73,6 +76,10 @@ export class EndScreen extends View {
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
+
+        if(EndScreen.AutoClose) {
+            this.onClose.trigger();
+        }
     }
 
     public hide(): void {

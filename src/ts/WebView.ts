@@ -27,6 +27,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
 import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
+import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
@@ -394,7 +395,7 @@ export class WebView {
                 retryWithConnectionEvents: false
             }).then(response => {
                 const locationUrl = response.url || videoUrl;
-                cacheAsset(locationUrl).then(fileUrl => {
+                return cacheAsset(locationUrl).then(fileUrl => {
                     campaign.setVideoUrl(fileUrl);
                     campaign.setVideoCached(true);
                 }).catch(error => {
@@ -633,6 +634,12 @@ export class WebView {
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
                 Overlay.setAutoSkip(autoSkip);
+            }
+        });
+
+        metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
+            if(found && autoClose) {
+                EndScreen.setAutoClose(autoClose);
             }
         });
     }

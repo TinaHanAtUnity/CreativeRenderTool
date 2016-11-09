@@ -5,10 +5,12 @@ const System = require('systemjs');
 const Istanbul = require('istanbul');
 const jsdom = require('jsdom').jsdom;
 const DOMParser = require('xmldom').DOMParser;
+const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 
 global.document = jsdom('');
 global.window = document.defaultView;
 global.DOMParser = DOMParser;
+global.XMLHttpRequest = XMLHttpRequest;
 
 let getPaths = (root) => {
     let paths = [];

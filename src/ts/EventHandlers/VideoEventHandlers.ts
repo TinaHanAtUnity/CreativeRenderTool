@@ -177,16 +177,6 @@ export class VideoEventHandlers {
         }
 
         this.afterVideoCompleted(nativeBridge, adUnit.getVideoAdUnitController());
-
-        metaData.get<boolean>('integration_test', false).then(([found, integrationTest]) => {
-            if(found && integrationTest) {
-                if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.rawInvoke('com.unity3d.ads.test.integration.IntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
-                } else {
-                    nativeBridge.rawInvoke('UADSIntegrationTest', 'onVideoCompleted', [adUnit.getPlacement().getId()]);
-                }
-            }
-        });
     }
 
     public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, what: number, extra: number, url: string) {
