@@ -28,6 +28,7 @@ describe('EventsTest', () => {
     it('should include all operational events on Android', function(this: Mocha.ITestDefinition, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
+        let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
                 if(++readyCount === 2) {
@@ -35,19 +36,19 @@ describe('EventsTest', () => {
                 }
             },
             onUnityAdsStart: (placement: string) => {
-                return;
+                ++startCount;
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
                     setTimeout(() => {
                         validateRequestLog(Request.getLog());
+                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
                         done();
                     }, 2500);
                 }
-                return;
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
-                return;
+                done(new Error(message));
             }
         };
 
@@ -90,6 +91,7 @@ describe('EventsTest', () => {
     it('should include all operational events on iOS', function(this: Mocha.ITestDefinition, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
+        let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
                 if(++readyCount === 2) {
@@ -97,19 +99,19 @@ describe('EventsTest', () => {
                 }
             },
             onUnityAdsStart: (placement: string) => {
-                return;
+                ++startCount;
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
                     setTimeout(() => {
                         validateRequestLog(Request.getLog());
+                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
                         done();
                     }, 2500);
                 }
-                return;
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
-                return;
+                done(new Error(message));
             }
         };
 
