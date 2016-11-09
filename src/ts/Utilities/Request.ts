@@ -53,6 +53,7 @@ export class Request {
     private static _allowedResponseCodes = new RegExp('200|501|30[0-8]');
     private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = new RegExp('30[0-8]');
+    private static _retryResponseCodes = new RegExp('5[0-9]{2}');
 
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
@@ -211,10 +212,12 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
-        } else if (Request._errorResponseCodes.exec(responseCode.toString())) {
+        } else if(Request._errorResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeRequest, nativeResponse));
-        } else {
+        } else if(Request._retryResponseCodes.exec(responseCode.toString())) {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
+        } else {
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_UNKNOWN_RESPONSE_CODE'), nativeRequest, nativeResponse));
         }
     }
 

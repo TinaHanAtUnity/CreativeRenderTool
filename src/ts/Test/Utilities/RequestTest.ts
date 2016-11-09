@@ -48,16 +48,10 @@ class TestRequestApi extends RequestApi {
                 this.sendFailResponse(id, url, 'Fail response');
             }
         } else if (url.indexOf('/errorresponsecode') !== -1) {
-            const responseCodes = url.match(/4[0-9]{2}/);
+            const responseCodes = url.match(/(4[0-9]{2})|600/);
             if (responseCodes && responseCodes.length > 0) {
                 const responseCode = responseCodes[0];
                 this.sendSuccessResponse(id, url, '{"error": "Failure response"}', parseInt(responseCode, 10), []);
-            }
-        } else if (url.indexOf('/404invalidjson') !== -1) {
-            const responseCodes = url.match(/4[0-9]{2}/);
-            if (responseCodes && responseCodes.length > 0) {
-                const responseCode = responseCodes[0];
-                this.sendSuccessResponse(id, url, '{{error Faisdflure response"', parseInt(responseCode, 10), []);
             }
         }
 
@@ -329,5 +323,23 @@ describe('RequestTest', () => {
                 });
             });
         }
+    });
+
+    describe('Request get should fail for unknown status codes', () => {
+        it('Request get should fail for response code 600', () => {
+            const failureUrl: string = 'http://www.example.org/errorresponsecode/' + 600;
+            const reason = 'FAILED_WITH_UNKNOWN_RESPONSE_CODE';
+            const failureResponse: string = '{"error": "Failure response"}';
+
+            return request.get(failureUrl).then((response) => {
+                assert.fail('Should not resolve');
+            }).catch(error => {
+                assert.instanceOf(error, RequestError);
+                error = <RequestError>error;
+                assert.equal(error.message, reason);
+                assert.equal(error.nativeResponse.responseCode, 600);
+                assert.equal(error.nativeResponse.response, failureResponse);
+            });
+        });
     });
 });
