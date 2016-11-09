@@ -50,8 +50,7 @@ export class Request {
         return null;
     }
 
-    private static _allowedResponseCodes = new RegExp('200|30[0-8]');
-    private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
+    private static _allowedResponseCodes = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = new RegExp('30[0-8]');
     private static _retryResponseCodes = new RegExp('5[0-9]{2}');
 
@@ -199,9 +198,10 @@ export class Request {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
-
-        if(Request._allowedResponseCodes.exec(responseCode.toString()) || Request._allowedResponseCodeRange.exec(responseCode.toString())) {
-            if(Request._redirectResponseCodes.exec(responseCode.toString()) && nativeRequest.options.followRedirects) {
+        if(Request._allowedResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+        } else if(Request._redirectResponseCodes.exec(responseCode.toString())) {
+            if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
                     nativeRequest.url = location;
