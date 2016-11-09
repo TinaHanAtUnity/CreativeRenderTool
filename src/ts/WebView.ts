@@ -29,6 +29,7 @@ import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
+import { RequestError } from 'Errors/RequestError';
 
 export class WebView {
 
@@ -469,15 +470,24 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        let responseCode: string = '';
+        if(error instanceof RequestError) {
+            const requestError = <RequestError>error;
+            if (requestError.nativeResponse && requestError.nativeResponse.response) {
+                responseCode = requestError.nativeResponse.responseCode.toString();
+            }
+        } else if(error instanceof Error && !(error instanceof DiagnosticError)) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
+
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger({
             'type': 'campaign_request_failed',
             'error': error
         });
-        this.onNoFill(3600); // todo: on errors, retry again in an hour
+        if (!Request._errorResponseCodes.exec(responseCode)) {
+            this.onNoFill(3600); // todo: on errors, retry again in an hour
+        }
     }
 
     private onNewAdRequestAllowed(): void {
