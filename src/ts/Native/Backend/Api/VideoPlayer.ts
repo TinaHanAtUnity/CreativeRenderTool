@@ -3,17 +3,7 @@ import { Backend } from 'Native/Backend/Backend';
 export class VideoPlayer {
 
     public static prepare(url: string) {
-        const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
-        if(videoView) {
-            videoView.addEventListener('canplay', () => {
-                VideoPlayer._url = url;
-                const duration = VideoPlayer._duration = Math.round(videoView.duration * 1000);
-                const width = VideoPlayer._width = videoView.videoWidth;
-                const height = VideoPlayer._height = videoView.videoHeight;
-                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
-            }, false);
-            videoView.src = url;
-        } else {
+        if('exec' in window) {
             // tslint:disable:no-string-literal
             const exec = window['exec'];
             exec('curl -s "' + url + '" | exiftool -j -', (err: Error, stdout: string, stderr: string) => {
@@ -26,19 +16,35 @@ export class VideoPlayer {
                 Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
             });
             // tslint:enable:no-string-literal
+        } else {
+            let videoView = VideoPlayer._videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
+            if(!videoView) {
+                videoView = document.createElement('video');
+            }
+            videoView.addEventListener('canplay', () => {
+                VideoPlayer._url = url;
+                const duration = VideoPlayer._duration = Math.round(videoView.duration * 1000);
+                const width = VideoPlayer._width = videoView.videoWidth;
+                const height = VideoPlayer._height = videoView.videoHeight;
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
+            }, false);
+            videoView.src = url;
         }
     }
 
     public static setVolume(volume: number) {
-        const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
+        let videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
+        if(!videoView) {
+            videoView = VideoPlayer._videoView;
+        }
         if(videoView) {
             videoView.volume = volume;
         }
     }
 
     public static play() {
-        const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
-        if(videoView) {
+        if(VideoPlayer._videoView) {
+            const videoView = VideoPlayer._videoView;
             videoView.addEventListener('timeupdate', () => {
                 Backend.sendEvent('VIDEOPLAYER', 'PROGRESS', Math.round(videoView.currentTime * 1000));
             }, false);
@@ -64,7 +70,10 @@ export class VideoPlayer {
     }
 
     public static pause() {
-        const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
+        let videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
+        if(!videoView) {
+            videoView = VideoPlayer._videoView;
+        }
         if(videoView) {
             videoView.pause();
         }
@@ -79,6 +88,7 @@ export class VideoPlayer {
     private static _width: number | undefined;
     private static _height: number | undefined;
 
+    private static _videoView: HTMLVideoElement;
     private static _progressTimer: any;
 
 }
