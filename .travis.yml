@@ -4,6 +4,11 @@ language: node_js
 node_js:
   - 6.7.0
 
+addons:
+  apt:
+    packages:
+    - libimage-exiftool-perl
+
 cache:
   directories:
     - node_modules
@@ -11,6 +16,7 @@ cache:
 script:
   - make lint
   - make test-coveralls
+  - make test-integration
   - make build-test
   - make build-release
 
