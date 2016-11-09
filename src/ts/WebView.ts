@@ -240,9 +240,7 @@ export class WebView {
                 }
             }
 
-            this._adUnit.show().then(() => {
-                this._sessionManager.sendShow(this._adUnit);
-            });
+            this._adUnit.show();
 
             delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);

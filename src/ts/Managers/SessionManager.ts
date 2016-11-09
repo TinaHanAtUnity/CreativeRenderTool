@@ -121,22 +121,6 @@ export class SessionManager {
         return this._clientInfo;
     }
 
-    public sendShow(adUnit: AbstractAdUnit): Promise<void> {
-        // todo: this pattern is rather bad and it's used only to allow tests to temporarily pass without having to create a new session for each test
-        if(this._currentSession) {
-            if(this._currentSession.showSent) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.showSent = true;
-        }
-
-        const fulfilled = ([id, infoJson]: [string, any]) => {
-            this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
-        };
-
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
-    }
-
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.startSent) {
@@ -247,17 +231,6 @@ export class SessionManager {
 
     public setGamerServerId(serverId: string): void {
         this._gamerServerId = serverId;
-    }
-
-    private createShowEventUrl(adUnit: AbstractAdUnit): string {
-        const campaign = adUnit.getCampaign();
-        return [
-            SessionManager.VideoEventBaseUrl,
-            campaign.getGamerId(),
-            'show',
-            campaign.getId(),
-            this._clientInfo.getGameId()
-        ].join('/');
     }
 
     private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {

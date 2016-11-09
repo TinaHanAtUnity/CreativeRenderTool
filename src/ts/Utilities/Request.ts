@@ -50,7 +50,7 @@ export class Request {
         return null;
     }
 
-    private static _allowedResponseCodes = new RegExp('200|501|30[0-8]');
+    private static _allowedResponseCodes = new RegExp('200|30[0-8]');
     private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = new RegExp('30[0-8]');
     private static _retryResponseCodes = new RegExp('5[0-9]{2}');
