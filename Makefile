@@ -281,6 +281,7 @@ test-coverage: build-dir
 	@cat $(BUILD_DIR)/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
 
+test-coveralls: BUILD_DIR = build/coverage
 test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose

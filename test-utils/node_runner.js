@@ -108,7 +108,6 @@ if(coverageDir) {
 const sourcePaths = getSourcePaths('src/ts');
 const testPaths = getTestPaths('src/ts/Test', testFilter);
 
-console.dir(testPaths);
 Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
     return System.import(testPath);
 })).then(() => {
@@ -119,6 +118,6 @@ Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
     });
 }).then(() => {
     if(coverageDir) {
-        fs.writeFileSync(process.env.COVERAGE_DIR + '/coverage.json', JSON.stringify(__coverage__));
+        fs.writeFileSync(coverageDir + '/coverage.json', JSON.stringify(__coverage__));
     }
 }).catch(console.error.bind(console));
