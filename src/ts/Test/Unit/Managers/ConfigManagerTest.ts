@@ -10,7 +10,7 @@ import { INativeResponse } from 'Utilities/Request';
 import ConfigurationJson from 'json/Configuration.json';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import {DiagnosticError} from "../../Errors/DiagnosticError";
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 class TestStorageApi extends StorageApi {
 
