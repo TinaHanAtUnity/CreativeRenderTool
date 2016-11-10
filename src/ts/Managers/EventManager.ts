@@ -4,7 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Analytics } from 'Utilities/Analytics';
-import {RequestError} from "../Errors/RequestError";
+import { RequestError } from 'Errors/RequestError';
 
 export class EventManager {
 
