@@ -7,8 +7,13 @@ export class AdUnit {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
 
-        videoView.style.display = 'block';
-        webView.style.display = 'block';
+        if(videoView) {
+            videoView.style.display = 'block';
+        }
+
+        if(webView) {
+            webView.style.display = 'block';
+        }
 
         const platform = Backend.getPlatform();
         if(platform === Platform.ANDROID) {
@@ -32,8 +37,13 @@ export class AdUnit {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
 
-        videoView.style.display = 'none';
-        webView.style.display = 'none';
+        if(videoView) {
+            videoView.style.display = 'none';
+        }
+
+        if(webView) {
+            webView.style.display = 'none';
+        }
     }
 
     public static setViews(views: string[]) {
