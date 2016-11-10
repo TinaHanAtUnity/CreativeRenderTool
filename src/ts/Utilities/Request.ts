@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { RequestError } from 'Errors/RequestError';
 
 const enum RequestStatus {
     COMPLETE,
@@ -37,6 +38,8 @@ export interface INativeResponse {
 
 export class Request {
 
+    public static _errorResponseCodes = new RegExp('4[0-9]{2}');
+
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
@@ -47,12 +50,12 @@ export class Request {
         return null;
     }
 
+    private static _allowedResponseCodes = new RegExp('2[0-9]{2}');
+    private static _redirectResponseCodes = new RegExp('30[0-8]');
+    private static _retryResponseCodes = new RegExp('5[0-9]{2}');
+
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
-
-    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
-    private static _allowedResponseCodeRange = new RegExp('2[0-9]{2}');
-    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
@@ -168,7 +171,7 @@ export class Request {
         }
     }
 
-    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
         if(nativeRequest.retryCount < nativeRequest.options.retries) {
             nativeRequest.retryCount++;
             setTimeout(() => {
@@ -176,7 +179,7 @@ export class Request {
             }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error(errorMessage), nativeRequest, nativeResponse));
             }
         }
     }
@@ -195,9 +198,10 @@ export class Request {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
-
-        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1 || Request._allowedResponseCodeRange.exec(responseCode.toString())) {
-            if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
+        if(Request._allowedResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+        } else if(Request._redirectResponseCodes.exec(responseCode.toString())) {
+            if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
                     nativeRequest.url = location;
@@ -208,8 +212,12 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
+        } else if(Request._errorResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeRequest, nativeResponse));
+        } else if(Request._retryResponseCodes.exec(responseCode.toString())) {
+            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
-            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_UNKNOWN_RESPONSE_CODE'), nativeRequest, nativeResponse));
         }
     }
 

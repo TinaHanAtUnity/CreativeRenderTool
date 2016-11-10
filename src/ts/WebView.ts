@@ -28,6 +28,8 @@ import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { ConfigError } from 'Errors/ConfigError';
+import { RequestError } from 'Errors/RequestError';
 
 export class WebView {
 
@@ -135,7 +137,10 @@ export class WebView {
 
             return this._eventManager.sendUnsentSessions();
         }).catch(error => {
-            if(error instanceof Error) {
+            if(error instanceof ConfigError) {
+                error = { 'message': error.message, 'name': error.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error) {
                 error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
                 if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
@@ -228,9 +233,7 @@ export class WebView {
                 }
             }
 
-            this._adUnit.show().then(() => {
-                this._sessionManager.sendShow(this._adUnit);
-            });
+            this._adUnit.show();
 
             delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
@@ -448,15 +451,24 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        let responseCode: string = '';
+        if(error instanceof RequestError) {
+            const requestError = <RequestError>error;
+            if (requestError.nativeResponse && requestError.nativeResponse.response) {
+                responseCode = requestError.nativeResponse.responseCode.toString();
+            }
+        } else if(error instanceof Error && !(error instanceof DiagnosticError)) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
+
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger({
             'type': 'campaign_request_failed',
             'error': error
         });
-        this.onNoFill(3600); // todo: on errors, retry again in an hour
+        if (!Request._errorResponseCodes.exec(responseCode)) {
+            this.onNoFill(3600); // todo: on errors, retry again in an hour
+        }
     }
 
     private onNewAdRequestAllowed(): void {

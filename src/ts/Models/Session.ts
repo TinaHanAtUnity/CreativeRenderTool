@@ -1,5 +1,4 @@
 export class Session {
-    public showSent: boolean = false;
     public startSent: boolean = false;
     public firstQuartileSent: boolean = false;
     public midpointSent: boolean = false;
