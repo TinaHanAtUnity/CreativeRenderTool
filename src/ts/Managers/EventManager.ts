@@ -4,6 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Analytics } from 'Utilities/Analytics';
+import { RequestError } from 'Errors/RequestError';
 
 export class EventManager {
 
@@ -61,14 +62,16 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: redirects,
             retryWithConnectionEvents: false
-        }).catch(([request, message]) => {
-            const error: DiagnosticError = new DiagnosticError(new Error(message), {
-                request: request,
-                event: event,
-                sessionId: sessionId,
-                url: url
-            });
-
+        }).catch(error => {
+            if(error instanceof RequestError) {
+                error = new DiagnosticError(error, {
+                    request: (<RequestError>error).nativeRequest,
+                    event: event,
+                    sessionId: sessionId,
+                    url: url,
+                    response: (<RequestError>error).nativeResponse
+                });
+            }
             return Diagnostics.trigger({
                 'type': 'click_attribution_failed',
                 'error': error
@@ -83,14 +86,16 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).catch(([request, message]) => {
-            const error: DiagnosticError = new DiagnosticError(new Error(message), {
-                request: request,
-                event: event,
-                sessionId: sessionId,
-                url: url
-            });
-
+        }).catch(error => {
+            if(error instanceof RequestError) {
+                error = new DiagnosticError(error, {
+                    request: (<RequestError>error).nativeRequest,
+                    event: event,
+                    sessionId: sessionId,
+                    url: url,
+                    response: (<RequestError>error).nativeResponse
+                });
+            }
             return Analytics.trigger({
                 'type': 'third_party_event_failed',
                 'error': error

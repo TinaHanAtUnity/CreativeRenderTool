@@ -280,16 +280,6 @@ describe('Event parameters should match specifications', () => {
                 adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             });
 
-            it('with show event', () => {
-                return sessionManager.sendShow(adUnit).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getVideoEventParams(), url, body);
-                    verifier.assert();
-                });
-            });
-
             it('with start event', () => {
                 return sessionManager.sendStart(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
@@ -358,16 +348,6 @@ describe('Event parameters should match specifications', () => {
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
-            });
-
-            it('with show event', () => {
-                return sessionManager.sendShow(adUnit).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
-                    verifier.assert();
-                });
             });
 
             it('with start event', () => {
