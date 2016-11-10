@@ -40,13 +40,10 @@ export class ConfigManager {
                     const requestError = <RequestError>error;
                     if (requestError.nativeResponse && requestError.nativeResponse.response) {
                         const responseObj = JsonParser.parse(requestError.nativeResponse.response);
-                        throw new ConfigError((new Error(responseObj.error)));
-                    } else {
-                        Promise.reject(error);
+                        error = new ConfigError((new Error(responseObj.error)));
                     }
-                } else {
-                    Promise.reject(error);
                 }
+                throw error;
             });
         });
     }

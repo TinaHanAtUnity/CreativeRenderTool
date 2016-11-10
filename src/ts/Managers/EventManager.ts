@@ -62,18 +62,15 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: redirects,
             retryWithConnectionEvents: false
-        }).catch(e => {
-            let error: any;
-            if(e instanceof RequestError) {
-                error = new DiagnosticError(e, {
-                    request: (<RequestError>e).nativeRequest,
+        }).catch(error => {
+            if(error instanceof RequestError) {
+                error = new DiagnosticError(error, {
+                    request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>e).nativeResponse
+                    response: (<RequestError>error).nativeResponse
                 });
-            } else {
-                error = e;
             }
             return Diagnostics.trigger({
                 'type': 'click_attribution_failed',
@@ -89,20 +86,16 @@ export class EventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).catch(e => {
-            let error: any;
-            if(e instanceof RequestError) {
-                error = new DiagnosticError(e, {
-                    request: (<RequestError>e).nativeRequest,
+        }).catch(error => {
+            if(error instanceof RequestError) {
+                error = new DiagnosticError(error, {
+                    request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>e).nativeResponse
+                    response: (<RequestError>error).nativeResponse
                 });
-            } else {
-                error = e;
             }
-
             return Analytics.trigger({
                 'type': 'third_party_event_failed',
                 'error': error
