@@ -40,7 +40,7 @@ export class Request {
 
     public static _errorResponseCodes = new RegExp('4[0-9]{2}');
 
-    public static getHeader(headers: [string, string][], headerName: string): string | null {
+    public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
             if(header[0].match(new RegExp(headerName, 'i'))) {
