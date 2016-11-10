@@ -52,6 +52,10 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
+    public static setProxyUrl(proxyUrl: string): void {
+        ConfigManager.ConfigBaseUrl = proxyUrl + '/games';
+    }
+
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData): string {

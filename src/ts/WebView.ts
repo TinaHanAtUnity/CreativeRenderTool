@@ -30,6 +30,7 @@ import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
+import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class WebView {
 
@@ -118,6 +119,13 @@ export class WebView {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
+            if(AbTestHelper.isReverseProxyTestActive(-1, configuration)) {
+                const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(-1, configuration);
+                CampaignManager.setProxyUrl(reverseProxyBaseUrl);
+                ConfigManager.setProxyUrl(reverseProxyBaseUrl);
+                SessionManager.setProxyUrl(reverseProxyBaseUrl);
+            }
+
             return this._sessionManager.create();
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();

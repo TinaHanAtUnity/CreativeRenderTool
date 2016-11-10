@@ -23,6 +23,10 @@ export class CampaignManager {
         CampaignManager.AbGroup = abGroup;
     }
 
+    public static setProxyUrl(url: string) {
+        CampaignManager.CampaignBaseUrl = url + '/games';
+    }
+
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
