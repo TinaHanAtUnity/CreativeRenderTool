@@ -25,7 +25,6 @@ import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
-import { AbTestHelper } from 'Utilities/AbTestHelper';
 import { IosUtils } from 'Utilities/IosUtils';
 import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -199,14 +198,7 @@ export class WebView {
             this._mustReinitialize = reinitialize;
         });
 
-        let cacheMode: CacheMode;
-        if(AbTestHelper.isCacheModeAbTestActive(this._campaign.getAbGroup())) {
-            cacheMode = AbTestHelper.getCacheMode(this._campaign.getAbGroup(), this._configuration);
-        } else {
-            cacheMode = this._configuration.getCacheMode();
-        }
-
-        if(cacheMode === CacheMode.ALLOWED) {
+        if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
             this._cacheManager.stop();
         }
 
@@ -278,12 +270,7 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode: CacheMode;
-        if (AbTestHelper.isCacheModeAbTestActive(campaign.getAbGroup())) {
-            cacheMode = AbTestHelper.getCacheMode(campaign.getAbGroup(), this._configuration);
-        } else {
-            cacheMode = this._configuration.getCacheMode();
-        }
+        const cacheMode = this._configuration.getCacheMode();
 
         const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
@@ -360,12 +347,7 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode: CacheMode;
-        if (AbTestHelper.isCacheModeAbTestActive(campaign.getAbGroup())) {
-            cacheMode = AbTestHelper.getCacheMode(campaign.getAbGroup(), this._configuration);
-        } else {
-            cacheMode = this._configuration.getCacheMode();
-        }
+        const cacheMode = this._configuration.getCacheMode();
 
         const cacheAsset = (url: string) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
