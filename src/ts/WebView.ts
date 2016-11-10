@@ -119,13 +119,6 @@ export class WebView {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
-            if(AbTestHelper.isReverseProxyTestActive(-1, configuration)) {
-                const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(-1, configuration);
-                CampaignManager.setProxyUrl(reverseProxyBaseUrl);
-                ConfigManager.setProxyUrl(reverseProxyBaseUrl);
-                SessionManager.setProxyUrl(reverseProxyBaseUrl);
-            }
-
             return this._sessionManager.create();
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
@@ -277,6 +270,12 @@ export class WebView {
      */
 
     private onCampaign(campaign: Campaign): void {
+        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
+            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
+                campaign.getAbGroup(), this._configuration);
+            SessionManager.setProxyUrl(reverseProxyBaseUrl);
+        }
+
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
@@ -354,6 +353,12 @@ export class WebView {
     }
 
     private onVastCampaign(campaign: Campaign): void {
+        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
+            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
+                campaign.getAbGroup(), this._configuration);
+            SessionManager.setProxyUrl(reverseProxyBaseUrl);
+        }
+        
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
