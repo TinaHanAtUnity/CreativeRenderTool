@@ -66,44 +66,45 @@ export class CampaignManager {
                     if (campaignJson.vast === null) {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
                         this.onNoFill.trigger(3600);
-                    } else {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                        const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
-                        this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-                            let campaignId: string;
-                            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                                campaignId = '00005472656d6f7220694f53';
-                            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                                campaignId = '005472656d6f7220416e6472';
-                            } else {
-                                campaignId = 'UNKNOWN';
-                            }
-                            const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
-                            if (campaign.getVast().getImpressionUrls().length === 0) {
-                                this.onError.trigger(new Error('Campaign does not have an impression url'));
-                                return;
-                            }
-                            // todo throw an Error if required events are missing. (what are the required events?)
-                            if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-                            }
-                            if (!campaign.getVideoUrl()) {
-                                const videoUrlError = new DiagnosticError(
-                                    new Error('Campaign does not have a video url'),
-                                    { rootWrapperVast: campaignJson.vast }
-                                );
-                                this.onError.trigger(videoUrlError);
-                                return;
-                            }
-                            this.onVastCampaign.trigger(campaign);
-                        }).catch((error) => {
-                            this.onError.trigger(error);
-                        });
+                        return;
                     }
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
+                    const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
+                    return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
+                        let campaignId: string;
+                        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                            campaignId = '00005472656d6f7220694f53';
+                        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                            campaignId = '005472656d6f7220416e6472';
+                        } else {
+                            campaignId = 'UNKNOWN';
+                        }
+                        const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
+                        if (campaign.getVast().getImpressionUrls().length === 0) {
+                            this.onError.trigger(new Error('Campaign does not have an impression url'));
+                            return;
+                        }
+                        // todo throw an Error if required events are missing. (what are the required events?)
+                        if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                            this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+                        }
+                        if (!campaign.getVideoUrl()) {
+                            const videoUrlError = new DiagnosticError(
+                                new Error('Campaign does not have a video url'),
+                                { rootWrapperVast: campaignJson.vast }
+                            );
+                            this.onError.trigger(videoUrlError);
+                            return;
+                        }
+                        this.onVastCampaign.trigger(campaign);
+                    }).catch((error) => {
+                        this.onError.trigger(error);
+                    });
                 } else {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
                     this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
                 }
+                return;
             });
         }).catch((error) => {
             this.onError.trigger(error);

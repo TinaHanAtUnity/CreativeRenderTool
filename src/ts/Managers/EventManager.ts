@@ -161,6 +161,8 @@ export class EventManager {
                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, EventManager.getEventKey(sessionId, eventId)),
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
             ]);
+        }).catch(() => {
+            // ignore failed resends, they will be retried later
         });
     }
 
