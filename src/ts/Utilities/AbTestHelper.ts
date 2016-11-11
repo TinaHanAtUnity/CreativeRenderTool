@@ -10,7 +10,6 @@ export class AbTestHelper {
     }
 
     public static getReverseProxyBaseUrl(abGroup: number, configuration: Configuration): string {
-        // zh?
         if (abGroup === this._reverseProxyAbGroup && configuration.getCountry().match(/^CN/)) {
             return 'https://delivery-china.unityads.unity3d.com';
         } else {
@@ -18,6 +17,5 @@ export class AbTestHelper {
         }
     }
 
-    private static _reverseProxyAbGroup = -1;
-
+    private static _reverseProxyAbGroup = 16;
 }
