@@ -358,7 +358,7 @@ export class WebView {
                 campaign.getAbGroup(), this._configuration);
             SessionManager.setProxyUrl(reverseProxyBaseUrl);
         }
-        
+
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
