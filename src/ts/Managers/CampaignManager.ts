@@ -109,7 +109,7 @@ export class CampaignManager {
                         } else {
                             campaignId = 'UNKNOWN';
                         }
-                        const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
+                        const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL, campaignJson.vast.tracking);
                         if (campaign.getVast().getImpressionUrls().length === 0) {
                             this.onError.trigger(new Error('Campaign does not have an impression url'));
                             return;
