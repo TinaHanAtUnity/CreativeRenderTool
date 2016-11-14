@@ -1,13 +1,11 @@
 import 'Workarounds';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WebView } from 'WebView';
 import { Platform } from 'Constants/Platform';
-import { Backend } from 'Native/Backend/Backend';
-
-interface IExtendedWindow extends Window {
-    nativebridge: NativeBridge;
-    webview: WebView;
-}
+import { UnityAds } from 'Native/Backend/UnityAds';
+import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
+import { FinishState } from 'Constants/FinishState';
+import { UnityAdsError } from 'Constants/UnityAdsError';
+import { Sdk } from 'Native/Backend/Api/Sdk';
+import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -24,14 +22,114 @@ const resizeHandler = (event?: Event) => {
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
+const setClientInfo = () => {
+    const fields = [
+        ['appName', 'setAppName'],
+        ['appVersion', 'setAppVersion'],
+        ['sdkVersion', 'setSdkVersion'],
+        ['sdkVersionName', 'setSdkVersionName'],
+        ['debuggable', 'setDebuggable', true],
+        ['configUrl', 'setConfigUrl'],
+        ['webViewUrl', 'setWebViewUrl'],
+        ['webViewHash', 'setWebViewHash'],
+        ['webViewVersion', 'setWebViewVersion']
+    ];
+    fields.forEach(([field, setter, flag]: [string, string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById(field);
+        Sdk[setter](flag ? element.checked : element.value);
+    });
+};
+
+const setAndroidDeviceInfo = () => {
+    const fields = [
+        ['AdvertisingTrackingId'],
+        ['LimitAdTrackingFlag'],
+        ['AndroidId'],
+        ['Manufacturer'],
+        ['Model'],
+        ['OsVersion'],
+        ['ApiLevel'],
+        ['Rooted', true],
+        ['ScreenWidth'],
+        ['ScreenHeight'],
+        ['ScreenDensity'],
+        ['ScreenLayout'],
+        ['ScreenBrightness'],
+        ['SystemLanguage'],
+        ['TimeZone'],
+        ['TotalSpace'],
+        ['FreeSpace'],
+        ['TotalMemory'],
+        ['FreeMemory'],
+        ['ConnectionType'],
+        ['NetworkType'],
+        ['NetworkOperator'],
+        ['NetworkOperatorName'],
+        ['Headset', true],
+        ['DeviceVolume'],
+        ['BatteryLevel'],
+        ['BatteryStatus'],
+        ['RingerMode']
+    ];
+    fields.forEach(([field, flag]: [string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
+        DeviceInfo['set' + field](flag ? element.checked : element.value);
+    });
+};
+
+const setIosDeviceInfo = () => {
+    const fields = [
+        ['AdvertisingTrackingId'],
+        ['LimitAdTrackingFlag'],
+        ['Manufacturer'],
+        ['Model'],
+        ['OsVersion'],
+        ['Rooted', true],
+        ['ScreenWidth'],
+        ['ScreenHeight'],
+        ['ScreenScale'],
+        ['ScreenBrightness'],
+        ['SystemLanguage'],
+        ['TimeZone'],
+        ['TotalSpace'],
+        ['FreeSpace'],
+        ['TotalMemory'],
+        ['FreeMemory'],
+        ['ConnectionType'],
+        ['NetworkType'],
+        ['NetworkOperator'],
+        ['NetworkOperatorName'],
+        ['Headset', true],
+        ['DeviceVolume'],
+        ['BatteryLevel'],
+        ['BatteryStatus'],
+        ['UserInterfaceIdiom'],
+        ['Simulator', true]
+    ];
+    fields.forEach(([field, flag]: [string, boolean]) => {
+        const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
+        DeviceInfo['set' + field](flag ? element.checked : element.value);
+    });
+};
+
 if(window.parent !== window) {
-    const initializeButton: HTMLButtonElement = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+    const platformElement = <HTMLInputElement>window.parent.document.getElementById('platform');
+    const gameIdElement = <HTMLInputElement>window.parent.document.getElementById('gameId');
+    const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
+    const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+    const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+
     initializeButton.addEventListener('click', (event: Event) => {
         event.preventDefault();
+
+        abGroupElement.disabled = true;
+        platformElement.disabled = true;
+        gameIdElement.disabled = true;
+        testModeElement.disabled = true;
+        autoSkipElement.disabled = true;
         initializeButton.disabled = true;
 
-        const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
-        const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
         const publicStorage: any = {
             test: {}
         };
@@ -52,24 +150,48 @@ if(window.parent !== window) {
         window.sessionStorage.clear();
         window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
-        let nativeBridge: NativeBridge;
-        const platformElement = <HTMLSelectElement>window.parent.document.getElementById('platform');
+        setClientInfo();
+
+        // tslint:disable:no-console
+        const listener: IUnityAdsListener = {
+            onUnityAdsReady: (placement: string) => {
+                console.log('onUnityAdsReady: ' + placement);
+                const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
+                const listener = (placementButtonEvent: Event) => {
+                    placementButtonEvent.preventDefault();
+                    placementButton.disabled = true;
+                    placementButton.removeEventListener('click', listener, false);
+                    UnityAds.show(placement);
+                };
+                placementButton.disabled = false;
+                placementButton.addEventListener('click', listener, false);
+            },
+            onUnityAdsStart: (placement: string) => {
+                console.log('onUnityAdsStart: ' + placement);
+            },
+            onUnityAdsFinish: (placement: string, state: FinishState) => {
+                console.log('onUnityAdsFinish: ' + placement + ' - ' + state);
+            },
+            onUnityAdsError: (error: UnityAdsError, message: string) => {
+                console.log('onUnityAdsError: ' + error + ' - ' + message);
+            }
+        };
+        // tslint:enable:no-console
+
         switch(platformElement.value) {
             case 'android':
-                nativeBridge = new NativeBridge(new Backend(), Platform.ANDROID);
+                setAndroidDeviceInfo();
+                UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
             case 'ios':
-                nativeBridge = new NativeBridge(new Backend(), Platform.IOS, false);
+                setIosDeviceInfo();
+                UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked);
                 break;
 
             default:
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
 
-        const extWindow = <IExtendedWindow> window;
-        extWindow.nativebridge = nativeBridge;
-        extWindow.webview = new WebView(nativeBridge);
-        extWindow.webview.initialize();
     }, false);
 }

@@ -1,25 +1,25 @@
-import { Configuration, CacheMode } from 'Models/Configuration';
+import { Configuration } from 'Models/Configuration';
 
 export class AbTestHelper {
 
-    public static isCacheModeAbTestActive(abGroup: number): boolean {
-        if (abGroup === this._cacheModeAllowedAbGroup || abGroup === this._cacheModeForcedAbGroup) {
+    public static isReverseProxyTestActive(abGroup: number, configuration: Configuration): boolean {
+        if ((abGroup === this._proxyAbGroup16 || abGroup === this._proxyAbGroup17)
+                && configuration.getCountry().match(/^CN/)) {
             return true;
         }
         return false;
     }
 
-    public static getCacheMode(abGroup: number, configuration: Configuration): CacheMode {
-        if (abGroup === this._cacheModeForcedAbGroup) {
-            return CacheMode.FORCED;
-        } else if (abGroup === this._cacheModeAllowedAbGroup) {
-            return CacheMode.ALLOWED;
+    public static getReverseProxyBaseUrl(abGroup: number, configuration: Configuration): string {
+        if ((abGroup === this._proxyAbGroup16 || abGroup === this._proxyAbGroup17)
+                && configuration.getCountry().match(/^CN/)) {
+            return 'https://delivery-china.unityads.unity3d.com';
         } else {
-            return configuration.getCacheMode();
+            return 'https://adserver.unityads.unity3d.com';
         }
     }
 
-    private static _cacheModeForcedAbGroup: number = 12;
-    private static _cacheModeAllowedAbGroup: number = 13;
+    private static _proxyAbGroup16 = 16;
+    private static _proxyAbGroup17 = 17;
 
 }

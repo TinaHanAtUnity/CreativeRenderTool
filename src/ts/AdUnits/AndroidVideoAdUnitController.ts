@@ -43,7 +43,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
         this.onVideoStart.trigger();
         this.setVideoActive(true);
 
-        let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
+        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
         if(!this._placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }

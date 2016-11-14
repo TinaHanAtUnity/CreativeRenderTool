@@ -5,7 +5,7 @@ let getPaths = (root) => {
     let paths = [];
     fs.readdirSync(root).forEach((file) => {
         let fullPath = path.join(root, file);
-        if (fs.statSync(fullPath).isDirectory()) {
+        if (fs.statSync(fullPath).isDirectory() && fullPath.indexOf('Test/Integration') === -1) {
             paths = paths.concat(getPaths(fullPath));
         } else if(fullPath.indexOf('Test.ts') !== -1) {
             paths.push(fullPath.replace('src/ts/', '').replace('.ts', ''));
