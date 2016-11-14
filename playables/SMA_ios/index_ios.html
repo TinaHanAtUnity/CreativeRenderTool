@@ -15,6 +15,11 @@
                 }
             }
         }, false);
+        document.addEventListener('click', function(event) {
+            if(event && event.target && event.target.href && event.target.href.match(/kochava/)) {
+                window.parent.postMessage('playable_click', '*');
+            }
+        }, false);
 	</script>
 </head>
 <body>		

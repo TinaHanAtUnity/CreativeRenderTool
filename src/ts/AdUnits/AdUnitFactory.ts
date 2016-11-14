@@ -92,6 +92,7 @@ export class AdUnitFactory {
 
         thirdParty.render();
         document.body.appendChild(thirdParty.container());
+        thirdParty.onClick.subscribe(() => sessionManager.sendClick(thirdPartyAdUnit));
         thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
 
         return thirdPartyAdUnit;

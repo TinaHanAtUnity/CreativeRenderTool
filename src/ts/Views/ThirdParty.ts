@@ -9,6 +9,7 @@ import { Placement } from 'Models/Placement';
 
 export class ThirdParty extends View {
 
+    public onClick: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
     private _placement: Placement;
@@ -54,10 +55,14 @@ export class ThirdParty extends View {
 
         window.addEventListener('message', (event: MessageEvent) => {
             if(event.data) {
-                this._nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': event.data
-                });
+                if(event.data === 'playable_click') {
+                    this.onClick.trigger();
+                } else {
+                    this._nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': event.data
+                    });
+                }
             }
         }, false);
 

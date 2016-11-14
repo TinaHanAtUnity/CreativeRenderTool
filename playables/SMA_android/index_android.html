@@ -15,6 +15,7 @@
                 }, false);
                 xhr.open('GET', event.target.href);
                 xhr.send();
+                window.parent.postMessage('playable_click', '*');
             }
         }, false);
 	</script>
