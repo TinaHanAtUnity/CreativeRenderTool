@@ -20,6 +20,8 @@ export class Tap {
     }
 
     private onTouchStart(event: TouchEvent) {
+        event.preventDefault();
+
         this._onTouchMoveListener = (touchEvent) => this.onTouchMove(touchEvent);
         this._onTouchEndListener = (touchEvent) => this.onTouchEnd(touchEvent);
         this._onTouchCancelListener = (touchEvent) => this.onTouchCancel(touchEvent);
