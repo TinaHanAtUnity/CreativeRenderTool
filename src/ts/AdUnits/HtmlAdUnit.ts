@@ -12,9 +12,11 @@ import { FinishState } from 'Constants/FinishState';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { IObserver2 } from 'Utilities/IObserver';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
+    private _sessionManager: SessionManager;
     private _thirdParty: ThirdParty;
     private _isShowing: boolean;
     private _options: any;
@@ -24,8 +26,9 @@ export class HtmlAdUnit extends AbstractAdUnit {
     private _onPauseObserver: IObserver2<boolean, number>;
     private _onDestroyObserver: IObserver2<boolean, number>;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
+    constructor(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
         super(nativeBridge, placement, campaign);
+        this._sessionManager = sessionManager;
         this._thirdParty = thirdParty;
         this._isShowing = false;
         this._options = options;
@@ -37,6 +40,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._thirdParty.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._sessionManager.sendStart(this);
         const platform = this._nativeBridge.getPlatform();
         if(platform === Platform.ANDROID) {
             let orientation: ScreenOrientation = this._options.requestedOrientation;
@@ -82,6 +86,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._thirdParty.container().parentElement.removeChild(this._thirdParty.container());
         this.unsetReferences();
 
+        this._sessionManager.sendView(this);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this._finishState);
 
         const platform = this._nativeBridge.getPlatform();
