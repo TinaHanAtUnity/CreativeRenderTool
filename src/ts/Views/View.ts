@@ -30,7 +30,7 @@ export class View {
     public render(): void {
         this._container = document.createElement('div');
         this._container.id = this._id;
-        this._container.innerHTML = this._template.render(this._templateData);
+        this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
         const attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
 

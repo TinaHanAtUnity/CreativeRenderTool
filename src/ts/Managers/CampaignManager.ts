@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
 
 export class CampaignManager {
 
@@ -28,6 +29,7 @@ export class CampaignManager {
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
+    public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
@@ -60,8 +62,36 @@ export class CampaignManager {
                 }
                 if (campaignJson.campaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, typeof CampaignManager.AbGroup === 'number' ? CampaignManager.AbGroup : campaignJson.abGroup);
-                    this.onCampaign.trigger(campaign);
+                    const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
+                    let resource: string | undefined;
+                    switch(campaign.getGameId()) {
+                        case 11326: // Game of War iOS
+                            resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
+                            break;
+
+                        case 13480: // Game of War Android
+                            resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
+                            break;
+
+                        case 53872: // Mobile Strike iOS
+                            resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+                            break;
+
+                        case 52447: // Mobile Strike Android
+                            resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    const abGroup = campaign.getAbGroup();
+                    if(resource && (abGroup === 10 || abGroup === 11)) {
+                        const htmlCampaign = new HtmlCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, resource);
+                        this.onThirdPartyCampaign.trigger(htmlCampaign);
+                    } else {
+                        this.onCampaign.trigger(campaign);
+                    }
                 } else if('vast' in campaignJson) {
                     if (campaignJson.vast === null) {
                         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');

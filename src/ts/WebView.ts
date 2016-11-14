@@ -24,6 +24,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { EndScreen } from 'Views/EndScreen';
@@ -126,10 +127,11 @@ export class WebView {
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
-            this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
-            this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
+            this._campaignManager.onCampaign.subscribe(campaign => this.onCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe(campaign => this.onVastCampaign(campaign));
+            this._campaignManager.onThirdPartyCampaign.subscribe(campaign => this.onThirdPartyCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill(retryLimit));
+            this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
             this._refillTimestamp = 0;
             this._campaignTimeout = 0;
             return this._campaignManager.request();
@@ -400,6 +402,77 @@ export class WebView {
                 });
             }).catch(error => {
                 this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+            });
+        };
+
+        const sendReady = () => {
+            this.setPlacementStates(PlacementState.READY);
+        };
+
+        if(cacheMode === CacheMode.FORCED) {
+            cacheAssets().then(() => {
+                if(this._showing) {
+                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            });
+        } else if(cacheMode === CacheMode.ALLOWED) {
+            if(this._showing) {
+                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    cacheAssets();
+                    sendReady();
+                });
+            } else {
+                cacheAssets();
+                sendReady();
+            }
+        } else {
+            if(this._showing) {
+                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    sendReady();
+                });
+            } else {
+                sendReady();
+            }
+        }
+    }
+
+    private onThirdPartyCampaign(campaign: HtmlCampaign): void {
+        this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
+
+        const cacheMode = this._configuration.getCacheMode();
+
+        const cacheAsset = (url: string) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
+                if(status === CacheStatus.OK) {
+                    return this._cacheManager.getFileUrl(fileId);
+                }
+                throw status;
+            }).catch(error => {
+                if(error !== CacheStatus.STOPPED) {
+                    return url;
+                }
+                throw error;
+            });
+        };
+
+        const cacheAssets = () => {
+            const resourceUrl = campaign.getResourceUrl();
+            return cacheAsset(resourceUrl).then(fileUrl => {
+                campaign.setResourceUrl(fileUrl);
+                campaign.setVideoCached(true);
+            }).catch(error => {
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                }
             });
         };
 
