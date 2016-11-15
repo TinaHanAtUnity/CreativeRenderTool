@@ -57,7 +57,11 @@ export class HtmlAdUnit extends AbstractAdUnit {
             this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
 
             this._activityId = AndroidVideoAdUnitController.ActivityId++;
-            return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+            return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel).then(() => {
+                if(AbstractAdUnit.getAutoClose()) {
+                    this.hide();
+                }
+            });
         } else if(platform === Platform.IOS) {
             let orientation: UIInterfaceOrientationMask = this._options.supportedOrientations;
             if(!this._placement.useDeviceOrientationForVideo()) {
@@ -72,7 +76,11 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
             this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
 
-            return this._nativeBridge.IosAdUnit.open(['webview'], orientation, true, true);
+            return this._nativeBridge.IosAdUnit.open(['webview'], orientation, true, true).then(() => {
+                if(AbstractAdUnit.getAutoClose()) {
+                    this.hide();
+                }
+            });
         }
 
         return Promise.resolve(void(0));
