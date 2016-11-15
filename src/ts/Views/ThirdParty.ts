@@ -67,10 +67,12 @@ export class ThirdParty extends View {
         }, false);
 
         window.addEventListener('resize', (event: Event) => {
-            iframe.contentWindow.postMessage({
-                innerWidth: window.innerWidth,
-                innerHeight: window.innerHeight
-            }, '*');
+            if(iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight
+                }, '*');
+            }
         }, false);
     }
 
