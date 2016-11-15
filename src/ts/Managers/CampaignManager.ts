@@ -61,7 +61,7 @@ export class CampaignManager {
                     this.storeGamerId(campaignJson.gamerId);
                 }
                 if (campaignJson.campaign) {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + campaignJson.abGroup);
                     const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     let resource: string | undefined;
                     switch(campaign.getGameId()) {
@@ -98,7 +98,7 @@ export class CampaignManager {
                         this.onNoFill.trigger(3600);
                         return;
                     }
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + campaignJson.abGroup);
                     const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
                     return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
                         let campaignId: string;
