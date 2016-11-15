@@ -7,7 +7,7 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
-import { AbstractAdUnit } from '../AdUnits/AbstractAdUnit';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class EndScreen extends View {
 
