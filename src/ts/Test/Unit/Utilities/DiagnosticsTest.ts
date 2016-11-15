@@ -9,6 +9,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { Configuration } from 'Models/Configuration';
+import ConfigurationJson from 'json/Configuration.json';
 
 describe('DiagnosticsTest', () => {
     const handleInvocation = sinon.spy();
@@ -49,11 +51,13 @@ describe('DiagnosticsTest', () => {
             null
         ]);
 
+        const configuration = new Configuration(JSON.parse(ConfigurationJson));
         const mockRequest = sinon.mock(request);
-        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+        mockRequest.expects('post').withArgs('https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":{}, "country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
         HttpKafka.setRequest(request);
         HttpKafka.setDeviceInfo(deviceInfo);
         HttpKafka.setClientInfo(clientInfo);
+        HttpKafka.setConfiguration(configuration);
         Diagnostics.trigger({'test': true}).then(value => {
             mockRequest.verify();
         });
