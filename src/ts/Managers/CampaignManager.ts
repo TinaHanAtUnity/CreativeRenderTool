@@ -50,6 +50,7 @@ export class CampaignManager {
     public request(): Promise<void> {
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            this._nativeBridge.Sdk.logInfo('AB Group ' + CampaignManager.AbGroup);
             return this._request.post(requestUrl, requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
