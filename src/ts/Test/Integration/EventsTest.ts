@@ -7,8 +7,8 @@ import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { EndScreen } from 'Views/EndScreen';
 import { Request } from 'Native/Backend/Api/Request';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 describe('EventsTest', () => {
 
@@ -82,7 +82,7 @@ describe('EventsTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setRingerMode(0);
 
-        EndScreen.setAutoClose(true);
+        AbstractAdUnit.setAutoClose(true);
 
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
     });
@@ -143,7 +143,7 @@ describe('EventsTest', () => {
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
 
-        EndScreen.setAutoClose(true);
+        AbstractAdUnit.setAutoClose(true);
 
         UnityAds.initialize(Platform.IOS, '14850', listener, true);
     });

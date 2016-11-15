@@ -5,6 +5,16 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export abstract class AbstractAdUnit {
 
+    public static setAutoClose(value: boolean) {
+        AbstractAdUnit._autoClose = value;
+    }
+
+    public static getAutoClose() {
+        return AbstractAdUnit._autoClose;
+    }
+
+    private static _autoClose = false;
+
     public onStart: Observable0 = new Observable0();
     public onFinish: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();

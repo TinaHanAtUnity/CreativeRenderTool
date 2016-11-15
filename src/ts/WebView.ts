@@ -27,7 +27,6 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
-import { EndScreen } from 'Views/EndScreen';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
@@ -707,7 +706,7 @@ export class WebView {
 
         metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
             if(found && autoClose) {
-                EndScreen.setAutoClose(autoClose);
+                AbstractAdUnit.setAutoClose(autoClose);
             }
         });
     }
