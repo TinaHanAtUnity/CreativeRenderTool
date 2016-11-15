@@ -50,7 +50,6 @@ export class CampaignManager {
     public request(): Promise<void> {
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-            this._nativeBridge.Sdk.logInfo('AB Group ' + CampaignManager.AbGroup);
             return this._request.post(requestUrl, requestBody, [], {
                 retries: 5,
                 retryDelay: 5000,
@@ -62,7 +61,7 @@ export class CampaignManager {
                     this.storeGamerId(campaignJson.gamerId);
                 }
                 if (campaignJson.campaign) {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
+                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + campaignJson.abGroup);
                     const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
                     let resource: string | undefined;
                     switch(campaign.getGameId()) {
