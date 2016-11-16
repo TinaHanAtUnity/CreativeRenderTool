@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import {Request, INativeResponse} from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { ClientInfo } from 'Models/ClientInfo';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -9,8 +9,9 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
-import ConfigurationJson from 'json/Configuration.json';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+
+import ConfigurationJson from 'json/Configuration.json';
 
 describe('DiagnosticsTest', () => {
     const handleInvocation = sinon.spy();
