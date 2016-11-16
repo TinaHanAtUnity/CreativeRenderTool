@@ -557,7 +557,7 @@ export class WebView {
     }
 
     private onNewAdRequestAllowed(): void {
-        if(this._mustRefill) {
+        if(this._mustRefill && !this._mustReinitialize) {
             this._mustRefill = false;
             this._campaignManager.request();
         }
