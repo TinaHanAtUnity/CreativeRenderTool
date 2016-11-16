@@ -36,6 +36,7 @@ import NoImpressionVastJson from 'json/NoImpressionVast.json';
 import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
+import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -560,4 +561,53 @@ describe('CampaignManager', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
     });
 
+    it('should process custom tracking urls', () => {
+
+        // given a valid VAST placement
+        const mockRequest = sinon.mock(request);
+        mockRequest.expects('post').returns(Promise.resolve({
+            response: CustomTrackingVastJson
+        }));
+
+        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        let triggeredCampaign: VastCampaign;
+        let triggeredError: any;
+        campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
+            triggeredCampaign = campaign;
+        });
+        campaignManager.onError.subscribe(error => {
+            triggeredError = error;
+        });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request().then(() => {
+            if(triggeredError) {
+                throw triggeredError;
+            }
+
+            // then the onVastCampaign observable is triggered with the correct campaign data
+            mockRequest.verify();
+            assert.equal(triggeredCampaign.getAbGroup(), 3);
+            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+            assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                'http://customTrackingUrl/start',
+                'http://customTrackingUrl/start2',
+                'http://customTrackingUrl/start3'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                'http://customTrackingUrl/firstQuartile'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                'http://customTrackingUrl/midpoint'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                'http://customTrackingUrl/thirdQuartile'
+            ]);
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                'http://customTrackingUrl/complete'
+            ]);
+        });
+    });
 });
