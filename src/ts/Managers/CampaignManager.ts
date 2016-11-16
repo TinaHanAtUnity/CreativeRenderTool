@@ -86,7 +86,7 @@ export class CampaignManager {
                     }
 
                     const abGroup = campaign.getAbGroup();
-                    if(resource && (abGroup === 10 || abGroup === 11)) {
+                    if(resource && (abGroup === 10 || abGroup === 11 || abGroup === 12 || abGroup === 13)) {
                         const htmlCampaign = new HtmlCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, resource);
                         this.onThirdPartyCampaign.trigger(htmlCampaign);
                     } else {
