@@ -11,7 +11,8 @@ export class WakeUpManager {
     public onAppForeground: Observable0 = new Observable0();
 
     private _nativeBridge: NativeBridge;
-    private _lastConnected: number;
+    private _firstConnection: number;
+    private _connectionEvents: number;
 
     private _screenListener: string = 'screenListener';
     private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
@@ -19,7 +20,8 @@ export class WakeUpManager {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._lastConnected = Date.now();
+        this._firstConnection = Date.now();
+        this._connectionEvents = 0;
         this._nativeBridge.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
         this._nativeBridge.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
         this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
@@ -46,11 +48,20 @@ export class WakeUpManager {
     }
 
     private onConnected(wifi: boolean, networkType: number) {
-        const fifteenMinutes: number = 15 * 60 * 1000;
+        const thirtyMinutes: number = 30 * 60 * 1000;
 
-        if(this._lastConnected + fifteenMinutes < Date.now()) {
-            this._lastConnected = Date.now();
+        if(this._firstConnection + thirtyMinutes < Date.now()) {
+            this._firstConnection = Date.now();
+            this._connectionEvents = 0;
             this.onNetworkConnected.trigger();
+        } else {
+            this._connectionEvents++;
+            // allow max 10 connection events in 30 minutes
+            if(this._connectionEvents < 10) {
+                this.onNetworkConnected.trigger();
+            } else if(this._connectionEvents === 10) {
+                this._nativeBridge.Sdk.logWarning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
+            }
         }
     }
 
