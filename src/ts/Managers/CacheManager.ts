@@ -30,6 +30,7 @@ interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
     retryCount: number;
+    networkRetryCount: number;
     resolve: Function;
     reject: Function;
     options: ICacheOptions;
@@ -225,6 +226,7 @@ export class CacheManager {
                 fileId: fileId,
                 networkRetry: false,
                 retryCount: 0,
+                networkRetryCount: 0,
                 resolve: resolve,
                 reject: reject,
                 options: options
@@ -326,6 +328,11 @@ export class CacheManager {
     private handleRetry(callback: ICallbackObject, url: string, error: string): void {
         if(callback.retryCount < callback.options.retries) {
             callback.retryCount++;
+            setTimeout(() => {
+                this.downloadFile(url, callback.fileId);
+            }, 5000);
+        } else if(callback.networkRetryCount < callback.options.retries) { // todo: network retry should have a different limit
+            callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
             callback.reject(CacheStatus.FAILED);
