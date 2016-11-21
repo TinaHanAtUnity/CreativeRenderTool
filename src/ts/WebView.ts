@@ -381,8 +381,7 @@ export class WebView {
             });
         };
 
-        const cacheAssets = () => {
-            const videoUrl = campaign.getVideoUrl();
+        const getVideoUrl = (videoUrl: string) => {
             // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
             // todo: remove this when CacheManager is refactored to support redirects
             return this._request.head(videoUrl, [], {
@@ -391,17 +390,21 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                const locationUrl = response.url || videoUrl;
-                return cacheAsset(locationUrl).then(fileUrl => {
-                    campaign.setVideoUrl(fileUrl);
-                    campaign.setVideoCached(true);
-                }).catch(error => {
-                    if(error === CacheStatus.STOPPED) {
-                        this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
-                    }
-                });
+                if(response.url) {
+                    return response.url;
+                }
+                throw new Error('Missing VAST video url after redirects');
+            });
+        };
+
+        const cacheAssets = (videoUrl: string) => {
+            return cacheAsset(videoUrl).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
             }).catch(error => {
-                this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                }
             });
         };
 
@@ -409,8 +412,30 @@ export class WebView {
             this.setPlacementStates(PlacementState.READY);
         };
 
-        if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
+        getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
+            if(cacheMode === CacheMode.FORCED) {
+                cacheAssets(videoUrl).then(() => {
+                    if(this._showing) {
+                        const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                            this._adUnit.onClose.unsubscribe(onCloseObserver);
+                            sendReady();
+                        });
+                    } else {
+                        sendReady();
+                    }
+                });
+            } else if(cacheMode === CacheMode.ALLOWED) {
+                if(this._showing) {
+                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        cacheAssets(videoUrl);
+                        sendReady();
+                    });
+                } else {
+                    cacheAssets(videoUrl);
+                    sendReady();
+                }
+            } else {
                 if(this._showing) {
                     const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
@@ -419,28 +444,11 @@ export class WebView {
                 } else {
                     sendReady();
                 }
-            });
-        } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
-                    sendReady();
-                });
-            } else {
-                cacheAssets();
-                sendReady();
             }
-        } else {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        }
+        }).catch((error) => {
+            this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+            this.onNoFill(3600);
+        });
     }
 
     private onThirdPartyCampaign(campaign: HtmlCampaign): void {
