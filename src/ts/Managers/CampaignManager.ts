@@ -68,7 +68,7 @@ export class CampaignManager {
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
         }
-        if ('campaign' in json) {
+        if('campaign' in json) {
             this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
             this.parseVastCampaign(json);
@@ -113,7 +113,7 @@ export class CampaignManager {
     }
 
     private parseVastCampaign(json: any) {
-        if (json.vast === null) {
+        if(json.vast === null) {
             this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
             this.onNoFill.trigger(3600);
             return;
@@ -130,18 +130,26 @@ export class CampaignManager {
                 campaignId = 'UNKNOWN';
             }
             const campaign = new VastCampaign(vast, campaignId, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.cacheTTL, json.vast.tracking);
-            if (campaign.getVast().getImpressionUrls().length === 0) {
+            if(campaign.getVast().getImpressionUrls().length === 0) {
                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                 return;
             }
             // todo throw an Error if required events are missing. (what are the required events?)
-            if (campaign.getVast().getErrorURLTemplates().length === 0) {
+            if(campaign.getVast().getErrorURLTemplates().length === 0) {
                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
             }
-            if (!campaign.getVideoUrl()) {
+            if(!campaign.getVideoUrl()) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign does not have a video url'),
-                    { rootWrapperVast: json.vast }
+                    {rootWrapperVast: json.vast}
+                );
+                this.onError.trigger(videoUrlError);
+                return;
+            }
+            if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideoUrl().match(/^https:\/\//)) {
+                const videoUrlError = new DiagnosticError(
+                    new Error('Campaign video url needs to be https for iOS'),
+                    {rootWrapperVast: json.vast}
                 );
                 this.onError.trigger(videoUrlError);
                 return;
