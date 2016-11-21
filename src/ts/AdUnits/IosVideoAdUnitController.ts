@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -24,12 +25,14 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
 
+    private _deviceInfo: DeviceInfo;
     private _iosOptions: IIosOptions;
     private _fakeLandscape: boolean;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
+        this._deviceInfo = deviceInfo;
         this._iosOptions = options;
         this._onViewControllerInitObserver = this._nativeBridge.IosAdUnit.onViewControllerInit.subscribe(() => this.onViewControllerInit());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -97,6 +100,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
         if(this._showing && this._fakeLandscape) {
             // fake landscape from portrait by transforming view by 90 degrees (half pi in radians)
             this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679));
+            this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(this._deviceInfo.getScreenWidth()), new Double(this._deviceInfo.getScreenHeight()));
         }
     }
 

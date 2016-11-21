@@ -59,7 +59,8 @@ export class Placement {
     }
 
     public useDeviceOrientationForVideo(): boolean {
-        return this._useDeviceOrientationForVideo;
+        return false;
+        // return this._useDeviceOrientationForVideo;
     }
 
     public muteVideo(): boolean {
