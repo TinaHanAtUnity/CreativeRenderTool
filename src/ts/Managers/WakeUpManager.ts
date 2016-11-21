@@ -57,9 +57,9 @@ export class WakeUpManager {
         } else {
             this._connectionEvents++;
             // allow max 10 connection events in 30 minutes
-            if(this._connectionEvents < 10) {
+            if(this._connectionEvents <= 10) {
                 this.onNetworkConnected.trigger();
-            } else if(this._connectionEvents === 10) {
+            } else if(this._connectionEvents === 11) {
                 this._nativeBridge.Sdk.logWarning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
             }
         }
