@@ -45,7 +45,7 @@ export class AdUnitFactory {
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         const metaData = new MetaData(nativeBridge);
 
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
@@ -67,7 +67,7 @@ export class AdUnitFactory {
     private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         const metaData = new MetaData(nativeBridge);
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
 
         const vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
@@ -125,11 +125,11 @@ export class AdUnitFactory {
 
     };
 
-    private static createVideoAdUnitController(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             return new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
         } else {
-            return new IosVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
+            return new IosVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
         }
     }
 
