@@ -7,11 +7,12 @@ export class VastCampaign extends Campaign {
     private _campaignId: string;
     private _vast: Vast;
 
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number) {
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
         super({}, gamerId, abGroup);
         this._campaignId = campaignId;
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
+        this.processCustomTracking(tracking);
     }
 
     public getId(): string {
@@ -35,4 +36,18 @@ export class VastCampaign extends Campaign {
         return this._cacheTTL;
     }
 
+    private processCustomTracking(tracking: any) {
+        if (tracking) {
+            for (const trackingEventName in tracking) {
+                if (tracking.hasOwnProperty(trackingEventName)) {
+                    const urls = tracking[trackingEventName];
+                    if (urls) {
+                        urls.forEach((url: string) => {
+                            this._vast.addTrackingEventUrl(trackingEventName, url);
+                        });
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { INativeResponse, Request } from 'Utilities/Request';
+import { Configuration } from 'Models/Configuration';
 
 export class HttpKafka {
     public static setRequest(request: Request) {
@@ -15,6 +16,10 @@ export class HttpKafka {
         HttpKafka._deviceInfo = deviceInfo;
     }
 
+    public static setConfiguration(configuration?: Configuration) {
+        HttpKafka._configuration = configuration;
+    }
+
     public static sendEvent(type: string, data: any): Promise<INativeResponse> {
         const messages: any[] = [];
         messages.push({
@@ -22,7 +27,7 @@ export class HttpKafka {
             'msg': data
         });
 
-        return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo).then(commonObject => {
+        return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
             messages.unshift(commonObject);
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
@@ -38,12 +43,14 @@ export class HttpKafka {
     private static _request: Request;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
+    private static _configuration: Configuration | undefined;
 
-    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): Promise<any> {
+    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
         const common: any = {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
                 'device': null,
+                'country': configuration ? configuration.getCountry() : null,
             }
         };
 

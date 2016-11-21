@@ -16,7 +16,7 @@ interface IAndroidOptions {
 }
 
 export class AndroidVideoAdUnitController extends VideoAdUnitController {
-    private static _activityIdCounter: number = 1;
+    public static ActivityId: number = 1;
 
     private _activityId: number;
 
@@ -31,7 +31,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
 
         this._androidOptions = options;
 
-        this._activityId = AndroidVideoAdUnitController._activityIdCounter++;
+        this._activityId = AndroidVideoAdUnitController.ActivityId++;
 
         this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
         this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
@@ -43,7 +43,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
         this.onVideoStart.trigger();
         this.setVideoActive(true);
 
-        let orientation: ScreenOrientation = this._androidOptions.requestedOrientation;
+        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
         if(!this._placement.useDeviceOrientationForVideo()) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }

@@ -7,6 +7,7 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class EndScreen extends View {
 
@@ -35,9 +36,6 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
                 'endscreenAlt': (() => {
-                    if(campaign.getAbGroup() !== 0) {
-                        return 'halloween';
-                    }
                     return undefined;
                 })()
             };
@@ -73,6 +71,10 @@ export class EndScreen extends View {
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
+
+        if(AbstractAdUnit.getAutoClose()) {
+            this.onClose.trigger();
+        }
     }
 
     public hide(): void {

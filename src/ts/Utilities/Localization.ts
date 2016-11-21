@@ -43,7 +43,7 @@ interface ILanguageMap {
 
 export class Localization {
 
-    public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
+    public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
         const languageMap = Localization._languageMap[language];
         if(languageMap) {
             return languageMap[namespace];
