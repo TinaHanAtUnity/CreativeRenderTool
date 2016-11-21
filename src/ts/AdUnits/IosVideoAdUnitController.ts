@@ -20,20 +20,24 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
 
+    private _onViewControllerInitObserver: any;
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
 
     private _iosOptions: IIosOptions;
+    private _fakeLandscape: boolean;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._iosOptions = options;
+        this._onViewControllerInitObserver = this._nativeBridge.IosAdUnit.onViewControllerInit.subscribe(() => this.onViewControllerInit());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
 
     public show(): Promise<void> {
         this._showing = true;
+        this._fakeLandscape = false;
         this.onVideoStart.trigger();
         this.setVideoActive(true);
 
@@ -45,6 +49,8 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
             } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+            } else {
+                this._fakeLandscape = true;
             }
         }
 
@@ -54,7 +60,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
 
         this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
 
-        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
+        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, this._fakeLandscape ? false : true);
     }
 
     public hide(): Promise<void> {
@@ -85,6 +91,13 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
         return this._nativeBridge.IosAdUnit.close().then(() => {
             this.onVideoClose.trigger();
         });
+    }
+
+    private onViewControllerInit(): void {
+        if(this._showing && this._fakeLandscape) {
+            // fake landscape from portrait by transforming view by 90 degrees (half pi in radians)
+            this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679));
+        }
     }
 
     private onViewDidAppear(): void {
