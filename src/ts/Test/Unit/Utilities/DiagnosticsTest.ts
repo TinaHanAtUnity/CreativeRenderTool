@@ -33,9 +33,9 @@ describe('DiagnosticsTest', () => {
         HttpKafka.setRequest(request);
 
         Diagnostics.trigger({'test': true});
-        resolvedPromise.then(() => {
+        return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
 
         });
     });

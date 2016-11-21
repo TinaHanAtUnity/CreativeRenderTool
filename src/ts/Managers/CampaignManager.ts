@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Request } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -55,87 +55,98 @@ export class CampaignManager {
                 retryDelay: 5000,
                 followRedirects: false,
                 retryWithConnectionEvents: true
-            }).then(response => {
-                const campaignJson: any = JsonParser.parse(response.response);
-                if(campaignJson.gamerId) {
-                    this.storeGamerId(campaignJson.gamerId);
-                }
-                if (campaignJson.campaign) {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + campaignJson.abGroup);
-                    const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup);
-                    let resource: string | undefined;
-                    switch(campaign.getGameId()) {
-                        case 11326: // Game of War iOS
-                            resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
-                            break;
-
-                        case 13480: // Game of War Android
-                            resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
-                            break;
-
-                        case 53872: // Mobile Strike iOS
-                            resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
-                            break;
-
-                        case 52447: // Mobile Strike Android
-                            resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    const abGroup = campaign.getAbGroup();
-                    if(resource && (abGroup === 10 || abGroup === 11 || abGroup === 12 || abGroup === 13)) {
-                        const htmlCampaign = new HtmlCampaign(campaignJson.campaign, campaignJson.gamerId, campaignJson.abGroup, resource);
-                        this.onThirdPartyCampaign.trigger(htmlCampaign);
-                    } else {
-                        this.onCampaign.trigger(campaign);
-                    }
-                } else if('vast' in campaignJson) {
-                    if (campaignJson.vast === null) {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                        this.onNoFill.trigger(3600);
-                        return;
-                    }
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + campaignJson.abGroup);
-                    const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
-                    return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-                        let campaignId: string;
-                        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                            campaignId = '00005472656d6f7220694f53';
-                        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                            campaignId = '005472656d6f7220416e6472';
-                        } else {
-                            campaignId = 'UNKNOWN';
-                        }
-                        const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL, campaignJson.vast.tracking);
-                        if (campaign.getVast().getImpressionUrls().length === 0) {
-                            this.onError.trigger(new Error('Campaign does not have an impression url'));
-                            return;
-                        }
-                        // todo throw an Error if required events are missing. (what are the required events?)
-                        if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                            this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-                        }
-                        if (!campaign.getVideoUrl()) {
-                            const videoUrlError = new DiagnosticError(
-                                new Error('Campaign does not have a video url'),
-                                { rootWrapperVast: campaignJson.vast }
-                            );
-                            this.onError.trigger(videoUrlError);
-                            return;
-                        }
-                        this.onVastCampaign.trigger(campaign);
-                    }).catch((error) => {
-                        this.onError.trigger(error);
-                    });
-                } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                    this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
-                }
-                return;
             });
+        }).then(response => {
+            return this.parseCampaign(response);
+        }).catch((error) => {
+            this.onError.trigger(error);
+        });
+    }
+
+    private parseCampaign(response: INativeResponse) {
+        const json: any = JsonParser.parse(response.response);
+        if(json.gamerId) {
+            this.storeGamerId(json.gamerId);
+        }
+        if ('campaign' in json) {
+            this.parsePerformanceCampaign(json);
+        } else if('vast' in json) {
+            this.parseVastCampaign(json);
+        } else {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
+            this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
+        }
+    }
+
+    private parsePerformanceCampaign(json: any) {
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+        const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+        let resource: string | undefined;
+        switch(campaign.getGameId()) {
+            case 11326: // Game of War iOS
+                resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
+                break;
+
+            case 13480: // Game of War Android
+                resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
+                break;
+
+            case 53872: // Mobile Strike iOS
+                resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+                break;
+
+            case 52447: // Mobile Strike Android
+                resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
+                break;
+
+            default:
+                break;
+        }
+
+        const abGroup = campaign.getAbGroup();
+        if(resource && (abGroup === 10 || abGroup === 11 || abGroup === 12 || abGroup === 13)) {
+            const htmlCampaign = new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
+            this.onThirdPartyCampaign.trigger(htmlCampaign);
+        } else {
+            this.onCampaign.trigger(campaign);
+        }
+    }
+
+    private parseVastCampaign(json: any) {
+        if (json.vast === null) {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
+            this.onNoFill.trigger(3600);
+            return;
+        }
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
+        const decodedVast = decodeURIComponent(json.vast.data).trim();
+        return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
+            let campaignId: string;
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                campaignId = '00005472656d6f7220694f53';
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                campaignId = '005472656d6f7220416e6472';
+            } else {
+                campaignId = 'UNKNOWN';
+            }
+            const campaign = new VastCampaign(vast, campaignId, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.cacheTTL, json.vast.tracking);
+            if (campaign.getVast().getImpressionUrls().length === 0) {
+                this.onError.trigger(new Error('Campaign does not have an impression url'));
+                return;
+            }
+            // todo throw an Error if required events are missing. (what are the required events?)
+            if (campaign.getVast().getErrorURLTemplates().length === 0) {
+                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+            }
+            if (!campaign.getVideoUrl()) {
+                const videoUrlError = new DiagnosticError(
+                    new Error('Campaign does not have a video url'),
+                    { rootWrapperVast: json.vast }
+                );
+                this.onError.trigger(videoUrlError);
+                return;
+            }
+            this.onVastCampaign.trigger(campaign);
         }).catch((error) => {
             this.onError.trigger(error);
         });
