@@ -74,6 +74,14 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<KeyCode[]>(this._apiClass, 'setKeyEventList', [keyEventList]);
     }
 
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+    }
+
+    public getViewFrame(view: string): Promise<number[]> {
+        return this._nativeBridge.invoke<number[]>(this._apiClass, 'getViewFrame', [view]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
