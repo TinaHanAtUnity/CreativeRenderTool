@@ -390,10 +390,10 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                if(response.url) {
+                if(response.url && response.url.match(/^https:\/\//)) {
                     return response.url;
                 }
-                throw new Error('Missing VAST video url after redirects');
+                throw new Error('Invalid VAST video url after redirects');
             });
         };
 
