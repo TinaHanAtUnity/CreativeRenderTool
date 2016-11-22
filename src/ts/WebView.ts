@@ -30,7 +30,6 @@ import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class WebView {
 
@@ -272,12 +271,6 @@ export class WebView {
      */
 
     private onCampaign(campaign: Campaign): void {
-        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
-            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
-                campaign.getAbGroup(), this._configuration);
-            SessionManager.setProxyUrl(reverseProxyBaseUrl);
-        }
-
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
@@ -355,12 +348,6 @@ export class WebView {
     }
 
     private onVastCampaign(campaign: Campaign): void {
-        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
-            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
-                campaign.getAbGroup(), this._configuration);
-            SessionManager.setProxyUrl(reverseProxyBaseUrl);
-        }
-
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());

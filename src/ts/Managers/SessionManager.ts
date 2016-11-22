@@ -77,11 +77,6 @@ export class SessionManager {
         SessionManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
     }
 
-    public static setProxyUrl(proxyUrl: string): void {
-        SessionManager.VideoEventBaseUrl = proxyUrl + '/mobile/gamers';
-        SessionManager.ClickEventBaseUrl = proxyUrl + '/mobile/campaigns';
-    }
-
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
