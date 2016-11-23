@@ -217,7 +217,7 @@ export class CacheManager {
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
-                        this.handleRetry(callback, url, false, CacheError[CacheError.NO_INTERNET]);
+                        this.handleRetry(callback, url, CacheError[CacheError.NO_INTERNET]);
                         return;
 
                     default:
@@ -321,7 +321,7 @@ export class CacheManager {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             const callback = this._callbacks[this._currentUrl];
             if(callback) {
-                this.handleRetry(callback, this._currentUrl, true, error);
+                this.handleRetry(callback, this._currentUrl, error);
                 return;
             }
         } else {
@@ -329,7 +329,7 @@ export class CacheManager {
             if(callback) {
                 switch (error) {
                     case CacheError[CacheError.FILE_IO_ERROR]:
-                        this.handleRetry(callback, url, true, error);
+                        this.handleRetry(callback, url, error);
                         return;
 
                     default:
@@ -341,8 +341,8 @@ export class CacheManager {
         }
     }
 
-    private handleRetry(callback: ICallbackObject, url: string, internet: boolean, error: string): void {
-        if(internet && callback.retryCount < callback.options.retries) {
+    private handleRetry(callback: ICallbackObject, url: string, error: string): void {
+        if(callback.retryCount < callback.options.retries) {
             callback.retryCount++;
             callback.networkRetry = true;
 
