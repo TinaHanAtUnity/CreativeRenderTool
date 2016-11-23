@@ -336,7 +336,6 @@ export class CacheManager {
                         callback.reject(CacheStatus.FAILED);
                         delete this._callbacks[url];
                         return;
-
                 }
             }
         }
