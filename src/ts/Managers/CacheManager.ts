@@ -5,6 +5,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { Platform } from 'Constants/Platform';
 
 export enum CacheStatus {
     OK,
@@ -48,6 +49,8 @@ export class CacheManager {
     private _wakeUpManager: WakeUpManager;
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
+
+    private _currentUrl: string;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
@@ -199,6 +202,7 @@ export class CacheManager {
     }
 
     private downloadFile(url: string, fileId: string): void {
+        this._currentUrl = url;
         this._nativeBridge.Cache.download(url, fileId).catch(error => {
             const callback = this._callbacks[url];
             if(callback) {
@@ -209,7 +213,7 @@ export class CacheManager {
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
-                        this.handleRetry(callback, url, CacheError[CacheError.NO_INTERNET]);
+                        this.handleRetry(callback, url, false, CacheError[CacheError.NO_INTERNET]);
                         return;
 
                     default:
@@ -310,28 +314,35 @@ export class CacheManager {
     }
 
     private onDownloadError(error: string, url: string, message: string): void {
-        const callback = this._callbacks[url];
-        if(callback) {
-            switch(error) {
-                case CacheError[CacheError.FILE_IO_ERROR]:
-                    this.handleRetry(callback, url, error);
-                    return;
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            const callback = this._callbacks[this._currentUrl];
+            if(callback) {
+                this.handleRetry(callback, this._currentUrl, true, error);
+                return;
+            }
+        } else {
+            const callback = this._callbacks[url];
+            if(callback) {
+                switch (error) {
+                    case CacheError[CacheError.FILE_IO_ERROR]:
+                        this.handleRetry(callback, url, true, error);
+                        return;
 
-                default:
-                    callback.reject(CacheStatus.FAILED);
-                    delete this._callbacks[url];
-                    return;
+                    default:
+                        callback.reject(CacheStatus.FAILED);
+                        delete this._callbacks[url];
+                        return;
+
+                }
             }
         }
     }
 
-    private handleRetry(callback: ICallbackObject, url: string, error: string): void {
-        if(callback.retryCount < callback.options.retries) {
+    private handleRetry(callback: ICallbackObject, url: string, internet: boolean, error: string): void {
+        if(internet && callback.retryCount < callback.options.retries) {
             callback.retryCount++;
-            setTimeout(() => {
-                this.downloadFile(url, callback.fileId);
-            }, 5000);
-        } else if(callback.networkRetryCount < callback.options.retries) { // todo: network retry should have a different limit
+            this.downloadFile(url, callback.fileId);
+        } else if(callback.networkRetryCount < callback.options.retries) {
             callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
