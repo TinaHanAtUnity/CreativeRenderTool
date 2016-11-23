@@ -449,8 +449,8 @@ export class WebView {
                     sendReady();
                 }
             }
-        }).catch((error) => {
-            this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+        }).catch(() => {
+            this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location');
             this.onNoFill(3600);
         });
     }
