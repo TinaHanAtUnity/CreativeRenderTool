@@ -344,7 +344,18 @@ export class CacheManager {
     private handleRetry(callback: ICallbackObject, url: string, internet: boolean, error: string): void {
         if(internet && callback.retryCount < callback.options.retries) {
             callback.retryCount++;
-            this.downloadFile(url, callback.fileId);
+            callback.networkRetry = true;
+
+            // note: this timeout may never trigger since timeouts are unreliable when ad unit is not active
+            // therefore this method should not assume any previous state and work the same way as system event handlers
+            // if this never triggers, retrying will still be triggered from connection events
+            setTimeout(() => {
+                const retryCallback = this._callbacks[url];
+                if(retryCallback && retryCallback.networkRetry) {
+                    retryCallback.networkRetry = false;
+                    this.downloadFile(url, retryCallback.fileId);
+                }
+            }, 10000);
         } else if(callback.networkRetryCount < callback.options.retries) {
             callback.networkRetryCount++;
             callback.networkRetry = true;
