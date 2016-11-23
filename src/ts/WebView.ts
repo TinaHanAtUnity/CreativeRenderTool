@@ -390,7 +390,10 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                if(response.url && response.url.match(/^https:\/\//)) {
+                if(response.url) {
+                    if(this._nativeBridge.getPlatform() === Platform.IOS && !response.url.match(/^https:\/\//)) {
+                        throw new Error('Non https VAST video url after redirects');
+                    }
                     return response.url;
                 }
                 throw new Error('Invalid VAST video url after redirects');
