@@ -453,7 +453,15 @@ export class WebView {
                 }
             }
         }).catch(() => {
-            this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location');
+            const message = 'Caching failed to get VAST video URL location';
+            const error = new DiagnosticError(new Error(message), {
+                url: campaign.getVideoUrl()
+            });
+            Diagnostics.trigger({
+                'type': 'cache_error',
+                'error': error
+            });
+            this._nativeBridge.Sdk.logError(message);
             this.onNoFill(3600);
         });
     }
