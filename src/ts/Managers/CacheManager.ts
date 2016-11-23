@@ -154,6 +154,10 @@ export class CacheManager {
             return Promise.resolve(this._fileIds[url]);
         }
 
+        if(url.indexOf('?') !== -1) {
+            url = url.split('?')[0];
+        }
+
         let extension: string;
         let urlFilename: string = url;
         const urlPaths = url.split('/');
