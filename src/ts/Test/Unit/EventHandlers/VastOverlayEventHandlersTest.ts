@@ -64,7 +64,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
         adUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
     });
@@ -111,7 +111,7 @@ describe('VastOverlayEventHandlersTest', () => {
         let videoAdUnitController: AndroidVideoAdUnitController;
 
         beforeEach(() => {
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{}, null);
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{}, null);
             vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');

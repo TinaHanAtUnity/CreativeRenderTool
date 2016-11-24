@@ -8,6 +8,7 @@ import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
+import { Platform } from 'Constants/Platform';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -28,7 +29,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 

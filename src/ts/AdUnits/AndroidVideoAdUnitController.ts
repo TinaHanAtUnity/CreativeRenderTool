@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -24,11 +25,13 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
 
+    private _deviceInfo: DeviceInfo;
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
+        this._deviceInfo = deviceInfo;
         this._androidOptions = options;
 
         this._activityId = AndroidVideoAdUnitController.ActivityId++;
@@ -53,10 +56,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
             keyEvents = [KeyCode.BACK];
         }
 
-        let hardwareAccel: boolean = true;
-        if(this._nativeBridge.getApiLevel() < 17) {
-            hardwareAccel = false;
-        }
+        const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
         this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled') + ', playing from ' + this.getVideoUrl());
 
@@ -121,5 +121,19 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+    }
+
+    private isHardwareAccelerationAllowed(): boolean {
+        if(this._nativeBridge.getApiLevel() < 17) {
+            // hardware acceleration does not work reliably before Android 4.2
+            return false;
+        }
+
+        if(this._nativeBridge.getApiLevel() === 17 && this._deviceInfo.getModel() === 'DARKSIDE') {
+            // specific device reported by GameLoft, ticket ABT-91
+            return false;
+        }
+
+        return true;
     }
 }
