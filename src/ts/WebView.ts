@@ -4,7 +4,7 @@ import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
-import { CacheManager, CacheStatus } from 'Managers/CacheManager';
+import { CacheManager } from 'Managers/CacheManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
@@ -23,13 +23,12 @@ import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
-import { RequestError } from 'Errors/RequestError';
+import { CampaignEventHandlers } from 'EventHandlers/CampaignEventHandlers';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class WebView {
 
@@ -57,9 +56,6 @@ export class WebView {
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
-    private _mustRefill: boolean;
-    private _refillTimestamp: number;
-    private _campaignTimeout: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -73,7 +69,6 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
-            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
@@ -111,13 +106,13 @@ export class WebView {
                 this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
 
-            this._cacheManager.cleanCache();
-
             return this.setupTestEnvironment();
         }).then(() => {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
+            this._cacheManager = new CacheManager(this._nativeBridge, this._wakeUpManager, configuration.getCacheMode());
+            this._cacheManager.cleanCache();
             HttpKafka.setConfiguration(this._configuration);
             return this._sessionManager.create();
         }).then(() => {
@@ -126,13 +121,11 @@ export class WebView {
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
-            this._campaignManager.onCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe(campaign => this.onVastCampaign(campaign));
-            this._campaignManager.onThirdPartyCampaign.subscribe(campaign => this.onThirdPartyCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill(retryLimit));
-            this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
-            this._refillTimestamp = 0;
-            this._campaignTimeout = 0;
+            this._campaignManager.onPerformanceCampaign.subscribe(campaign => CampaignEventHandlers.onPerformanceCampaign(this._nativeBridge, this._configuration, this._campaignManager, this._cacheManager, campaign));
+            this._campaignManager.onVastCampaign.subscribe(campaign => CampaignEventHandlers.onVastCampaign(campaign));
+            this._campaignManager.onThirdPartyCampaign.subscribe(campaign => CampaignEventHandlers.onHtmlCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe(retryLimit => CampaignEventHandlers.onNoFill(this._nativeBridge, this._configuration, this._campaignManager));
+            this._campaignManager.onError.subscribe(error => CampaignEventHandlers.onError(this._nativeBridge, error));
             return this._campaignManager.request();
         }).then(() => {
             this._initialized = true;
@@ -187,8 +180,8 @@ export class WebView {
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: this._campaign.getId(),
-                appStoreId: this._campaign.getAppStoreId(),
-                timeoutInSeconds: this._campaign.getTimeoutInSeconds()
+                /*appStoreId: this._campaign.getAppStoreId(),
+                timeoutInSeconds: this._campaign.getTimeoutInSeconds()*/
             });
 
             Diagnostics.trigger({
@@ -214,11 +207,11 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._deviceInfo, this._sessionManager, this._cacheManager, placement, this._campaign, this._configuration, options);
             this._adUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._adUnit.onClose.subscribe(() => this.onClose());
 
-            if (this._nativeBridge.getPlatform() === Platform.IOS && !(this._campaign instanceof VastCampaign)) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS && this._campaign instanceof PerformanceCampaign) {
                 if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
                         id: parseInt(this._campaign.getAppStoreId(), 10)
@@ -266,275 +259,6 @@ export class WebView {
         }
     }
 
-    /*
-     CAMPAIGN EVENT HANDLERS
-     */
-
-    private onCampaign(campaign: Campaign): void {
-        this._campaign = campaign;
-        this._refillTimestamp = 0;
-        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
-
-        const cacheMode = this._configuration.getCacheMode();
-
-        const cacheAsset = (url: string, failAllowed: boolean) => {
-            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
-                if(status === CacheStatus.OK) {
-                    return this._cacheManager.getFileUrl(fileId);
-                }
-                throw status;
-            }).catch(error => {
-                if(failAllowed === true && error === CacheStatus.FAILED) {
-                    return url;
-                }
-                throw error;
-            });
-        };
-
-        const cacheAssets = (failAllowed: boolean) => {
-            return cacheAsset(campaign.getVideoUrl(), failAllowed).then(fileUrl => {
-                campaign.setVideoUrl(fileUrl);
-                campaign.setVideoCached(true);
-            }).then(() =>
-                cacheAsset(campaign.getLandscapeUrl(), failAllowed)).then(fileUrl => campaign.setLandscapeUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getPortraitUrl(), failAllowed)).then(fileUrl => campaign.setPortraitUrl(fileUrl)).then(() =>
-                cacheAsset(campaign.getGameIcon(), failAllowed)).then(fileUrl => campaign.setGameIcon(fileUrl)).catch(error => {
-                if(error === CacheStatus.STOPPED) {
-                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
-                } else if(!failAllowed && error === CacheStatus.FAILED) {
-                    throw error;
-                }
-            });
-        };
-
-        const sendReady = () => {
-            this.setPlacementStates(PlacementState.READY);
-        };
-
-        if(cacheMode === CacheMode.FORCED) {
-            cacheAssets(false).then(() => {
-                if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            }).catch(() => {
-                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
-                this.onNoFill(3600);
-            });
-        } else if(cacheMode === CacheMode.ALLOWED) {
-            cacheAssets(true);
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        } else {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        }
-    }
-
-    private onVastCampaign(campaign: Campaign): void {
-        this._campaign = campaign;
-        this._refillTimestamp = 0;
-        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
-
-        const cacheMode = this._configuration.getCacheMode();
-
-        const cacheAsset = (url: string, failAllowed: boolean) => {
-            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
-                if(status === CacheStatus.OK) {
-                    return this._cacheManager.getFileUrl(fileId);
-                }
-                throw status;
-            }).catch(error => {
-                if(failAllowed === true && error === CacheStatus.FAILED) {
-                    return url;
-                }
-                throw error;
-            });
-        };
-
-        const getVideoUrl = (videoUrl: string) => {
-            // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
-            // todo: remove this when CacheManager is refactored to support redirects
-            return this._request.head(videoUrl, [], {
-                retries: 5,
-                retryDelay: 1000,
-                followRedirects: true,
-                retryWithConnectionEvents: false
-            }).then(response => {
-                if(response.url) {
-                    if(this._nativeBridge.getPlatform() === Platform.IOS && !response.url.match(/^https:\/\//)) {
-                        throw new Error('Non https VAST video url after redirects');
-                    }
-                    return response.url;
-                }
-                throw new Error('Invalid VAST video url after redirects');
-            });
-        };
-
-        const cacheAssets = (videoUrl: string, failAllowed: boolean) => {
-            return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
-                campaign.setVideoUrl(fileUrl);
-                campaign.setVideoCached(true);
-            }).catch(error => {
-                if(error === CacheStatus.STOPPED) {
-                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
-                } else if(!failAllowed && error === CacheStatus.FAILED) {
-                    throw error;
-                }
-            });
-        };
-
-        const sendReady = () => {
-            this.setPlacementStates(PlacementState.READY);
-        };
-
-        getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
-            if(cacheMode === CacheMode.FORCED) {
-                cacheAssets(videoUrl, false).then(() => {
-                    if(this._showing) {
-                        const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                            this._adUnit.onClose.unsubscribe(onCloseObserver);
-                            sendReady();
-                        });
-                    } else {
-                        sendReady();
-                    }
-                }).catch(() => {
-                    this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
-                    this.onNoFill(3600);
-                });
-            } else if(cacheMode === CacheMode.ALLOWED) {
-                cacheAssets(videoUrl, true);
-                if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            } else {
-                if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            }
-        }).catch(() => {
-            const message = 'Caching failed to get VAST video URL location';
-            const error = new DiagnosticError(new Error(message), {
-                url: campaign.getVideoUrl()
-            });
-            Diagnostics.trigger({
-                'type': 'cache_error',
-                'error': error
-            });
-            this._nativeBridge.Sdk.logError(message);
-            this.onNoFill(3600);
-        });
-    }
-
-    private onThirdPartyCampaign(campaign: HtmlCampaign): void {
-        this._campaign = campaign;
-        this._refillTimestamp = 0;
-        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
-
-        const cacheMode = this._configuration.getCacheMode();
-
-        const cacheAsset = (url: string, failAllowed: boolean) => {
-            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
-                if(status === CacheStatus.OK) {
-                    return this._cacheManager.getFileUrl(fileId);
-                }
-                throw status;
-            }).catch(error => {
-                if(failAllowed === true && error === CacheStatus.FAILED) {
-                    return url;
-                }
-                throw error;
-            });
-        };
-
-        const cacheAssets = (failAllowed: boolean) => {
-            const resourceUrl = campaign.getResourceUrl();
-            return cacheAsset(resourceUrl, failAllowed).then(fileUrl => {
-                campaign.setResourceUrl(fileUrl);
-                campaign.setVideoCached(true);
-            }).catch(error => {
-                if(error === CacheStatus.STOPPED) {
-                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
-                } else if(!failAllowed && error === CacheStatus.FAILED) {
-                    throw error;
-                }
-            });
-        };
-
-        const sendReady = () => {
-            this.setPlacementStates(PlacementState.READY);
-        };
-
-        if(cacheMode === CacheMode.FORCED) {
-            cacheAssets(false).then(() => {
-                if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            }).catch(() => {
-                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
-                this.onNoFill(3600);
-            });
-        } else if(cacheMode === CacheMode.ALLOWED) {
-            cacheAssets(true);
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        } else {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        }
-    }
-
-    private onNoFill(retryTime: number) {
-        this._refillTimestamp = Date.now() + retryTime * 1000;
-        this._campaignTimeout = 0;
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
-        this.setPlacementStates(PlacementState.NO_FILL);
-    }
-
     private setCampaignTimeout(campaignTimeout: number) {
         if(campaignTimeout === 0) {
             this._campaignTimeout = 0;
@@ -548,27 +272,6 @@ export class WebView {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
         this._campaignManager.request();
-    }
-
-    private onCampaignError(error: any) {
-        let responseCode: string = '';
-        if(error instanceof RequestError) {
-            const requestError = <RequestError>error;
-            if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                responseCode = requestError.nativeResponse.responseCode.toString();
-            }
-        } else if(error instanceof Error && !(error instanceof DiagnosticError)) {
-            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-        }
-
-        this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger({
-            'type': 'campaign_request_failed',
-            'error': error
-        });
-        if (!Request._errorResponseCodes.exec(responseCode)) {
-            this.onNoFill(3600); // todo: on errors, retry again in an hour
-        }
     }
 
     private onNewAdRequestAllowed(): void {

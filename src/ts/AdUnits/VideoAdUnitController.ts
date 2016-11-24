@@ -147,11 +147,12 @@ export abstract class VideoAdUnitController {
     };
 
     protected getVideoUrl(): string {
-        const campaign: Campaign = this.getCampaign();
+        /*const campaign: Campaign = this.getCampaign();
         if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
             return campaign.getStreamingVideoUrl();
         } else {
             return campaign.getVideoUrl();
-        }
+        }*/
+        return 'lol';
     }
 }

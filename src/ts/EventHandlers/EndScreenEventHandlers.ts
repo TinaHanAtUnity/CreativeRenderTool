@@ -2,18 +2,18 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { Campaign } from 'Models/Campaign';
 import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class EndScreenEventHandlers {
 
     public static onDownloadAndroid(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
         const platform = nativeBridge.getPlatform();
-        const campaign = adUnit.getCampaign();
+        const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
@@ -40,7 +40,7 @@ export class EndScreenEventHandlers {
 
     public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
         const platform = nativeBridge.getPlatform();
-        const campaign = adUnit.getCampaign();
+        const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
@@ -99,7 +99,7 @@ export class EndScreenEventHandlers {
         }
     }
 
-    private static getAppStoreUrl(platform: Platform, campaign: Campaign) {
+    private static getAppStoreUrl(platform: Platform, campaign: PerformanceCampaign) {
         if(platform === Platform.IOS) {
             return 'https://itunes.apple.com/app/id' + campaign.getAppStoreId();
         } else {

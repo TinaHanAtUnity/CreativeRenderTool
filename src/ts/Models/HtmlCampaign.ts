@@ -5,7 +5,7 @@ export class HtmlCampaign extends Campaign {
     private _resourceUrl: string;
 
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl: string) {
-        super(campaign, gamerId, abGroup);
+        super(campaign.id, gamerId, abGroup);
         this._resourceUrl = resourceUrl;
     }
 

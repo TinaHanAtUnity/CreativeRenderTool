@@ -4,19 +4,13 @@ import { Vast } from 'Models/Vast/Vast';
 export class VastCampaign extends Campaign {
 
     private _cacheTTL: number;
-    private _campaignId: string;
     private _vast: Vast;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super({}, gamerId, abGroup);
-        this._campaignId = campaignId;
+        super(campaignId, gamerId, abGroup);
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
         this.processCustomTracking(tracking);
-    }
-
-    public getId(): string {
-        return this._campaignId;
     }
 
     public getVast(): Vast {
@@ -24,12 +18,7 @@ export class VastCampaign extends Campaign {
     }
 
     public getVideoUrl(): string {
-        const videoUrl = super.getVideoUrl();
-        if (videoUrl) {
-            return videoUrl;
-        } else {
-            return this._vast.getVideoUrl() || '';
-        }
+        return this._vast.getVideoUrl();
     }
 
     public getTimeoutInSeconds(): number {

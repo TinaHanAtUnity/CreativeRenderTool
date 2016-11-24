@@ -6,6 +6,8 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Platform } from 'Constants/Platform';
+import { Campaign } from 'Models/Campaign';
+import { CacheMode } from 'Models/Configuration';
 
 export enum CacheStatus {
     OK,
@@ -15,6 +17,7 @@ export enum CacheStatus {
 
 export interface ICacheOptions {
     retries: number;
+    allowFailure: boolean;
 }
 
 export interface ICacheResponse {
@@ -41,21 +44,27 @@ export class CacheManager {
 
     private static getDefaultCacheOptions(): ICacheOptions {
         return {
-            retries: 0
+            retries: 0,
+            allowFailure: false
         };
     }
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
+    private _cacheMode: CacheMode;
+
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
 
     private _currentUrl: string;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, cacheMode: CacheMode) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+        this._cacheMode = cacheMode;
+
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+
         this._nativeBridge.Cache.setProgressInterval(500);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
         this._nativeBridge.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
@@ -64,27 +73,43 @@ export class CacheManager {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string, options?: ICacheOptions): Promise<[CacheStatus, string]> {
+    public cache(url: string, options?: ICacheOptions): Promise<string> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
-                return Promise.reject(CacheStatus.FAILED);
+                throw CacheStatus.FAILED;
             }
             return Promise.all<boolean, string>([
                 this.shouldCache(url),
                 this.getFileId(url)
-            ]).then(([shouldCache, fileId]) => {
-                if(!shouldCache) {
-                    return Promise.resolve([CacheStatus.OK, fileId]);
-                }
-
-                if(typeof options === 'undefined') {
-                    options = CacheManager.getDefaultCacheOptions();
-                }
-                const promise = this.registerCallback(url, fileId, options);
-                this.downloadFile(url, fileId);
-                return promise;
-            });
+            ]);
+        }).then(([shouldCache, fileId]) => {
+            if(!shouldCache) {
+                return Promise.resolve([CacheStatus.OK, fileId]);
+            }
+            if(typeof options === 'undefined') {
+                options = CacheManager.getDefaultCacheOptions();
+            }
+            const promise = this.registerCallback(url, fileId, options);
+            this.downloadFile(url, fileId);
+            return promise;
+        }).then(([status, fileId]: [CacheStatus, string]) => {
+            if(status === CacheStatus.OK) {
+                return this.getFileUrl(fileId);
+            }
+            throw status;
+        }).catch(error => {
+            if(typeof options === 'undefined') {
+                options = CacheManager.getDefaultCacheOptions();
+            }
+            if(options.allowFailure && error === CacheStatus.FAILED) {
+                return url;
+            }
+            throw error;
         });
+    }
+
+    public isCached(campaign: Campaign) {
+        return true;
     }
 
     public stop(): void {

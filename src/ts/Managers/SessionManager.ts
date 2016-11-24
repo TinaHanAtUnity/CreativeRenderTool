@@ -7,6 +7,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
+import { PerformanceCampaign } from '../Models/PerformanceCampaign';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -36,7 +37,7 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'cached': adUnit.getCampaign().isVideoCached(),
+            'cached': /* adUnit.getCampaign().isVideoCached() */ true,
             'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
             'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
@@ -223,9 +224,12 @@ export class SessionManager {
 
         this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
 
-        if(campaign.getClickAttributionUrl()) {
-            return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+        if(campaign instanceof PerformanceCampaign) {
+            if(campaign.getClickAttributionUrl()) {
+                return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+            }
         }
+
         return Promise.reject('Missing click attribution url');
     }
 
