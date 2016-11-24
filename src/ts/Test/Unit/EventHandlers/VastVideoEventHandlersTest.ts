@@ -16,6 +16,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { Platform } from 'Constants/Platform';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -43,7 +44,7 @@ describe('VastVideoEventHandlers tests', () => {
 
         const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
         sessionManager.setSession(new Session('123'));
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
         const adUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
         VastVideoEventHandlers.onVideoStart(sessionManager, adUnit);
@@ -63,7 +64,7 @@ describe('VastVideoEventHandlers tests', () => {
 
         const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
         sessionManager.setSession(new Session('123'));
-        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
         const adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
 
         VastVideoEventHandlers.onVideoCompleted(sessionManager, adUnit);

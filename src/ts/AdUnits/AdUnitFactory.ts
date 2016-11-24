@@ -127,7 +127,7 @@ export class AdUnitFactory {
 
     private static createVideoAdUnitController(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            return new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, options);
+            return new AndroidVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
         } else {
             return new IosVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
         }

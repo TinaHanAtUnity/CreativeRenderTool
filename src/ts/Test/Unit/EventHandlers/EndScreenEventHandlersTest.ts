@@ -53,7 +53,7 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => 'fooAppId',
                 getClickAttributionUrlFollowsRedirects: () => true

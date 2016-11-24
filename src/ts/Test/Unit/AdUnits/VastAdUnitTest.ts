@@ -12,6 +12,7 @@ import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { Platform } from 'Constants/Platform';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -49,7 +50,7 @@ describe('VastAdUnit', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
-        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
         adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
     });
 
@@ -115,7 +116,7 @@ describe('VastAdUnit', () => {
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
             adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
         });
 

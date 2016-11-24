@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -24,11 +25,13 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
 
+    private _deviceInfo: DeviceInfo;
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
+        this._deviceInfo = deviceInfo;
         this._androidOptions = options;
 
         this._activityId = AndroidVideoAdUnitController.ActivityId++;
@@ -54,7 +57,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
         }
 
         let hardwareAccel: boolean = true;
-        if(this._nativeBridge.getApiLevel() < 17) {
+        if(this._nativeBridge.getApiLevel() < 17 || (this._nativeBridge.getApiLevel() === 18 && this._deviceInfo.getModel() === 'DARKSIDE')) {
             hardwareAccel = false;
         }
 
