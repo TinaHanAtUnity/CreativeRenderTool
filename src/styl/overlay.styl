@@ -3,47 +3,70 @@
   width: 100%
   height: 100%
   color: #FFF
-  text-shadow: 1px 1px #000
 
-  .skip-button
-    display: none
+  .header
     position: absolute
-    top: 10px
-    left: 10px
+    top: 0%
+    width: 100%
+    height: 10%
+    background: rgba(0, 0, 0, 0.5)
+
+    .skip-button
+      position: absolute
+      top: 50%
+      left: 2%
+      -webkit-transform: translate(0,-50%)
+      text-decoration: none;
 
     .skip-duration
       font-weight: bold
 
-  .mute-button
-    display: none
-    position: absolute
-    left: 2%
-    bottom: 2%
-
-    .mute-icon
-    .unmute-icon
-      font-size: 27px
-
-    .unmute-icon
+    .call-button
       display: none
+      position: absolute
+      top: 50%
+      right: 2%;
+      -webkit-transform: translate(0,-50%)
+      border: none;
 
-    &.muted
+  .footer
+    position: absolute
+    bottom: 0%
+    width: 100%
+    height: 10%
+    background: rgba(0, 0, 0, 0.5)
+
+    .mute-button
+      position: absolute
+      display: none
+      left: 2%
+      top: 50%
+      -webkit-transform: translate(0,-50%)
+
       .mute-icon
-        display: none
+      .unmute-icon
+        font-size: 27px
 
       .unmute-icon
-        display: block
+        display: none
 
-  .video-duration-text
-    display: none
-    position: absolute
-    text-align: center
-    line-height: 45px
-    bottom: 2%
-    right: 2%
+      &.muted
+        .mute-icon
+          display: none
 
-    .video-duration
-      font-weight: bold
+        .unmute-icon
+          display: block
+
+    .video-duration-text
+      position: absolute
+      display: none
+      -webkit-transform: translate(0,-50%)
+      right: 2%
+      top: 50%
+      text-align: right
+
+      .video-duration
+        font-weight: bold
 
   .buffering-spinner
     display: none
@@ -71,22 +94,6 @@
     position: absolute
     top: 50%
     right: 10px
-
-  .call-button
-    display: none
-    position: absolute
-    top: 10px
-    right: 10px;
-    background-color: white;
-    border: none;
-    border-radius: 3px;
-    color: #4f4f4f;
-    padding: .3em .7em;
-    text-align: center;
-    text-decoration: none;
-    text-shadow: none
-    font-weight: bold;
-    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
 
   @-webkit-keyframes spinner
     from
