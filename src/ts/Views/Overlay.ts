@@ -155,6 +155,13 @@ export class Overlay extends View {
             // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
             this._videoDurationCounterElement.innerHTML = '0';
         }
+
+        // redraw updated elements to fix the overlapping texts issue
+        this._container.style.display = 'none';
+        /* tslint:disable:no-unused-expression */
+        this._container.offsetHeight;
+        /* tslint:enable:no-unused-expression */
+        this._container.style.display = 'block';
     }
 
     public setMuteEnabled(value: boolean) {
