@@ -56,10 +56,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
             keyEvents = [KeyCode.BACK];
         }
 
-        let hardwareAccel: boolean = true;
-        if(this._nativeBridge.getApiLevel() < 17 || (this._nativeBridge.getApiLevel() === 18 && this._deviceInfo.getModel() === 'DARKSIDE')) {
-            hardwareAccel = false;
-        }
+        const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
         this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled') + ', playing from ' + this.getVideoUrl());
 
@@ -124,5 +121,19 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+    }
+
+    private isHardwareAccelerationAllowed(): boolean {
+        if(this._nativeBridge.getApiLevel() < 17) {
+            // hardware acceleration does not work reliably before Android 4.2
+            return false;
+        }
+
+        if(this._nativeBridge.getApiLevel() === 17 && this._deviceInfo.getModel() === 'DARKSIDE') {
+            // specific device reported by GameLoft, ticket ABT-91
+            return false;
+        }
+
+        return true;
     }
 }
