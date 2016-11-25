@@ -30,7 +30,6 @@ import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class WebView {
 
@@ -272,12 +271,6 @@ export class WebView {
      */
 
     private onCampaign(campaign: Campaign): void {
-        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
-            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
-                campaign.getAbGroup(), this._configuration);
-            SessionManager.setProxyUrl(reverseProxyBaseUrl);
-        }
-
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
@@ -355,34 +348,27 @@ export class WebView {
     }
 
     private onVastCampaign(campaign: Campaign): void {
-        if(AbTestHelper.isReverseProxyTestActive(campaign.getAbGroup(), this._configuration)) {
-            const reverseProxyBaseUrl = AbTestHelper.getReverseProxyBaseUrl(
-                campaign.getAbGroup(), this._configuration);
-            SessionManager.setProxyUrl(reverseProxyBaseUrl);
-        }
-
         this._campaign = campaign;
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
         const cacheMode = this._configuration.getCacheMode();
 
-        const cacheAsset = (url: string) => {
+        const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 throw status;
             }).catch(error => {
-                if(error !== CacheStatus.STOPPED) {
+                if(failAllowed === true && error === CacheStatus.FAILED) {
                     return url;
                 }
                 throw error;
             });
         };
 
-        const cacheAssets = () => {
-            const videoUrl = campaign.getVideoUrl();
+        const getVideoUrl = (videoUrl: string) => {
             // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
             // todo: remove this when CacheManager is refactored to support redirects
             return this._request.head(videoUrl, [], {
@@ -391,17 +377,26 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                const locationUrl = response.url || videoUrl;
-                return cacheAsset(locationUrl).then(fileUrl => {
-                    campaign.setVideoUrl(fileUrl);
-                    campaign.setVideoCached(true);
-                }).catch(error => {
-                    if(error === CacheStatus.STOPPED) {
-                        this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                if(response.url) {
+                    if(this._nativeBridge.getPlatform() === Platform.IOS && !response.url.match(/^https:\/\//)) {
+                        throw new Error('Non https VAST video url after redirects');
                     }
-                });
+                    return response.url;
+                }
+                throw new Error('Invalid VAST video url after redirects');
+            });
+        };
+
+        const cacheAssets = (videoUrl: string, failAllowed: boolean) => {
+            return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
             }).catch(error => {
-                this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
+                }
             });
         };
 
@@ -409,8 +404,23 @@ export class WebView {
             this.setPlacementStates(PlacementState.READY);
         };
 
-        if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
+        getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
+            if(cacheMode === CacheMode.FORCED) {
+                cacheAssets(videoUrl, false).then(() => {
+                    if(this._showing) {
+                        const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                            this._adUnit.onClose.unsubscribe(onCloseObserver);
+                            sendReady();
+                        });
+                    } else {
+                        sendReady();
+                    }
+                }).catch(() => {
+                    this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                    this.onNoFill(3600);
+                });
+            } else if(cacheMode === CacheMode.ALLOWED) {
+                cacheAssets(videoUrl, true);
                 if(this._showing) {
                     const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
@@ -419,28 +429,28 @@ export class WebView {
                 } else {
                     sendReady();
                 }
+            } else {
+                if(this._showing) {
+                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
+                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            }
+        }).catch(() => {
+            const message = 'Caching failed to get VAST video URL location';
+            const error = new DiagnosticError(new Error(message), {
+                url: campaign.getVideoUrl()
             });
-        } else if(cacheMode === CacheMode.ALLOWED) {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
-                    sendReady();
-                });
-            } else {
-                cacheAssets();
-                sendReady();
-            }
-        } else {
-            if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    sendReady();
-                });
-            } else {
-                sendReady();
-            }
-        }
+            Diagnostics.trigger({
+                'type': 'cache_error',
+                'error': error
+            });
+            this._nativeBridge.Sdk.logError(message);
+            this.onNoFill(3600);
+        });
     }
 
     private onThirdPartyCampaign(campaign: HtmlCampaign): void {
@@ -450,28 +460,30 @@ export class WebView {
 
         const cacheMode = this._configuration.getCacheMode();
 
-        const cacheAsset = (url: string) => {
+        const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 throw status;
             }).catch(error => {
-                if(error !== CacheStatus.STOPPED) {
+                if(failAllowed === true && error === CacheStatus.FAILED) {
                     return url;
                 }
                 throw error;
             });
         };
 
-        const cacheAssets = () => {
+        const cacheAssets = (failAllowed: boolean) => {
             const resourceUrl = campaign.getResourceUrl();
-            return cacheAsset(resourceUrl).then(fileUrl => {
+            return cacheAsset(resourceUrl, failAllowed).then(fileUrl => {
                 campaign.setResourceUrl(fileUrl);
                 campaign.setVideoCached(true);
             }).catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
                 }
             });
         };
@@ -481,7 +493,7 @@ export class WebView {
         };
 
         if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
+            cacheAssets(false).then(() => {
                 if(this._showing) {
                     const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
@@ -490,16 +502,18 @@ export class WebView {
                 } else {
                     sendReady();
                 }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
             });
         } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets(true);
             if(this._showing) {
                 const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                     this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
                     sendReady();
                 });
             } else {
-                cacheAssets();
                 sendReady();
             }
         } else {
