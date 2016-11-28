@@ -351,8 +351,6 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        const cacheMode = this._configuration.getCacheMode();
-
         const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
@@ -404,23 +402,8 @@ export class WebView {
         };
 
         getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
-            if(cacheMode === CacheMode.FORCED) {
-                cacheAssets(videoUrl, false).then(() => {
-                    if(this._showing) {
-                        const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                            this._adUnit.onClose.unsubscribe(onCloseObserver);
-                            sendReady();
-                        });
-                    } else {
-                        sendReady();
-                    }
-                }).catch(() => {
-                    this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
-                    this.onNoFill(3600);
-                });
-            } else if(cacheMode === CacheMode.ALLOWED) {
-                cacheAssets(videoUrl, true);
-                if(this._showing) {
+            cacheAssets(videoUrl, false).then(() => {
+                if (this._showing) {
                     const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                         this._adUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
@@ -428,16 +411,10 @@ export class WebView {
                 } else {
                     sendReady();
                 }
-            } else {
-                if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
-                        sendReady();
-                    });
-                } else {
-                    sendReady();
-                }
-            }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
+            });
         }).catch(() => {
             const message = 'Caching failed to get VAST video URL location';
             const error = new DiagnosticError(new Error(message), {
