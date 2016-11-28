@@ -29,7 +29,6 @@ import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
-import { RequestError } from 'Errors/RequestError';
 
 export class WebView {
 
@@ -551,13 +550,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        let responseCode: string = '';
-        if(error instanceof RequestError) {
-            const requestError = <RequestError>error;
-            if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                responseCode = requestError.nativeResponse.responseCode.toString();
-            }
-        } else if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        if(error instanceof Error && !(error instanceof DiagnosticError)) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
