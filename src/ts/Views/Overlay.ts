@@ -5,6 +5,7 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
+import { Platform } from 'Constants/Platform';
 
 export class Overlay extends View {
 
@@ -157,11 +158,13 @@ export class Overlay extends View {
         }
 
         // redraw updated elements to fix the overlapping texts issue
-        this._container.style.display = 'none';
-        /* tslint:disable:no-unused-expression */
-        this._container.offsetHeight;
-        /* tslint:enable:no-unused-expression */
-        this._container.style.display = 'block';
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 21) {
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+        }
     }
 
     public setMuteEnabled(value: boolean) {
