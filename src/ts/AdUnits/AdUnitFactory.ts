@@ -61,6 +61,10 @@ export class AdUnitFactory {
             videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
         });
 
+        videoAdUnitController.onVideoClose.subscribe(() => {
+            performanceAdUnit.hide();
+        });
+
         return performanceAdUnit;
     }
 
