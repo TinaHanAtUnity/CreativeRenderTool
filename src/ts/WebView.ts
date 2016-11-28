@@ -566,9 +566,8 @@ export class WebView {
             'type': 'campaign_request_failed',
             'error': error
         });
-        if (!Request._errorResponseCodes.exec(responseCode)) {
-            this.onNoFill(3600); // todo: on errors, retry again in an hour
-        }
+
+        this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
     private onNewAdRequestAllowed(): void {
