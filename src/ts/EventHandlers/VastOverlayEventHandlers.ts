@@ -22,6 +22,8 @@ export class VastOverlayEventHandlers {
     }
 
     public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
+        nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
+
         adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId());
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();

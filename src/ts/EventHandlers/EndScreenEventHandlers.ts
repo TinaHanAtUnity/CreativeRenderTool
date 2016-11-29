@@ -15,6 +15,8 @@ export class EndScreenEventHandlers {
         const platform = nativeBridge.getPlatform();
         const campaign = adUnit.getCampaign();
 
+        nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
+
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
@@ -39,6 +41,8 @@ export class EndScreenEventHandlers {
     public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
         const platform = nativeBridge.getPlatform();
         const campaign = adUnit.getCampaign();
+
+        nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
             sessionManager.sendClick(adUnit).then(response => {
