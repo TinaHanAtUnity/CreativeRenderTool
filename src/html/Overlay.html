@@ -1,12 +1,16 @@
-<div class="skip-button"><%= data.t("You can skip this video in <span class=\"skip-duration\">0</span> seconds") %></div>
+<div class="header">
+    <div class="skip-button"><%= data.t("You can skip this video in <span class=\"skip-duration\">0</span> seconds") %></div>
+    <div class="call-button"><%= data.t("Learn More") %></div>
+</div>
 <div class="buffering-spinner">
     <div class="spinner-animation"></div>
     <div class="spinner-text"><%= data.t("Buffering") %></div>
 </div>
-<div class="mute-button <%= data.muted ? 'muted' : '' %>">
-    <div class="mute-icon"><span class="icon-volume"></span></div>
-    <div class="unmute-icon"><span class="icon-volume-mute"></span></div>
+<div class="footer">
+    <div class="mute-button <%= data.muted ? 'muted' : '' %>">
+        <div class="mute-icon"><span class="icon-volume"></span></div>
+        <div class="unmute-icon"><span class="icon-volume-mute"></span></div>
+    </div>
+    <div class="video-duration-text"><%= data.t("This video ends in <span class=\"video-duration\">0</span> seconds") %></div>
 </div>
-<div class="video-duration-text"><%= data.t("This video ends in <span class=\"video-duration\">0</span> seconds") %></div>
-<div class="call-button"><%= data.t("Learn More") %></div>
 <div class="debug-message-text"></div>
