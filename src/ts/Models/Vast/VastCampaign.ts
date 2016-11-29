@@ -8,7 +8,12 @@ export class VastCampaign extends Campaign {
     private _vast: Vast;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super({}, gamerId, abGroup);
+        const campaign = {
+            endScreenPortrait: vast.getCompanionPortraitUrl(),//'http://localhost:8000/PM_16441-RD-en_US-320x480@2X.jpg',
+            endScreenLandscape: vast.getCompanionLandscapeUrl()//'http://localhost:8000/PM_16441-RD-en_US-480x320@2X.jpg'
+        };
+
+        super(campaign, gamerId, abGroup);
         this._campaignId = campaignId;
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;

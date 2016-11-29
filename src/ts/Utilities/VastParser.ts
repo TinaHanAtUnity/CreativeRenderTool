@@ -3,6 +3,7 @@ import { VastAd } from 'Models/Vast/VastAd';
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -196,6 +197,17 @@ export class VastParser {
                                         }
                                     }
                                     break;
+                                case 'CompanionAds':
+                                    const companionAdElements = this.childsByName(creativeTypeElement, 'Companion');
+                                    for (let i = 0; i < companionAdElements.length; i++) {
+                                        // TODO: Check if this is Unity supported tag
+                                        const companionAdElement = companionAdElements[i];
+                                        const companionAd = this.parseCreativeCompanionAdElement(companionAdElement);
+                                        if (companionAd) {
+                                            ad.addCompanionAd(companionAd);
+                                        }
+                                    }
+                                    break;
                                 default:
                                     break;
                             }
@@ -280,6 +292,21 @@ export class VastParser {
         }
 
         return creative;
+    }
+
+    private parseCreativeCompanionAdElement(companionAdElement: any): any {
+        const id = companionAdElement.getAttribute('id');
+
+        const staticResourceElement = this.childByName(companionAdElement, 'StaticResource');
+        const creativeType = staticResourceElement.getAttribute('creativeType');
+        const staticResourceURL = this.parseNodeText(staticResourceElement);
+
+        const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
+        const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement);
+
+        const companionAd = new VastCreativeCompanionAd(id, creativeType, staticResourceURL, companionClickThroughURLTemplate);
+
+        return companionAd;
     }
 
     private parseDuration(durationString: string): number {

@@ -24,6 +24,17 @@ export class VastVideoEventHandlers {
         }
         adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId());
 
-        adUnit.hide();
+        this.hideEndScreen(adUnit);
+    }
+
+    public static onVideoError(adUnit: VastAdUnit) {
+        this.hideEndScreen(adUnit);
+    }
+
+    private static hideEndScreen(adUnit: VastAdUnit) {
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        }
     }
 }

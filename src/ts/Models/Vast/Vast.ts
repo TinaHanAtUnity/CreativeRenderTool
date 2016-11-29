@@ -118,6 +118,44 @@ export class Vast {
         return null;
     }
 
+    public getCompanionLandscapeUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    const id = companionAd.getId();
+                    if (id && id.toLocaleLowerCase() === 'unity_brand_endcard_landscape') {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionPortraitUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    const id = companionAd.getId();
+                    if (id && id.toLocaleLowerCase() === 'unity_brand_endcard_portrait') {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     private isPlayableMIMEType(MIMEType: string): boolean {
         const playableMIMEType = 'video/mp4';
         MIMEType = MIMEType.toLowerCase();

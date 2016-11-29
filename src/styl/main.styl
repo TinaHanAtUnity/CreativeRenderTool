@@ -59,6 +59,10 @@ body.android
     color: #ffffff
     text-shadow: 2px 2px 20px #7c7c7c
     text-align: center
+    &.brand
+      color: #7c7c7c
+      text-shadow: 0px 0px 0px #fafafa
+      text-align: center
 
   .game-background
     width: 100%
@@ -69,6 +73,8 @@ body.android
     position: absolute
     top: 0
     bottom: 47%
+    &.brand
+      bottom: 0
 
   .end-screen-info-background
     position: absolute
@@ -213,6 +219,12 @@ body.android
     .game-background
       width: 53%
       bottom: 0
+      &.brand
+        width: 100%
+      &.game-background-portrait
+        display: none
+      &.game-background-landscape
+        display: block
 
     .end-screen-info-background
       width: 47%

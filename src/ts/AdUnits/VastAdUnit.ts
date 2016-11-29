@@ -4,11 +4,16 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { VastEndScreen } from 'Views/VastEndScreen';
 
 export class VastAdUnit extends VideoAdUnit {
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+    private _endScreen: VastEndScreen | undefined;
+
+    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
         super(nativeBridge, videoAdUnitController);
+
+        this._endScreen = endScreen;
     }
 
     public show(): Promise<void> {
@@ -16,6 +21,12 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     public hide(): Promise<void> {
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            endScreen.hide();
+            endScreen.container().parentElement.removeChild(endScreen.container());
+        }
+
         return this._videoAdUnitController.hide();
     }
 
@@ -75,6 +86,10 @@ export class VastAdUnit extends VideoAdUnit {
                 this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, clickTrackingEventUrls[i]);
             }
         }
+    }
+
+    public getEndScreen(): VastEndScreen | undefined {
+        return this._endScreen;
     }
 
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {

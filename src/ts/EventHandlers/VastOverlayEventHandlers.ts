@@ -6,7 +6,11 @@ import { Platform } from 'Constants/Platform';
 export class VastOverlayEventHandlers {
 
     public static onSkip(adUnit: VastAdUnit) {
-        adUnit.hide();
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        }
+        adUnit.onFinish.trigger();
     }
 
     public static onMute(sessionManager: SessionManager, adUnit: VastAdUnit, muted: boolean): void {
