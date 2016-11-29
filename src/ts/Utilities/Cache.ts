@@ -6,7 +6,6 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Platform } from 'Constants/Platform';
-import { CacheMode } from 'Models/Configuration';
 
 export enum CacheStatus {
     OK,
@@ -50,17 +49,15 @@ export class Cache {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
-    private _cacheMode: CacheMode;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
 
     private _currentUrl: string;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, cacheMode: CacheMode) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
-        this._cacheMode = cacheMode;
 
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 

@@ -1,41 +1,52 @@
 import { Campaign } from 'Models/Campaign';
+import { Asset } from 'Models/Asset';
+import { Video } from 'Models/Video';
 
 export class PerformanceCampaign extends Campaign {
 
     private _appStoreId: string;
     private _appStoreCountry: string;
+
     private _gameId: number;
     private _gameName: string;
-    private _gameIcon: string;
+    private _gameIcon: Asset;
+
     private _rating: number;
     private _ratingCount: number;
-    private _landscapeImage: string;
-    private _portraitImage: string;
-    private _video: string;
-    private _videoSize: number;
-    private _streamingVideo: string;
+
+    private _landscapeImage: Asset;
+    private _portraitImage: Asset;
+
+    private _video: Video;
+    private _streamingVideo: Video;
+
     private _clickAttributionUrl: string;
     private _clickAttributionUrlFollowsRedirects: boolean;
-    private _bypassAppSheet: boolean;
 
-    private _isVideoCached: boolean = false;
+    private _bypassAppSheet: boolean;
 
     constructor(campaign: any, gamerId: string, abGroup: number) {
         super(campaign.id, gamerId, abGroup);
+
         this._appStoreId = campaign.appStoreId;
         this._appStoreCountry = campaign.appStoreCountry;
+
         this._gameId = campaign.gameId;
         this._gameName = campaign.gameName;
-        this._gameIcon = campaign.gameIcon;
+        this._gameIcon = new Asset(campaign.gameIcon);
+
         this._rating = campaign.rating;
         this._ratingCount = campaign.ratingCount;
-        this._landscapeImage = campaign.endScreenLandscape;
-        this._portraitImage = campaign.endScreenPortrait;
-        this._video = campaign.trailerDownloadable;
-        this._videoSize = campaign.trailerDownloadableSize;
-        this._streamingVideo = campaign.trailerStreaming;
+
+        this._landscapeImage = new Asset(campaign.endScreenLandscape);
+        this._portraitImage = new Asset(campaign.endScreenPortrait);
+
+        this._video = new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize);
+        this._streamingVideo = new Video(campaign.trailerStreaming);
+
         this._clickAttributionUrl = campaign.clickAttributionUrl;
         this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
+
         this._bypassAppSheet = campaign.bypassAppSheet;
     }
 
@@ -55,47 +66,31 @@ export class PerformanceCampaign extends Campaign {
         return this._gameName;
     }
 
-    public getGameIcon(): string {
+    public getGameIcon(): Asset {
         return this._gameIcon;
     }
 
-    public setGameIcon(gameIcon: string): void {
-        this._gameIcon = gameIcon;
-    }
-
-    public getRating(): number {
+    public getRating() {
         return this._rating;
     }
 
-    public getRatingCount(): number {
+    public getRatingCount() {
         return this._ratingCount;
     }
 
-    public getPortraitUrl(): string {
+    public getPortrait(): Asset {
         return this._portraitImage;
     }
 
-    public setPortraitUrl(portraitUrl: string): void {
-        this._portraitImage = portraitUrl;
-    }
-
-    public getLandscapeUrl(): string {
+    public getLandscape(): Asset {
         return this._landscapeImage;
     }
 
-    public setLandscapeUrl(landscapeUrl: string): void {
-        this._landscapeImage = landscapeUrl;
-    }
-
-    public getVideoUrl(): string {
+    public getVideo(): Video {
         return this._video;
     }
 
-    public setVideoUrl(videoUrl: string): void {
-        this._video = videoUrl;
-    }
-
-    public getStreamingVideoUrl(): string {
+    public getStreamingVideo(): Video {
         return this._streamingVideo;
     }
 
@@ -111,15 +106,22 @@ export class PerformanceCampaign extends Campaign {
         return this._bypassAppSheet;
     }
 
-    public isVideoCached(): boolean {
-        return this._isVideoCached;
-    }
-
-    public setVideoCached(value: boolean) {
-        this._isVideoCached = value;
-    }
-
     public getTimeoutInSeconds(): number {
         return 0;
     }
+
+    public getRequiredAssets() {
+        return [
+            this.getVideo()
+        ];
+    }
+
+    public getOptionalAssets() {
+        return [
+            this.getGameIcon(),
+            this.getPortrait(),
+            this.getLandscape()
+        ];
+    }
+
 }

@@ -13,6 +13,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { AssetManager } from 'Managers/AssetManager';
 
 export class CampaignManager {
 
@@ -36,6 +37,7 @@ export class CampaignManager {
     public onError: Observable1<Error> = new Observable1();
 
     private _nativeBridge: NativeBridge;
+    private _assetManager: AssetManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
@@ -44,8 +46,9 @@ export class CampaignManager {
     private _requesting: boolean;
     private _refillTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
+    constructor(nativeBridge: NativeBridge, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
+        this._assetManager = assetManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;

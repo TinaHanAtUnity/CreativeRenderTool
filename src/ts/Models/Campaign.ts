@@ -1,3 +1,5 @@
+import { Asset } from 'Models/Asset';
+
 export abstract class Campaign {
 
     private _id: string;
@@ -31,5 +33,8 @@ export abstract class Campaign {
     public isExpired() {
         return this._timeout !== 0 && Date.now() > this._timeout;
     }
+
+    public abstract getRequiredAssets(): Asset[];
+    public abstract getOptionalAssets(): Asset[];
 
 }
