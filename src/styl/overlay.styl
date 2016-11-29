@@ -58,7 +58,6 @@
       right: 10px
       bottom: 10%
       text-align: right
-      line-height: 45px
 
       .video-duration
         font-weight: bold
@@ -102,6 +101,36 @@
     color: #FFF
     font-weight: bold
     text-shadow: 1px 1px #000
+
+  // 375/667 iPhone 5, 6, 7
+  @media only screen and (device-aspect-ratio: 16/9), screen and (device-aspect-ratio: 16/10), screen and (device-aspect-ratio: 9/16), screen and (device-aspect-ratio: 10/16), screen and (device-aspect-ratio: 375/667), screen and (device-aspect-ratio: 667/375)
+    .header
+      height: 12%
+      background: rgba(0, 0, 0, 0.5)
+
+      .skip-button
+        top: 50%
+        left: 2%
+        -webkit-transform: translate(0,-50%)
+
+      .call-button
+        top: 50%
+        right: 2%;
+        -webkit-transform: translate(0,-50%)
+
+    .footer
+      height: 12%
+      background: rgba(0, 0, 0, 0.5)
+
+      .mute-button
+        left: 2%
+        top: 50%
+        -webkit-transform: translate(0,-60%)
+
+      .video-duration-text
+        -webkit-transform: translate(0,-50%)
+        right: 2%
+        top: 50%
 
 .fade
   opacity: 0
