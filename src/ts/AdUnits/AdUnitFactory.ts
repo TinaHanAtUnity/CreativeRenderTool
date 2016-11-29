@@ -27,7 +27,7 @@ import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { ThirdParty } from 'Views/ThirdParty';
 import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { CacheManager } from 'Managers/CacheManager';
+import { CacheManager } from '../Utilities/CacheManager';
 
 export class AdUnitFactory {
 
@@ -63,6 +63,10 @@ export class AdUnitFactory {
         performanceAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
+        });
+
+        videoAdUnitController.onVideoClose.subscribe(() => {
+            performanceAdUnit.hide();
         });
 
         return performanceAdUnit;

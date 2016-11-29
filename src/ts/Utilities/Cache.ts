@@ -6,7 +6,6 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Platform } from 'Constants/Platform';
-import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 
 export enum CacheStatus {
@@ -40,7 +39,7 @@ interface ICallbackObject {
     options: ICacheOptions;
 }
 
-export class CacheManager {
+export class Cache {
 
     private static getDefaultCacheOptions(): ICacheOptions {
         return {
@@ -79,15 +78,15 @@ export class CacheManager {
                 throw CacheStatus.FAILED;
             }
             return Promise.all<boolean, string>([
-                this.shouldCache(url),
+                this.isCached(url),
                 this.getFileId(url)
             ]);
-        }).then(([shouldCache, fileId]) => {
-            if(!shouldCache) {
+        }).then(([isCached, fileId]) => {
+            if(isCached) {
                 return Promise.resolve([CacheStatus.OK, fileId]);
             }
             if(typeof options === 'undefined') {
-                options = CacheManager.getDefaultCacheOptions();
+                options = Cache.getDefaultCacheOptions();
             }
             const promise = this.registerCallback(url, fileId, options);
             this.downloadFile(url, fileId);
@@ -99,7 +98,7 @@ export class CacheManager {
             throw status;
         }).catch(error => {
             if(typeof options === 'undefined') {
-                options = CacheManager.getDefaultCacheOptions();
+                options = Cache.getDefaultCacheOptions();
             }
             if(options.allowFailure && error === CacheStatus.FAILED) {
                 return url;
@@ -108,8 +107,18 @@ export class CacheManager {
         });
     }
 
-    public isCached(campaign: Campaign) {
-        return true;
+    public isCached(url: string): Promise<boolean> {
+        return this.getFileId(url).then(fileId => {
+            return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
+                if(fileInfo.found && fileInfo.size > 0) {
+                    return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
+                        const storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
+                        return storedCacheResponse.fullyDownloaded;
+                    });
+                }
+                return false;
+            });
+        });
     }
 
     public stop(): void {
@@ -212,21 +221,6 @@ export class CacheManager {
     public getFileUrl(fileId: string): Promise<string> {
         return this._nativeBridge.Cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
-        });
-    }
-
-    private shouldCache(url: string): Promise<boolean> {
-        return this.getFileId(url).then(fileId => {
-            return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
-                if(fileInfo.found && fileInfo.size > 0) {
-                    return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
-                        const storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
-                        return !storedCacheResponse.fullyDownloaded;
-                    });
-                } else {
-                    return true;
-                }
-            });
         });
     }
 

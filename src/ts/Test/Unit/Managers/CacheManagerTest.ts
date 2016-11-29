@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheManager, CacheStatus } from 'Managers/CacheManager';
+import { CacheManager, CacheStatus } from '../../../Utilities/CacheManager';
 import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';

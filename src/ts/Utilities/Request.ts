@@ -38,8 +38,6 @@ export interface INativeResponse {
 
 export class Request {
 
-    public static _errorResponseCodes = new RegExp('4[0-9]{2}');
-
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
@@ -52,6 +50,7 @@ export class Request {
 
     private static _allowedResponseCodes = new RegExp('2[0-9]{2}');
     private static _redirectResponseCodes = new RegExp('30[0-8]');
+    private static _errorResponseCodes = new RegExp('4[0-9]{2}');
     private static _retryResponseCodes = new RegExp('5[0-9]{2}');
 
     private static _connectTimeout = 30000;

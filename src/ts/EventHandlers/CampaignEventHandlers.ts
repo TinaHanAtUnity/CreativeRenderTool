@@ -1,7 +1,7 @@
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
-import { CacheStatus, CacheManager } from 'Managers/CacheManager';
+import { CacheStatus, CacheManager } from '../Utilities/CacheManager';
 import { PlacementState } from 'Models/Placement';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';

@@ -5,6 +5,7 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
+import { Platform } from 'Constants/Platform';
 
 export class Overlay extends View {
 
@@ -154,6 +155,15 @@ export class Overlay extends View {
         } else {
             // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
             this._videoDurationCounterElement.innerHTML = '0';
+        }
+
+        // redraw updated elements to fix the overlapping texts issue
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 21) {
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
         }
     }
 
