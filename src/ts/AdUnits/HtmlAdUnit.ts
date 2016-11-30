@@ -89,6 +89,8 @@ export class HtmlAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         this._isShowing = false;
         this._thirdParty.hide();
+
+        this._sessionManager.sendThirdQuartile(this);
         this._sessionManager.sendView(this);
 
         this.onFinish.trigger();
