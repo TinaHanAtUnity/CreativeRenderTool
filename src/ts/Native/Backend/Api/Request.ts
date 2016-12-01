@@ -30,16 +30,6 @@ export class Request {
         xhr.send(body);
     }
 
-    public static head(id: string, url: string, body: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
-        Request._requestLog.push(url);
-        const xhr = new XMLHttpRequest();
-        xhr.onload = (event: Event) => {
-            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
-        };
-        xhr.open('HEAD', url);
-        xhr.send(body);
-    }
-
     private static _requestLog: string[] = [];
 
 }

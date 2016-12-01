@@ -34,7 +34,7 @@ export class AdUnitFactory {
     public static createAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, configuration, options);
+            return this.createVastAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof HtmlCampaign) {
             return this.createHtmlAdUnit(nativeBridge, deviceInfo, sessionManager, placement, campaign, options);
         } else {
@@ -70,18 +70,24 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
-        const vastEndScreen = new VastEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
-        const metaData = new MetaData(nativeBridge);
+        let vastAdUnit: VastAdUnit;
 
+        const metaData = new MetaData(nativeBridge);
         const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
-        const vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+
+        if (campaign.hasEndscreen()) {
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+            this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
+        } else {
+            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
+        }
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, metaData);
-        this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
@@ -163,18 +169,17 @@ export class AdUnitFactory {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, adUnit));
         endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
 
-        // if (nativeBridge.getPlatform() === Platform.ANDROID) {
-        //     endScreen.onClick.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
-        //     const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
-        //     adUnit.onClose.subscribe(() => {
-        //         nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-        //     });
-        // } else if (nativeBridge.getPlatform() === Platform.IOS) {
-        //     endScreen.onClick.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
-        // }
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, adUnit));
+        }
     }
 
     private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {

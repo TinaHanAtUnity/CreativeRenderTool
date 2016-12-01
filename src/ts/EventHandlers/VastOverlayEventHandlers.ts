@@ -9,8 +9,10 @@ export class VastOverlayEventHandlers {
         const endScreen = adUnit.getEndScreen();
         if (endScreen) {
             endScreen.show();
+            adUnit.onFinish.trigger();
+        } else {
+            adUnit.hide();
         }
-        adUnit.onFinish.trigger();
     }
 
     public static onMute(sessionManager: SessionManager, adUnit: VastAdUnit, muted: boolean): void {

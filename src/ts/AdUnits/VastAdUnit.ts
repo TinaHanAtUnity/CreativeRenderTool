@@ -8,12 +8,12 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 
 export class VastAdUnit extends VideoAdUnit {
 
-    private _endScreen: VastEndScreen | undefined;
+    private _endScreen: VastEndScreen | null;
 
     constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
         super(nativeBridge, videoAdUnitController);
 
-        this._endScreen = endScreen;
+        this._endScreen = endScreen || null;
     }
 
     public show(): Promise<void> {
@@ -24,7 +24,7 @@ export class VastAdUnit extends VideoAdUnit {
         const endScreen = this.getEndScreen();
         if (endScreen) {
             endScreen.hide();
-            endScreen.container().parentElement.removeChild(endScreen.container());
+            endScreen.remove();
         }
 
         return this._videoAdUnitController.hide();
@@ -69,11 +69,18 @@ export class VastAdUnit extends VideoAdUnit {
 
     public getVideoClickThroughURL(): string | null {
         const url = this.getVast().getVideoClickThroughURL();
-        const reg = new RegExp('^(https?)://.+$');
-        if (url && reg.test(url)) {
+        if (this.isValidURL(url)) {
             return url;
         } else {
-            // in the future, we want to send this event to our server and notify the advertiser of a broken link
+            return null;
+        }
+    }
+
+    public getCompanionClickThroughUrl(): string | null {
+        const url = this.getVast().getCompanionClickThroughUrl();
+        if (this.isValidURL(url)) {
+            return url;
+        } else {
             return null;
         }
     }
@@ -88,7 +95,7 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public getEndScreen(): VastEndScreen | undefined {
+    public getEndScreen(): VastEndScreen | null {
         return this._endScreen;
     }
 
@@ -108,6 +115,11 @@ export class VastAdUnit extends VideoAdUnit {
 
     private getTrackingEventUrls(eventName: string): string[] | null {
         return this.getVast().getTrackingEventUrls(eventName);
+    }
+
+    private isValidURL(url: string | null): boolean {
+        const reg = new RegExp('^(https?)://.+$');
+        return !!url && reg.test(url);
     }
 
 }

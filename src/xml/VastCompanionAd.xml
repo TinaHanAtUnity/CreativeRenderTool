@@ -1,0 +1,62 @@
+<VAST version="2.0" xsi:noNamespaceSchemaLocation="vast.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Ad id="3203937">
+        <InLine>
+            <AdSystem version="6.5.0">MediaMath T1 VADS (VACS 6.8.0)</AdSystem>
+            <AdTitle><![CDATA[UNITY TEST COMPANION BANNER]]></AdTitle>
+            <Description><![CDATA[UNITY TEST COMPANION BANNER]]></Description>
+            <Error><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=err&mt_id=3203937&error=[ERRORCODE]&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Error>
+            <Impression><![CDATA[http://vast.mathtag.com/index.html/notify/img?price=12&nocache=true&id=asfasf&cid=3203937&exch=brx&protocol_version=1&sid=111666111]]></Impression>
+            <Impression><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=imp&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Impression>
+            <Creatives>
+                <Creative id="3203937" sequence="0">
+                    <Linear>
+                        <Duration>00:00:15</Duration>
+                        <TrackingEvents>
+                            <Tracking event="resume"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=resume&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="acceptInvitation"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=acceptInvitation&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="collapse"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=collapse&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=q3&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="close"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=close&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="creativeView"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=vv&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="fullscreen"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=fullscreen&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="complete"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=q4&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="start"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=vst&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="rewind"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=rewind&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="unmute"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=unmute&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="expand"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=expand&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="mute"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=mute&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=q2&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="pause"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=pause&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=q1&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[https://www.mediamath.com]]></ClickThrough>
+                            <ClickTracking><![CDATA[https://pixel.mathtag.com/click/img?cb=8541700239826312192&mt_aid=123&event=click&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></ClickTracking>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile type="video/mp4" bitrate="652" delivery="progressive" width="320" height="180" scalable="true" maintainAspectRatio="true"><![CDATA[https://cdn.unityads.unity3d.com/impact/11017/blue_test_trailer.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+                <Creative id="unity_companion" sequence="0">
+                    <CompanionAds>
+                        <Companion id="unity_brand_endcard_portrait" width="2500" height="3500">
+                            <StaticResource creativeType="image/png"><![CDATA[http://unity.com/portrait.jpg]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://test.com/clicktracking]]></Tracking>
+                            </TrackingEvents>
+                            <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                        </Companion>
+                        <Companion id="unity_brand_endcard_landscape" width="3500" height="2500">
+                            <StaticResource creativeType="image/png"><![CDATA[http://unity.com/landscape.jpg]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_uuid=83d5ca41-447b-4650-a4a1-745fa218e1e1&mt_cmid=1&mt_aid=123&event=companionImpression&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            </TrackingEvents>
+                            <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                        </Companion>
+                    </CompanionAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>

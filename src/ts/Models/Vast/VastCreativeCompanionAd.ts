@@ -6,12 +6,11 @@ export class VastCreativeCompanionAd {
     private _staticResourceURL: string | null;
     private _creativeType: string | null;
     private _companionClickThroughURLTemplate: string | null;
-    // private _trackingEvents = {}
 
-    constructor(id: string, creativeType: string, staticResourceURL: string, companionClickThroughURLTemplate: string) {
+    constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
         this._id = id || null;
-        this._width = 0;
-        this._height = 0;
+        this._width = width || 0;
+        this._height = height || 0;
         this._type = '';
         this._creativeType = creativeType || null;
         this._staticResourceURL = staticResourceURL || null;
@@ -32,5 +31,13 @@ export class VastCreativeCompanionAd {
 
     public getCompanionClickThroughURLTemplate(): string | null {
         return this._companionClickThroughURLTemplate;
+    }
+
+    public getHeight(): number {
+        return this._height;
+    }
+
+    public getWidth(): number {
+        return this._width;
     }
 }

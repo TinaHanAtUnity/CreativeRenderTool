@@ -3,10 +3,8 @@ import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0, Observable1 } from 'Utilities/Observable';
+import { Observable0 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
-import { Privacy } from 'Views/Privacy';
-import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class VastEndScreen extends View {
@@ -14,21 +12,15 @@ export class VastEndScreen extends View {
     public onClick: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
-    private _coppaCompliant: boolean;
-    private _gameName: string;
-    private _privacy: Privacy;
-
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign) {
         super(nativeBridge, 'end-screen');
-        this._coppaCompliant = coppaCompliant;
-        this._gameName = campaign.getGameName();
 
-        this._template = new Template(VastEndScreenTemplate, new Localization(language, 'endscreen'));
+        this._template = new Template(VastEndScreenTemplate);
 
         if(campaign) {
             this._templateData = {
-                'endScreenLandscape': campaign.getLandscapeUrl(),
-                'endScreenPortrait': campaign.getPortraitUrl()
+                'endScreenLandscape': campaign.getLandscapeUrl() || campaign.getPortraitUrl(),
+                'endScreenPortrait': campaign.getPortraitUrl() || campaign.getLandscapeUrl()
             };
         }
 
@@ -54,14 +46,8 @@ export class VastEndScreen extends View {
         }
     }
 
-    public hide(): void {
-        super.hide();
-
-        if(this._privacy) {
-            this._privacy.hide();
-            this._privacy.container().parentElement.removeChild(this._privacy.container());
-            delete this._privacy;
-        }
+    public remove(): void {
+        this.container().parentElement.removeChild(this.container());
     }
 
     private onCloseEvent(event: Event): void {

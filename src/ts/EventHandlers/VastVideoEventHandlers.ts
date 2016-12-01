@@ -24,17 +24,20 @@ export class VastVideoEventHandlers {
         }
         adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId());
 
-        this.hideEndScreen(adUnit);
-    }
-
-    public static onVideoError(adUnit: VastAdUnit) {
-        this.hideEndScreen(adUnit);
-    }
-
-    private static hideEndScreen(adUnit: VastAdUnit) {
         const endScreen = adUnit.getEndScreen();
         if (endScreen) {
             endScreen.show();
+        } else {
+            adUnit.hide();
+        }
+    }
+
+    public static onVideoError(adUnit: VastAdUnit) {
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        } else {
+            adUnit.hide();
         }
     }
 }

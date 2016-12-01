@@ -33,7 +33,6 @@ export class VastAd {
         return this._creatives;
     }
 
-    // TODO: This might cause bugs if we have more than just linear creatives
     public getCreative(): VastCreative | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
