@@ -1,25 +1,25 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 import DummyAdPlan from 'json/DummyAdPlan.json';
 import SimpleVast from 'xml/SimpleVast.xml';
 import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
-describe('Campaign', () => {
+describe('PerformanceCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
             const json = JSON.parse(DummyAdPlan);
-            const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
             assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
-            assert.equal(campaign.getLandscapeUrl(), json.campaign.endScreenLandscape);
-            assert.equal(campaign.getPortraitUrl(), json.campaign.endScreenPortrait);
+            assert.equal(campaign.getLandscape().getUrl(), json.campaign.endScreenLandscape);
+            assert.equal(campaign.getPortrait().getUrl(), json.campaign.endScreenPortrait);
             assert.equal(campaign.getGameIcon(), json.campaign.gameIcon);
             assert.equal(campaign.getGameId(), json.campaign.gameId);
             assert.equal(campaign.getGameName(), json.campaign.gameName);
@@ -37,15 +37,7 @@ describe('Campaign', () => {
             const campaign = new VastCampaign(parsedVast, '12345', 'gamerId', 1);
             assert.equal(campaign.getAbGroup(), 1);
             assert.equal(campaign.getGamerId(), 'gamerId');
-            assert.equal(campaign.getAppStoreId(), null);
-            assert.equal(campaign.getLandscapeUrl(), null);
-            assert.equal(campaign.getPortraitUrl(), null);
-            assert.equal(campaign.getGameIcon(), null);
-            assert.equal(campaign.getGameId(), null);
-            assert.equal(campaign.getGameName(), null);
             assert.equal(campaign.getId(), '12345');
-            assert.equal(campaign.getRating(), null);
-            assert.equal(campaign.getRatingCount(), null);
             const vast = campaign.getVast();
             assert.equal(1, vast.getAds().length);
             assert.deepEqual(vast.getImpressionUrls(), [
@@ -69,9 +61,9 @@ describe('Campaign', () => {
             const vastXml = CacheSimpleVast;
             const vastParser = TestFixtures.getVastParser();
             const parsedVast = vastParser.parseVast(vastXml);
-            const campaign = new Campaign({vast: parsedVast}, 'gamerId', 1);
-            campaign.setVideoUrl('file://some/cache/path.mp4');
-            assert.equal(campaign.getVideoUrl(), 'file://some/cache/path.mp4');
+            const campaign = new VastCampaign(parsedVast, 'campaignId', 'gamerId', 1);
+            campaign.getVideo().setCachedUrl('file://some/cache/path.mp4');
+            assert.equal(campaign.getVideo().getUrl(), 'file://some/cache/path.mp4');
         });
     });
 });

@@ -11,12 +11,12 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventManager } from 'Managers/EventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
-import { Campaign } from 'Models/Campaign';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { IosVideoAdUnitController } from 'AdUnits/IosVideoAdUnitController';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -53,11 +53,11 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign>{
-                getVideoUrl: () => 'fake url',
-                getAppStoreId: () => 'fooAppId',
-                getClickAttributionUrlFollowsRedirects: () => true
-            }, overlay, null);
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), new PerformanceCampaign({
+                trailerDownloadable: 'fake url',
+                appStoreId: 'fooAppId',
+                clickAttributionUrlFollowsRedirects: true
+            }, 'asd', 10), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
         });
@@ -147,13 +147,13 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getPlacement(), <Campaign>{
-                getVideoUrl: () => 'fake url',
-                getAppStoreId: () => '11111',
-                getClickAttributionUrlFollowsRedirects: () => true,
-                getBypassAppSheet: () => false,
-                getClickAttributionUrl: () => ''
-            }, overlay, null);
+            videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getPlacement(), new PerformanceCampaign({
+                trailerDownloadable: 'fake url',
+                appStoreId: '11111',
+                clickAttributionUrlFollowsRedirects: true,
+                bypassAppSheet: false,
+                clickAttributionUrl: ''
+            }, 'asd', 10), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
         });

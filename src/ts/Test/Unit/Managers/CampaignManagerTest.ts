@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -37,6 +36,9 @@ import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
+import { AssetManager } from 'Managers/AssetManager';
+import { Cache } from 'Utilities/Cache';
+import { CacheMode } from 'Models/Configuration';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -54,10 +56,11 @@ describe('CampaignManager', () => {
             response: OnVastCampaignJson
         }));
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
-        let triggeredCampaign: Campaign;
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        let triggeredCampaign: VastCampaign;
         let triggeredError: any;
-        campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
+        campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
         });
         campaignManager.onError.subscribe(error => {
@@ -74,7 +77,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
         });
     });
 
@@ -90,7 +93,8 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(1);
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
@@ -98,7 +102,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
             assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'http://myErrorURL/error',
                 'http://myErrorURL/wrapper/error'
@@ -164,7 +168,8 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(2);
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
@@ -172,7 +177,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
             assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
                 'http://events.tremorhub.com/diag?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&rid=fd53cdbe934c44c68c57467d184160d7&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=rwd19-1059849-video&seatId=60673&pbid=1585&brid=3418&sid=9755&sdom=demo.app.com&asid=5097&nid=3&lid=3&adom=nissanusa.com&crid=17282869&aid=13457'
@@ -271,7 +276,8 @@ describe('CampaignManager', () => {
             response: nonWrappedVAST
         }));
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         campaignManager.onError.subscribe((err: Error) => {
             assert.equal(err.message, 'VAST wrapper depth exceeded');
             done();
@@ -286,7 +292,8 @@ describe('CampaignManager', () => {
         const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
             triggeredError = error;
@@ -307,7 +314,8 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
         const verify = () => {
             // then the onError observable is triggered with an appropriate error
@@ -405,7 +413,8 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+            const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+            const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
             let triggeredRetryTime: number;
             let triggeredError: any;
             campaignManager.onNoFill.subscribe((retryTime: number) => {
@@ -456,10 +465,11 @@ describe('CampaignManager', () => {
         const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
-        let triggeredCampaign: Campaign;
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        let triggeredCampaign: VastCampaign;
         let triggeredError: any;
-        campaignManager.onVastCampaign.subscribe((campaign: Campaign) => {
+        campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
         });
         campaignManager.onError.subscribe(error => {
@@ -476,7 +486,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
         });
     };
 
@@ -569,7 +579,8 @@ describe('CampaignManager', () => {
             response: CustomTrackingVastJson
         }));
 
-        const campaignManager = new CampaignManager(nativeBridge, request, clientInfo, deviceInfo, vastParser);
+        const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -589,7 +600,7 @@ describe('CampaignManager', () => {
             mockRequest.verify();
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-            assert.equal(triggeredCampaign.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
 
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                 'http://customTrackingUrl/start',

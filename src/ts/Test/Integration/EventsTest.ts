@@ -1,14 +1,14 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Platform } from 'Constants/Platform';
-import { UnityAds } from 'Native/Backend/UnityAds';
-import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { UnityAdsError } from 'Constants/UnityAdsError';
-import { FinishState } from 'Constants/FinishState';
-import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { Request } from 'Native/Backend/Api/Request';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Platform } from '../../Constants/Platform';
+import { UnityAds } from '../../Native/Backend/UnityAds';
+import { IUnityAdsListener } from '../../Native/Backend/IUnityAdsListener';
+import { UnityAdsError } from '../../Constants/UnityAdsError';
+import { FinishState } from '../../Constants/FinishState';
+import { DeviceInfo } from '../../Native/Backend/Api/DeviceInfo';
+import { Request } from '../../Native/Backend/Api/Request';
+import { AbstractAdUnit } from '../../AdUnits/AbstractAdUnit';
 
 describe('EventsTest', () => {
 
