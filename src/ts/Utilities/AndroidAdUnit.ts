@@ -5,6 +5,12 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
+/*
+interface IAndroidOptions {
+    requestedOrientation: ScreenOrientation;
+}
+*/
+
 export class AndroidAdUnit extends AdUnit {
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
