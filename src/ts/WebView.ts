@@ -244,6 +244,7 @@ export class WebView {
     }
 
     private onCampaign(campaign: Campaign) {
+        this._campaign = campaign;
         if(this._showing) {
             const onCloseObserver = this._adUnit.onClose.subscribe(() => {
                 this._adUnit.onClose.unsubscribe(onCloseObserver);

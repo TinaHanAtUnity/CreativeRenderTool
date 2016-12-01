@@ -22,7 +22,9 @@ export class AssetManager {
             });
         }, Promise.resolve()).then(() => {
             const optionalChain = campaign.getOptionalAssets().reduce((previous, current) => {
-                return this._cache.cache(current.getUrl()).then(fileUrl => current.setCachedUrl(fileUrl));
+                return previous.then(() => {
+                    return this._cache.cache(current.getUrl()).then(fileUrl => current.setCachedUrl(fileUrl));
+                });
             }, Promise.resolve());
             if(this._cacheMode === CacheMode.FORCED) {
                 return optionalChain;

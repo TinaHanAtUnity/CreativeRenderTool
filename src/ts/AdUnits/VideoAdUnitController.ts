@@ -4,6 +4,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { FinishState } from 'Constants/FinishState';
+import { PerformanceCampaign } from '../Models/PerformanceCampaign';
+import { VastCampaign } from '../Models/Vast/VastCampaign';
 
 export abstract class VideoAdUnitController {
 
@@ -147,12 +149,12 @@ export abstract class VideoAdUnitController {
     };
 
     protected getVideoUrl(): string {
-        /*const campaign: Campaign = this.getCampaign();
-        if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
-            return campaign.getStreamingVideoUrl();
-        } else {
-            return campaign.getVideoUrl();
-        }*/
-        return 'lol';
+        const campaign = this._campaign;
+        if(campaign instanceof PerformanceCampaign) {
+            return campaign.getVideo().isCached() ? campaign.getVideo().getUrl() : campaign.getStreamingVideo().getUrl();
+        } else if(campaign instanceof VastCampaign) {
+            return campaign.getVideo().getUrl();
+        }
+        throw new Error('Not a video campaign');
     }
 }
