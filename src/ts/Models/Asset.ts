@@ -8,6 +8,13 @@ export class Asset {
     }
 
     public getUrl(): string {
+        if(typeof this._cachedUrl !== 'undefined') {
+            return this._cachedUrl;
+        }
+        return this._url;
+    }
+
+    public getOriginalUrl() {
         return this._url;
     }
 

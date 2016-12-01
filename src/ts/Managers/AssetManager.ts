@@ -28,6 +28,10 @@ export class AssetManager {
                 return optionalChain;
             }
             return Promise.resolve();
+        }).catch(error => {
+            if(this._cacheMode !== CacheMode.ALLOWED) {
+                throw error;
+            }
         });
     }
 

@@ -1,15 +1,18 @@
 import { Campaign } from 'Models/Campaign';
 import { Vast } from 'Models/Vast/Vast';
+import { Video } from 'Models/Video';
 
 export class VastCampaign extends Campaign {
 
     private _cacheTTL: number;
     private _vast: Vast;
+    private _video: Video;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
         super(campaignId, gamerId, abGroup);
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
+        this._video = new Video(this._vast.getVideoUrl());
         this.processCustomTracking(tracking);
     }
 
@@ -17,12 +20,22 @@ export class VastCampaign extends Campaign {
         return this._vast;
     }
 
-    public getVideoUrl(): string {
-        return this._vast.getVideoUrl();
+    public getVideo() {
+        return this._video;
     }
 
     public getTimeoutInSeconds(): number {
         return this._cacheTTL;
+    }
+
+    public getRequiredAssets() {
+        return [
+            this._video
+        ];
+    }
+
+    public getOptionalAssets() {
+        return [];
     }
 
     private processCustomTracking(tracking: any) {

@@ -1,20 +1,27 @@
 import { Campaign } from 'Models/Campaign';
+import { Asset } from 'Models/Asset';
 
 export class HtmlCampaign extends Campaign {
 
-    private _resourceUrl: string;
+    private _resource: Asset;
 
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl: string) {
         super(campaign.id, gamerId, abGroup);
-        this._resourceUrl = resourceUrl;
+        this._resource = new Asset(resourceUrl);
     }
 
-    public getResourceUrl(): string {
-        return this._resourceUrl;
+    public getResource() {
+        return this._resource;
     }
 
-    public setResourceUrl(url: string): void {
-        this._resourceUrl = url;
+    public getRequiredAssets() {
+        return [
+            this._resource
+        ];
+    }
+
+    public getOptionalAssets() {
+        return [];
     }
 
 }

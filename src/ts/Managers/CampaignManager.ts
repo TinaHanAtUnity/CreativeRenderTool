@@ -92,15 +92,15 @@ export class CampaignManager {
             this.storeGamerId(json.gamerId);
         }
         if('campaign' in json) {
-            this.parsePerformanceCampaign(json);
+            return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
-            this.parseVastCampaign(json);
+            return this.parseVastCampaign(json);
         } else {
-            this.handleNoFill();
+            return this.handleNoFill();
         }
     }
 
-    private parsePerformanceCampaign(json: any) {
+    private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
         const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
         let resource: string | undefined;
@@ -128,16 +128,15 @@ export class CampaignManager {
         const abGroup = campaign.getAbGroup();
         if(resource && (abGroup === 10 || abGroup === 11 || abGroup === 12 || abGroup === 13)) {
             const htmlCampaign = new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
-            this.onThirdPartyCampaign.trigger(htmlCampaign);
+            return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
         } else {
-            this.onPerformanceCampaign.trigger(campaign);
+            return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
 
-    private parseVastCampaign(json: any) {
+    private parseVastCampaign(json: any): Promise<void> {
         if(json.vast === null) {
-            this.handleNoFill();
-            return;
+            return this.handleNoFill();
         }
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
         const decodedVast = decodeURIComponent(json.vast.data).trim();
@@ -159,15 +158,7 @@ export class CampaignManager {
             if(campaign.getVast().getErrorURLTemplates().length === 0) {
                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
             }
-            if(!campaign.getVideoUrl()) {
-                const videoUrlError = new DiagnosticError(
-                    new Error('Campaign does not have a video url'),
-                    {rootWrapperVast: json.vast}
-                );
-                this.onError.trigger(videoUrlError);
-                return;
-            }
-            if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideoUrl().match(/^https:\/\//)) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign video url needs to be https for iOS'),
                     {rootWrapperVast: json.vast}
@@ -175,16 +166,17 @@ export class CampaignManager {
                 this.onError.trigger(videoUrlError);
                 return;
             }
-            this.onVastCampaign.trigger(campaign);
+            this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
         }).catch((error) => {
             this.onError.trigger(error);
         });
     }
 
-    private handleNoFill() {
+    private handleNoFill(): Promise<void> {
         this._refillTimestamp = Date.now() + 3600 * 1000;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.onNoFill.trigger(CampaignManager.NoFillDelay);
+        return Promise.resolve();
     }
 
     private createRequestUrl(): Promise<string> {
