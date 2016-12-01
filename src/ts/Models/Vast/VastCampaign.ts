@@ -12,7 +12,6 @@ export class VastCampaign extends Campaign {
         super(campaignId, gamerId, abGroup);
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
-        this._video = new Video(this._vast.getVideoUrl());
         this.processCustomTracking(tracking);
     }
 
@@ -21,6 +20,9 @@ export class VastCampaign extends Campaign {
     }
 
     public getVideo() {
+        if(!this._video) {
+            this._video = new Video(this._vast.getVideoUrl());
+        }
         return this._video;
     }
 

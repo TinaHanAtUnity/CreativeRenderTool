@@ -20,7 +20,7 @@ describe('PerformanceCampaign', () => {
             assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
             assert.equal(campaign.getLandscape().getUrl(), json.campaign.endScreenLandscape);
             assert.equal(campaign.getPortrait().getUrl(), json.campaign.endScreenPortrait);
-            assert.equal(campaign.getGameIcon(), json.campaign.gameIcon);
+            assert.equal(campaign.getGameIcon().getUrl(), json.campaign.gameIcon);
             assert.equal(campaign.getGameId(), json.campaign.gameId);
             assert.equal(campaign.getGameName(), json.campaign.gameName);
             assert.equal(campaign.getId(), json.campaign.id);

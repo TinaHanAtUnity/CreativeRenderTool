@@ -158,6 +158,14 @@ export class CampaignManager {
             if(campaign.getVast().getErrorURLTemplates().length === 0) {
                 this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
             }
+            if(!campaign.getVideo().getUrl()) {
+                const videoUrlError = new DiagnosticError(
+                    new Error('Campaign does not have a video url'),
+                    {rootWrapperVast: json.vast}
+                );
+                this.onError.trigger(videoUrlError);
+                return;
+            }
             if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign video url needs to be https for iOS'),

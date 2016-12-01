@@ -142,7 +142,7 @@ class TestStorageApi extends StorageApi {
     }
 }
 
-describe('CacheManagerTest', () => {
+describe('CacheTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
@@ -162,7 +162,7 @@ describe('CacheManagerTest', () => {
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
         cacheManager = new Cache(nativeBridge, wakeUpManager);
-        sinon.stub(cacheManager, 'shouldCache').returns(Promise.resolve(true));
+        sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
     it('Get local file url for cached file', () => {
@@ -274,7 +274,6 @@ describe('CacheManagerTest', () => {
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
         return cacheManager.cache(testUrl).then(fileUrl => {
-            assert.equal(CacheStatus.OK, status, 'CacheStatus was not OK for already downloaded file');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });

@@ -11,7 +11,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { VastParser } from 'Utilities/VastParser';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Observable2 } from 'Utilities/Observable';
+import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 
@@ -346,7 +346,7 @@ describe('CampaignManager', () => {
             const response = {
                 response: NoVideoVastJson
             };
-            return verifyErrorForResponse(response, 'Campaign does not have a video url');
+            return verifyErrorForResponse(response, 'No video URL found for VAST');
         });
 
         it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
@@ -357,7 +357,7 @@ describe('CampaignManager', () => {
             const wrappedResponse = Promise.resolve({
                 response: NoVideoWrappedVast
             });
-            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Campaign does not have a video url', done);
+            return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'No video URL found for VAST', done);
         });
 
         it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
@@ -544,6 +544,14 @@ describe('CampaignManager', () => {
                 onFailed: {
                     subscribe: sinon.spy()
                 }
+            },
+            Cache: {
+                setProgressInterval: sinon.spy(),
+                onDownloadStarted: new Observable0(),
+                onDownloadProgress: new Observable0(),
+                onDownloadEnd: new Observable0(),
+                onDownloadStopped: new Observable0(),
+                onDownloadError: new Observable0(),
             },
             Sdk: {
                 logWarning: warningSpy,
