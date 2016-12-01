@@ -30,7 +30,7 @@ export class EndScreen extends View {
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
                 'endScreenLandscape': campaign.getLandscape().getUrl(),
                 'endScreenPortrait': campaign.getPortrait().getUrl(),
                 'rating': adjustedRating.toString(),
