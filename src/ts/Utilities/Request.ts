@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
+import { Platform } from 'Constants/Platform';
 
 const enum RequestStatus {
     COMPLETE,
@@ -121,6 +122,11 @@ export class Request {
     public head(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
+        }
+
+        // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
+            headers.push(['Accept-Encoding', '']);
         }
 
         const id = Request._callbackId++;
