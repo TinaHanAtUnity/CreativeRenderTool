@@ -76,7 +76,7 @@ export class AndroidAdUnit extends AdUnit {
 
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onKill.trigger();
+                this.onSystemKill.trigger();
             }
         }
     }
@@ -85,7 +85,7 @@ export class AndroidAdUnit extends AdUnit {
         if(activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onKill.trigger();
+                this.onSystemKill.trigger();
             }
         }
     }
