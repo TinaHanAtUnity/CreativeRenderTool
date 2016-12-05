@@ -36,10 +36,12 @@ export class EndScreen extends View {
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
                 'endscreenAlt': (() => {
-                     if(campaign.getAbGroup() == 8 || 9) && (gameId == 45236 || gameId == 45237) {
+                    const abGroup = campaign.getAbGroup();
+                    const gameId = campaign.getGameId();
+                    if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
                         return 'animated';
                     }
-                     if(campaign.getAbGroup() == 10 || 11) && (gameId == 45236 || gameId == 45237) {
+                    if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
                         return 'animated2';
                     }
                     return undefined;
