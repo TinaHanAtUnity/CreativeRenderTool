@@ -1,0 +1,105 @@
+body.iphone
+body.ipad
+body.android
+  .campaign-container.animated2
+    
+    .btn-download
+     background-image: #9f1281
+     background: #9f1281
+    
+    .game-icon
+     display: none
+
+    .name-container
+     color: #fafafa
+    
+    .coc_cta
+     display: block
+     position: absolute
+     left: 20%
+     bottom: 5%
+     width: 40%
+     height: 10%
+     background-size: cover
+     background-image: url('../img/coc_cta.gif')
+     background-repeat: no-repeat
+     
+    .cocback
+     display: block
+     position: absolute
+     top: 0
+     bottom: 0%
+     width: 55%
+     height: 100%
+     background-size: cover
+     background-position: center
+     background-image: url('../img/coc_back2.gif')
+     background-repeat: no-repeat
+    
+    .cocchars
+     display: block
+     position: fixed
+     left: 0%
+     bottom: -50%
+     width: 50%
+     height: 100%
+     background-size: contain
+     background-image: url('../img/coc_char.gif')
+     background-repeat: no-repeat
+     -webkit-transform-origin: 50% 50%
+     
+    .cocchars2
+     -webkit-animation-name: zoomIn
+     -webkit-animation-duration: 5s
+     -webkit-transform-origin: 50% 50%
+     
+    .coclogo
+     display: none
+    
+    .coclogoicon
+     display: block
+     position: absolute
+     left: 8%
+     top: 1%
+     width: 100%
+     height: 50%
+     background-size: contain
+     background-image: url('../img/coc_logo.gif')
+     background-repeat: no-repeat
+     
+    
+  &.portrait
+    .campaign-container.animated2
+        
+      .game-icon
+        display: block
+      .name-container
+        color: #1f1e1e
+    
+      .coclogoicon
+        display: none
+                      
+      .cocback
+        width: 100%
+        height: 60%
+      
+      .cocchars
+        bottom: 25%
+        width: 100%
+        height: 50%
+      
+      .coc_cta
+        left: 50%
+        bottom: 15%
+        
+      .coclogo
+        display: block
+        position: absolute
+        left: 5%
+        top: 5%
+        width: 40%
+        height: 40%
+        background-size: contain
+        background-image: url('../img/coc_logo.gif')
+        background-repeat: no-repeat
+        
