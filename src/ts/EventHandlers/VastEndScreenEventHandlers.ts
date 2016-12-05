@@ -6,7 +6,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 
 export class VastEndScreenEventHandlers {
-    public static onEndcardClick(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
+    public static onClick(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
         const platform = nativeBridge.getPlatform();
         const clickThroughURL = adUnit.getCompanionClickThroughUrl() || adUnit.getVideoClickThroughURL();
         if (clickThroughURL) {

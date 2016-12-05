@@ -42,7 +42,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         });
     });
 
-    describe('when calling onEndcardClick', () => {
+    describe('when calling onClick', () => {
         let vastAdUnit: VastAdUnit;
 
         beforeEach(() => {
@@ -58,7 +58,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('https://bar.com');
 
-            VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, vastAdUnit);
+            VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://bar.com');
         });
 
@@ -67,7 +67,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, vastAdUnit);
+            VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://foo.com');
         });
 
@@ -76,7 +76,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.Intent, 'launch');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, vastAdUnit);
+            VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                 'action': 'android.intent.action.VIEW',
                 'uri': 'https://foo.com'

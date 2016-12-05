@@ -28,7 +28,7 @@ export class VastEndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onClickEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                selector: '.game-background'
             },
             {
                 event: 'click',

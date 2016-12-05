@@ -6,7 +6,7 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import {VastCreativeCompanionAd} from "../../../../Models/Vast/VastCreativeCompanionAd";
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
 describe('Vast', () => {
     let vastCreative: VastCreativeLinear;

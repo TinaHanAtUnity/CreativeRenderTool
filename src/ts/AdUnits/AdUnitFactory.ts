@@ -172,13 +172,13 @@ export class AdUnitFactory {
         endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, adUnit));
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
             adUnit.onClose.subscribe(() => {
                 nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
             });
         } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onEndcardClick(nativeBridge, sessionManager, adUnit));
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
         }
     }
 
