@@ -1,11 +1,11 @@
 import 'mocha';
 
-import { Platform } from '../../Constants/Platform';
-import { UnityAds } from '../../Native/Backend/UnityAds';
-import { IUnityAdsListener } from '../../Native/Backend/IUnityAdsListener';
-import { UnityAdsError } from '../../Constants/UnityAdsError';
-import { FinishState } from '../../Constants/FinishState';
-import { DeviceInfo } from '../../Native/Backend/Api/DeviceInfo';
+import { Platform } from 'Constants/Platform';
+import { UnityAds } from 'Native/Backend/UnityAds';
+import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
+import { UnityAdsError } from 'Constants/UnityAdsError';
+import { FinishState } from 'Constants/FinishState';
+import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 
 describe('IntegrationTest', () => {
 

@@ -111,6 +111,9 @@ export class Cache {
                     return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
                         const storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
                         return storedCacheResponse.fullyDownloaded;
+                    }).catch(error => {
+                        // todo: should we do something more intelligent here?
+                        return false;
                     });
                 }
                 return false;
