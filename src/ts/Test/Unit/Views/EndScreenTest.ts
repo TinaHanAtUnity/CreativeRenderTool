@@ -27,7 +27,7 @@ describe('EndScreen', () => {
         });
     });
 
-    it('should render', () => {
+    xit('should render', () => {
         const endScreen = new EndScreen(nativeBridge, new Campaign(JSON.parse(TestCampaign), '', 0), true, 'en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
