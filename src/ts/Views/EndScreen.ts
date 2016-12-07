@@ -43,7 +43,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
             },
             {
                 event: 'click',
