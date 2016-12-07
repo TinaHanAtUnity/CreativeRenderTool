@@ -1,3 +1,9 @@
+# Wed Dec  7 16:48:28 UTC 2016
+
+* Disable fake landscape introduced in 2.0.6 due to iOS native bug
+* Marvel Contest of Champions custom animated endscreens (A/B groups from 8 to 11)
+* Restore accidentally removed rules for endscreen portrait and landscape image assets
+
 # Wed Nov 30 13:40:07 UTC 2016
 
 * Deploy playable ads to all users except for A/B groups 6 and 7
