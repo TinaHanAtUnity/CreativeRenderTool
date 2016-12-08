@@ -8,9 +8,7 @@ import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { INativeResponse } from 'Utilities/Request';
 
 import ConfigurationJson from 'json/Configuration.json';
-import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import { DiagnosticError } from 'Errors/DiagnosticError';
 
 class TestStorageApi extends StorageApi {
 
@@ -132,8 +130,7 @@ describe('ConfigManagerTest', () => {
             return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
-                assert.instanceOf(error, ConfigError);
-                assert.equal(error.message, 'Error message');
+                assert.equal(error.message, 'FAILED_WITH_ERROR_RESPONSE');
             });
         });
     });
@@ -156,7 +153,7 @@ describe('ConfigManagerTest', () => {
             return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
-                assert.instanceOf(error, DiagnosticError);
+                assert.equal(error.message, 'FAILED_WITH_ERROR_RESPONSE');
             });
         });
     });

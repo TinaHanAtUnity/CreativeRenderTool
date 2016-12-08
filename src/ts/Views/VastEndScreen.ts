@@ -47,7 +47,7 @@ export class VastEndScreen extends View {
     }
 
     public remove(): void {
-        this.container().parentElement.removeChild(this.container());
+        this.container().parentElement!.removeChild(this.container());
     }
 
     private onCloseEvent(event: Event): void {

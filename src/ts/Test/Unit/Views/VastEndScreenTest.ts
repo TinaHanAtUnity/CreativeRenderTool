@@ -11,8 +11,8 @@ import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 
 describe('VastEndScreen', () => {
-    let handleInvocation: Sinon.SinonSpy;
-    let handleCallback: Sinon.SinonSpy;
+    let handleInvocation: sinon.SinonSpy;
+    let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {

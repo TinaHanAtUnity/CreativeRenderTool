@@ -11,8 +11,8 @@ import TestCampaign from 'json/TestCampaign.json';
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 
 describe('EndScreen', () => {
-    let handleInvocation: Sinon.SinonSpy;
-    let handleCallback: Sinon.SinonSpy;
+    let handleInvocation: sinon.SinonSpy;
+    let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {

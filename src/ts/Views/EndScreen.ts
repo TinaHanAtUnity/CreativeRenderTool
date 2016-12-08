@@ -84,7 +84,7 @@ export class EndScreen extends View {
 
         if(this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement.removeChild(this._privacy.container());
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
         }
     }
@@ -133,7 +133,7 @@ export class EndScreen extends View {
         this._privacy.onClose.subscribe(() => {
             if(this._privacy) {
                 this._privacy.hide();
-                this._privacy.container().parentElement.removeChild(this._privacy.container());
+                this._privacy.container().parentElement!.removeChild(this._privacy.container());
                 delete this._privacy;
             }
         });
