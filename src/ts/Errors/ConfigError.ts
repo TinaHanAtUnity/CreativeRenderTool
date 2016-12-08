@@ -1,8 +1,8 @@
-export class ConfigError extends Error {
+import { WebViewError } from 'Errors/WebViewError';
+
+export class ConfigError extends WebViewError {
 
     constructor(error: Error) {
-        super();
-        this.name = error.name;
-        this.message = error.message;
+        super(error.message, error.name);
     }
 }

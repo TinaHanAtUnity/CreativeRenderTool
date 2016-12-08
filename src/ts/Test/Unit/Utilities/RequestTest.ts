@@ -315,6 +315,7 @@ describe('RequestTest', () => {
                 return request.get(failureUrl).then((response) => {
                     assert.fail('Should not resolve');
                 }).catch(error => {
+                    assert.instanceOf(error, RequestError);
                     error = <RequestError>error;
                     assert.equal(error.message, reason);
                     assert.equal(error.nativeResponse.responseCode, i);
@@ -333,6 +334,7 @@ describe('RequestTest', () => {
             return request.get(failureUrl).then((response) => {
                 assert.fail('Should not resolve');
             }).catch(error => {
+                assert.instanceOf(error, RequestError);
                 error = <RequestError>error;
                 assert.equal(error.message, reason);
                 assert.equal(error.nativeResponse.responseCode, 600);
