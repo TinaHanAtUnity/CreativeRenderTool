@@ -41,6 +41,13 @@ interface ILanguageMap {
     };
 }
 
+interface ILocalizedAbbreviations {
+    [key: string]: { // device language regexp
+        thousand: string,
+        million: string
+    };
+}
+
 export class Localization {
 
     public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
@@ -66,6 +73,21 @@ export class Localization {
             Localization._languageMap[language] = {};
         }
         Localization._languageMap[language][namespace] = map;
+    }
+
+    public static getLocalizedAbbreviations(language: string): { thousand: string, million: string } | undefined {
+        const localizedAbbreviations = Localization._localizedAbbreviations[language];
+        if(localizedAbbreviations) {
+            return localizedAbbreviations;
+        }
+        for(const key in Localization._localizedAbbreviations) {
+            if(Localization._localizedAbbreviations.hasOwnProperty(key)) {
+                if(language.match(key)) {
+                    return Localization._localizedAbbreviations[key];
+                }
+            }
+        }
+        return undefined;
     }
 
     private static _languageMap: ILanguageMap = {
@@ -139,6 +161,17 @@ export class Localization {
         },
     };
 
+    private static _localizedAbbreviations: ILocalizedAbbreviations = {
+        'en.*': {
+            thousand: 'k',
+            million: 'm'
+        },
+        'zh.*': {
+            thousand: '千',
+            million: '百万'
+        }
+    };
+
     private _language: string;
     private _namespace: string;
 
@@ -153,6 +186,20 @@ export class Localization {
             return phrase;
         }
         return languageMap[phrase];
+    }
+
+    public readableNumberOfReviews(numOfReviews: number): string {
+        const localizedAbbreviations = Localization.getLocalizedAbbreviations(this._language);
+        if (!localizedAbbreviations) {
+            return numOfReviews.toString();
+        }
+        if (numOfReviews >= 1000000) {
+            return (Math.floor(numOfReviews / 1000000)).toString() + " " + localizedAbbreviations.million;
+        }
+        if (numOfReviews >= 10000) {
+            return (Math.floor(numOfReviews / 1000)).toString() + " " + localizedAbbreviations.thousand;
+        }
+        return numOfReviews.toString();
     }
 
 }
