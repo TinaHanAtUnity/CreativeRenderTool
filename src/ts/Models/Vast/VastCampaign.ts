@@ -6,12 +6,21 @@ export class VastCampaign extends Campaign {
     private _cacheTTL: number;
     private _campaignId: string;
     private _vast: Vast;
+    private _hasEndscreen: boolean;
 
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number) {
-        super({}, gamerId, abGroup);
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
+        const campaign = {
+            endScreenPortrait: vast.getCompanionPortraitUrl(),
+            endScreenLandscape: vast.getCompanionLandscapeUrl()
+        };
+
+        super(campaign, gamerId, abGroup);
+
+        this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
         this._campaignId = campaignId;
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
+        this.processCustomTracking(tracking);
     }
 
     public getId(): string {
@@ -35,4 +44,22 @@ export class VastCampaign extends Campaign {
         return this._cacheTTL;
     }
 
+    public hasEndscreen(): boolean {
+        return this._hasEndscreen;
+    }
+
+    private processCustomTracking(tracking: any) {
+        if (tracking) {
+            for (const trackingEventName in tracking) {
+                if (tracking.hasOwnProperty(trackingEventName)) {
+                    const urls = tracking[trackingEventName];
+                    if (urls) {
+                        urls.forEach((url: string) => {
+                            this._vast.addTrackingEventUrl(trackingEventName, url);
+                        });
+                    }
+                }
+            }
+        }
+    }
 }

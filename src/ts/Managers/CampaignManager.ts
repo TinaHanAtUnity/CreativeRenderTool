@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Request } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
 
 export class CampaignManager {
 
@@ -28,6 +29,7 @@ export class CampaignManager {
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
+    public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<Error> = new Observable1();
 
@@ -53,58 +55,126 @@ export class CampaignManager {
                 retryDelay: 5000,
                 followRedirects: false,
                 retryWithConnectionEvents: true
-            }).then(response => {
-                const campaignJson: any = JsonParser.parse(response.response);
-                if(campaignJson.gamerId) {
-                    this.storeGamerId(campaignJson.gamerId);
-                }
-                if (campaignJson.campaign) {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
-                    const campaign = new Campaign(campaignJson.campaign, campaignJson.gamerId, typeof CampaignManager.AbGroup === 'number' ? CampaignManager.AbGroup : campaignJson.abGroup);
-                    this.onCampaign.trigger(campaign);
-                } else if('vast' in campaignJson) {
-                    if (campaignJson.vast === null) {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                        this.onNoFill.trigger(3600);
-                    } else {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
-                        const decodedVast = decodeURIComponent(campaignJson.vast.data).trim();
-                        this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-                            let campaignId: string;
-                            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                                campaignId = '00005472656d6f7220694f53';
-                            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                                campaignId = '005472656d6f7220416e6472';
-                            } else {
-                                campaignId = 'UNKNOWN';
-                            }
-                            const campaign = new VastCampaign(vast, campaignId, campaignJson.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : campaignJson.abGroup, campaignJson.cacheTTL);
-                            if (campaign.getVast().getImpressionUrls().length === 0) {
-                                this.onError.trigger(new Error('Campaign does not have an impression url'));
-                                return;
-                            }
-                            // todo throw an Error if required events are missing. (what are the required events?)
-                            if (campaign.getVast().getErrorURLTemplates().length === 0) {
-                                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-                            }
-                            if (!campaign.getVideoUrl()) {
-                                const videoUrlError = new DiagnosticError(
-                                    new Error('Campaign does not have a video url'),
-                                    { rootWrapperVast: campaignJson.vast }
-                                );
-                                this.onError.trigger(videoUrlError);
-                                return;
-                            }
-                            this.onVastCampaign.trigger(campaign);
-                        }).catch((error) => {
-                            this.onError.trigger(error);
-                        });
-                    }
-                } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
-                    this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
-                }
             });
+        }).then(response => {
+            return this.parseCampaign(response);
+        }).catch((error) => {
+            this.onError.trigger(error);
+        });
+    }
+
+    private parseCampaign(response: INativeResponse) {
+        const json: any = JsonParser.parse(response.response);
+        if(json.gamerId) {
+            this.storeGamerId(json.gamerId);
+        }
+        if('campaign' in json) {
+            this.parsePerformanceCampaign(json);
+        } else if('vast' in json) {
+            this.parseVastCampaign(json);
+        } else {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
+            this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
+        }
+    }
+
+    private parsePerformanceCampaign(json: any) {
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+        const htmlCampaign = this.parseHtmlCampaign(json);
+        if(htmlCampaign) {
+            this.onThirdPartyCampaign.trigger(htmlCampaign);
+        } else {
+            const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+            this.onCampaign.trigger(campaign);
+        }
+    }
+
+    private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
+        const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+        let resource: string | undefined;
+        switch(campaign.getId()) {
+            // Game of War iOS
+            case '583dfda0d933a3630a53249c':
+            case '583dfd52abb1feee0909882b':
+            case '583dfd45669a903e086e38d2':
+            case '583dfd4c9ceadb4708b021de':
+                resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
+                break;
+
+            // Game of War Android
+            case '583dfca5a93bfa6700d8c6f3':
+            case '583dfcb54622865a0a246bdf':
+                resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
+                break;
+
+            // Mobile Strike iOS
+            case '583dfb9a5b79df3f0a274f0b':
+            case '583dfe483fe2166c0ac9e6fb':
+            case '583dfba09bfc2a2d0a9a0b1c':
+            case '583dfba69d308fe203d7d740':
+                resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+                break;
+
+            // Mobile Strike Android
+            case '583dfc532e4d9b5008c934d1':
+            case '583dfc667f448e630ac6a4bc':
+                resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
+                break;
+
+            default:
+                break;
+        }
+
+        const abGroup = campaign.getAbGroup();
+        if(resource && abGroup !== 6 && abGroup !== 7) {
+            return new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
+        }
+        return undefined;
+    }
+
+    private parseVastCampaign(json: any) {
+        if(json.vast === null) {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
+            this.onNoFill.trigger(3600);
+            return;
+        }
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
+        const decodedVast = decodeURIComponent(json.vast.data).trim();
+        return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
+            let campaignId: string;
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                campaignId = '00005472656d6f7220694f53';
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                campaignId = '005472656d6f7220416e6472';
+            } else {
+                campaignId = 'UNKNOWN';
+            }
+            const campaign = new VastCampaign(vast, campaignId, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.cacheTTL, json.vast.tracking);
+            if(campaign.getVast().getImpressionUrls().length === 0) {
+                this.onError.trigger(new Error('Campaign does not have an impression url'));
+                return;
+            }
+            // todo throw an Error if required events are missing. (what are the required events?)
+            if(campaign.getVast().getErrorURLTemplates().length === 0) {
+                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
+            }
+            if(!campaign.getVideoUrl()) {
+                const videoUrlError = new DiagnosticError(
+                    new Error('Campaign does not have a video url'),
+                    {rootWrapperVast: json.vast}
+                );
+                this.onError.trigger(videoUrlError);
+                return;
+            }
+            if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideoUrl().match(/^https:\/\//)) {
+                const videoUrlError = new DiagnosticError(
+                    new Error('Campaign video url needs to be https for iOS'),
+                    {rootWrapperVast: json.vast}
+                );
+                this.onError.trigger(videoUrlError);
+                return;
+            }
+            this.onVastCampaign.trigger(campaign);
         }).catch((error) => {
             this.onError.trigger(error);
         });

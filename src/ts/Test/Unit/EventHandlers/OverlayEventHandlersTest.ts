@@ -17,6 +17,7 @@ import { Double } from 'Utilities/Double';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { Platform } from 'Constants/Platform';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -38,7 +39,7 @@ describe('OverlayEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
 
     });

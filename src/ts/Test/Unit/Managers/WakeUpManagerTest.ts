@@ -38,9 +38,7 @@ describe('WakeUpManagerTest', () => {
         nativeBridge.Connectivity = new TestConnectivityApi(nativeBridge);
         nativeBridge.Broadcast = new TestBroadcastApi(nativeBridge);
 
-        const clock = sinon.useFakeTimers();
         wakeUpManager = new WakeUpManager(nativeBridge);
-        clock.restore();
     });
 
     it('should set connection listening status true', () => {
@@ -75,17 +73,22 @@ describe('WakeUpManagerTest', () => {
     });
 
     it('should trigger onNetworkConnected', () => {
-        const clock = sinon.useFakeTimers();
         const spy = sinon.spy();
         wakeUpManager.onNetworkConnected.subscribe(spy);
 
         nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        sinon.assert.callCount(spy, 0);
-
-        clock.tick(20 * 60 * 1000);
-        nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
         sinon.assert.callCount(spy, 1);
-        clock.restore();
+    });
+
+    it('should throttle onNetworkConnected to 10 events', () => {
+        const spy = sinon.spy();
+        wakeUpManager.onNetworkConnected.subscribe(spy);
+
+        for(let i: number = 0; i < 20; i++) {
+            nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
+        }
+
+        sinon.assert.callCount(spy, 10);
     });
 
     it('should trigger onScreenOn', () => {

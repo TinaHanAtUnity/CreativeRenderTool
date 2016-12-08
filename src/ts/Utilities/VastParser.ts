@@ -3,6 +3,7 @@ import { VastAd } from 'Models/Vast/VastAd';
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -196,6 +197,16 @@ export class VastParser {
                                         }
                                     }
                                     break;
+                                case 'CompanionAds':
+                                    const companionAdElements = this.childsByName(creativeTypeElement, 'Companion');
+                                    for (let i = 0; i < companionAdElements.length; i++) {
+                                        const companionAdElement = companionAdElements[i];
+                                        const companionAd = this.parseCreativeCompanionAdElement(companionAdElement);
+                                        if (companionAd) {
+                                            ad.addCompanionAd(companionAd);
+                                        }
+                                    }
+                                    break;
                                 default:
                                     break;
                             }
@@ -280,6 +291,26 @@ export class VastParser {
         }
 
         return creative;
+    }
+
+    private parseCreativeCompanionAdElement(companionAdElement: any): any {
+        const staticResourceElement = this.childByName(companionAdElement, 'StaticResource');
+        const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
+
+        if (companionAdElement && staticResourceElement) {
+            const id = companionAdElement.getAttribute('id');
+            const height = parseInt(companionAdElement.getAttribute('height') || 0, 10);
+            const width = parseInt(companionAdElement.getAttribute('width') || 0, 10);
+            const creativeType = staticResourceElement.getAttribute('creativeType');
+            const staticResourceURL = this.parseNodeText(staticResourceElement);
+            const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement);
+
+            const companionAd = new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate);
+
+            return companionAd;
+        } else {
+            return null;
+        }
     }
 
     private parseDuration(durationString: string): number {

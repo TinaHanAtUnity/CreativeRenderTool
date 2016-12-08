@@ -18,6 +18,7 @@ import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
+import { VastEndScreen } from 'Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -32,6 +33,7 @@ describe('VastOverlayEventHandlersTest', () => {
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, adUnit: VastAdUnit;
     let sessionManager: SessionManager;
+    let videoAdUnitController: AndroidVideoAdUnitController;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -64,7 +66,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
+        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
         adUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
 
     });
@@ -79,6 +81,16 @@ describe('VastOverlayEventHandlersTest', () => {
             sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
         });
 
+        describe('When ad unit has an endscreen', () => {
+            it('should hide endcard', () => {
+                const vastEndScreen = <VastEndScreen><any> {
+                    show: sinon.spy()
+                };
+                const vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+                VastOverlayEventHandlers.onSkip(vastAdUnit);
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+            });
+        });
     });
 
     describe('When calling onMute', () => {
@@ -108,10 +120,9 @@ describe('VastOverlayEventHandlersTest', () => {
 
     describe('When calling onCallButton', () => {
         let vastAdUnit: VastAdUnit;
-        let videoAdUnitController: AndroidVideoAdUnitController;
 
         beforeEach(() => {
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{}, null);
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{}, null);
             vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');

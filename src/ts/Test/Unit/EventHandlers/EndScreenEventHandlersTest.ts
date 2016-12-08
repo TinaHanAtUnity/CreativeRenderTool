@@ -53,7 +53,7 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => 'fooAppId',
                 getClickAttributionUrlFollowsRedirects: () => true
@@ -147,7 +147,7 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign>{
+            videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => '11111',
                 getClickAttributionUrlFollowsRedirects: () => true,

@@ -7,22 +7,21 @@ import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { EndScreen } from 'Views/EndScreen';
 import { Request } from 'Native/Backend/Api/Request';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 describe('EventsTest', () => {
 
     const validateRequestLog = (requestLog: string[]) => {
-        assert.equal(requestLog.length, 9, 'Request log length should be 9 for showing one ad');
+        assert.equal(requestLog.length, 8, 'Request log length should be 9 for showing one ad');
         assert(requestLog[0].match('/games/\\d+/configuration'), '1st request was not a configuration request');
         assert(requestLog[1].match('/games/\\d+/fill'), '2nd request was not a fill request');
-        assert(requestLog[2].match('/mobile/gamers/[0-9a-f]+/show'), '3rd request was not a show event');
-        assert(requestLog[3].match('/mobile/gamers/[0-9a-f]+/video/video_start'), '4th request was not a video_start event');
-        assert(requestLog[4].match('/mobile/gamers/[0-9a-f]+/video/first_quartile'), '5th request was not a first_quartile event');
-        assert(requestLog[5].match('/mobile/gamers/[0-9a-f]+/video/midpoint'), '6th request was not a midpoint event');
-        assert(requestLog[6].match('/mobile/gamers/[0-9a-f]+/video/third_quartile'), '7th request was not a third_quartile event');
-        assert(requestLog[7].match('/games/\\d+/fill'), '8th request was not a fill request');
-        assert(requestLog[8].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '9th request was not a video_end event');
+        assert(requestLog[2].match('/mobile/gamers/[0-9a-f]+/video/video_start'), '3th request was not a video_start event');
+        assert(requestLog[3].match('/mobile/gamers/[0-9a-f]+/video/first_quartile'), '4th request was not a first_quartile event');
+        assert(requestLog[4].match('/mobile/gamers/[0-9a-f]+/video/midpoint'), '5th request was not a midpoint event');
+        assert(requestLog[5].match('/mobile/gamers/[0-9a-f]+/video/third_quartile'), '6th request was not a third_quartile event');
+        assert(requestLog[6].match('/games/\\d+/fill'), '7th request was not a fill request');
+        assert(requestLog[7].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '8th request was not a video_end event');
     };
 
     it('should include all operational events on Android', function(this: Mocha.ITestDefinition, done: MochaDone) {
@@ -83,7 +82,7 @@ describe('EventsTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setRingerMode(0);
 
-        EndScreen.setAutoClose(true);
+        AbstractAdUnit.setAutoClose(true);
 
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
     });
@@ -144,7 +143,7 @@ describe('EventsTest', () => {
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
 
-        EndScreen.setAutoClose(true);
+        AbstractAdUnit.setAutoClose(true);
 
         UnityAds.initialize(Platform.IOS, '14850', listener, true);
     });

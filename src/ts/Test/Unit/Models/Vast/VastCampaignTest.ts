@@ -2,6 +2,9 @@ import 'mocha';
 import { assert } from 'chai';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
+import { TestFixtures } from '../../TestHelpers/TestFixtures';
+import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 describe('VastCampaign', () => {
     it('should return default cache TTL of 1 hour represented in seconds', () => {
@@ -33,5 +36,21 @@ describe('VastCampaign', () => {
         };
         const campaign = new VastCampaign(new Vast([], []), 'campaignId', json.gamerId, json.abGroup, json.cacheTTL);
         assert.equal(campaign.getTimeoutInSeconds(), 5000);
+    });
+
+    describe('when VAST has a companion ad', () => {
+        it('should have an endscreen when VAST has portrait or landscape url', () => {
+            const vastParser = TestFixtures.getVastParser();
+            const vast = vastParser.parseVast(VastCompanionXml);
+            const vastCampaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+            assert.equal(vastCampaign.hasEndscreen(), true);
+        });
+
+        it('should not have an endscreen when both portrait and landscape urls missing', () => {
+            const vastParser = TestFixtures.getVastParser();
+            const vast = vastParser.parseVast(VastCompanionAdWithoutImagesXml);
+            const vastCampaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+            assert.equal(vastCampaign.hasEndscreen(), false);
+        });
     });
 });

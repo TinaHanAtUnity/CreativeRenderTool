@@ -24,6 +24,7 @@ import { Session } from 'Models/Session';
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { Platform } from 'Constants/Platform';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -59,7 +60,7 @@ describe('VideoEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
-        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
     });
 
@@ -73,7 +74,7 @@ describe('VideoEventHandlersTest', () => {
 
     describe('with video start', () => {
         beforeEach(() => {
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
             sessionManager.setSession(new Session('123'));
         });
@@ -270,7 +271,7 @@ describe('VideoEventHandlersTest', () => {
             const prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
             const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
-            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), vastCampaign, overlay, null);
             const vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
 
@@ -292,7 +293,7 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
             const vastCampaign = <VastCampaign><any>{};
-            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), vastCampaign, overlay, null);
 
             const vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
 
@@ -304,7 +305,7 @@ describe('VideoEventHandlersTest', () => {
 
         it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
             const vastCampaign = <VastCampaign><any>{};
-            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), vastCampaign, overlay, null);
 
             const vastAdUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
 

@@ -6,10 +6,13 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
+    supportedOrientationsPlist: UIInterfaceOrientationMask;
     shouldAutorotate: boolean;
+    statusBarOrientation: number;
 }
 
 export class IosVideoAdUnitController extends VideoAdUnitController {
@@ -21,11 +24,13 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
 
+    private _deviceInfo: DeviceInfo;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
+        this._deviceInfo = deviceInfo;
         this._iosOptions = options;
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }

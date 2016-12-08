@@ -5,6 +5,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { Platform } from 'Constants/Platform';
 
 export enum CacheStatus {
     OK,
@@ -30,6 +31,7 @@ interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
     retryCount: number;
+    networkRetryCount: number;
     resolve: Function;
     reject: Function;
     options: ICacheOptions;
@@ -47,6 +49,8 @@ export class CacheManager {
     private _wakeUpManager: WakeUpManager;
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
+
+    private _currentUrl: string;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
@@ -154,6 +158,10 @@ export class CacheManager {
             return Promise.resolve(this._fileIds[url]);
         }
 
+        if(url.indexOf('?') !== -1) {
+            url = url.split('?')[0];
+        }
+
         let extension: string;
         let urlFilename: string = url;
         const urlPaths = url.split('/');
@@ -198,6 +206,7 @@ export class CacheManager {
     }
 
     private downloadFile(url: string, fileId: string): void {
+        this._currentUrl = url;
         this._nativeBridge.Cache.download(url, fileId).catch(error => {
             const callback = this._callbacks[url];
             if(callback) {
@@ -225,6 +234,7 @@ export class CacheManager {
                 fileId: fileId,
                 networkRetry: false,
                 retryCount: 0,
+                networkRetryCount: 0,
                 resolve: resolve,
                 reject: reject,
                 options: options
@@ -308,17 +318,25 @@ export class CacheManager {
     }
 
     private onDownloadError(error: string, url: string, message: string): void {
-        const callback = this._callbacks[url];
-        if(callback) {
-            switch(error) {
-                case CacheError[CacheError.FILE_IO_ERROR]:
-                    this.handleRetry(callback, url, error);
-                    return;
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            const callback = this._callbacks[this._currentUrl];
+            if(callback) {
+                this.handleRetry(callback, this._currentUrl, error);
+                return;
+            }
+        } else {
+            const callback = this._callbacks[url];
+            if(callback) {
+                switch (error) {
+                    case CacheError[CacheError.FILE_IO_ERROR]:
+                        this.handleRetry(callback, url, error);
+                        return;
 
-                default:
-                    callback.reject(CacheStatus.FAILED);
-                    delete this._callbacks[url];
-                    return;
+                    default:
+                        callback.reject(CacheStatus.FAILED);
+                        delete this._callbacks[url];
+                        return;
+                }
             }
         }
     }
@@ -326,6 +344,20 @@ export class CacheManager {
     private handleRetry(callback: ICallbackObject, url: string, error: string): void {
         if(callback.retryCount < callback.options.retries) {
             callback.retryCount++;
+            callback.networkRetry = true;
+
+            // note: this timeout may never trigger since timeouts are unreliable when ad unit is not active
+            // therefore this method should not assume any previous state and work the same way as system event handlers
+            // if this never triggers, retrying will still be triggered from connection events
+            setTimeout(() => {
+                const retryCallback = this._callbacks[url];
+                if(retryCallback && retryCallback.networkRetry) {
+                    retryCallback.networkRetry = false;
+                    this.downloadFile(url, retryCallback.fileId);
+                }
+            }, 10000);
+        } else if(callback.networkRetryCount < callback.options.retries) {
+            callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
             callback.reject(CacheStatus.FAILED);

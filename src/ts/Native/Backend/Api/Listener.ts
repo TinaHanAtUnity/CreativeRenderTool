@@ -25,7 +25,7 @@ export class Listener {
         }
     }
 
-    public static sendErrorEvent(error: string, message: string) {
+    public static sendErrorEvent(error: string, message: string) {
         const listener = UnityAds.getListener();
         if(listener) {
             listener.onUnityAdsError(UnityAdsError[error], message);

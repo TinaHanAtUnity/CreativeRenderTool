@@ -12,6 +12,8 @@ import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { Platform } from 'Constants/Platform';
+import { VastEndScreen } from 'Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -49,7 +51,7 @@ describe('VastAdUnit', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
-        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+        const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
         adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
     });
 
@@ -115,7 +117,7 @@ describe('VastAdUnit', () => {
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, placement, campaign, overlay, null);
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
             adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController);
         });
 
@@ -197,6 +199,50 @@ describe('VastAdUnit', () => {
 
             adUnit.sendVideoClickTrackingEvent(eventManager, '123');
             mockEventManager.verify();
+        });
+    });
+
+    describe('with companion ad', () => {
+        let vast: Vast;
+        let vastEndScreen: VastEndScreen;
+
+        beforeEach(() => {
+            vast = new Vast([], []);
+            const placement = TestFixtures.getPlacement();
+            campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+            const nativeBridge = TestFixtures.getNativeBridge();
+            const androidVideoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
+            vastEndScreen = <VastEndScreen><any> {
+                hide: sinon.spy(),
+                remove: sinon.spy()
+            };
+            adUnit = new VastAdUnit(nativeBridge, androidVideoAdUnitController, vastEndScreen);
+        });
+
+        it('should return correct companion click through url', () => {
+            sandbox.stub(vast, 'getCompanionClickThroughUrl').returns('http://www.example.com/wpstyle/?p=364');
+
+            const clickThroughURL = adUnit.getCompanionClickThroughUrl();
+            assert.equal(clickThroughURL, 'http://www.example.com/wpstyle/?p=364');
+        });
+
+        it('should return null when companion click through url is invalid', () => {
+            sandbox.stub(vast, 'getCompanionClickThroughUrl').returns('blah');
+
+            const clickThroughURL = adUnit.getCompanionClickThroughUrl();
+            assert.equal(clickThroughURL, null);
+        });
+
+        it('should return endscreen', () => {
+            const endScreen = adUnit.getEndScreen();
+            assert.equal(endScreen, vastEndScreen);
+        });
+
+        it('should hide and then remove endscreen on hide', () => {
+            adUnit.hide();
+            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
+            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
         });
     });
 });

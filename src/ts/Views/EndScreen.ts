@@ -7,14 +7,9 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class EndScreen extends View {
-
-    public static setAutoClose(autoClose: boolean) {
-        EndScreen.AutoClose = autoClose;
-    }
-
-    private static AutoClose: boolean = false;
 
     public onDownload: Observable0 = new Observable0();
     public onPrivacy: Observable1<string> = new Observable1();
@@ -23,13 +18,15 @@ export class EndScreen extends View {
     private _coppaCompliant: boolean;
     private _gameName: string;
     private _privacy: Privacy;
+    private _localization: Localization;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
+        this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         if(campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
@@ -39,10 +36,8 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString(),
-                'endscreenAlt': (() => {
-                    return undefined;
-                })()
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
+                'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
 
@@ -50,7 +45,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
             },
             {
                 event: 'click',
@@ -77,9 +72,11 @@ export class EndScreen extends View {
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
-        if(EndScreen.AutoClose) {
+        if(AbstractAdUnit.getAutoClose()) {
             this.onClose.trigger();
         }
+
+        this.triggerAnimations();
     }
 
     public hide(): void {
@@ -89,6 +86,29 @@ export class EndScreen extends View {
             this._privacy.hide();
             this._privacy.container().parentElement.removeChild(this._privacy.container());
             delete this._privacy;
+        }
+    }
+
+    private getEndscreenAlt(campaign: Campaign) {
+        const abGroup = campaign.getAbGroup();
+        const gameId = campaign.getGameId();
+        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
+            return 'animated';
+        }
+        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
+            return 'animated2';
+        }
+        return undefined;
+    }
+
+    private triggerAnimations() {
+        const charsElement = <HTMLElement>this._container.querySelector('.cocchars');
+        const logoElement = <HTMLElement>this._container.querySelector('.coclogo');
+        if(charsElement) {
+            charsElement.classList.add('cocchars2');
+        }
+        if(logoElement) {
+            logoElement.classList.add('coclogo2');
         }
     }
 
