@@ -6,6 +6,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Platform } from 'Constants/Platform';
+import { Request } from 'Utilities/Request';
 
 export enum CacheStatus {
     OK,
@@ -36,6 +37,7 @@ interface ICallbackObject {
     resolve: Function;
     reject: Function;
     options: ICacheOptions;
+    originalUrl?: string;
 }
 
 export class Cache {
@@ -108,9 +110,8 @@ export class Cache {
         return this.getFileId(url).then(fileId => {
             return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
                 if(fileInfo.found && fileInfo.size > 0) {
-                    return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
-                        const storedCacheResponse: ICacheResponse = JsonParser.parse(rawStoredCacheResponse);
-                        return storedCacheResponse.fullyDownloaded;
+                    return this.getCacheResponse(fileId).then(cacheResponse => {
+                        return cacheResponse.fullyDownloaded;
                     }).catch(error => {
                         // todo: should we do something more intelligent here?
                         return false;
@@ -128,8 +129,7 @@ export class Cache {
             if(this._callbacks.hasOwnProperty(url)) {
                 const callback: ICallbackObject = this._callbacks[url];
                 if(callback.networkRetry) {
-                    callback.reject(CacheStatus.STOPPED);
-                    delete this._callbacks[url];
+                    this.fulfillCallback(url, CacheStatus.STOPPED);
                 } else {
                     activeDownload = true;
                 }
@@ -232,7 +232,7 @@ export class Cache {
                 switch(error) {
                     case CacheError[CacheError.FILE_ALREADY_CACHING]:
                         this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
-                        callback.reject(CacheStatus.FAILED);
+                        this.fulfillCallback(url, CacheStatus.FAILED);
                         return;
 
                     case CacheError[CacheError.NO_INTERNET]:
@@ -240,14 +240,14 @@ export class Cache {
                         return;
 
                     default:
-                        callback.reject(CacheStatus.FAILED);
+                        this.fulfillCallback(url, CacheStatus.FAILED);
                         return;
                 }
             }
         });
     }
 
-    private registerCallback(url: string, fileId: string, options: ICacheOptions): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, options: ICacheOptions, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
@@ -256,10 +256,31 @@ export class Cache {
                 networkRetryCount: 0,
                 resolve: resolve,
                 reject: reject,
-                options: options
+                options: options,
+                originalUrl: originalUrl
             };
             this._callbacks[url] = callbackObject;
         });
+    }
+
+    private fulfillCallback(url: string, cacheStatus: CacheStatus) {
+        const callback = this._callbacks[url];
+        const originalCallback = callback.originalUrl ? this._callbacks[callback.originalUrl] : undefined;
+        if(cacheStatus === CacheStatus.FAILED) {
+            callback.reject(CacheStatus.FAILED);
+            if(originalCallback) {
+                originalCallback.reject(CacheStatus.FAILED);
+            }
+        } else {
+            callback.resolve([cacheStatus, callback.fileId]);
+            if(originalCallback) {
+                originalCallback.resolve([cacheStatus, originalCallback.fileId]);
+            }
+        }
+        if(callback.originalUrl) {
+            delete this._callbacks[callback.originalUrl];
+        }
+        delete this._callbacks[url];
     }
 
     private createCacheResponse(fullyDownloaded: boolean, url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): ICacheResponse {
@@ -272,6 +293,12 @@ export class Cache {
             responseCode: responseCode,
             headers: headers
         };
+    }
+
+    private getCacheResponse(fileId: string): Promise<ICacheResponse> {
+        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.' + fileId).then(rawStoredCacheResponse => {
+            return <ICacheResponse>JsonParser.parse(rawStoredCacheResponse);
+        });
     }
 
     private writeCacheResponse(url: string, cacheResponse: ICacheResponse): void {
@@ -297,33 +324,46 @@ export class Cache {
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
         const callback = this._callbacks[url];
         if(callback) {
-            // todo: add redirect logic here
-            if(responseCode !== 200 && responseCode !== 206) {
-                const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
-                    url: url,
-                    size: size,
-                    totalSize: totalSize,
-                    duration: duration,
-                    responseCode: responseCode,
-                    headers: JSON.stringify(headers)
-                });
-                Diagnostics.trigger({
-                    'type': 'cache_error',
-                    'error': error
-                });
-
+            if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
+                this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
+                this.fulfillCallback(url, CacheStatus.OK);
+                return;
+            } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.deleteCacheResponse(url);
                 if(size > 0) {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
                 }
-
-                callback.reject(CacheStatus.FAILED);
-                delete this._callbacks[url];
-            } else {
-                this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
-                callback.resolve([CacheStatus.OK, callback.fileId]);
-                delete this._callbacks[url];
+                const location = Request.getHeader(headers, 'location');
+                if(location) {
+                    let fileId = callback.fileId;
+                    if(callback.originalUrl) {
+                        fileId = this._callbacks[callback.originalUrl].fileId;
+                    }
+                    this.registerCallback(location, fileId, Cache.getDefaultCacheOptions(), url);
+                    this.downloadFile(location, fileId);
+                    return;
+                }
             }
+
+            const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
+                url: url,
+                size: size,
+                totalSize: totalSize,
+                duration: duration,
+                responseCode: responseCode,
+                headers: JSON.stringify(headers)
+            });
+            Diagnostics.trigger({
+                'type': 'cache_error',
+                'error': error
+            });
+
+            this.deleteCacheResponse(url);
+            if(size > 0) {
+                this._nativeBridge.Cache.deleteFile(callback.fileId);
+            }
+
+            this.fulfillCallback(url, CacheStatus.FAILED);
         }
     }
 
@@ -331,8 +371,7 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
-            callback.resolve([CacheStatus.STOPPED, callback.fileId]);
-            delete this._callbacks[url];
+            this.fulfillCallback(url, CacheStatus.STOPPED);
         }
     }
 
@@ -352,8 +391,7 @@ export class Cache {
                         return;
 
                     default:
-                        callback.reject(CacheStatus.FAILED);
-                        delete this._callbacks[url];
+                        this.fulfillCallback(url, CacheStatus.FAILED);
                         return;
                 }
             }
@@ -379,8 +417,7 @@ export class Cache {
             callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
-            callback.reject(CacheStatus.FAILED);
-            delete this._callbacks[url];
+            this.fulfillCallback(url, CacheStatus.FAILED);
         }
     }
 
