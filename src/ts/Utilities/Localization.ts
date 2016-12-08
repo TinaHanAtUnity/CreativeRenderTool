@@ -188,18 +188,18 @@ export class Localization {
         return languageMap[phrase];
     }
 
-    public readableNumberOfReviews(numOfReviews: number): string {
+    public abbreviate(number: number): string {
         const localizedAbbreviations = Localization.getLocalizedAbbreviations(this._language);
         if (!localizedAbbreviations) {
-            return numOfReviews.toString();
+            return number.toString();
         }
-        if (numOfReviews >= 1000000) {
-            return (Math.floor(numOfReviews / 1000000)).toString() + " " + localizedAbbreviations.million;
+        if (number >= 1000000) {
+            return (Math.floor(number / 1000000)).toString() + " " + localizedAbbreviations.million;
         }
-        if (numOfReviews >= 10000) {
-            return (Math.floor(numOfReviews / 1000)).toString() + " " + localizedAbbreviations.thousand;
+        if (number >= 10000) {
+            return (Math.floor(number / 1000)).toString() + " " + localizedAbbreviations.thousand;
         }
-        return numOfReviews.toString();
+        return number.toString();
     }
 
 }
