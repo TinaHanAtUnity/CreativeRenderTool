@@ -18,13 +18,15 @@ export class EndScreen extends View {
     private _coppaCompliant: boolean;
     private _gameName: string;
     private _privacy: Privacy;
+    private _localization: Localization;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
+        this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         if(campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
@@ -34,7 +36,7 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString(),
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
