@@ -1,3 +1,8 @@
+# Thu Dec  8 15:37:41 UTC 2016
+
+* Optional end screen support for brand ads
+* Rating count abbreviation support
+
 # Wed Dec  7 16:48:28 UTC 2016
 
 * Disable fake landscape introduced in 2.0.6 due to iOS native bug
