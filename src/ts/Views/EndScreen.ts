@@ -34,7 +34,7 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString(),
+                'ratingCount': new Localization(language, '').readableNumberOfReviews(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
