@@ -4,11 +4,16 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { VastEndScreen } from 'Views/VastEndScreen';
 
 export class VastAdUnit extends VideoAdUnit {
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+    private _endScreen: VastEndScreen | null;
+
+    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
         super(nativeBridge, videoAdUnitController);
+
+        this._endScreen = endScreen || null;
     }
 
     public show(): Promise<void> {
@@ -16,6 +21,12 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     public hide(): Promise<void> {
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            endScreen.hide();
+            endScreen.remove();
+        }
+
         return this._videoAdUnitController.hide();
     }
 
@@ -58,11 +69,18 @@ export class VastAdUnit extends VideoAdUnit {
 
     public getVideoClickThroughURL(): string | null {
         const url = this.getVast().getVideoClickThroughURL();
-        const reg = new RegExp('^(https?)://.+$');
-        if (url && reg.test(url)) {
+        if (this.isValidURL(url)) {
             return url;
         } else {
-            // in the future, we want to send this event to our server and notify the advertiser of a broken link
+            return null;
+        }
+    }
+
+    public getCompanionClickThroughUrl(): string | null {
+        const url = this.getVast().getCompanionClickThroughUrl();
+        if (this.isValidURL(url)) {
+            return url;
+        } else {
             return null;
         }
     }
@@ -75,6 +93,10 @@ export class VastAdUnit extends VideoAdUnit {
                 this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, clickTrackingEventUrls[i]);
             }
         }
+    }
+
+    public getEndScreen(): VastEndScreen | null {
+        return this._endScreen;
     }
 
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
@@ -93,6 +115,11 @@ export class VastAdUnit extends VideoAdUnit {
 
     private getTrackingEventUrls(eventName: string): string[] | null {
         return this.getVast().getTrackingEventUrls(eventName);
+    }
+
+    private isValidURL(url: string | null): boolean {
+        const reg = new RegExp('^(https?)://.+$');
+        return !!url && reg.test(url);
     }
 
 }

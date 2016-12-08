@@ -12,9 +12,11 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
+import { VastEndScreen } from 'Views/VastEndScreen';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
@@ -68,12 +70,20 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        let vastAdUnit: VastAdUnit;
+
         const metaData = new MetaData(nativeBridge);
         const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, deviceInfo, placement, campaign, overlay, options);
 
-        const vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
+        if (campaign.hasEndscreen()) {
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+            this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
+        } else {
+            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
+        }
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
@@ -152,6 +162,23 @@ export class AdUnitFactory {
             });
         } else if (nativeBridge.getPlatform() === Platform.IOS) {
             endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
+        }
+    }
+
+    private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo) {
+        endScreen.render();
+        endScreen.hide();
+        document.body.appendChild(endScreen.container());
+        endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
         }
     }
 
