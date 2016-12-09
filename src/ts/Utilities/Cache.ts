@@ -112,11 +112,11 @@ export class Cache {
                 if(fileInfo.found && fileInfo.size > 0) {
                     return this.getCacheResponse(fileId).then(cacheResponse => {
                         return cacheResponse.fullyDownloaded;
-                    }).catch(error => {
-                        // todo: should we do something more intelligent here?
-                        return false;
                     });
                 }
+                return false;
+            }).catch(error => {
+                // todo: should we do something more intelligent here?
                 return false;
             });
         });

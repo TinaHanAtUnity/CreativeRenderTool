@@ -31,19 +31,14 @@ export class AssetManager {
     }
 
     private cache(assets: Asset[]): Promise<any> {
-        return this.reduce<Asset>(assets, (previous, current) => {
-            return previous.then(() => {
-                return this._cache.cache(current.getUrl()).then(fileUrl => current.setCachedUrl(fileUrl));
+        let chain = Promise.resolve();
+        for(let i = 0; i < assets.length; ++i) {
+            chain = chain.then(() => {
+                const asset = assets[i];
+                return this._cache.cache(asset.getUrl()).then(fileUrl => asset.setCachedUrl(fileUrl));
             });
-        }, Promise.resolve());
-    }
-
-    private reduce<T>(array: T[], callback: (previous: Promise<T>, current: T) => Promise<T>, initial?: Promise<T>): Promise<T> {
-        let accumulator = initial ? initial : Promise.resolve(array[0]);
-        for(let i = 0; i < array.length; ++i) {
-            accumulator = callback.call(undefined, accumulator, array[i], i, array);
         }
-        return accumulator;
+        return chain;
     }
 
 }
