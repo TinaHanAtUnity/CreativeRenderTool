@@ -82,6 +82,7 @@ export class VideoEventHandlers {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
                 sessionManager.getSession().getId(),
+                sessionManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideoAdUnitController().getVideoPosition());
         }

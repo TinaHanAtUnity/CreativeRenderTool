@@ -45,26 +45,25 @@ export class VastAdUnit extends VideoAdUnit {
     public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
-            for (let impressionUrl of impressionUrls) {
-                impressionUrl = impressionUrl.replace(/%SDK_VERSION%/, sdkVersion);
-                this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
+            for (const impressionUrl of impressionUrls) {
+                this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, sdkVersion, impressionUrl);
             }
         }
     }
 
-    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string): void {
+    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string, sdkVersion: string): void {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this.sendThirdPartyEvent(eventManager, `vast ${eventName}`, sessionId, url);
+                this.sendThirdPartyEvent(eventManager, `vast ${eventName}`, sessionId, sdkVersion, url);
             }
         }
     }
 
-    public sendProgressEvents(eventManager: EventManager, sessionId: string, position: number, oldPosition: number) {
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 1, 'firstQuartile');
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 2, 'midpoint');
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 3, 'thirdQuartile');
+    public sendProgressEvents(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number) {
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -85,12 +84,12 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string): void {
+    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
             for (let i = 0; i < clickTrackingEventUrls.length; i++) {
-                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, clickTrackingEventUrls[i]);
+                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrls[i]);
             }
         }
     }
@@ -99,17 +98,18 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
+    private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                this.sendTrackingEvent(eventManager, quartileEventName, sessionId);
+                this.sendTrackingEvent(eventManager, quartileEventName, sessionId, sdkVersion);
             }
         }
     }
 
-    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, url: string): void {
+    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, sdkVersion: string, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
+        url = url.replace(/%SDK_VERSION%/, sdkVersion);
         eventManager.thirdPartyEvent(event, sessionId, url);
     }
 

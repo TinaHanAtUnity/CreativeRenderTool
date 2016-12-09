@@ -594,7 +594,7 @@ describe('CampaignManager', () => {
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                 'http://customTrackingUrl/start',
                 'http://customTrackingUrl/start2',
-                'http://customTrackingUrl/start3'
+                "http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%"
             ]);
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
                 'http://customTrackingUrl/firstQuartile'
