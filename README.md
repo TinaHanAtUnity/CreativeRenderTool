@@ -79,3 +79,4 @@ Before releasing, update dependencies to latest versions in `package.json`, then
 - Ask QA to run tests
 - If all looks good, update `LKG_*` tags
 - Merge staging branches through PRs to production branches
+- Update CHANGELOG.md in master branch
