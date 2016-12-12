@@ -6,7 +6,7 @@
       "start": [
         "http://customTrackingUrl/start",
         "http://customTrackingUrl/start2",
-        "http://customTrackingUrl/start3"
+        "http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%"
       ],
       "firstQuartile": [
         "http://customTrackingUrl/firstQuartile"
