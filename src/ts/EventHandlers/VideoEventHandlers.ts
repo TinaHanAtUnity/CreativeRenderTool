@@ -21,6 +21,18 @@ export class VideoEventHandlers {
             return;
         }
 
+        if(duration > 40000) {
+            const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
+                duration: duration,
+                url: adUnit.getCampaign().getVideoUrl(),
+                originalUrl: adUnit.getCampaign().getOriginalVideoUrl()
+            });
+            Diagnostics.trigger({
+                type: 'video_too_long',
+                error: error
+            });
+        }
+
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
 
         adUnit.getVideoAdUnitController().setVideoDuration(duration);
