@@ -1,3 +1,9 @@
+# Mon Dec 12 15:55:37 UTC 2016
+
+* Update to TypeScript 2.1.4
+* Update dependencies to latest
+* Add SDK version to all VAST tracking/impression urls
+
 # Thu Dec  8 15:37:41 UTC 2016
 
 * Optional end screen support for brand ads
