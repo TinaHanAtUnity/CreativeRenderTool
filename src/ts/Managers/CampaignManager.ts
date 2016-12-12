@@ -68,6 +68,7 @@ export class CampaignManager {
             return Promise.resolve();
         }
         this._requesting = true;
+        this._refillTimestamp = 0;
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {

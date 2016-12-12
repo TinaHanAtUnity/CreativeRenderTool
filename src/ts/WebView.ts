@@ -289,7 +289,7 @@ export class WebView {
     }
 
     private onNewAdRequestAllowed(): void {
-        if(!this._mustReinitialize) {
+        if(!this._mustReinitialize && !this._campaign) {
             this._campaignManager.request();
         }
     }
@@ -302,7 +302,9 @@ export class WebView {
             this.reinitialize();
         } else {
             this._sessionManager.create();
-            this._campaignManager.request();
+            if(!this._campaign) {
+                this._campaignManager.request();
+            }
         }
     }
 
@@ -341,8 +343,9 @@ export class WebView {
     }
 
     private checkCampaignStatus(): void {
-        this._campaignManager.request();
-        if(this._campaign && this._campaign.isExpired()) {
+        if(!this._campaign) {
+            this._campaignManager.request();
+        } else if(this._campaign.isExpired()) {
             this.onCampaignExpired(this._campaign);
         }
     }
