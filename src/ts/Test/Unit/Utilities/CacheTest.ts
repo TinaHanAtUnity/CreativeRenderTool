@@ -130,7 +130,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public get<T>(type: StorageType, key: string): Promise<T> {
-        return Promise.resolve();
+        return Promise.resolve(<any>void(0));
     }
 
     public set<T>(type: StorageType, key: string, value: T): Promise<void> {

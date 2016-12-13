@@ -21,7 +21,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
         const endScreen = this.getEndScreen();
         if (endScreen) {
             endScreen.hide();
-            endScreen.container().parentElement.removeChild(endScreen.container());
+            endScreen.container().parentElement!.removeChild(endScreen.container());
         }
         this.unsetReferences();
         return this._videoAdUnitController.hide();

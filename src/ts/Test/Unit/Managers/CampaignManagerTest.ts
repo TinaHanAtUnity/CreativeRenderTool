@@ -14,6 +14,10 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
+import { AssetManager } from 'Managers/AssetManager';
+import { Cache } from 'Utilities/Cache';
+import { CacheMode } from 'Models/Configuration';
+import { WebViewError } from 'Errors/WebViewError';
 
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
 import InsideOutsideJson from 'json/InsideOutside.json';
@@ -36,9 +40,6 @@ import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
-import { AssetManager } from 'Managers/AssetManager';
-import { Cache } from 'Utilities/Cache';
-import { CacheMode } from 'Models/Configuration';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -316,11 +317,13 @@ describe('CampaignManager', () => {
 
         const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
         const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
-        let triggeredError: Error;
+        let triggeredError: WebViewError | Error;
         const verify = () => {
             // then the onError observable is triggered with an appropriate error
             mockRequest.verify();
-            if (triggeredError instanceof Error) {
+            if(triggeredError instanceof Error) {
+                assert.equal(triggeredError.message, expectedErrorMessage);
+            } else if (triggeredError instanceof WebViewError) {
                 assert.equal(triggeredError.message, expectedErrorMessage);
             } else {
                 assert.equal(triggeredError, expectedErrorMessage);
@@ -613,7 +616,7 @@ describe('CampaignManager', () => {
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                 'http://customTrackingUrl/start',
                 'http://customTrackingUrl/start2',
-                'http://customTrackingUrl/start3'
+                "http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%"
             ]);
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
                 'http://customTrackingUrl/firstQuartile'

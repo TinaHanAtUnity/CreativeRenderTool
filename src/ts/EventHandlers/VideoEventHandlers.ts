@@ -12,6 +12,8 @@ import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VideoEventHandlers {
 
@@ -19,6 +21,31 @@ export class VideoEventHandlers {
         if(adUnit.getVideoAdUnitController().getVideoErrorStatus()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
+        }
+
+        if(duration > 40000) {
+            const campaign = adUnit.getCampaign();
+            let url: string;
+            let originalUrl: string;
+            if(campaign instanceof PerformanceCampaign) {
+                url = (<PerformanceCampaign>campaign).getVideo().getUrl();
+                originalUrl = (<PerformanceCampaign>campaign).getVideo().getOriginalUrl();
+            } else if(campaign instanceof VastCampaign) {
+                url = (<VastCampaign>campaign).getVideo().getUrl();
+                originalUrl = (<VastCampaign>campaign).getVideo().getOriginalUrl();
+            } else {
+                throw new Error('Unknown campaign type');
+            }
+
+            const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
+                duration: duration,
+                url: url,
+                originalUrl: originalUrl
+            });
+            Diagnostics.trigger({
+                type: 'video_too_long',
+                error: error
+            });
         }
 
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
@@ -82,6 +109,7 @@ export class VideoEventHandlers {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
                 sessionManager.getSession().getId(),
+                sessionManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideoAdUnitController().getVideoPosition());
         }

@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
+import { Platform } from 'Constants/Platform';
 
 const enum RequestStatus {
     COMPLETE,
@@ -123,6 +124,11 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
+        // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
+            headers.push(['Accept-Encoding', '']);
+        }
+
         const id = Request._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -178,7 +184,7 @@ export class Request {
             }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error(errorMessage), nativeRequest, nativeResponse));
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
             }
         }
     }
@@ -212,11 +218,11 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else if(Request.ErrorResponseCodes.exec(responseCode.toString())) {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeRequest, nativeResponse));
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
         } else if(Request.RetryResponseCodes.exec(responseCode.toString())) {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_UNKNOWN_RESPONSE_CODE'), nativeRequest, nativeResponse));
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
         }
     }
 

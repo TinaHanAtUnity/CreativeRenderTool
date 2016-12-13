@@ -14,6 +14,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
+import { WebViewError } from '../Errors/WebViewError';
 
 export class CampaignManager {
 
@@ -34,7 +35,7 @@ export class CampaignManager {
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
     public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
-    public onError: Observable1<Error> = new Observable1();
+    public onError: Observable1<WebViewError> = new Observable1();
 
     private _nativeBridge: NativeBridge;
     private _assetManager: AssetManager;
@@ -103,22 +104,44 @@ export class CampaignManager {
 
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+        const htmlCampaign = this.parseHtmlCampaign(json);
+        if(htmlCampaign) {
+            return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
+        } else {
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
+            return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
+        }
+    }
+
+    private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
         const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
         let resource: string | undefined;
-        switch(campaign.getGameId()) {
-            case 11326: // Game of War iOS
+        switch(campaign.getId()) {
+            // Game of War iOS
+            case '583dfda0d933a3630a53249c':
+            case '583dfd52abb1feee0909882b':
+            case '583dfd45669a903e086e38d2':
+            case '583dfd4c9ceadb4708b021de':
                 resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
                 break;
 
-            case 13480: // Game of War Android
+            // Game of War Android
+            case '583dfca5a93bfa6700d8c6f3':
+            case '583dfcb54622865a0a246bdf':
                 resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
                 break;
 
-            case 53872: // Mobile Strike iOS
+            // Mobile Strike iOS
+            case '583dfb9a5b79df3f0a274f0b':
+            case '583dfe483fe2166c0ac9e6fb':
+            case '583dfba09bfc2a2d0a9a0b1c':
+            case '583dfba69d308fe203d7d740':
                 resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
                 break;
 
-            case 52447: // Mobile Strike Android
+            // Mobile Strike Android
+            case '583dfc532e4d9b5008c934d1':
+            case '583dfc667f448e630ac6a4bc':
                 resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
                 break;
 
@@ -127,12 +150,10 @@ export class CampaignManager {
         }
 
         const abGroup = campaign.getAbGroup();
-        if(resource && (abGroup === 10 || abGroup === 11 || abGroup === 12 || abGroup === 13)) {
-            const htmlCampaign = new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
-            return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
-        } else {
-            return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
+        if(resource && abGroup !== 6 && abGroup !== 7) {
+            return new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
         }
+        return undefined;
     }
 
     private parseVastCampaign(json: any): Promise<void> {

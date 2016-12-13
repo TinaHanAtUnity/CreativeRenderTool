@@ -89,11 +89,13 @@ export class HtmlAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         this._isShowing = false;
         this._thirdParty.hide();
+
+        this._sessionManager.sendThirdQuartile(this);
         this._sessionManager.sendView(this);
 
         this.onFinish.trigger();
         this.onClose.trigger();
-        this._thirdParty.container().parentElement.removeChild(this._thirdParty.container());
+        this._thirdParty.container().parentElement!.removeChild(this._thirdParty.container());
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this._finishState);

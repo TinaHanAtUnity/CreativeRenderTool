@@ -144,7 +144,7 @@ export abstract class VideoAdUnitController {
         const overlay = this.getOverlay();
 
         if(overlay) {
-            overlay.container().parentElement.removeChild(overlay.container());
+            overlay.container().parentElement!.removeChild(overlay.container());
         }
     };
 

@@ -18,13 +18,15 @@ export class EndScreen extends View {
     private _coppaCompliant: boolean;
     private _gameName: string;
     private _privacy: Privacy;
+    private _localization: Localization;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
+        this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         if(campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
@@ -34,10 +36,8 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscape().getUrl(),
                 'endScreenPortrait': campaign.getPortrait().getUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString(),
-                'endscreenAlt': (() => {
-                    return undefined;
-                })()
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
+                'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
 
@@ -45,7 +45,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
             },
             {
                 event: 'click',
@@ -75,6 +75,8 @@ export class EndScreen extends View {
         if(AbstractAdUnit.getAutoClose()) {
             this.onClose.trigger();
         }
+
+        this.triggerAnimations();
     }
 
     public hide(): void {
@@ -82,8 +84,31 @@ export class EndScreen extends View {
 
         if(this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement.removeChild(this._privacy.container());
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
+        }
+    }
+
+    private getEndscreenAlt(campaign: PerformanceCampaign) {
+        const abGroup = campaign.getAbGroup();
+        const gameId = campaign.getGameId();
+        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
+            return 'animated';
+        }
+        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
+            return 'animated2';
+        }
+        return undefined;
+    }
+
+    private triggerAnimations() {
+        const charsElement = <HTMLElement>this._container.querySelector('.cocchars');
+        const logoElement = <HTMLElement>this._container.querySelector('.coclogo');
+        if(charsElement) {
+            charsElement.classList.add('cocchars2');
+        }
+        if(logoElement) {
+            logoElement.classList.add('coclogo2');
         }
     }
 
@@ -108,7 +133,7 @@ export class EndScreen extends View {
         this._privacy.onClose.subscribe(() => {
             if(this._privacy) {
                 this._privacy.hide();
-                this._privacy.container().parentElement.removeChild(this._privacy.container());
+                this._privacy.container().parentElement!.removeChild(this._privacy.container());
                 delete this._privacy;
             }
         });

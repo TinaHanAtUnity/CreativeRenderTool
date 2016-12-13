@@ -22,7 +22,7 @@ export class FakeDeviceInfo extends DeviceInfo {
     }
 
     public fetch(): Promise<any[]> {
-        return Promise.resolve();
+        return Promise.resolve(<any>void(0));
     }
 
     public getAndroidId(): string {

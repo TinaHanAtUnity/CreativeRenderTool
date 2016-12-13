@@ -8,8 +8,8 @@ import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { INativeResponse } from 'Utilities/Request';
 
 import ConfigurationJson from 'json/Configuration.json';
-import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
+import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 
 class TestStorageApi extends StorageApi {
@@ -117,12 +117,12 @@ describe('ConfigManagerTest', () => {
         beforeEach(() => {
             const nativeResponse: INativeResponse = {
                 url: '',
-                response: '{"error":"Error message"}',
+                response: '{"error": "Error message from backend"}',
                 responseCode: 405,
                 headers: []
             };
 
-            configPromise = Promise.reject(new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), {}, nativeResponse));
+            configPromise = Promise.reject(new RequestError('FAILED_WITH_ERROR_RESPONSE', {}, nativeResponse));
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };
@@ -133,7 +133,7 @@ describe('ConfigManagerTest', () => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, ConfigError);
-                assert.equal(error.message, 'Error message');
+                assert.equal(error.message, 'Error message from backend');
             });
         });
     });
@@ -146,7 +146,7 @@ describe('ConfigManagerTest', () => {
                 responseCode: 405,
                 headers: []
             };
-            configPromise = Promise.reject(new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), {}, nativeResponse));
+            configPromise = Promise.reject(new RequestError('FAILED_WITH_ERROR_RESPONSE', {}, nativeResponse));
             requestMock = {
                 get: sinon.mock().returns(configPromise)
             };

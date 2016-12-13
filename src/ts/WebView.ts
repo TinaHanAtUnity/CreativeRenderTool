@@ -29,6 +29,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
+import { WebViewError } from './Errors/WebViewError';
 
 export class WebView {
 
@@ -260,8 +261,8 @@ export class WebView {
         this.setPlacementStates(PlacementState.NO_FILL);
     }
 
-    private onCampaignError(error: Error) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+    private onCampaignError(error: WebViewError | Error) {
+        if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
