@@ -40,6 +40,10 @@ export class VastCampaign extends Campaign {
         }
     }
 
+    public getOriginalVideoUrl(): string {
+        return this._vast.getVideoUrl() || '';
+    }
+
     public getTimeoutInSeconds(): number {
         return this._cacheTTL;
     }
