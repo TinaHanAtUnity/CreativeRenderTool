@@ -17,17 +17,14 @@ export class AssetManager {
         if(this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
-        return this.cache(campaign.getRequiredAssets()).then(() => {
-            const optionalChain = this.cache(campaign.getOptionalAssets());
-            if(this._cacheMode === CacheMode.FORCED) {
-                return optionalChain;
-            }
-            return Promise.resolve();
-        }).catch(error => {
-            if(this._cacheMode !== CacheMode.ALLOWED) {
-                throw error;
-            }
-        });
+
+        const requiredChain = this.cache(campaign.getRequiredAssets());
+        const optionalChain = this.cache(campaign.getOptionalAssets());
+
+        if(this._cacheMode === CacheMode.FORCED) {
+            return requiredChain.then(() => optionalChain);
+        }
+        return Promise.resolve(campaign);
     }
 
     private cache(assets: Asset[]): Promise<any> {
