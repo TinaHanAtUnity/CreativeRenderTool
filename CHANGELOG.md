@@ -1,3 +1,7 @@
+# Tue Dec 13 11:49:18 UTC 2016
+
+* Diagnostics message for videos over 40 seconds
+
 # Mon Dec 12 15:55:37 UTC 2016
 
 * Update to TypeScript 2.1.4
@@ -34,3 +38,4 @@
 * If caching fails due to network error, retry five times with a 10 second delay between retries
 * Fix iOS cache retries, previously they never retried if downloading failed due to network error
 * Disable hardware acceleration on one Android 4.2 device (ABT-91)
+
