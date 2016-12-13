@@ -229,8 +229,9 @@ describe('CacheTest', () => {
         });
     });
 
-    // todo: these two tests are unstable in hybrid tests on old Androids and should be refactored
-    xit('Cache one file with repeated network failures (expect to fail)', () => {
+    it('Cache one file with repeated network failures (expect to fail)', function(this: Mocha.ITestDefinition) {
+        this.timeout(60000);
+
         const testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
@@ -240,9 +241,9 @@ describe('CacheTest', () => {
         };
 
         cacheApi.setInternet(false);
-        setTimeout(() => { triggerNetwork(); }, 5);
-        setTimeout(() => { triggerNetwork(); }, 10);
-        setTimeout(() => { triggerNetwork(); }, 15);
+        setTimeout(() => triggerNetwork(), 5);
+        setTimeout(() => triggerNetwork(), 10);
+        setTimeout(() => triggerNetwork(), 15);
 
         return cacheManager.cache(testUrl, { retries: 3, allowFailure: false }).then(() => {
             assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
@@ -251,9 +252,8 @@ describe('CacheTest', () => {
         });
     });
 
-    xit('Stop caching', () => {
+    it('Stop caching', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
-        const testFileId: string = '-960478764.mp4';
 
         cacheApi.setInternet(false);
 
@@ -261,9 +261,8 @@ describe('CacheTest', () => {
 
         return cacheManager.cache(testUrl, { retries: 3, allowFailure: false }).then(() => {
             assert.fail('Caching should fail when stopped');
-        }).catch(([status, fileId]) => {
-            assert.equal(status, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');
-            assert.equal(testFileId, fileId, 'Wrong file id after caching stopped');
+        }).catch(error => {
+            assert.equal(error, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');
         });
     });
 
