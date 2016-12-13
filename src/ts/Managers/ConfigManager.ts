@@ -10,7 +10,6 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import { PlacementState, Placement } from 'Models/Placement';
 
 export class ConfigManager {
 
@@ -47,19 +46,6 @@ export class ConfigManager {
                 throw error;
             });
         });
-    }
-
-    public static setPlacementStates(nativeBridge: NativeBridge, configuration: Configuration, placementState: PlacementState) {
-        const placements: { [id: string]: Placement } = configuration.getPlacements();
-        for(const placementId in placements) {
-            if(placements.hasOwnProperty(placementId)) {
-                const placement: Placement = placements[placementId];
-                nativeBridge.Placement.setPlacementState(placement.getId(), placementState);
-                if(placementState === PlacementState.READY) {
-                    nativeBridge.Listener.sendReadyEvent(placement.getId());
-                }
-            }
-        }
     }
 
     public static setTestBaseUrl(baseUrl: string): void {
