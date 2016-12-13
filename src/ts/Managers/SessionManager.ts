@@ -7,7 +7,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
-import { PerformanceCampaign } from '../Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class SessionManagerEventMetadataCreator {
 

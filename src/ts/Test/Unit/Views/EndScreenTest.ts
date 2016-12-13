@@ -5,10 +5,10 @@ import { assert } from 'chai';
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Localization } from 'Utilities/Localization';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 import TestCampaign from 'json/TestCampaign.json';
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;

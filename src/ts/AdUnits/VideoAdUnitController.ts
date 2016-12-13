@@ -4,8 +4,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { FinishState } from 'Constants/FinishState';
-import { PerformanceCampaign } from '../Models/PerformanceCampaign';
-import { VastCampaign } from '../Models/Vast/VastCampaign';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export abstract class VideoAdUnitController {
 

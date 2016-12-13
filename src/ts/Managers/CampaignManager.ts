@@ -14,7 +14,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { WebViewError } from '../Errors/WebViewError';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class CampaignManager {
 
