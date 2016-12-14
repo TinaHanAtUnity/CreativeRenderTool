@@ -35,6 +35,22 @@ export class HttpKafka {
         });
     }
 
+    public static sendBrandEvent(event: string, data: any): Promise<INativeResponse> {
+        const messages: any[] = [];
+        data.evt = event;
+        messages.push({
+            'type': 'ads.events.brand.v1',
+            'msg': data
+        });
+
+        return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
+            messages.unshift(commonObject);
+
+            const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
+            return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+        });
+    }
+
     public static setTestBaseUrl(baseUrl: string) {
         HttpKafka.KafkaBaseUrl = baseUrl + '/v1/events';
     }
