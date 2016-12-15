@@ -45,7 +45,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
@@ -75,8 +75,6 @@ export class EndScreen extends View {
         if(AbstractAdUnit.getAutoClose()) {
             this.onClose.trigger();
         }
-
-        this.triggerAnimations();
     }
 
     public hide(): void {
@@ -90,27 +88,10 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: Campaign) {
-        const abGroup = campaign.getAbGroup();
-        const gameId = campaign.getGameId();
-        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated';
-        }
-        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated2';
-        }
+
         return undefined;
     }
 
-    private triggerAnimations() {
-        const charsElement = <HTMLElement>this._container.querySelector('.cocchars');
-        const logoElement = <HTMLElement>this._container.querySelector('.coclogo');
-        if(charsElement) {
-            charsElement.classList.add('cocchars2');
-        }
-        if(logoElement) {
-            logoElement.classList.add('coclogo2');
-        }
-    }
 
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
