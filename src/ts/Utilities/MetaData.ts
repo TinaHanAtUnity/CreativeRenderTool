@@ -8,13 +8,13 @@ export class MetaData {
         this._nativeBridge = nativeBridge;
     }
 
-    public get<T>(key: string, deleteValue: boolean): Promise<[boolean, T | null]> {
-        return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T): Promise<[boolean, T]> => {
+    public get<T>(key: string, deleteValue: boolean): Promise<[boolean, T | null]> {
+        return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T): Promise<[boolean, T | null]> => {
             if(value && deleteValue) {
                 this._nativeBridge.Storage.delete(StorageType.PUBLIC, key);
                 this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
-            return Promise.resolve([true, value]);
+            return Promise.resolve<[boolean, T]>([true, value]);
         }).catch(([error]) => {
             switch(error) {
                 case StorageError[StorageError.COULDNT_GET_VALUE]:

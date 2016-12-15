@@ -31,7 +31,7 @@ export class CampaignManager {
     public onVastCampaign: Observable1<Campaign> = new Observable1();
     public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
-    public onError: Observable1<Error> = new Observable1();
+    public onError: Observable1<any> = new Observable1();
 
     private _nativeBridge: NativeBridge;
     private _request: Request;

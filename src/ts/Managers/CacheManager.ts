@@ -65,7 +65,7 @@ export class CacheManager {
     }
 
     public cache(url: string, options?: ICacheOptions): Promise<[CacheStatus, string]> {
-        return this._nativeBridge.Cache.isCaching().then(isCaching => {
+        return this._nativeBridge.Cache.isCaching().then((isCaching): Promise<[CacheStatus, string]> => {
             if(isCaching) {
                 return Promise.reject(CacheStatus.FAILED);
             }
@@ -108,7 +108,7 @@ export class CacheManager {
     }
 
     public cleanCache(): Promise<any[]> {
-        return this._nativeBridge.Cache.getFiles().then(files => {
+        return this._nativeBridge.Cache.getFiles().then((files): Promise<any> => {
             if(!files || !files.length) {
                 return Promise.resolve();
             }

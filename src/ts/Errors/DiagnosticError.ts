@@ -1,11 +1,12 @@
-export class DiagnosticError extends Error {
+import { WebViewError } from 'Errors/WebViewError';
+
+export class DiagnosticError extends WebViewError {
 
     public diagnostic: { [id: string]: any } = {};
+    public stack?: string;
 
     constructor(error: Error, diagnosticData: { [id: string]: any }) {
-        super();
-        this.name = error.name;
-        this.message = error.message;
+        super(error.message, error.name);
         this.stack = error.stack;
         this.diagnostic = diagnosticData;
     }

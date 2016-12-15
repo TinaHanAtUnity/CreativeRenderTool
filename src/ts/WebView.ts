@@ -388,7 +388,12 @@ export class WebView {
             return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
-            }).catch(error => {
+            })
+            .then(() => cacheAsset(campaign.getLandscapeUrl(), failAllowed))
+            .then(fileUrl => campaign.setLandscapeUrl(fileUrl))
+            .then(() => cacheAsset(campaign.getPortraitUrl(), failAllowed))
+            .then(fileUrl => campaign.setPortraitUrl(fileUrl))
+            .catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                 } else if(!failAllowed && error === CacheStatus.FAILED) {
@@ -527,7 +532,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
