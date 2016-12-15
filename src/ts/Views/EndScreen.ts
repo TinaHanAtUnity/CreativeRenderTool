@@ -35,9 +35,7 @@ export class EndScreen extends View {
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': campaign.getRatingCount().toString(),
-                'endscreenAlt': (() => {
-                    return undefined;
-                })()
+                'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
 
@@ -85,6 +83,15 @@ export class EndScreen extends View {
             this._privacy.container().parentElement.removeChild(this._privacy.container());
             delete this._privacy;
         }
+    }
+
+    private getEndscreenAlt(campaign: Campaign) {
+            const abGroup = campaign.getAbGroup();
+                if((abGroup === 8 || abGroup === 9)) {
+                return 'xmas';
+                }
+
+        return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
