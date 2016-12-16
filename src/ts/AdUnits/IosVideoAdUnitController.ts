@@ -53,9 +53,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
             } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
             } else {
-                if(this._deviceInfo.getOsVersion().match(/^1/)) {
-                    this._fakeLandscape = true;
-                }
+                this._fakeLandscape = true;
             }
         }
 
