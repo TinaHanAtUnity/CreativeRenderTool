@@ -114,6 +114,7 @@ const setIosDeviceInfo = () => {
 
 if(window.parent !== window) {
     const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+    const campaignIdElement = <HTMLInputElement>window.parent.document.getElementById('campaignId');
     const platformElement = <HTMLInputElement>window.parent.document.getElementById('platform');
     const gameIdElement = <HTMLInputElement>window.parent.document.getElementById('gameId');
     const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
@@ -124,6 +125,7 @@ if(window.parent !== window) {
         event.preventDefault();
 
         abGroupElement.disabled = true;
+        campaignIdElement.disabled = true;
         platformElement.disabled = true;
         gameIdElement.disabled = true;
         testModeElement.disabled = true;
@@ -137,6 +139,12 @@ if(window.parent !== window) {
         if(abGroupElement.value.length) {
             publicStorage.test.abGroup = {
                 value: parseInt(abGroupElement.value, 10),
+                ts: Date.now()
+            };
+        }
+        if(campaignIdElement.value.length) {
+            publicStorage.test.campaignId = {
+                value: campaignIdElement.value,
                 ts: Date.now()
             };
         }

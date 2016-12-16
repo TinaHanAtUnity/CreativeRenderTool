@@ -687,6 +687,12 @@ export class WebView {
             }
         });
 
+        metaData.get<string>('test.campaignId', true).then(([found, campaignId]) => {
+            if(found && typeof campaignId === 'string') {
+                CampaignManager.setCampaignId(campaignId);
+            }
+        });
+
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
                 Overlay.setAutoSkip(autoSkip);
