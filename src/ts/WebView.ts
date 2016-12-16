@@ -693,6 +693,12 @@ export class WebView {
             }
         });
 
+        metaData.get<string>('test.country', true).then(([found, country]) => {
+            if(found && typeof country === 'string') {
+                CampaignManager.setCountry(country);
+            }
+        });
+
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
                 Overlay.setAutoSkip(autoSkip);

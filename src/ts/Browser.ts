@@ -115,6 +115,7 @@ const setIosDeviceInfo = () => {
 if(window.parent !== window) {
     const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
     const campaignIdElement = <HTMLInputElement>window.parent.document.getElementById('campaignId');
+    const countryElement = <HTMLInputElement>window.parent.document.getElementById('country');
     const platformElement = <HTMLInputElement>window.parent.document.getElementById('platform');
     const gameIdElement = <HTMLInputElement>window.parent.document.getElementById('gameId');
     const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
@@ -126,6 +127,7 @@ if(window.parent !== window) {
 
         abGroupElement.disabled = true;
         campaignIdElement.disabled = true;
+        countryElement.disabled = true;
         platformElement.disabled = true;
         gameIdElement.disabled = true;
         testModeElement.disabled = true;
@@ -145,6 +147,12 @@ if(window.parent !== window) {
         if(campaignIdElement.value.length) {
             publicStorage.test.campaignId = {
                 value: campaignIdElement.value,
+                ts: Date.now()
+            };
+        }
+        if(countryElement.value.length) {
+            publicStorage.test.country = {
+                value: countryElement.value,
                 ts: Date.now()
             };
         }
