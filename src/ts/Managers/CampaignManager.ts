@@ -28,9 +28,14 @@ export class CampaignManager {
         CampaignManager.CampaignId = campaignId;
     }
 
+    public static setCountry(country: string) {
+        CampaignManager.Country = country;
+    }
+
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
+    private static Country: string | undefined;
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
@@ -237,6 +242,12 @@ export class CampaignManager {
         if(CampaignManager.AbGroup) {
             url = Url.addParameters(url, {
                 forceAbGroup: CampaignManager.AbGroup
+            });
+        }
+
+        if(CampaignManager.Country) {
+            url = Url.addParameters(url, {
+                force_country: CampaignManager.Country
             });
         }
 
