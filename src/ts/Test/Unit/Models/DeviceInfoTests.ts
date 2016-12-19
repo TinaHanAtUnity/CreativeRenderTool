@@ -44,12 +44,10 @@ describe('DeviceInfoTest', () => {
 
     });
 
-    it('Get DeviceInfo DTO', (done) => {
-        deviceInfo.getDTO().then(dto => {
+    it('Get DeviceInfo DTO', () => {
+        return deviceInfo.getDTO().then(dto => {
             assert.equal(dto.connectionType, 'wifi');
             assert.equal(dto.networkType, 0);
-            assert.equal(dto.trackingEnabled, true);
-            assert.equal(dto.advertisingId, 12345);
             assert.equal(dto.osVersion, 'testVersion');
             assert.equal(dto.deviceModel, 'testModel');
             assert.equal(dto.screenHeight, '1200');
@@ -63,8 +61,6 @@ describe('DeviceInfoTest', () => {
             assert.equal(dto.batteryLevel, 0.3);
             assert.equal(dto.batteryStatus, 1);
             assert.equal(dto.freeMemory, 1024);
-
-            done();
         });
     });
 });
@@ -74,7 +70,7 @@ describe('DeviceInfoTest Android', () => {
     let deviceInfo: DeviceInfo;
     let nativeBridge: NativeBridge;
 
-    beforeEach(() => {
+    it('Get DeviceInfo DTO Android with GAID', () => {
         nativeBridge = <NativeBridge><any>{
             getPlatform: () => {
                 return Platform.ANDROID;
@@ -115,13 +111,9 @@ describe('DeviceInfoTest Android', () => {
 
         };
         deviceInfo = new DeviceInfo(nativeBridge);
-        return deviceInfo.fetch();
 
-    });
-
-    it('Get DeviceInfo DTO Android', (done) => {
-        deviceInfo.getDTO().then(dto => {
-            assert.equal(dto.androidId, 17);
+        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
+            assert.equal(dto.androidId, undefined);
             assert.equal(dto.apiLevel, 16);
             assert.equal(dto.deviceMake, 'N');
             assert.equal(dto.screenDensity, 2);
@@ -133,8 +125,53 @@ describe('DeviceInfoTest Android', () => {
             assert.equal(dto.deviceVolume, 0.5);
             assert.equal(dto.totalSpaceExternal, 2048);
             assert.equal(dto.totalSpaceInternal, 2048);
+        });
+    });
 
-            done();
+    it('Get DeviceInfo DTO Android without GAID', () => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.ANDROID;
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve(undefined)),
+                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(undefined)),
+                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+                getModel: sinon.stub().returns(Promise.resolve('testModel')),
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+                isRooted: sinon.stub().returns(Promise.resolve(true)),
+                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getHeadset: sinon.stub().returns(Promise.resolve(true)),
+                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+
+                Android: {
+                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
+                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
+                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
+                    getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
+                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
+                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                }
+            },
+
+        };
+        deviceInfo = new DeviceInfo(nativeBridge);
+
+        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
+            assert.equal(dto.androidId, '17');
         });
     });
 });
@@ -184,8 +221,8 @@ describe('DeviceInfoTest iOS', () => {
         return deviceInfo.fetch();
     });
 
-    it('Get DeviceInfo DTO iOS', (done) => {
-        deviceInfo.getDTO().then(dto => {
+    it('Get DeviceInfo DTO iOS', () => {
+        return deviceInfo.getDTO().then(dto => {
             assert.equal(dto.userInterfaceIdiom, 1);
             assert.equal(dto.screenScale, 2);
             assert.equal(dto.simulator, true);
@@ -194,8 +231,6 @@ describe('DeviceInfoTest iOS', () => {
             assert.equal(dto.networkOperator, 'operator');
             assert.equal(dto.deviceVolume, 0.5);
             assert.equal(dto.totalSpaceInternal, 1024);
-
-            done();
         });
     });
 });
@@ -241,11 +276,11 @@ describe('DeviceInfoTest catch random reject', () => {
 
     });
 
-    it('Get DeviceInfo DTO', (done) => {
-        deviceInfo.getDTO().then(dto => {
+    it('Get DeviceInfo DTO', () => {
+        return deviceInfo.getDTO().then(dto => {
             assert.equal(dto.connectionType, 'wifi');
             assert.equal(dto.networkType, 0);
-            assert.equal(dto.trackingEnabled, true);
+            assert.equal(dto.trackingEnabled, undefined);
             assert.isUndefined(dto.advertisingId,  'Stub throws error, should be null');
             assert.equal(dto.osVersion, 'testVersion');
             assert.equal(dto.deviceModel, 'testModel');
@@ -260,8 +295,6 @@ describe('DeviceInfoTest catch random reject', () => {
             assert.equal(dto.batteryLevel, 0.3);
             assert.equal(dto.batteryStatus, 1);
             assert.equal(dto.freeMemory, 1024);
-
-            done();
         });
     });
 });
@@ -302,6 +335,5 @@ describe('DeviceInfoTest reject promises', () => {
         };
         deviceInfo = new DeviceInfo(nativeBridge);
         return deviceInfo.fetch();
-
     });
 });
