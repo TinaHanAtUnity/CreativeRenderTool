@@ -5,7 +5,6 @@ import { Asset } from 'Models/Asset';
 
 export class VastCampaign extends Campaign {
 
-    private _cacheTTL: number;
     private _vast: Vast;
     private _video: Video;
     private _hasEndscreen: boolean;
@@ -13,7 +12,7 @@ export class VastCampaign extends Campaign {
     private _landscape: Asset | undefined;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super(campaignId, gamerId, abGroup);
+        super(campaignId, gamerId, abGroup, cacheTTL || 3600);
 
         this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
         const portraitUrl = vast.getCompanionPortraitUrl();
@@ -27,7 +26,6 @@ export class VastCampaign extends Campaign {
         }
 
         this._vast = vast;
-        this._cacheTTL = cacheTTL || 3600;
         this.processCustomTracking(tracking);
     }
 
@@ -44,10 +42,6 @@ export class VastCampaign extends Campaign {
 
     public getOriginalVideoUrl(): string {
         return this._vast.getVideoUrl() || '';
-    }
-
-    public getTimeoutInSeconds(): number {
-        return this._cacheTTL;
     }
 
     public getRequiredAssets() {
