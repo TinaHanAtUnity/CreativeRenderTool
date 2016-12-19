@@ -89,7 +89,7 @@ export class EndScreen extends View {
 
     private getEndscreenAlt(campaign: Campaign) {
         const abGroup = campaign.getAbGroup();
-        if(abGroup === 8 || abGroup === 9) {
+        if(abGroup !== 8 && abGroup !== 9) {
             return 'xmas';
         }
         return undefined;
