@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { VastCampaign } from '../Models/Vast/VastCampaign';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -37,7 +38,6 @@ export class SessionManagerEventMetadataCreator {
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
-            'cached': /* adUnit.getCampaign().isVideoCached() */ true,
             'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
             'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
@@ -46,6 +46,13 @@ export class SessionManagerEventMetadataCreator {
             'deviceModel': this._deviceInfo.getModel(),
             'sdkVersion': this._clientInfo.getSdkVersion()
         };
+
+        const campaign = adUnit.getCampaign();
+        if(campaign instanceof PerformanceCampaign) {
+            infoJson.cached = campaign.getVideo().isCached();
+        } else if(campaign instanceof VastCampaign) {
+            infoJson.cached = campaign.getVideo().isCached();
+        }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             infoJson.webviewUa = navigator.userAgent;
