@@ -1,3 +1,8 @@
+# Thu Dec 15 16:46:43 UTC 2016
+
+* Removed Marvel AB test from groups 8-11
+* Added christmas theme AB test to groups 8 & 9
+
 # Tue Dec 13 11:49:18 UTC 2016
 
 * Diagnostics message for videos over 40 seconds
