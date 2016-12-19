@@ -70,6 +70,8 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager);
+            this._cache.cleanCache();
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
@@ -112,15 +114,12 @@ export class WebView {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager);
-            this._cache.cleanCache();
             HttpKafka.setConfiguration(this._configuration);
             return this._sessionManager.create();
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
-
             this._campaignManager = new CampaignManager(this._nativeBridge, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
