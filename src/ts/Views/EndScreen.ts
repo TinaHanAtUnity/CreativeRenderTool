@@ -33,8 +33,8 @@ export class EndScreen extends View {
             this._templateData = {
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon(),
-                'endScreenLandscape': campaign.getLandscapeUrl(),
-                'endScreenPortrait': campaign.getPortraitUrl(),
+                'endScreenLandscape': campaign.getPortraitUrl(),
+                'endScreenPortrait': campaign.getLandscapeUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
