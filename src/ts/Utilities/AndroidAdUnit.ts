@@ -5,11 +5,9 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
-/*
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
 }
-*/
 
 export class AndroidAdUnit extends AdUnit {
     private _nativeBridge: NativeBridge;
@@ -36,13 +34,13 @@ export class AndroidAdUnit extends AdUnit {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
 
         let views: string[] = ['webview'];
         if(videoplayer) {
-            views = ['videoplayer','webview'];
+            views = ['videoplayer', 'webview'];
         }
 
         let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
@@ -72,8 +70,6 @@ export class AndroidAdUnit extends AdUnit {
 
     private onPause(finishing: boolean, activityId: number): void {
         if(activityId === this._activityId) {
-            this.onHide.trigger();
-
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
                 this.onSystemKill.trigger();
