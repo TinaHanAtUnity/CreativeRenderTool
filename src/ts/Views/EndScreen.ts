@@ -33,8 +33,9 @@ export class EndScreen extends View {
             this._templateData = {
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon().getUrl(),
-                'endScreenLandscape': campaign.getLandscape().getUrl(),
-                'endScreenPortrait': campaign.getPortrait().getUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortrait().getUrl(),
+                'endScreenPortrait': campaign.getLandscape().getUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
@@ -45,7 +46,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
@@ -75,8 +76,6 @@ export class EndScreen extends View {
         if(AbstractAdUnit.getAutoClose()) {
             this.onClose.trigger();
         }
-
-        this.triggerAnimations();
     }
 
     public hide(): void {
@@ -91,25 +90,10 @@ export class EndScreen extends View {
 
     private getEndscreenAlt(campaign: PerformanceCampaign) {
         const abGroup = campaign.getAbGroup();
-        const gameId = campaign.getGameId();
-        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated';
-        }
-        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated2';
+        if(abGroup !== 8 && abGroup !== 9) {
+            return 'xmas';
         }
         return undefined;
-    }
-
-    private triggerAnimations() {
-        const charsElement = <HTMLElement>this._container.querySelector('.cocchars');
-        const logoElement = <HTMLElement>this._container.querySelector('.coclogo');
-        if(charsElement) {
-            charsElement.classList.add('cocchars2');
-        }
-        if(logoElement) {
-            logoElement.classList.add('coclogo2');
-        }
     }
 
     private onDownloadEvent(event: Event): void {

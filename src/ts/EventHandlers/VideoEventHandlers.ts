@@ -39,6 +39,7 @@ export class VideoEventHandlers {
 
             const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
                 duration: duration,
+                campaignId: campaign.getId(),
                 url: url,
                 originalUrl: originalUrl
             });

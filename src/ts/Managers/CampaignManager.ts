@@ -26,10 +26,19 @@ export class CampaignManager {
         CampaignManager.AbGroup = abGroup;
     }
 
-    private static NoFillDelay = 3600;
+    public static setCampaignId(campaignId: string) {
+        CampaignManager.CampaignId = campaignId;
+    }
 
+    public static setCountry(country: string) {
+        CampaignManager.Country = country;
+    }
+
+    private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
+    private static CampaignId: string | undefined;
+    private static Country: string | undefined;
 
     public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
@@ -108,13 +117,13 @@ export class CampaignManager {
         if(htmlCampaign) {
             return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
         } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
 
     private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
-        const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
+        const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
         let resource: string | undefined;
         switch(campaign.getId()) {
             // Game of War iOS
@@ -151,7 +160,7 @@ export class CampaignManager {
 
         const abGroup = campaign.getAbGroup();
         if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
+            return new HtmlCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
         }
         return undefined;
     }
@@ -250,6 +259,24 @@ export class CampaignManager {
 
         if(this._clientInfo.getTestMode()) {
             url = Url.addParameters(url, {test: true});
+        }
+
+        if(CampaignManager.CampaignId) {
+            url = Url.addParameters(url, {
+                forceCampaignId: CampaignManager.CampaignId
+            });
+        }
+
+        if(CampaignManager.AbGroup) {
+            url = Url.addParameters(url, {
+                forceAbGroup: CampaignManager.AbGroup
+            });
+        }
+
+        if(CampaignManager.Country) {
+            url = Url.addParameters(url, {
+                force_country: CampaignManager.Country
+            });
         }
 
         const promises: Promise<any>[] = [];

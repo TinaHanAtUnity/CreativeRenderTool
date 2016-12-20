@@ -1,3 +1,19 @@
+# Tue Dec 20 10:38:00 UTC 2016
+
+* Flip end screen images to match 1.5 behaviour
+
+# Mon Dec 19 13:33:52 UTC 2016
+
+* Add campaign ID to video_too_long diagnostic message
+* Add test option to force a country, campaign or A/B group
+* Send only Google Play Advertising ID or Android ID in diagnostic messages, never both
+* Add Xmas endscreen to all A/B groups except 8 and 9
+
+# Thu Dec 15 16:46:43 UTC 2016
+
+* Removed Marvel AB test from groups 8-11
+* Added christmas theme AB test to groups 8 & 9
+
 # Tue Dec 13 11:49:18 UTC 2016
 
 * Diagnostics message for videos over 40 seconds
