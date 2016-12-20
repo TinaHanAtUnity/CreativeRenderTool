@@ -15,6 +15,9 @@ import RootVastClean from 'xml/RootVastClean.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
+import VastCompanionAd from 'xml/VastCompanionAd.xml';
+import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
+import VastCompanionAdWithoutClickthrough from 'xml/VastCompanionAdWithoutImages.xml';
 
 describe('VastParser', () => {
     let request: Request;
@@ -198,6 +201,43 @@ describe('VastParser', () => {
             'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
         ]);
         assert.deepEqual(vast.getVideoClickTrackingURLs(), ['http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&EC=2&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=624905135', 'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=click&vastcrtype=linear&crid=7286756']);
+    });
+
+    describe('Companion Ad', () => {
+        it('should have correct companion landscape url', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            assert.equal(vast.getCompanionLandscapeUrl(), 'http://unity.com/landscape.jpg');
+        });
+
+        it('should have correct companion portrait url', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            assert.equal(vast.getCompanionPortraitUrl(), 'http://unity.com/portrait.jpg');
+        });
+
+        it('should have correct companion clickthrough url', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            assert.equal(vast.getCompanionClickThroughUrl(), 'https://test.com/companionClickThrough');
+        });
+
+        it('should return null if the companion does not have a static resource tag for landscape image', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutImages);
+            assert.equal(vast.getCompanionLandscapeUrl(), null);
+        });
+
+        it('should return null if the companion does not have a static resource tag for portrait image', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutImages);
+            assert.equal(vast.getCompanionPortraitUrl(), null);
+        });
+
+        it('should have correct companion landscape url when no clickthrough url is present', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickthrough);
+            assert.equal(vast.getCompanionLandscapeUrl(), null);
+        });
+
+        it('should have correct companion portrait url when no clickthrough url is present', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickthrough);
+            assert.equal(vast.getCompanionPortraitUrl(), null);
+        });
     });
 
     beforeEach(() => {

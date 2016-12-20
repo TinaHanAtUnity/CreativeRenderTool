@@ -21,6 +21,19 @@ export class VideoEventHandlers {
             return;
         }
 
+        if(duration > 40000) {
+            const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
+                duration: duration,
+                campaignId: adUnit.getCampaign().getId(),
+                url: adUnit.getCampaign().getVideoUrl(),
+                originalUrl: adUnit.getCampaign().getOriginalVideoUrl()
+            });
+            Diagnostics.trigger({
+                type: 'video_too_long',
+                error: error
+            });
+        }
+
         const overlay = adUnit.getVideoAdUnitController().getOverlay();
 
         adUnit.getVideoAdUnitController().setVideoDuration(duration);
@@ -82,6 +95,7 @@ export class VideoEventHandlers {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
                 sessionManager.getSession().getId(),
+                sessionManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideoAdUnitController().getVideoPosition());
         }

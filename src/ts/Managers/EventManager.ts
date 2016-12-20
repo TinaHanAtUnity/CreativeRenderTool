@@ -64,7 +64,7 @@ export class EventManager {
             retryWithConnectionEvents: false
         }).catch(error => {
             if(error instanceof RequestError) {
-                error = new DiagnosticError(error, {
+                error = new DiagnosticError(new Error(error.message), {
                     request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
@@ -88,7 +88,7 @@ export class EventManager {
             retryWithConnectionEvents: false
         }).catch(error => {
             if(error instanceof RequestError) {
-                error = new DiagnosticError(error, {
+                error = new DiagnosticError(new Error(error.message), {
                     request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,

@@ -69,13 +69,14 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
-### Integration tests
-
-- Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/release/config.json`)
-- Change webview release config (`src/config.json`) to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/release/index.html`)
-- `make build-release`
-- Run integration test suite from the SDK
-
 ## Releasing
 
 Before releasing, update dependencies to latest versions in `package.json`, then regenerate `npm-shrinkwrap.json` with `npm shrinkwrap` and then manually remove `fsevents` dependency from the `npm-shrinkwrap.json` file (`fsevents` breaks build on Linux machines. See [this](https://github.com/npm/npm/issues/2679#issuecomment-150084700))
+
+### Release checklist
+
+- Create `staging/*` branches for all release branches and resolve any conflicts
+- Ask QA to run tests
+- If all looks good, update `LKG_*` tags
+- Merge staging branches through PRs to production branches
+- Update CHANGELOG.md in master branch

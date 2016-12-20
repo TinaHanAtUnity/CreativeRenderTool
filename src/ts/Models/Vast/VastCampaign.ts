@@ -6,9 +6,17 @@ export class VastCampaign extends Campaign {
     private _cacheTTL: number;
     private _campaignId: string;
     private _vast: Vast;
+    private _hasEndscreen: boolean;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super({}, gamerId, abGroup);
+        const campaign = {
+            endScreenPortrait: vast.getCompanionPortraitUrl(),
+            endScreenLandscape: vast.getCompanionLandscapeUrl()
+        };
+
+        super(campaign, gamerId, abGroup);
+
+        this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
         this._campaignId = campaignId;
         this._vast = vast;
         this._cacheTTL = cacheTTL || 3600;
@@ -32,8 +40,16 @@ export class VastCampaign extends Campaign {
         }
     }
 
+    public getOriginalVideoUrl(): string {
+        return this._vast.getVideoUrl() || '';
+    }
+
     public getTimeoutInSeconds(): number {
         return this._cacheTTL;
+    }
+
+    public hasEndscreen(): boolean {
+        return this._hasEndscreen;
     }
 
     private processCustomTracking(tracking: any) {

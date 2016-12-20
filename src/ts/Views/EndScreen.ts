@@ -18,13 +18,15 @@ export class EndScreen extends View {
     private _coppaCompliant: boolean;
     private _gameName: string;
     private _privacy: Privacy;
+    private _localization: Localization;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
+        this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, new Localization(language, 'endscreen'));
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         if(campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
@@ -34,10 +36,8 @@ export class EndScreen extends View {
                 'endScreenLandscape': campaign.getLandscapeUrl(),
                 'endScreenPortrait': campaign.getPortraitUrl(),
                 'rating': adjustedRating.toString(),
-                'ratingCount': campaign.getRatingCount().toString(),
-                'endscreenAlt': (() => {
-                    return undefined;
-                })()
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
+                'endscreenAlt': this.getEndscreenAlt(campaign)
             };
         }
 
@@ -82,9 +82,17 @@ export class EndScreen extends View {
 
         if(this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement.removeChild(this._privacy.container());
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
         }
+    }
+
+    private getEndscreenAlt(campaign: Campaign) {
+        const abGroup = campaign.getAbGroup();
+        if(abGroup !== 8 && abGroup !== 9) {
+            return 'xmas';
+        }
+        return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
@@ -108,7 +116,7 @@ export class EndScreen extends View {
         this._privacy.onClose.subscribe(() => {
             if(this._privacy) {
                 this._privacy.hide();
-                this._privacy.container().parentElement.removeChild(this._privacy.container());
+                this._privacy.container().parentElement!.removeChild(this._privacy.container());
                 delete this._privacy;
             }
         });

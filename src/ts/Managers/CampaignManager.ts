@@ -24,14 +24,24 @@ export class CampaignManager {
         CampaignManager.AbGroup = abGroup;
     }
 
+    public static setCampaignId(campaignId: string) {
+        CampaignManager.CampaignId = campaignId;
+    }
+
+    public static setCountry(country: string) {
+        CampaignManager.Country = country;
+    }
+
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
+    private static CampaignId: string | undefined;
+    private static Country: string | undefined;
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
     public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
-    public onError: Observable1<Error> = new Observable1();
+    public onError: Observable1<any> = new Observable1();
 
     private _nativeBridge: NativeBridge;
     private _request: Request;
@@ -84,13 +94,13 @@ export class CampaignManager {
         if(htmlCampaign) {
             this.onThirdPartyCampaign.trigger(htmlCampaign);
         } else {
-            const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+            const campaign = new Campaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             this.onCampaign.trigger(campaign);
         }
     }
 
     private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
-        const campaign = new Campaign(json.campaign, json.gamerId, json.abGroup);
+        const campaign = new Campaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
         let resource: string | undefined;
         switch(campaign.getId()) {
             // Game of War iOS
@@ -127,7 +137,7 @@ export class CampaignManager {
 
         const abGroup = campaign.getAbGroup();
         if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new HtmlCampaign(json.campaign, json.gamerId, json.abGroup, resource);
+            return new HtmlCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
         }
         return undefined;
     }
@@ -221,6 +231,24 @@ export class CampaignManager {
 
         if(this._clientInfo.getTestMode()) {
             url = Url.addParameters(url, {test: true});
+        }
+
+        if(CampaignManager.CampaignId) {
+            url = Url.addParameters(url, {
+                forceCampaignId: CampaignManager.CampaignId
+            });
+        }
+
+        if(CampaignManager.AbGroup) {
+            url = Url.addParameters(url, {
+                forceAbGroup: CampaignManager.AbGroup
+            });
+        }
+
+        if(CampaignManager.Country) {
+            url = Url.addParameters(url, {
+                force_country: CampaignManager.Country
+            });
         }
 
         const promises: Promise<any>[] = [];

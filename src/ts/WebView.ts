@@ -388,7 +388,12 @@ export class WebView {
             return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
-            }).catch(error => {
+            })
+            .then(() => cacheAsset(campaign.getLandscapeUrl(), failAllowed))
+            .then(fileUrl => campaign.setLandscapeUrl(fileUrl))
+            .then(() => cacheAsset(campaign.getPortraitUrl(), failAllowed))
+            .then(fileUrl => campaign.setPortraitUrl(fileUrl))
+            .catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                 } else if(!failAllowed && error === CacheStatus.FAILED) {
@@ -527,7 +532,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
@@ -679,6 +684,18 @@ export class WebView {
         metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
             if(found && typeof abGroup === 'number') {
                 CampaignManager.setAbGroup(abGroup);
+            }
+        });
+
+        metaData.get<string>('test.campaignId', true).then(([found, campaignId]) => {
+            if(found && typeof campaignId === 'string') {
+                CampaignManager.setCampaignId(campaignId);
+            }
+        });
+
+        metaData.get<string>('test.country', true).then(([found, country]) => {
+            if(found && typeof country === 'string') {
+                CampaignManager.setCountry(country);
             }
         });
 
