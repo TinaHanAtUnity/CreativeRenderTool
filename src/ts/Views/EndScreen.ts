@@ -33,8 +33,9 @@ export class EndScreen extends View {
             this._templateData = {
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon(),
-                'endScreenLandscape': campaign.getLandscapeUrl(),
-                'endScreenPortrait': campaign.getPortraitUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortraitUrl(),
+                'endScreenPortrait': campaign.getLandscapeUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
