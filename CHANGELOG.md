@@ -1,3 +1,7 @@
+# Tue Dec 20 10:38:00 UTC 2016
+
+* Flip end screen images to match 1.5 behaviour
+
 # Mon Dec 19 13:33:52 UTC 2016
 
 * Add campaign ID to video_too_long diagnostic message
