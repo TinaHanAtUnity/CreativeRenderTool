@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { Double } from 'Utilities/Double';
+/* import { Double } from 'Utilities/Double'; */
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,
@@ -70,6 +70,8 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
     }
 
+    /*
+    NOTE: THIS CODE IS COMMENTED OUT FROM MASTER BECAUSE IOS 2.0.6 AND 2.0.7 ACCIDENTALLY POINT TO MASTER
     public setTransform(rotation: Double): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setTransform', [rotation]);
     }
@@ -85,6 +87,7 @@ export class IosAdUnitApi extends NativeApi {
     public getViewFrame(view: string): Promise<Double[]> {
         return this._nativeBridge.invoke<Double[]>(this._apiClass, 'getViewFrame', [view]);
     }
+    */
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
