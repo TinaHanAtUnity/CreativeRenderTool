@@ -62,6 +62,14 @@ export class AndroidAdUnit extends AdUnit {
         return this._nativeBridge.AndroidAdUnit.close();
     }
 
+    public reconfigure(): Promise<any[]> {
+        // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
+        return Promise.all([
+            this._nativeBridge.AndroidAdUnit.setViews(['webview']),
+            this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR)
+        ]);
+    }
+
     private onResume(activityId: number): void {
         if(activityId === this._activityId) {
             this.onShow.trigger();

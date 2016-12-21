@@ -71,6 +71,14 @@ export class IosAdUnit extends AdUnit {
         return this._nativeBridge.IosAdUnit.close();
     }
 
+    public reconfigure(): Promise<any[]> {
+        // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
+        return Promise.all([
+            this._nativeBridge.IosAdUnit.setViews(['webview']),
+            this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL)
+        ]);
+    }
+
     private onViewControllerInit(): void {
         if(this._fakeLandscape) {
             // fake landscape from portrait by transforming view by 90 degrees (half pi in radians)
