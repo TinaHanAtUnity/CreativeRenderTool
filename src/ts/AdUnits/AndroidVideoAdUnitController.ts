@@ -11,6 +11,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { AdUnit } from 'Utilities/AdUnit';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -28,7 +29,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private _deviceInfo: DeviceInfo;
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._deviceInfo = deviceInfo;

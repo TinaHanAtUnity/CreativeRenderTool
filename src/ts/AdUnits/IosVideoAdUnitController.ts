@@ -7,6 +7,7 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { AdUnit } from 'Utilities/AdUnit';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -29,7 +30,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
     private _iosOptions: IIosOptions;
     private _fakeLandscape: boolean;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._deviceInfo = deviceInfo;

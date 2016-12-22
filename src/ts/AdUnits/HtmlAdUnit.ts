@@ -13,6 +13,7 @@ import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
 import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
 import { IObserver2 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
@@ -26,7 +27,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
     private _onPauseObserver: IObserver2<boolean, number>;
     private _onDestroyObserver: IObserver2<boolean, number>;
 
-    constructor(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
         super(nativeBridge, placement, campaign);
         this._sessionManager = sessionManager;
         this._thirdParty = thirdParty;
