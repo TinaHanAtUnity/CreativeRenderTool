@@ -70,25 +70,6 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
     }
 
-    /*
-    NOTE: THIS CODE IS COMMENTED OUT FROM MASTER BECAUSE IOS 2.0.6 AND 2.0.7 ACCIDENTALLY POINT TO MASTER
-    public setTransform(rotation: Double): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setTransform', [rotation]);
-    }
-
-    public getTransform(): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'getTransform');
-    }
-
-    public setViewFrame(view: string, x: Double, y: Double, width: Double, height: Double): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
-    }
-
-    public getViewFrame(view: string): Promise<Double[]> {
-        return this._nativeBridge.invoke<Double[]>(this._apiClass, 'getViewFrame', [view]);
-    }
-    */
-
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
