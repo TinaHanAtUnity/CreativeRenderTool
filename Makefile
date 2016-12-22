@@ -98,7 +98,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 		var o={encoding:'utf-8'};\
 		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
 		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
-		c=c.replace('{BRANCH}', '$(BRANCH)');\
+		c=c.replace('{BRANCH}', '$(BRANCH)' === '2.0.6-ios' ? 'master' : '$(BRANCH)');\
 		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
 		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
 
