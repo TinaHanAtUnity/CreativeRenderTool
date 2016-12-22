@@ -59,9 +59,8 @@ const paths = [
     '/test/config.json'
 ];
 
-const urlRoot = '/webview/' + branch;
-const urlsFromPath = (base_urls, path, addHttps) => {
-    return base_urls.map((baseUrl) => {
+const urlsFromPath = (urlRoot, baseUrls, path, addHttps) => {
+    return baseUrls.map((baseUrl) => {
         return (addHttps ? 'https://' : '') + baseUrl + urlRoot + path;
     });
 };
@@ -90,9 +89,9 @@ const checkConfigJson = (url, version) => {
     return doFetch();
 };
 
-let purgeAkamai = () => {
-    let urls = flatten(paths.map(function(path) {
-        return urlsFromPath(cdnConfig.akamai.base_urls, path, true);
+let purgeAkamai = (urlRoot) => {
+    let urls = flatten(paths.map(path => {
+        return urlsFromPath(urlRoot, cdnConfig.akamai.base_urls, path, true);
     }));
 
     console.log('Starting Akamai purge of: ');
@@ -124,9 +123,9 @@ let purgeAkamai = () => {
     });
 };
 
-let purgeHighwinds = () => {
-    let urls = flatten(paths.map(function(path) {
-        return urlsFromPath(cdnConfig.highwinds.base_urls, path, true);
+let purgeHighwinds = (urlRoot) => {
+    let urls = flatten(paths.map(path => {
+        return urlsFromPath(urlRoot, cdnConfig.highwinds.base_urls, path, true);
     }));
 
     console.log('Starting Highwinds purge of: ');
@@ -159,9 +158,9 @@ let purgeHighwinds = () => {
     });
 };
 
-let purgeChinaNetCenter = () => {
-    let urls = flatten(paths.map(function(path) {
-        return urlsFromPath(cdnConfig.chinanetcenter.base_urls, path, false);
+let purgeChinaNetCenter = (urlRoot) => {
+    let urls = flatten(paths.map(path => {
+        return urlsFromPath(urlRoot, cdnConfig.chinanetcenter.base_urls, path, false);
     }));
 
     console.log('Starting ChinaNetCenter purge of: ');
@@ -191,10 +190,19 @@ let purgeChinaNetCenter = () => {
     });
 };
 
+let urlRoot = '/webview/' + branch;
 Promise.all([
-    purgeAkamai(),
-    purgeHighwinds(),
-    purgeChinaNetCenter()
+    purgeAkamai(urlRoot),
+    purgeHighwinds(urlRoot),
+    purgeChinaNetCenter(urlRoot)
 ]).then(() => {
     console.log('Successfully purged all CDNs!');
+    if(branch === '2.0.6') {
+        urlRoot = '/webview/master';
+        return Promise.all([
+            purgeAkamai(urlRoot),
+            purgeHighwinds(urlRoot),
+            purgeChinaNetCenter(urlRoot)
+        ]);
+    }
 });
