@@ -55,7 +55,7 @@ deploy:
     local_dir: build
     upload-dir: webview/master
     on:
-      branch: 2.0.6
+      branch: 2.0.6-ios
   - provider: s3
     access_key_id: AKIAI5V7ATZVXQHBGHYA
     secret_access_key:
