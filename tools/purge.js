@@ -40,9 +40,13 @@ const cdnConfig = {
     }
 };
 
-const branch = process.env.TRAVIS_BRANCH;
+let branch = process.env.TRAVIS_BRANCH;
 if(!branch) {
     throw new Error('Invalid branch: ' + branch);
+}
+
+if(branch === 'master') {
+    branch = 'development';
 }
 
 const commit = process.env.TRAVIS_COMMIT;
