@@ -191,18 +191,14 @@ let purgeChinaNetCenter = (urlRoot) => {
 };
 
 let urlRoot = '/webview/' + branch;
+if(branch === '2.0.6-ios') {
+    urlRoot = '/webview/master';
+}
+
 Promise.all([
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
     purgeChinaNetCenter(urlRoot)
 ]).then(() => {
     console.log('Successfully purged all CDNs!');
-    if(branch === '2.0.6-ios') {
-        urlRoot = '/webview/master';
-        return Promise.all([
-            purgeAkamai(urlRoot),
-            purgeHighwinds(urlRoot),
-            purgeChinaNetCenter(urlRoot)
-        ]);
-    }
 });
