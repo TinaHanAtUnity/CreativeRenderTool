@@ -57,7 +57,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
 
         this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
 
-        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true /* this._fakeLandscape ? false : true */ );
+        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
     }
 
     public hide(): Promise<void> {
