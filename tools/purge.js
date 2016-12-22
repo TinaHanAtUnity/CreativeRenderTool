@@ -197,7 +197,7 @@ Promise.all([
     purgeChinaNetCenter(urlRoot)
 ]).then(() => {
     console.log('Successfully purged all CDNs!');
-    if(branch === '2.0.6') {
+    if(branch === '2.0.6-ios') {
         urlRoot = '/webview/master';
         return Promise.all([
             purgeAkamai(urlRoot),
