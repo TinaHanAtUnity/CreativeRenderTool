@@ -49,7 +49,7 @@ export class AdUnitFactory {
         const metaData = new MetaData(nativeBridge);
 
         const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, deviceInfo, placement, campaign, overlay, options);
-        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
@@ -80,10 +80,10 @@ export class AdUnitFactory {
 
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
-            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
         } else {
-            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
+            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
         }
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);

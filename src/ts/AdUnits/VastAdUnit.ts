@@ -5,13 +5,14 @@ import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
-        super(nativeBridge, videoAdUnitController);
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
+        super(nativeBridge, adUnit, videoAdUnitController);
 
         this._endScreen = endScreen || null;
     }
