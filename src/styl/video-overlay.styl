@@ -1,0 +1,185 @@
+#video-overlay
+  background-color: transparent
+  width: 100%
+  height: 100%
+  color: #FFF
+
+  .header
+  .footer
+    position: absolute
+    width: 100%
+    height: 12%
+
+  .header
+    top: 0
+
+  .skip-icon
+    position: absolute
+    display: none
+    top: 50%
+    left: 2%
+    width: 27px
+    height: 27px
+    font-size: 27px
+    -webkit-transform: translate(0, -50%)
+
+  .footer
+    bottom: 0
+
+  .mute-button
+    position: absolute
+    display: none
+    left: 2%
+    top: 50%
+    -webkit-transform: translate(0, -50%)
+    width: 27px
+    height: 27px
+
+    .mute-icon
+    .unmute-icon
+      font-size: 27px
+
+    .unmute-icon
+      display: none
+
+    &.muted
+      .mute-icon
+        display: none
+
+      .unmute-icon
+        display: block
+
+  .full-screen-button
+    display: none
+    position: absolute
+    right: 2%
+    top: 50%
+    width: 27px
+    height: 27px
+    font-size: 27px
+    -webkit-transform: translate(0, -50%)
+
+  .call-button
+    display: none
+    position: absolute
+    right: 2%
+    top: 50%
+    font-weight: bold
+    -webkit-transform: translate(0, -50%)
+
+  .buffering-spinner
+    display: none
+    position: absolute
+    margin: auto
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    width: 100px
+    height: 65px
+
+  .spinner-animation
+    width: 24px
+    height: 24px
+    margin: 0 auto
+    border: 4px solid #fff
+    border-left-color: transparent
+    border-right-color: transparent
+    border-radius: 200px
+    -webkit-animation: spinner 1s linear infinite
+
+  .debug-message-text
+    display: none
+    position: absolute
+    top: 50%
+    right: 10px
+
+  @-webkit-keyframes spinner
+    from
+      -webkit-transform: rotate(0deg)
+    to
+      -webkit-transform: rotate(360deg)
+
+  .spinner-text
+    margin-top: 10px
+    text-align: center
+    color: #FFF
+    font-weight: bold
+    text-shadow: 1px 1px #000
+
+  .progress
+    display: none
+    position: absolute
+    top: 50%
+    right: 2%
+    width: 36px
+    height: 36px
+    -webkit-transform: translate(0, -50%)
+
+  .progress-wrapper
+    position: absolute
+    width: 36px
+    height: 36px
+    clip: rect(0px, 36px, 36px, 18px)
+
+  .progress:after
+    position: absolute
+    display: block
+    left: 50%
+    top: 50%
+    content: attr(data-seconds)
+    font-size: 18px
+    color: white
+    -webkit-transform: translate(-50%, -50%)
+
+  .circle-base
+  .circle-left
+  .circle-right
+    position: absolute
+    vertical-align: middle
+    background-color: transparent
+    width: 28px
+    height: 28px
+    border-radius: 100%
+
+  .circle-base
+    border: 4px solid #696969
+
+  .circle-left
+  .circle-right
+    border: 4px solid #fff
+    clip: rect(0px, 18px, 36px, 0px)
+
+  .progress-wrapper
+  .circle-left
+  .circle-right
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: 0.01s;
+
+  @-webkit-keyframes right-spin
+    from
+      -webkit-transform: rotate(0deg)
+    to
+      -webkit-transform: rotate(180deg)
+  @-webkit-keyframes left-spin
+    from
+      -webkit-transform: rotate(0deg)
+    to
+      -webkit-transform: rotate(360deg)
+  @-webkit-keyframes close-progress-wrapper
+    to
+      clip: rect(auto, auto, auto, auto)
+
+// iPhone 5 40/71, iPhone 5, 6, 7 375/667
+@media only screen and (device-aspect-ratio: 16/9), screen and (device-aspect-ratio: 16/10), screen and (device-aspect-ratio: 9/16), screen and (device-aspect-ratio: 10/16), screen and (device-aspect-ratio: 375/667), screen and (device-aspect-ratio: 667/375), screen and (device-aspect-ratio: 40/71), screen and (device-aspect-ratio: 71/40)
+  .header
+    background: rgba(0, 0, 0, 0.5)
+
+  .footer
+    background: rgba(0, 0, 0, 0.5)
+
+.fade
+  opacity: 0
+  transition: opacity 1s ease-in-out

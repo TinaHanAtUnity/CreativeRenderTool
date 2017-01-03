@@ -2,7 +2,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { Overlay } from 'Views/Overlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { FinishState } from 'Constants/FinishState';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Double } from 'Utilities/Double';
@@ -28,7 +28,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private _deviceInfo: DeviceInfo;
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._deviceInfo = deviceInfo;
