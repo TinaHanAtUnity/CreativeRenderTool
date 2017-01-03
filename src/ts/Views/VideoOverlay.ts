@@ -245,6 +245,7 @@ export class VideoOverlay extends AbstractVideoOverlay {
 
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
+            this._skipVisible = value;
             this._skipElement.style.display = value ? 'block' : 'none';
         }
     }
