@@ -1,8 +1,6 @@
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
-import { IosVideoAdUnitController } from 'AdUnits/IosVideoAdUnitController';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
@@ -141,11 +139,7 @@ export class AdUnitFactory {
     };
 
     private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            return new AndroidVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
-        } else {
-            return new IosVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
-        }
+        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
     }
 
     private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {

@@ -4,8 +4,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { FinishState } from 'Constants/FinishState';
+import { AdUnit } from 'Utilities/AdUnit';
+import { Double } from 'Utilities/Double';
 
-export abstract class VideoAdUnitController {
+export class VideoAdUnitController {
 
     private static _progressInterval: number = 250;
 
@@ -14,27 +16,35 @@ export abstract class VideoAdUnitController {
     public onVideoClose: Observable0 = new Observable0();
     public onVideoError: Observable0 = new Observable0();
 
-    protected _finishState: FinishState;
+    private _finishState: FinishState;
 
-    protected _nativeBridge: NativeBridge;
-    protected _placement: Placement;
-    protected _campaign: Campaign;
-    protected _overlay: Overlay | undefined;
+    private _nativeBridge: NativeBridge;
+    private _adUnit: AdUnit;
+    private _placement: Placement;
+    private _campaign: Campaign;
+    private _overlay: Overlay | undefined;
+    private _options: any;
 
-    protected _videoStarted: boolean;
-    protected _videoErrorStatus: boolean;
-    protected _videoDuration: number;
-    protected _videoPosition: number;
-    protected _videoPositionRepeats: number;
-    protected _videoQuartile: number;
-    protected _videoActive: boolean;
-    protected _showing: boolean = false;
+    private _onShowObserver: any;
+    private _onSystemKillObserver: any;
+    private _onSystemInterruptObserver: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign, overlay: Overlay) {
+    private _videoStarted: boolean;
+    private _videoErrorStatus: boolean;
+    private _videoDuration: number;
+    private _videoPosition: number;
+    private _videoPositionRepeats: number;
+    private _videoQuartile: number;
+    private _videoActive: boolean;
+    private _showing: boolean = false;
+
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         this._nativeBridge = nativeBridge;
+        this._adUnit = adUnit;
         this._placement = placement;
         this._campaign = campaign;
         this._overlay = overlay;
+        this._options = options;
 
         this._videoStarted = false;
         this._videoErrorStatus = false;
@@ -44,9 +54,33 @@ export abstract class VideoAdUnitController {
         this._videoActive = true;
     }
 
-    public abstract show(): Promise<void>;
+    public show(): Promise<void> {
+        this._showing = true;
+        this.onVideoStart.trigger();
+        this.setVideoActive(true);
 
-    public abstract hide(): Promise<void>;
+        this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
+        this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onSystemInterruptObserver = this._adUnit.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
+
+        return this._adUnit.open('video', true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
+    }
+
+    public hide(): Promise<void> {
+        if(!this._showing) {
+            return Promise.resolve();
+        }
+        this._showing = false;
+
+        this.hideChildren();
+        this.unsetReferences();
+
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+
+        return this._adUnit.close().then(() => {
+            this.onVideoClose.trigger();
+        });
+    }
 
     public isShowing(): boolean {
         return this._showing;
@@ -134,11 +168,11 @@ export abstract class VideoAdUnitController {
         return this._campaign;
     }
 
-    protected unsetReferences() {
+    private unsetReferences() {
         delete this._overlay;
     }
 
-    protected hideChildren() {
+    private hideChildren() {
         const overlay = this.getOverlay();
 
         if(overlay) {
@@ -146,12 +180,32 @@ export abstract class VideoAdUnitController {
         }
     };
 
-    protected getVideoUrl(): string {
+    private getVideoUrl(): string {
         const campaign: Campaign = this.getCampaign();
         if(!campaign.isVideoCached() && campaign.getStreamingVideoUrl()) {
             return campaign.getStreamingVideoUrl();
         } else {
             return campaign.getVideoUrl();
+        }
+    }
+
+    private onShow() {
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+        }
+    }
+
+    private onSystemKill() {
+        if(this._showing) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    private onSystemInterrupt(): void {
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+            this._nativeBridge.VideoPlayer.play();
         }
     }
 }
