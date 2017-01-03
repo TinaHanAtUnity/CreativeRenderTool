@@ -7,7 +7,6 @@ import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AndroidVideoPlayerError } from 'Native/Api/AndroidVideoPlayer';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdUnit } from 'Utilities/AdUnit';
 
 interface IAndroidOptions {
@@ -19,14 +18,12 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     private _onSystemKillObserver: any;
 
     private _adUnit: AdUnit;
-    private _deviceInfo: DeviceInfo;
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._adUnit = adUnit;
-        this._deviceInfo = deviceInfo;
         this._androidOptions = options;
     }
 
@@ -70,7 +67,7 @@ export class AndroidVideoAdUnitController extends VideoAdUnitController {
     }
 
     private onShow() {
-        if(this._showing) {
+        if(this._showing && this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }

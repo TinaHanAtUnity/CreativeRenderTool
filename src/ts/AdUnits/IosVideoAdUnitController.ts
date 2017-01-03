@@ -6,7 +6,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { IosVideoPlayerEvent } from 'Native/Api/IosVideoPlayer';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdUnit } from 'Utilities/AdUnit';
 
 interface IIosOptions {
@@ -17,23 +16,17 @@ interface IIosOptions {
 }
 
 export class IosVideoAdUnitController extends VideoAdUnitController {
+    private _onShowObserver: any;
+    private _onSystemInterruptObserver: any;
 
-    private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
-    private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
-    private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
-
-    private _onViewControllerDidAppearObserver: any;
-    private _onNotificationObserver: any;
-
-    private _deviceInfo: DeviceInfo;
+    private _adUnit: AdUnit;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
-        this._deviceInfo = deviceInfo;
+        this._adUnit = adUnit;
         this._iosOptions = options;
-        this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
     }
 
     public show(): Promise<void> {
@@ -41,24 +34,10 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
         this.onVideoStart.trigger();
         this.setVideoActive(true);
 
-        let orientation: UIInterfaceOrientationMask = this._iosOptions.supportedOrientations;
-        if(!this._placement.useDeviceOrientationForVideo()) {
-            if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
-            } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
-            } else if((this._iosOptions.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
-            }
-        }
+        this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
+        this._onSystemInterruptObserver = this._adUnit.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
-        this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
-        this._nativeBridge.Notification.addNotificationObserver(IosVideoAdUnitController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addNotificationObserver(IosVideoAdUnitController._audioSessionRouteChange, []);
-
-        this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', playing from ' + this.getVideoUrl());
-
-        return this._nativeBridge.IosAdUnit.open(['videoplayer', 'webview'], orientation, true, true);
+        return this._adUnit.open('video', true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._iosOptions);
     }
 
     public hide(): Promise<void> {
@@ -81,53 +60,21 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
-        this._nativeBridge.IosAdUnit.onViewControllerDidAppear.unsubscribe(this._onViewControllerDidAppearObserver);
-        this._nativeBridge.Notification.onNotification.unsubscribe(this._onNotificationObserver);
-        this._nativeBridge.Notification.removeNotificationObserver(IosVideoAdUnitController._audioSessionInterrupt);
-        this._nativeBridge.Notification.removeNotificationObserver(IosVideoAdUnitController._audioSessionRouteChange);
-
-        return this._nativeBridge.IosAdUnit.close().then(() => {
+        return this._adUnit.close().then(() => {
             this.onVideoClose.trigger();
         });
     }
 
-    private onViewDidAppear(): void {
+    private onShow(): void {
         if(this._showing && this.isVideoActive()) {
             this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }
 
-    private onNotification(event: string, parameters: any): void {
-        switch(event) {
-            case IosVideoAdUnitController._appDidBecomeActive:
-                if(this._showing && this.isVideoActive()) {
-                    this._nativeBridge.Sdk.logInfo('Resuming Unity Ads video playback, app is active');
-                    this._nativeBridge.VideoPlayer.play();
-                }
-                break;
-
-            case IosVideoAdUnitController._audioSessionInterrupt:
-                const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
-
-                if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
-                    if(interruptData.AVAudioSessionInterruptionOptionKey === 1 && this._showing && this.isVideoActive()) {
-                        this._nativeBridge.Sdk.logInfo('Resuming Unity Ads video playback after audio interrupt');
-                        this._nativeBridge.VideoPlayer.play();
-                    }
-                }
-                break;
-
-            case IosVideoAdUnitController._audioSessionRouteChange:
-                if(this._showing && this.isVideoActive()) {
-                    this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after audio session route change');
-                    this._nativeBridge.VideoPlayer.play();
-                }
-                break;
-
-            default:
-                // ignore other events
-                break;
+    private onSystemInterrupt(): void {
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+            this._nativeBridge.VideoPlayer.play();
         }
     }
-
 }
