@@ -84,7 +84,7 @@ export class AndroidAdUnit extends AdUnit {
     }
 
     private onPause(finishing: boolean, activityId: number): void {
-        if(activityId === this._activityId) {
+        if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
                 this.onSystemKill.trigger();
@@ -93,7 +93,7 @@ export class AndroidAdUnit extends AdUnit {
     }
 
     private onDestroy(finishing: boolean, activityId: number): void {
-        if(activityId === this._activityId) {
+        if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
                 this.onSystemKill.trigger();
