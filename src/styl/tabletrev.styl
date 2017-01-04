@@ -1,0 +1,39 @@
+body.ipad
+body.android
+  @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px)
+    .campaign-container.tabletrev 
+      .game-background
+        bottom: 30%
+      .end-screen-info-background
+        height: 30%
+        .name-container
+          font-size: 20pt
+        .game-rating
+          font-size: 30px
+        .game-rating-count
+          font-size: 25px
+        .download-container
+          clear: none
+        .btn-download
+          float: left
+          margin-top: 10px
+          margin-left: 30px
+          padding: 20px
+
+    &.landscape  
+      .campaign-container.tabletrev 
+        .game-background
+          width: 70%
+          bottom: 0%
+        .end-screen-info-background
+          width: 30%
+          height: 100%
+          .name-container
+            font-size: 20pt
+          .game-rating
+            font-size: 30px
+          .game-rating-count
+            font-size: 25px
+          .btn-download
+            font-size: 25pt
+            margin-top: 50px

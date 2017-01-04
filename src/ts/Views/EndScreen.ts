@@ -89,7 +89,8 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: Campaign) {
-        return undefined;
+        return 'tabletrev';
+        //return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
