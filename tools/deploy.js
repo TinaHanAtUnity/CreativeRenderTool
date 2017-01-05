@@ -21,6 +21,8 @@ if(!process.env.COMMIT_ID) {
 }
 const commitId = process.env.COMMIT_ID;
 
+const http = require('http');
+const https = require('https');
 http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
 
 const s3 = require('s3');
