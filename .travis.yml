@@ -9,7 +9,7 @@ addons:
     - libimage-exiftool-perl
 
 install:
-  - pip install awscli
+  - pip install --user awscli
   - npm install
 
 cache:
