@@ -191,7 +191,7 @@ let purgeChinaNetCenter = (urlRoot) => {
 };
 
 let urlRoot = '/webview/' + branch;
-if(branch === '2.0.6-ios') {
+if(branch === '2.0.6') {
     urlRoot = '/webview/master';
 }
 
