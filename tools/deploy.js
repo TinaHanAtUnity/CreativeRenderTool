@@ -16,11 +16,6 @@ if(branch === '2.0.6') {
     branch = 'development';
 }
 
-if(!process.env.COMMIT_ID) {
-    throw new Error('Missing COMMIT_ID env parameter');
-}
-const commitId = process.env.COMMIT_ID;
-
 const http = require('http');
 const https = require('https');
 http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
@@ -30,7 +25,7 @@ const client = s3.createClient({
     s3Options: {
         accessKeyId: process.env.AWS_KEY,
         secretAccessKey: process.env.AWS_SECRET,
-        region: 'us-east-1',
+        region: 'us-east-1'
     }
 });
 
@@ -55,6 +50,6 @@ const upload = (prefix) => {
     });
 };
 
-upload(['webview', branch, commitId].join('/'));
+upload(['webview', branch, ''].join('/'));
 
 

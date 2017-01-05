@@ -8,6 +8,10 @@ addons:
     packages:
     - libimage-exiftool-perl
 
+install:
+  - pip install awscli
+  - npm install
+
 cache:
   directories:
     - node_modules

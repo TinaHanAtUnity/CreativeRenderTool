@@ -283,5 +283,4 @@ deploy:
 	rm -rf build/coverage
 	find build/test/* -not -name "config.json" | xargs rm -rf
 	find build/release/* -not -name "config.json" | xargs rm -rf
-	BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) node tools/deploy.js
-	node tools/purge.js
+	BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) node tools/deploy.js && node tools/purge.js
