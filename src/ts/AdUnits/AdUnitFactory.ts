@@ -47,7 +47,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         let overlay: AbstractVideoOverlay;
-        if (AbTest.isOverlayTestActive()) {
+        if (AbTest.isOverlayTestActive(campaign)) {
             overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         } else {
             overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
@@ -80,7 +80,7 @@ export class AdUnitFactory {
 
     private static createVastAdUnit(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         let overlay: AbstractVideoOverlay;
-        if (AbTest.isOverlayTestActive()) {
+        if (AbTest.isOverlayTestActive(campaign)) {
             overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         } else {
             overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
