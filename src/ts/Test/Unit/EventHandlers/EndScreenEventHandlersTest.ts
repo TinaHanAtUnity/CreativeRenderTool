@@ -17,7 +17,7 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { AdUnit } from 'Utilities/AdUnit';
 import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
-import { IosAdUnit } from "../../../Utilities/IosAdUnit";
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 describe('EndScreenEventHandlersTest', () => {
 
