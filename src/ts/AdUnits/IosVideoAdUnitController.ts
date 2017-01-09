@@ -1,6 +1,6 @@
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { Overlay } from 'Views/Overlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
@@ -27,7 +27,7 @@ export class IosVideoAdUnitController extends VideoAdUnitController {
     private _deviceInfo: DeviceInfo;
     private _iosOptions: IIosOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any) {
         super(nativeBridge, placement, campaign, overlay);
 
         this._deviceInfo = deviceInfo;
