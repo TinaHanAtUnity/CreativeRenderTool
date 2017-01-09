@@ -11,7 +11,6 @@
   "dependencies": {
     "es6-promise": "3.3.1",
     "google-closure-compiler": "20161201.0.0",
-    "s3": "4.4.0",
     "stylus": "0.54.5",
     "systemjs": "0.19.41",
     "systemjs-plugin-text": "0.0.9",
