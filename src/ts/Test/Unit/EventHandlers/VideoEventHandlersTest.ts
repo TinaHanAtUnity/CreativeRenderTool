@@ -275,8 +275,8 @@ describe('VideoEventHandlersTest', () => {
             const prom = Promise.resolve([true, true]);
             sinon.stub(metaData, 'get').returns(prom);
             const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
-            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+            const vastVideoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, vastVideoAdUnitController);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
 
             return prom.then(() => {
@@ -297,9 +297,9 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
             const vastCampaign = <VastCampaign><any>{};
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastVideoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
 
-            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, vastVideoAdUnitController);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
@@ -309,9 +309,9 @@ describe('VideoEventHandlersTest', () => {
 
         it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
             const vastCampaign = <VastCampaign><any>{};
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastVideoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), vastCampaign, overlay, null);
 
-            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, vastVideoAdUnitController);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
