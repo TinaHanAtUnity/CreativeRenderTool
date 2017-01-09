@@ -36,6 +36,7 @@ export class Overlay extends AbstractVideoOverlay {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _headerElement: HTMLElement;
 
     private _fadeTimer: any;
 
@@ -84,6 +85,7 @@ export class Overlay extends AbstractVideoOverlay {
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._headerElement = <HTMLElement>this.container().querySelector('.header');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -102,6 +104,7 @@ export class Overlay extends AbstractVideoOverlay {
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -176,6 +179,7 @@ export class Overlay extends AbstractVideoOverlay {
     public setCallButtonVisible(value: boolean) {
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
