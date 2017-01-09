@@ -13,7 +13,7 @@ elif [ $BRANCH == master ]; then
     BRANCH='development'
 fi
 
-aws s3 sync build s3://unityads-cd-origin/webview/$BRANCH/ --acl public-read --dryrun
+aws s3 sync build s3://unityads-cdn-origin/webview/$BRANCH/ --acl public-read --dryrun
 
 if [ $BRANCH == master ]; then
     aws s3 sync build s3://unityads-cdn-origin/webview/2.0.6/ --acl public-read --dryrun
