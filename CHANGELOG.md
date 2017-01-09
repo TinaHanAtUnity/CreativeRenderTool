@@ -1,3 +1,7 @@
+# Thu Jan 5 09:25:01 UTC 2017
+
+* Remove xmas theme
+
 # Thu Dec 22 16:34:25 UTC 2016
 
 * Use Travis to work around iOS native 2.0.6 and 2.0.7 releases that used webview master instead of release branches
