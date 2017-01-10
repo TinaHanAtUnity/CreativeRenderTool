@@ -5,8 +5,8 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { IosAdUnit } from "../../../Utilities/IosAdUnit";
-import { UIInterfaceOrientationMask } from "../../../Constants/iOS/UIInterfaceOrientationMask";
+import { IosAdUnit } from 'Utilities/IosAdUnit';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
