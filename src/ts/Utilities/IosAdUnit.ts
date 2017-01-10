@@ -2,6 +2,7 @@ import { AdUnit } from 'Utilities/AdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -32,7 +33,7 @@ export class IosAdUnit extends AdUnit {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(description: string, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
         this._showing = true;
 
         let views: string[] = ['webview'];
@@ -54,7 +55,7 @@ export class IosAdUnit extends AdUnit {
         this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + description + ' ad with orientation ' + orientation);
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
         return this._nativeBridge.IosAdUnit.open(views, orientation, true, true);
     }

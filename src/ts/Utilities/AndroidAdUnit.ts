@@ -4,6 +4,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -34,7 +35,7 @@ export class AndroidAdUnit extends AdUnit {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(description: string, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
 
@@ -55,7 +56,7 @@ export class AndroidAdUnit extends AdUnit {
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + description + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
     }

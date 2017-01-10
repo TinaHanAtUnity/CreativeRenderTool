@@ -38,6 +38,8 @@ export abstract class AbstractAdUnit {
 
     public abstract isShowing(): boolean;
 
+    public abstract description(): string;
+
     public getPlacement(): Placement {
         return this._placement;
     }

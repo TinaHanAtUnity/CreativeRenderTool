@@ -38,7 +38,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._adUnit.open('playable', false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
+        return this._adUnit.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
     }
 
     public hide(): Promise<void> {
@@ -64,6 +64,10 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
     public isShowing(): boolean {
         return this._isShowing;
+    }
+
+    public description(): string {
+        return 'playable';
     }
 
     private onShow() {

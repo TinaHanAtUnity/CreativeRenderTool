@@ -6,6 +6,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { FinishState } from 'Constants/FinishState';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Double } from 'Utilities/Double';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class VideoAdUnitController {
 
@@ -54,7 +55,7 @@ export class VideoAdUnitController {
         this._videoActive = true;
     }
 
-    public show(): Promise<void> {
+    public show(adUnit: AbstractAdUnit): Promise<void> {
         this._showing = true;
         this.onVideoStart.trigger();
         this.setVideoActive(true);
@@ -63,7 +64,7 @@ export class VideoAdUnitController {
         this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._adUnit.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
-        return this._adUnit.open('video', true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
+        return this._adUnit.open(adUnit, true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
     }
 
     public hide(): Promise<void> {

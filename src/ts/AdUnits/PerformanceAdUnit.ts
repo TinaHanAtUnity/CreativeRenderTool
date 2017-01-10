@@ -15,7 +15,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
     }
 
     public show(): Promise<void> {
-        return this._videoAdUnitController.show();
+        return this._videoAdUnitController.show(this);
     }
 
     public hide(): Promise<void> {
@@ -30,6 +30,10 @@ export class PerformanceAdUnit extends VideoAdUnit {
 
     public isShowing(): boolean {
         return this._videoAdUnitController.isShowing();
+    }
+
+    public description(): string {
+        return 'performance';
     }
 
     public getEndScreen(): EndScreen | undefined {
