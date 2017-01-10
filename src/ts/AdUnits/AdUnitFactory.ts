@@ -27,6 +27,9 @@ import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { ThirdParty } from 'Views/ThirdParty';
 import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { AdUnit } from 'Utilities/AdUnit';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
+import { AbTest } from 'Utilities/AbTest';
 
 export class AdUnitFactory {
 
@@ -42,7 +45,13 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        let overlay: AbstractVideoOverlay;
+        if (AbTest.isOverlayTestActive(campaign)) {
+            overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        } else {
+            overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        }
+
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         const metaData = new MetaData(nativeBridge);
 
@@ -70,7 +79,13 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        let overlay: AbstractVideoOverlay;
+        if (AbTest.isOverlayTestActive(campaign)) {
+            overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        } else {
+            overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        }
+
         let vastAdUnit: VastAdUnit;
 
         const metaData = new MetaData(nativeBridge);
@@ -111,7 +126,7 @@ export class AdUnitFactory {
         return thirdPartyAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
+    private static prepareOverlay(overlay: AbstractVideoOverlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
         overlay.render();
         document.body.appendChild(overlay.container());
         overlay.setSpinnerEnabled(!adUnit.getCampaign().isVideoCached());
@@ -127,18 +142,18 @@ export class AdUnitFactory {
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
-    private static preparePerformanceOverlayEventHandlers(overlay: Overlay, adUnit: PerformanceAdUnit) {
+    private static preparePerformanceOverlayEventHandlers(overlay: AbstractVideoOverlay, adUnit: PerformanceAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(adUnit));
     }
 
-    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
+    private static prepareVastOverlayEventHandlers(overlay: AbstractVideoOverlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
         overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit));
         overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted));
 
     };
 
-    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any): VideoAdUnitController {
         return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
     }
 

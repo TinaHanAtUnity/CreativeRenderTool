@@ -12,6 +12,7 @@ import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { Overlay } from 'Views/Overlay';
 
 export class VideoEventHandlers {
 
@@ -42,8 +43,8 @@ export class VideoEventHandlers {
             if(adUnit.getVideoAdUnitController().getVideoPosition() > 0) {
                 overlay.setVideoProgress(adUnit.getVideoAdUnitController().getVideoPosition());
             }
-            if(adUnit.getPlacement().allowSkip()) {
-                overlay.setSkipVisible(true);
+            if(overlay instanceof Overlay && adUnit.getPlacement().allowSkip()) {
+                (<Overlay>overlay).setSkipVisible(true);
             }
             overlay.setMuteEnabled(true);
             overlay.setVideoDurationEnabled(true);
