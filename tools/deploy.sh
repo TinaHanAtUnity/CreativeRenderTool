@@ -13,8 +13,8 @@ elif [ $BRANCH == master ]; then
     BRANCH='development'
 fi
 
-aws s3 cp build s3://unityads-cdn-origin/webview/$BRANCH/ --recursive --acl public-read --dryrun
+aws s3 cp build s3://unityads-cdn-origin/webview/$BRANCH/ --acl public-read
 
 if [ $BRANCH == master ]; then
-    aws s3 cp build s3://unityads-cdn-origin/webview/2.0.6/ --recursive --acl public-read --dryrun
+    aws s3 cp build s3://unityads-cdn-origin/webview/2.0.6/ --acl public-read
 fi
