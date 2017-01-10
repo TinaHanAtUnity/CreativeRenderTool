@@ -716,5 +716,11 @@ export class WebView {
                 AbstractAdUnit.setAutoClose(autoClose);
             }
         });
+
+        metaData.get<number>('test.autoCloseDelay', false).then(([found, autoCloseDelay]) => {
+            if(found && autoCloseDelay) {
+                AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
+            }
+        });
     }
 }

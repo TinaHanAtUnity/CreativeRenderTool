@@ -74,7 +74,9 @@ export class EndScreen extends View {
         nameContainer.innerHTML = this._gameName + ' ';
 
         if(AbstractAdUnit.getAutoClose()) {
-            this.onClose.trigger();
+           setTimeout(() => {
+               this.onClose.trigger();
+           }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 
