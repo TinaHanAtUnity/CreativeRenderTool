@@ -214,11 +214,19 @@ if(branch === '2.0.6') {
     urlRoot = '/webview/master';
 }
 
-Promise.all([
+let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
     purgeChinaNetCenter(urlRoot)
-]).then(() => {
+];
+
+if(branch === '2.0.6') {
+    purgeList.push(purgeAkamai('/webview/2.0.6'));
+    purgeList.push(purgeHighwinds('/webview/2.0.6'));
+    purgeList.push(purgeChinaNetCenter('/webview/2.0.6'));
+}
+
+Promise.all(purgeList).then(() => {
     console.log('Successfully purged all CDNs!');
 }).catch(error => {
     console.dir(error);
