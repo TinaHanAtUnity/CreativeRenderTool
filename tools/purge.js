@@ -78,7 +78,9 @@ const fetchRetry = (url, options, retries, delay) => {
             console.log('Retrying in ' + delay + 'ms');
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    fetchRetry(url, options, --retries, delay).then(() => resolve()).catch(() => reject());
+                    fetchRetry(url, options, --retries, delay)
+                        .then((response) => resolve(response))
+                        .catch((error) => reject(error));
                 }, delay);
             });
         });
