@@ -1,3 +1,8 @@
+# Tue Jan 10 12:20:51 UTC 2017
+
+* Hide overlay header bar if skip disabled
+* Video overlay with icons AB test
+
 # Thu Jan 5 09:25:01 UTC 2017
 
 * Remove xmas theme
