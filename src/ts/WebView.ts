@@ -718,7 +718,7 @@ export class WebView {
         });
 
         metaData.get<number>('test.autoCloseDelay', false).then(([found, autoCloseDelay]) => {
-            if(found && autoCloseDelay) {
+            if(found && typeof autoCloseDelay === 'number') {
                 AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
             }
         });
