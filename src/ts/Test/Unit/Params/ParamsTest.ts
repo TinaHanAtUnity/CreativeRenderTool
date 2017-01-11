@@ -25,6 +25,9 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
+import { AdUnit } from 'Utilities/AdUnit';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -169,7 +172,15 @@ class TestHelper {
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
         const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
-        return AdUnitFactory.createAdUnit(nativeBridge, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+
+        let adUnit: AdUnit;
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            adUnit = new IosAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+        } else {
+            adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        }
+
+        return AdUnitFactory.createAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 

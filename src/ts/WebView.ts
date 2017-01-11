@@ -29,7 +29,10 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { WebViewError } from './Errors/WebViewError';
+import { WebViewError } from 'Errors/WebViewError';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 export class WebView {
 
@@ -44,8 +47,9 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _cache: Cache;
+    private _adUnit: AdUnit;
 
-    private _adUnit: AbstractAdUnit;
+    private _currentAdUnit: AbstractAdUnit;
     private _campaign: Campaign;
 
     private _sessionManager: SessionManager;
@@ -84,6 +88,7 @@ export class WebView {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
+                this._adUnit = new AndroidAdUnit(this._nativeBridge, this._deviceInfo);
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -91,6 +96,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
+                this._adUnit = new IosAdUnit(this._nativeBridge, this._deviceInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
@@ -194,9 +200,9 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
-            this._adUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
-            this._adUnit.onClose.subscribe(() => this.onClose());
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._adUnit, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
+            this._currentAdUnit.onClose.subscribe(() => this.onClose());
 
             if (this._nativeBridge.getPlatform() === Platform.IOS && this._campaign instanceof PerformanceCampaign) {
                 if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
@@ -207,7 +213,7 @@ export class WebView {
                         const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.prepare(appSheetOptions);
                         });
-                        this._adUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
                             this._nativeBridge.AppSheet.destroy(appSheetOptions);
                         });
@@ -215,7 +221,7 @@ export class WebView {
                 }
             }
 
-            this._adUnit.show();
+            this._currentAdUnit.show();
 
             delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
@@ -246,8 +252,8 @@ export class WebView {
     private onCampaign(campaign: Campaign) {
         this._campaign = campaign;
         if(this._showing) {
-            const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                this._adUnit.onClose.unsubscribe(onCloseObserver);
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.READY);
             });
         } else {

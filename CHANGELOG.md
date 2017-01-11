@@ -1,3 +1,16 @@
+# Tue Jan 10 12:20:51 UTC 2017
+
+* Hide overlay header bar if skip disabled
+* Video overlay with icons AB test
+
+# Thu Jan 5 09:25:01 UTC 2017
+
+* Remove xmas theme
+
+# Thu Dec 22 16:34:25 UTC 2016
+
+* Use Travis to work around iOS native 2.0.6 and 2.0.7 releases that used webview master instead of release branches
+
 # Tue Dec 20 10:38:00 UTC 2016
 
 * Flip end screen images to match 1.5 behaviour
