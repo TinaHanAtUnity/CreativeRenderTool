@@ -2,7 +2,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 
 export abstract class AbstractAdUnit {
 
@@ -21,13 +21,13 @@ export abstract class AbstractAdUnit {
     public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;
-    protected _adUnit: AdUnit;
+    protected _container: AdUnitContainer;
     protected _placement: Placement;
     protected _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
-        this._adUnit = adUnit;
+        this._container = container;
         this._placement = placement;
         this._campaign = campaign;
     }
@@ -47,4 +47,5 @@ export abstract class AbstractAdUnit {
     public getCampaign(): Campaign {
         return this._campaign;
     }
+
 }

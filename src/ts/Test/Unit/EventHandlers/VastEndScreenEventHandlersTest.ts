@@ -7,30 +7,26 @@ import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Placement } from 'Models/Placement';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { Activity } from 'AdUnits/Activity';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    let adUnit: AdUnit;
+    let container: AdUnitContainer;
     const sessionManager = <SessionManager><any>{};
-    let videoAdUnitController: VideoAdUnitController;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
         });
-        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
     });
 
     describe('when calling onClose', () => {
@@ -38,7 +34,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             const vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy()
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
 
             VastEndScreenEventHandlers.onClose(vastAdUnit);
@@ -53,7 +49,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             const vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
         });
 
         it('should should use video click through url when companion click url is not present', () => {

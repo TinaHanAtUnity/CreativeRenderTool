@@ -6,7 +6,7 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
@@ -19,8 +19,8 @@ export class HtmlAdUnit extends AbstractAdUnit {
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
-        super(nativeBridge, adUnit, placement, campaign);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
+        super(nativeBridge, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._thirdParty = thirdParty;
         this._isShowing = false;
@@ -35,17 +35,17 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._sessionManager.sendStart(this);
 
-        this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
+        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._adUnit.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
+        return this._container.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
     }
 
     public hide(): Promise<void> {
         this._isShowing = false;
 
-        this._adUnit.onShow.unsubscribe(this._onShowObserver);
-        this._adUnit.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this._container.onShow.unsubscribe(this._onShowObserver);
+        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         this._thirdParty.hide();
 
@@ -59,7 +59,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this._finishState);
 
-        return this._adUnit.close();
+        return this._container.close();
     }
 
     public isShowing(): boolean {

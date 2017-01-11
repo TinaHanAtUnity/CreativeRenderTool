@@ -3,22 +3,18 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { Placement } from 'Models/Placement';
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
-        super(nativeBridge, adUnit, videoAdUnitController);
-
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: AbstractVideoOverlay, options: any, endScreen?: VastEndScreen) {
+        super(nativeBridge, container, placement, campaign, overlay, options);
         this._endScreen = endScreen || null;
-    }
-
-    public show(): Promise<void> {
-        return this._videoAdUnitController.show(this);
     }
 
     public hide(): Promise<void> {
@@ -28,11 +24,7 @@ export class VastAdUnit extends VideoAdUnit {
             endScreen.remove();
         }
 
-        return this._videoAdUnitController.hide();
-    }
-
-    public isShowing(): boolean {
-        return this._videoAdUnitController.isShowing();
+        return super.hide();
     }
 
     public description(): string {

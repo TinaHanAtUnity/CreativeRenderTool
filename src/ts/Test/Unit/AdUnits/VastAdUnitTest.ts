@@ -11,12 +11,11 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { Activity } from '../../../AdUnits/Activity';
 
 describe('VastAdUnit', () => {
 
@@ -51,10 +50,9 @@ describe('VastAdUnit', () => {
         const nativeBridge = TestFixtures.getNativeBridge();
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
-        const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         eventManager = new EventManager(nativeBridge, request);
-        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
-        vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+        vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, null);
     });
 
     afterEach(() => sandbox.restore);
@@ -140,9 +138,8 @@ describe('VastAdUnit', () => {
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
-            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+            const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, null);
         });
 
         it('should return correct http:// url', () => {
@@ -236,13 +233,12 @@ describe('VastAdUnit', () => {
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
+            const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy(),
                 remove: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, null, vastEndScreen);
         });
 
         it('should return correct companion click through url', () => {

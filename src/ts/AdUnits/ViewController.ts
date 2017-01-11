@@ -1,8 +1,8 @@
-import { AdUnit } from 'Utilities/AdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -11,7 +11,8 @@ interface IIosOptions {
     statusBarOrientation: number;
 }
 
-export class IosAdUnit extends AdUnit {
+export class ViewController extends AdUnitContainer {
+
     private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
@@ -52,8 +53,8 @@ export class IosAdUnit extends AdUnit {
             }
         }
 
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
+        this._nativeBridge.Notification.addNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
+        this._nativeBridge.Notification.addNotificationObserver(ViewController._audioSessionRouteChange, []);
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
@@ -62,8 +63,8 @@ export class IosAdUnit extends AdUnit {
 
     public close(): Promise<void> {
         this._showing = false;
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionInterrupt);
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionRouteChange);
+        this._nativeBridge.Notification.removeNotificationObserver(ViewController._audioSessionInterrupt);
+        this._nativeBridge.Notification.removeNotificationObserver(ViewController._audioSessionRouteChange);
         return this._nativeBridge.IosAdUnit.close();
     }
 
@@ -86,11 +87,11 @@ export class IosAdUnit extends AdUnit {
         }
 
         switch(event) {
-            case IosAdUnit._appDidBecomeActive:
+            case ViewController._appDidBecomeActive:
                 this.onSystemInterrupt.trigger();
                 break;
 
-            case IosAdUnit._audioSessionInterrupt:
+            case ViewController._audioSessionInterrupt:
                 const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
@@ -100,7 +101,7 @@ export class IosAdUnit extends AdUnit {
                 }
                 break;
 
-            case IosAdUnit._audioSessionRouteChange:
+            case ViewController._audioSessionRouteChange:
                 this.onSystemInterrupt.trigger();
                 break;
 
@@ -109,4 +110,5 @@ export class IosAdUnit extends AdUnit {
                 break;
         }
     }
+
 }

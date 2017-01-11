@@ -25,9 +25,9 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnit } from 'Utilities/AdUnit';
-import { IosAdUnit } from 'Utilities/IosAdUnit';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { AdUnitContainer } from '../../../AdUnits/AdUnitContainer';
+import { ViewController } from '../../../AdUnits/ViewController';
+import { Activity } from '../../../AdUnits/Activity';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -173,14 +173,14 @@ class TestHelper {
         const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
-        let adUnit: AdUnit;
+        let container: AdUnitContainer;
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            adUnit = new IosAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
         } else {
-            adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 
