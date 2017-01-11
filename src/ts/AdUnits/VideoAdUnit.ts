@@ -50,6 +50,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._videoPositionRepeats = 0;
         this._videoQuartile = 0;
         this._videoActive = true;
+
+        this.onVideoClose.subscribe(() => this.onClose.trigger());
+        this.onVideoFinish.subscribe(() => this.onFinish.trigger());
+        this.onVideoStart.subscribe(() => this.onStart.trigger());
     }
 
     public show(): Promise<void> {
