@@ -246,7 +246,7 @@ describe('CacheTest', () => {
         setTimeout(() => triggerNetwork(), 15);
 
         cacheManager.cache(testUrl, { retries: 3, allowFailure: false }).then(() => {
-            done('Cache one file with repeated network failures: caching should not be successful with no internet')
+            done('Cache one file with repeated network failures: caching should not be successful with no internet');
         }).catch(error => {
             assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
             done();
