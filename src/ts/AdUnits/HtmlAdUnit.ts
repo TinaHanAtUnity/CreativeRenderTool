@@ -72,7 +72,9 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
     private onShow() {
         if(AbstractAdUnit.getAutoClose()) {
-            this.hide();
+            setTimeout(() => {
+                this.hide();
+            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 

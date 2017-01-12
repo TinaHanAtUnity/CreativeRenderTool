@@ -1,3 +1,7 @@
+# Wed Jan 11 12:55:17 UTC 2017
+
+* Refactor AdUnit API handling from different ad units to a common utility class
+
 # Tue Jan 10 12:20:51 UTC 2017
 
 * Hide overlay header bar if skip disabled

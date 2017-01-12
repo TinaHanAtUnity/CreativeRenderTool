@@ -45,7 +45,9 @@ export class VastEndScreen extends View {
         super.show();
 
         if(AbstractAdUnit.getAutoClose()) {
-            this.onClose.trigger();
+            setTimeout(() => {
+                this.onClose.trigger();
+            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 
