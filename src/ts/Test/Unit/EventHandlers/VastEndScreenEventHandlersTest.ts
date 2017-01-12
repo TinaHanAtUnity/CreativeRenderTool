@@ -20,7 +20,6 @@ describe('VastEndScreenEventHandlersTest', () => {
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let adUnit: AdUnit;
-    const sessionManager = <SessionManager><any>{};
     let videoAdUnitController: VideoAdUnitController;
 
     beforeEach(() => {

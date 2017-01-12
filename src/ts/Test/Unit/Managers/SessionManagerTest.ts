@@ -13,8 +13,9 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Request } from 'Utilities/Request';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 import EventTestVast from 'xml/EventTestVast.xml';
 
 describe('SessionManagerTest', () => {
@@ -61,8 +62,9 @@ describe('SessionManagerTest', () => {
         sinon.stub(eventManager, 'getUniqueEventId').returns(resolvedPromise);
         sinon.stub(deviceInfo, 'getConnectionType').returns(Promise.resolve('wifi'));
         sessionManagerEventMetadataCreator = new SessionManagerEventMetadataCreator(eventManager, clientInfo, deviceInfo, nativeBridge);
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), <Placement><any>{}, vastCampaign, <Overlay><any>{hide: sinon.spy()}, null);
-        vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
+        const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, vastCampaign, <Overlay><any>{hide: sinon.spy()}, null);
+        vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
     });
 
     it('should send successful brand video click through event', () => {
