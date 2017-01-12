@@ -9,7 +9,7 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 
 describe('IntegrationTest', () => {
 
-    it('should handle happy path on Android', function(this: Mocha.ITestDefinition, done: MochaDone) {
+    it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
@@ -61,7 +61,7 @@ describe('IntegrationTest', () => {
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
     });
 
-    it('should handle happy path on iOS', function(this: Mocha.ITestDefinition, done: MochaDone) {
+    it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {

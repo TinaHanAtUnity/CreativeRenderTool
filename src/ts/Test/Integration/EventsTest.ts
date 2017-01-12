@@ -24,7 +24,7 @@ describe('EventsTest', () => {
         assert(requestLog[7].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '8th request was not a video_end event');
     };
 
-    it('should include all operational events on Android', function(this: Mocha.ITestDefinition, done: MochaDone) {
+    it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
         let startCount = 0;
@@ -87,7 +87,7 @@ describe('EventsTest', () => {
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
     });
 
-    it('should include all operational events on iOS', function(this: Mocha.ITestDefinition, done: MochaDone) {
+    it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
         let readyCount = 0;
         let startCount = 0;

@@ -1,24 +1,22 @@
 sudo: false
 
 language: node_js
-node_js:
-  - 6.7.0
+node_js: 6
 
 addons:
   apt:
     packages:
     - libimage-exiftool-perl
 
+install:
+  - pip install --user awscli
+  - npm install
+
 cache:
   directories:
     - node_modules
 
-script:
-  - make lint
-  - make test-coveralls
-  - make test-integration
-  - make build-test
-  - make build-release
+script: make lint && make test-coveralls && make test-integration && make build-test && make build-release && make deploy
 
 notifications:
   slack:
@@ -27,46 +25,3 @@ notifications:
     on_success: change
     on_failure: always
     on_start: never
-
-before_deploy:
-  - rm -rf build/coverage
-  - find build/test/* -not -name "config.json" | xargs rm -rf
-  - find build/release/* -not -name "config.json" | xargs rm -rf
-
-deploy:
-  - provider: s3
-    access_key_id: AKIAI5V7ATZVXQHBGHYA
-    secret_access_key:
-      secure: cIr1MP27jfW0ilgbR8nSQ4BJHt7ErCnlSKk5tk6mh49rOd0VksJ0CKY2ZMkJ0MaFge2wNP/b+mEt/X/NJEbgMCz3ktwRGXDpSjjK2r5kpMwKEhpXzsQHI1UOjyDjBiuRc9hbFsCyZ8tjfjYYL7LBbZMnoBtlEUtWNHGnMQ3IOA79pRknWApSzyC+cJPZDdm7Gq89PGlmB76HgmZSrWFA8AURWdBUjL+/gHYT01+9aBeEq0d7XMhEmdZo1mTTGEN1P6fTqgzYNHdk3T+1MWVVF5lyjY1Kgmo+u8eYFI+LGFgZ83kvwZOt/sL4NViAblRRUPtg4YYtfJx8/hBnr1rXIl2EMT353Bs5uMuDMaaJFngaSN0DQJ6GT76zZ64fp2F/MfTQ+jPBpZRjYpfzpjLRgeEo5CDkChR2m2IetVzR5Lbk/R2+lCeuIWQPgVnmQRLMtUb8onAZmgt+3mi3JOa1Y6EO/uiDpZ5lyb56GtGa6phDNTUTFnHaDDbnhbUKgey4kvpoSH9HFSW/Fob2Y/nLslTpe8+XyRoaY4WzFJjtBsTkVBWsvs3HUkeQUX7girxaL1l/X0yphhPZBypbu5k4tbgrVo+1Y8eGca47uzGQAwSZUCIaFAWhDBDNZA+XN3iuicEXvmPXjwt0s3CtUhi5kpI1mneE/QuwLF5FdxQLpnw=
-    bucket: unityads-cdn-origin
-    skip_cleanup: true
-    acl: public_read
-    local_dir: build
-    upload-dir: webview/development
-    on:
-      branch: master
-  - provider: s3
-    access_key_id: AKIAI5V7ATZVXQHBGHYA
-    secret_access_key:
-      secure: cIr1MP27jfW0ilgbR8nSQ4BJHt7ErCnlSKk5tk6mh49rOd0VksJ0CKY2ZMkJ0MaFge2wNP/b+mEt/X/NJEbgMCz3ktwRGXDpSjjK2r5kpMwKEhpXzsQHI1UOjyDjBiuRc9hbFsCyZ8tjfjYYL7LBbZMnoBtlEUtWNHGnMQ3IOA79pRknWApSzyC+cJPZDdm7Gq89PGlmB76HgmZSrWFA8AURWdBUjL+/gHYT01+9aBeEq0d7XMhEmdZo1mTTGEN1P6fTqgzYNHdk3T+1MWVVF5lyjY1Kgmo+u8eYFI+LGFgZ83kvwZOt/sL4NViAblRRUPtg4YYtfJx8/hBnr1rXIl2EMT353Bs5uMuDMaaJFngaSN0DQJ6GT76zZ64fp2F/MfTQ+jPBpZRjYpfzpjLRgeEo5CDkChR2m2IetVzR5Lbk/R2+lCeuIWQPgVnmQRLMtUb8onAZmgt+3mi3JOa1Y6EO/uiDpZ5lyb56GtGa6phDNTUTFnHaDDbnhbUKgey4kvpoSH9HFSW/Fob2Y/nLslTpe8+XyRoaY4WzFJjtBsTkVBWsvs3HUkeQUX7girxaL1l/X0yphhPZBypbu5k4tbgrVo+1Y8eGca47uzGQAwSZUCIaFAWhDBDNZA+XN3iuicEXvmPXjwt0s3CtUhi5kpI1mneE/QuwLF5FdxQLpnw=
-    bucket: unityads-cdn-origin
-    skip_cleanup: true
-    acl: public_read
-    local_dir: build
-    upload-dir: webview/master
-    on:
-      branch: 2.0.6-ios
-  - provider: s3
-    access_key_id: AKIAI5V7ATZVXQHBGHYA
-    secret_access_key:
-      secure: cIr1MP27jfW0ilgbR8nSQ4BJHt7ErCnlSKk5tk6mh49rOd0VksJ0CKY2ZMkJ0MaFge2wNP/b+mEt/X/NJEbgMCz3ktwRGXDpSjjK2r5kpMwKEhpXzsQHI1UOjyDjBiuRc9hbFsCyZ8tjfjYYL7LBbZMnoBtlEUtWNHGnMQ3IOA79pRknWApSzyC+cJPZDdm7Gq89PGlmB76HgmZSrWFA8AURWdBUjL+/gHYT01+9aBeEq0d7XMhEmdZo1mTTGEN1P6fTqgzYNHdk3T+1MWVVF5lyjY1Kgmo+u8eYFI+LGFgZ83kvwZOt/sL4NViAblRRUPtg4YYtfJx8/hBnr1rXIl2EMT353Bs5uMuDMaaJFngaSN0DQJ6GT76zZ64fp2F/MfTQ+jPBpZRjYpfzpjLRgeEo5CDkChR2m2IetVzR5Lbk/R2+lCeuIWQPgVnmQRLMtUb8onAZmgt+3mi3JOa1Y6EO/uiDpZ5lyb56GtGa6phDNTUTFnHaDDbnhbUKgey4kvpoSH9HFSW/Fob2Y/nLslTpe8+XyRoaY4WzFJjtBsTkVBWsvs3HUkeQUX7girxaL1l/X0yphhPZBypbu5k4tbgrVo+1Y8eGca47uzGQAwSZUCIaFAWhDBDNZA+XN3iuicEXvmPXjwt0s3CtUhi5kpI1mneE/QuwLF5FdxQLpnw=
-    bucket: unityads-cdn-origin
-    skip_cleanup: true
-    acl: public_read
-    local_dir: build
-    upload-dir: webview/$TRAVIS_BRANCH
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH != master
-
-after_deploy: node tools/purge.js

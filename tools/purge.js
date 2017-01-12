@@ -71,18 +71,37 @@ const flatten = (array) => {
     }, []);
 };
 
+const fetchRetry = (url, options, retries, delay) => {
+    const doFetch = () => {
+        return fetch(url, options ? options : {}).catch(error => {
+            console.dir(error);
+            console.log('Retrying in ' + delay + 'ms');
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    fetchRetry(url, options, --retries, delay)
+                        .then((response) => resolve(response))
+                        .catch((error) => reject(error));
+                }, delay);
+            });
+        });
+    };
+    if(retries >= 0) {
+        return doFetch();
+    }
+    return Promise.reject('Failed to fetch "' + url + '" after retries');
+};
+
 const checkConfigJson = (url, version) => {
     console.log('Checking "' + url + '"');
-    let doFetch = () => {
-        return fetch(url).then(res => res.json()).then(configJson => {
+    const doFetch = () => {
+        return fetchRetry(url, {}, 5, 5000).then(res => res.json()).then(configJson => {
             if(configJson.version !== version) {
                 console.log('Invalid version "' + configJson.version + '" from "' + url + '"');
-                let timeoutPromise = new Promise((resolve) => {
+                return new Promise((resolve) => {
                     setTimeout(() => {
                         doFetch().then(() => resolve());
                     }, 5000);
                 });
-                return timeoutPromise;
             }
         });
     };
@@ -104,14 +123,14 @@ let purgeAkamai = (urlRoot) => {
 
     const endpoint = 'https://api.ccu.akamai.com/ccu/v2/queues/default';
 
-    return fetch(endpoint, {
+    return fetchRetry(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Basic ' + Buffer.from(cdnConfig.akamai.username + ':' + cdnConfig.akamai.password).toString('base64')
         },
         body: JSON.stringify(body)
-    }).then(res => {
+    }, 5, 5000).then(res => {
         if(res.status !== 201) {
             throw new Error('Akamai purge request failed');
         }
@@ -139,14 +158,14 @@ let purgeHighwinds = (urlRoot) => {
 
     const endpoint = 'https://striketracker.highwinds.com/api/v1/accounts/' + cdnConfig.highwinds.account_hash + '/purge';
 
-    return fetch(endpoint, {
+    return fetchRetry(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + cdnConfig.highwinds.bearer
         },
         body: JSON.stringify(body)
-    }).then(res => {
+    }, 5, 5000).then(res => {
         if(res.status !== 200) {
             throw new Error('Highwinds purge request failed');
         }
@@ -178,7 +197,7 @@ let purgeChinaNetCenter = (urlRoot) => {
         passwd: hashedPassword
     }) + '&url=' + combinedUrls;
 
-    return fetch(endpoint).then(res => {
+    return fetchRetry(endpoint, {}, 5, 5000).then(res => {
         if(res.status !== 200) {
             throw new Error('ChinaNetCenter purge request failed');
         }
@@ -191,14 +210,25 @@ let purgeChinaNetCenter = (urlRoot) => {
 };
 
 let urlRoot = '/webview/' + branch;
-if(branch === '2.0.6-ios') {
+if(branch === '2.0.6') {
     urlRoot = '/webview/master';
 }
 
-Promise.all([
+let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
     purgeChinaNetCenter(urlRoot)
-]).then(() => {
+];
+
+if(branch === '2.0.6') {
+    purgeList.push(purgeAkamai('/webview/2.0.6'));
+    purgeList.push(purgeHighwinds('/webview/2.0.6'));
+    purgeList.push(purgeChinaNetCenter('/webview/2.0.6'));
+}
+
+Promise.all(purgeList).then(() => {
     console.log('Successfully purged all CDNs!');
+}).catch(error => {
+    console.dir(error);
+    process.exit(1);
 });

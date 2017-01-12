@@ -14,7 +14,16 @@ export abstract class AbstractAdUnit {
         return AbstractAdUnit._autoClose;
     }
 
+    public static setAutoCloseDelay(value: number) {
+        AbstractAdUnit._autoCloseDelay = value;
+    }
+
+    public static getAutoCloseDelay() {
+        return AbstractAdUnit._autoCloseDelay;
+    }
+
     private static _autoClose = false;
+    private static _autoCloseDelay: number = 0;
 
     public onStart: Observable0 = new Observable0();
     public onFinish: Observable0 = new Observable0();

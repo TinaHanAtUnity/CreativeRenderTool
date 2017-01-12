@@ -229,7 +229,7 @@ describe('CacheTest', () => {
         });
     });
 
-    it('Cache one file with repeated network failures (expect to fail)', function(this: Mocha.ITestDefinition) {
+    it('Cache one file with repeated network failures (expect to fail)', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
 
         const testUrl: string = 'http://www.example.net/test.mp4';
@@ -245,10 +245,11 @@ describe('CacheTest', () => {
         setTimeout(() => triggerNetwork(), 10);
         setTimeout(() => triggerNetwork(), 15);
 
-        return cacheManager.cache(testUrl, { retries: 3, allowFailure: false }).then(() => {
-            assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
+        cacheManager.cache(testUrl, { retries: 3, allowFailure: false }).then(() => {
+            done('Cache one file with repeated network failures: caching should not be successful with no internet')
         }).catch(error => {
             assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
+            done();
         });
     });
 
