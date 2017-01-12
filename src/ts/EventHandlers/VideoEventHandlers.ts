@@ -202,6 +202,7 @@ export class VideoEventHandlers {
         Diagnostics.trigger({
             'type': 'video_player_generic_error',
             'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition(),
             'error': {
                 'what': what,
                 'extra': extra
@@ -217,6 +218,7 @@ export class VideoEventHandlers {
         Diagnostics.trigger({
             'type': 'video_player_generic_error',
             'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition(),
             'error': {
                 'description': description
             }
@@ -230,7 +232,8 @@ export class VideoEventHandlers {
 
         Diagnostics.trigger({
             'type': 'video_player_prepare_timeout',
-            'url': url
+            'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition()
         });
     }
 
@@ -241,7 +244,8 @@ export class VideoEventHandlers {
 
         Diagnostics.trigger({
             'type': 'video_player_prepare_error',
-            'url': url
+            'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition()
         });
     }
 
@@ -252,7 +256,8 @@ export class VideoEventHandlers {
 
         Diagnostics.trigger({
             'type': 'video_player_seek_to_error',
-            'url': url
+            'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition()
         });
     }
 
@@ -263,7 +268,8 @@ export class VideoEventHandlers {
 
         Diagnostics.trigger({
             'type': 'video_player_pause_error',
-            'url': url
+            'url': url,
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition()
         });
     }
 
@@ -273,7 +279,8 @@ export class VideoEventHandlers {
         this.handleVideoError(nativeBridge, videoAdUnit);
 
         Diagnostics.trigger({
-            'type': 'video_player_illegal_state_error'
+            'type': 'video_player_illegal_state_error',
+            'position': videoAdUnit.getVideoAdUnitController().getVideoPosition()
         });
     }
 
