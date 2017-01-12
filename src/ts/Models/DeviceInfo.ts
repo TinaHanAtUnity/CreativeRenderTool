@@ -307,10 +307,7 @@ export class DeviceInfo extends Model {
         }
 
         return Promise.all(promises).then(values => {
-            return {
-                'androidId': this._androidId,
-                'advertisingId': this._advertisingIdentifier,
-                'trackingEnabled': this._limitAdTracking,
+            const dto: any = {
                 'apiLevel': this._apiLevel,
                 'osVersion': this._osVersion,
                 'deviceMake': this._manufacturer,
@@ -342,6 +339,15 @@ export class DeviceInfo extends Model {
                 'rooted': this._rooted,
                 'simulator': this._simulator,
             };
+
+            if(this.getAdvertisingIdentifier()) {
+                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+                dto.limitAdTracking = this.getLimitAdTracking();
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                dto.androidId = this.getAndroidId();
+            }
+
+            return dto;
         });
     }
 

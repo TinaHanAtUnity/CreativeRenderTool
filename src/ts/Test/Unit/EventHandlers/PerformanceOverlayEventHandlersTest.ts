@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Campaign } from 'Models/Campaign';
@@ -11,12 +11,15 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { Observable0 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 
 describe('PerformanceOverlayEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
+    let adUnit: AdUnit;
     let performanceAdUnit: PerformanceAdUnit;
 
     beforeEach(() => {
@@ -31,8 +34,9 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        const videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
     });
 
     describe('with onSkip', () => {

@@ -32,7 +32,7 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -93,14 +93,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 	@echo Computing build details to release config
 	@echo
 
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
-		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
 	@echo
 	@echo Generating commit id based build directory
@@ -159,13 +152,7 @@ build-test: clean build-dir build-css build-static build-ts
 	@echo Computing build details to test config
 	@echo
 
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
 
 	@echo
 	@echo Generating commit id based build directory
@@ -291,3 +278,13 @@ watch:
 
 setup: clean
 	rm -rf node_modules && npm install
+
+deploy:
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+	rm -rf build/coverage
+	find build/test/* -not -name "config.json" | xargs rm -rf
+	find build/release/* -not -name "config.json" | xargs rm -rf
+	tools/deploy.sh $(BRANCH) && node tools/purge.js
+else
+	@echo 'Skipping deployment for pull requests'
+endif

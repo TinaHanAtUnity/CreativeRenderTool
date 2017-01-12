@@ -1,13 +1,14 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
     protected _videoAdUnitController: VideoAdUnitController;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
-        super(nativeBridge, videoAdUnitController.getPlacement(), videoAdUnitController.getCampaign());
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController) {
+        super(nativeBridge, adUnit, videoAdUnitController.getPlacement(), videoAdUnitController.getCampaign());
 
         videoAdUnitController.onVideoClose.subscribe(() => this.onClose.trigger());
         videoAdUnitController.onVideoFinish.subscribe(() => this.onFinish.trigger());
