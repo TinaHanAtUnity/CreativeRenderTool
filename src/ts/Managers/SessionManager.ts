@@ -8,7 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { VastCampaign } from '../Models/Vast/VastCampaign';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class SessionManagerEventMetadataCreator {
 

@@ -212,7 +212,7 @@ export class CampaignManager {
     }
 
     private handleNoFill(): Promise<void> {
-        this._refillTimestamp = Date.now() + 3600 * 1000;
+        this._refillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.onNoFill.trigger(CampaignManager.NoFillDelay);
         return Promise.resolve();
