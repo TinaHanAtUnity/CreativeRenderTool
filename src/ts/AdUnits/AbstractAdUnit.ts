@@ -1,25 +1,42 @@
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { FinishState } from 'Constants/FinishState';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { EventManager } from 'Managers/EventManager';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export abstract class AbstractAdUnit {
 
+    public static setAutoClose(value: boolean) {
+        AbstractAdUnit._autoClose = value;
+    }
+
+    public static getAutoClose() {
+        return AbstractAdUnit._autoClose;
+    }
+
+    public static setAutoCloseDelay(value: number) {
+        AbstractAdUnit._autoCloseDelay = value;
+    }
+
+    public static getAutoCloseDelay() {
+        return AbstractAdUnit._autoCloseDelay;
+    }
+
+    private static _autoClose = false;
+    private static _autoCloseDelay: number = 0;
+
     public onStart: Observable0 = new Observable0();
-    public onNewAdRequestAllowed: Observable0 = new Observable0();
+    public onFinish: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
     protected _nativeBridge: NativeBridge;
-
+    protected _adUnit: AdUnit;
     protected _placement: Placement;
     protected _campaign: Campaign;
-    protected _finishState: FinishState;
-    protected _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
+        this._adUnit = adUnit;
         this._placement = placement;
         this._campaign = campaign;
     }
@@ -28,7 +45,9 @@ export abstract class AbstractAdUnit {
 
     public abstract hide(): Promise<void>;
 
-    public abstract setNativeOptions(options: any): void;
+    public abstract isShowing(): boolean;
+
+    public abstract description(): string;
 
     public getPlacement(): Placement {
         return this._placement;
@@ -36,31 +55,5 @@ export abstract class AbstractAdUnit {
 
     public getCampaign(): Campaign {
         return this._campaign;
-    }
-
-    public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
-            this._finishState = finishState;
-        }
-    }
-
-    public getFinishState(): FinishState {
-        return this._finishState;
-    }
-
-    public isShowing(): boolean {
-        return this._showing;
-    }
-
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
-        // do nothing; can be overridden in subclasses
-    }
-
-    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string): void {
-        // do nothing; can be overridden in subclasses
-    }
-
-    public sendProgressEvents(eventManager: EventManager, sessionId: string, position: number, oldPosition: number) {
-        // do nothing; can be overridden in subclasses
     }
 }

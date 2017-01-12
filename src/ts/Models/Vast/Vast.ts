@@ -17,9 +17,9 @@ export class Vast {
     }
 
     public getErrorURLTemplates(): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
-            let adErrorUrls = ad.getErrorURLTemplates();
+            const adErrorUrls = ad.getErrorURLTemplates();
             if (adErrorUrls instanceof Array) {
                 return adErrorUrls.concat(this._errorURLTemplates || []);
             }
@@ -27,19 +27,20 @@ export class Vast {
         return this._errorURLTemplates;
     }
 
-    public getAd(): VastAd {
+    public getAd(): VastAd | null {
         if (this.getAds() && this.getAds().length > 0) {
             return this.getAds()[0];
         }
         return null;
     }
 
-    public getVideoUrl(): string {
-        let ad = this.getAd();
+    public getVideoUrl(): string | null {
+        const ad = this.getAd();
         if (ad) {
-            for (let creative of ad.getCreatives()) {
-                for (let mediaFile of creative.getMediaFiles()) {
-                    let playable = this.isPlayableMIMEType(mediaFile.getMIMEType());
+            for (const creative of ad.getCreatives()) {
+                for (const mediaFile of creative.getMediaFiles()) {
+                    const mimeType = mediaFile.getMIMEType();
+                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
                     if (mediaFile.getFileURL() && playable) {
                         return mediaFile.getFileURL();
                     }
@@ -51,7 +52,7 @@ export class Vast {
     }
 
     public getImpressionUrls(): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
             return ad.getImpressionURLTemplates();
         }
@@ -59,9 +60,9 @@ export class Vast {
     }
 
     public getTrackingEventUrls(eventName: string): string[] {
-        let ad = this.getAd();
+        const ad = this.getAd();
         if (ad) {
-            let adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
+            const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
             let additionalTrackingEventUrls: string[] = [];
             if (this._additionalTrackingEvents) {
                 additionalTrackingEventUrls = this._additionalTrackingEvents[eventName] || [];
@@ -72,7 +73,7 @@ export class Vast {
                 return additionalTrackingEventUrls;
             }
         }
-        return null;
+        return [];
     }
 
     public addTrackingEventUrl(eventName: string, url: string) {
@@ -85,36 +86,112 @@ export class Vast {
         this._additionalTrackingEvents[eventName].push(url);
     }
 
-    public getDuration(): number {
-        let ad = this.getAd();
+    public getDuration(): number | null {
+        const ad = this.getAd();
         if (ad) {
             return ad.getDuration();
         }
         return null;
     }
 
-    public getWrapperURL(): string {
-        let ad = this.getAd();
+    public getWrapperURL(): string | null {
+        const ad = this.getAd();
         if (ad) {
             return ad.getWrapperURL();
         }
         return null;
     }
 
-    public getVideoClickThroughURL(): string {
-        let ad = this.getAd();
+    public getVideoClickThroughURL(): string | null {
+        const ad = this.getAd();
         if (ad) {
             return ad.getVideoClickThroughURLTemplate();
         }
         return null;
     }
 
-    public getVideoClickTrackingURLs(): string[] {
-        let ad = this.getAd();
+    public getVideoClickTrackingURLs(): string[] | null {
+        const ad = this.getAd();
         if (ad) {
             return ad.getVideoClickTrackingURLTemplates();
         }
         return null;
+    }
+
+    public getCompanionLandscapeUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionPortraitUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionClickThroughUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    const url = companionAd.getCompanionClickThroughURLTemplate();
+                    const height = companionAd.getHeight();
+                    const width = companionAd.getWidth();
+                    const creativeType = companionAd.getCreativeType();
+                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
+                    if (url && validCompanion) {
+                        return url;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
+        const minHeight = 320;
+        const minWidth = 480;
+        return this.isValidCompanionCreativeType(creativeType) && (height < width) && (height >= minHeight) && (width >= minWidth);
+    }
+
+    private isValidPortraitCompanion(creativeType: string | null, height: number, width: number): boolean {
+        const minHeight = 480;
+        const minWidth = 320;
+        return this.isValidCompanionCreativeType(creativeType) && (height > width) && (height >= minHeight) && (width >= minWidth);
+    }
+
+    private isValidCompanionCreativeType(creativeType: string | null): boolean {
+        const reg = new RegExp('(jpe?g|gif|png)', 'gi');
+        return !!creativeType && reg.test(creativeType);
     }
 
     private isPlayableMIMEType(MIMEType: string): boolean {

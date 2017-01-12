@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
-    "module": "amd",
-    "target": "es5",
+    "module": "es2015",
+    "target": "es2015",
     "inlineSourceMap": true,
-    "moduleResolution": "classic",
-    "noImplicitReturns": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "moduleResolution": "node",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "rootDir": "src/ts",
+    "baseUrl": "src/ts",
+    "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true
   },
-  "exclude": [
-    "test",
-    "node_modules"
+  "include": [
+    "src/ts/**/*.ts"
   ]
 }

@@ -1,0 +1,173 @@
+{
+  "event": "Ad request",
+  "parameters": [
+    {
+      "parameter": "advertisingTrackingId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "limitAdTracking",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "androidId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceModel",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenWidth",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenHeight",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "sdkVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenSize",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "osVersion",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "apiLevel",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "test",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "connectionType",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "networkType",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "gamerId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "bundleVersion",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "bundleId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "timeZone",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "webviewUa",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperator",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperatorName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationOrdinal",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    }
+  ]
+}

@@ -11,6 +11,7 @@ export class Campaign {
     private _landscapeImage: string;
     private _portraitImage: string;
     private _video: string;
+    private _originalVideo: string;
     private _videoSize: number;
     private _streamingVideo: string;
     private _clickAttributionUrl: string;
@@ -34,6 +35,7 @@ export class Campaign {
         this._landscapeImage = campaign.endScreenLandscape;
         this._portraitImage = campaign.endScreenPortrait;
         this._video = campaign.trailerDownloadable;
+        this._originalVideo = campaign.trailerDownloadable;
         this._videoSize = campaign.trailerDownloadableSize;
         this._streamingVideo = campaign.trailerStreaming;
         this._clickAttributionUrl = campaign.clickAttributionUrl;
@@ -98,6 +100,10 @@ export class Campaign {
 
     public getVideoUrl(): string {
         return this._video;
+    }
+
+    public getOriginalVideoUrl(): string {
+        return this._originalVideo;
     }
 
     public setVideoUrl(videoUrl: string): void {

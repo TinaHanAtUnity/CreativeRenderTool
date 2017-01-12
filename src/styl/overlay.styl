@@ -3,47 +3,65 @@
   width: 100%
   height: 100%
   color: #FFF
-  text-shadow: 1px 1px #000
 
-  .skip-button
-    display: none
+  .header
     position: absolute
-    top: 10px
-    left: 10px
+    top: 0
+    width: 100%
+
+    .skip-button
+      display: none
+      position: absolute
+      top: 10px
+      left: 10px
+      text-decoration: none;
 
     .skip-duration
       font-weight: bold
 
-  .mute-button
-    display: none
-    position: absolute
-    left: 2%
-    bottom: 2%
-
-    .mute-icon
-    .unmute-icon
-      font-size: 27px
-
-    .unmute-icon
+    .call-button
       display: none
+      position: absolute
+      top: 10px
+      right: 10px
+      font-weight: bold
 
-    &.muted
+  .footer
+    position: absolute
+    bottom: 0
+    width: 100%
+
+    .mute-button
+      position: absolute
+      display: none
+      left: 7px
+      bottom: 7px
+      width: 27px
+      height: 27px
+
       .mute-icon
-        display: none
+      .unmute-icon
+        font-size: 27px
 
       .unmute-icon
-        display: block
+        display: none
 
-  .video-duration-text
-    display: none
-    position: absolute
-    text-align: center
-    line-height: 45px
-    bottom: 2%
-    right: 2%
+      &.muted
+        .mute-icon
+          display: none
 
-    .video-duration
-      font-weight: bold
+        .unmute-icon
+          display: block
+
+    .video-duration-text
+      position: absolute
+      display: none
+      right: 10px
+      bottom: 10px
+      text-align: right
+
+      .video-duration
+        font-weight: bold
 
   .buffering-spinner
     display: none
@@ -72,22 +90,6 @@
     top: 50%
     right: 10px
 
-  .call-button
-    display: none
-    position: absolute
-    top: 10px
-    right: 10px;
-    background-color: white;
-    border: none;
-    border-radius: 3px;
-    color: #4f4f4f;
-    padding: .3em .7em;
-    text-align: center;
-    text-decoration: none;
-    text-shadow: none
-    font-weight: bold;
-    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.6);
-
   @-webkit-keyframes spinner
     from
       -webkit-transform: rotate(0deg)
@@ -100,3 +102,38 @@
     color: #FFF
     font-weight: bold
     text-shadow: 1px 1px #000
+
+  // 375/667 iPhone 5, 6, 7
+  @media only screen and (device-aspect-ratio: 16/9), screen and (device-aspect-ratio: 16/10), screen and (device-aspect-ratio: 9/16), screen and (device-aspect-ratio: 10/16), screen and (device-aspect-ratio: 375/667), screen and (device-aspect-ratio: 667/375)
+    .header
+      height: 12%
+      background: rgba(0, 0, 0, 0.5)
+
+      .skip-button
+        top: 50%
+        left: 2%
+        -webkit-transform: translate(0,-50%)
+
+      .call-button
+        top: 50%
+        right: 2%;
+        -webkit-transform: translate(0,-50%)
+
+    .footer
+      height: 12%
+      background: rgba(0, 0, 0, 0.5)
+
+      .mute-button
+        left: 2%
+        top: 50%
+        -webkit-transform: translate(0,-50%)
+
+      .video-duration-text
+        -webkit-transform: translate(0,-50%)
+        right: 2%
+        top: 50%
+
+
+.fade
+  opacity: 0
+  transition: opacity 1s ease-in-out

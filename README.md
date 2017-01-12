@@ -3,15 +3,13 @@
 
 ## Requirements
 
-- Node (`brew install node`)
-- TypeScript (`npm install -g typescript@1.8.10`)
-- TSLint (`npm install -g tslint`)
-- Typings (`npm install -g typings`)
+- Node (`brew install node`) (Latest or at least Node 6+)
 
 ### Optional
 
 - Python (`brew install python3`)
 - Watchman (`brew install watchman`)
+- exiftool (`brew install exiftool`) for integration tests
 
 ## IDE
 
@@ -22,21 +20,27 @@
 		1. .idea
 		2. build
 		3. node_modules
-		4. typings
 	- Tests
 		1. test
 		2. test-utils
 2. Configure TypeScript (Preferences -> Languages & Frameworks -> TypeScript)
 	1. Enable TypeScript
-	2. Change compiler to `/usr/local/lib/node_modules/typescript/lib`
+	2. Change compiler to use TypeScript installation from your project directory `node_modules/typescript/lib`
 	3. Switch to use `tsconfig.json`
 3. Enable TSLint (Preferences -> Languages & Frameworks -> TypeScript -> TSLint)
+	1. Change TSLint package to use TSLint installation from your project directory `node_modules/tslint`
 
 ## Building
 
 ### Dependencies
 
 - `make setup`
+
+### Browser Build
+
+- `make build-browser`
+
+Suggested testing browser is Google Chrome
 
 ### Development Build
 
@@ -65,13 +69,14 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
-### Integration tests
-
-- Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/release/config.json`)
-- Change webview release config (`src/config.json`) to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/release/index.html`)
-- `make build-release`
-- Run integration test suite from the SDK
-
 ## Releasing
 
 Before releasing, update dependencies to latest versions in `package.json`, then regenerate `npm-shrinkwrap.json` with `npm shrinkwrap` and then manually remove `fsevents` dependency from the `npm-shrinkwrap.json` file (`fsevents` breaks build on Linux machines. See [this](https://github.com/npm/npm/issues/2679#issuecomment-150084700))
+
+### Release checklist
+
+- Create `staging/*` branches for all release branches and resolve any conflicts
+- Ask QA to run tests
+- If all looks good, update `LKG_*` tags
+- Merge staging branches through PRs to production branches
+- Update CHANGELOG.md in master branch

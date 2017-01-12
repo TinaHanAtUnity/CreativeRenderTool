@@ -1,11 +1,43 @@
-import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { NativeBridge } from 'Native/NativeBridge';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { SessionManager } from 'Managers/SessionManager';
 
-export class VastVideoEventHandlers extends VideoEventHandlers {
+export class VastVideoEventHandlers {
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
-        adUnit.hide();
+    public static onVideoStart(sessionManager: SessionManager, adUnit: VastAdUnit): void {
+        if (sessionManager.getSession()) {
+            if (sessionManager.getSession().impressionSent) {
+                return;
+            }
+            sessionManager.getSession().impressionSent = true;
+        }
+        adUnit.sendImpressionEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'creativeView', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'start', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
     }
 
+    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VastAdUnit) {
+        if (sessionManager.getSession()) {
+            if (sessionManager.getSession().vastCompleteSent) {
+                return;
+            }
+            sessionManager.getSession().vastCompleteSent = true;
+        }
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        } else {
+            adUnit.hide();
+        }
+    }
+
+    public static onVideoError(adUnit: VastAdUnit) {
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        } else {
+            adUnit.hide();
+        }
+    }
 }

@@ -1,102 +1,130 @@
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { Overlay } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
 import { Vast } from 'Models/Vast/Vast';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
+import { VastEndScreen } from 'Views/VastEndScreen';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class VastAdUnit extends VideoAdUnit {
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: VastCampaign, overlay: Overlay) {
-        super(nativeBridge, placement, campaign, overlay, null);
+    private _endScreen: VastEndScreen | null;
+
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
+        super(nativeBridge, adUnit, videoAdUnitController);
+
+        this._endScreen = endScreen || null;
     }
 
-    protected hideChildren() {
-        const overlay = this.getOverlay();
-        overlay.container().parentElement.removeChild(overlay.container());
+    public show(): Promise<void> {
+        return this._videoAdUnitController.show(this);
+    }
+
+    public hide(): Promise<void> {
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            endScreen.hide();
+            endScreen.remove();
+        }
+
+        return this._videoAdUnitController.hide();
+    }
+
+    public isShowing(): boolean {
+        return this._videoAdUnitController.isShowing();
+    }
+
+    public description(): string {
+        return 'VAST';
     }
 
     public getVast(): Vast {
         return (<VastCampaign> this.getCampaign()).getVast();
     }
 
-    public getDuration(): number {
+    public getDuration(): number | null {
         return this.getVast().getDuration();
     }
 
     public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
-            for (let impressionUrl of impressionUrls) {
-                impressionUrl = impressionUrl.replace(/%SDK_VERSION%/, sdkVersion);
-                this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, impressionUrl);
+            for (const impressionUrl of impressionUrls) {
+                this.sendThirdPartyEvent(eventManager, 'vast impression', sessionId, sdkVersion, impressionUrl);
             }
         }
     }
 
-    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string): void {
+    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string, sdkVersion: string): void {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
-            for (let url of trackingEventUrls) {
-                this.sendThirdPartyEvent(eventManager, `vast ${eventName}`, sessionId, url);
+            for (const url of trackingEventUrls) {
+                this.sendThirdPartyEvent(eventManager, `vast ${eventName}`, sessionId, sdkVersion, url);
             }
         }
     }
 
-    public sendProgressEvents(eventManager: EventManager, sessionId: string, position: number, oldPosition: number) {
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 1);
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 2);
-        this.sendQuartileEvent(eventManager, sessionId, position, oldPosition, 3);
+    public sendProgressEvents(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number) {
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
+        this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
     }
 
-    public getVideoClickThroughURL(): string {
-        let url = this.getVast().getVideoClickThroughURL();
-        let reg = new RegExp('^(https?)://.+$');
-        if (reg.test(url)) {
+    public getVideoClickThroughURL(): string | null {
+        const url = this.getVast().getVideoClickThroughURL();
+        if (this.isValidURL(url)) {
             return url;
         } else {
-            // in the future, we want to send this event to our server and notify the advertiser of a broken link
             return null;
         }
     }
 
-    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string): void {
-        let clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
+    public getCompanionClickThroughUrl(): string | null {
+        const url = this.getVast().getCompanionClickThroughUrl();
+        if (this.isValidURL(url)) {
+            return url;
+        } else {
+            return null;
+        }
+    }
+
+    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
+        const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
             for (let i = 0; i < clickTrackingEventUrls.length; i++) {
-                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, clickTrackingEventUrls[i]);
+                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrls[i]);
             }
         }
     }
 
-    private sendQuartileEvent(eventManager: EventManager, sessionId: string, position: number, oldPosition: number, quartile: number) {
-        let quartileEventName: string;
-        if (quartile === 1) {
-            quartileEventName = 'firstQuartile';
-        }
-        if (quartile === 2) {
-            quartileEventName = 'midpoint';
-        }
-        if (quartile === 3) {
-            quartileEventName = 'thirdQuartile';
-        }
+    public getEndScreen(): VastEndScreen | null {
+        return this._endScreen;
+    }
+
+    private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
-            let duration = this.getDuration();
+            const duration = this.getDuration();
             if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                this.sendTrackingEvent(eventManager, quartileEventName, sessionId);
+                this.sendTrackingEvent(eventManager, quartileEventName, sessionId, sdkVersion);
             }
         }
     }
 
-    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, url: string): void {
+    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, sdkVersion: string, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
+        url = url.replace(/%SDK_VERSION%/, sdkVersion);
         eventManager.thirdPartyEvent(event, sessionId, url);
     }
 
-    private getTrackingEventUrls(eventName: string): string[] {
+    private getTrackingEventUrls(eventName: string): string[] | null {
         return this.getVast().getTrackingEventUrls(eventName);
+    }
+
+    private isValidURL(url: string | null): boolean {
+        const reg = new RegExp('^(https?)://.+$');
+        return !!url && reg.test(url);
     }
 
 }

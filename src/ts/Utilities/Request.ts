@@ -1,5 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { RequestError } from 'Errors/RequestError';
+import { Platform } from 'Constants/Platform';
 
 const enum RequestStatus {
     COMPLETE,
@@ -37,28 +39,27 @@ export interface INativeResponse {
 
 export class Request {
 
-    private static _connectTimeout = 30000;
-    private static _readTimeout = 30000;
-
-    private static _allowedResponseCodes = [200, 501, 300, 301, 302, 303, 304, 305, 306, 307, 308];
-    private static _redirectResponseCodes = [300, 301, 302, 303, 304, 305, 306, 307, 308];
-
-    private static _callbackId: number = 1;
-    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
-    private static _requests: { [key: number]: INativeRequest } = {};
-
-    private _nativeBridge: NativeBridge;
-    private _wakeUpManager: WakeUpManager;
-
-    public static getHeader(headers: [string, string][], headerName: string): string {
+    public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
-            let header = headers[i];
+            const header = headers[i];
             if(header[0].match(new RegExp(headerName, 'i'))) {
                 return header[1];
             }
         }
         return null;
     }
+
+    private static _allowedResponseCodes = new RegExp('2[0-9]{2}');
+    private static _redirectResponseCodes = new RegExp('30[0-8]');
+    private static _errorResponseCodes = new RegExp('4[0-9]{2}');
+    private static _retryResponseCodes = new RegExp('5[0-9]{2}');
+
+    private static _connectTimeout = 30000;
+    private static _readTimeout = 30000;
+
+    private static _callbackId: number = 1;
+    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
+    private static _requests: { [key: number]: INativeRequest } = {};
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -68,6 +69,9 @@ export class Request {
             retryWithConnectionEvents: false
         };
     }
+
+    private _nativeBridge: NativeBridge;
+    private _wakeUpManager: WakeUpManager;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
@@ -83,8 +87,8 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
@@ -102,8 +106,8 @@ export class Request {
 
         headers.push(['Content-Type', 'application/json']);
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.POST,
             url: url,
@@ -120,8 +124,13 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
-        let id = Request._callbackId++;
-        let promise = this.registerCallback(id);
+        // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
+            headers.push(['Accept-Encoding', '']);
+        }
+
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.HEAD,
             url: url,
@@ -134,7 +143,7 @@ export class Request {
 
     private registerCallback(id: number): Promise<INativeResponse> {
         return new Promise<INativeResponse>((resolve, reject) => {
-            let callbackObject: { [key: number]: Function } = {};
+            const callbackObject: { [key: number]: Function } = {};
             callbackObject[RequestStatus.COMPLETE] = resolve;
             callbackObject[RequestStatus.FAILED] = reject;
             Request._callbacks[id] = callbackObject;
@@ -148,7 +157,7 @@ export class Request {
                 return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
 
             case RequestMethod.HEAD:
                 return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
@@ -159,7 +168,7 @@ export class Request {
     }
 
     private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
-        let callbackObject = Request._callbacks[id];
+        const callbackObject = Request._callbacks[id];
         if(callbackObject) {
             callbackObject[status](...parameters);
             delete Request._callbacks[id];
@@ -167,7 +176,7 @@ export class Request {
         }
     }
 
-    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string): void {
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
         if(nativeRequest.retryCount < nativeRequest.options.retries) {
             nativeRequest.retryCount++;
             setTimeout(() => {
@@ -175,25 +184,32 @@ export class Request {
             }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, [nativeRequest, errorMessage]);
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
             }
         }
     }
 
     private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
-        let id = parseInt(rawId, 10);
-        let nativeResponse: INativeResponse = {
+        const id = parseInt(rawId, 10);
+        const nativeResponse: INativeResponse = {
             url: url,
             response: response,
             responseCode: responseCode,
             headers: headers
         };
-        let nativeRequest = Request._requests[id];
+        const nativeRequest = Request._requests[id];
 
-        if(Request._allowedResponseCodes.indexOf(responseCode) !== -1) {
-            if(Request._redirectResponseCodes.indexOf(responseCode) !== -1 && nativeRequest.options.followRedirects) {
-                let location = nativeRequest.url = Request.getHeader(headers, 'location');
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+        if(Request._allowedResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+        } else if(Request._redirectResponseCodes.exec(responseCode.toString())) {
+            if(nativeRequest.options.followRedirects) {
+                const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
+                    nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
                     this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
@@ -201,24 +217,33 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
+        } else if(Request._errorResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
+        } else if(Request._retryResponseCodes.exec(responseCode.toString())) {
+            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
-            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES');
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
         }
     }
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
-        let id = parseInt(rawId, 10);
-        let nativeRequest = Request._requests[id];
+        const id = parseInt(rawId, 10);
+        const nativeRequest = Request._requests[id];
+
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+
         this.handleFailedRequest(id, nativeRequest, error);
     }
 
     private onNetworkConnected(): void {
-        let id: any;
-        for(id in Request._requests) {
+        for(const id in Request._requests) {
             if(Request._requests.hasOwnProperty(id)) {
-                let request: INativeRequest = Request._requests[id];
+                const request: INativeRequest = Request._requests[id];
                 if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
-                    this.invokeRequest(id, request);
+                    this.invokeRequest(parseInt(id, 10), request);
                 }
             }
         }

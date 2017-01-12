@@ -1,0 +1,47 @@
+{
+  "event": "Configuration request",
+  "parameters": [
+    {
+      "parameter": "bundleId",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "encrypted",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "rooted",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "frameworkName",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "frameworkVersion",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adapterName",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adapterVersion",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    }
+  ]
+}

@@ -42,7 +42,6 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
     private _simulator: boolean;
-    private _appleWatchPaired: boolean;
 
     private _nativeBridge: NativeBridge;
 
@@ -52,7 +51,7 @@ export class DeviceInfo extends Model {
     }
 
     public fetch(): Promise<any[]> {
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
 
         promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking).catch(err => this.handleDeviceInfoError(err)));
@@ -214,7 +213,6 @@ export class DeviceInfo extends Model {
         return this._totalExternalSpace;
     }
 
-
     public getLanguage(): string {
         return this._language;
     }
@@ -290,7 +288,7 @@ export class DeviceInfo extends Model {
     }
 
     public getDTO(): Promise<any> {
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this.getConnectionType().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getNetworkType().catch(err => this.handleDeviceInfoError(err)));
         promises.push(this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)));
@@ -309,10 +307,7 @@ export class DeviceInfo extends Model {
         }
 
         return Promise.all(promises).then(values => {
-            return {
-                'androidId': this._androidId,
-                'advertisingId': this._advertisingIdentifier,
-                'trackingEnabled': this._limitAdTracking,
+            const dto: any = {
                 'apiLevel': this._apiLevel,
                 'osVersion': this._osVersion,
                 'deviceMake': this._manufacturer,
@@ -343,11 +338,17 @@ export class DeviceInfo extends Model {
                 'totalMemory': this._totalMemory,
                 'rooted': this._rooted,
                 'simulator': this._simulator,
-                'appleWatchPaired': this._appleWatchPaired
             };
+
+            if(this.getAdvertisingIdentifier()) {
+                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+                dto.limitAdTracking = this.getLimitAdTracking();
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                dto.androidId = this.getAndroidId();
+            }
+
+            return dto;
         });
-
-
     }
 
     private handleDeviceInfoError(error: any) {

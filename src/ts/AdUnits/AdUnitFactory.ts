@@ -1,5 +1,6 @@
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
@@ -9,168 +10,241 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen } from 'Views/EndScreen';
+import { VastEndScreen } from 'Views/VastEndScreen';
 import { Overlay } from 'Views/Overlay';
-import { IObserver0, IObserver1, IObserver2, IObserver3 } from 'Utilities/IObserver';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { MetaData } from 'Utilities/MetaData';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
+import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
+import { ThirdParty } from 'Views/ThirdParty';
+import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
+import { AbTest } from 'Utilities/AbTest';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
+            return this.createVastAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, options);
+        } else if(campaign instanceof HtmlCampaign) {
+            return this.createHtmlAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, options);
         } else {
-            return this.createVideoAdUnit(nativeBridge, sessionManager, placement, campaign, configuration);
+            return this.createPerformanceAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, configuration, options);
         }
     }
 
-    private static createVideoAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration): VideoAdUnit {
-        let overlay = new Overlay(nativeBridge, placement.muteVideo());
-        let endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant());
-        let videoAdUnit = new VideoAdUnit(nativeBridge, placement, campaign, overlay, endScreen);
-        let metaData = new MetaData(nativeBridge);
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+        let overlay: AbstractVideoOverlay;
+        if (AbTest.isOverlayTestActive(campaign)) {
+            overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        } else {
+            overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        }
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, videoAdUnit, placement, campaign);
-        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, videoAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, videoAdUnit, metaData);
+        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+        const metaData = new MetaData(nativeBridge);
 
-        return videoAdUnit;
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
+
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
+        this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
+        this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, metaData);
+        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
+        const onVideoErrorObserver = videoAdUnitController.onVideoError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
+
+        performanceAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+            videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
+        });
+
+        videoAdUnitController.onVideoClose.subscribe(() => {
+            performanceAdUnit.hide();
+        });
+
+        return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration): VideoAdUnit {
-        let overlay = new Overlay(nativeBridge, placement.muteVideo());
-        let vastAdUnit = new VastAdUnit(nativeBridge, placement, campaign, overlay);
-        let metaData = new MetaData(nativeBridge);
+    private static createVastAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
+        let overlay: AbstractVideoOverlay;
+        if (AbTest.isOverlayTestActive(campaign)) {
+            overlay = new VideoOverlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        } else {
+            overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        }
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit, placement, campaign);
+        let vastAdUnit: VastAdUnit;
+
+        const metaData = new MetaData(nativeBridge);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+
+        if (campaign.hasEndscreen()) {
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
+            this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
+        } else {
+            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+        }
+
+        this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
+        this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, metaData);
+
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
+        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
+
+        vastAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+            nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+        });
 
         return vastAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, placement: Placement, campaign: Campaign) {
+    private static createHtmlAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: HtmlCampaign, options: any): AbstractAdUnit {
+        const thirdParty = new ThirdParty(nativeBridge, placement, campaign);
+        const thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, adUnit, sessionManager, placement, campaign, thirdParty, options);
+
+        thirdParty.render();
+        document.body.appendChild(thirdParty.container());
+        thirdParty.onClick.subscribe(() => sessionManager.sendClick(thirdPartyAdUnit));
+        thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
+
+        return thirdPartyAdUnit;
+    }
+
+    private static prepareOverlay(overlay: AbstractVideoOverlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
         overlay.render();
         document.body.appendChild(overlay.container());
-        this.prepareOverlayEventHandlers(overlay, nativeBridge, sessionManager, videoAdUnit);
+        overlay.setSpinnerEnabled(!adUnit.getCampaign().isVideoCached());
 
-        overlay.setSpinnerEnabled(!campaign.isVideoCached());
-
-        if(!placement.allowSkip()) {
+        if(!adUnit.getPlacement().allowSkip()) {
             overlay.setSkipEnabled(false);
         } else {
             overlay.setSkipEnabled(true);
-            overlay.setSkipDuration(placement.allowSkipInSeconds());
+            overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
         }
+
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, adUnit));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
-    private static prepareOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
-        if (videoAdUnit instanceof VastAdUnit) {
-            overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
-            overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(nativeBridge, sessionManager, videoAdUnit, muted));
-            overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, videoAdUnit));
-        } else {
-            overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, sessionManager, videoAdUnit));
-            overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, sessionManager, videoAdUnit, muted));
-        }
+    private static preparePerformanceOverlayEventHandlers(overlay: AbstractVideoOverlay, adUnit: PerformanceAdUnit) {
+        overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(adUnit));
+    }
+
+    private static prepareVastOverlayEventHandlers(overlay: AbstractVideoOverlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
+        overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
+        overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit));
+        overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted));
+
     };
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit) {
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any): VideoAdUnitController {
+        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+    }
+
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
-        endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownload(nativeBridge, sessionManager, videoAdUnit));
         endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
-        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(nativeBridge, videoAdUnit));
+        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
+        }
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, videoAdUnit: VideoAdUnit, metaData: MetaData) {
-        let onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, videoAdUnit, duration, metaData));
-        let onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, videoAdUnit, position));
-        let onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoStart(nativeBridge, sessionManager, videoAdUnit));
+    private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo) {
+        endScreen.render();
+        endScreen.hide();
+        document.body.appendChild(endScreen.container());
+        endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
 
-        let onCompletedObserver: IObserver1<string>;
-        if (videoAdUnit instanceof VastAdUnit) {
-            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit, metaData));
-        } else {
-            onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, videoAdUnit, metaData));
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
         }
+    }
 
-        videoAdUnit.onClose.subscribe(() => {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
+        const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit.getVideoAdUnitController(), url));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
+        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData));
+
+        adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
+            nativeBridge.VideoPlayer.onPrepareTimeout.unsubscribe(onPrepareTimeoutObserver);
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
         });
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            this.prepareAndroidVideoPlayer(nativeBridge, videoAdUnit);
+            this.prepareAndroidVideoPlayer(nativeBridge, adUnit.getVideoAdUnitController());
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            this.prepareIosVideoPlayer(nativeBridge, videoAdUnit);
+            this.prepareIosVideoPlayer(nativeBridge, adUnit.getVideoAdUnitController());
         }
     }
 
-    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        let onGenericErrorObserver: IObserver3<number, number, string>;
-        let onVideoPrepareErrorObserver: IObserver1<string>;
-        let onVideoSeekToErrorObserver: IObserver1<string>;
-        let onVideoPauseErrorObserver: IObserver1<string>;
-        let onVideoIllegalStateErrorObserver: IObserver0;
+    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        const onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((what, extra, url) => VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnitController, what, extra, url));
+        const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Android.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnitController, url));
+        const onVideoSeekToErrorObserver = nativeBridge.VideoPlayer.Android.onSeekToError.subscribe((url) => VideoEventHandlers.onSeekToError(nativeBridge, videoAdUnitController, url));
+        const onVideoPauseErrorObserver = nativeBridge.VideoPlayer.Android.onPauseError.subscribe((url) => VideoEventHandlers.onPauseError(nativeBridge, videoAdUnitController, url));
+        const onVideoIllegalStateErrorObserver = nativeBridge.VideoPlayer.Android.onIllegalStateError.subscribe(() => VideoEventHandlers.onIllegalStateError(nativeBridge, videoAdUnitController));
 
-        if (videoAdUnit instanceof VastAdUnit) {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((what, extra, url) => VastVideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, what, extra, url));
-            onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Android.onPrepareError.subscribe((url) => VastVideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-            onVideoSeekToErrorObserver = nativeBridge.VideoPlayer.Android.onSeekToError.subscribe((url) => VastVideoEventHandlers.onSeekToError(nativeBridge, videoAdUnit, url));
-            onVideoPauseErrorObserver = nativeBridge.VideoPlayer.Android.onPauseError.subscribe((url) => VastVideoEventHandlers.onPauseError(nativeBridge, videoAdUnit, url));
-            onVideoIllegalStateErrorObserver = nativeBridge.VideoPlayer.Android.onIllegalStateError.subscribe(() => VastVideoEventHandlers.onIllegalStateError(nativeBridge, videoAdUnit));
-        } else {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((what, extra, url) => VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, what, extra, url));
-            onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Android.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-            onVideoSeekToErrorObserver = nativeBridge.VideoPlayer.Android.onSeekToError.subscribe((url) => VideoEventHandlers.onSeekToError(nativeBridge, videoAdUnit, url));
-            onVideoPauseErrorObserver = nativeBridge.VideoPlayer.Android.onPauseError.subscribe((url) => VideoEventHandlers.onPauseError(nativeBridge, videoAdUnit, url));
-            onVideoIllegalStateErrorObserver = nativeBridge.VideoPlayer.Android.onIllegalStateError.subscribe(() => VideoEventHandlers.onIllegalStateError(nativeBridge, videoAdUnit));
-        }
-
-        videoAdUnit.onClose.subscribe(() => {
+        videoAdUnitController.onVideoClose.subscribe(() => {
             nativeBridge.VideoPlayer.Android.onGenericError.unsubscribe(onGenericErrorObserver);
-            nativeBridge.VideoPlayer.Android.onPauseError.unsubscribe(onVideoPrepareErrorObserver);
-            nativeBridge.VideoPlayer.Android.onPauseError.unsubscribe(onVideoSeekToErrorObserver);
+            nativeBridge.VideoPlayer.Android.onPrepareError.unsubscribe(onVideoPrepareErrorObserver);
+            nativeBridge.VideoPlayer.Android.onSeekToError.unsubscribe(onVideoSeekToErrorObserver);
             nativeBridge.VideoPlayer.Android.onPauseError.unsubscribe(onVideoPauseErrorObserver);
-            nativeBridge.VideoPlayer.Android.onPauseError.unsubscribe(onVideoIllegalStateErrorObserver);
-
+            nativeBridge.VideoPlayer.Android.onIllegalStateError.unsubscribe(onVideoIllegalStateErrorObserver);
         });
     }
 
-    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
-        let onGenericErrorObserver: IObserver2<string, string>;
-        let onVideoPrepareErrorObserver: IObserver1<string>;
+    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController) {
+        const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnitController, url, description));
+        const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnitController, url));
 
-        if (videoAdUnit instanceof VastAdUnit) {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VastVideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
-            onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VastVideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-
-        } else {
-            onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
-            onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-
-        }
-
-        let onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
+        const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
                 nativeBridge.VideoPlayer.play();
             }
         });
-        videoAdUnit.onClose.subscribe(() => {
+
+        videoAdUnitController.onVideoClose.subscribe(() => {
             nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.unsubscribe(onLikelyToKeepUpObserver);
             nativeBridge.VideoPlayer.Ios.onGenericError.unsubscribe(onGenericErrorObserver);
             nativeBridge.VideoPlayer.Ios.onPrepareError.unsubscribe(onVideoPrepareErrorObserver);
-
         });
-
     }
 
 }

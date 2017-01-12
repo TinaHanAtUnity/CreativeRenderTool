@@ -66,7 +66,7 @@ export class AppSheetApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'canOpen');
     }
 
-    public prepare(options: IAppSheetOptions, timeout: number = 30000): Promise<void> {
+    public prepare(options: IAppSheetOptions, timeout: number = 30000): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'prepare', [options, timeout]);
     }
 
@@ -89,7 +89,7 @@ export class AppSheetApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getPrepareTimeout');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AppSheetEvent[AppSheetEvent.PREPARED]:
                 this.onPrepared.trigger(parameters[0]);

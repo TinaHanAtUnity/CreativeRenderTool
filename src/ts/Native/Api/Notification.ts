@@ -26,7 +26,7 @@ export class NotificationApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'removeAllNotificationObservers');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case NotificationEvent[NotificationEvent.ACTION]:
                 this.onNotification.trigger(parameters[0], parameters[1]);

@@ -1,5 +1,4 @@
-/// <amd-dependency path='text!html/Privacy.html' name='PrivacyTemplate' />
-declare var PrivacyTemplate: string;
+import PrivacyTemplate from 'html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -23,12 +22,12 @@ export class Privacy extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event) => this.onOkEvent(event),
+                listener: (event: Event) => this.onOkEvent(event),
                 selector: '.ok-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onPrivacyEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: 'a'
             }
         ];

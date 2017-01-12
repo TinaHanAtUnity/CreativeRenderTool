@@ -1,0 +1,310 @@
+[
+  {
+    "key": "adapterName",
+    "type": "String",
+    "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "adapterVersion",
+    "type": "String",
+    "description": "SDK version name for adapter, should be in sync with SDK version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "advertisingTrackingId",
+    "type": "String",
+    "description": "Advertising identifier in raw format",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "androidId",
+    "type": "String",
+    "description": "Android ID",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "apiLevel",
+    "type": "Integer",
+    "description": "Android device API level",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "bundleId",
+    "type": "String",
+    "description": "Bundle identifier for the app",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "bundleVersion",
+    "type": "String",
+    "description": "Game version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cached",
+    "type": "Boolean",
+    "description": "If video is cached or streamed",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "campaignId",
+    "type": "String",
+    "description": "Internal campaign identifier",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "connectionType",
+    "type": "String",
+    "description": "\"wifi\", \"cellular\" or \"none\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "deviceMake",
+    "type": "String",
+    "description": "Android device manufacturer",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "deviceModel",
+    "type": "String",
+    "description": "Android or iOS device model, example 'iPhone7,1'",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "encrypted",
+    "type": "Boolean",
+    "description": "If true, app is encrypted for app store distribution and game is live",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "eventId",
+    "type": "String",
+    "description": "Unique event identifier",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "deviceFreeSpace",
+    "type": "Integer",
+    "description": "Free space in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkName",
+    "type": "Integer",
+    "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkVersion",
+    "type": "Integer",
+    "description": "Unity engine version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "gameId",
+    "type": "String",
+    "description": "Source game identifier",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "gamerId",
+    "type": "String",
+    "description": "Internal gamer identifier",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "language",
+    "type": "String",
+    "description": "Device language code (e.g. en_US or fr_CA)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "limitAdTracking",
+    "type": "Boolean",
+    "description": "Boolean if user has limited tracking or not",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "mediation",
+    "type": "JSONobject",
+    "description": "mediation data in JSON object (Will get refactored)",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationOrdinal",
+    "type": "Integer",
+    "description": "Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationName",
+    "type": "String",
+    "description": "Mediation provider name",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationVersion",
+    "type": "String",
+    "description": "Mediation SDK version",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "networkOperator",
+    "type": "String",
+    "description": "MCC + MNC codes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "networkOperatorName",
+    "type": "String",
+    "description": "Cell network operator name",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "networkType",
+    "type": "String",
+    "description": "Detailed cellular network type",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "osVersion",
+    "type": "String",
+    "description": "Device operating system version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "placementId",
+    "type": "String",
+    "description": "Internal placement identifier",
+    "provider": "Admin",
+    "platforms": "all"
+  },
+  {
+    "key": "platform",
+    "type": "String",
+    "description": "\"android\" or \"ios\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "redirect",
+    "type": "Boolean",
+    "description": "Legacy parameter, always false",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "rooted",
+    "type": "Boolean",
+    "description": "Is the device rooted or jailbroken",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenDensity",
+    "type": "Integer",
+    "description": "Screen density in DPI",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "screenHeight",
+    "type": "Integer",
+    "description": "Screen height in pixels",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenSize",
+    "type": "Integer",
+    "description": "Android raw screen layout value",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "screenWidth",
+    "type": "Integer",
+    "description": "Screen width in pixels",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sdkVersion",
+    "type": "String",
+    "description": "SDK version in four digits",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sessionId",
+    "type": "String",
+    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sid",
+    "type": "String",
+    "description": "Server side reward callback id",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "skippedAt",
+    "type": "Integer",
+    "description": "Milliseconds from video start to video skip",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "test",
+    "type": "Boolean",
+    "description": "Test mode",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "timeZone",
+    "type": "String",
+    "description": "Current timezone",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "webviewUa",
+    "type": "String",
+    "description": "WebView user agent string",
+    "provider": "SDK",
+    "platforms": "all"
+  }
+]

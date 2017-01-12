@@ -2,10 +2,6 @@ import { Model } from 'Models/Model';
 
 export class MediationMetaData extends Model {
 
-    private _name: string;
-    private _version: string;
-    private _ordinal: number;
-
     public static getCategory(): string {
         return 'mediation';
     }
@@ -13,6 +9,10 @@ export class MediationMetaData extends Model {
     public static getKeys(): string[] {
         return ['name', 'version', 'ordinal'];
     }
+
+    private _name: string;
+    private _version: string;
+    private _ordinal: number;
 
     constructor(data: string[]) {
         super();

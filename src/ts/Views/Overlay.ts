@@ -1,16 +1,14 @@
-/// <amd-dependency path="text!html/Overlay.html" name="OverlayTemplate" />
-declare var OverlayTemplate: string;
+import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable1 } from 'Utilities/Observable';
+import { Localization } from 'Utilities/Localization';
+import { Platform } from 'Constants/Platform';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class Overlay extends View {
+export class Overlay extends AbstractVideoOverlay {
 
-    public onSkip: Observable1<number> = new Observable1();
-    public onMute: Observable1<boolean> = new Observable1();
-    public onCallButton: Observable1<boolean> = new Observable1();
+    private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
 
@@ -38,11 +36,15 @@ export class Overlay extends View {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _headerElement: HTMLElement;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean) {
+    private _fadeTimer: any;
+
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
 
-        this._template = new Template(OverlayTemplate);
+        this._localization = new Localization(language, 'overlay');
+        this._template = new Template(OverlayTemplate, this._localization);
 
         this._muted = muted;
 
@@ -53,18 +55,22 @@ export class Overlay extends View {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event) => this.onSkipEvent(event),
+                listener: (event: Event) => this.onSkipEvent(event),
                 selector: '.skip-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onMuteEvent(event),
+                listener: (event: Event) => this.onMuteEvent(event),
                 selector: '.mute-button'
             },
             {
                 event: 'click',
-                listener: (event) => this.onCallButtonEvent(event),
+                listener: (event: Event) => this.onCallButtonEvent(event),
                 selector: '.call-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onClick(event)
             }
         ];
     }
@@ -79,6 +85,7 @@ export class Overlay extends View {
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._headerElement = <HTMLElement>this.container().querySelector('.header');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -97,6 +104,7 @@ export class Overlay extends View {
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -118,6 +126,17 @@ export class Overlay extends View {
     }
 
     public setVideoProgress(value: number): void {
+        if(AbstractVideoOverlay.AutoSkip) {
+            this.onSkip.trigger(value);
+        }
+
+        if(!this._fadeTimer) {
+            this._fadeTimer = setTimeout(() => {
+                this.fade(true);
+                this._fadeTimer = undefined;
+            }, 3000);
+        }
+
         this._videoProgress = value;
         if(this._skipEnabled && this._skipRemaining > 0) {
             this._skipRemaining = Math.round((this._skipDuration - value) / 1000);
@@ -128,6 +147,15 @@ export class Overlay extends View {
         } else {
             // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
             this._videoDurationCounterElement.innerHTML = '0';
+        }
+
+        // redraw updated elements to fix the overlapping texts issue
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 21) {
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
         }
     }
 
@@ -151,6 +179,7 @@ export class Overlay extends View {
     public setCallButtonVisible(value: boolean) {
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -160,7 +189,7 @@ export class Overlay extends View {
 
     private setSkipText(skipRemaining: number): void {
         if(skipRemaining <= 0) {
-            this._skipElement.innerHTML = 'Skip Video';
+            this._skipElement.innerHTML = this._localization.translate('Skip Video');
         } else {
             this._skipDurationElement.innerHTML = skipRemaining.toString();
         }
@@ -188,6 +217,22 @@ export class Overlay extends View {
     private onCallButtonEvent(event: Event): void {
         event.preventDefault();
         this.onCallButton.trigger(true);
+    }
+
+    private onClick(event: Event) {
+        if(this._fadeTimer) {
+            clearTimeout(this._fadeTimer);
+            this._fadeTimer = undefined;
+        }
+        this.fade(false);
+    }
+
+    private fade(value: boolean) {
+        if(value) {
+            this._container.classList.add('fade');
+        } else {
+            this._container.classList.remove('fade');
+        }
     }
 
 }

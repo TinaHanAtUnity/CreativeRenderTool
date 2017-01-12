@@ -4,9 +4,9 @@ import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 export class VastCreativeLinear extends VastCreative {
 
     private _duration: number;
-    private _skipDelay: number;
+    private _skipDelay: number | null;
     private _mediaFiles: VastMediaFile[];
-    private _videoClickThroughURLTemplate: string;
+    private _videoClickThroughURLTemplate: string | null;
     private _videoClickTrackingURLTemplates: string[];
     private _videoCustomClickURLTemplates: string[];
     private _adParameters: any;
@@ -33,11 +33,11 @@ export class VastCreativeLinear extends VastCreative {
         this._duration = duration;
     }
 
-    public getSkipDelay(): number {
+    public getSkipDelay(): number | null {
         return this._skipDelay;
     }
 
-    public setSkipDelay(skipDelay: number) {
+    public setSkipDelay(skipDelay: number | null) {
         this._skipDelay = skipDelay;
     }
 
@@ -49,7 +49,7 @@ export class VastCreativeLinear extends VastCreative {
         this._mediaFiles.push(mediaFile);
     }
 
-    public getVideoClickThroughURLTemplate(): string {
+    public getVideoClickThroughURLTemplate(): string | null {
         return this._videoClickThroughURLTemplate;
     }
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Unity Ads WebView</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
+
+    <script>{ES6_PROMISE}</script>
+    <script>{SYSTEM_JS}</script>
+    <script>
+        var origin = 'http://localhost:8000';
+        if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
+            var queryString = location.search.split('?')[1].split('&');
+            var queryParams = {};
+            for(i = 0; i < queryString.length; i++) {
+                var param = queryString[i].split('=');
+                queryParams[param[0]] = param[1];
+            }
+            if('origin' in queryParams) {
+                var decodedOrigin = decodeURIComponent(queryParams['origin']);
+                var parser = document.createElement('a');
+                parser.href = decodedOrigin;
+                origin = parser.origin;
+            }
+        }
+
+        var style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = origin + '/build/dev/css/main.css';
+        document.head.appendChild(style);
+
+        var config = {
+            baseURL: origin + '/build/dev/js',
+            map: {
+                'es6-promise': '@empty',
+                'text': origin + '/node_modules/systemjs-plugin-text/text.js'
+            },
+            meta: {
+                '*.html': {
+                    loader: 'text'
+                },
+                '*.xml': {
+                    loader: 'text'
+                },
+                '*.json': {
+                    loader: 'text'
+                }
+            },
+            packages: {},
+            paths: {
+                '*.html': origin + '/build/dev/*.html',
+                '*.xml': origin + '/build/dev/*.xml',
+                '*.json': origin + '/build/dev/*.json'
+            }
+        };
+        config.packages[origin] = {
+            defaultExtension: 'js'
+        };
+        System.config(config);
+        System.import('Device');
+    </script>
+</head>
+<body></body>
+</html>

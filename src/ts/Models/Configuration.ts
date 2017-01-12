@@ -13,7 +13,7 @@ export class Configuration {
     private _coppaCompliant: boolean;
     private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
-    private _defaultPlacement: Placement = null;
+    private _defaultPlacement: Placement;
 
     constructor(configJson: any) {
         this._enabled = configJson.enabled;
@@ -37,10 +37,10 @@ export class Configuration {
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
 
-        let placements = configJson.placements;
+        const placements = configJson.placements;
 
         placements.forEach((rawPlacement: any): void => {
-            let placement: Placement = new Placement(rawPlacement);
+            const placement: Placement = new Placement(rawPlacement);
             this._placements[placement.getId()] = placement;
             if(placement.isDefault()) {
                 this._defaultPlacement = placement;
@@ -77,8 +77,8 @@ export class Configuration {
             return 0;
         }
 
-        let count: number = 0;
-        for(let placement in this._placements) {
+        let count = 0;
+        for(const placement in this._placements) {
             if(this._placements.hasOwnProperty(placement)) {
                 count++;
             }

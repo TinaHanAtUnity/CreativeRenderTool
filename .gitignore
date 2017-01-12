@@ -12,10 +12,3 @@ build
 src/**/*.js
 src/**/*.js.map
 src/**/*.css
-
-# Tests
-test/**/*.js
-test/**/*.js.map
-
-# Typings
-typings

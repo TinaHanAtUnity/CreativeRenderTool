@@ -1,6 +1,3 @@
-/// <reference path="../../../typings/index.d.ts" />
-/// <reference path="WebViewBridge.d.ts" />
-
 import { INativeBridge } from 'Native/INativeBridge';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { BroadcastApi } from 'Native/Api/Broadcast';
@@ -37,23 +34,34 @@ export class NativeBridge implements INativeBridge {
 
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
-    public AppSheet: AppSheetApi = null;
-    public AndroidAdUnit: AndroidAdUnitApi = null;
-    public Broadcast: BroadcastApi = null;
-    public Cache: CacheApi = null;
-    public Connectivity: ConnectivityApi = null;
-    public DeviceInfo: DeviceInfoApi = null;
-    public Intent: IntentApi = null;
-    public IosAdUnit: IosAdUnitApi = null;
-    public Listener: ListenerApi = null;
-    public Notification: NotificationApi = null;
-    public Placement: PlacementApi = null;
-    public Request: RequestApi = null;
-    public Resolve: ResolveApi = null;
-    public Sdk: SdkApi = null;
-    public Storage: StorageApi = null;
-    public VideoPlayer: VideoPlayerApi = null;
-    public UrlScheme: UrlSchemeApi = null;
+    private static convertStatus(status: string): CallbackStatus {
+        switch(status) {
+            case CallbackStatus[CallbackStatus.OK]:
+                return CallbackStatus.OK;
+            case CallbackStatus[CallbackStatus.ERROR]:
+                return CallbackStatus.ERROR;
+            default:
+                throw new Error('Status string is not valid: ' + status);
+        }
+    }
+
+    public AppSheet: AppSheetApi;
+    public AndroidAdUnit: AndroidAdUnitApi;
+    public Broadcast: BroadcastApi;
+    public Cache: CacheApi;
+    public Connectivity: ConnectivityApi;
+    public DeviceInfo: DeviceInfoApi;
+    public Intent: IntentApi;
+    public IosAdUnit: IosAdUnitApi;
+    public Listener: ListenerApi;
+    public Notification: NotificationApi;
+    public Placement: PlacementApi;
+    public Request: RequestApi;
+    public Resolve: ResolveApi;
+    public Sdk: SdkApi;
+    public Storage: StorageApi;
+    public VideoPlayer: VideoPlayerApi;
+    public UrlScheme: UrlSchemeApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer} = {};
@@ -66,17 +74,6 @@ export class NativeBridge implements INativeBridge {
     private _autoBatch: BatchInvocation;
     private _autoBatchTimer: any; // todo: should be number but causes naming clash with nodejs Timer
     private _autoBatchInterval = 50;
-
-    private static convertStatus(status: string): CallbackStatus {
-        switch(status) {
-            case CallbackStatus[CallbackStatus.OK]:
-                return CallbackStatus.OK;
-            case CallbackStatus[CallbackStatus.ERROR]:
-                return CallbackStatus.ERROR;
-            default:
-                throw new Error('Status string is not valid: ' + status);
-        }
-    }
 
     constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;
@@ -108,7 +105,7 @@ export class NativeBridge implements INativeBridge {
     }
 
     public registerCallback(resolve: Function, reject: Function): number {
-        let id: number = this._callbackId++;
+        const id: number = this._callbackId++;
         this._callbackTable[id] = new CallbackContainer(resolve, reject);
         return id;
     }
@@ -118,37 +115,36 @@ export class NativeBridge implements INativeBridge {
             if(!this._autoBatch) {
                 this._autoBatch = new BatchInvocation(this);
             }
-            let promise = this._autoBatch.queue(className, methodName, parameters);
+            const promise = this._autoBatch.queue(className, methodName, parameters);
             if(!this._autoBatchTimer) {
                 this._autoBatchTimer = setTimeout(() => {
                     this.invokeBatch(this._autoBatch);
-                    this._autoBatch = null;
+                    delete this._autoBatch;
                     this._autoBatchTimer = null;
                 }, this._autoBatchInterval);
             }
             return promise;
         } else {
-            let batch = new BatchInvocation(this);
-            let promise = batch.queue(className, methodName, parameters);
+            const batch = new BatchInvocation(this);
+            const promise = batch.queue(className, methodName, parameters);
             this.invokeBatch(batch);
             return promise;
         }
     }
 
     public rawInvoke(fullClassName: string, methodName: string, parameters?: any[]): Promise<any[]> {
-        let batch: BatchInvocation = new BatchInvocation(this);
-        let promise = batch.rawQueue(fullClassName, methodName, parameters);
+        const batch: BatchInvocation = new BatchInvocation(this);
+        const promise = batch.rawQueue(fullClassName, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
     }
 
-    /* tslint:disable:switch-default */
     public handleCallback(results: any[][]): void {
         results.forEach((result: any[]): void => {
-            let id: number = parseInt(result.shift(), 10);
-            let status = NativeBridge.convertStatus(result.shift());
+            const id: number = parseInt(result.shift(), 10);
+            const status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
-            let callbackObject: CallbackContainer = this._callbackTable[id];
+            const callbackObject: CallbackContainer = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
@@ -162,14 +158,16 @@ export class NativeBridge implements INativeBridge {
                 case CallbackStatus.ERROR:
                     callbackObject.reject(parameters);
                     break;
+                default:
+                    throw new Error('Unknown callback status');
             }
             delete this._callbackTable[id];
         });
     }
 
     public handleEvent(parameters: any[]): void {
-        let category: string = parameters.shift();
-        let event: string = parameters.shift();
+        const category: string = parameters.shift();
+        const event: string = parameters.shift();
         switch(category) {
             case EventCategory[EventCategory.APPSHEET]:
                 this.AppSheet.handleEvent(event, parameters);
@@ -221,9 +219,9 @@ export class NativeBridge implements INativeBridge {
     }
 
     public handleInvocation(parameters: any[]): void {
-        let className: string = parameters.shift();
-        let methodName: string = parameters.shift();
-        let callback: string = parameters.shift();
+        const className: string = parameters.shift();
+        const methodName: string = parameters.shift();
+        const callback: string = parameters.shift();
         parameters.push((status: CallbackStatus, ...callbackParameters: any[]) => {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });

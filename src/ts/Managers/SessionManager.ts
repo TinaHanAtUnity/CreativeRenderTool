@@ -2,12 +2,11 @@ import { Session } from 'Models/Session';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Url } from 'Utilities/Url';
-import { EventManager } from 'EventManager';
+import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -30,7 +29,7 @@ export class SessionManagerEventMetadataCreator {
     };
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string): Promise<[string, any]> {
-        let infoJson: any = {
+        const infoJson: any = {
             'eventId': id,
             'sessionId': currentSession.getId(),
             'gamerId': adUnit.getCampaign().getGamerId(),
@@ -38,8 +37,8 @@ export class SessionManagerEventMetadataCreator {
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
             'cached': adUnit.getCampaign().isVideoCached(),
-            'advertisingId': this._deviceInfo.getAdvertisingIdentifier(),
-            'trackingEnabled': this._deviceInfo.getLimitAdTracking(),
+            'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
+            'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
             'sid': gamerSid,
             'deviceMake': this._deviceInfo.getManufacturer(),
@@ -51,7 +50,7 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        let promises: Promise<any>[] = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
 
@@ -73,6 +72,11 @@ export class SessionManagerEventMetadataCreator {
 
 export class SessionManager {
 
+    public static setTestBaseUrl(baseUrl: string): void {
+        SessionManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
+        SessionManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
+    }
+
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
 
@@ -85,11 +89,6 @@ export class SessionManager {
     private _currentSession: Session;
 
     private _gamerServerId: string;
-
-    public static setTestBaseUrl(baseUrl: string): void {
-        SessionManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
-        SessionManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
-    }
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;
@@ -114,65 +113,38 @@ export class SessionManager {
         this._currentSession = session;
     }
 
-    public sendShow(adUnit: AbstractAdUnit): Promise<void> {
-        // todo: this pattern is rather bad and it's used only to allow tests to temporarily pass without having to create a new session for each test
-        if(this._currentSession) {
-            if(this._currentSession.showSent) {
-                return;
-            }
-            this._currentSession.showSent = true;
-        }
-
-        const fulfilled = ([id, infoJson]) => {
-            this._eventManager.operativeEvent('show', id, infoJson.sessionId, this.createShowEventUrl(adUnit), JSON.stringify(infoJson));
-        };
-
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    public getEventManager() {
+        return this._eventManager;
     }
 
-    public sendImpressionEvent(adUnit: AbstractAdUnit): void {
-        if(this._currentSession) {
-            if(this._currentSession.impressionSent) {
-                return;
-            }
-            this._currentSession.impressionSent = true;
-        }
-
-        adUnit.sendImpressionEvent(this._eventManager, this._currentSession.getId(), this._clientInfo.getSdkVersion());
-        adUnit.sendTrackingEvent(this._eventManager, 'creativeView', this._currentSession.getId());
+    public getClientInfo() {
+        return this._clientInfo;
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.startSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.startSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
-            adUnit.sendTrackingEvent(this._eventManager, 'start', infoJson.sessionId);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendProgress(adUnit: AbstractAdUnit, session: Session, position: number, oldPosition: number): void {
-        if (session) {
-            adUnit.sendProgressEvents(this._eventManager, session.getId(), position, oldPosition);
-        }
-    }
-
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.firstQuartileSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.firstQuartileSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
         };
 
@@ -182,12 +154,12 @@ export class SessionManager {
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.midpointSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.midpointSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
 
@@ -197,56 +169,55 @@ export class SessionManager {
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if (this._currentSession.thirdQuartileSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.thirdQuartileSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): void {
+    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.skipSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.skipSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             if(videoProgress) {
                 infoJson.skippedAt = videoProgress;
             }
             this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.viewSent) {
-                return;
+                return Promise.resolve(void(0));
             }
             this._currentSession.viewSent = true;
         }
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
-            adUnit.sendTrackingEvent(this._eventManager, 'complete', infoJson.sessionId);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
-        let campaign = adUnit.getCampaign();
+        const campaign = adUnit.getCampaign();
 
-        const fulfilled = ([id, infoJson]) => {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
@@ -258,31 +229,8 @@ export class SessionManager {
         return Promise.reject('Missing click attribution url');
     }
 
-    public sendMute(adUnit: AbstractAdUnit, session: Session, muted: boolean): void {
-        if (muted) {
-            adUnit.sendTrackingEvent(this._eventManager, 'mute', session.getId());
-        } else {
-            adUnit.sendTrackingEvent(this._eventManager, 'unmute', session.getId());
-        }
-    }
-
-    public sendVideoClickTracking(adUnit: VastAdUnit, session: Session): void {
-        adUnit.sendVideoClickTrackingEvent(this._eventManager, session.getId());
-    }
-
     public setGamerServerId(serverId: string): void {
         this._gamerServerId = serverId;
-    }
-
-    private createShowEventUrl(adUnit: AbstractAdUnit): string {
-        const campaign = adUnit.getCampaign();
-        return [
-            SessionManager.VideoEventBaseUrl,
-            campaign.getGamerId(),
-            'show',
-            campaign.getId(),
-            this._clientInfo.getGameId()
-        ].join('/');
     }
 
     private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {
@@ -299,7 +247,7 @@ export class SessionManager {
 
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
-        let url = [
+        const url = [
             SessionManager.ClickEventBaseUrl,
             campaign.getId(),
             'click',

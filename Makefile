@@ -1,23 +1,24 @@
 # Binaries
-TYPESCRIPT = tsc
-TSLINT = tslint
-REQUIREJS = node_modules/.bin/r.js
-STYLUS = node_modules/.bin/stylus
-BABEL = node_modules/.bin/babel
-
-MOCHA = node_modules/.bin/_mocha
-ISTANBUL = node_modules/.bin/istanbul
-REMAP_ISTANBUL = node_modules/.bin/remap-istanbul
-COVERALLS = node_modules/coveralls/bin/coveralls.js
+BIN = node_modules/.bin
+TYPESCRIPT = $(BIN)/tsc
+TSLINT = $(BIN)/tslint
+STYLUS = $(BIN)/stylus
+BABEL = $(BIN)/babel
+ROLLUP = $(BIN)/rollup
+ISTANBUL = $(BIN)/istanbul
+REMAP_ISTANBUL = $(BIN)/remap-istanbul
+COVERALLS = $(BIN)/coveralls
+CC = java -jar node_modules/google-closure-compiler/compiler.jar
+ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.js
+SYSTEM_JS = node_modules/systemjs/dist/system.src.js
 
 # Sources
 TS_SRC = src/ts
 STYL_SRC = src/styl
 PROD_INDEX_SRC = src/prod-index.html
 TEST_INDEX_SRC = src/test-index.html
-PROD_CONFIG_SRC = src/config.json
+PROD_CONFIG_SRC = src/prod-config.json
 TEST_CONFIG_SRC = src/test-config.json
-TEST_SRC = test
 
 # Branch and commit id
 ifeq ($(TRAVIS), true)
@@ -31,15 +32,33 @@ endif
 # Targets
 BUILD_DIR = build
 
-.PHONY: build-release build-test build-dirs build-ts build-js build-css build-html clean lint test
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
+
+build-browser: BUILD_DIR = build/browser
+build-browser: MODULE = system
+build-browser: TARGET = es5
+build-browser: build-dir build-static build-css build-ts
+	cp src/browser-index.html $(BUILD_DIR)/index.html
+	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
 
 build-dev: BUILD_DIR = build/dev
-build-dev: build-ts build-css build-html
+build-dev: MODULE = system
+build-dev: TARGET = es5
+build-dev: build-dir build-static build-css build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
-	cp src/index.html $(BUILD_DIR)/index.html
+	cp src/dev-index.html $(BUILD_DIR)/index.html
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
+		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
+		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
 
 build-release: BUILD_DIR = build/release
-build-release: clean build-dirs build-ts build-js build-css
+build-release: MODULE = es2015
+build-release: TARGET = es5
+build-release: clean build-dir build-static build-css build-ts build-js
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -54,7 +73,7 @@ build-release: clean build-dirs build-ts build-js build-css
 		var fs=require('fs');\
 		var o={encoding:'utf-8'};\
 		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
-		var j=fs.readFileSync('$(BUILD_DIR)/main.js', o);\
+		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
@@ -62,7 +81,7 @@ build-release: clean build-dirs build-ts build-js build-css
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/main.js
+	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -74,14 +93,7 @@ build-release: clean build-dirs build-ts build-js build-css
 	@echo Computing build details to release config
 	@echo
 
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		c=c.replace('{COMPILED_HASH}', '`cat $(BUILD_DIR)/index.html | openssl dgst -sha256 | sed 's/^.*= //'`');\
-		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
 	@echo
 	@echo Generating commit id based build directory
@@ -90,52 +102,30 @@ build-release: clean build-dirs build-ts build-js build-css
 	mkdir build/$(COMMIT_ID) | true
 	rsync -r build/release build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('build/$(COMMIT_ID)/release/config.json', o);\
-		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
-		fs.writeFileSync('build/$(COMMIT_ID)/release/config.json', c, o);"
 
 build-test: BUILD_DIR = build/test
-build-test: clean build-dirs build-css build-html
-	@echo
-	@echo Transpiling .ts to .js for remote tests
-	@echo
-
-	$(TYPESCRIPT) --project test --module amd --outDir $(BUILD_DIR)
-
+build-test: MODULE = system
+build-test: TARGET = es5
+build-test: clean build-dir build-css build-static build-ts
 	@echo
 	@echo Generating test runner
 	@echo
 
 	cp test-utils/runner.js $(BUILD_DIR)
-	node -e "\
-		var fs = require('fs');\
-		var path = require('path');\
-		var getTestPaths = function(root) {\
-		    var paths = [];\
-            fs.readdirSync(root).forEach(function(file) {\
-                var fullPath = path.join(root, file);\
-                if(fs.statSync(fullPath).isDirectory()) {\
-                    paths = paths.concat(getTestPaths(fullPath));\
-                } else if(fullPath.indexOf('Test.ts') !== -1) {\
-                    paths.push(fullPath.replace('.ts', ''));\
-                }\
-            });\
-            return paths;\
-        };\
-		var testList = JSON.stringify(getTestPaths('test'));\
-        console.log(testList);\
-		var o = {encoding:'utf-8'};\
-		var f = fs.readFileSync('$(BUILD_DIR)/runner.js', o);\
-		fs.writeFileSync('$(BUILD_DIR)/runner.js', f.replace('{TEST_LIST}', testList), o);"
+	BUILD_DIR=$(BUILD_DIR) node test-utils/generate_runner.js
 
 	@echo
 	@echo Copying test index.html to build
 	@echo
 
 	cp $(TEST_INDEX_SRC) $(BUILD_DIR)/index.html
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
+		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
+		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
 
 	@echo
 	@echo Copying vendor libraries to build
@@ -144,20 +134,13 @@ build-test: clean build-dirs build-css build-html
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
 		node_modules/es6-promise/dist/es6-promise.js \
-		node_modules/requirejs/require.js \
+		node_modules/systemjs/dist/system.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
-		node_modules/requirejs-text/text.js \
-		node_modules/xmldom/dom-parser.js \
+		node_modules/systemjs-plugin-text/text.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
-
-	@echo
-	@echo Running through babel for ES3 compatibility
-	@echo
-
-	$(BABEL) $(BUILD_DIR) -d $(BUILD_DIR)
 
 	@echo
 	@echo Copying test config to build
@@ -169,13 +152,7 @@ build-test: clean build-dirs build-css build-html
 	@echo Computing build details to test config
 	@echo
 
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('$(BUILD_DIR)/config.json', o);\
-		c=c.replace('{BRANCH}', '$(BRANCH)');\
-		c=c.replace(/{VERSION}/g, '$(COMMIT_ID)');\
-		fs.writeFileSync('$(BUILD_DIR)/config.json', c, o);"
+	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
 
 	@echo
 	@echo Generating commit id based build directory
@@ -184,12 +161,6 @@ build-test: clean build-dirs build-css build-html
 	mkdir build/$(COMMIT_ID) | true
 	rsync -r build/test build/$(COMMIT_ID)
 	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var c=fs.readFileSync('build/$(COMMIT_ID)/test/config.json', o);\
-		c=c.replace('$(BRANCH)', '$(BRANCH)/$(COMMIT_ID)');\
-		fs.writeFileSync('build/$(COMMIT_ID)/test/config.json', c, o);"
 
 build-dir:
 	@echo
@@ -203,14 +174,15 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-	$(TYPESCRIPT) --rootDir src/ts --outDir $(BUILD_DIR)/js
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
 
 build-js:
 	@echo
 	@echo Bundling .js files
 	@echo
 
-	$(REQUIREJS) -o config/requirejs/release.js baseUrl=$(BUILD_DIR)/js out=$(BUILD_DIR)/main.js
+	$(ROLLUP) -c rollup.js
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
 	@echo
@@ -218,14 +190,17 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -c --inline `find $(STYL_SRC) -name *.styl | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
 
-build-html:
+build-static:
 	@echo
-	@echo Copying templates to build
+	@echo Copying static files to build
 	@echo
 
+	cp -r src/img $(BUILD_DIR)
 	cp -r src/html $(BUILD_DIR)
+	cp -r src/xml $(BUILD_DIR)
+	cp -r src/json $(BUILD_DIR)
 
 clean:
 	@echo
@@ -233,52 +208,79 @@ clean:
 	@echo
 
 	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
-	find $(TEST_SRC) -type f -name *.js -or -name *.map | xargs rm -rf
+	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
 
 lint:
 	@echo
 	@echo Running linter
 	@echo
 
-	$(TSLINT) -c tslint.json `find $(TS_SRC) -name *.ts | xargs`
-	$(TSLINT) -c tslint.json `find test -name *.ts | xargs`
+	$(TSLINT) -c tslint.json `find $(TS_SRC) -name "*.ts" | xargs`
 
-test: clean
+test: test-unit test-integration
+
+test-unit: MODULE = system
+test-unit: TARGET = es5
+test-unit:
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project .
-	$(TYPESCRIPT) --project test
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
 
 	@echo
-	@echo Running local tests
+	@echo Running unit tests
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(MOCHA) --recursive --check-leaks --require test-utils/unhandled_rejection
+	TEST_FILTER=Unit node test-utils/node_runner.js
 
-test-coverage: clean
+test-integration: MODULE = system
+test-integration: TARGET = es5
+test-integration:
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
 
-	$(TYPESCRIPT) --project .
-	$(TYPESCRIPT) --project test
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
 
 	@echo
-	@echo Running local tests with coverage
+	@echo Running integration tests
 	@echo
 
-	NODE_PATH=$(TS_SRC) $(ISTANBUL) cover --root $(TS_SRC) --include-all-sources --dir $(BUILD_DIR)/coverage --report none $(MOCHA) -- --recursive --check-leaks --require test-utils/unhandled_rejection
-	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/report -t html
+	TEST_FILTER=Integration node test-utils/node_runner.js
 
+test-coverage: BUILD_DIR = build/coverage
+test-coverage: MODULE = system
+test-coverage: TARGET = es5
+test-coverage: build-dir
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
+	@echo
+	@echo Running unit tests with coverage
+	@echo
+
+	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Unit node test-utils/node_runner.js
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
+	@cat $(BUILD_DIR)/summary && echo \n
+	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
+
+test-coveralls: BUILD_DIR = build/coverage
 test-coveralls: test-coverage
-	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage/coverage.json -o $(BUILD_DIR)/coverage/lcov.info -t lcovonly
-	cat $(BUILD_DIR)/coverage/lcov.info | $(COVERALLS) --verbose
+	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
+	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
 watch:
-	watchman-make -p 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'test/**/*.ts' -t test
+	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
 setup: clean
-	sudo npm install -g typescript@1.8.10 tslint typings && rm -rf node_modules typings && npm install && typings install
+	rm -rf node_modules && npm install
+
+deploy:
+	rm -rf build/coverage
+	find build/test/* -not -name "config.json" | xargs rm -rf
+	find build/release/* -not -name "config.json" | xargs rm -rf
+	tools/deploy.sh $(BRANCH) && node tools/purge.js

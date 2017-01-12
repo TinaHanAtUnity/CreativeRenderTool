@@ -8,23 +8,22 @@ export class MetaData {
         this._nativeBridge = nativeBridge;
     }
 
-    public get<T>(key: string, deleteValue: boolean): Promise<[boolean, T]> {
-        return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T) => {
+    public get<T>(key: string, deleteValue: boolean): Promise<[boolean, T | null]> {
+        return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T): Promise<[boolean, T | null]> => {
             if(value && deleteValue) {
                 this._nativeBridge.Storage.delete(StorageType.PUBLIC, key);
                 this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }
-
-            return [true, value];
+            return Promise.resolve<[boolean, T]>([true, value]);
         }).catch(([error]) => {
             switch(error) {
                 case StorageError[StorageError.COULDNT_GET_VALUE]:
                     // it is normal that a value is not found
-                    return [false, <T>null];
+                    return Promise.resolve([false, null]);
 
                 case StorageError[StorageError.COULDNT_GET_STORAGE]:
                     // it is normal that public metadata storage might not exist
-                    return [false, <T>null];
+                    return Promise.resolve([false, null]);
 
                 default:
                     throw new Error(error);

@@ -2,32 +2,25 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 import { Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
-import { AdapterMetaData } from 'Models/MetaData//AdapterMetaData';
+import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { MetaData } from 'Utilities/MetaData';
 
 interface IMetaDataCaches {
-    framework: Model;
-    adapter: Model;
-    mediation: Model;
-    player: Model;
+    framework: Model | undefined;
+    adapter: Model | undefined;
+    mediation: Model | undefined;
+    player: Model | undefined;
 }
 
 export class MetaDataManager {
 
-    private static caches: IMetaDataCaches = {
-        framework: undefined,
-        adapter: undefined,
-        mediation: undefined,
-        player: undefined,
-    };
-
     public static getValues(category: string, keys: string[], nativeBridge: NativeBridge) {
-        let metaData: MetaData = new MetaData(nativeBridge);
+        const metaData: MetaData = new MetaData(nativeBridge);
         return metaData.hasCategory(category).then(exists => {
             if(!exists) {
-                return Promise.resolve(undefined);
+                return Promise.resolve([]);
             }
             return Promise.all(keys.map((key) => metaData.get<string>(category + '.' + key, false).then(([found, value]) => {
                 if(found) {
@@ -82,7 +75,7 @@ export class MetaDataManager {
     }
 
     public static createAndCache(category: string, data: string[], cache = true) {
-        if (data === undefined) {
+        if (!data.length) {
             return undefined;
         }
         if(cache && !MetaDataManager.caches[category]) {
@@ -94,7 +87,7 @@ export class MetaDataManager {
         return MetaDataManager.createByCategory(category, data);
     }
 
-    public static createByCategory(category: string, data: string[]): Model {
+    public static createByCategory(category: string, data: string[]): Model | undefined {
         switch(category) {
             case 'framework':
                 return new FrameworkMetaData(data);
@@ -105,7 +98,7 @@ export class MetaDataManager {
             case 'player':
                 return new PlayerMetaData(data);
             default:
-                return null;
+                return undefined;
         }
     }
 
@@ -117,4 +110,12 @@ export class MetaDataManager {
             player: undefined,
         };
     }
+
+    private static caches: IMetaDataCaches = {
+        framework: undefined,
+        adapter: undefined,
+        mediation: undefined,
+        player: undefined,
+    };
+
 }

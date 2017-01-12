@@ -1,11 +1,13 @@
-/* tslint:disable:no-bitwise no-unused-expression */
+import 'es6-promise';
+
+/* tslint:disable:no-unused-expression */
 
 if(!Array.prototype.forEach) {
-    Array.prototype.forEach = function(callback, thisArg) {
+    Array.prototype.forEach = function<T>(this: Array<T>, callback: Function, thisArg: any) {
         if(typeof(callback) !== 'function') {
             throw new TypeError(callback + ' is not a function!');
         }
-        let len = this.length;
+        const len = this.length;
         for(let i = 0; i < len; i++) {
             callback.call(thisArg, this[i], i, this);
         }
@@ -14,19 +16,19 @@ if(!Array.prototype.forEach) {
 
 if(!('classList' in document.documentElement) && Object.defineProperty && typeof HTMLElement !== 'undefined') {
     Object.defineProperty(HTMLElement.prototype, 'classList', {
-        get: function() {
-            let self = this;
+        get: function(this: HTMLElement) {
+            const self = this;
 
             function update(fn: Function) {
                 return function(value: string) {
-                    let classes = self.className.split(/\s+/);
-                    let index = classes.indexOf(value);
+                    const classes = self.className.split(/\s+/);
+                    const index = classes.indexOf(value);
                     fn(classes, index, value);
                     self.className = classes.join(' ');
                 };
             }
 
-            let ret = {
+            const ret = {
                 add: update(function(classes: string[], index: number, value: string) {
                     ~index || classes.push(value);
                 }),
@@ -58,3 +60,5 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
         }
     });
 }
+
+/* tslint:enable:no-unused-expression */

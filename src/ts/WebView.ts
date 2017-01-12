@@ -23,6 +23,15 @@ import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { HtmlCampaign } from 'Models/HtmlCampaign';
+import { Overlay } from 'Views/Overlay';
+import { IosUtils } from 'Utilities/IosUtils';
+import { HttpKafka } from 'Utilities/HttpKafka';
+import { ConfigError } from 'Errors/ConfigError';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 export class WebView {
 
@@ -37,8 +46,9 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _cacheManager: CacheManager;
+    private _adUnit: AdUnit;
 
-    private _adUnit: AbstractAdUnit;
+    private _currentAdUnit: AbstractAdUnit;
     private _campaign: Campaign;
 
     private _sessionManager: SessionManager;
@@ -71,23 +81,25 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
-            Diagnostics.setEventManager(this._eventManager);
-            Diagnostics.setClientInfo(this._clientInfo);
+            HttpKafka.setRequest(this._request);
+            HttpKafka.setClientInfo(this._clientInfo);
 
             return this._deviceInfo.fetch();
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
+                this._adUnit = new AndroidAdUnit(this._nativeBridge, this._deviceInfo);
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
-                let model = this._deviceInfo.getModel();
+                const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
                     document.body.classList.add('iphone');
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
+                this._adUnit = new IosAdUnit(this._nativeBridge, this._deviceInfo);
             }
-            Diagnostics.setDeviceInfo(this._deviceInfo);
+            HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
@@ -111,17 +123,19 @@ export class WebView {
             return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
         }).then((configuration) => {
             this._configuration = configuration;
+            HttpKafka.setConfiguration(this._configuration);
             return this._sessionManager.create();
         }).then(() => {
-            let defaultPlacement = this._configuration.getDefaultPlacement();
+            const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, new VastParser());
-            this._campaignManager.onCampaign.subscribe((campaign) => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe((campaign) => this.onVastCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe((retryLimit) => this.onNoFill(retryLimit));
-            this._campaignManager.onError.subscribe((error) => this.onCampaignError(error));
+            this._campaignManager.onCampaign.subscribe(campaign => this.onCampaign(campaign));
+            this._campaignManager.onVastCampaign.subscribe(campaign => this.onVastCampaign(campaign));
+            this._campaignManager.onThirdPartyCampaign.subscribe(campaign => this.onThirdPartyCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill(retryLimit));
+            this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
             this._refillTimestamp = 0;
             this._campaignTimeout = 0;
             return this._campaignManager.request();
@@ -130,8 +144,11 @@ export class WebView {
 
             return this._eventManager.sendUnsentSessions();
         }).catch(error => {
-            if(error instanceof Error) {
-                error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+            if(error instanceof ConfigError) {
+                error = { 'message': error.message, 'name': error.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error) {
+                error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
                 if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
@@ -157,7 +174,7 @@ export class WebView {
             return;
         }
 
-        let placement: Placement = this._configuration.getPlacement(placementId);
+        const placement: Placement = this._configuration.getPlacement(placementId);
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
@@ -173,7 +190,7 @@ export class WebView {
             this.showError(true, placementId, 'Campaign has expired');
             this.onCampaignExpired();
 
-            let error = new DiagnosticError(new Error('Campaign expired'), {
+            const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: this._campaign.getId(),
                 appStoreId: this._campaign.getAppStoreId(),
                 timeoutInSeconds: this._campaign.getTimeoutInSeconds()
@@ -185,12 +202,6 @@ export class WebView {
             });
 
             return;
-        }
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS && !this._campaign.getBypassAppSheet()) {
-            this._nativeBridge.AppSheet.prepare({
-                id: parseInt(this._campaign.getAppStoreId(), 10)
-            });
         }
 
         this._showing = true;
@@ -208,16 +219,30 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._sessionManager, placement, this._campaign, this._configuration);
-            this._adUnit.setNativeOptions(options);
-            this._adUnit.onNewAdRequestAllowed.subscribe(() => this.onNewAdRequestAllowed());
-            this._adUnit.onClose.subscribe(() => this.onClose());
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._adUnit, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
+            this._currentAdUnit.onClose.subscribe(() => this.onClose());
 
-            this._adUnit.show().then(() => {
-                this._sessionManager.sendShow(this._adUnit);
-            });
+            if (this._nativeBridge.getPlatform() === Platform.IOS && !(this._campaign instanceof VastCampaign)) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
+                    const appSheetOptions = {
+                        id: parseInt(this._campaign.getAppStoreId(), 10)
+                    };
+                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
+                        });
+                        this._currentAdUnit.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                        });
+                    });
+                }
+            }
 
-            this._campaign = null;
+            this._currentAdUnit.show();
+
+            delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
             this._campaignTimeout = 0;
@@ -234,10 +259,10 @@ export class WebView {
     }
 
     private setPlacementStates(placementState: PlacementState): void {
-        let placements: { [id: string]: Placement } = this._configuration.getPlacements();
-        for(let placementId in placements) {
+        const placements: { [id: string]: Placement } = this._configuration.getPlacements();
+        for(const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
-                let placement: Placement = placements[placementId];
+                const placement: Placement = placements[placementId];
                 this._nativeBridge.Placement.setPlacementState(placement.getId(), placementState);
                 if(placementState === PlacementState.READY) {
                     this._nativeBridge.Listener.sendReadyEvent(placement.getId());
@@ -255,9 +280,9 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode = this._configuration.getCacheMode();
+        const cacheMode = this._configuration.getCacheMode();
 
-        let cacheAsset = (url: string, failAllowed: boolean) => {
+        const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
@@ -271,7 +296,7 @@ export class WebView {
             });
         };
 
-        let cacheAssets = (failAllowed: boolean) => {
+        const cacheAssets = (failAllowed: boolean) => {
             return cacheAsset(campaign.getVideoUrl(), failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
@@ -287,15 +312,15 @@ export class WebView {
             });
         };
 
-        let sendReady = () => {
+        const sendReady = () => {
             this.setPlacementStates(PlacementState.READY);
         };
 
         if(cacheMode === CacheMode.FORCED) {
             cacheAssets(false).then(() => {
                 if(this._showing) {
-                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
                     });
                 } else {
@@ -308,8 +333,8 @@ export class WebView {
         } else if(cacheMode === CacheMode.ALLOWED) {
             cacheAssets(true);
             if(this._showing) {
-                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -317,8 +342,8 @@ export class WebView {
             }
         } else {
             if(this._showing) {
-                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -332,24 +357,21 @@ export class WebView {
         this._refillTimestamp = 0;
         this.setCampaignTimeout(campaign.getTimeoutInSeconds());
 
-        let cacheMode = this._configuration.getCacheMode();
-
-        let cacheAsset = (url: string) => {
+        const cacheAsset = (url: string, failAllowed: boolean) => {
             return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
                 if(status === CacheStatus.OK) {
                     return this._cacheManager.getFileUrl(fileId);
                 }
                 throw status;
             }).catch(error => {
-                if(error !== CacheStatus.STOPPED) {
+                if(failAllowed === true && error === CacheStatus.FAILED) {
                     return url;
                 }
                 throw error;
             });
         };
 
-        let cacheAssets = () => {
-            let videoUrl = campaign.getVideoUrl();
+        const getVideoUrl = (videoUrl: string) => {
             // todo: this is a temporary hack to follow video url 302 redirects until we get the real video location
             // todo: remove this when CacheManager is refactored to support redirects
             return this._request.head(videoUrl, [], {
@@ -358,50 +380,133 @@ export class WebView {
                 followRedirects: true,
                 retryWithConnectionEvents: false
             }).then(response => {
-                let locationUrl = response.url || videoUrl;
-                cacheAsset(locationUrl).then(fileUrl => {
-                    campaign.setVideoUrl(fileUrl);
-                    campaign.setVideoCached(true);
-                }).catch(error => {
-                    if(error === CacheStatus.STOPPED) {
-                        this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                if(response.url) {
+                    if(this._nativeBridge.getPlatform() === Platform.IOS && !response.url.match(/^https:\/\//)) {
+                        throw new Error('Non https VAST video url after redirects');
                     }
-                });
-            }).catch(error => {
-                this._nativeBridge.Sdk.logError('Caching failed to get VAST video URL location: ' + error);
+                    return response.url;
+                }
+                throw new Error('Invalid VAST video url after redirects');
             });
         };
 
-        let sendReady = () => {
+        const cacheAssets = (videoUrl: string, failAllowed: boolean) => {
+            return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
+                campaign.setVideoUrl(fileUrl);
+                campaign.setVideoCached(true);
+            })
+            .then(() => cacheAsset(campaign.getLandscapeUrl(), failAllowed))
+            .then(fileUrl => campaign.setLandscapeUrl(fileUrl))
+            .then(() => cacheAsset(campaign.getPortraitUrl(), failAllowed))
+            .then(fileUrl => campaign.setPortraitUrl(fileUrl))
+            .catch(error => {
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
+                }
+            });
+        };
+
+        const sendReady = () => {
             this.setPlacementStates(PlacementState.READY);
         };
 
-        if(cacheMode === CacheMode.FORCED) {
-            cacheAssets().then(() => {
-                if(this._showing) {
-                    let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+        getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
+            cacheAssets(videoUrl, false).then(() => {
+                if (this._showing) {
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
                     });
                 } else {
                     sendReady();
                 }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
+            });
+        }).catch(() => {
+            const message = 'Caching failed to get VAST video URL location';
+            const error = new DiagnosticError(new Error(message), {
+                url: campaign.getVideoUrl()
+            });
+            Diagnostics.trigger({
+                'type': 'cache_error',
+                'error': error
+            });
+            this._nativeBridge.Sdk.logError(message);
+            this.onNoFill(3600);
+        });
+    }
+
+    private onThirdPartyCampaign(campaign: HtmlCampaign): void {
+        this._campaign = campaign;
+        this._refillTimestamp = 0;
+        this.setCampaignTimeout(campaign.getTimeoutInSeconds());
+
+        const cacheMode = this._configuration.getCacheMode();
+
+        const cacheAsset = (url: string, failAllowed: boolean) => {
+            return this._cacheManager.cache(url, { retries: 5 }).then(([status, fileId]) => {
+                if(status === CacheStatus.OK) {
+                    return this._cacheManager.getFileUrl(fileId);
+                }
+                throw status;
+            }).catch(error => {
+                if(failAllowed === true && error === CacheStatus.FAILED) {
+                    return url;
+                }
+                throw error;
+            });
+        };
+
+        const cacheAssets = (failAllowed: boolean) => {
+            const resourceUrl = campaign.getResourceUrl();
+            return cacheAsset(resourceUrl, failAllowed).then(fileUrl => {
+                campaign.setResourceUrl(fileUrl);
+                campaign.setVideoCached(true);
+            }).catch(error => {
+                if(error === CacheStatus.STOPPED) {
+                    this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
+                } else if(!failAllowed && error === CacheStatus.FAILED) {
+                    throw error;
+                }
+            });
+        };
+
+        const sendReady = () => {
+            this.setPlacementStates(PlacementState.READY);
+        };
+
+        if(cacheMode === CacheMode.FORCED) {
+            cacheAssets(false).then(() => {
+                if(this._showing) {
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                        sendReady();
+                    });
+                } else {
+                    sendReady();
+                }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logError('Caching failed when cache mode is forced, setting no fill');
+                this.onNoFill(3600);
             });
         } else if(cacheMode === CacheMode.ALLOWED) {
+            cacheAssets(true);
             if(this._showing) {
-                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
-                    cacheAssets();
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
-                cacheAssets();
                 sendReady();
             }
         } else {
             if(this._showing) {
-                let onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -433,19 +538,21 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
-            error = {'message': error.message, 'name': error.name, 'stack': error.stack};
+        if(error instanceof Error) {
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
+
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger({
             'type': 'campaign_request_failed',
             'error': error
         });
+
         this.onNoFill(3600); // todo: on errors, retry again in an hour
     }
 
     private onNewAdRequestAllowed(): void {
-        if(this._mustRefill) {
+        if(this._mustRefill && !this._mustReinitialize) {
             this._mustRefill = false;
             this._campaignManager.request();
         }
@@ -552,7 +659,7 @@ export class WebView {
         }
         return this.getConfigJson().then(response => {
             this._configJsonCheckedAt = Date.now();
-            let configJson = JsonParser.parse(response.response);
+            const configJson = JsonParser.parse(response.response);
             return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {
             return false;
@@ -564,7 +671,7 @@ export class WebView {
      */
 
     private setupTestEnvironment(): void {
-        let metaData: MetaData = new MetaData(this._nativeBridge);
+        const metaData: MetaData = new MetaData(this._nativeBridge);
 
         metaData.get<string>('test.serverUrl', true).then(([found, url]) => {
             if(found && url) {
@@ -576,7 +683,43 @@ export class WebView {
 
         metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
             if(found && url) {
-                Diagnostics.setTestBaseUrl(url);
+                HttpKafka.setTestBaseUrl(url);
+            }
+        });
+
+        metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
+            if(found && typeof abGroup === 'number') {
+                CampaignManager.setAbGroup(abGroup);
+            }
+        });
+
+        metaData.get<string>('test.campaignId', true).then(([found, campaignId]) => {
+            if(found && typeof campaignId === 'string') {
+                CampaignManager.setCampaignId(campaignId);
+            }
+        });
+
+        metaData.get<string>('test.country', true).then(([found, country]) => {
+            if(found && typeof country === 'string') {
+                CampaignManager.setCountry(country);
+            }
+        });
+
+        metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
+            if(found && autoSkip !== null) {
+                Overlay.setAutoSkip(autoSkip);
+            }
+        });
+
+        metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
+            if(found && autoClose) {
+                AbstractAdUnit.setAutoClose(autoClose);
+            }
+        });
+
+        metaData.get<number>('test.autoCloseDelay', false).then(([found, autoCloseDelay]) => {
+            if(found && typeof autoCloseDelay === 'number') {
+                AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
             }
         });
     }

@@ -16,8 +16,9 @@ interface IWebKit {
     messageHandlers: IMessageHandlers;
 }
 
-/* tslint:disable:interface-name */
+// tslint:disable:interface-name
 interface Window {
     webviewbridge: IWebViewBridge;
     webkit: IWebKit;
 }
+// tslint:enable:interface-name

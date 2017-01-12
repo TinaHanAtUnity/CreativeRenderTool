@@ -1,24 +1,27 @@
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
 export class VastAd {
 
-    private _id: string;
+    private _id: string | undefined;
     private _creatives: VastCreative[];
+    private _companionAds: VastCreativeCompanionAd[];
     private _errorURLTemplates: string[];
     private _impressionURLTemplates: string[];
     private _wrapperURLs: string[];
 
     constructor();
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[]) {
-        this._id = id;
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
+        this._id = id || undefined;
         this._creatives = creatives || [];
+        this._companionAds = companionAds || [];
         this._errorURLTemplates = errorURLTemplates || [];
         this._impressionURLTemplates = impressionURLTemplates || [];
         this._wrapperURLs = wrapperURLs || [];
     }
 
-    public getId(): string {
+    public getId(): string | undefined {
         return this._id;
     }
 
@@ -30,7 +33,7 @@ export class VastAd {
         return this._creatives;
     }
 
-    public getCreative(): VastCreative {
+    public getCreative(): VastCreative | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
         }
@@ -39,6 +42,14 @@ export class VastAd {
 
     public addCreative(creative: VastCreative) {
         this._creatives.push(creative);
+    }
+
+    public getCompanionAds(): VastCreativeCompanionAd[] {
+        return this._companionAds;
+    }
+
+    public addCompanionAd(companionAd: VastCreativeCompanionAd) {
+        this._companionAds.push(companionAd);
     }
 
     public getErrorURLTemplates(): string[] {
@@ -66,7 +77,7 @@ export class VastAd {
     }
 
     public getTrackingEventUrls(eventName: string) {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative) {
             if (creative.getTrackingEvents()) {
                 return creative.getTrackingEvents()[eventName];
@@ -75,8 +86,8 @@ export class VastAd {
         return null;
     }
 
-    public getDuration(): number {
-        let creative = this.getCreative();
+    public getDuration(): number | null {
+        const creative = this.getCreative();
         if (creative) {
             return creative.getDuration();
         } else {
@@ -84,8 +95,8 @@ export class VastAd {
         }
     }
 
-    public getVideoClickThroughURLTemplate(): string {
-        let creative = this.getCreative();
+    public getVideoClickThroughURLTemplate(): string | null {
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickThroughURLTemplate();
         }
@@ -93,15 +104,15 @@ export class VastAd {
     }
 
     public getVideoClickTrackingURLTemplates(): string[] {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             return creative.getVideoClickTrackingURLTemplates();
         }
-        return null;
+        return [];
     }
 
     public addVideoClickTrackingURLTemplate(videoClickTrackingURL: string) {
-        let creative = this.getCreative();
+        const creative = this.getCreative();
         if (creative instanceof VastCreativeLinear) {
             creative.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
         }
