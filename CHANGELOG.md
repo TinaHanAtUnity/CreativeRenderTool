@@ -1,3 +1,13 @@
+# Thu Jan 12 15:41:06 UTC 2017
+
+* Improved layout for large tablets A/B test
+* Add optional delay for autoclosing ad units
+* Improve deployment scripts
+
+# Wed Jan 11 12:55:17 UTC 2017
+
+* Refactor AdUnit API handling from different ad units to a common utility class
+
 # Tue Jan 10 12:20:51 UTC 2017
 
 * Hide overlay header bar if skip disabled
