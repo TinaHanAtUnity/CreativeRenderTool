@@ -37,6 +37,7 @@ import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
+import { WebViewError } from 'Errors/WebViewError';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -312,7 +313,7 @@ describe('CampaignManager', () => {
         const verify = () => {
             // then the onError observable is triggered with an appropriate error
             mockRequest.verify();
-            if (triggeredError instanceof Error) {
+            if (triggeredError instanceof WebViewError) {
                 assert.equal(triggeredError.message, expectedErrorMessage);
             } else {
                 assert.equal(triggeredError, expectedErrorMessage);
@@ -594,7 +595,7 @@ describe('CampaignManager', () => {
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                 'http://customTrackingUrl/start',
                 'http://customTrackingUrl/start2',
-                'http://customTrackingUrl/start3'
+                "http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%"
             ]);
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
                 'http://customTrackingUrl/firstQuartile'

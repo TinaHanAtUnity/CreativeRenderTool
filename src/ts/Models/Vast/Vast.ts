@@ -118,6 +118,82 @@ export class Vast {
         return null;
     }
 
+    public getCompanionLandscapeUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionPortraitUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                        return companionAd.getStaticResourceURL();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionClickThroughUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (let i = 0; i < companionAds.length; i++) {
+                    const companionAd = companionAds[i];
+                    const url = companionAd.getCompanionClickThroughURLTemplate();
+                    const height = companionAd.getHeight();
+                    const width = companionAd.getWidth();
+                    const creativeType = companionAd.getCreativeType();
+                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
+                    if (url && validCompanion) {
+                        return url;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
+        const minHeight = 320;
+        const minWidth = 480;
+        return this.isValidCompanionCreativeType(creativeType) && (height < width) && (height >= minHeight) && (width >= minWidth);
+    }
+
+    private isValidPortraitCompanion(creativeType: string | null, height: number, width: number): boolean {
+        const minHeight = 480;
+        const minWidth = 320;
+        return this.isValidCompanionCreativeType(creativeType) && (height > width) && (height >= minHeight) && (width >= minWidth);
+    }
+
+    private isValidCompanionCreativeType(creativeType: string | null): boolean {
+        const reg = new RegExp('(jpe?g|gif|png)', 'gi');
+        return !!creativeType && reg.test(creativeType);
+    }
+
     private isPlayableMIMEType(MIMEType: string): boolean {
         const playableMIMEType = 'video/mp4';
         MIMEType = MIMEType.toLowerCase();

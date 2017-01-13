@@ -3,16 +3,10 @@ import { ThirdParty } from 'Views/ThirdParty';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
-import { Platform } from 'Constants/Platform';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Constants/Android/KeyCode';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { FinishState } from 'Constants/FinishState';
-import { AndroidAdUnitError } from 'Native/Api/AndroidAdUnit';
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
-import { IObserver2 } from 'Utilities/IObserver';
+import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
@@ -20,14 +14,13 @@ export class HtmlAdUnit extends AbstractAdUnit {
     private _thirdParty: ThirdParty;
     private _isShowing: boolean;
     private _options: any;
-    private _activityId: number;
     private _finishState: FinishState;
 
-    private _onPauseObserver: IObserver2<boolean, number>;
-    private _onDestroyObserver: IObserver2<boolean, number>;
+    private _onShowObserver: IObserver0;
+    private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
-        super(nativeBridge, placement, campaign);
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, sessionManager: SessionManager, placement: Placement, campaign: Campaign, thirdParty: ThirdParty, options: any) {
+        super(nativeBridge, adUnit, placement, campaign);
         this._sessionManager = sessionManager;
         this._thirdParty = thirdParty;
         this._isShowing = false;
@@ -41,53 +34,19 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._sessionManager.sendStart(this);
-        const platform = this._nativeBridge.getPlatform();
-        if(platform === Platform.ANDROID) {
-            let orientation: ScreenOrientation = this._options.requestedOrientation;
-            if(!this._placement.useDeviceOrientationForVideo()) {
-                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-            }
 
-            const keyEvents: KeyCode[] = [KeyCode.BACK];
-            const hardwareAccel: boolean = true;
+        this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
+        this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
 
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
-
-            this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
-            this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
-
-            this._activityId = AndroidVideoAdUnitController.ActivityId++;
-            return this._nativeBridge.AndroidAdUnit.open(this._activityId, ['webview'], orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel).then(() => {
-                if(AbstractAdUnit.getAutoClose()) {
-                    this.hide();
-                }
-            });
-        } else if(platform === Platform.IOS) {
-            let orientation: UIInterfaceOrientationMask = this._options.supportedOrientations;
-            if(!this._placement.useDeviceOrientationForVideo()) {
-                if((orientation & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
-                } else if((orientation & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
-                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
-                } else if((orientation & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
-                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
-                }
-            }
-
-            this._nativeBridge.Sdk.logInfo('Opening game ad with orientation ' + orientation);
-
-            return this._nativeBridge.IosAdUnit.open(['webview'], orientation, true, true).then(() => {
-                if(AbstractAdUnit.getAutoClose()) {
-                    this.hide();
-                }
-            });
-        }
-
-        return Promise.resolve(void(0));
+        return this._adUnit.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
     }
 
     public hide(): Promise<void> {
         this._isShowing = false;
+
+        this._adUnit.onShow.unsubscribe(this._onShowObserver);
+        this._adUnit.onSystemKill.unsubscribe(this._onSystemKillObserver);
+
         this._thirdParty.hide();
 
         this._sessionManager.sendThirdQuartile(this);
@@ -95,49 +54,38 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
         this.onFinish.trigger();
         this.onClose.trigger();
-        this._thirdParty.container().parentElement.removeChild(this._thirdParty.container());
+        this._thirdParty.container().parentElement!.removeChild(this._thirdParty.container());
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this._finishState);
 
-        const platform = this._nativeBridge.getPlatform();
-        if(platform === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.onPause.unsubscribe(this._onPauseObserver);
-            this._nativeBridge.AndroidAdUnit.onDestroy.unsubscribe(this._onDestroyObserver);
-
-            return this._nativeBridge.AndroidAdUnit.close().catch(error => {
-                // activity might be null here if we are coming from onDestroy observer so just cleanly ignore the error
-                if(error !== AndroidAdUnitError[AndroidAdUnitError.ACTIVITY_NULL]) {
-                    throw new Error(error);
-                }
-            });
-        } else if(platform === Platform.IOS) {
-            return this._nativeBridge.IosAdUnit.close();
-        }
-
-        return Promise.resolve(void(0));
+        return this._adUnit.close();
     }
 
     public isShowing(): boolean {
         return this._isShowing;
     }
 
+    public description(): string {
+        return 'playable';
+    }
+
+    private onShow() {
+        if(AbstractAdUnit.getAutoClose()) {
+            setTimeout(() => {
+                this.hide();
+            }, AbstractAdUnit.getAutoCloseDelay());
+        }
+    }
+
+    private onSystemKill() {
+        if(this._isShowing) {
+            this._finishState = FinishState.SKIPPED;
+            this.hide();
+        }
+    }
+
     private unsetReferences() {
         delete this._thirdParty;
     }
-
-    private onPause(finishing: boolean, activityId: number): void {
-        if(finishing && this._isShowing && activityId === this._activityId) {
-            this._finishState = FinishState.SKIPPED;
-            this.hide();
-        }
-    }
-
-    private onDestroy(finishing: boolean, activityId: number): void {
-        if(this._isShowing && finishing && activityId === this._activityId) {
-            this._finishState = FinishState.SKIPPED;
-            this.hide();
-        }
-    }
-
 }

@@ -69,6 +69,9 @@ body.android
     position: absolute
     top: 0
     bottom: 47%
+    &.brand
+      background-size: contain
+      bottom: 0
 
   .end-screen-info-background
     position: absolute
@@ -225,6 +228,8 @@ body.android
     .game-background
       width: 53%
       bottom: 0
+      &.brand
+        width: 100%
 
     .end-screen-info-background
       width: 47%
@@ -243,5 +248,7 @@ body.android
 @import "fresh-base-size.styl"
 @import "fresh-responsive.styl"
 @import "overlay.styl"
+@import "video-overlay.styl"
 @import "icons.styl"
 @import "third-party.styl"
+@import "tabletrev.styl"

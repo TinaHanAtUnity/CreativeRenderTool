@@ -11,8 +11,8 @@ export class VastVideoEventHandlers {
             sessionManager.getSession().impressionSent = true;
         }
         adUnit.sendImpressionEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
-        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'creativeView', sessionManager.getSession().getId());
-        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'start', sessionManager.getSession().getId());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'creativeView', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'start', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
     }
 
     public static onVideoCompleted(sessionManager: SessionManager, adUnit: VastAdUnit) {
@@ -22,8 +22,22 @@ export class VastVideoEventHandlers {
             }
             sessionManager.getSession().vastCompleteSent = true;
         }
-        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId());
+        adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'complete', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
 
-        adUnit.hide();
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        } else {
+            adUnit.hide();
+        }
+    }
+
+    public static onVideoError(adUnit: VastAdUnit) {
+        const endScreen = adUnit.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        } else {
+            adUnit.hide();
+        }
     }
 }

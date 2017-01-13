@@ -184,7 +184,7 @@ export class Request {
             }, nativeRequest.options.retryDelay);
         } else {
             if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error(errorMessage), nativeRequest, nativeResponse));
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
             }
         }
     }
@@ -218,11 +218,11 @@ export class Request {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
         } else if(Request._errorResponseCodes.exec(responseCode.toString())) {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_ERROR_RESPONSE'), nativeRequest, nativeResponse));
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
         } else if(Request._retryResponseCodes.exec(responseCode.toString())) {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError(new Error('FAILED_WITH_UNKNOWN_RESPONSE_CODE'), nativeRequest, nativeResponse));
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
         }
     }
 

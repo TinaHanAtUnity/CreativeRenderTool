@@ -7,8 +7,8 @@ import { Overlay } from 'Views/Overlay';
 import { Localization } from 'Utilities/Localization';
 
 describe('Overlay', () => {
-    let handleInvocation: Sinon.SinonSpy;
-    let handleCallback: Sinon.SinonSpy;
+    let handleInvocation: sinon.SinonSpy;
+    let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {

@@ -1,23 +1,12 @@
 import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class Overlay extends View {
-
-    public static setAutoSkip(value: boolean) {
-        Overlay.AutoSkip = value;
-    }
-
-    private static AutoSkip: boolean = false;
-
-    public onSkip: Observable1<number> = new Observable1();
-    public onMute: Observable1<boolean> = new Observable1();
-    public onCallButton: Observable1<boolean> = new Observable1();
+export class Overlay extends AbstractVideoOverlay {
 
     private _localization: Localization;
 
@@ -47,6 +36,7 @@ export class Overlay extends View {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _headerElement: HTMLElement;
 
     private _fadeTimer: any;
 
@@ -95,6 +85,7 @@ export class Overlay extends View {
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._headerElement = <HTMLElement>this.container().querySelector('.header');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -113,6 +104,7 @@ export class Overlay extends View {
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -134,7 +126,7 @@ export class Overlay extends View {
     }
 
     public setVideoProgress(value: number): void {
-        if(Overlay.AutoSkip) {
+        if(AbstractVideoOverlay.AutoSkip) {
             this.onSkip.trigger(value);
         }
 
@@ -187,6 +179,7 @@ export class Overlay extends View {
     public setCallButtonVisible(value: boolean) {
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
+            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 

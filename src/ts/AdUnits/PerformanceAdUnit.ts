@@ -2,26 +2,27 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { EndScreen } from 'Views/EndScreen';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen: EndScreen) {
-        super(nativeBridge, videoAdUnitController);
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen: EndScreen) {
+        super(nativeBridge, adUnit, videoAdUnitController);
 
         this._endScreen = endScreen;
     }
 
     public show(): Promise<void> {
-        return this._videoAdUnitController.show();
+        return this._videoAdUnitController.show(this);
     }
 
     public hide(): Promise<void> {
         const endScreen = this.getEndScreen();
         if (endScreen) {
             endScreen.hide();
-            endScreen.container().parentElement.removeChild(endScreen.container());
+            endScreen.container().parentElement!.removeChild(endScreen.container());
         }
         this.unsetReferences();
         return this._videoAdUnitController.hide();
@@ -29,6 +30,10 @@ export class PerformanceAdUnit extends VideoAdUnit {
 
     public isShowing(): boolean {
         return this._videoAdUnitController.isShowing();
+    }
+
+    public description(): string {
+        return 'performance';
     }
 
     public getEndScreen(): EndScreen | undefined {

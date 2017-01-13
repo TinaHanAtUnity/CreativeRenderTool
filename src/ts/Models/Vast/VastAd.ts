@@ -1,18 +1,21 @@
 import { VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
 export class VastAd {
 
     private _id: string | undefined;
     private _creatives: VastCreative[];
+    private _companionAds: VastCreativeCompanionAd[];
     private _errorURLTemplates: string[];
     private _impressionURLTemplates: string[];
     private _wrapperURLs: string[];
 
     constructor();
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[]) {
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         this._id = id || undefined;
         this._creatives = creatives || [];
+        this._companionAds = companionAds || [];
         this._errorURLTemplates = errorURLTemplates || [];
         this._impressionURLTemplates = impressionURLTemplates || [];
         this._wrapperURLs = wrapperURLs || [];
@@ -39,6 +42,14 @@ export class VastAd {
 
     public addCreative(creative: VastCreative) {
         this._creatives.push(creative);
+    }
+
+    public getCompanionAds(): VastCreativeCompanionAd[] {
+        return this._companionAds;
+    }
+
+    public addCompanionAd(companionAd: VastCreativeCompanionAd) {
+        this._companionAds.push(companionAd);
     }
 
     public getErrorURLTemplates(): string[] {

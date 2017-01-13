@@ -29,6 +29,9 @@ import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 export class WebView {
 
@@ -43,8 +46,9 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _cacheManager: CacheManager;
+    private _adUnit: AdUnit;
 
-    private _adUnit: AbstractAdUnit;
+    private _currentAdUnit: AbstractAdUnit;
     private _campaign: Campaign;
 
     private _sessionManager: SessionManager;
@@ -85,6 +89,7 @@ export class WebView {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
+                this._adUnit = new AndroidAdUnit(this._nativeBridge, this._deviceInfo);
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -92,6 +97,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
+                this._adUnit = new IosAdUnit(this._nativeBridge, this._deviceInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
@@ -213,9 +219,9 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._adUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
-            this._adUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
-            this._adUnit.onClose.subscribe(() => this.onClose());
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._adUnit, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
+            this._currentAdUnit.onClose.subscribe(() => this.onClose());
 
             if (this._nativeBridge.getPlatform() === Platform.IOS && !(this._campaign instanceof VastCampaign)) {
                 if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
@@ -226,7 +232,7 @@ export class WebView {
                         const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.prepare(appSheetOptions);
                         });
-                        this._adUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
                             this._nativeBridge.AppSheet.destroy(appSheetOptions);
                         });
@@ -234,7 +240,7 @@ export class WebView {
                 }
             }
 
-            this._adUnit.show();
+            this._currentAdUnit.show();
 
             delete this._campaign;
             this.setPlacementStates(PlacementState.WAITING);
@@ -313,8 +319,8 @@ export class WebView {
         if(cacheMode === CacheMode.FORCED) {
             cacheAssets(false).then(() => {
                 if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
                     });
                 } else {
@@ -327,8 +333,8 @@ export class WebView {
         } else if(cacheMode === CacheMode.ALLOWED) {
             cacheAssets(true);
             if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -336,8 +342,8 @@ export class WebView {
             }
         } else {
             if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -388,7 +394,12 @@ export class WebView {
             return cacheAsset(videoUrl, failAllowed).then(fileUrl => {
                 campaign.setVideoUrl(fileUrl);
                 campaign.setVideoCached(true);
-            }).catch(error => {
+            })
+            .then(() => cacheAsset(campaign.getLandscapeUrl(), failAllowed))
+            .then(fileUrl => campaign.setLandscapeUrl(fileUrl))
+            .then(() => cacheAsset(campaign.getPortraitUrl(), failAllowed))
+            .then(fileUrl => campaign.setPortraitUrl(fileUrl))
+            .catch(error => {
                 if(error === CacheStatus.STOPPED) {
                     this._nativeBridge.Sdk.logInfo('Caching was stopped, using streaming instead');
                 } else if(!failAllowed && error === CacheStatus.FAILED) {
@@ -404,8 +415,8 @@ export class WebView {
         getVideoUrl(campaign.getVideoUrl()).then((videoUrl: string) => {
             cacheAssets(videoUrl, false).then(() => {
                 if (this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
                     });
                 } else {
@@ -471,8 +482,8 @@ export class WebView {
         if(cacheMode === CacheMode.FORCED) {
             cacheAssets(false).then(() => {
                 if(this._showing) {
-                    const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                        this._adUnit.onClose.unsubscribe(onCloseObserver);
+                    const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                        this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                         sendReady();
                     });
                 } else {
@@ -485,8 +496,8 @@ export class WebView {
         } else if(cacheMode === CacheMode.ALLOWED) {
             cacheAssets(true);
             if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -494,8 +505,8 @@ export class WebView {
             }
         } else {
             if(this._showing) {
-                const onCloseObserver = this._adUnit.onClose.subscribe(() => {
-                    this._adUnit.onClose.unsubscribe(onCloseObserver);
+                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     sendReady();
                 });
             } else {
@@ -527,7 +538,7 @@ export class WebView {
     }
 
     private onCampaignError(error: any) {
-        if(error instanceof Error && !(error instanceof DiagnosticError)) {
+        if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
@@ -682,6 +693,18 @@ export class WebView {
             }
         });
 
+        metaData.get<string>('test.campaignId', true).then(([found, campaignId]) => {
+            if(found && typeof campaignId === 'string') {
+                CampaignManager.setCampaignId(campaignId);
+            }
+        });
+
+        metaData.get<string>('test.country', true).then(([found, country]) => {
+            if(found && typeof country === 'string') {
+                CampaignManager.setCountry(country);
+            }
+        });
+
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
                 Overlay.setAutoSkip(autoSkip);
@@ -691,6 +714,12 @@ export class WebView {
         metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
             if(found && autoClose) {
                 AbstractAdUnit.setAutoClose(autoClose);
+            }
+        });
+
+        metaData.get<number>('test.autoCloseDelay', false).then(([found, autoCloseDelay]) => {
+            if(found && typeof autoCloseDelay === 'number') {
+                AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
             }
         });
     }
