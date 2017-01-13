@@ -32,10 +32,15 @@ export class CampaignManager {
         CampaignManager.Country = country;
     }
 
+    public static setCampaignResponse(campaignResponse: string) {
+        CampaignManager.CampaignResponse = campaignResponse;
+    }
+
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
+    private static CampaignResponse: string | undefined;
 
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
@@ -74,7 +79,7 @@ export class CampaignManager {
     }
 
     private parseCampaign(response: INativeResponse) {
-        const json: any = JsonParser.parse(response.response);
+        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
         }
