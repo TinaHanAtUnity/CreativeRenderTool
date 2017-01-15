@@ -142,7 +142,9 @@ export class WebView {
         }).then(() => {
             this._initialized = true;
 
-            return this._eventManager.sendUnsentSessions();
+            // EMERGENCY HACK 15th Jan 2017: DISABLE SENDING UNSENT EVENTS
+            // return this._eventManager.sendUnsentSessions();
+            return Promise.resolve([]);
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -593,7 +595,8 @@ export class WebView {
                     }
                 } else {
                     this.checkCampaignStatus();
-                    this._eventManager.sendUnsentSessions();
+                    // EMERGENCY HACK 15th Jan 2017: DISABLE SENDING UNSENT EVENTS
+                    // this._eventManager.sendUnsentSessions();
                 }
             });
         }
