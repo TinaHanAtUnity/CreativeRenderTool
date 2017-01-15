@@ -60,12 +60,21 @@ export class CampaignManager {
     public request(): Promise<void> {
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            // EMERGENCY HACK 15th Jan 2017: DISABLE ALL RETRIES IN CAMPAIGN REQUESTS
             return this._request.post(requestUrl, requestBody, [], {
-                retries: 5,
-                retryDelay: 5000,
+                retries: 0,
+                retryDelay: 0,
                 followRedirects: false,
-                retryWithConnectionEvents: true
+                retryWithConnectionEvents: false
             });
+            /*
+             return this._request.post(requestUrl, requestBody, [], {
+                 retries: 5,
+                 retryDelay: 5000,
+                 followRedirects: false,
+                 retryWithConnectionEvents: true
+             });
+             */
         }).then(response => {
             return this.parseCampaign(response);
         }).catch((error) => {

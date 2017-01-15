@@ -518,7 +518,9 @@ export class WebView {
     }
 
     private onNoFill(retryTime: number) {
-        this._refillTimestamp = Date.now() + retryTime * 1000;
+        // EMERGENCY HACK 15th Jan 2017: disable all retries in case of no fill and errors
+        this._refillTimestamp = 0;
+        // this._refillTimestamp = Date.now() + retryTime * 1000;
         this._campaignTimeout = 0;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.setPlacementStates(PlacementState.NO_FILL);
