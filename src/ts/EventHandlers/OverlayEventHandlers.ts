@@ -11,9 +11,9 @@ export class OverlayEventHandlers {
 
     public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.pause();
-        adUnit.setVideoActive(false);
+        adUnit.getVideo().setActive(false);
         adUnit.setFinishState(FinishState.SKIPPED);
-        sessionManager.sendSkip(adUnit, adUnit.getVideoPosition());
+        sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
         if (nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.IosAdUnit.setViews(['webview']);

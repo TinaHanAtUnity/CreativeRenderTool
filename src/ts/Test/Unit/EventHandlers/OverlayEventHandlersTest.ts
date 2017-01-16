@@ -19,6 +19,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 import { Activity } from 'AdUnits/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Video } from 'Models/Video';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -28,6 +29,7 @@ describe('OverlayEventHandlersTest', () => {
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
     let endScreen: EndScreen;
+    let video: Video;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -41,8 +43,12 @@ describe('OverlayEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null, endScreen);
-
+        video = new Video('');
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+            getVast: sinon.spy(),
+                getVideo: () => video,
+                getStreamingVideo: () => video
+        }, <Overlay><any>{hide: sinon.spy()}, null, endScreen);
     });
 
     describe('When calling onSkip', () => {
@@ -59,7 +65,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should set video inactive', () => {
-            assert.isFalse(performanceAdUnit.isVideoActive());
+            assert.isFalse(performanceAdUnit.getVideo().isActive());
         });
 
         it('should set finish state', () => {
@@ -67,7 +73,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideoPosition());
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
         });
 
         it('should set views through AdUnit API', () => {

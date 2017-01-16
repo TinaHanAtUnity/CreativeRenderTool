@@ -11,6 +11,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 import { Activity } from 'AdUnits/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Video } from 'Models/Video';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -19,6 +20,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
+    let video: Video;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -33,7 +35,11 @@ describe('PerformanceVideoEventHandlersTest', () => {
         };
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{}, overlay, null, endScreen);
+        video = new Video('');
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+            getVideo: () => video,
+            getStreamingVideo: () => video
+        }, overlay, null, endScreen);
     });
 
     describe('with onVideoCompleted', () => {

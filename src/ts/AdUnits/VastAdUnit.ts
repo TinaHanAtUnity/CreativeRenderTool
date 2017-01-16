@@ -13,7 +13,7 @@ export class VastAdUnit extends VideoAdUnit {
     private _endScreen: VastEndScreen | null;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: AbstractVideoOverlay, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, container, placement, campaign, overlay, options);
+        super(nativeBridge, container, placement, campaign, campaign.getVideo(), overlay, options);
         this._endScreen = endScreen || null;
     }
 

@@ -26,7 +26,7 @@ export class VastEndScreenEventHandlers {
     }
 
     public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
-        if (keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isVideoActive()) {
+        if (keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideo().isActive()) {
             adUnit.hide();
         }
     }

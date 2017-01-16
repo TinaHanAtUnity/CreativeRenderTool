@@ -6,9 +6,8 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Double } from 'Utilities/Double';
+import { Video } from 'Models/Video';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -21,6 +20,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
     private _finishState: FinishState;
 
+    private _video: Video;
     private _overlay: AbstractVideoOverlay | undefined;
     private _options: any;
 
@@ -28,28 +28,15 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _onSystemKillObserver: any;
     private _onSystemInterruptObserver: any;
 
-    private _videoStarted: boolean;
-    private _videoErrorStatus: boolean;
-    private _videoDuration: number;
-    private _videoPosition: number;
-    private _videoPositionRepeats: number;
-    private _videoQuartile: number;
-    private _videoActive: boolean;
     private _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: AbstractVideoOverlay, options: any) {
         super(nativeBridge, container, placement, campaign);
 
         this._container = container;
+        this._video = video;
         this._overlay = overlay;
         this._options = options;
-
-        this._videoStarted = false;
-        this._videoErrorStatus = false;
-        this._videoPosition = 0;
-        this._videoPositionRepeats = 0;
-        this._videoQuartile = 0;
-        this._videoActive = true;
 
         this.onVideoClose.subscribe(() => this.onClose.trigger());
         this.onVideoFinish.subscribe(() => this.onFinish.trigger());
@@ -59,7 +46,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this._showing = true;
         this.onVideoStart.trigger();
-        this.setVideoActive(true);
+        this._video.setActive(true);
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
@@ -88,62 +75,6 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._showing;
     }
 
-    public isVideoStarted(): boolean {
-        return this._videoStarted;
-    }
-
-    public setVideoStarted(started: boolean): void {
-        this._videoStarted = started;
-    }
-
-    public getVideoErrorStatus(): boolean {
-        return this._videoErrorStatus;
-    }
-
-    public setVideoErrorStatus(status: boolean): void {
-        this._videoErrorStatus = status;
-    }
-
-    public getVideoDuration(): number {
-        return this._videoDuration;
-    }
-
-    public setVideoDuration(duration: number): void {
-        this._videoDuration = duration;
-    }
-
-    public getVideoPosition(): number {
-        return this._videoPosition;
-    }
-
-    public setVideoPosition(position: number): void {
-        this._videoPosition = position;
-
-        if(this._videoDuration) {
-            this._videoQuartile = Math.floor((this._videoPosition * 4) / this._videoDuration);
-        }
-    }
-
-    public getVideoPositionRepeats(): number {
-        return this._videoPositionRepeats;
-    }
-
-    public setVideoPositionRepeats(repeats: number): void {
-        this._videoPositionRepeats = repeats;
-    }
-
-    public getVideoQuartile(): number {
-        return this._videoQuartile;
-    }
-
-    public isVideoActive(): boolean {
-        return this._videoActive;
-    }
-
-    public setVideoActive(active: boolean): void {
-        this._videoActive = active;
-    }
-
     public getOverlay(): AbstractVideoOverlay | undefined {
         return this._overlay;
     }
@@ -170,6 +101,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._campaign;
     }
 
+    public getVideo(): Video {
+        return this._video;
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
@@ -182,19 +117,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         }
     };
 
-    private getVideoUrl(): string {
-        const campaign = this._campaign;
-        if(campaign instanceof PerformanceCampaign) {
-            return campaign.getVideo().isCached() ? campaign.getVideo().getUrl() : campaign.getStreamingVideo().getUrl();
-        } else if(campaign instanceof VastCampaign) {
-            return campaign.getVideo().getUrl();
-        }
-        throw new Error('Not a video campaign');
-    }
-
     private onShow() {
-        if(this._showing && this.isVideoActive()) {
-            this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+        if(this._showing && this._video.isActive()) {
+            this._nativeBridge.VideoPlayer.prepare(this.getVideo().getUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }
 
@@ -206,7 +131,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     }
 
     private onSystemInterrupt(): void {
-        if(this._showing && this.isVideoActive()) {
+        if(this._showing && this._video.isActive()) {
             this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
             this._nativeBridge.VideoPlayer.play();
         }

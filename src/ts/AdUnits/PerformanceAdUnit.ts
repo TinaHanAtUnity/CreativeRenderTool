@@ -11,7 +11,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
     private _endScreen: EndScreen | undefined;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: AbstractVideoOverlay, options: any, endScreen: EndScreen) {
-        super(nativeBridge, container, placement, campaign, overlay, options);
+        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), overlay, options);
 
         this._endScreen = endScreen;
     }

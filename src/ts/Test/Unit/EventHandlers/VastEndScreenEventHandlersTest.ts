@@ -13,6 +13,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
 import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
 import { Activity } from 'AdUnits/Activity';
+import { Video } from 'Models/Video';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -34,7 +35,11 @@ describe('VastEndScreenEventHandlersTest', () => {
             const vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy()
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
+            const video = new Video('');
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{
+                getVast: sinon.spy(),
+                getVideo: () => video
+            }, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
 
             VastEndScreenEventHandlers.onClose(vastAdUnit);
@@ -44,12 +49,17 @@ describe('VastEndScreenEventHandlersTest', () => {
 
     describe('when calling onClick', () => {
         let vastAdUnit: VastAdUnit;
+        let video: Video;
 
         beforeEach(() => {
             const vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
+            video = new Video('');
+            vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{
+                getVast: sinon.spy(),
+                getVideo: () => video
+            }, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
         });
 
         it('should should use video click through url when companion click url is not present', () => {

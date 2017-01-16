@@ -13,9 +13,10 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { Activity } from 'AdUnits/Activity';
+import { Video } from 'Models/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { Activity } from '../../../AdUnits/Activity';
 
 describe('VastAdUnit', () => {
 
@@ -135,7 +136,9 @@ describe('VastAdUnit', () => {
         beforeEach(() => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
+            const video = new Video('');
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
@@ -230,7 +233,9 @@ describe('VastAdUnit', () => {
         beforeEach(() => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
+            const video = new Video('');
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));

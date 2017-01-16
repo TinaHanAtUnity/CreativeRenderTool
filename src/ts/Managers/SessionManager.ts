@@ -145,6 +145,7 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
+        console.dir(arguments);
         if(this._currentSession) {
             if(this._currentSession.firstQuartileSent) {
                 return Promise.resolve(void(0));
