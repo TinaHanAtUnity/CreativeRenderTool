@@ -142,9 +142,7 @@ export class WebView {
         }).then(() => {
             this._initialized = true;
 
-            // EMERGENCY HACK 15th Jan 2017: DISABLE SENDING UNSENT EVENTS
-            // return this._eventManager.sendUnsentSessions();
-            return Promise.resolve([]);
+            return this._eventManager.sendUnsentSessions();
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -518,9 +516,7 @@ export class WebView {
     }
 
     private onNoFill(retryTime: number) {
-        // EMERGENCY HACK 15th Jan 2017: disable all retries in case of no fill and errors
-        this._refillTimestamp = 0;
-        // this._refillTimestamp = Date.now() + retryTime * 1000;
+        this._refillTimestamp = Date.now() + retryTime * 1000;
         this._campaignTimeout = 0;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.setPlacementStates(PlacementState.NO_FILL);
@@ -597,8 +593,7 @@ export class WebView {
                     }
                 } else {
                     this.checkCampaignStatus();
-                    // EMERGENCY HACK 15th Jan 2017: DISABLE SENDING UNSENT EVENTS
-                    // this._eventManager.sendUnsentSessions();
+                    this._eventManager.sendUnsentSessions();
                 }
             });
         }
