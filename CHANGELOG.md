@@ -1,3 +1,7 @@
+# Mon Jan 16 11:58:22 UTC 2017
+
+* Revert two emergency fixes because backend is now able to keep up with the load
+
 # Sun Jan 15 14:21:00 UTC 2017
 
 * Emergency fix: disabled all ad request retries to help with backend load
