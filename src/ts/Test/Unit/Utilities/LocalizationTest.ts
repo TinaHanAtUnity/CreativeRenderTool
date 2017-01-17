@@ -59,6 +59,12 @@ describe('LocalizationTest', () => {
         assert.equal(localization.translate(phrase), '免費下載', 'Localization did not translate exact match');
     });
 
+    it('should translate Learn More', () => {
+        const localization = new Localization('fi', 'overlay');
+        const phrase = 'Learn More';
+        assert.equal(localization.translate(phrase), 'Lisää tietoa', 'Localization did not translate');
+    });
+
     it('should translate correctly all Chinese simplified codes', () => {
         const phrase = 'Download For Free';
         assert.equal(new Localization('zh', 'endscreen').translate(phrase), '免费下载', 'Localization zh did not map to correct language');

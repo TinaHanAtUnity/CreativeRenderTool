@@ -4,7 +4,6 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
-import { Localization } from 'Utilities/Localization';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -18,15 +17,21 @@ describe('Overlay', () => {
             handleInvocation,
             handleCallback
         });
-        Localization.setLanguageMap('fi.*', 'overlay', {
-            'You can skip this video in <span class=\"skip-duration\">0</span> seconds': 'Voit ohittaa videon <span class="skip-duration">0</span> sekunnin päästä'
-        });
     });
 
-    it('should render with translations', () => {
-        const overlay = new Overlay(nativeBridge, true, 'fi');
+    it('should render', () => {
+        const overlay = new Overlay(nativeBridge, true, 'en');
         overlay.render();
-        const skipButtonElement = overlay.container().querySelectorAll('.skip-button')[0];
-        assert.equal(skipButtonElement.innerHTML, 'Voit ohittaa videon <span class="skip-duration">0</span> sekunnin päästä');
+        assert.isNotNull(overlay.container().innerHTML);
+        assert.isNotNull(overlay.container().querySelector('.skip-icon'));
+        assert.isNotNull(overlay.container().querySelector('.buffering-spinner'));
+        assert.isNotNull(overlay.container().querySelector('.mute-button'));
+        assert.isNotNull(overlay.container().querySelector('.debug-message-text'));
+        assert.isNotNull(overlay.container().querySelector('.call-button'));
+        assert.isNotNull(overlay.container().querySelector('.progress'));
+        assert.isNotNull(overlay.container().querySelector('.circle-left'));
+        assert.isNotNull(overlay.container().querySelector('.circle-right'));
+        assert.isNotNull(overlay.container().querySelector('.progress-wrapper'));
+        assert.isNotNull(overlay.container().querySelector('.full-screen-button'));
     });
 });
