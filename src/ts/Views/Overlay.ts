@@ -1,4 +1,4 @@
-import OverlayTemplate from 'html/VideoOverlay.html';
+import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
@@ -7,10 +7,10 @@ import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { View } from 'Views/View';
 
-export class VideoOverlay extends View {
+export class Overlay extends View {
 
     public static setAutoSkip(value: boolean) {
-        VideoOverlay.AutoSkip = value;
+        Overlay.AutoSkip = value;
     }
 
     protected static AutoSkip: boolean = false;
@@ -58,7 +58,7 @@ export class VideoOverlay extends View {
     private _fadeTimer: any;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
-        super(nativeBridge, 'video-overlay');
+        super(nativeBridge, 'overlay');
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
@@ -140,7 +140,7 @@ export class VideoOverlay extends View {
     }
 
     public setVideoProgress(value: number): void {
-        if(VideoOverlay.AutoSkip) {
+        if(Overlay.AutoSkip) {
             this.onSkip.trigger(value);
         }
 

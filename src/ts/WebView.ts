@@ -25,7 +25,7 @@ import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
-import { VideoOverlay } from 'Views/VideoOverlay';
+import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
@@ -707,7 +707,7 @@ export class WebView {
 
         metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
             if(found && autoSkip !== null) {
-                VideoOverlay.setAutoSkip(autoSkip);
+                Overlay.setAutoSkip(autoSkip);
             }
         });
 

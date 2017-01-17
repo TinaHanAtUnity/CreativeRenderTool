@@ -4,7 +4,7 @@ import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Campaign } from 'Models/Campaign';
-import { VideoOverlay } from 'Views/VideoOverlay';
+import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
@@ -16,7 +16,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: VideoOverlay, endScreen: EndScreen | undefined;
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
     let adUnit: AdUnit;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -26,7 +26,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleCallback
         });
 
-        overlay = <VideoOverlay><any> {};
+        overlay = <Overlay><any> {};
 
         endScreen = <EndScreen><any> {
             show: sinon.spy(),

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { VideoOverlay } from 'Views/VideoOverlay';
+import { Overlay } from 'Views/Overlay';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -20,7 +20,7 @@ describe('Overlay', () => {
     });
 
     it('should render', () => {
-        const overlay = new VideoOverlay(nativeBridge, true, 'en');
+        const overlay = new Overlay(nativeBridge, true, 'en');
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-icon'));
