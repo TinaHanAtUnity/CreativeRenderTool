@@ -12,9 +12,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
 
     private _sessionManager: SessionManager;
     private _thirdParty: ThirdParty;
-    private _isShowing: boolean;
     private _options: any;
-    private _finishState: FinishState;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -23,13 +21,11 @@ export class HtmlAdUnit extends AbstractAdUnit {
         super(nativeBridge, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._thirdParty = thirdParty;
-        this._isShowing = false;
         this._options = options;
-        this._finishState = FinishState.COMPLETED;
     }
 
     public show(): Promise<void> {
-        this._isShowing = true;
+        this.setShowing(true);
         this._thirdParty.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
@@ -42,7 +38,8 @@ export class HtmlAdUnit extends AbstractAdUnit {
     }
 
     public hide(): Promise<void> {
-        this._isShowing = false;
+        this.setShowing(false);
+        this.setFinishState(FinishState.COMPLETED);
 
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
@@ -57,13 +54,9 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._thirdParty.container().parentElement!.removeChild(this._thirdParty.container());
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this._finishState);
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
         return this._container.close();
-    }
-
-    public isShowing(): boolean {
-        return this._isShowing;
     }
 
     public description(): string {
@@ -79,8 +72,8 @@ export class HtmlAdUnit extends AbstractAdUnit {
     }
 
     private onSystemKill() {
-        if(this._isShowing) {
-            this._finishState = FinishState.SKIPPED;
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }

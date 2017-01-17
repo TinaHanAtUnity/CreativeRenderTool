@@ -7,7 +7,6 @@ import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
-import { Observable0 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -54,13 +53,11 @@ describe('PerformanceOverlayEventHandlersTest', () => {
         });
 
         it('should trigger onFinish', () => {
-            performanceAdUnit.onFinish = <Observable0><any> {
-                trigger: sinon.spy(),
-            };
+            const spy = sinon.spy(performanceAdUnit.onFinish, 'trigger');
 
             PerformanceOverlayEventHandlers.onSkip(performanceAdUnit);
 
-            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.onFinish.trigger);
+            sinon.assert.called(spy);
         });
     });
 

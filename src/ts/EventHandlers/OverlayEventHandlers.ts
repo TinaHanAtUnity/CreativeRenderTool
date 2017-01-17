@@ -32,7 +32,7 @@ export class OverlayEventHandlers {
             overlay.hide();
         }
 
-        adUnit.onVideoFinish.trigger();
+        adUnit.onFinish.trigger();
     }
 
     public static onMute(nativeBridge: NativeBridge, muted: boolean): void {
