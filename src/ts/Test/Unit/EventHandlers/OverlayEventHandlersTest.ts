@@ -7,7 +7,7 @@ import { Campaign } from 'Models/Campaign';
 import { SessionManager } from 'Managers/SessionManager';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { EndScreen } from 'Views/EndScreen';
 import { EventManager } from 'Managers/EventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -43,7 +43,7 @@ describe('OverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
 
         adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign><any>{getVast: sinon.spy()}, <VideoOverlay><any>{hide: sinon.spy()}, null);
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
 
     });

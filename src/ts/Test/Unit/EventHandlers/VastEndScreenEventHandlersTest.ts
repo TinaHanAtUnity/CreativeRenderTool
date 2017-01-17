@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { Platform } from 'Constants/Platform';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Placement } from 'Models/Placement';
@@ -30,7 +30,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         });
         adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <VideoOverlay><any>{hide: sinon.spy()}, null);
     });
 
     describe('when calling onClose', () => {

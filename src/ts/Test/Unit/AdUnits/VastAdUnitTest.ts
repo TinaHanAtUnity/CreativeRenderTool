@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { EventManager } from 'Managers/EventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
@@ -47,7 +47,7 @@ describe('VastAdUnit', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        const overlay = <Overlay><any>sinon.createStubInstance(Overlay);
+        const overlay = <VideoOverlay><any>sinon.createStubInstance(VideoOverlay);
         const nativeBridge = TestFixtures.getNativeBridge();
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
@@ -138,7 +138,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+            const overlay = <VideoOverlay><any> sinon.createStubInstance(VideoOverlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
@@ -234,7 +234,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
+            const overlay = <VideoOverlay><any> sinon.createStubInstance(VideoOverlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);

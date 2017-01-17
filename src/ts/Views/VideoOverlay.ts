@@ -5,9 +5,19 @@ import { Template } from 'Utilities/Template';
 import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { View } from 'Views/View';
 
-export class VideoOverlay extends AbstractVideoOverlay {
+export class VideoOverlay extends View {
+
+    public static setAutoSkip(value: boolean) {
+        VideoOverlay.AutoSkip = value;
+    }
+
+    protected static AutoSkip: boolean = false;
+
+    public onSkip: Observable1<number> = new Observable1();
+    public onMute: Observable1<boolean> = new Observable1();
+    public onCallButton: Observable1<boolean> = new Observable1();
 
     public onFullScreenButton: Observable1<boolean> = new Observable1();
 
@@ -130,7 +140,7 @@ export class VideoOverlay extends AbstractVideoOverlay {
     }
 
     public setVideoProgress(value: number): void {
-        if(AbstractVideoOverlay.AutoSkip) {
+        if(VideoOverlay.AutoSkip) {
             this.onSkip.trigger(value);
         }
 

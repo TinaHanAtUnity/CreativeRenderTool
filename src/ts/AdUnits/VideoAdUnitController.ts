@@ -1,5 +1,5 @@
 import { Placement } from 'Models/Placement';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
@@ -23,7 +23,7 @@ export class VideoAdUnitController {
     private _adUnit: AdUnit;
     private _placement: Placement;
     private _campaign: Campaign;
-    private _overlay: AbstractVideoOverlay | undefined;
+    private _overlay: VideoOverlay | undefined;
     private _options: any;
 
     private _onShowObserver: any;
@@ -39,7 +39,7 @@ export class VideoAdUnitController {
     private _videoActive: boolean;
     private _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: AbstractVideoOverlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: VideoOverlay, options: any) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._placement = placement;
@@ -143,7 +143,7 @@ export class VideoAdUnitController {
         this._videoActive = active;
     }
 
-    public getOverlay(): AbstractVideoOverlay | undefined {
+    public getOverlay(): VideoOverlay | undefined {
         return this._overlay;
     }
 

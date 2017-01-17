@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { EndScreen } from 'Views/EndScreen';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -23,7 +23,7 @@ describe('EndScreenEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, overlay: VideoOverlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -37,7 +37,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo());
-            overlay = <Overlay><any> {
+            overlay = <VideoOverlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
                 show: sinon.spy(),
@@ -133,7 +133,7 @@ describe('EndScreenEventHandlersTest', () => {
 
             adUnit = new IosAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
 
-            overlay = <Overlay><any> {
+            overlay = <VideoOverlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
                 show: sinon.spy(),

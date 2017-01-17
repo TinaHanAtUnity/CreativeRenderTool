@@ -16,7 +16,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventManager } from 'Managers/EventManager';
 import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { EndScreen } from 'Views/EndScreen';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Session } from 'Models/Session';
@@ -31,7 +31,7 @@ describe('VideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, overlay: VideoOverlay, endScreen: EndScreen;
     let adUnit: AdUnit;
     let performanceAdUnit: PerformanceAdUnit, videoAdUnitController: VideoAdUnitController;
     let sessionManager: SessionManager;
@@ -44,7 +44,7 @@ describe('VideoEventHandlersTest', () => {
 
         adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        overlay = <Overlay><any> {
+        overlay = <VideoOverlay><any> {
             setVideoProgress: sinon.spy(),
             setVideoDuration: sinon.spy(),
             isMuted: sinon.spy(),

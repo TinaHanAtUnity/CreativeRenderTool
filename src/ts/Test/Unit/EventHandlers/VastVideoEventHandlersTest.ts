@@ -14,7 +14,7 @@ import { Request } from 'Utilities/Request';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
+import { VideoOverlay } from 'Views/VideoOverlay';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
@@ -32,7 +32,7 @@ describe('VastVideoEventHandlers tests', () => {
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let overlay: Overlay;
+    let overlay: VideoOverlay;
     let vastEndScreen: VastEndScreen;
     let wakeUpManager: WakeUpManager;
     let request: Request;
@@ -143,7 +143,7 @@ describe('VastVideoEventHandlers tests', () => {
 
         adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        overlay = new Overlay(nativeBridge, false, 'en');
+        overlay = new VideoOverlay(nativeBridge, false, 'en');
 
         const vastParser = TestFixtures.getVastParser();
 
