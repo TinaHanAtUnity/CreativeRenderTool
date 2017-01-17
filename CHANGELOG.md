@@ -1,3 +1,21 @@
+# Mon Jan 16 11:58:22 UTC 2017
+
+* Revert two emergency fixes because backend is now able to keep up with the load
+
+# Sun Jan 15 14:21:00 UTC 2017
+
+* Emergency fix: disabled all ad request retries to help with backend load
+
+# Sun Jan 15 12:28:00 UTC 2017
+
+* Emergency fix: disabled resending any failed events to help with backend load
+
+# Thu Jan 12 15:41:06 UTC 2017
+
+* Improved layout for large tablets A/B test
+* Add optional delay for autoclosing ad units
+* Improve deployment scripts
+
 # Wed Jan 11 12:55:17 UTC 2017
 
 * Refactor AdUnit API handling from different ad units to a common utility class

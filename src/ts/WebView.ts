@@ -455,5 +455,11 @@ export class WebView {
                 AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
             }
         });
+
+        metaData.get<string>('test.campaignResponse', false).then(([found, campaignResponse]) => {
+            if(found && typeof campaignResponse === 'string') {
+                CampaignManager.setCampaignResponse(campaignResponse);
+            }
+        });
     }
 }

@@ -27,6 +27,7 @@ export class VastOverlayEventHandlers {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
         adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        sessionManager.sendBrandClickThrough(adUnit);
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
