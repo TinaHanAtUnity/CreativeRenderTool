@@ -20,7 +20,6 @@ describe('VastEndScreenEventHandlersTest', () => {
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
-    const sessionManager = <SessionManager><any>{};
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -50,9 +49,15 @@ describe('VastEndScreenEventHandlersTest', () => {
     describe('when calling onClick', () => {
         let vastAdUnit: VastAdUnit;
         let video: Video;
+        let sessionManager: SessionManager;
 
         beforeEach(() => {
-            const vastEndScreen = <VastEndScreen><any> {
+            sessionManager = <SessionManager><any>{
+                sendBrandClickThrough: sinon.spy(),
+                sendCompanionClickThrough: sinon.spy()
+            };
+
+            const vastEndScreen = <VastEndScreen><any>{
                 hide: sinon.spy()
             };
             video = new Video('');
@@ -70,6 +75,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
             VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://bar.com');
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendCompanionClickThrough, vastAdUnit);
         });
 
         it('should open click through link on iOS', () => {
@@ -79,6 +85,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
             VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://foo.com');
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendCompanionClickThrough, vastAdUnit);
         });
 
         it('should open click through link on Android', () => {
@@ -91,6 +98,15 @@ describe('VastEndScreenEventHandlersTest', () => {
                 'action': 'android.intent.action.VIEW',
                 'uri': 'https://foo.com'
             });
+            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendCompanionClickThrough, vastAdUnit);
+        });
+
+        it('should should not open link when there is no URL', () => {
+            sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
+
+            VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit);
+            sinon.assert.notCalled(<sinon.SinonSpy>sessionManager.sendCompanionClickThrough);
         });
     });
 });

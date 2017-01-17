@@ -61,6 +61,8 @@ describe('VideoEventHandlersTest', () => {
 
         endScreen = <EndScreen><any> {
             show: sinon.spy(),
+            hide: sinon.spy(),
+            container: sinon.spy()
         };
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
@@ -339,6 +341,7 @@ describe('VideoEventHandlersTest', () => {
             sandbox = sinon.sandbox.create();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+            sinon.stub(performanceAdUnit, 'hide');
         });
 
         afterEach(() => {
@@ -356,6 +359,7 @@ describe('VideoEventHandlersTest', () => {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
+            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
 
@@ -366,13 +370,15 @@ describe('VideoEventHandlersTest', () => {
             sandbox = sinon.sandbox.create();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+            sinon.stub(performanceAdUnit, 'hide');
         });
 
         afterEach(() => {
             sandbox.restore();
         });
 
-        it('should set video to inactive and video to finish state to error', () => {
+        it('should set video to inactive and video to finish state to error, video started', () => {
+            performanceAdUnit.getVideo().setStarted(true);
             VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, performanceAdUnit, 1, 0, 'http://test.video.url');
 
             assert.isFalse(performanceAdUnit.getVideo().isActive());
@@ -384,6 +390,22 @@ describe('VideoEventHandlersTest', () => {
             }
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
+            sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.hide);
+        });
+
+        it('should set video to inactive and video to finish state to error, video not started', () => {
+            VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, performanceAdUnit, 1, 0, 'http://test.video.url');
+
+            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
+
+            const adUnitOverlay = performanceAdUnit.getOverlay();
+            if(adUnitOverlay) {
+                sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
+            }
+
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
+            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
 });

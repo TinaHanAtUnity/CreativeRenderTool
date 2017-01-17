@@ -30,6 +30,12 @@ export class SessionManagerEventMetadataCreator {
         });
     };
 
+    public createUniqueKafkaEventMetadata(adUnit: AbstractAdUnit): Promise<any> {
+        return this._eventManager.getUniqueEventId().then(id => {
+            return this.getEventJson(adUnit, id);
+        });
+    };
+
     private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
@@ -74,6 +80,31 @@ export class SessionManagerEventMetadataCreator {
                 }
                 return [id, infoJson];
             });
+        });
+    }
+
+    private getEventJson(adUnit: AbstractAdUnit, id: string): Promise<[string, any]> {
+        const eventJson: any = {
+            ab: adUnit.getCampaign().getAbGroup(),
+            cmp: adUnit.getCampaign().getId(),
+            ctyp: 'brand',
+            id: id,
+            osv: this._deviceInfo.getOsVersion(),
+            plt: this._clientInfo.getPlatform(),
+            tlim: this._deviceInfo.getLimitAdTracking(),
+            uid: adUnit.getCampaign().getGamerId(),
+            sdkv: this._clientInfo.getSdkVersion(),
+            ts: new Date().toISOString()
+        };
+
+        const campaign = adUnit.getCampaign();
+        if(campaign instanceof PerformanceCampaign) {
+            eventJson.tgtg = campaign.getGameId();
+        }
+
+        return this._deviceInfo.getConnectionType().then((connectionType) => {
+            eventJson.conn = connectionType;
+            return eventJson;
         });
     }
 }
@@ -145,7 +176,6 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        console.dir(arguments);
         if(this._currentSession) {
             if(this._currentSession.firstQuartileSent) {
                 return Promise.resolve(void(0));
@@ -221,6 +251,36 @@ export class SessionManager {
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+    }
+
+    public sendBrandClickThrough(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.videoClickThroughSent) {
+                return Promise.resolve(void(0));
+            }
+            this._currentSession.videoClickThroughSent = true;
+        }
+
+        const fulfilled = (infoJson: any) => {
+            this._eventManager.brandEvent('vclickthru', infoJson);
+        };
+
+        return this._eventMetadataCreator.createUniqueKafkaEventMetadata(adUnit).then(fulfilled);
+    }
+
+    public sendCompanionClickThrough(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.companionClickThroughSent) {
+                return Promise.resolve(void(0));
+            }
+            this._currentSession.companionClickThroughSent = true;
+        }
+
+        const fulfilled = (infoJson: any) => {
+            this._eventManager.brandEvent('cclickthru', infoJson);
+        };
+
+        return this._eventMetadataCreator.createUniqueKafkaEventMetadata(adUnit).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {

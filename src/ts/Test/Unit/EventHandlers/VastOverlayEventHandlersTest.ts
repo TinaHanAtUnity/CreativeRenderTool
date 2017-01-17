@@ -133,6 +133,7 @@ describe('VastOverlayEventHandlersTest', () => {
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
             sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
+            sinon.stub(sessionManager, 'sendBrandClickThrough').returns(sinon.spy());
         });
 
         it('should call video click through tracking url', () => {
@@ -140,6 +141,13 @@ describe('VastOverlayEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open');
             VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
+        });
+
+        it('should send brand click through event', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open');
+            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
+            sinon.assert.called(<sinon.SinonSpy>sessionManager.sendBrandClickThrough);
         });
 
         it('should open click trough link in iOS web browser when call button is clicked', () => {
