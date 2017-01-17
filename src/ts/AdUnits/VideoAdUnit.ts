@@ -3,24 +3,24 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Video';
+import { Overlay } from 'Views/Overlay';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
     private static _progressInterval: number = 250;
 
     private _video: Video;
-    private _overlay: AbstractVideoOverlay | undefined;
+    private _overlay: Overlay | undefined;
     private _options: any;
 
     private _onShowObserver: any;
     private _onSystemKillObserver: any;
     private _onSystemInterruptObserver: any;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: AbstractVideoOverlay, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, options: any) {
         super(nativeBridge, container, placement, campaign);
 
         this._video = video;
@@ -56,7 +56,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         });
     }
 
-    public getOverlay(): AbstractVideoOverlay | undefined {
+    public getOverlay(): Overlay | undefined {
         return this._overlay;
     }
 

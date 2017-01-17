@@ -2,15 +2,15 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { EndScreen } from 'Views/EndScreen';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
+import { Overlay } from 'Views/Overlay';
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: AbstractVideoOverlay, options: any, endScreen: EndScreen) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: Overlay, options: any, endScreen: EndScreen) {
         super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), overlay, options);
 
         this._endScreen = endScreen;

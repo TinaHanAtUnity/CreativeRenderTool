@@ -2,11 +2,24 @@ import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
+import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { View } from 'Views/View';
 
-export class Overlay extends AbstractVideoOverlay {
+export class Overlay extends View {
+
+    public static setAutoSkip(value: boolean) {
+        Overlay.AutoSkip = value;
+    }
+
+    protected static AutoSkip: boolean = false;
+
+    public onSkip: Observable1<number> = new Observable1();
+    public onMute: Observable1<boolean> = new Observable1();
+    public onCallButton: Observable1<boolean> = new Observable1();
+
+    public onFullScreenButton: Observable1<boolean> = new Observable1();
 
     private _localization: Localization;
 
@@ -30,13 +43,17 @@ export class Overlay extends AbstractVideoOverlay {
 
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
-    private _skipDurationElement: HTMLElement;
-    private _videoDurationElement: HTMLElement;
-    private _videoDurationCounterElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
-    private _headerElement: HTMLElement;
+
+    private _progressElement: HTMLElement;
+    private _progressLeftCircleElement: HTMLElement;
+    private _progressRightCircleElement: HTMLElement;
+    private _progressWrapperElement: HTMLElement;
+    private _fullScreenButtonElement: HTMLElement;
+
+    private _fullScreenButtonVisible: boolean = false;
 
     private _fadeTimer: any;
 
@@ -56,7 +73,7 @@ export class Overlay extends AbstractVideoOverlay {
             {
                 event: 'click',
                 listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip-button'
+                selector: '.skip-icon'
             },
             {
                 event: 'click',
@@ -70,6 +87,11 @@ export class Overlay extends AbstractVideoOverlay {
             },
             {
                 event: 'click',
+                listener: (event: Event) => this.onFullScreenButtonEvent(event),
+                selector: '.full-screen-button'
+            },
+            {
+                event: 'click',
                 listener: (event: Event) => this.onClick(event)
             }
         ];
@@ -77,15 +99,16 @@ export class Overlay extends AbstractVideoOverlay {
 
     public render(): void {
         super.render();
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-icon');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._skipDurationElement = <HTMLElement>this._container.querySelector('.skip-duration');
-        this._videoDurationElement = <HTMLElement>this._container.querySelector('.video-duration-text');
-        this._videoDurationCounterElement = <HTMLElement>this._container.querySelector('.video-duration');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._headerElement = <HTMLElement>this.container().querySelector('.header');
+        this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        this._progressLeftCircleElement = <HTMLElement>this._container.querySelector('.circle-left');
+        this._progressRightCircleElement = <HTMLElement>this._container.querySelector('.circle-right');
+        this._progressWrapperElement = <HTMLElement>this._container.querySelector('.progress-wrapper');
+        this._fullScreenButtonElement = <HTMLElement>this._container.querySelector('.full-screen-button');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -95,38 +118,29 @@ export class Overlay extends AbstractVideoOverlay {
         }
     }
 
-    public setSkipVisible(value: boolean) {
-        if(this._skipVisible !== value) {
-            this._skipElement.style.display = value ? 'block' : 'none';
-        }
-    }
-
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
-            this._headerElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public setSkipDuration(value: number): void {
         this._skipDuration = this._skipRemaining = value * 1000;
-        this.setSkipText(value);
     }
 
     public setVideoDurationEnabled(value: boolean) {
         if(this._videoDurationEnabled !== value) {
             this._videoDurationEnabled = value;
-            this._videoDurationElement.style.display = value ? 'block' : 'none';
+            this._progressElement.style.display  = value ? 'block' : 'none';
         }
     }
 
     public setVideoDuration(value: number): void {
         this._videoDuration = value;
-        this._videoDurationCounterElement.innerHTML = Math.round(value / 1000).toString();
     }
 
     public setVideoProgress(value: number): void {
-        if(AbstractVideoOverlay.AutoSkip) {
+        if(Overlay.AutoSkip) {
             this.onSkip.trigger(value);
         }
 
@@ -140,23 +154,12 @@ export class Overlay extends AbstractVideoOverlay {
         this._videoProgress = value;
         if(this._skipEnabled && this._skipRemaining > 0) {
             this._skipRemaining = Math.round((this._skipDuration - value) / 1000);
-            this.setSkipText(this._skipRemaining);
+            if(this._skipRemaining <= 0) {
+                this.setSkipElementVisible(true);
+            }
         }
-        if(this._videoDuration > value) {
-            this._videoDurationCounterElement.innerHTML = Math.round((this._videoDuration - value) / 1000).toString();
-        } else {
-            // sometimes video duration and progress might be reported with slight inaccuracies so prevent showing negative numbers
-            this._videoDurationCounterElement.innerHTML = '0';
-        }
-
-        // redraw updated elements to fix the overlapping texts issue
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 21) {
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-        }
+        this._progressElement.setAttribute('data-seconds',  Math.round((this._videoDuration - value) / 1000).toString());
+        this.updateProgressCircle();
     }
 
     public setMuteEnabled(value: boolean) {
@@ -179,20 +182,17 @@ export class Overlay extends AbstractVideoOverlay {
     public setCallButtonVisible(value: boolean) {
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
-            this._headerElement.style.display = value ? 'block' : 'none';
+        }
+    }
+
+    public setFullScreenButtonVisible(value: boolean) {
+        if(this._fullScreenButtonVisible !== value) {
+            this._fullScreenButtonElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public isMuted(): boolean {
         return this._muted;
-    }
-
-    private setSkipText(skipRemaining: number): void {
-        if(skipRemaining <= 0) {
-            this._skipElement.innerHTML = this._localization.translate('Skip Video');
-        } else {
-            this._skipDurationElement.innerHTML = skipRemaining.toString();
-        }
     }
 
     private onSkipEvent(event: Event): void {
@@ -225,6 +225,39 @@ export class Overlay extends AbstractVideoOverlay {
             this._fadeTimer = undefined;
         }
         this.fade(false);
+    }
+
+    private onFullScreenButtonEvent(event: Event): void {
+        event.preventDefault();
+        this.onFullScreenButton.trigger(true);
+
+    }
+
+    private updateProgressCircle() {
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+            this._progressWrapperElement.style.display = 'none';
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+            return;
+        }
+        const degree = (this._videoProgress / this._videoDuration) * 360;
+        const rotateParam = 'rotate(' + degree + 'deg)';
+        this._progressLeftCircleElement.style.webkitTransform = rotateParam;
+
+        if(this._videoProgress > this._videoDuration / 2) {
+            this._progressWrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+            this._progressRightCircleElement.style.webkitAnimationName = 'right-spin';
+        }
+    }
+
+    private setSkipElementVisible(value: boolean) {
+        if(this._skipVisible !== value) {
+            this._skipVisible = value;
+            this._skipElement.style.display = value ? 'block' : 'none';
+        }
     }
 
     private fade(value: boolean) {

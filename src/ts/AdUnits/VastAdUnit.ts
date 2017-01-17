@@ -5,14 +5,14 @@ import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { Placement } from 'Models/Placement';
+import { Overlay } from 'Views/Overlay';
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: AbstractVideoOverlay, options: any, endScreen?: VastEndScreen) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, options: any, endScreen?: VastEndScreen) {
         super(nativeBridge, container, placement, campaign, campaign.getVideo(), overlay, options);
         this._endScreen = endScreen || null;
     }

@@ -13,7 +13,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Overlay } from 'Views/Overlay';
 
 export class VideoEventHandlers {
 
@@ -57,9 +56,7 @@ export class VideoEventHandlers {
             if(adUnit.getVideo().getPosition() > 0) {
                 overlay.setVideoProgress(adUnit.getVideo().getPosition());
             }
-            if(overlay instanceof Overlay && adUnit.getPlacement().allowSkip()) {
-                (<Overlay>overlay).setSkipVisible(true);
-            }
+
             overlay.setMuteEnabled(true);
             overlay.setVideoDurationEnabled(true);
 
