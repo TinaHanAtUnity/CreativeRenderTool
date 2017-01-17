@@ -14,9 +14,9 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
-import { ViewController } from '../../../AdUnits/ViewController';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 describe('EndScreenEventHandlersTest', () => {
 

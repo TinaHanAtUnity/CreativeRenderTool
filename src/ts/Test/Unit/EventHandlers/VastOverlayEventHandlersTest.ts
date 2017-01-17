@@ -12,8 +12,8 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';

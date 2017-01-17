@@ -29,7 +29,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Views/VideoOverlay';
 import { AbTest } from 'Utilities/AbTest';
-import { AdUnitContainer } from './AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 export class AdUnitFactory {
 

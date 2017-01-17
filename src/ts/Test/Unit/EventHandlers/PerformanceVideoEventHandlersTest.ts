@@ -8,8 +8,8 @@ import { EndScreen } from 'Views/EndScreen';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Video';
 

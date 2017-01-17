@@ -9,7 +9,7 @@ import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { Activity } from 'AdUnits/Activity';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;

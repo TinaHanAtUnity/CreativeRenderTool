@@ -17,10 +17,10 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { Activity } from '../../../AdUnits/Activity';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();

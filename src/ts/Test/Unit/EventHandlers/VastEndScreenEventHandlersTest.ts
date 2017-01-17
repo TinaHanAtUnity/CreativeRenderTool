@@ -11,8 +11,8 @@ import { Placement } from 'Models/Placement';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Video';
 
 describe('VastEndScreenEventHandlersTest', () => {

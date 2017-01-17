@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;

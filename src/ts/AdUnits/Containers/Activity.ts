@@ -4,7 +4,7 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;

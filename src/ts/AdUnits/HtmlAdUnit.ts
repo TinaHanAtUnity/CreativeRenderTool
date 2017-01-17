@@ -6,7 +6,7 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 

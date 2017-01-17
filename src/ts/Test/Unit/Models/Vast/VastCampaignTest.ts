@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
+
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 

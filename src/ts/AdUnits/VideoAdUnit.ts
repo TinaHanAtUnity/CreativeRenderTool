@@ -5,7 +5,7 @@ import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Video';
 

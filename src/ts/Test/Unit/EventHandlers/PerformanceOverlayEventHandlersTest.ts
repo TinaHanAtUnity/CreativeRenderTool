@@ -9,8 +9,8 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { Observable0 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Video';
 

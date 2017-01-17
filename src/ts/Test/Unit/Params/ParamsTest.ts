@@ -25,9 +25,9 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer } from '../../../AdUnits/AdUnitContainer';
-import { ViewController } from '../../../AdUnits/ViewController';
-import { Activity } from '../../../AdUnits/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'AdUnits/Containers/ViewController';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {

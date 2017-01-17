@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { EndScreen } from 'Views/EndScreen';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';

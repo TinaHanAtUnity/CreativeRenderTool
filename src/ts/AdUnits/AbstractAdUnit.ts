@@ -2,7 +2,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 export abstract class AbstractAdUnit {
 

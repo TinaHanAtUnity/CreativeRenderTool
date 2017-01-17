@@ -13,7 +13,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { Activity } from 'AdUnits/Activity';
+import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';

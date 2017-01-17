@@ -4,7 +4,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { Placement } from 'Models/Placement';
 

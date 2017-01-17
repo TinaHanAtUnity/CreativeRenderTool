@@ -30,9 +30,9 @@ import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
-import { Activity } from 'AdUnits/Activity';
-import { ViewController } from 'AdUnits/ViewController';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class WebView {
 

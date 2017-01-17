@@ -15,7 +15,7 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Request } from 'Utilities/Request';
 import EventTestVast from 'xml/EventTestVast.xml';
-import { Activity } from '../../../AdUnits/Activity';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 describe('SessionManagerTest', () => {
     const handleInvocation = sinon.spy();

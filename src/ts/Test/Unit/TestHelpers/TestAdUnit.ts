@@ -2,7 +2,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { AdUnitContainer } from 'AdUnits/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 export class TestAdUnit extends AbstractAdUnit {
 
