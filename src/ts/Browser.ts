@@ -121,6 +121,7 @@ if(window.parent !== window) {
     const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
     const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
     const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
     initializeButton.addEventListener('click', (event: Event) => {
         event.preventDefault();
@@ -159,6 +160,12 @@ if(window.parent !== window) {
         if(autoSkipElement.checked) {
             publicStorage.test.autoSkip = {
                 value: true,
+                ts: Date.now()
+            };
+        }
+        if(campaignResponseElement.value.length) {
+            publicStorage.test.campaignResponse = {
+                value: campaignResponseElement.value,
                 ts: Date.now()
             };
         }
