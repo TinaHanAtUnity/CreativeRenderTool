@@ -5,6 +5,8 @@ export class Session {
     public thirdQuartileSent: boolean = false;
     public viewSent: boolean = false;
     public skipSent: boolean = false;
+    public videoClickThroughSent: boolean = false;
+    public companionClickThroughSent: boolean = false;
 
     public impressionSent: boolean = false;
     public vastCompleteSent: boolean = false;
