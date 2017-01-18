@@ -5,7 +5,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
-import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class EventManager {
 
@@ -55,12 +54,6 @@ export class EventManager {
                 this._nativeBridge.Storage.write(StorageType.PRIVATE)
             ]);
         });
-    }
-
-    public brandEvent(event: string, data: any): Promise<INativeResponse> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads brand event: sending ' + event );
-
-        return HttpKafka.sendBrandEvent(event, data);
     }
 
     public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {

@@ -9,7 +9,6 @@ import { RequestApi } from 'Native/Api/Request';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { HttpKafka } from 'Utilities/HttpKafka';
 
 class TestStorageApi extends StorageApi {
 
@@ -352,14 +351,5 @@ describe('EventManagerTest', () => {
         return eventManager.getUniqueEventId().then(uniqueId => {
             assert.equal(testId, uniqueId, 'Unique id does not match what native API returned');
         });
-    });
-
-    it('Send successful brand event', () => {
-        const event: string = 'vct';
-        const data = {};
-
-        sinon.stub(HttpKafka, 'sendBrandEvent').returns(sinon.spy());
-        eventManager.brandEvent(event, data);
-        sinon.assert.calledOnce(<sinon.SinonSpy>HttpKafka.sendBrandEvent);
     });
 });
