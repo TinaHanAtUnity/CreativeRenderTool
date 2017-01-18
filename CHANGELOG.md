@@ -1,3 +1,10 @@
+# Wed Jan 18 10:39:48 UTC 2017
+
+* New overlay to all groups
+* Video errors without progress events will close ad
+* VAST events to httpkafka
+* Browser build improvements
+
 # Mon Jan 16 11:58:22 UTC 2017
 
 * Revert two emergency fixes because backend is now able to keep up with the load
