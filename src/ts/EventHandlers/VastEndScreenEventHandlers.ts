@@ -10,8 +10,6 @@ export class VastEndScreenEventHandlers {
         const platform = nativeBridge.getPlatform();
         const clickThroughURL = adUnit.getCompanionClickThroughUrl() || adUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
-            sessionManager.sendCompanionClickThrough(adUnit);
-
             if (platform === Platform.IOS) {
                 nativeBridge.UrlScheme.open(clickThroughURL);
             } else if (nativeBridge.getPlatform() === Platform.ANDROID) {
