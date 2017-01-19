@@ -48,11 +48,8 @@ export class Overlay extends View {
     private _callButtonElement: HTMLElement;
 
     private _progressElement: HTMLElement;
-    private _progressLeftCircleElement: HTMLElement;
-    private _progressRightCircleElement: HTMLElement;
-    private _progressWrapperElement: HTMLElement;
-    private _fullScreenButtonElement: HTMLElement;
 
+    private _fullScreenButtonElement: HTMLElement;
     private _fullScreenButtonVisible: boolean = false;
 
     private _fadeTimer: any;
@@ -73,7 +70,7 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip-icon'
+                selector: '.skip'
             },
             {
                 event: 'click',
@@ -99,15 +96,12 @@ export class Overlay extends View {
 
     public render(): void {
         super.render();
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-icon');
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        this._progressLeftCircleElement = <HTMLElement>this._container.querySelector('.circle-left');
-        this._progressRightCircleElement = <HTMLElement>this._container.querySelector('.circle-right');
-        this._progressWrapperElement = <HTMLElement>this._container.querySelector('.progress-wrapper');
         this._fullScreenButtonElement = <HTMLElement>this._container.querySelector('.full-screen-button');
     }
 
@@ -148,18 +142,21 @@ export class Overlay extends View {
             this._fadeTimer = setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
-            }, 3000);
+            }, 6000);
         }
 
         this._videoProgress = value;
         if(this._skipEnabled && this._skipRemaining > 0) {
-            this._skipRemaining = Math.round((this._skipDuration - value) / 1000);
+            this._skipRemaining = this._skipDuration - value;
             if(this._skipRemaining <= 0) {
                 this.setSkipElementVisible(true);
+                this.updateProgressCircle(this._skipElement, 1);
+            } else {
+                this.updateProgressCircle(this._skipElement, (this._skipDuration - this._skipRemaining) / this._skipDuration);
             }
         }
         this._progressElement.setAttribute('data-seconds',  Math.round((this._videoDuration - value) / 1000).toString());
-        this.updateProgressCircle();
+        this.updateProgressCircle(this._progressElement, this._videoProgress / this._videoDuration);
     }
 
     public setMuteEnabled(value: boolean) {
@@ -233,9 +230,11 @@ export class Overlay extends View {
 
     }
 
-    private updateProgressCircle() {
+    private updateProgressCircle(container: HTMLElement, value: number) {
+        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            this._progressWrapperElement.style.display = 'none';
+            wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
             this._container.offsetHeight;
@@ -243,13 +242,16 @@ export class Overlay extends View {
             this._container.style.display = 'block';
             return;
         }
-        const degree = (this._videoProgress / this._videoDuration) * 360;
-        const rotateParam = 'rotate(' + degree + 'deg)';
-        this._progressLeftCircleElement.style.webkitTransform = rotateParam;
 
-        if(this._videoProgress > this._videoDuration / 2) {
-            this._progressWrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            this._progressRightCircleElement.style.webkitAnimationName = 'right-spin';
+        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
+
+        const degrees = value * 360;
+        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+        if(value >= 0.5) {
+            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+            rightCircleElement.style.webkitAnimationName = 'right-spin';
         }
     }
 
