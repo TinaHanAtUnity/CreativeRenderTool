@@ -28,6 +28,7 @@ export class VideoAdUnitController {
 
     private _onShowObserver: any;
     private _onSystemKillObserver: any;
+    private _onSystemPauseObserver: any;
     private _onSystemInterruptObserver: any;
 
     private _videoStarted: boolean;
@@ -62,6 +63,7 @@ export class VideoAdUnitController {
 
         this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onSystemPauseObserver = this._adUnit.onSystemPause.subscribe(() => this.onSystemPause());
         this._onSystemInterruptObserver = this._adUnit.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
         return this._adUnit.open(adUnit, true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
@@ -200,6 +202,13 @@ export class VideoAdUnitController {
         if(this._showing) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
+        }
+    }
+
+    private onSystemPause(): void {
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback after interrupt');
+            this._nativeBridge.VideoPlayer.pause();
         }
     }
 

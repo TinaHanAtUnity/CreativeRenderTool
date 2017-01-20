@@ -12,6 +12,8 @@ interface IIosOptions {
 }
 
 export class IosAdUnit extends AdUnit {
+
+    private static _appWillResignActive: string = 'UIApplicationWillResignActiveNotification';
     private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
@@ -52,6 +54,7 @@ export class IosAdUnit extends AdUnit {
             }
         }
 
+        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._appWillResignActive, []);
         this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
 
@@ -86,6 +89,10 @@ export class IosAdUnit extends AdUnit {
         }
 
         switch(event) {
+            case IosAdUnit._appWillResignActive:
+                this.onSystemPause.trigger();
+                break;
+
             case IosAdUnit._appDidBecomeActive:
                 this.onSystemInterrupt.trigger();
                 break;

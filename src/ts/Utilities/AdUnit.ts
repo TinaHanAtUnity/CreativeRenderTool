@@ -4,6 +4,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 export abstract class AdUnit {
     public onShow: Observable0 = new Observable0(); // ad unit becomes visible
     public onSystemKill: Observable0 = new Observable0(); // ad unit killed by the system (Android only)
+    public onSystemPause: Observable0 = new Observable0(); // ad unit has been resigned from active (iOS only)
     public onSystemInterrupt: Observable0 = new Observable0(); // ad unit has been interrupted and video has been paused (iOS only)
 
     public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: any): Promise<void>;
