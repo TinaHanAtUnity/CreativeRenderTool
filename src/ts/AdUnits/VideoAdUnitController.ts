@@ -40,6 +40,8 @@ export class VideoAdUnitController {
     private _videoActive: boolean;
     private _showing: boolean = false;
 
+    private _forcePause = false;
+
     constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
@@ -141,6 +143,10 @@ export class VideoAdUnitController {
         return this._videoActive;
     }
 
+    public isForcePause(): boolean {
+        return this._forcePause;
+    }
+
     public setVideoActive(active: boolean): void {
         this._videoActive = active;
     }
@@ -208,6 +214,7 @@ export class VideoAdUnitController {
     private onSystemPause(): void {
         if(this._showing && this.isVideoActive()) {
             this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback after interrupt');
+            this._forcePause = true;
             this._nativeBridge.VideoPlayer.pause();
         }
     }
@@ -215,6 +222,7 @@ export class VideoAdUnitController {
     private onSystemInterrupt(): void {
         if(this._showing && this.isVideoActive()) {
             this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+            this._forcePause = false;
             this._nativeBridge.VideoPlayer.play();
         }
     }

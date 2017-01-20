@@ -222,7 +222,9 @@ export class AdUnitFactory {
 
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
-                nativeBridge.VideoPlayer.play();
+                if(!videoAdUnit.getVideoAdUnitController().isForcePause()) {
+                    nativeBridge.VideoPlayer.play();
+                }
             }
         });
 
