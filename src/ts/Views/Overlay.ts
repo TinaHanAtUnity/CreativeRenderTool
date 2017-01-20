@@ -258,7 +258,7 @@ export class Overlay extends View {
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
-            this._skipElement.style.display = value ? 'block' : 'none';
+            this._skipElement.style.opacity = value ? '1' : '0.4';
         }
     }
 
