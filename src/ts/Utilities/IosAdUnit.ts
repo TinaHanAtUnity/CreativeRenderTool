@@ -21,6 +21,7 @@ export class IosAdUnit extends AdUnit {
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _showing: boolean;
+    private _paused = false;
 
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
@@ -78,6 +79,10 @@ export class IosAdUnit extends AdUnit {
         ]);
     }
 
+    public isPaused() {
+        return this._paused;
+    }
+
     private onViewDidAppear(): void {
         this.onShow.trigger();
     }
@@ -90,10 +95,12 @@ export class IosAdUnit extends AdUnit {
 
         switch(event) {
             case IosAdUnit._appWillResignActive:
+                this._paused = true;
                 this.onSystemPause.trigger();
                 break;
 
             case IosAdUnit._appDidBecomeActive:
+                this._paused = false;
                 this.onSystemInterrupt.trigger();
                 break;
 

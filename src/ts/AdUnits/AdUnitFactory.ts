@@ -27,6 +27,7 @@ import { ThirdParty } from 'Views/ThirdParty';
 import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Overlay } from 'Views/Overlay';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 export class AdUnitFactory {
 
@@ -51,7 +52,7 @@ export class AdUnitFactory {
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, metaData);
+        this.prepareVideoPlayer(nativeBridge, adUnit, sessionManager, performanceAdUnit, metaData);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
@@ -87,7 +88,7 @@ export class AdUnitFactory {
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, metaData);
+        this.prepareVideoPlayer(nativeBridge, adUnit, sessionManager, vastAdUnit, metaData);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
@@ -178,7 +179,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnit, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
@@ -196,7 +197,7 @@ export class AdUnitFactory {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.prepareAndroidVideoPlayer(nativeBridge, adUnit);
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            this.prepareIosVideoPlayer(nativeBridge, adUnit);
+            this.prepareIosVideoPlayer(nativeBridge, <IosAdUnit>container, adUnit);
         }
     }
 
@@ -216,13 +217,13 @@ export class AdUnitFactory {
         });
     }
 
-    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: IosAdUnit, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
 
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
-                if(!videoAdUnit.getVideoAdUnitController().isForcePause()) {
+                if(!container.isPaused()) {
                     nativeBridge.VideoPlayer.play();
                 }
             }

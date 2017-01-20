@@ -78,6 +78,10 @@ export class AndroidAdUnit extends AdUnit {
         ]);
     }
 
+    public isPaused() {
+        return false;
+    }
+
     private onResume(activityId: number): void {
         if(activityId === this._activityId) {
             this.onShow.trigger();
