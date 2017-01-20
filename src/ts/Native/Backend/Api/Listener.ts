@@ -32,4 +32,11 @@ export class Listener {
         }
     }
 
+    public static sendClickEvent(placement: string) {
+        const listener = UnityAds.getListener();
+        if(listener) {
+            listener.onUnityAdsClick(placement);
+        }
+    }
+
 }

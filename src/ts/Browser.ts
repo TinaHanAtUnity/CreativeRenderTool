@@ -197,6 +197,9 @@ if(window.parent !== window) {
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
                 console.log('onUnityAdsError: ' + error + ' - ' + message);
+            },
+            onUnityAdsClick: (placement: string) => {
+                console.log('onUnityAdsClick: ' + placement);
             }
         };
         // tslint:enable:no-console
