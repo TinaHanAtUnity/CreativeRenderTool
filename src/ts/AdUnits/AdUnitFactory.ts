@@ -92,10 +92,12 @@ export class AdUnitFactory {
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
+        const onVideoErrorObserver = videoAdUnitController.onVideoError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
 
         vastAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
         });
 
         return vastAdUnit;
