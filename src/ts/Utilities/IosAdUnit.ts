@@ -66,6 +66,7 @@ export class IosAdUnit extends AdUnit {
 
     public close(): Promise<void> {
         this._showing = false;
+        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._appWillResignActive);
         this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionRouteChange);
         return this._nativeBridge.IosAdUnit.close();
