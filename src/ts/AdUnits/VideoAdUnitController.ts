@@ -7,6 +7,7 @@ import { FinishState } from 'Constants/FinishState';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Double } from 'Utilities/Double';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Platform } from 'Constants/Platform';
 
 export class VideoAdUnitController {
 
@@ -194,6 +195,14 @@ export class VideoAdUnitController {
 
     private onShow() {
         if(this._showing && this.isVideoActive()) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                if(this.getCampaign().isVideoCached()) {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                } else {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                }
+            }
+
             this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }

@@ -26,6 +26,14 @@ export class NotificationApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'removeAllNotificationObservers');
     }
 
+    public addAVNotificationObserver(name: string, keys: string[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'addAVNotificationObserver', [name, keys]);
+    }
+
+    public removeAVNotificationObserver(name: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'removeAVNotificationObserver', [name]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case NotificationEvent[NotificationEvent.ACTION]:
