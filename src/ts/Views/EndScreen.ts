@@ -91,11 +91,11 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: Campaign) {
-        const abGroup = campaign.getAbGroup();
-        if(abGroup === 10 || abGroup === 11) {
-            return 'tabletrev';
-        }
-        return undefined;
+        //const abGroup = campaign.getAbGroup();
+        //if(abGroup === 10 || abGroup === 11) {
+            return 'chinesenewyear';
+        //}
+        //return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
