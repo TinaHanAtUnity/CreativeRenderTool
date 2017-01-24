@@ -7,6 +7,9 @@ import { FinishState } from 'Constants/FinishState';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Double } from 'Utilities/Double';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Platform } from 'Constants/Platform';
+import { IosUtils } from 'Utilities/IosUtils';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class VideoAdUnitController {
 
@@ -23,6 +26,7 @@ export class VideoAdUnitController {
     private _adUnit: AdUnit;
     private _placement: Placement;
     private _campaign: Campaign;
+    private _deviceInfo: DeviceInfo;
     private _overlay: Overlay | undefined;
     private _options: any;
 
@@ -40,11 +44,12 @@ export class VideoAdUnitController {
     private _videoActive: boolean;
     private _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, deviceInfo: DeviceInfo, overlay: Overlay, options: any) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._placement = placement;
         this._campaign = campaign;
+        this._deviceInfo = deviceInfo;
         this._overlay = overlay;
         this._options = options;
 
@@ -194,6 +199,14 @@ export class VideoAdUnitController {
 
     private onShow() {
         if(this._showing && this.isVideoActive()) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+                if(this.getCampaign().isVideoCached()) {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                } else {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                }
+            }
+
             this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }

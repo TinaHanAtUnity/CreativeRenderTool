@@ -47,7 +47,7 @@ export class AdUnitFactory {
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         const metaData = new MetaData(nativeBridge);
 
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
@@ -76,7 +76,7 @@ export class AdUnitFactory {
         let vastAdUnit: VastAdUnit;
 
         const metaData = new MetaData(nativeBridge);
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
 
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
@@ -142,8 +142,8 @@ export class AdUnitFactory {
 
     };
 
-    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
-        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, deviceInfo: DeviceInfo, overlay: Overlay, options: any): VideoAdUnitController {
+        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
     }
 
     private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {

@@ -53,7 +53,7 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         eventManager = new EventManager(nativeBridge, request);
-        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
+        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
         vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
     });
 
@@ -141,7 +141,7 @@ describe('VastAdUnit', () => {
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
+            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
             vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
         });
 
@@ -237,7 +237,7 @@ describe('VastAdUnit', () => {
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
+            const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
             vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy(),
                 remove: sinon.spy()

@@ -56,8 +56,8 @@ export class IosAdUnit extends AdUnit {
         }
 
         this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._appWillResignActive, []);
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
+        this._nativeBridge.Notification.addAVNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
+        this._nativeBridge.Notification.addAVNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
@@ -67,8 +67,8 @@ export class IosAdUnit extends AdUnit {
     public close(): Promise<void> {
         this._showing = false;
         this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._appWillResignActive);
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionInterrupt);
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionRouteChange);
+        this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionInterrupt);
+        this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionRouteChange);
         return this._nativeBridge.IosAdUnit.close();
     }
 
