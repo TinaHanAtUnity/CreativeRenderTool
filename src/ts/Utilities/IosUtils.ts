@@ -6,4 +6,11 @@ export class IosUtils {
         }
         return false;
     }
+
+    public static hasVideoStallingApi(osVersion: string): boolean {
+        if(osVersion.match(/^1/)) {
+            return true;
+        }
+        return false;
+    }
 }

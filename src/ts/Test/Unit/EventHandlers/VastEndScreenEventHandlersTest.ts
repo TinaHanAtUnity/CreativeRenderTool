@@ -30,7 +30,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         });
         adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{hide: sinon.spy()}, null);
+        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, <Placement><any>{}, <VastCampaign><any>{getVast: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), <Overlay><any>{hide: sinon.spy()}, null);
     });
 
     describe('when calling onClose', () => {

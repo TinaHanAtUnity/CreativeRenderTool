@@ -73,7 +73,7 @@ describe('VastVideoEventHandlers tests', () => {
             ]
         };
         const campaignWithTrackers = new VastCampaign(vast, '12345', 'gamerId', 1, 10, customTracking);
-        const videoAdUnitCtrl = new VideoAdUnitController(nativeBridge, adUnit, placement, campaignWithTrackers, overlay, null);
+        const videoAdUnitCtrl = new VideoAdUnitController(nativeBridge, adUnit, placement, campaignWithTrackers, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
         const adUnitWithTrackers = new VastAdUnit(nativeBridge, adUnit, videoAdUnitCtrl);
 
         const mockEventManager = sinon.mock(eventManager);
@@ -171,7 +171,7 @@ describe('VastVideoEventHandlers tests', () => {
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
         sessionManager.setSession(new Session('123'));
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, null);
+        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
         testAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
         sinon.spy(testAdUnit, 'hide');
     });
