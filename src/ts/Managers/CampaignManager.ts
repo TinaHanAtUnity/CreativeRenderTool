@@ -13,6 +13,9 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+
+import TestMRAID from 'html/fixtures/TestMRAID.html';
 
 export class CampaignManager {
 
@@ -45,6 +48,7 @@ export class CampaignManager {
     public onCampaign: Observable1<Campaign> = new Observable1();
     public onVastCampaign: Observable1<Campaign> = new Observable1();
     public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
+    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<any> = new Observable1();
 
@@ -87,6 +91,8 @@ export class CampaignManager {
             this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
             this.parseVastCampaign(json);
+        } else if('mraid' in json) {
+            this.parseMRAIDCampaign(json);
         } else {
             this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill');
             this.onNoFill.trigger(3600); // default to retry in one hour, this value should be set by server
@@ -193,6 +199,11 @@ export class CampaignManager {
         }).catch((error) => {
             this.onError.trigger(error);
         });
+    }
+
+    private parseMRAIDCampaign(json: any) {
+        const campaign = new MRAIDCampaign(undefined, 'gamerId', 0, '', TestMRAID);
+        this.onMRAIDCampaign.trigger(campaign);
     }
 
     private createRequestUrl(): Promise<string> {
