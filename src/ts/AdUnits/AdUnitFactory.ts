@@ -28,6 +28,9 @@ import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Overlay } from 'Views/Overlay';
 import { IosAdUnit } from 'Utilities/IosAdUnit';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { MRAID } from 'Views/MRAID';
 
 export class AdUnitFactory {
 
@@ -37,6 +40,8 @@ export class AdUnitFactory {
             return this.createVastAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof HtmlCampaign) {
             return this.createHtmlAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, options);
+        } else if(campaign instanceof MRAIDCampaign) {
+            return this.createMRAIDAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, options);
         } else {
             return this.createPerformanceAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, placement, campaign, configuration, options);
         }
@@ -113,6 +118,18 @@ export class AdUnitFactory {
         thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
 
         return thirdPartyAdUnit;
+    }
+
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, adUnit: AdUnit, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
+        const mraid = new MRAID(nativeBridge, placement, campaign);
+        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, adUnit, sessionManager, placement, campaign, mraid, options);
+
+        mraid.render();
+        document.body.appendChild(mraid.container());
+        mraid.onClick.subscribe(() => sessionManager.sendClick(mraidAdUnit));
+        mraid.onClose.subscribe(() => mraidAdUnit.hide());
+
+        return mraidAdUnit;
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {

@@ -3,17 +3,17 @@
 <head>
     <title>Unity Ads WebView</title>
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="format-detection" content="telephone=no" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
 
     <script id="mraid">
         var mraid = window.mraid = {};
 
         mraid.getState = function() {
-            return 'ready';
+            return 'expanded';
         };
         mraid.getVersion = function() {
             return '2.0';
@@ -31,8 +31,10 @@
                 forceOrientation: 'none'
             };
         };
-        mraid.addEventListener = function() {
-
+        mraid.addEventListener = function(event, listener) {
+            if(event === 'ready') {
+                listener();
+            }
         };
         mraid.isViewable = function() {
             return true;
@@ -71,31 +73,28 @@
                 height: document.body.clientHeight
             };
         };
+        mraid.useCustomClose = function() {};
     </script>
     <script>
-        var getQueryParameter = function(parameter) {
-            if(!location.search.length || location.search.indexOf('?') === -1) {
-                return undefined;
-            }
-            var queryString = location.search.split('?')[1].split('&');
-            for(var i = 0; i < queryString.length; i++) {
-                var queryParam = queryString[i].split('=');
-                if(queryParam[0] === parameter) {
-                    return queryParam[1];
-                }
-            }
-            return undefined;
+        var initialize = function(mraid) {
+            document.write(mraid.replace('<scr' + 'ipt src="mraid.js"></scr' + 'ipt>', '<scr' + 'ipt>' + document.getElementById('mraid').innerHTML + '</scr' + 'ipt>'));
         };
 
-        var mraid = getQueryParameter('mraid');
-        if(mraid) {
-            var xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', function() {
-                document.write(xhr.responseText.replace('<scr' + 'ipt src="mraid.js"></scr' + 'ipt>', '<scr' + 'ipt>' + document.getElementById('mraid').innerHTML + '</scr' + 'ipt>'));
-            }, false);
-            xhr.open('GET', decodeURIComponent(mraid));
-            xhr.send();
-        }
+        window.addEventListener('message', function(event) {
+            console.dir(event);
+            if(event && event.data && typeof event.data === 'object') {
+                if(event.data.url) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.addEventListener('load', function() {
+                        initialize(xhr.responseText);
+                    }, false);
+                    xhr.open('GET', decodeURIComponent(mraid));
+                    xhr.send();
+                } else if(event.data.data) {
+                    initialize(event.data.data);
+                }
+            }
+        }, false);
     </script>
 </head>
 <body></body>

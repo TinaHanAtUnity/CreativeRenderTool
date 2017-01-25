@@ -87,6 +87,12 @@ export class CampaignManager {
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
         }
+
+        if(1 === 1) {
+            this.parseMRAIDCampaign(json);
+            return;
+        }
+
         if('campaign' in json) {
             this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
@@ -202,7 +208,7 @@ export class CampaignManager {
     }
 
     private parseMRAIDCampaign(json: any) {
-        const campaign = new MRAIDCampaign(undefined, 'gamerId', 0, '', TestMRAID);
+        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', TestMRAID);
         this.onMRAIDCampaign.trigger(campaign);
     }
 
