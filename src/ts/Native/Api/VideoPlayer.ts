@@ -80,6 +80,10 @@ export class VideoPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<Double>(this._apiClass, 'setVolume', [volume]);
     }
 
+    public setAutomaticallyWaitsToMinimizeStalling(value: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:

@@ -59,7 +59,7 @@ describe('EndScreenEventHandlersTest', () => {
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => 'fooAppId',
                 getClickAttributionUrlFollowsRedirects: () => true
-            }, overlay, null);
+            }, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });
@@ -157,7 +157,7 @@ describe('EndScreenEventHandlersTest', () => {
                 getClickAttributionUrlFollowsRedirects: () => true,
                 getBypassAppSheet: () => false,
                 getClickAttributionUrl: () => ''
-            }, overlay, null);
+            }, TestFixtures.getDeviceInfo(Platform.IOS), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });

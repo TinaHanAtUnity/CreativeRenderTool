@@ -7,6 +7,9 @@ import { FinishState } from 'Constants/FinishState';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Double } from 'Utilities/Double';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Platform } from 'Constants/Platform';
+import { IosUtils } from 'Utilities/IosUtils';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class VideoAdUnitController {
 
@@ -23,11 +26,13 @@ export class VideoAdUnitController {
     private _adUnit: AdUnit;
     private _placement: Placement;
     private _campaign: Campaign;
+    private _deviceInfo: DeviceInfo;
     private _overlay: Overlay | undefined;
     private _options: any;
 
     private _onShowObserver: any;
     private _onSystemKillObserver: any;
+    private _onSystemPauseObserver: any;
     private _onSystemInterruptObserver: any;
 
     private _videoStarted: boolean;
@@ -39,11 +44,12 @@ export class VideoAdUnitController {
     private _videoActive: boolean;
     private _showing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any) {
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, deviceInfo: DeviceInfo, overlay: Overlay, options: any) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._placement = placement;
         this._campaign = campaign;
+        this._deviceInfo = deviceInfo;
         this._overlay = overlay;
         this._options = options;
 
@@ -62,6 +68,7 @@ export class VideoAdUnitController {
 
         this._onShowObserver = this._adUnit.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._adUnit.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onSystemPauseObserver = this._adUnit.onSystemPause.subscribe(() => this.onSystemPause());
         this._onSystemInterruptObserver = this._adUnit.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
         return this._adUnit.open(adUnit, true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
@@ -192,6 +199,14 @@ export class VideoAdUnitController {
 
     private onShow() {
         if(this._showing && this.isVideoActive()) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+                if(this.getCampaign().isVideoCached()) {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                } else {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                }
+            }
+
             this._nativeBridge.VideoPlayer.prepare(this.getVideoUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
         }
     }
@@ -203,10 +218,19 @@ export class VideoAdUnitController {
         }
     }
 
+    private onSystemPause(): void {
+        if(this._showing && this.isVideoActive()) {
+            this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback after interrupt');
+            this._nativeBridge.VideoPlayer.pause();
+        }
+    }
+
     private onSystemInterrupt(): void {
         if(this._showing && this.isVideoActive()) {
             this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
-            this._nativeBridge.VideoPlayer.play();
+            if(!this._adUnit.isPaused()) {
+                this._nativeBridge.VideoPlayer.play();
+            }
         }
     }
 }
