@@ -114,16 +114,21 @@ const setIosDeviceInfo = () => {
 
 if(window.parent !== window) {
     const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
+    const campaignIdElement = <HTMLInputElement>window.parent.document.getElementById('campaignId');
+    const countryElement = <HTMLInputElement>window.parent.document.getElementById('country');
     const platformElement = <HTMLInputElement>window.parent.document.getElementById('platform');
     const gameIdElement = <HTMLInputElement>window.parent.document.getElementById('gameId');
     const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
     const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
     const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
     initializeButton.addEventListener('click', (event: Event) => {
         event.preventDefault();
 
         abGroupElement.disabled = true;
+        campaignIdElement.disabled = true;
+        countryElement.disabled = true;
         platformElement.disabled = true;
         gameIdElement.disabled = true;
         testModeElement.disabled = true;
@@ -140,9 +145,27 @@ if(window.parent !== window) {
                 ts: Date.now()
             };
         }
+        if(campaignIdElement.value.length) {
+            publicStorage.test.campaignId = {
+                value: campaignIdElement.value,
+                ts: Date.now()
+            };
+        }
+        if(countryElement.value.length) {
+            publicStorage.test.country = {
+                value: countryElement.value,
+                ts: Date.now()
+            };
+        }
         if(autoSkipElement.checked) {
             publicStorage.test.autoSkip = {
                 value: true,
+                ts: Date.now()
+            };
+        }
+        if(campaignResponseElement.value.length) {
+            publicStorage.test.campaignResponse = {
+                value: campaignResponseElement.value,
                 ts: Date.now()
             };
         }

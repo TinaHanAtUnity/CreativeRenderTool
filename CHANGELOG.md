@@ -1,3 +1,68 @@
+# Wed Jan 25 09:58:18 UTC 201
+
+* End tablet layout AB test
+* Add Chinese new year AB test
+* Pause videos on iOS when notification/control center is pulled visible
+* Prevent brand ad video errors causing a black screen
+
+# Wed Jan 18 10:39:48 UTC 2017
+
+* New overlay to all groups
+* Video errors without progress events will close ad
+* VAST events to httpkafka
+* Browser build improvements
+
+# Mon Jan 16 11:58:22 UTC 2017
+
+* Revert two emergency fixes because backend is now able to keep up with the load
+
+# Sun Jan 15 14:21:00 UTC 2017
+
+* Emergency fix: disabled all ad request retries to help with backend load
+
+# Sun Jan 15 12:28:00 UTC 2017
+
+* Emergency fix: disabled resending any failed events to help with backend load
+
+# Thu Jan 12 15:41:06 UTC 2017
+
+* Improved layout for large tablets A/B test
+* Add optional delay for autoclosing ad units
+* Improve deployment scripts
+
+# Wed Jan 11 12:55:17 UTC 2017
+
+* Refactor AdUnit API handling from different ad units to a common utility class
+
+# Tue Jan 10 12:20:51 UTC 2017
+
+* Hide overlay header bar if skip disabled
+* Video overlay with icons AB test
+
+# Thu Jan 5 09:25:01 UTC 2017
+
+* Remove xmas theme
+
+# Thu Dec 22 16:34:25 UTC 2016
+
+* Use Travis to work around iOS native 2.0.6 and 2.0.7 releases that used webview master instead of release branches
+
+# Tue Dec 20 10:38:00 UTC 2016
+
+* Flip end screen images to match 1.5 behaviour
+
+# Mon Dec 19 13:33:52 UTC 2016
+
+* Add campaign ID to video_too_long diagnostic message
+* Add test option to force a country, campaign or A/B group
+* Send only Google Play Advertising ID or Android ID in diagnostic messages, never both
+* Add Xmas endscreen to all A/B groups except 8 and 9
+
+# Thu Dec 15 16:46:43 UTC 2016
+
+* Removed Marvel AB test from groups 8-11
+* Added christmas theme AB test to groups 8 & 9
+
 # Tue Dec 13 11:49:18 UTC 2016
 
 * Diagnostics message for videos over 40 seconds

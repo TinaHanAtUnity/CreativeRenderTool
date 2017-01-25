@@ -13,16 +13,17 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Campaign } from 'Models/Campaign';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
-import { IosVideoAdUnitController } from 'AdUnits/IosVideoAdUnitController';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 describe('EndScreenEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -35,6 +36,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             });
 
+            adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo());
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
@@ -53,13 +55,13 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getPlacement(), <Campaign>{
+            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => 'fooAppId',
                 getClickAttributionUrlFollowsRedirects: () => true
-            }, overlay, null);
+            }, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -129,6 +131,8 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            adUnit = new IosAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
@@ -147,15 +151,15 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            videoAdUnitController = new IosVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getPlacement(), <Campaign>{
+            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign>{
                 getVideoUrl: () => 'fake url',
                 getAppStoreId: () => '11111',
                 getClickAttributionUrlFollowsRedirects: () => true,
                 getBypassAppSheet: () => false,
                 getClickAttributionUrl: () => ''
-            }, overlay, null);
+            }, TestFixtures.getDeviceInfo(Platform.IOS), overlay, null);
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, videoAdUnitController, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });
 
         it('should send a click with session manager', () => {

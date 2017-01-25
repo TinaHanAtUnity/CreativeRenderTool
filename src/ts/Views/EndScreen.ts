@@ -33,8 +33,9 @@ export class EndScreen extends View {
             this._templateData = {
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon(),
-                'endScreenLandscape': campaign.getLandscapeUrl(),
-                'endScreenPortrait': campaign.getPortraitUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortraitUrl(),
+                'endScreenPortrait': campaign.getLandscapeUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
@@ -45,7 +46,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .coc_cta'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
@@ -73,10 +74,10 @@ export class EndScreen extends View {
         nameContainer.innerHTML = this._gameName + ' ';
 
         if(AbstractAdUnit.getAutoClose()) {
-            this.onClose.trigger();
+           setTimeout(() => {
+               this.onClose.trigger();
+           }, AbstractAdUnit.getAutoCloseDelay());
         }
-
-        this.triggerAnimations();
     }
 
     public hide(): void {
@@ -91,25 +92,10 @@ export class EndScreen extends View {
 
     private getEndscreenAlt(campaign: Campaign) {
         const abGroup = campaign.getAbGroup();
-        const gameId = campaign.getGameId();
-        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated';
-        }
-        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated2';
+        if(abGroup === 10 || abGroup === 11) {
+            return 'chinesenewyear';
         }
         return undefined;
-    }
-
-    private triggerAnimations() {
-        const charsElement = <HTMLElement>this._container.querySelector('.cocchars');
-        const logoElement = <HTMLElement>this._container.querySelector('.coclogo');
-        if(charsElement) {
-            charsElement.classList.add('cocchars2');
-        }
-        if(logoElement) {
-            logoElement.classList.add('coclogo2');
-        }
     }
 
     private onDownloadEvent(event: Event): void {

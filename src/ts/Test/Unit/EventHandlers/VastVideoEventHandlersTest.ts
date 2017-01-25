@@ -15,9 +15,11 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { AndroidVideoAdUnitController } from 'AdUnits/AndroidVideoAdUnitController';
+import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { AdUnit } from 'Utilities/AdUnit';
+import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -25,6 +27,7 @@ describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let adUnit: AdUnit;
     let campaign: VastCampaign;
     let placement: Placement;
     let deviceInfo: DeviceInfo;
@@ -35,8 +38,8 @@ describe('VastVideoEventHandlers tests', () => {
     let request: Request;
     let eventManager: EventManager;
     let sessionManager: SessionManager;
-    let adUnit: VastAdUnit;
-    let videoAdUnitController: AndroidVideoAdUnitController;
+    let testAdUnit: VastAdUnit;
+    let videoAdUnitController: VideoAdUnitController;
 
     it('sends start events from VAST', () => {
         // given a VAST placement
@@ -47,7 +50,7 @@ describe('VastVideoEventHandlers tests', () => {
         mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '123', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
         mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '123', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        VastVideoEventHandlers.onVideoStart(sessionManager, adUnit);
+        VastVideoEventHandlers.onVideoStart(sessionManager, testAdUnit);
 
         mockEventManager.verify();
     });
@@ -70,8 +73,8 @@ describe('VastVideoEventHandlers tests', () => {
             ]
         };
         const campaignWithTrackers = new VastCampaign(vast, '12345', 'gamerId', 1, 10, customTracking);
-        const videoAdUnitCtrl = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaignWithTrackers, overlay, null);
-        const adUnitWithTrackers = new VastAdUnit(nativeBridge, videoAdUnitCtrl);
+        const videoAdUnitCtrl = new VideoAdUnitController(nativeBridge, adUnit, placement, campaignWithTrackers, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
+        const adUnitWithTrackers = new VastAdUnit(nativeBridge, adUnit, videoAdUnitCtrl);
 
         const mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://customTrackingUrl/start');
@@ -93,19 +96,19 @@ describe('VastVideoEventHandlers tests', () => {
         const mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast complete', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        VastVideoEventHandlers.onVideoCompleted(sessionManager, adUnit);
+        VastVideoEventHandlers.onVideoCompleted(sessionManager, testAdUnit);
 
         mockEventManager.verify();
     });
 
     it('should hide ad unit when onVideoCompleted', () => {
-        VastVideoEventHandlers.onVideoCompleted(sessionManager, adUnit);
-        sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+        VastVideoEventHandlers.onVideoCompleted(sessionManager, testAdUnit);
+        sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
     });
 
     it('should hide ad unit when onVideoError', () => {
-        VastVideoEventHandlers.onVideoError(adUnit);
-        sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+        VastVideoEventHandlers.onVideoError(testAdUnit);
+        sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
     });
 
     describe('with companion ad', () => {
@@ -114,21 +117,21 @@ describe('VastVideoEventHandlers tests', () => {
             vastEndScreen = <VastEndScreen><any> {
                 show: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, videoAdUnitController, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
         });
 
         it('should show end screen when onVideoCompleted', () => {
             VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
-            sinon.assert.notCalled(<sinon.SinonSpy>adUnit.hide);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 
         it('should show end screen when onVideoError', () => {
             VastVideoEventHandlers.onVideoError(vastAdUnit);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
-            sinon.assert.notCalled(<sinon.SinonSpy>adUnit.hide);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
     });
 
@@ -137,6 +140,8 @@ describe('VastVideoEventHandlers tests', () => {
             handleInvocation,
             handleCallback
         });
+
+        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         overlay = new Overlay(nativeBridge, false, 'en');
 
@@ -166,9 +171,9 @@ describe('VastVideoEventHandlers tests', () => {
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
         sessionManager.setSession(new Session('123'));
-        videoAdUnitController = new AndroidVideoAdUnitController(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID), placement, campaign, overlay, null);
-        adUnit = new VastAdUnit(nativeBridge, videoAdUnitController);
-        sinon.spy(adUnit, 'hide');
+        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
+        testAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+        sinon.spy(testAdUnit, 'hide');
     });
 
 });

@@ -45,6 +45,9 @@ export class VideoPlayer {
     public static play() {
         if(VideoPlayer._videoView) {
             const videoView = VideoPlayer._videoView;
+            videoView.addEventListener('play', () => {
+                Backend.sendEvent('VIDEOPLAYER', 'PLAY');
+            }, false);
             videoView.addEventListener('timeupdate', () => {
                 Backend.sendEvent('VIDEOPLAYER', 'PROGRESS', Math.round(videoView.currentTime * 1000));
             }, false);
@@ -54,6 +57,7 @@ export class VideoPlayer {
             videoView.play();
         } else {
             let currentTime = 0;
+            Backend.sendEvent('VIDEOPLAYER', 'PLAY');
             VideoPlayer._progressTimer = setInterval(() => {
                 currentTime += 250;
                 if(currentTime >= VideoPlayer._duration) {

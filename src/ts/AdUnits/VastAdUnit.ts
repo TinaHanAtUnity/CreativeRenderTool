@@ -5,19 +5,20 @@ import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { AdUnit } from 'Utilities/AdUnit';
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
-        super(nativeBridge, videoAdUnitController);
+    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen?: VastEndScreen) {
+        super(nativeBridge, adUnit, videoAdUnitController);
 
         this._endScreen = endScreen || null;
     }
 
     public show(): Promise<void> {
-        return this._videoAdUnitController.show();
+        return this._videoAdUnitController.show(this);
     }
 
     public hide(): Promise<void> {
@@ -32,6 +33,10 @@ export class VastAdUnit extends VideoAdUnit {
 
     public isShowing(): boolean {
         return this._videoAdUnitController.isShowing();
+    }
+
+    public description(): string {
+        return 'VAST';
     }
 
     public getVast(): Vast {
