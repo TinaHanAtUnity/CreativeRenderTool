@@ -115,6 +115,7 @@ export class Overlay extends View {
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
+            this._skipElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -142,7 +143,7 @@ export class Overlay extends View {
             this._fadeTimer = setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
-            }, 6000);
+            }, 3000);
         }
 
         this._videoProgress = value;
@@ -221,7 +222,14 @@ export class Overlay extends View {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
         }
-        this.fade(false);
+
+        if(this._container.classList.contains('fade')) {
+            this.fade(false);
+        } else if(this._container.style.opacity === '0') {
+            this._container.style.opacity = null;
+        } else {
+            this._container.style.opacity = '0';
+        }
     }
 
     private onFullScreenButtonEvent(event: Event): void {
