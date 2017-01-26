@@ -35,6 +35,7 @@ export class MRAID extends View {
         const iframe: any = this._iframe = <HTMLIFrameElement>document.createElement('iframe');
         iframe.id = this._id;
         iframe.srcdoc = MRAIDContainer;
+        window.addEventListener('message', (event: MessageEvent) => this.onMessage(event), false);
         this._container = iframe;
     }
 
@@ -58,6 +59,12 @@ export class MRAID extends View {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this.onClose.trigger();
+    }
+
+    private onMessage(event: MessageEvent) {
+        if(event.data === 'close') {
+            this.onClose.trigger();
+        }
     }
 
 }

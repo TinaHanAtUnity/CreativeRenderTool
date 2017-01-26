@@ -16,6 +16,7 @@ import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
 import TestMRAID from 'html/fixtures/TestMRAID.html';
+// import SimpleTestMRAID from 'html/fixtures/SimpleTestMRAID.html';
 
 export class CampaignManager {
 
