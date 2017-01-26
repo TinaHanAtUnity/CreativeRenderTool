@@ -200,6 +200,7 @@ export class Overlay extends View {
 
     private onSkipEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
         if(this._skipEnabled && this._videoProgress > this._skipDuration) {
             this.onSkip.trigger(this._videoProgress);
         }
@@ -207,6 +208,8 @@ export class Overlay extends View {
 
     private onMuteEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
+        this.resetSlideTimer();
         if(this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
@@ -219,14 +222,13 @@ export class Overlay extends View {
 
     private onCallButtonEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
+        this.resetSlideTimer();
         this.onCallButton.trigger(true);
     }
 
     private onClick(event: Event) {
-        if(this._slideTimer) {
-            clearTimeout(this._slideTimer);
-            this._slideTimer = undefined;
-        }
+        this.resetSlideTimer();
 
         if(!this._slideStatus) {
             this.slide(false);
@@ -237,6 +239,8 @@ export class Overlay extends View {
 
     private onFullScreenButtonEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
+        this.resetSlideTimer();
         this.onFullScreenButton.trigger(true);
 
     }
@@ -270,6 +274,13 @@ export class Overlay extends View {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
             this._skipElement.style.opacity = value ? '1' : '0.4';
+        }
+    }
+
+    private resetSlideTimer() {
+        if(this._slideTimer) {
+            clearTimeout(this._slideTimer);
+            this._slideTimer = undefined;
         }
     }
 
