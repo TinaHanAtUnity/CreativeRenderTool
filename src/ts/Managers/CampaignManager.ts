@@ -15,8 +15,10 @@ import { StorageType } from 'Native/Api/Storage';
 import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
-import TestMRAID from 'html/fixtures/TestMRAID.html';
-// import SimpleTestMRAID from 'html/fixtures/SimpleTestMRAID.html';
+import TestMRAID from 'html/fixtures/mraid/TestMRAID.html';
+// import TestMRAID2 from 'html/fixtures/mraid/TestMRAID2.html';
+// import SimpleTestMRAID from 'html/fixtures/mraid/SimpleTestMRAID.html';
+// import DiagnosticMRAID from 'html/fixtures/mraid/DiagnosticMRAID.html';
 
 export class CampaignManager {
 

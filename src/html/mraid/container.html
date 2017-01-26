@@ -74,7 +74,9 @@
                         listeners[event].push(listener);
                     }
                     if(event === 'ready' && state === 'default') {
-                        trigger('ready');
+                        setTimeout(function() {
+                            trigger('ready');
+                        }, 2000);
                     }
                 };
 
