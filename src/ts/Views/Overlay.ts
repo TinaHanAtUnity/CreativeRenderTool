@@ -41,6 +41,8 @@ export class Overlay extends View {
 
     private _callButtonVisible: boolean = false;
 
+    private _headerElement: HTMLElement;
+    private _footerElement: HTMLElement;
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
@@ -52,7 +54,8 @@ export class Overlay extends View {
     private _fullScreenButtonElement: HTMLElement;
     private _fullScreenButtonVisible: boolean = false;
 
-    private _fadeTimer: any;
+    private _slideTimer: any;
+    private _slideStatus: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
@@ -96,6 +99,8 @@ export class Overlay extends View {
 
     public render(): void {
         super.render();
+        this._headerElement = <HTMLElement>this._container.querySelector('.header');
+        this._footerElement = <HTMLElement>this._container.querySelector('.footer');
         this._skipElement = <HTMLElement>this._container.querySelector('.skip');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
@@ -139,10 +144,10 @@ export class Overlay extends View {
             this.onSkip.trigger(value);
         }
 
-        if(!this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            this._fadeTimer = setTimeout(() => {
-                this.fade(true);
-                this._fadeTimer = undefined;
+        if(!this._slideTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
+            this._slideTimer = setTimeout(() => {
+                this.slide(true);
+                this._slideTimer = undefined;
             }, 3000);
         }
 
@@ -218,17 +223,13 @@ export class Overlay extends View {
     }
 
     private onClick(event: Event) {
-        if(this._fadeTimer) {
-            clearTimeout(this._fadeTimer);
-            this._fadeTimer = undefined;
+        if(this._slideTimer) {
+            clearTimeout(this._slideTimer);
+            this._slideTimer = undefined;
         }
 
-        if(this._container.classList.contains('fade')) {
-            this.fade(false);
-        } else if(this._container.style.opacity === '0') {
-            this._container.style.opacity = null;
-        } else {
-            this._container.style.opacity = '0';
+        if(!this._slideStatus) {
+            this.slide(false);
         }
     }
 
@@ -270,12 +271,15 @@ export class Overlay extends View {
         }
     }
 
-    private fade(value: boolean) {
+    private slide(value: boolean) {
         if(value) {
-            this._container.classList.add('fade');
+            this._headerElement.style.transform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
+            this._footerElement.style.transform = 'translateY(' + this._footerElement.clientHeight + 'px)';
+            this._slideStatus = false;
         } else {
-            this._container.classList.remove('fade');
+            this._headerElement.style.transform = 'translateY(0px)';
+            this._footerElement.style.transform = 'translateY(0px)';
+            this._slideStatus = true;
         }
     }
-
 }
