@@ -230,6 +230,8 @@ export class Overlay extends View {
 
         if(!this._slideStatus) {
             this.slide(false);
+        } else {
+            this.slide(true);
         }
     }
 
