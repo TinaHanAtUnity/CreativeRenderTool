@@ -40,16 +40,15 @@ export class MRAID extends View {
 
     public show(): void {
         super.show();
-        console.log('showing');
         setTimeout(() => {
             if(this._campaign.getResource()) {
-                console.log('posting data');
                 this._iframe.contentWindow.postMessage({
+                    type: 'initialize',
                     data: this._campaign.getResource()
                 }, '*');
             } else if(this._campaign.getResourceUrl()) {
-                console.log('posting url');
                 this._iframe.contentWindow.postMessage({
+                    type: 'initialize',
                     url: this._campaign.getResourceUrl()
                 }, '*');
             }

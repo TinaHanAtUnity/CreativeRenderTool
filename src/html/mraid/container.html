@@ -10,88 +10,163 @@
     <meta name="format-detection" content="telephone=no"/>
 
     <script id="mraid">
-        var mraid = window.mraid = {};
-
-        mraid.getState = function() {
-            return 'expanded';
-        };
-        mraid.getVersion = function() {
-            return '2.0';
-        };
-        mraid.getPlacementType = function() {
-            return 'interstitial';
-        };
-        mraid.supports = function() {
-            return false;
-        };
-        mraid.setOrientationProperties = function() {};
-        mraid.getOrientationProperties = function() {
-            return {
-                allowOrientationChange: true,
-                forceOrientation: 'none'
-            };
-        };
-        mraid.addEventListener = function(event, listener) {
-            if(event === 'ready') {
-                listener();
+        (function(initialize) {
+            if(!initialize) {
+                return;
             }
-        };
-        mraid.isViewable = function() {
-            return true;
-        };
-        mraid.getCurrentPosition = mraid.getDefaultPosition = function() {
-            return {
-                x: 0,
-                y: 0,
-                width: document.body.clientWidth,
-                height: document.body.clientHeight
+
+            var MRAID = function() {
+                var state = 'loading';
+                var listeners = {
+                    ready: [],
+                    error: [],
+                    stateChange: [],
+                    viewableChange: [],
+                    sizeChange: []
+                };
+
+                var trigger = function(event, parameters) {
+                    if(!parameters) {
+                        parameters = [];
+                    }
+                    if(event in listeners) {
+                        listeners[event].forEach(function(listener) {
+                            listener.apply(window, parameters);
+                        });
+                    }
+                };
+
+                this.getState = function() {
+                    return state;
+                };
+
+                var setState = function(newState) {
+                    state = newState;
+                    trigger('stateChange', [newState]);
+                };
+
+                this.getVersion = function() {
+                    return '2.0';
+                };
+
+                this.getPlacementType = function() {
+                    return 'interstitial';
+                };
+
+                this.setOrientationProperties = function() {};
+                this.getOrientationProperties = function() {
+                    return {
+                        allowOrientationChange: true,
+                        forceOrientation: 'none'
+                    };
+                };
+
+                this.supports = function() {
+                    return false;
+                };
+
+                this.getPlacementType = function() {
+                    return 'interstitial';
+                };
+
+                this.addEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        listeners[event].push(listener);
+                    }
+                    if(event === 'ready' && state === 'default') {
+                        trigger('ready');
+                    }
+                };
+
+                this.removeEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        var index = listeners[event].indexOf(listener);
+                        if(index !== -1) {
+                            listeners[event].splice(index, 1);
+                        }
+                    }
+                };
+
+                this.isViewable = function() {
+                    return true;
+                };
+
+                this.getCurrentPosition = this.getDefaultPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: document.body.clientWidth,
+                        height: document.body.clientHeight
+                    };
+                };
+
+                this.getExpandProperties = function() {
+                    return {
+                        width: document.body.clientWidth,
+                        height: document.body.clientHeight,
+                        useCustomClose: false,
+                        isModal: true
+                    };
+                };
+
+                this.setExpandProperties = function() {};
+                this.getResizeProperties = function() {
+                    return {
+                        width: undefined,
+                        height: undefined,
+                        offsetX: undefined,
+                        offsetY: undefined,
+                        customClosePosition: 'top-right',
+                        allowOffscreen: true
+                    };
+                };
+
+                this.setResizeProperties = function() {};
+
+                this.getMaxSize = this.getScreenSize = function() {
+                    return {
+                        width: document.body.clientWidth,
+                        height: document.body.clientHeight
+                    };
+                };
+
+                this.useCustomClose = function() {};
+
+                this.close = function() {
+                    setState('hidden');
+                    window.parent.postMessage('close', '*');
+                };
+
+                window.parent.postMessage('loaded', '*');
+                setState('default');
             };
-        };
-        mraid.getExpandProperties = function() {
-            return {
-                width: document.body.clientWidth,
-                height: document.body.clientHeight,
-                useCustomClose: false,
-                isModal: true
-            };
-        };
-        mraid.setExpandProperties = function() {};
-        mraid.getResizeProperties = function() {
-            return {
-                width: undefined,
-                height: undefined,
-                offsetX: undefined,
-                offsetY: undefined,
-                customClosePosition: 'top-right',
-                allowOffscreen: true
-            };
-        };
-        mraid.setResizeProperties = function() {};
-        mraid.getMaxSize = mraid.getScreenSize = function() {
-            return {
-                width: document.body.clientWidth,
-                height: document.body.clientHeight
-            };
-        };
-        mraid.useCustomClose = function() {};
+            window.mraid = new MRAID();
+        })(window.initialize);
     </script>
     <script>
         var initialize = function(mraid) {
+            window.initialize = true;
             document.write(mraid.replace('<scr' + 'ipt src="mraid.js"></scr' + 'ipt>', '<scr' + 'ipt>' + document.getElementById('mraid').innerHTML + '</scr' + 'ipt>'));
         };
 
         window.addEventListener('message', function(event) {
-            console.dir(event);
-            if(event && event.data && typeof event.data === 'object') {
-                if(event.data.url) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.addEventListener('load', function() {
-                        initialize(xhr.responseText);
-                    }, false);
-                    xhr.open('GET', decodeURIComponent(mraid));
-                    xhr.send();
-                } else if(event.data.data) {
-                    initialize(event.data.data);
+            if(event && event.data && typeof event.data === 'object' && event.data.type && typeof event.data.type === 'string') {
+                switch(event.data.type) {
+                    case 'initialize':
+                        if(event.data.url) {
+                            var xhr = new XMLHttpRequest();
+                            xhr.addEventListener('load', function() {
+                                initialize(xhr.responseText);
+                            }, false);
+                            xhr.open('GET', decodeURIComponent(mraid));
+                            xhr.send();
+                        } else if(event.data.data) {
+                            initialize(event.data.data);
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
             }
         }, false);
