@@ -139,7 +139,7 @@ export class Overlay extends View {
             this.onSkip.trigger(value);
         }
 
-        if(!this._fadeTimer) {
+        if(!this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
             this._fadeTimer = setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
