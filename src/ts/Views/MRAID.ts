@@ -5,6 +5,7 @@ import { View } from 'Views/View';
 import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { Platform } from 'Constants/Platform';
 
 export class MRAID extends View {
 
@@ -63,11 +64,29 @@ export class MRAID extends View {
 
     private onMessage(event: MessageEvent) {
         console.dir(event);
-        if(event.data === 'close') {
-            this.onClose.trigger();
-        } else if(event.data === 'loaded') {
-            this._loaded = true;
-            this.onLoaded.trigger();
+        switch(event.data.type) {
+            case 'loaded':
+                this._loaded = true;
+                this.onLoaded.trigger();
+                break;
+
+            case 'open':
+                if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    this._nativeBridge.UrlScheme.open(event.data.url);
+                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': event.data.url
+                    });
+                }
+                break;
+
+            case 'close':
+                this.onClose.trigger();
+                break;
+
+            default:
+                break;
         }
     }
 

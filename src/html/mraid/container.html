@@ -126,9 +126,18 @@
 
                 this.useCustomClose = function() {};
 
+                this.open = function(url) {
+                    window.parent.postMessage({
+                        type: 'open',
+                        url: url
+                    }, '*');
+                };
+
                 this.close = function() {
                     setState('hidden');
-                    window.parent.postMessage('close', '*');
+                    window.parent.postMessage({
+                        type: 'close'
+                    }, '*');
                 };
 
                 window.addEventListener('message', function(event) {
@@ -140,7 +149,9 @@
                 }, false);
 
                 window.addEventListener('DOMContentLoaded', function() {
-                    window.parent.postMessage('loaded', '*');
+                    window.parent.postMessage({
+                        type: 'loaded'
+                    }, '*');
                     setState('default');
                     trigger('ready');
                 }, false);
