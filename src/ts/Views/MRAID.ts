@@ -11,10 +11,13 @@ export class MRAID extends View {
     public onClick: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
+    private onLoaded: Observable0 = new Observable0();
+
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
 
     private _iframe: HTMLIFrameElement;
+    private _loaded = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -34,26 +37,23 @@ export class MRAID extends View {
     public render() {
         const iframe: any = this._iframe = <HTMLIFrameElement>document.createElement('iframe');
         iframe.id = this._id;
-        iframe.srcdoc = MRAIDContainer;
+        iframe.srcdoc = this.createMRAID();
         window.addEventListener('message', (event: MessageEvent) => this.onMessage(event), false);
         this._container = iframe;
     }
 
     public show(): void {
         super.show();
-        setTimeout(() => {
-            if(this._campaign.getResource()) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'initialize',
-                    data: this._campaign.getResource()
-                }, '*');
-            } else if(this._campaign.getResourceUrl()) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'initialize',
-                    url: this._campaign.getResourceUrl()
-                }, '*');
-            }
-        }, 5000); // todo: fix temp timer to wait for iframe ready
+        if(this._loaded) {
+            console.log('immediate viewable');
+            this._iframe.contentWindow.postMessage('viewable', '*');
+        } else {
+            const observer = this.onLoaded.subscribe(() => {
+                console.log('postponed viewable');
+                this._iframe.contentWindow.postMessage('viewable', '*');
+                this.onLoaded.unsubscribe(observer);
+            });
+        }
     }
 
     private onCloseEvent(event: Event): void {
@@ -62,9 +62,17 @@ export class MRAID extends View {
     }
 
     private onMessage(event: MessageEvent) {
+        console.dir(event);
         if(event.data === 'close') {
             this.onClose.trigger();
+        } else if(event.data === 'loaded') {
+            this._loaded = true;
+            this.onLoaded.trigger();
         }
+    }
+
+    private createMRAID() {
+        return MRAIDContainer.replace('<body></body>', '<body>' + this._campaign.getResource().replace('<script src="mraid.js"></script>', '') + '</body>');
     }
 
 }

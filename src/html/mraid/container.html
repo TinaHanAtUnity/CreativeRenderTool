@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Unity Ads WebView</title>
+    <title>Unity Ads MRAID WebView</title>
 
     <meta charset="utf-8"/>
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
@@ -9,12 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
-    <script id="mraid">
-        (function(initialize) {
-            if(!initialize) {
-                return;
-            }
-
+    <script>
+        (function() {
             var MRAID = function() {
                 var state = 'loading';
                 var listeners = {
@@ -24,6 +20,7 @@
                     viewableChange: [],
                     sizeChange: []
                 };
+                var viewable = false;
 
                 var trigger = function(event, parameters) {
                     if(!parameters) {
@@ -73,11 +70,6 @@
                     if(event in listeners) {
                         listeners[event].push(listener);
                     }
-                    if(event === 'ready' && state === 'default') {
-                        setTimeout(function() {
-                            trigger('ready');
-                        }, 2000);
-                    }
                 };
 
                 this.removeEventListener = function(event, listener) {
@@ -90,7 +82,7 @@
                 };
 
                 this.isViewable = function() {
-                    return true;
+                    return viewable;
                 };
 
                 this.getCurrentPosition = this.getDefaultPosition = function() {
@@ -139,39 +131,22 @@
                     window.parent.postMessage('close', '*');
                 };
 
-                window.parent.postMessage('loaded', '*');
-                setState('default');
+                window.addEventListener('message', function(event) {
+                    console.dir(event);
+                    if(event.data === 'viewable') {
+                        viewable = true;
+                        trigger('viewableChange', [true]);
+                    }
+                }, false);
+
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.parent.postMessage('loaded', '*');
+                    setState('default');
+                    trigger('ready');
+                }, false);
             };
             window.mraid = new MRAID();
-        })(window.initialize);
-    </script>
-    <script>
-        var initialize = function(mraid) {
-            window.initialize = true;
-            document.write(mraid.replace('<scr' + 'ipt src="mraid.js"></scr' + 'ipt>', '<scr' + 'ipt>' + document.getElementById('mraid').innerHTML + '</scr' + 'ipt>'));
-        };
-
-        window.addEventListener('message', function(event) {
-            if(event && event.data && typeof event.data === 'object' && event.data.type && typeof event.data.type === 'string') {
-                switch(event.data.type) {
-                    case 'initialize':
-                        if(event.data.url) {
-                            var xhr = new XMLHttpRequest();
-                            xhr.addEventListener('load', function() {
-                                initialize(xhr.responseText);
-                            }, false);
-                            xhr.open('GET', decodeURIComponent(mraid));
-                            xhr.send();
-                        } else if(event.data.data) {
-                            initialize(event.data.data);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }, false);
+        })();
     </script>
 </head>
 <body></body>
