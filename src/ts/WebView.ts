@@ -30,9 +30,9 @@ import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
-import { AdUnit } from 'Utilities/AdUnit';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
-import { IosAdUnit } from 'Utilities/IosAdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class WebView {
 
@@ -47,7 +47,7 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _cache: Cache;
-    private _adUnit: AdUnit;
+    private _container: AdUnitContainer;
 
     private _currentAdUnit: AbstractAdUnit;
     private _campaign: Campaign;
@@ -88,7 +88,7 @@ export class WebView {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
-                this._adUnit = new AndroidAdUnit(this._nativeBridge, this._deviceInfo);
+                this._container = new Activity(this._nativeBridge, this._deviceInfo);
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -96,7 +96,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._adUnit = new IosAdUnit(this._nativeBridge, this._deviceInfo);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
@@ -200,7 +200,7 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._adUnit, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
             this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._currentAdUnit.onClose.subscribe(() => this.onClose());
 

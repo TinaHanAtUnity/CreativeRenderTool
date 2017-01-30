@@ -2,7 +2,8 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { FinishState } from 'Constants/FinishState';
 
 export abstract class AbstractAdUnit {
 
@@ -25,29 +26,42 @@ export abstract class AbstractAdUnit {
     private static _autoClose = false;
     private static _autoCloseDelay: number = 0;
 
-    public onStart: Observable0 = new Observable0();
-    public onFinish: Observable0 = new Observable0();
-    public onClose: Observable0 = new Observable0();
+    public readonly onStart: Observable0 = new Observable0();
+    public readonly onFinish: Observable0 = new Observable0();
+    public readonly onClose: Observable0 = new Observable0();
+    public readonly onError: Observable0 = new Observable0();
 
-    protected _nativeBridge: NativeBridge;
-    protected _adUnit: AdUnit;
-    protected _placement: Placement;
-    protected _campaign: Campaign;
+    protected readonly _nativeBridge: NativeBridge;
+    protected readonly _container: AdUnitContainer;
+    protected readonly _placement: Placement;
+    protected readonly _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign) {
+    private _showing: boolean;
+    private _finishState: FinishState;
+
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
-        this._adUnit = adUnit;
+        this._container = container;
         this._placement = placement;
         this._campaign = campaign;
+
+        this._showing = false;
+        this._finishState = FinishState.ERROR;
     }
 
     public abstract show(): Promise<void>;
 
     public abstract hide(): Promise<void>;
 
-    public abstract isShowing(): boolean;
-
     public abstract description(): string;
+
+    public isShowing() {
+        return this._showing;
+    }
+
+    public setShowing(showing: boolean) {
+        this._showing = showing;
+    }
 
     public getPlacement(): Placement {
         return this._placement;
@@ -56,4 +70,15 @@ export abstract class AbstractAdUnit {
     public getCampaign(): Campaign {
         return this._campaign;
     }
+
+    public getFinishState() {
+        return this._finishState;
+    }
+
+    public setFinishState(finishState: FinishState) {
+        if(this._finishState !== FinishState.COMPLETED) {
+            this._finishState = finishState;
+        }
+    }
+
 }

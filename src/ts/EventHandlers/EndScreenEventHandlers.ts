@@ -94,7 +94,7 @@ export class EndScreenEventHandlers {
     }
 
     public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
-        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideoAdUnitController().isVideoActive()) {
+        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideo().isActive()) {
             adUnit.hide();
         }
     }
