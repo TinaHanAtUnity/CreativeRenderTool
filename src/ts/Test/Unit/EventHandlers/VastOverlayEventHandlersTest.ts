@@ -70,7 +70,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
+        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), <Overlay><any>{hide: sinon.spy()}, null);
         testAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
     });
 
@@ -125,13 +125,12 @@ describe('VastOverlayEventHandlersTest', () => {
         let vastAdUnit: VastAdUnit;
 
         beforeEach(() => {
-            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, <Overlay><any>{}, null);
+            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), <Overlay><any>{}, null);
             vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
             sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
-            sinon.stub(sessionManager, 'sendBrandClickThrough').returns(sinon.spy());
         });
 
         it('should call video click through tracking url', () => {
@@ -139,13 +138,6 @@ describe('VastOverlayEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open');
             VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
             sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
-        });
-
-        it('should send brand click through event', () => {
-            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
-            sinon.assert.called(<sinon.SinonSpy>sessionManager.sendBrandClickThrough);
         });
 
         it('should open click trough link in iOS web browser when call button is clicked', () => {

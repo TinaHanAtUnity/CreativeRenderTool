@@ -12,6 +12,8 @@ interface IIosOptions {
 }
 
 export class IosAdUnit extends AdUnit {
+
+    private static _appWillResignActive: string = 'UIApplicationWillResignActiveNotification';
     private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
@@ -19,6 +21,7 @@ export class IosAdUnit extends AdUnit {
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _showing: boolean;
+    private _paused = false;
 
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
@@ -52,8 +55,9 @@ export class IosAdUnit extends AdUnit {
             }
         }
 
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
+        this._nativeBridge.Notification.addNotificationObserver(IosAdUnit._appWillResignActive, []);
+        this._nativeBridge.Notification.addAVNotificationObserver(IosAdUnit._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
+        this._nativeBridge.Notification.addAVNotificationObserver(IosAdUnit._audioSessionRouteChange, []);
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
@@ -62,8 +66,9 @@ export class IosAdUnit extends AdUnit {
 
     public close(): Promise<void> {
         this._showing = false;
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionInterrupt);
-        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._audioSessionRouteChange);
+        this._nativeBridge.Notification.removeNotificationObserver(IosAdUnit._appWillResignActive);
+        this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionInterrupt);
+        this._nativeBridge.Notification.removeAVNotificationObserver(IosAdUnit._audioSessionRouteChange);
         return this._nativeBridge.IosAdUnit.close();
     }
 
@@ -73,6 +78,10 @@ export class IosAdUnit extends AdUnit {
             this._nativeBridge.IosAdUnit.setViews(['webview']),
             this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL)
         ]);
+    }
+
+    public isPaused() {
+        return this._paused;
     }
 
     private onViewDidAppear(): void {
@@ -86,7 +95,13 @@ export class IosAdUnit extends AdUnit {
         }
 
         switch(event) {
+            case IosAdUnit._appWillResignActive:
+                this._paused = true;
+                this.onSystemPause.trigger();
+                break;
+
             case IosAdUnit._appDidBecomeActive:
+                this._paused = false;
                 this.onSystemInterrupt.trigger();
                 break;
 

@@ -59,7 +59,7 @@ describe('EndScreenEventHandlersTest', () => {
                 trailerDownloadable: 'fake url',
                 appStoreId: 'fooAppId',
                 clickAttributionUrlFollowsRedirects: true
-            }, 'asd', 10), overlay, null);
+            }, 'asd', 10), TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });
@@ -157,7 +157,7 @@ describe('EndScreenEventHandlersTest', () => {
                 clickAttributionUrlFollowsRedirects: true,
                 bypassAppSheet: false,
                 clickAttributionUrl: ''
-            }, 'asd', 10), overlay, null);
+            }, 'asd', 10), TestFixtures.getDeviceInfo(Platform.IOS), overlay, null);
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
         });

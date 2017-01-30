@@ -48,6 +48,9 @@ describe('EventsTest', () => {
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
                 done(new Error(message));
+            },
+            onUnityAdsClick: (placement: string) => {
+                return;
             }
         };
 
@@ -111,6 +114,9 @@ describe('EventsTest', () => {
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
                 done(new Error(message));
+            },
+            onUnityAdsClick: (placement: string) => {
+                return;
             }
         };
 

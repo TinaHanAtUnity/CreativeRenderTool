@@ -1,3 +1,21 @@
+# Mon Jan 30 13:59:36 UTC 2017
+
+* Fixed several overlay UX issues 
+
+# Wed Jan 25 09:58:18 UTC 201
+
+* End tablet layout AB test
+* Add Chinese new year AB test
+* Pause videos on iOS when notification/control center is pulled visible
+* Prevent brand ad video errors causing a black screen
+
+# Wed Jan 18 10:39:48 UTC 2017
+
+* New overlay to all groups
+* Video errors without progress events will close ad
+* VAST events to httpkafka
+* Browser build improvements
+
 # Mon Jan 16 11:58:22 UTC 2017
 
 * Revert two emergency fixes because backend is now able to keep up with the load

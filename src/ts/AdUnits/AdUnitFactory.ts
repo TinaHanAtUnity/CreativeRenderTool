@@ -28,6 +28,7 @@ import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnit } from 'Utilities/AdUnit';
 import { Overlay } from 'Views/Overlay';
+import { IosAdUnit } from 'Utilities/IosAdUnit';
 
 export class AdUnitFactory {
 
@@ -49,14 +50,14 @@ export class AdUnitFactory {
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         const metaData = new MetaData(nativeBridge);
 
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, performanceAdUnit, metaData);
+        this.prepareVideoPlayer(nativeBridge, adUnit, sessionManager, performanceAdUnit, metaData);
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
@@ -80,7 +81,7 @@ export class AdUnitFactory {
         let vastAdUnit: VastAdUnit;
 
         const metaData = new MetaData(nativeBridge);
-        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+        const videoAdUnitController = this.createVideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
 
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
@@ -94,14 +95,16 @@ export class AdUnitFactory {
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
-        this.prepareVideoPlayer(nativeBridge, sessionManager, vastAdUnit, metaData);
+        this.prepareVideoPlayer(nativeBridge, adUnit, sessionManager, vastAdUnit, metaData);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
+        const onVideoErrorObserver = videoAdUnitController.onVideoError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
 
         vastAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            videoAdUnitController.onVideoError.unsubscribe(onVideoErrorObserver);
         });
 
         return vastAdUnit;
@@ -145,8 +148,8 @@ export class AdUnitFactory {
 
     };
 
-    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, overlay: Overlay, options: any): VideoAdUnitController {
-        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, overlay, options);
+    private static createVideoAdUnitController(nativeBridge: NativeBridge, adUnit: AdUnit, placement: Placement, campaign: Campaign, deviceInfo: DeviceInfo, overlay: Overlay, options: any): VideoAdUnitController {
+        return new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, deviceInfo, overlay, options);
     }
 
     private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
@@ -184,7 +187,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnit, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
@@ -202,7 +205,7 @@ export class AdUnitFactory {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.prepareAndroidVideoPlayer(nativeBridge, adUnit);
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            this.prepareIosVideoPlayer(nativeBridge, adUnit);
+            this.prepareIosVideoPlayer(nativeBridge, <IosAdUnit>container, adUnit);
         }
     }
 
@@ -222,13 +225,15 @@ export class AdUnitFactory {
         });
     }
 
-    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: IosAdUnit, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
 
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
-                nativeBridge.VideoPlayer.play();
+                if(!container.isPaused()) {
+                    nativeBridge.VideoPlayer.play();
+                }
             }
         });
 
