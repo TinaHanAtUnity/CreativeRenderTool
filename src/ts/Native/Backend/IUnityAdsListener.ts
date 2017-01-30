@@ -7,5 +7,6 @@ export interface IUnityAdsListener {
     onUnityAdsStart(placement: string): void;
     onUnityAdsFinish(placement: string, state: FinishState): void;
     onUnityAdsError(error: UnityAdsError, message: string): void;
+    onUnityAdsClick(placement: string): void;
 
 }

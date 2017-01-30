@@ -2,6 +2,10 @@ import { Backend } from 'Native/Backend/Backend';
 
 export class VideoPlayer {
 
+    public static setProgressEventInterval(milliseconds: number) {
+        return;
+    }
+
     public static prepare(url: string) {
         if('exec' in window) {
             // tslint:disable:no-string-literal
