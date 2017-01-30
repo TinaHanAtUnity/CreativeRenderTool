@@ -1,3 +1,7 @@
+# Mon Jan 30 13:59:36 UTC 2017
+
+* Fixed several overlay UX issues 
+
 # Wed Jan 25 09:58:18 UTC 201
 
 * End tablet layout AB test
