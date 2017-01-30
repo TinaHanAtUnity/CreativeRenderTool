@@ -21,6 +21,9 @@ export class ClientInfo extends Model {
     private _webviewHash: string;
     private _webviewVersion: string;
 
+    private _initTimestamp: number;
+    private _reinitialized: boolean;
+
     constructor(platform: Platform, data: any[]) {
         super();
 
@@ -44,6 +47,9 @@ export class ClientInfo extends Model {
         this._webviewUrl = data.shift();
         this._webviewHash = data.shift();
         this._webviewVersion = data.shift();
+
+        this._initTimestamp = data.shift();
+        this._reinitialized = data.shift();
     }
 
     public getGameId(): string {
