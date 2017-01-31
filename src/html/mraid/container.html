@@ -95,27 +95,28 @@
                 };
 
                 this.getExpandProperties = function() {
-                    return {
-                        width: document.body.clientWidth,
-                        height: document.body.clientHeight,
-                        useCustomClose: false,
-                        isModal: true
-                    };
+                    trigger('error', ['not implemented', 'getExpandProperties']);
                 };
 
-                this.setExpandProperties = function() {};
+                this.setExpandProperties = function() {
+                    trigger('error', ['not implemented', 'setExpandProperties']);
+                };
+
+                this.expand = function() {
+                    trigger('error', ['not implemented', 'expand']);
+                };
+
                 this.getResizeProperties = function() {
-                    return {
-                        width: undefined,
-                        height: undefined,
-                        offsetX: undefined,
-                        offsetY: undefined,
-                        customClosePosition: 'top-right',
-                        allowOffscreen: true
-                    };
+                    trigger('error', ['not implemented', 'getResizeProperties']);
                 };
 
-                this.setResizeProperties = function() {};
+                this.setResizeProperties = function() {
+                    trigger('error', ['not implemented', 'setResizeProperties']);
+                };
+
+                this.resize = function() {
+                    trigger('error', ['not implemented', 'resize']);
+                };
 
                 this.getMaxSize = this.getScreenSize = function() {
                     return {
