@@ -46,11 +46,9 @@ export class MRAID extends View {
     public show(): void {
         super.show();
         if(this._loaded) {
-            console.log('immediate viewable');
             this._iframe.contentWindow.postMessage('viewable', '*');
         } else {
             const observer = this.onLoaded.subscribe(() => {
-                console.log('postponed viewable');
                 this._iframe.contentWindow.postMessage('viewable', '*');
                 this.onLoaded.unsubscribe(observer);
             });
