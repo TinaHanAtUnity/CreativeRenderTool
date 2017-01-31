@@ -100,6 +100,14 @@ export class ClientInfo extends Model {
         return this._webviewVersion;
     }
 
+    public getInitTimestamp(): number {
+        return this._initTimestamp;
+    }
+
+    public isReinitialized(): boolean {
+        return this._reinitialized;
+    }
+
     public getDTO() {
         return {
             'gameId': this._gameId,
@@ -113,7 +121,9 @@ export class ClientInfo extends Model {
             'configUrl': this._configUrl,
             'webviewUrl': this._webviewUrl,
             'webviewHash': this._webviewHash,
-            'webviewVersion': this._webviewVersion
+            'webviewVersion': this._webviewVersion,
+            'initTimestamp': this._initTimestamp,
+            'reinitialized': this._reinitialized
         };
     }
 }
