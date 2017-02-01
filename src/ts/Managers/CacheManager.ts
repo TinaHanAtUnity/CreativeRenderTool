@@ -207,7 +207,7 @@ export class CacheManager {
 
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
-        this._nativeBridge.Cache.download(url, fileId).catch(error => {
+        this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
             const callback = this._callbacks[url];
             if(callback) {
                 switch(error) {
