@@ -60,6 +60,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [StorageType[storageType]]);
     }
 
+    public getGLString(glesType: string, glInfo: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getGLString', [glesType, glInfo]);
+    }
+
     public getSensorList(): Promise<any[]> {
         return this._nativeBridge.invoke<any[]>(this._apiClass, 'getSensorList');
     }
