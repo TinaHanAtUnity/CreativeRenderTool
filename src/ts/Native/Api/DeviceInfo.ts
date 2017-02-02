@@ -97,4 +97,12 @@ export class DeviceInfoApi extends NativeApi {
     public getTotalMemory(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalMemory');
     }
+
+    public getGLVersion(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getGLVersion');
+    }
+
+    public getGLString(property: string): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getGLString', [property]);
+    }
 }
