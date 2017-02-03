@@ -38,8 +38,8 @@ export class CacheApi extends NativeApi {
         super(nativeBridge, 'Cache');
     }
 
-    public download(url: string, fileId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId]);
+    public download(url: string, fileId: string, headers: [string, string][]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId, headers]);
     }
 
     public stop(): Promise<void> {
