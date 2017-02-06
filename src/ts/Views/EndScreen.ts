@@ -89,12 +89,8 @@ export class EndScreen extends View {
             delete this._privacy;
         }
     }
-
+    
     private getEndscreenAlt(campaign: PerformanceCampaign) {
-        const abGroup = campaign.getAbGroup();
-        if(abGroup === 10 || abGroup === 11) {
-            return 'chinesenewyear';
-        }
         return undefined;
     }
 
