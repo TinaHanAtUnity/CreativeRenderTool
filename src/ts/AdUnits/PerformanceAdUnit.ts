@@ -1,21 +1,19 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { EndScreen } from 'Views/EndScreen';
-import { AdUnit } from 'Utilities/AdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Placement } from 'Models/Placement';
+import { Overlay } from 'Views/Overlay';
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, endScreen: EndScreen) {
-        super(nativeBridge, adUnit, videoAdUnitController);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: Overlay, options: any, endScreen: EndScreen) {
+        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), overlay, options);
 
         this._endScreen = endScreen;
-    }
-
-    public show(): Promise<void> {
-        return this._videoAdUnitController.show(this);
     }
 
     public hide(): Promise<void> {
@@ -25,11 +23,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
         this.unsetReferences();
-        return this._videoAdUnitController.hide();
-    }
-
-    public isShowing(): boolean {
-        return this._videoAdUnitController.isShowing();
+        return super.hide();
     }
 
     public description(): string {
@@ -40,7 +34,8 @@ export class PerformanceAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    private unsetReferences() {
+    protected unsetReferences() {
+        super.unsetReferences();
         delete this._endScreen;
     }
 

@@ -2,7 +2,15 @@ import { Backend } from 'Native/Backend/Backend';
 
 export class VideoPlayer {
 
+    public static setProgressEventInterval(milliseconds: number) {
+        return;
+    }
+
     public static prepare(url: string) {
+        if(url.indexOf('file://http') !== -1) {
+            url = url.replace('file://', '');
+        }
+
         if('exec' in window) {
             // tslint:disable:no-string-literal
             const exec = window['exec'];

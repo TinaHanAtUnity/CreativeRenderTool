@@ -4,23 +4,26 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0 } from 'Utilities/Observable';
-import { Campaign } from 'Models/Campaign';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VastEndScreen extends View {
 
     public onClick: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign) {
         super(nativeBridge, 'end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
 
         if(campaign) {
+            const landscape = campaign.getLandscape();
+            const portrait = campaign.getPortrait();
+
             this._templateData = {
-                'endScreenLandscape': campaign.getLandscapeUrl() || campaign.getPortraitUrl(),
-                'endScreenPortrait': campaign.getPortraitUrl() || campaign.getLandscapeUrl()
+                'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
+                'endScreenPortrait': (portrait ? portrait.getUrl() : (landscape ? landscape.getUrl() : undefined))
             };
         }
 

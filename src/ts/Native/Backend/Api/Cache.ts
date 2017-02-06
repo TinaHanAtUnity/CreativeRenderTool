@@ -1,3 +1,6 @@
+import { IFileInfo, CacheError } from 'Native/Api/Cache';
+import { Backend } from 'Native/Backend/Backend';
+
 export class Cache {
 
     public static setProgressInterval() {
@@ -25,8 +28,28 @@ export class Cache {
         return hash.toString();
     }
 
-    public static getFileInfo(fileId: string) {
-        return;
+    public static getFileInfo(fileId: string): IFileInfo {
+        return {
+            id: fileId,
+            found: true,
+            size: 10000,
+            mtime: 1481112345
+        };
     }
+
+    public static download(url: string, fileId: string) {
+        Cache._fileIdMap[fileId] = url;
+        Backend.sendEvent('CACHE', 'DOWNLOAD_STARTED', url, 0, 10000, 200, []);
+        Backend.sendEvent('CACHE', 'DOWNLOAD_END', url, 10000, 10000, 1000, 200, []);
+    }
+
+    public static getFilePath(fileId: string) {
+        if(fileId in Cache._fileIdMap) {
+            return Cache._fileIdMap[fileId];
+        }
+        throw CacheError.FILE_NOT_FOUND;
+    }
+
+    private static _fileIdMap: { [key: string]: string } = {};
 
 }
