@@ -15,6 +15,7 @@ export abstract class AdUnitContainer {
     // currently open ad unit is only reconfigured to move from video playback to endscreen with unlocked orientation
     // in the future, when we add more options, this method should be updated to handle future use cases
     public abstract reconfigure(): Promise<any[]>;
+    public abstract reorient(allowOrientation: boolean, orientation: 'portrait' | 'landscape' | 'none'): Promise<any[]>;
 
     public abstract isPaused(): boolean;
 

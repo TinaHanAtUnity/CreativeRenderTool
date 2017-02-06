@@ -37,7 +37,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
+        return this._container.open(this, false, false, true, this._options);
     }
 
     public hide(): Promise<void> {

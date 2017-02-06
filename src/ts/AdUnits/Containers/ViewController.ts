@@ -80,6 +80,18 @@ export class ViewController extends AdUnitContainer {
         ]);
     }
 
+    public reorient(allowOrientation: boolean, forceOrientation: 'portrait' | 'landscape' | 'none'): Promise<any> {
+        return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowOrientation).then(() => {
+            if(forceOrientation === 'portrait') {
+                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN);
+            } else if(forceOrientation === 'landscape') {
+                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE);
+            } else {
+                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
+            }
+        });
+    }
+
     public isPaused() {
         return this._paused;
     }

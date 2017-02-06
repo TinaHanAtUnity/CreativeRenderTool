@@ -2,15 +2,21 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
+
+export interface IOrientationProperties {
+    allowOrientationChange: boolean;
+    forceOrientation: 'portrait' | 'landscape' | 'none';
+}
 
 export class MRAID extends View {
 
     public onClick: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
+    public onOrientationProperties: Observable1<IOrientationProperties> = new Observable1();
 
     private onLoaded: Observable0 = new Observable0();
 
@@ -19,6 +25,8 @@ export class MRAID extends View {
 
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
+
+    private _resizeHandler: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -49,10 +57,35 @@ export class MRAID extends View {
             this._iframe.contentWindow.postMessage('viewable', '*');
         } else {
             const observer = this.onLoaded.subscribe(() => {
-                this._iframe.contentWindow.postMessage('viewable', '*');
+                this._iframe.contentWindow.postMessage({
+                    type: 'viewable',
+                    value: true
+                }, '*');
                 this.onLoaded.unsubscribe(observer);
             });
         }
+        this._resizeHandler = (event: Event) => {
+            if(this._iframe.contentWindow) {
+                this._iframe.contentWindow.postMessage({
+                    type: 'resize',
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                }, '*');
+            }
+        };
+        window.addEventListener('resize', this._resizeHandler, false);
+    }
+
+    public hide() {
+        this._iframe.contentWindow.postMessage({
+            type: 'viewable',
+            value: false
+        }, '*');
+        if(this._resizeHandler) {
+            window.removeEventListener('resize', this._resizeHandler, false);
+            this._resizeHandler = undefined;
+        }
+        super.hide();
     }
 
     private onCloseEvent(event: Event): void {
@@ -81,6 +114,13 @@ export class MRAID extends View {
 
             case 'close':
                 this.onClose.trigger();
+                break;
+
+            case 'orientation':
+                this.onOrientationProperties.trigger({
+                    allowOrientationChange: event.data.properties.allowOrientationChange,
+                    forceOrientation: event.data.properties.forceOrientation
+                });
                 break;
 
             default:

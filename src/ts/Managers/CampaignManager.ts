@@ -115,6 +115,11 @@ export class CampaignManager {
             this.storeGamerId(json.gamerId);
         }
 
+        if(1 === 1) {
+            this.parseMRAIDCampaign(json);
+            return;
+        }
+
         if('campaign' in json) {
             return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {

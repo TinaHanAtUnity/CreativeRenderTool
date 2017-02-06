@@ -79,6 +79,26 @@ export class Activity extends AdUnitContainer {
         ]);
     }
 
+    public reorient(allowOrientation: boolean, forceOrientation: 'portrait' | 'landscape' | 'none'): Promise<any> {
+        let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_USER;
+        if(allowOrientation) {
+            if(forceOrientation === 'portrait') {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+            } else if(forceOrientation === 'landscape') {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            }
+        } else {
+            if(forceOrientation === 'portrait') {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
+            } else if(forceOrientation === 'landscape') {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
+            } else {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
+            }
+        }
+        return this._nativeBridge.AndroidAdUnit.setOrientation(orientation);
+    }
+
     public isPaused() {
         return false;
     }
