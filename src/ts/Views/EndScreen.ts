@@ -89,7 +89,7 @@ export class EndScreen extends View {
             delete this._privacy;
         }
     }
-    
+
     private getEndscreenAlt(campaign: PerformanceCampaign) {
         return undefined;
     }
