@@ -10,20 +10,19 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventManager } from 'Managers/EventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
-import { Campaign } from 'Models/Campaign';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnit } from 'Utilities/AdUnit';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
-import { IosAdUnit } from 'Utilities/IosAdUnit';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 describe('EndScreenEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, adUnit: AdUnit, videoAdUnitController: VideoAdUnitController, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
 
@@ -36,7 +35,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             });
 
-            adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo());
+            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo());
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
@@ -55,13 +54,11 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign>{
-                getVideoUrl: () => 'fake url',
-                getAppStoreId: () => 'fooAppId',
-                getClickAttributionUrlFollowsRedirects: () => true
-            }, TestFixtures.getDeviceInfo(Platform.ANDROID), overlay, null);
-
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
+                trailerDownloadable: 'fake url',
+                appStoreId: 'fooAppId',
+                clickAttributionUrlFollowsRedirects: true
+            }, 'asd', 10), overlay, null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -131,7 +128,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            adUnit = new IosAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
 
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -151,15 +148,13 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign>{
-                getVideoUrl: () => 'fake url',
-                getAppStoreId: () => '11111',
-                getClickAttributionUrlFollowsRedirects: () => true,
-                getBypassAppSheet: () => false,
-                getClickAttributionUrl: () => ''
-            }, TestFixtures.getDeviceInfo(Platform.IOS), overlay, null);
-
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
+                trailerDownloadable: 'fake url',
+                appStoreId: '11111',
+                clickAttributionUrlFollowsRedirects: true,
+                bypassAppSheet: false,
+                clickAttributionUrl: ''
+            }, 'asd', 10), overlay, null, endScreen);
         });
 
         it('should send a click with session manager', () => {

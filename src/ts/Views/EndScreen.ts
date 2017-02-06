@@ -4,10 +4,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0, Observable1 } from 'Utilities/Observable';
-import { Campaign } from 'Models/Campaign';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class EndScreen extends View {
 
@@ -20,7 +20,7 @@ export class EndScreen extends View {
     private _privacy: Privacy;
     private _localization: Localization;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
@@ -32,10 +32,10 @@ export class EndScreen extends View {
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
                 // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-                'endScreenLandscape': campaign.getPortraitUrl(),
-                'endScreenPortrait': campaign.getLandscapeUrl(),
+                'endScreenLandscape': campaign.getPortrait().getUrl(),
+                'endScreenPortrait': campaign.getLandscape().getUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
@@ -90,7 +90,7 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: Campaign) {
+    private getEndscreenAlt(campaign: PerformanceCampaign) {
         return undefined;
     }
 

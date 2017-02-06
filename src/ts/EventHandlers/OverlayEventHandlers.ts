@@ -11,9 +11,9 @@ export class OverlayEventHandlers {
 
     public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.pause();
-        adUnit.getVideoAdUnitController().setVideoActive(false);
-        adUnit.getVideoAdUnitController().setFinishState(FinishState.SKIPPED);
-        sessionManager.sendSkip(adUnit, adUnit.getVideoAdUnitController().getVideoPosition());
+        adUnit.getVideo().setActive(false);
+        adUnit.setFinishState(FinishState.SKIPPED);
+        sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
         if (nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.IosAdUnit.setViews(['webview']);
@@ -27,12 +27,12 @@ export class OverlayEventHandlers {
             nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
         }
 
-        const overlay = adUnit.getVideoAdUnitController().getOverlay();
+        const overlay = adUnit.getOverlay();
         if (overlay) {
             overlay.hide();
         }
 
-        adUnit.getVideoAdUnitController().onVideoFinish.trigger();
+        adUnit.onFinish.trigger();
     }
 
     public static onMute(nativeBridge: NativeBridge, muted: boolean): void {

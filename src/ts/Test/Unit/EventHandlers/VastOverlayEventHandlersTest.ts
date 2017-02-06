@@ -12,15 +12,15 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
-import { AdUnit } from 'Utilities/AdUnit';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
 
 import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { Video } from 'Models/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -34,9 +34,8 @@ describe('VastOverlayEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, testAdUnit: VastAdUnit;
-    let adUnit: AdUnit;
+    let container: AdUnitContainer;
     let sessionManager: SessionManager;
-    let videoAdUnitController: VideoAdUnitController;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -44,7 +43,7 @@ describe('VastOverlayEventHandlersTest', () => {
             handleCallback
         });
         overlay = new Overlay(nativeBridge, false, 'en');
-        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         const vastParser = TestFixtures.getVastParser();
 
@@ -70,8 +69,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, placement, campaign, TestFixtures.getDeviceInfo(Platform.ANDROID), <Overlay><any>{hide: sinon.spy()}, null);
-        testAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
     });
 
     describe('When calling onSkip', () => {
@@ -89,7 +87,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = <VastEndScreen><any> {
                     show: sinon.spy()
                 };
-                const vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController, vastEndScreen);
+                const vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
                 VastOverlayEventHandlers.onSkip(vastAdUnit);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
@@ -123,10 +121,14 @@ describe('VastOverlayEventHandlersTest', () => {
 
     describe('When calling onCallButton', () => {
         let vastAdUnit: VastAdUnit;
+        let video: Video;
 
         beforeEach(() => {
-            videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <VastCampaign><any>{getVast: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), <Overlay><any>{}, null);
-            vastAdUnit = new VastAdUnit(nativeBridge, adUnit, videoAdUnitController);
+            video = new Video('');
+            vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <VastCampaign><any>{
+                getVast: sinon.spy(),
+                getVideo: () => video
+            }, <Overlay><any>{}, null);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());

@@ -9,7 +9,6 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
 import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { SessionManager } from 'Managers/SessionManager';
@@ -19,12 +18,14 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 import {VastAdUnit} from 'AdUnits/VastAdUnit';
 import {PerformanceAdUnit} from 'AdUnits/PerformanceAdUnit';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
-    let adUnit: AndroidAdUnit;
+    let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
     let sessionManager: SessionManager;
     let config: Configuration;
@@ -37,7 +38,7 @@ describe('AdUnitFactoryTest', () => {
         nativeBridge = TestFixtures.getNativeBridge();
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
-        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         const eventManager = new EventManager(nativeBridge, request);
         config = new Configuration({'assetCaching': 'forced', 'placements': []});
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
@@ -51,8 +52,8 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
-            videoAdUnit.getVideoAdUnitController().onVideoError.trigger();
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+            videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
         });
@@ -61,9 +62,11 @@ describe('AdUnitFactoryTest', () => {
     describe('VAST AdUnit', () => {
         it('should call onVideoError on video controller error', () => {
             sandbox.stub(VastVideoEventHandlers, 'onVideoError').returns(null);
-            const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnit, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, {});
-            videoAdUnit.getVideoAdUnitController().onVideoError.trigger();
+            const vast = new Vast([], []);
+            sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
+            const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, {});
+            videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
         });

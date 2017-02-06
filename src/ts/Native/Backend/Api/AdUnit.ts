@@ -58,4 +58,12 @@ export class AdUnit {
         return;
     }
 
+    public static setTransform(rotation: number) {
+        return;
+    }
+
+    public static setViewFrame(view: string, x: number, y: number, width: number, height: number) {
+        return;
+    }
+
 }

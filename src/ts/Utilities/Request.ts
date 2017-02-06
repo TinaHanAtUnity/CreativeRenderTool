@@ -39,20 +39,20 @@ export interface INativeResponse {
 
 export class Request {
 
+    public static AllowedResponseCodes = new RegExp('2[0-9]{2}');
+    public static RedirectResponseCodes = new RegExp('30[0-8]');
+    public static ErrorResponseCodes = new RegExp('4[0-9]{2}');
+    public static RetryResponseCodes = new RegExp('5[0-9]{2}');
+
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
-            if(header[0].match(new RegExp(headerName, 'i'))) {
+            if(header[0] && header[0].match(new RegExp(headerName, 'i'))) {
                 return header[1];
             }
         }
         return null;
     }
-
-    private static _allowedResponseCodes = new RegExp('2[0-9]{2}');
-    private static _redirectResponseCodes = new RegExp('30[0-8]');
-    private static _errorResponseCodes = new RegExp('4[0-9]{2}');
-    private static _retryResponseCodes = new RegExp('5[0-9]{2}');
 
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
@@ -203,9 +203,9 @@ export class Request {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
-        if(Request._allowedResponseCodes.exec(responseCode.toString())) {
+        if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-        } else if(Request._redirectResponseCodes.exec(responseCode.toString())) {
+        } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
             if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
                 if(location && location.match(/^https?/i)) {
@@ -217,9 +217,9 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
-        } else if(Request._errorResponseCodes.exec(responseCode.toString())) {
+        } else if(Request.ErrorResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
-        } else if(Request._retryResponseCodes.exec(responseCode.toString())) {
+        } else if(Request.RetryResponseCodes.exec(responseCode.toString())) {
             this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
