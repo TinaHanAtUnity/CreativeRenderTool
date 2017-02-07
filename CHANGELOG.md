@@ -1,3 +1,7 @@
+# Tue Feb  7 13:13:11 UTC 2017
+
+* Major refactorings (should improve programmatic caching)
+
 # Mon Feb  6 10:43:02 UTC 2017
 
 * Removed Chinese new year AB test
