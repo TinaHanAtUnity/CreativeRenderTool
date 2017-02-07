@@ -11,7 +11,7 @@ export abstract class Campaign {
         this._id = id;
         this._gamerId = gamerId;
         this._abGroup = abGroup;
-        this._timeout = typeof timeout !== 'undefined' ? timeout : 0;
+        this._timeout = typeof timeout !== 'undefined' ? (Date.now() + timeout * 1000) : 0;
     }
 
     public getId(): string {
