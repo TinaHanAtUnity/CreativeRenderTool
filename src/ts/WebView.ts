@@ -105,14 +105,10 @@ export class WebView {
             this._nativeBridge.Sdk.initComplete();
 
             this._wakeUpManager.setListenConnectivity(true);
-            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
-
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._wakeUpManager.setListenAppForeground(true);
-                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
             } else {
                 this._wakeUpManager.setListenScreen(true);
-                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
 
             return this.setupTestEnvironment();
@@ -134,6 +130,13 @@ export class WebView {
             this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
             return this._campaignManager.request();
         }).then(() => {
+            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
+            } else {
+                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
+            }
+
             this._initialized = true;
 
             return this._eventManager.sendUnsentSessions();
