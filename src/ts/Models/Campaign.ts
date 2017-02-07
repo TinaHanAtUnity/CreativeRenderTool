@@ -6,12 +6,16 @@ export abstract class Campaign {
     private _gamerId: string;
     private _abGroup: number;
     private _timeout: number;
+    private _willExpireAt: number;
 
     constructor(id: string, gamerId: string, abGroup: number, timeout?: number) {
         this._id = id;
         this._gamerId = gamerId;
         this._abGroup = abGroup;
         this._timeout = typeof timeout !== 'undefined' ? timeout : 0;
+        if(this._timeout) {
+            this._willExpireAt = Date.now() + timeout * 1000;
+        }
     }
 
     public getId(): string {
@@ -31,7 +35,7 @@ export abstract class Campaign {
     }
 
     public isExpired() {
-        return this._timeout !== 0 && Date.now() > this._timeout;
+        return this._willExpireAt && Date.now() > this._willExpireAt;
     }
 
     public abstract getRequiredAssets(): Asset[];
