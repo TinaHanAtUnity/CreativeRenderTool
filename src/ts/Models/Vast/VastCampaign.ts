@@ -1,55 +1,69 @@
 import { Campaign } from 'Models/Campaign';
 import { Vast } from 'Models/Vast/Vast';
+import { Video } from 'Models/Video';
+import { Asset } from 'Models/Asset';
 
 export class VastCampaign extends Campaign {
 
-    private _cacheTTL: number;
-    private _campaignId: string;
     private _vast: Vast;
+    private _video: Video;
     private _hasEndscreen: boolean;
+    private _portrait: Asset | undefined;
+    private _landscape: Asset | undefined;
 
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        const campaign = {
-            endScreenPortrait: vast.getCompanionPortraitUrl(),
-            endScreenLandscape: vast.getCompanionLandscapeUrl()
-        };
-
-        super(campaign, gamerId, abGroup);
+        super(campaignId, gamerId, abGroup, cacheTTL || 3600);
 
         this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
-        this._campaignId = campaignId;
-        this._vast = vast;
-        this._cacheTTL = cacheTTL || 3600;
-        this.processCustomTracking(tracking);
-    }
+        const portraitUrl = vast.getCompanionPortraitUrl();
+        if(portraitUrl) {
+            this._portrait = new Asset(portraitUrl);
+        }
 
-    public getId(): string {
-        return this._campaignId;
+        const landscapeUrl = vast.getCompanionLandscapeUrl();
+        if(landscapeUrl) {
+            this._landscape = new Asset(landscapeUrl);
+        }
+
+        this._vast = vast;
+        this.processCustomTracking(tracking);
     }
 
     public getVast(): Vast {
         return this._vast;
     }
 
-    public getVideoUrl(): string {
-        const videoUrl = super.getVideoUrl();
-        if (videoUrl) {
-            return videoUrl;
-        } else {
-            return this._vast.getVideoUrl() || '';
+    public getVideo() {
+        if(!this._video) {
+            this._video = new Video(this._vast.getVideoUrl());
         }
+        return this._video;
     }
 
     public getOriginalVideoUrl(): string {
         return this._vast.getVideoUrl() || '';
     }
 
-    public getTimeoutInSeconds(): number {
-        return this._cacheTTL;
+    public getRequiredAssets() {
+        return [
+            this._video
+        ];
+    }
+
+    public getOptionalAssets() {
+        return [];
     }
 
     public hasEndscreen(): boolean {
         return this._hasEndscreen;
+    }
+
+    public getLandscape(): Asset | undefined {
+        return this._landscape;
+    }
+
+    public getPortrait(): Asset | undefined {
+        return this._portrait;
     }
 
     private processCustomTracking(tracking: any) {

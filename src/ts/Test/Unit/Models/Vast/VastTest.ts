@@ -61,7 +61,7 @@ describe('Vast', () => {
         sinon.stub(vastMediaFile, 'getMIMEType').returns('video/3gpp');
         sinon.stub(vastCreative, 'getMediaFiles').returns([vastMediaFile]);
 
-        assert.equal(vast.getVideoUrl(), null);
+        assert.throws(vast.getVideoUrl);
     });
 
     describe('when VAST has a companion ad', () => {

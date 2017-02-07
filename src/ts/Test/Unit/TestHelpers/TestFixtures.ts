@@ -6,8 +6,8 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { Campaign } from 'Models/Campaign';
 import DummyCampaign from 'json/DummyCampaign.json';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class TestFixtures {
 
@@ -24,8 +24,8 @@ export class TestFixtures {
         });
     }
 
-    public static getCampaign(): Campaign {
-        return new Campaign(JSON.parse(DummyCampaign), 'abc123', 123);
+    public static getCampaign(): PerformanceCampaign {
+        return new PerformanceCampaign(JSON.parse(DummyCampaign), 'abc123', 123);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
