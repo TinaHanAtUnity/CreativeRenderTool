@@ -34,7 +34,6 @@ interface ICallbackObject {
     networkRetry: boolean;
     retryCount: number;
     networkRetryCount: number;
-    maxRetries: number;
     resolve: Function;
     reject: Function;
     originalUrl?: string;
@@ -50,19 +49,16 @@ export class Cache {
 
     private _currentUrl: string;
 
-    private _defaultMaxRetries: number = 5;
-    private _defaultRetryDelay: number = 10000;
+    private _maxRetries: number = 5;
+    private _retryDelay: number = 10000;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
 
-        if(typeof options === 'undefined') {
-            this._defaultMaxRetries = 5;
-            this._defaultRetryDelay = 10000;
-        } else {
-            this._defaultMaxRetries = options.retries;
-            this._defaultRetryDelay = options.retryDelay;
+        if(options) {
+            this._maxRetries = options.retries;
+            this._retryDelay = options.retryDelay;
         }
 
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -249,7 +245,6 @@ export class Cache {
                 networkRetry: false,
                 retryCount: 0,
                 networkRetryCount: 0,
-                maxRetries: this._defaultMaxRetries,
                 resolve: resolve,
                 reject: reject,
                 originalUrl: originalUrl
@@ -394,7 +389,7 @@ export class Cache {
     }
 
     private handleRetry(callback: ICallbackObject, url: string, error: string): void {
-        if(callback.retryCount < callback.maxRetries) {
+        if(callback.retryCount < this._maxRetries) {
             callback.retryCount++;
             callback.networkRetry = true;
 
@@ -407,8 +402,8 @@ export class Cache {
                     retryCallback.networkRetry = false;
                     this.downloadFile(url, retryCallback.fileId);
                 }
-            }, this._defaultRetryDelay);
-        } else if(callback.networkRetryCount < callback.maxRetries) {
+            }, this._retryDelay);
+        } else if(callback.networkRetryCount < this._maxRetries) {
             callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
