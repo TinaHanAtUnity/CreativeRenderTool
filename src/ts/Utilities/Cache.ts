@@ -14,6 +14,11 @@ export enum CacheStatus {
     FAILED
 }
 
+export interface ICacheOptions {
+    retries: number;
+    retryDelay: number;
+}
+
 export interface ICacheResponse {
     fullyDownloaded: boolean;
     url: string;
@@ -48,9 +53,17 @@ export class Cache {
     private _defaultMaxRetries: number = 5;
     private _defaultRetryDelay: number = 10000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+
+        if(typeof options === 'undefined') {
+            this._defaultMaxRetries = 5;
+            this._defaultRetryDelay = 10000;
+        } else {
+            this._defaultMaxRetries = options.retries;
+            this._defaultRetryDelay = options.retryDelay;
+        }
 
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
@@ -204,11 +217,6 @@ export class Cache {
         return this._nativeBridge.Cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
         });
-    }
-
-    public setRetryDefaults(retries: number, delay: number) {
-        this._defaultMaxRetries = retries;
-        this._defaultRetryDelay = delay;
     }
 
     private downloadFile(url: string, fileId: string): void {

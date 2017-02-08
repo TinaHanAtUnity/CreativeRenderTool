@@ -161,8 +161,7 @@ describe('CacheTest', () => {
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
-        cacheManager = new Cache(nativeBridge, wakeUpManager);
-        cacheManager.setRetryDefaults(0, 1);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, {retries: 3, retryDelay: 1});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
@@ -224,7 +223,6 @@ describe('CacheTest', () => {
             cacheApi.setInternet(true);
             wakeUpManager.onNetworkConnected.trigger();
         }, 10);
-        cacheManager.setRetryDefaults(1, 1);
 
         return cacheManager.cache(testUrl).then(fileUrl => {
             assert(networkTriggered, 'Cache one file with network failure: network was not triggered');
@@ -246,7 +244,6 @@ describe('CacheTest', () => {
         setTimeout(() => triggerNetwork(), 5);
         setTimeout(() => triggerNetwork(), 10);
         setTimeout(() => triggerNetwork(), 15);
-        cacheManager.setRetryDefaults(3, 1);
 
         cacheManager.cache(testUrl).then(() => {
             done('Cache one file with repeated network failures: caching should not be successful with no internet');
@@ -262,7 +259,6 @@ describe('CacheTest', () => {
         cacheApi.setInternet(false);
 
         setTimeout(() => { cacheManager.stop(); }, 5);
-        cacheManager.setRetryDefaults(1, 1000);
 
         return cacheManager.cache(testUrl).then(() => {
             assert.fail('Caching should fail when stopped');
