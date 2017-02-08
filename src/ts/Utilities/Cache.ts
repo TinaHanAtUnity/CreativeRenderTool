@@ -343,10 +343,7 @@ export class Cache {
                 responseCode: responseCode,
                 headers: JSON.stringify(headers)
             });
-            Diagnostics.trigger({
-                'type': 'cache_error',
-                'error': error
-            });
+            Diagnostics.trigger('cache_error', error);
 
             this.deleteCacheResponse(url);
             if(size > 0) {
