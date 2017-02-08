@@ -26,17 +26,49 @@ describe('DiagnosticsTest', () => {
         }, Platform.TEST, false);
     });
 
+    it('should not allow primitives as root values', () => {
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
+        sinon.stub(request, 'post').returns(resolvedPromise);
+        HttpKafka.setRequest(request);
+
+        Diagnostics.trigger('test', 123);
+        return resolvedPromise.then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"value":123}}}');
+            return Diagnostics.trigger('test', false);
+        }).then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"value":false}}}');
+            return Diagnostics.trigger('test', []);
+        }).then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"value":[]}}}');
+            return Diagnostics.trigger('test', <any>null);
+        }).then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"value":null}}}');
+            return Diagnostics.trigger('test', <any>undefined);
+        }).then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{}}}');
+            return Diagnostics.trigger('test', 'lol');
+        }).then(() => {
+            sinon.assert.calledWith(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"value":"lol"}}}');
+        });
+    });
+
     it('should generate proper request', () => {
         const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
         HttpKafka.setRequest(request);
 
-        Diagnostics.trigger({'test': true});
+        Diagnostics.trigger('test', {'test': true});
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
-
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"test":true}}}');
         });
     });
 
@@ -64,11 +96,11 @@ describe('DiagnosticsTest', () => {
         HttpKafka.setRequest(request);
         HttpKafka.setClientInfo(clientInfo);
         HttpKafka.setConfiguration(configuration);
-        Diagnostics.trigger({'test': true});
+        Diagnostics.trigger('test', {'test': true});
 
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":null,"country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"test":true}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":null,"country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"test":true}}}');
         });
     });
 });
