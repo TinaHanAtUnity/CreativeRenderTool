@@ -218,6 +218,7 @@ describe('AssetManagerTest', () => {
 
     it('should not swallow errors when cache mode is forced', () => {
         const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge));
+        cache.setRetryDefaults(0, 1);
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([asset], []);

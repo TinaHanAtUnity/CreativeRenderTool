@@ -14,11 +14,6 @@ export enum CacheStatus {
     FAILED
 }
 
-export interface ICacheOptions {
-    retries: number;
-    allowFailure: boolean;
-}
-
 export interface ICacheResponse {
     fullyDownloaded: boolean;
     url: string;
@@ -34,20 +29,13 @@ interface ICallbackObject {
     networkRetry: boolean;
     retryCount: number;
     networkRetryCount: number;
+    maxRetries: number;
     resolve: Function;
     reject: Function;
-    options: ICacheOptions;
     originalUrl?: string;
 }
 
 export class Cache {
-
-    private static getDefaultCacheOptions(): ICacheOptions {
-        return {
-            retries: 0,
-            allowFailure: false
-        };
-    }
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -56,6 +44,9 @@ export class Cache {
     private _fileIds: { [key: string]: string } = {};
 
     private _currentUrl: string;
+
+    private _defaultMaxRetries: number = 5;
+    private _defaultRetryDelay: number = 10000;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
@@ -71,7 +62,7 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string, options?: ICacheOptions): Promise<string> {
+    public cache(url: string): Promise<string> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -84,10 +75,7 @@ export class Cache {
             if(isCached) {
                 return Promise.resolve([CacheStatus.OK, fileId]);
             }
-            if(typeof options === 'undefined') {
-                options = Cache.getDefaultCacheOptions();
-            }
-            const promise = this.registerCallback(url, fileId, options);
+            const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
@@ -96,12 +84,6 @@ export class Cache {
             }
             throw status;
         }).catch(error => {
-            if(typeof options === 'undefined') {
-                options = Cache.getDefaultCacheOptions();
-            }
-            if(options.allowFailure && error === CacheStatus.FAILED) {
-                return url;
-            }
             throw error;
         });
     }
@@ -224,6 +206,11 @@ export class Cache {
         });
     }
 
+    public setRetryDefaults(retries: number, delay: number) {
+        this._defaultMaxRetries = retries;
+        this._defaultRetryDelay = delay;
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
         this._nativeBridge.Cache.download(url, fileId).catch(error => {
@@ -247,16 +234,16 @@ export class Cache {
         });
     }
 
-    private registerCallback(url: string, fileId: string, options: ICacheOptions, originalUrl?: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
                 networkRetry: false,
                 retryCount: 0,
                 networkRetryCount: 0,
+                maxRetries: this._defaultMaxRetries,
                 resolve: resolve,
                 reject: reject,
-                options: options,
                 originalUrl: originalUrl
             };
             this._callbacks[url] = callbackObject;
@@ -339,7 +326,7 @@ export class Cache {
                     if(callback.originalUrl) {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                     }
-                    this.registerCallback(location, fileId, Cache.getDefaultCacheOptions(), url);
+                    this.registerCallback(location, fileId, url);
                     this.downloadFile(location, fileId);
                     return;
                 }
@@ -399,7 +386,7 @@ export class Cache {
     }
 
     private handleRetry(callback: ICallbackObject, url: string, error: string): void {
-        if(callback.retryCount < callback.options.retries) {
+        if(callback.retryCount < callback.maxRetries) {
             callback.retryCount++;
             callback.networkRetry = true;
 
@@ -412,8 +399,8 @@ export class Cache {
                     retryCallback.networkRetry = false;
                     this.downloadFile(url, retryCallback.fileId);
                 }
-            }, 10000);
-        } else if(callback.networkRetryCount < callback.options.retries) {
+            }, this._defaultRetryDelay);
+        } else if(callback.networkRetryCount < callback.maxRetries) {
             callback.networkRetryCount++;
             callback.networkRetry = true;
         } else {
