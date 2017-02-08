@@ -206,7 +206,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should swallow optional errors when cache mode is allowed', () => {
-        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge));
+        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge), {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
@@ -217,7 +217,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not swallow errors when cache mode is forced', () => {
-        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge));
+        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge), {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([asset], []);
