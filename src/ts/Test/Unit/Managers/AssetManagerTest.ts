@@ -210,10 +210,8 @@ describe('AssetManagerTest', () => {
         const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
-        const spy = sinon.spy(cache, 'cache');
         cacheApi.setInternet(false);
         return assetManager.setup(campaign).then(() => {
-            assert(spy.called, 'Cache was not called for required asset');
             assert(!asset.isCached(), 'Asset was cached');
         });
     });
