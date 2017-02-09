@@ -121,6 +121,7 @@ if(window.parent !== window) {
     const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
     const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
     const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+    const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
     initializeButton.addEventListener('click', (event: Event) => {
         event.preventDefault();
@@ -162,6 +163,12 @@ if(window.parent !== window) {
                 ts: Date.now()
             };
         }
+        if(campaignResponseElement.value.length) {
+            publicStorage.test.campaignResponse = {
+                value: campaignResponseElement.value,
+                ts: Date.now()
+            };
+        }
 
         window.sessionStorage.clear();
         window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
@@ -190,6 +197,9 @@ if(window.parent !== window) {
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
                 console.log('onUnityAdsError: ' + error + ' - ' + message);
+            },
+            onUnityAdsClick: (placement: string) => {
+                console.log('onUnityAdsClick: ' + placement);
             }
         };
         // tslint:enable:no-console

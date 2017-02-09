@@ -1,3 +1,55 @@
+# Thu Feb  9 10:44:10 UTC 2017
+
+* Second deployment of major refactorings, including caching fixes to previous deployment
+
+# Wed Feb  8 07:52:00 UTC 2017
+
+* Revert previous deployment due to serious caching problems that cause no fill
+
+# Tue Feb  7 13:13:11 UTC 2017
+
+* Major refactorings (should improve programmatic caching)
+
+# Mon Feb  6 10:43:02 UTC 2017
+
+* Removed Chinese new year AB test
+
+# Mon Jan 30 13:59:36 UTC 2017
+
+* Fixed several overlay UX issues 
+
+# Wed Jan 25 09:58:18 UTC 201
+
+* End tablet layout AB test
+* Add Chinese new year AB test
+* Pause videos on iOS when notification/control center is pulled visible
+* Prevent brand ad video errors causing a black screen
+
+# Wed Jan 18 10:39:48 UTC 2017
+
+* New overlay to all groups
+* Video errors without progress events will close ad
+* VAST events to httpkafka
+* Browser build improvements
+
+# Mon Jan 16 11:58:22 UTC 2017
+
+* Revert two emergency fixes because backend is now able to keep up with the load
+
+# Sun Jan 15 14:21:00 UTC 2017
+
+* Emergency fix: disabled all ad request retries to help with backend load
+
+# Sun Jan 15 12:28:00 UTC 2017
+
+* Emergency fix: disabled resending any failed events to help with backend load
+
+# Thu Jan 12 15:41:06 UTC 2017
+
+* Improved layout for large tablets A/B test
+* Add optional delay for autoclosing ad units
+* Improve deployment scripts
+
 # Wed Jan 11 12:55:17 UTC 2017
 
 * Refactor AdUnit API handling from different ad units to a common utility class

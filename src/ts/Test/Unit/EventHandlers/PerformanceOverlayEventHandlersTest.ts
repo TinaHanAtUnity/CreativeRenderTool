@@ -1,26 +1,26 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { VideoAdUnitController } from 'AdUnits/VideoAdUnitController';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Campaign } from 'Models/Campaign';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
-import { Observable0 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { AdUnit } from 'Utilities/AdUnit';
-import { AndroidAdUnit } from 'Utilities/AndroidAdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Video } from 'Models/Video';
 
 describe('PerformanceOverlayEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
-    let adUnit: AdUnit;
+    let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
+    let video: Video;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -34,9 +34,12 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             show: sinon.spy(),
         };
 
-        adUnit = new AndroidAdUnit(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        const videoAdUnitController = new VideoAdUnitController(nativeBridge, adUnit, TestFixtures.getPlacement(), <Campaign><any>{}, overlay, null);
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, adUnit, videoAdUnitController, endScreen);
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        video = new Video('');
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+            getVideo: () => video,
+            getStreamingVideo: () => video
+        }, overlay, null, endScreen);
     });
 
     describe('with onSkip', () => {
@@ -50,13 +53,11 @@ describe('PerformanceOverlayEventHandlersTest', () => {
         });
 
         it('should trigger onFinish', () => {
-            performanceAdUnit.onFinish = <Observable0><any> {
-                trigger: sinon.spy(),
-            };
+            const spy = sinon.spy(performanceAdUnit.onFinish, 'trigger');
 
             PerformanceOverlayEventHandlers.onSkip(performanceAdUnit);
 
-            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.onFinish.trigger);
+            sinon.assert.called(spy);
         });
     });
 

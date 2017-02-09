@@ -280,7 +280,11 @@ setup: clean
 	rm -rf node_modules && npm install
 
 deploy:
+ifeq ($(TRAVIS_PULL_REQUEST), false)
 	rm -rf build/coverage
 	find build/test/* -not -name "config.json" | xargs rm -rf
 	find build/release/* -not -name "config.json" | xargs rm -rf
 	tools/deploy.sh $(BRANCH) && node tools/purge.js
+else
+	@echo 'Skipping deployment for pull requests'
+endif

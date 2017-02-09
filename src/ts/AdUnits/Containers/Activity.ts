@@ -1,16 +1,17 @@
-import { AdUnit } from 'Utilities/AdUnit';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
 }
 
-export class AndroidAdUnit extends AdUnit {
+export class Activity extends AdUnitContainer {
+
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
 
@@ -76,6 +77,10 @@ export class AndroidAdUnit extends AdUnit {
             this._nativeBridge.AndroidAdUnit.setViews(['webview']),
             this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR)
         ]);
+    }
+
+    public isPaused() {
+        return false;
     }
 
     private onResume(activityId: number): void {

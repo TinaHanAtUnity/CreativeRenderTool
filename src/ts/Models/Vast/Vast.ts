@@ -34,21 +34,22 @@ export class Vast {
         return null;
     }
 
-    public getVideoUrl(): string | null {
+    public getVideoUrl(): string {
         const ad = this.getAd();
         if (ad) {
             for (const creative of ad.getCreatives()) {
                 for (const mediaFile of creative.getMediaFiles()) {
                     const mimeType = mediaFile.getMIMEType();
                     const playable = mimeType && this.isPlayableMIMEType(mimeType);
-                    if (mediaFile.getFileURL() && playable) {
-                        return mediaFile.getFileURL();
+                    const fileUrl = mediaFile.getFileURL();
+                    if (fileUrl && playable) {
+                        return fileUrl;
                     }
                 }
             }
         }
 
-        return null;
+        throw new Error('No video URL found for VAST');
     }
 
     public getImpressionUrls(): string[] {

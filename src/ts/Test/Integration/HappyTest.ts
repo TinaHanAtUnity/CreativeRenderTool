@@ -26,6 +26,9 @@ describe('IntegrationTest', () => {
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
                 return;
+            },
+            onUnityAdsClick: (placement: string) => {
+                return;
             }
         };
 
@@ -77,6 +80,9 @@ describe('IntegrationTest', () => {
                 return;
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
+                return;
+            },
+            onUnityAdsClick: (placement: string) => {
                 return;
             }
         };
