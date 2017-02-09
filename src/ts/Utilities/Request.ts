@@ -47,8 +47,10 @@ export class Request {
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
             const header = headers[i];
-            if(header[0] && header[0].match(new RegExp(headerName, 'i'))) {
-                return header[1];
+            const key = header[0];
+            const value = header[1];
+            if (key && key.match(new RegExp(headerName, 'i'))) {
+                return value;
             }
         }
         return null;

@@ -105,14 +105,10 @@ export class WebView {
             this._nativeBridge.Sdk.initComplete();
 
             this._wakeUpManager.setListenConnectivity(true);
-            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
-
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._wakeUpManager.setListenAppForeground(true);
-                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
             } else {
                 this._wakeUpManager.setListenScreen(true);
-                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
 
             return this.setupTestEnvironment();
@@ -136,6 +132,13 @@ export class WebView {
             this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
             return this._campaignManager.request();
         }).then(() => {
+            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
+            } else {
+                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
+            }
+
             this._initialized = true;
 
             return this._eventManager.sendUnsentSessions();
@@ -150,10 +153,7 @@ export class WebView {
                 }
             }
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger({
-                'type': 'initialization_error',
-                'error': error
-            });
+            Diagnostics.trigger('initialization_error', error);
         });
     }
 
@@ -273,10 +273,7 @@ export class WebView {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger({
-            'type': 'campaign_request_failed',
-            'error': error
-        });
+        Diagnostics.trigger('campaign_request_failed', error);
         this.onNoFill();
     }
 
@@ -290,10 +287,7 @@ export class WebView {
             timeoutInSeconds: this._campaign.getTimeout()
         });
 
-        Diagnostics.trigger({
-            type: 'campaign_expired',
-            error: error
-        });
+        Diagnostics.trigger('campaign_expired', error);
     }
 
     private onNewAdRequestAllowed(): void {
@@ -362,8 +356,7 @@ export class WebView {
      GENERIC ONERROR HANDLER
      */
     private onError(event: ErrorEvent): boolean {
-        Diagnostics.trigger({
-            'type': 'js_error',
+        Diagnostics.trigger('js_error', {
             'message': event.message,
             'url': event.filename,
             'line': event.lineno,

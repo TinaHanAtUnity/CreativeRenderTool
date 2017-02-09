@@ -72,10 +72,7 @@ export class EventManager {
                     response: (<RequestError>error).nativeResponse
                 });
             }
-            return Diagnostics.trigger({
-                'type': 'click_attribution_failed',
-                'error': error
-            });
+            return Diagnostics.trigger('click_attribution_failed', error);
         });
     }
 
@@ -96,10 +93,7 @@ export class EventManager {
                     response: (<RequestError>error).nativeResponse
                 });
             }
-            return Analytics.trigger({
-                'type': 'third_party_event_failed',
-                'error': error
-            });
+            return Analytics.trigger('third_party_event_failed', error);
         });
     }
 
