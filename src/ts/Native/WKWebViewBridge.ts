@@ -1,4 +1,4 @@
-export class IosWebViewBridge implements IWebViewBridge {
+export class WKWebViewBridge implements IWebViewBridge {
 
     public handleInvocation(invocations: string): void {
         window.webkit.messageHandlers.handleInvocation.postMessage(invocations);
