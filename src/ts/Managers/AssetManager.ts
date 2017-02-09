@@ -19,11 +19,13 @@ export class AssetManager {
         }
 
         const requiredChain = this.cache(campaign.getRequiredAssets());
-        const optionalChain = this.cache(campaign.getOptionalAssets());
 
         if(this._cacheMode === CacheMode.FORCED) {
-            return requiredChain.then(() => optionalChain);
+            return requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
+        } else {
+            requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
         }
+
         return Promise.resolve(campaign);
     }
 

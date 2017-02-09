@@ -206,20 +206,18 @@ describe('AssetManagerTest', () => {
     });
 
     it('should swallow optional errors when cache mode is allowed', () => {
-        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge));
+        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge), {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
-        const spy = sinon.spy(cache, 'cache');
         cacheApi.setInternet(false);
         return assetManager.setup(campaign).then(() => {
-            assert(spy.called, 'Cache was not called for required asset');
             assert(!asset.isCached(), 'Asset was cached');
         });
     });
 
     it('should not swallow errors when cache mode is forced', () => {
-        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge));
+        const cache = new Cache(nativeBridge, new WakeUpManager(nativeBridge), {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new Asset('https://www.google.fi');
         const campaign = new TestCampaign([asset], []);

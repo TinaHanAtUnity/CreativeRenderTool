@@ -42,10 +42,7 @@ export class VideoEventHandlers {
                 url: url,
                 originalUrl: originalUrl
             });
-            Diagnostics.trigger({
-                type: 'video_too_long',
-                error: error
-            });
+            Diagnostics.trigger('video_too_long', error);
         }
 
         const overlay = adUnit.getOverlay();
@@ -127,10 +124,7 @@ export class VideoEventHandlers {
                     lastPosition: lastPosition,
                     duration: adUnit.getVideo().getDuration()
                 });
-                Diagnostics.trigger({
-                    type: 'video_player_too_large_progress',
-                    error: error
-                });
+                Diagnostics.trigger('video_player_too_large_progress', error);
 
                 return;
             }
@@ -149,10 +143,7 @@ export class VideoEventHandlers {
                         position: position,
                         duration: adUnit.getVideo().getDuration()
                     });
-                    Diagnostics.trigger({
-                        type: 'video_player_stuck',
-                        error: error
-                    });
+                    Diagnostics.trigger('video_player_stuck', error);
 
                     return;
                 } else {
@@ -210,14 +201,11 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_generic_error',
+        Diagnostics.trigger('video_player_generic_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition(),
-            'error': {
-                'what': what,
-                'extra': extra
-            }
+            'what': what,
+            'extra': extra
         });
     }
 
@@ -226,13 +214,10 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_generic_error',
+        Diagnostics.trigger('video_player_generic_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition(),
-            'error': {
-                'description': description
-            }
+            'description': description
         });
     }
 
@@ -241,8 +226,7 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_prepare_timeout',
+        Diagnostics.trigger('video_player_prepare_timeout', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
@@ -253,8 +237,7 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_prepare_error',
+        Diagnostics.trigger('video_player_prepare_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
@@ -265,8 +248,7 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_seek_to_error',
+        Diagnostics.trigger('video_player_seek_to_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
@@ -277,8 +259,7 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_pause_error',
+        Diagnostics.trigger('video_player_pause_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
@@ -289,8 +270,7 @@ export class VideoEventHandlers {
 
         this.handleVideoError(nativeBridge, videoAdUnit);
 
-        Diagnostics.trigger({
-            'type': 'video_player_illegal_state_error',
+        Diagnostics.trigger('video_player_illegal_state_error', {
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
