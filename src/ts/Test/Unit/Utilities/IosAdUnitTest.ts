@@ -8,6 +8,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { ViewConfiguration } from 'AdUnits/Containers/ViewConfiguration';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -66,7 +67,7 @@ describe('IosAdUnitTest', () => {
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());
 
-        return container.reconfigure().then(() => {
+        return container.reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN).then(() => {
             sinon.assert.calledWith(<sinon.SinonSpy>stubViews, ['webview']);
             sinon.assert.calledWith(<sinon.SinonSpy>stubOrientation, UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
             return;

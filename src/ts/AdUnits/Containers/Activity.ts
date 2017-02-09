@@ -5,6 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -71,12 +72,30 @@ export class Activity extends AdUnitContainer {
         }
     }
 
-    public reconfigure(): Promise<any[]> {
-        // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
-        return Promise.all([
-            this._nativeBridge.AndroidAdUnit.setViews(['webview']),
-            this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR)
-        ]);
+    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        const promises: Promise<any>[] = [];
+        const width = this._deviceInfo.getScreenWidth();
+        const height = this._deviceInfo.getScreenHeight();
+
+        switch (configuration) {
+            case ViewConfiguration.CONFIGURATION_ENDSCREEN:
+                promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
+                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                break;
+
+            case ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN:
+                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT));
+                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, width, height / 2));
+                break;
+
+            case ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO:
+                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
+                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, this._deviceInfo.getScreenHeight(), this._deviceInfo.getScreenWidth()));
+                break;
+            default:
+                break;
+        }
+        return Promise.all(promises);
     }
 
     public isPaused() {

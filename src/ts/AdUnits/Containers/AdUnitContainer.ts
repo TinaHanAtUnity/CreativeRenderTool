@@ -1,5 +1,6 @@
 import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
 
 export abstract class AdUnitContainer {
 
@@ -12,9 +13,7 @@ export abstract class AdUnitContainer {
 
     public abstract close(): Promise<void>;
 
-    // currently open ad unit is only reconfigured to move from video playback to endscreen with unlocked orientation
-    // in the future, when we add more options, this method should be updated to handle future use cases
-    public abstract reconfigure(): Promise<any[]>;
+    public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
 
     public abstract isPaused(): boolean;
 
