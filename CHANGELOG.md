@@ -1,3 +1,11 @@
+# Thu Feb  9 10:44:10 UTC 2017
+
+* Second deployment of major refactorings, including caching fixes to previous deployment
+
+# Wed Feb  8 07:52:00 UTC 2017
+
+* Revert previous deployment due to serious caching problems that cause no fill
+
 # Tue Feb  7 13:13:11 UTC 2017
 
 * Major refactorings (should improve programmatic caching)
