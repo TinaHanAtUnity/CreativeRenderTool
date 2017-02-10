@@ -1,3 +1,7 @@
+# Fri Feb 10 12:19:06 UTC 2017
+
+* Fixed overlay clicking and scrolling issues
+
 # Thu Feb  9 10:44:10 UTC 2017
 
 * Second deployment of major refactorings, including caching fixes to previous deployment
