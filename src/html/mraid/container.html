@@ -4,12 +4,16 @@
     <title>Unity Ads MRAID WebView</title>
 
     <meta charset="utf-8"/>
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
     <script>
+        setInterval(function() {
+            console.log('w: ' + window.innerWidth + ' h: ' + window.innerHeight);
+        }, 100);
+
         (function() {
             var MRAID = function() {
                 var state = 'loading';

@@ -48,6 +48,8 @@ export class Activity extends AdUnitContainer {
         let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
         if(forceOrientation === ForceOrientation.LANDSCAPE) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
+            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         }
 
         let keyEvents: any[] = [];
