@@ -27,12 +27,12 @@ class TestRequestApi extends RequestApi {
             if(this._retryCount === 3) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
-                this.sendSuccessResponse(id, url, 'Must continue retrying', 500, []);
+                this.sendFailResponse(id, url, 'Must continue retrying');
             }
 
             this._retryCount++;
         } else if(url.indexOf('/alwaysRetry') !== -1) {
-            this.sendSuccessResponse(id, url, 'Must continue retrying', 500, []);
+            this.sendFailResponse(id, url, 'This URL always fails');
         } else if(url.indexOf('/toggle') !== -1) {
             if(this._toggleUrl) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
@@ -75,7 +75,7 @@ class TestRequestApi extends RequestApi {
             if(this._retryCount === 3) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
-                this.sendSuccessResponse(id, url, 'Must continue retrying', 500, []);
+                this.sendFailResponse(id, url, 'Must continue retrying');
             }
 
             this._retryCount++;
@@ -257,7 +257,7 @@ describe('RequestTest', () => {
             throw new Error('Should not have received a response');
         }).catch(error => {
             error = <RequestError>error;
-            assert.equal('FAILED_AFTER_RETRIES', error.message, 'Error was not correct after retries');
+            assert.equal('This URL always fails', error.message, 'Error was not correct after retries');
         });
     });
 
