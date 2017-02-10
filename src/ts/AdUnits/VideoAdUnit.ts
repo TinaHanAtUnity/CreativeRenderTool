@@ -3,7 +3,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Video';
 import { Overlay } from 'Views/Overlay';
@@ -37,7 +37,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
-        return this._container.open(this, true, !this._placement.useDeviceOrientationForVideo(), this._placement.disableBackButton(), this._options);
+        return this._container.open(this, true, true, this._placement.useDeviceOrientationForVideo() ? ForceOrientation.NONE : ForceOrientation.LANDSCAPE, this._placement.disableBackButton(), this._options);
     }
 
     public hide(): Promise<void> {

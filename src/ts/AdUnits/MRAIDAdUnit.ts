@@ -5,30 +5,48 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { MRAID } from 'Views/MRAID';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { MRAID, IOrientationProperties } from 'Views/MRAID';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _sessionManager: SessionManager;
     private _mraid: MRAID;
-    private _isShowing: boolean;
     private _options: any;
+    private _orientationProperties: IOrientationProperties;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: Campaign, mraid: MRAID, options: any) {
-        super(nativeBridge, adUnit, placement, campaign);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: Campaign, mraid: MRAID, options: any) {
+        super(nativeBridge, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
-        this._isShowing = false;
+
+        this._orientationProperties = {
+            allowOrientationChange: true,
+            forceOrientation: ForceOrientation.NONE
+        };
+
+        mraid.onOrientationProperties.subscribe((properties) => {
+            if(this.isShowing()) {
+                container.reorient(properties.allowOrientationChange, properties.forceOrientation);
+            } else {
+                this._orientationProperties = properties;
+            }
+        });
+
         this._options = options;
+        this.setShowing(false);
         this.setFinishState(FinishState.COMPLETED);
     }
 
     public show(): Promise<void> {
-        this._isShowing = true;
+        if(this.isShowing()) {
+            return Promise.resolve();
+        }
+
+        this.setShowing(true);
         this._mraid.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
@@ -37,11 +55,15 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, false, true, this._options);
+        return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, this._options);
     }
 
     public hide(): Promise<void> {
-        this._isShowing = false;
+        if(!this.isShowing()) {
+            return Promise.resolve();
+        }
+
+        this.setShowing(false);
 
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
@@ -61,10 +83,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         return this._container.close();
     }
 
-    public isShowing(): boolean {
-        return this._isShowing;
-    }
-
     public description(): string {
         return 'mraid';
     }
@@ -78,7 +96,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     }
 
     private onSystemKill() {
-        if(this._isShowing) {
+        if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }

@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -36,7 +36,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
         this._showing = true;
 
         let views: string[] = ['webview'];
@@ -45,7 +45,7 @@ export class ViewController extends AdUnitContainer {
         }
 
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
-        if(forceLandscape) {
+        if(forceOrientation === ForceOrientation.LANDSCAPE) {
             if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
             } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
@@ -61,7 +61,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
-        return this._nativeBridge.IosAdUnit.open(views, orientation, true, true);
+        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowOrientation);
     }
 
     public close(): Promise<void> {
@@ -80,11 +80,11 @@ export class ViewController extends AdUnitContainer {
         ]);
     }
 
-    public reorient(allowOrientation: boolean, forceOrientation: 'portrait' | 'landscape' | 'none'): Promise<any> {
+    public reorient(allowOrientation: boolean, forceOrientation: ForceOrientation): Promise<any> {
         return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowOrientation).then(() => {
-            if(forceOrientation === 'portrait') {
+            if(forceOrientation === ForceOrientation.PORTRAIT) {
                 return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN);
-            } else if(forceOrientation === 'landscape') {
+            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
                 return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE);
             } else {
                 return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);

@@ -6,10 +6,11 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
-    forceOrientation: 'portrait' | 'landscape' | 'none';
+    forceOrientation: ForceOrientation;
 }
 
 export class MRAID extends View {
@@ -117,9 +118,22 @@ export class MRAID extends View {
                 break;
 
             case 'orientation':
+                let forceOrientation = ForceOrientation.NONE;
+                switch(event.data.properties.forceOrientation) {
+                    case 'portrait':
+                        forceOrientation = ForceOrientation.PORTRAIT;
+                        break;
+
+                    case 'landscape':
+                        forceOrientation = ForceOrientation.LANDSCAPE;
+                        break;
+
+                    default:
+                        break;
+                }
                 this.onOrientationProperties.trigger({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: event.data.properties.forceOrientation
+                    forceOrientation: forceOrientation
                 });
                 break;
 

@@ -126,10 +126,6 @@ export class AdUnitFactory {
         const mraid = new MRAID(nativeBridge, placement, campaign);
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
-        mraid.onOrientationProperties.subscribe((properties) => {
-            container.reorient(properties.allowOrientationChange, properties.forceOrientation);
-        });
-
         mraid.render();
         document.body.appendChild(mraid.container());
         mraid.onClick.subscribe(() => sessionManager.sendClick(mraidAdUnit));

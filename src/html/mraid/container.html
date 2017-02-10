@@ -4,7 +4,7 @@
     <title>Unity Ads MRAID WebView</title>
 
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
@@ -46,6 +46,7 @@
                 };
 
                 window.addEventListener('message', function(event) {
+                    console.dir(arguments);
                     switch(event.data.type) {
                         case 'viewable':
                             viewable = event.data.value;
@@ -94,8 +95,8 @@
                     return {
                         x: 0,
                         y: 0,
-                        width: window.innerWidth,
-                        height: window.innerHeight
+                        width: screen.width,
+                        height: screen.height
                     };
                 };
 
@@ -105,8 +106,8 @@
 
                 this.getMaxSize = this.getScreenSize = function() {
                     return {
-                        width: window.innerWidth,
-                        height: window.innerHeight
+                        width: screen.width,
+                        height: screen.height
                     };
                 };
 
@@ -163,6 +164,8 @@
                 };
 
                 this.setOrientationProperties = function(properties) {
+                    console.log('setOrientationProperties');
+                    console.dir(properties);
                     orientationProperties = properties;
                     window.parent.postMessage({
                         type: 'orientation',

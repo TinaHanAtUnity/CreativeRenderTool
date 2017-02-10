@@ -17,10 +17,11 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 
-import TestMRAID from 'html/fixtures/mraid/TestMRAID.html';
+// import TestMRAID from 'html/fixtures/mraid/TestMRAID.html';
 // import TestMRAID2 from 'html/fixtures/mraid/TestMRAID2.html';
 // import SimpleTestMRAID from 'html/fixtures/mraid/SimpleTestMRAID.html';
 // import DiagnosticMRAID from 'html/fixtures/mraid/DiagnosticMRAID.html';
+import TresensaMRAID from 'html/fixtures/mraid/TresensaMRAID.html';
 
 export class CampaignManager {
 
@@ -232,7 +233,7 @@ export class CampaignManager {
     }
 
     private parseMRAIDCampaign(json: any) {
-        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', TestMRAID);
+        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', TresensaMRAID);
         this.onMRAIDCampaign.trigger(campaign);
     }
 
