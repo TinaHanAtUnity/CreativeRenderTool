@@ -26,7 +26,7 @@ export class PerformanceCampaign extends Campaign {
     private _bypassAppSheet: boolean;
 
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super(campaign.id, gamerId, abGroup);
+        super(campaign.id, gamerId, abGroup, campaign.store);
 
         this._appStoreId = campaign.appStoreId;
         this._appStoreCountry = campaign.appStoreCountry;

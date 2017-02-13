@@ -106,6 +106,7 @@ describe('DeviceInfoTest Android', () => {
                     getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
                     getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                    isAppInstalled: sinon.stub().returns(Promise.resolve(true))
                 }
             },
 
@@ -164,6 +165,7 @@ describe('DeviceInfoTest Android', () => {
                     getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
                     getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                    isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
                 }
             },
 

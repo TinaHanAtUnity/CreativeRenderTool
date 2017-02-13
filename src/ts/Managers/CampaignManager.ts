@@ -249,7 +249,8 @@ export class CampaignManager {
             screenWidth: this._deviceInfo.getScreenWidth(),
             screenHeight: this._deviceInfo.getScreenHeight(),
             sdkVersion: this._clientInfo.getSdkVersion(),
-            screenSize: this._deviceInfo.getScreenLayout()
+            screenSize: this._deviceInfo.getScreenLayout(),
+            stores: this._deviceInfo.getStores()
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {

@@ -98,6 +98,12 @@
       "body": false
     },
     {
+      "parameter": "stores",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "gamerId",
       "required": "no",
       "queryString": true,
