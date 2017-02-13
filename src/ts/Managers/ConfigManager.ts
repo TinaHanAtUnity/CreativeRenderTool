@@ -21,8 +21,8 @@ export class ConfigManager {
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
-                retries: 5,
-                retryDelay: 5000,
+                retries: 2,
+                retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: true
             }).then(response => {
