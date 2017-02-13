@@ -22,7 +22,6 @@ export class PerformanceAdUnit extends VideoAdUnit {
             endScreen.hide();
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
-        this.unsetReferences();
         return super.hide();
     }
 
