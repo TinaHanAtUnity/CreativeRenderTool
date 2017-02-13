@@ -77,7 +77,7 @@ export class ViewController extends AdUnitContainer {
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         const promises: Promise<any>[] = [];
         const width = this._deviceInfo.getScreenWidth();
-        const height = this._deviceInfo.getScreenHeight();
+        const height = this._deviceInfo.getScreenHeight() + this._deviceInfo.getStatusBarHeight();
 
         switch (configuration) {
             case ViewConfiguration.CONFIGURATION_ENDSCREEN:
@@ -88,8 +88,8 @@ export class ViewController extends AdUnitContainer {
             case ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN:
                 promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(0)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
-                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(this._deviceInfo.getScreenHeight() / 2)));
-                break;
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width ), new Double(height / 2)));
+                break
 
             case ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO:
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
