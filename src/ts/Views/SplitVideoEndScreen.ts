@@ -59,23 +59,20 @@ export class SplitVideoEndScreen extends View {
         this._endScreen.hide();
     }
 
-    public setCloseElementVisibility(visible: boolean) {
-        if (this._closeElement) {
-            this._closeElement.style.display = visible ? 'block' : 'none';
-        }
-        if (this._gameBackgroundElement) {
-            this._gameBackgroundElement.style.display = visible ? 'block' : 'none';
-            this._gameBackgroundElement.style.width = visible ? '100%' : '0';
-            this._gameBackgroundElement.style.height = visible ? '50%' : '0';
-            this._gameBackgroundElement.style.webkitAnimation = 'fade-in';
-            this._gameBackgroundElement.style.webkitAnimationDuration = '1s';
+    public showEndScreen() {
+        this._overlayContainer.style.height = '0';
 
-            this._endScreenContainer.style.top = "0";
-            this._endScreenContainer.style.height = "100%";
-            this._overlayContainer.style.height = '0';
-            this._endScreenInfoElement.style.height = '50%';
-            this._endScreenInfoElement.style.top = '50%';
-        }
+        this._closeElement.style.display = 'block';
+        this._gameBackgroundElement.style.display = 'block';
+        this._gameBackgroundElement.style.width = '100%';
+        this._gameBackgroundElement.style.height = '53%';
+        this._gameBackgroundElement.style.webkitAnimation = 'fade-in';
+        this._gameBackgroundElement.style.webkitAnimationDuration = '1s';
+
+        this._endScreenContainer.style.top = "0";
+        this._endScreenContainer.style.height = "100%";
+        this._endScreenInfoElement.style.height = '47%';
+        this._endScreenInfoElement.style.top = '53%';
     }
 
     public setFullScreenVideo(fullScreen: boolean) {
@@ -85,10 +82,10 @@ export class SplitVideoEndScreen extends View {
 
             this._overlayContainer.style.height = '100%';
         } else {
-            this._endScreenContainer.style.height = '50%';
+            this._endScreenContainer.style.height = '47%';
             this._endScreenContainer.style.display = 'block';
 
-            this._overlayContainer.style.height = '50%';
+            this._overlayContainer.style.height = '53%';
         }
         this._fullScreenVideo = fullScreen;
     }

@@ -23,10 +23,10 @@ export class SplitVideoEndScreenEventHandlers {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 endScreen.setFullScreenVideo(false);
-                endScreen.setCloseElementVisibility(true);
+                endScreen.showEndScreen();
             });
         } else {
-            endScreen.setCloseElementVisibility(true);
+            endScreen.showEndScreen();
         }
     }
 
@@ -34,10 +34,10 @@ export class SplitVideoEndScreenEventHandlers {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 endScreen.setFullScreenVideo(false);
-                endScreen.setCloseElementVisibility(true);
+                endScreen.showEndScreen();
             });
         } else {
-            endScreen.setCloseElementVisibility(true);
+            endScreen.showEndScreen();
         }
     }
 
@@ -45,7 +45,7 @@ export class SplitVideoEndScreenEventHandlers {
         if(adUnit.getEndScreen()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 adUnit.getEndScreen()!.setFullScreenVideo(false);
-                adUnit.getEndScreen()!.setCloseElementVisibility(true);
+                adUnit.getEndScreen()!.showEndScreen();
             });
         }
         adUnit.onFinish.trigger();
