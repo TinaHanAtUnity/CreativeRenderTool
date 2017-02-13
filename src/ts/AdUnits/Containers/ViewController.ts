@@ -89,7 +89,7 @@ export class ViewController extends AdUnitContainer {
                 promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(0)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width ), new Double(height / 2)));
-                break
+                break;
 
             case ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO:
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
