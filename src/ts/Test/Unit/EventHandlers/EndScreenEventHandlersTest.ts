@@ -17,6 +17,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import {StoreName} from "../../../Models/Campaign";
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -98,7 +99,7 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with no follow redirects', () => {
             beforeEach(() => {
                 sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-
+                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
                 EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
             });
@@ -195,6 +196,7 @@ describe('EndScreenEventHandlersTest', () => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '8.1'};
                 sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
@@ -211,6 +213,7 @@ describe('EndScreenEventHandlersTest', () => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
                 sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
+                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
