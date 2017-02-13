@@ -60,7 +60,7 @@ export class SplitVideoEndScreen extends View {
     }
 
     public showEndScreen() {
-        this._overlayContainer.style.height = '0';
+        this._overlayContainer.style.display = 'none';
 
         this._closeElement.style.display = 'block';
         this._gameBackgroundElement.style.display = 'block';
