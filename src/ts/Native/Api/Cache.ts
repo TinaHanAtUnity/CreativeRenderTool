@@ -1,6 +1,9 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable3, Observable6, Observable5 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
+import { AndroidCacheApi } from 'Native/Api/AndroidCache';
+import { IosCacheApi } from 'Native/Api/IosCache';
+import { Platform } from 'Constants/Platform';
 
 export enum CacheError {
     FILE_IO_ERROR,
@@ -8,7 +11,11 @@ export enum CacheError {
     FILE_ALREADY_CACHING,
     NOT_CACHING,
     JSON_ERROR,
-    NO_INTERNET
+    NO_INTERNET,
+    MALFORMED_URL,
+    NETWORK_ERROR,
+    ILLEGAL_STATE,
+    INVALID_ARGUMENT
 }
 
 export enum CacheEvent {
@@ -27,6 +34,8 @@ export interface IFileInfo {
 }
 
 export class CacheApi extends NativeApi {
+    public Android: AndroidCacheApi;
+    public Ios: IosCacheApi;
 
     public onDownloadStarted: Observable5<string, number, number, number, [string, string][]> = new Observable5();
     public onDownloadProgress: Observable3<string, number, number> = new Observable3();
@@ -36,10 +45,16 @@ export class CacheApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Cache');
+
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            this.Ios = new IosCacheApi(nativeBridge);
+        } else {
+            this.Android = new AndroidCacheApi(nativeBridge);
+        }
     }
 
-    public download(url: string, fileId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId]);
+    public download(url: string, fileId: string, headers: [string, string][]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId, headers]);
     }
 
     public stop(): Promise<void> {

@@ -30,4 +30,12 @@ export class IosDeviceInfoApi extends NativeApi {
     public isSimulator(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isSimulator');
     }
+
+    public getGLString(glInfo: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getGLString', [glInfo]);
+    }
+
+    public getSensorList(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSensorList');
+    }
 }
