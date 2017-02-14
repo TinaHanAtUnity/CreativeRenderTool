@@ -56,23 +56,31 @@ export class SplitVideoEndScreen extends View {
     public hide(): void {
         super.hide();
 
-        this._endScreen.hide();
+        if (this._endScreen) {
+            this._endScreen.hide();
+            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
+            delete this._endScreen;
+        }
+
     }
 
     public showEndScreen() {
         this._overlayContainer.style.display = 'none';
 
-        this._closeElement.style.display = 'block';
         this._gameBackgroundElement.style.display = 'block';
         this._gameBackgroundElement.style.width = '100%';
         this._gameBackgroundElement.style.height = '53%';
-        this._gameBackgroundElement.style.webkitAnimation = 'fade-in';
-        this._gameBackgroundElement.style.webkitAnimationDuration = '1s';
 
         this._endScreenContainer.style.top = "0";
         this._endScreenContainer.style.height = "100%";
         this._endScreenInfoElement.style.height = '47%';
         this._endScreenInfoElement.style.top = '53%';
+        this._endScreenContainer.style.display = 'block';
+
+        this._gameBackgroundElement.style.webkitAnimation = 'fade-in';
+        this._gameBackgroundElement.style.webkitAnimationDuration = '1s';
+        this._closeElement.style.display = 'block';
+
     }
 
     public setFullScreenVideo(fullScreen: boolean) {

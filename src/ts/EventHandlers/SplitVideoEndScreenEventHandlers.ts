@@ -1,4 +1,3 @@
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { SplitVideoEndScreen }  from 'Views/SplitVideoEndScreen';
 import { SplitVideoEndScreenAdUnit } from 'AdUnits/SplitVideoEndScreenAdUnit';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
@@ -6,7 +5,7 @@ import { ViewConfiguration } from 'AdUnits/Containers/ViewConfiguration';
 
 export class SplitVideoEndScreenEventHandlers {
 
-    public static onFullScreenButton(deviceInfo: DeviceInfo, adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onFullScreenButton(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
         if (!endScreen.isFullScreenVideo()) {
             endScreen!.setFullScreenVideo(true);
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO).then(() => {
@@ -19,10 +18,9 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onVideoCompleted(deviceInfo: DeviceInfo, adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onVideoCompleted(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
-                endScreen.setFullScreenVideo(false);
                 endScreen.showEndScreen();
             });
         } else {
@@ -30,10 +28,9 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onVideoError(deviceInfo: DeviceInfo, adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onVideoError(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
-                endScreen.setFullScreenVideo(false);
                 endScreen.showEndScreen();
             });
         } else {
@@ -41,17 +38,16 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onSkip(deviceInfo: DeviceInfo, adUnitContainer: AdUnitContainer, adUnit: SplitVideoEndScreenAdUnit) {
-        if(adUnit.getEndScreen()) {
+    public static onSkip(adUnitContainer: AdUnitContainer, adUnit: SplitVideoEndScreenAdUnit) {
+        if(adUnit.getSplitVideoEndScreen()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
-                adUnit.getEndScreen()!.setFullScreenVideo(false);
-                adUnit.getEndScreen()!.showEndScreen();
+                adUnit.getSplitVideoEndScreen()!.showEndScreen();
             });
         }
         adUnit.onFinish.trigger();
     }
 
-    public static onVideoPrepared(deviceInfo: DeviceInfo, adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen) {
+    public static onVideoPrepared(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen) {
         endScreen.getOverlay().setFullScreenButtonVisible(true);
         if(!endScreen.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN);
