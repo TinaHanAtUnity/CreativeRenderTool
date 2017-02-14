@@ -25,7 +25,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._orientationProperties = {
             allowOrientationChange: true,
-            forceOrientation: ForceOrientation.PORTRAIT
+            forceOrientation: ForceOrientation.NONE
         };
 
         mraid.onOrientationProperties.subscribe((properties) => {

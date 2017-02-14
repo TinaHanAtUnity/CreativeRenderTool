@@ -95,7 +95,6 @@ export class MRAID extends View {
     }
 
     private onMessage(event: MessageEvent) {
-        console.dir(event);
         switch(event.data.type) {
             case 'loaded':
                 this._loaded = true;

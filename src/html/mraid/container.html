@@ -10,10 +10,6 @@
     <meta name="format-detection" content="telephone=no"/>
 
     <script>
-        setInterval(function() {
-            console.log('w: ' + window.innerWidth + ' h: ' + window.innerHeight);
-        }, 100);
-
         (function() {
             var MRAID = function() {
                 var state = 'loading';
@@ -50,7 +46,6 @@
                 };
 
                 window.addEventListener('message', function(event) {
-                    console.dir(arguments);
                     switch(event.data.type) {
                         case 'viewable':
                             viewable = event.data.value;
@@ -147,7 +142,7 @@
                 };
 
                 this.playVideo = function() {
-                    trigger('error', ['not implemented', 'getResizeProperties']);
+                    trigger('error', ['not implemented', 'playVideo']);
                 };
 
                 this.removeEventListener = function(event, listener) {

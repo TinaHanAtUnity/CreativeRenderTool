@@ -21,7 +21,8 @@ import { WebViewError } from 'Errors/WebViewError';
 // import TestMRAID2 from 'html/fixtures/mraid/TestMRAID2.html';
 // import SimpleTestMRAID from 'html/fixtures/mraid/SimpleTestMRAID.html';
 // import DiagnosticMRAID from 'html/fixtures/mraid/DiagnosticMRAID.html';
-import TresensaMRAID from 'html/fixtures/mraid/TresensaMRAID.html';
+// import TresensaMRAID from 'html/fixtures/mraid/TresensaMRAID.html';
+import AarkiMRAID from 'html/fixtures/mraid/AarkiMRAID5.html';
 
 export class CampaignManager {
 
@@ -233,7 +234,7 @@ export class CampaignManager {
     }
 
     private parseMRAIDCampaign(json: any) {
-        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', TresensaMRAID);
+        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', AarkiMRAID);
         this.onMRAIDCampaign.trigger(campaign);
     }
 
