@@ -17,10 +17,15 @@ enum AdUnitEvent {
 }
 
 export enum AndroidAdUnitError {
-    ACTIVITY_NULL,
+    ADUNIT_NULL,
     ACTIVITY_ID,
+    GENERIC,
+    ORIENTATION,
+    SCREENVISIBILITY,
     CORRUPTED_VIEWLIST,
-    CORRUPTED_KEYEVENTLIST
+    CORRUPTED_KEYEVENTLIST,
+    SYSTEM_UI_VISIBILITY,
+    UNKNOWN_VIEW
 }
 
 export class AndroidAdUnitApi extends NativeApi {

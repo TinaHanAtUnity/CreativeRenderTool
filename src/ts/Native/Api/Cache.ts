@@ -8,7 +8,11 @@ export enum CacheError {
     FILE_ALREADY_CACHING,
     NOT_CACHING,
     JSON_ERROR,
-    NO_INTERNET
+    NO_INTERNET,
+    MALFORMED_URL,
+    NETWORK_ERROR,
+    ILLEGAL_STATE,
+    INVALID_ARGUMENT
 }
 
 export enum CacheEvent {
