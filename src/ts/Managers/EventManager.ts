@@ -44,8 +44,8 @@ export class EventManager {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
 
         return this._request.post(url, data, [], {
-            retries: 5,
-            retryDelay: 5000,
+            retries: 2,
+            retryDelay: 10000,
             followRedirects: false,
             retryWithConnectionEvents: false
         }).then(() => {

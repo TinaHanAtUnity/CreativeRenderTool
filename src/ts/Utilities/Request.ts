@@ -41,8 +41,7 @@ export class Request {
 
     public static AllowedResponseCodes = new RegExp('2[0-9]{2}');
     public static RedirectResponseCodes = new RegExp('30[0-8]');
-    public static ErrorResponseCodes = new RegExp('4[0-9]{2}');
-    public static RetryResponseCodes = new RegExp('5[0-9]{2}');
+    public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
 
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(let i = 0; i < headers.length; ++i) {
@@ -221,8 +220,6 @@ export class Request {
             }
         } else if(Request.ErrorResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
-        } else if(Request.RetryResponseCodes.exec(responseCode.toString())) {
-            this.handleFailedRequest(id, nativeRequest, 'FAILED_AFTER_RETRIES', nativeResponse);
         } else {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
         }
