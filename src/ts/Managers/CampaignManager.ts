@@ -87,10 +87,10 @@ export class CampaignManager {
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
-                retries: 0,
-                retryDelay: 0,
+                retries: 2,
+                retryDelay: 10000,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: true
             });
         }).then(response => {
             return this.parseCampaign(response);

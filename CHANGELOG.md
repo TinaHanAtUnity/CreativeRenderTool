@@ -1,3 +1,11 @@
+# Mon Feb 13 10:40:14 UTC 2017
+
+* New retry policy: never retry 4xx or 5xx error responses
+
+# Fri Feb 10 12:19:06 UTC 2017
+
+* Fixed overlay clicking and scrolling issues
+
 # Thu Feb  9 10:44:10 UTC 2017
 
 * Second deployment of major refactorings, including caching fixes to previous deployment
