@@ -4,7 +4,7 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
 
 interface IAndroidOptions {
@@ -37,7 +37,7 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
 
@@ -47,8 +47,10 @@ export class Activity extends AdUnitContainer {
         }
 
         let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
-        if(forceLandscape) {
+        if(forceOrientation === ForceOrientation.LANDSCAPE) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
+            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         }
 
         let keyEvents: any[] = [];

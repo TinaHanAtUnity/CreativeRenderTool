@@ -2,6 +2,12 @@ import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
 
+export const enum ForceOrientation {
+    PORTRAIT,
+    LANDSCAPE,
+    NONE
+}
+
 export abstract class AdUnitContainer {
 
     public onShow: Observable0 = new Observable0(); // ad unit becomes visible
@@ -9,7 +15,7 @@ export abstract class AdUnitContainer {
     public onSystemPause: Observable0 = new Observable0(); // ad unit has been resigned from active (iOS only)
     public onSystemInterrupt: Observable0 = new Observable0(); // ad unit has been interrupted and video has been paused (iOS only)
 
-    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: any): Promise<void>;
+    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void>;
 
     public abstract close(): Promise<void>;
 

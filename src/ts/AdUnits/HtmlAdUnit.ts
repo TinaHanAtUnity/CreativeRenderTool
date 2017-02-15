@@ -6,7 +6,7 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export class HtmlAdUnit extends AbstractAdUnit {
 
@@ -34,7 +34,7 @@ export class HtmlAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, !this._placement.useDeviceOrientationForVideo(), true, this._options);
+        return this._container.open(this, false, true, ForceOrientation.NONE, true, this._options);
     }
 
     public hide(): Promise<void> {
