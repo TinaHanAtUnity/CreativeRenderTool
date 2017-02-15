@@ -113,7 +113,7 @@ export class EndScreenEventHandlers {
                 return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
             }
             default: {
-                return "";
+                return "migamecenter://details?pkgname=store.not.set.correctly" + store;
             }
         }
 
