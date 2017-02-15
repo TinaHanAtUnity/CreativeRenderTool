@@ -21,9 +21,6 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { HtmlCampaign } from 'Models/HtmlCampaign';
-import { ThirdParty } from 'Views/ThirdParty';
-import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
@@ -38,8 +35,6 @@ export class AdUnitFactory {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
-        } else if(campaign instanceof HtmlCampaign) {
-            return this.createHtmlAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
@@ -108,18 +103,6 @@ export class AdUnitFactory {
         });
 
         return vastAdUnit;
-    }
-
-    private static createHtmlAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: HtmlCampaign, options: any): AbstractAdUnit {
-        const thirdParty = new ThirdParty(nativeBridge, placement, campaign);
-        const thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, container, sessionManager, placement, campaign, thirdParty, options);
-
-        thirdParty.render();
-        document.body.appendChild(thirdParty.container());
-        thirdParty.onClick.subscribe(() => sessionManager.sendClick(thirdPartyAdUnit));
-        thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
-
-        return thirdPartyAdUnit;
     }
 
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {

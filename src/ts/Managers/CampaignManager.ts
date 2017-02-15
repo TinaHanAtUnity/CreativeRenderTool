@@ -11,7 +11,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
-import { HtmlCampaign } from 'Models/HtmlCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
@@ -22,7 +21,7 @@ import { WebViewError } from 'Errors/WebViewError';
 // import SimpleTestMRAID from 'html/fixtures/mraid/SimpleTestMRAID.html';
 // import DiagnosticMRAID from 'html/fixtures/mraid/DiagnosticMRAID.html';
 // import TresensaMRAID from 'html/fixtures/mraid/TresensaMRAID.html';
-import AarkiMRAID from 'html/fixtures/mraid/AarkiMRAID5.html';
+// import AarkiMRAID from 'html/fixtures/mraid/AarkiMRAID5.html';
 
 export class CampaignManager {
 
@@ -55,7 +54,6 @@ export class CampaignManager {
 
     public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
-    public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
     public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<WebViewError> = new Observable1();
@@ -117,17 +115,10 @@ export class CampaignManager {
             this.storeGamerId(json.gamerId);
         }
 
-        if(1 === 1) {
-            this.parseMRAIDCampaign(json);
-            return;
-        }
-
         if('campaign' in json) {
             return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
             return this.parseVastCampaign(json);
-        } else if('mraid' in json) {
-            return this.parseMRAIDCampaign(json);
         } else {
             return this.handleNoFill();
         }
@@ -135,16 +126,16 @@ export class CampaignManager {
 
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
-        const htmlCampaign = this.parseHtmlCampaign(json);
-        if(htmlCampaign) {
-            return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
+        const mraidCampaign = this.parseMRAIDCampaign(json);
+        if(mraidCampaign) {
+            return this._assetManager.setup(mraidCampaign).then(() => this.onMRAIDCampaign.trigger(mraidCampaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
 
-    private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
+    private parseMRAIDCampaign(json: any): MRAIDCampaign | undefined {
         const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
         let resource: string | undefined;
         switch(campaign.getId()) {
@@ -182,7 +173,7 @@ export class CampaignManager {
 
         const abGroup = campaign.getAbGroup();
         if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new HtmlCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
+            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource, '');
         }
         return undefined;
     }
@@ -231,11 +222,6 @@ export class CampaignManager {
         }).catch((error) => {
             this.onError.trigger(error);
         });
-    }
-
-    private parseMRAIDCampaign(json: any) {
-        const campaign = new MRAIDCampaign(json.campaign, 'gamerId', 0, '', AarkiMRAID);
-        this.onMRAIDCampaign.trigger(campaign);
     }
 
     private handleNoFill(): Promise<void> {
