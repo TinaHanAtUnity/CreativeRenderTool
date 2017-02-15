@@ -109,7 +109,7 @@ export class EndScreenEventHandlers {
                 return 'market://details?id=' + campaign.getAppStoreId();
             }
             case StoreName.XIAOMI: {
-                return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '\&channel=unityAds\&from=' + packageName + '\&trace=' + campaign.getGamerId();
+                return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
             }
             default: {
                 return "";
