@@ -47,7 +47,9 @@ export class MRAID extends View {
     public render() {
         const iframe: any = this._iframe = <HTMLIFrameElement>document.createElement('iframe');
         iframe.id = this._id;
-        iframe.srcdoc = this.createMRAID();
+        this.createMRAID().then(mraid => {
+            iframe.srcdoc = mraid;
+        });
         window.addEventListener('message', (event: MessageEvent) => this.onMessage(event), false);
         this._container = iframe;
     }
@@ -141,8 +143,16 @@ export class MRAID extends View {
         }
     }
 
-    private createMRAID() {
-        return MRAIDContainer.replace('<body></body>', '<body>' + this._campaign.getResource().replace('<script src="mraid.js"></script>', '') + '</body>');
+    private createMRAID(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                const mraid = MRAIDContainer.replace('<body></body>', '<body>' + xhr.responseText.replace('<script src="mraid.js"></script>', '') + '</body>');
+                resolve(mraid);
+            }, false);
+            xhr.open('GET', decodeURIComponent(this._campaign.getResourceUrl().getUrl()));
+            xhr.send();
+        });
     }
 
 }

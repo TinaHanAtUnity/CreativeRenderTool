@@ -144,13 +144,13 @@ export class CampaignManager {
             case '583dfd52abb1feee0909882b':
             case '583dfd45669a903e086e38d2':
             case '583dfd4c9ceadb4708b021de':
-                resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
+                resource = 'https://cdn.unityads.unity3d.com/playables/SG_ios/index_ios.html';
                 break;
 
             // Game of War Android
             case '583dfca5a93bfa6700d8c6f3':
             case '583dfcb54622865a0a246bdf':
-                resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
+                resource = 'https://cdn.unityads.unity3d.com/playables/SG_android/index_android.html';
                 break;
 
             // Mobile Strike iOS
@@ -158,13 +158,13 @@ export class CampaignManager {
             case '583dfe483fe2166c0ac9e6fb':
             case '583dfba09bfc2a2d0a9a0b1c':
             case '583dfba69d308fe203d7d740':
-                resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
+                resource = 'https://cdn.unityads.unity3d.com/playables/SMA_ios/index_ios.html';
                 break;
 
             // Mobile Strike Android
             case '583dfc532e4d9b5008c934d1':
             case '583dfc667f448e630ac6a4bc':
-                resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
+                resource = 'https://cdn.unityads.unity3d.com/playables/SMA_android/index_android.html';
                 break;
 
             default:

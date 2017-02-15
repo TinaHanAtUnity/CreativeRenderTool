@@ -7,7 +7,7 @@ export class MRAIDCampaign extends Campaign {
     private _resource: string;
 
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl: string, resource: string) {
-        super(campaign, gamerId, abGroup);
+        super(campaign.id, gamerId, abGroup);
         this._resourceUrl = new Asset(resourceUrl);
         this._resource = resource;
     }
