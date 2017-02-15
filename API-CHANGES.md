@@ -24,23 +24,22 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android DeviceInfo methods: getGLString, getSensorList, getBoard, getBootloader, getDevice, getHardware, getHost, getProduct and getSupportedAbis
 * Added iOS DeviceInfo methods: getGLString and getSensorList
 * Added header parameter to Cache.download method
-* Review and refactoring of error and event handling:
-** Modified VideoPlayer events: all events have now video url as first parameter (except PROGRESS)
-** Modified iOS AdUnit API: remove VIEW_CONTROLLER prefix from callback error messages
-** Modified iOS AdUnit API: remove TARGET_VIEW_NULL error, use only UNKNOWN_VIEW
-** Modified Android and iOS AdUnit API: use ADUNIT_NULL error instead of VIEWCONTROLLER_NULL or ACTIVITY_NULL
-** Fixed iOS Cache.getFilePath to return FILE_NOT_FOUND error
-** Fixed iOS Cache.deleteFile to return FILE_IO_ERROR if file could not be deleted and removed booleans from callback parameters
-** Fixed iOS Listener API, removed sending errors to webview if listener was null or didn’t respond to selector
-** Fixed iOS Request API: added MAPPING_HEADERS_FAILED error
-** Fixed iOS Request API: added response fail event if parsing headers to webview format fails
-** Modified iOS Resolve API: make implementation similar to Android and send INVALID_HOST instead of UNEXPECTED_EXCEPTION
-** Modified Android VideoPlayer API, remove useless ’17’ from API_LEVEL_ERROR
-** Modified iOS Cache API events by adding request url to all errors
-** Added iOS Cache API events: NO_INTERNET, FILE_IO_ERROR, MALFORMED_URL and NETWORK_ERROR
-** Added Android Cache API events: NETWORK_ERROR and ILLEGAL_STATE
-** Modified Cache API on both platforms to add existing file size to expected content size (not just totalBytes from request)
-** Added Android Request API exception type to RESULT_FAIL message
+* Modified VideoPlayer events: all events have now video url as first parameter (except PROGRESS)
+* Modified iOS AdUnit API: remove VIEW_CONTROLLER prefix from callback error messages
+* Modified iOS AdUnit API: remove TARGET_VIEW_NULL error, use only UNKNOWN_VIEW
+* Modified Android and iOS AdUnit API: use ADUNIT_NULL error instead of VIEWCONTROLLER_NULL or ACTIVITY_NULL
+* Fixed iOS Cache.getFilePath to return FILE_NOT_FOUND error
+* Fixed iOS Cache.deleteFile to return FILE_IO_ERROR if file could not be deleted and removed booleans from callback parameters
+* Fixed iOS Listener API, removed sending errors to webview if listener was null or didn’t respond to selector
+* Fixed iOS Request API: added MAPPING_HEADERS_FAILED error
+* Fixed iOS Request API: added response fail event if parsing headers to webview format fails
+* Modified iOS Resolve API: make implementation similar to Android and send INVALID_HOST instead of UNEXPECTED_EXCEPTION
+* Modified Android VideoPlayer API, remove useless ’17’ from API_LEVEL_ERROR
+* Modified iOS Cache API events by adding request url to all errors
+* Added iOS Cache API events: NO_INTERNET, FILE_IO_ERROR, MALFORMED_URL and NETWORK_ERROR
+* Added Android Cache API events: NETWORK_ERROR and ILLEGAL_STATE
+* Modified Cache API on both platforms to add existing file size to expected content size (not just totalBytes from request)
+* Added Android Request API exception type to RESULT_FAIL message
 
 
 ## 2.0.8
