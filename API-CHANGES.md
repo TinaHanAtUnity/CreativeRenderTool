@@ -21,24 +21,30 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 ## 2.0.8
 
-*
+* Added iOS Notification.addAVNotificationObserver and Notification.removeAVNotificationObserver
+* Added iOS VideoPlayer.setAutomaticallyWaitsToMinimizeStalling
+* Added iOS DeviceInfo.getStatusBarWidth, DeviceInfo.getStatusBarHeight and DeviceInfo.isStatusBarHidden
 
 ## 2.0.7
 
-*
-
+* Enabled webview flags for iOS HTML5 video playback
 
 ## 2.0.6
 
-*
+* Added Android and iOS AdUnit.setViewFrame and AdUnit.getViewFrame methods
+* Added iOS AdUnit.setTransform and AdUnit.getTransform but setTransform method was broken
+* Added supportedOrientationsPlist and statusBarOrientation parameters when invoking show on iOS
+* Added iOS DeviceInfo.getSupportedOrientations and DeviceInfo.getSupportedOrientationsPlist methods
+* Added Listener.sendClickEvent method
+* Added timeout parameter to VideoPlayer.prepare method and PREPARE_TIMEOUT event
 
 ## 2.0.5
 
-*
+* Fix iOS DeviceInfo.getNetworkType, DeviceInfo.getNetworkOperator and DeviceInfo.getNetworkOperatorName for iOS 10. In previous releases these methods will fail on iOS 10.
 
 ## 2.0.4
 
-*
+* No visible changes
 
 ## 2.0.3
 
