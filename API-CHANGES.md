@@ -24,6 +24,7 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added iOS Notification.addAVNotificationObserver and Notification.removeAVNotificationObserver
 * Added iOS VideoPlayer.setAutomaticallyWaitsToMinimizeStalling
 * Added iOS DeviceInfo.getStatusBarWidth, DeviceInfo.getStatusBarHeight and DeviceInfo.isStatusBarHidden
+* Fixed iOS config.json fetching: 2.0.6 and 2.0.7 fetched config.json from master directory
 
 ## 2.0.7
 
