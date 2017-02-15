@@ -32,6 +32,7 @@ export class EndScreenEventHandlers {
             });
         } else {
             sessionManager.sendClick(adUnit);
+            nativeBridge.Sdk.logInfo(EndScreenEventHandlers.getAppStoreUrl(campaign, packageName));
             nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': EndScreenEventHandlers.getAppStoreUrl(campaign, packageName)
