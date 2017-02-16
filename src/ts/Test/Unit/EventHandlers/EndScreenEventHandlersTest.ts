@@ -35,7 +35,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             });
 
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo());
+            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
                 setSkipDuration: sinon.spy(),
@@ -58,7 +58,7 @@ describe('EndScreenEventHandlersTest', () => {
                 trailerDownloadable: 'fake url',
                 appStoreId: 'fooAppId',
                 clickAttributionUrlFollowsRedirects: true
-            }, 'asd', 10), overlay, null, endScreen);
+            }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -154,7 +154,7 @@ describe('EndScreenEventHandlersTest', () => {
                 clickAttributionUrlFollowsRedirects: true,
                 bypassAppSheet: false,
                 clickAttributionUrl: ''
-            }, 'asd', 10), overlay, null, endScreen);
+            }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
