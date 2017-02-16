@@ -21,23 +21,29 @@ export class SplitScreenEventHandlers {
         }
     }
 
-    public static onVideoCompleted(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
-        if(endScreen!.isFullScreenVideo()) {
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+    public static onVideoCompleted(adUnitContainer: AdUnitContainer, adUnit: SplitScreenAdUnit): void {
+        const endScreen = adUnit.getSplitVideoEndScreen();
+        if(endScreen) {
+            if(endScreen!.isFullScreenVideo()) {
+                adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+                    endScreen.showEndScreen();
+                });
+            } else {
                 endScreen.showEndScreen();
-            });
-        } else {
-            endScreen.showEndScreen();
+            }
         }
     }
 
-    public static onError(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
-        if(endScreen!.isFullScreenVideo()) {
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+    public static onError(adUnitContainer: AdUnitContainer, adUnit: SplitScreenAdUnit): void {
+        const endScreen = adUnit.getSplitVideoEndScreen();
+        if(endScreen) {
+            if(endScreen!.isFullScreenVideo()) {
+                adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+                    endScreen.showEndScreen();
+                });
+            } else {
                 endScreen.showEndScreen();
-            });
-        } else {
-            endScreen.showEndScreen();
+            }
         }
     }
 
@@ -60,10 +66,13 @@ export class SplitScreenEventHandlers {
         adUnit.onFinish.trigger();
     }
 
-    public static onPrepared(adUnitContainer: AdUnitContainer, endScreen: SplitScreen) {
-        endScreen.getOverlay().setFullScreenButtonVisible(true);
-        if(!endScreen.isFullScreenVideo()) {
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN);
+    public static onPrepared(adUnitContainer: AdUnitContainer, adUnit: SplitScreenAdUnit) {
+        const endScreen = adUnit.getSplitVideoEndScreen();
+        if(endScreen) {
+            endScreen.getOverlay().setFullScreenButtonVisible(true);
+            if(!endScreen.isFullScreenVideo()) {
+                adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN);
+            }
         }
     }
 }

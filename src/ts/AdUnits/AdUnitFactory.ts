@@ -56,14 +56,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
-        overlay.render();
-        document.body.appendChild(overlay.container());
-
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-
         const metaData = new MetaData(nativeBridge);
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, overlay, options, endScreen);
@@ -92,8 +85,6 @@ export class AdUnitFactory {
 
     private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
-        overlay.render();
-        document.body.appendChild(overlay.container());
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
@@ -162,18 +153,7 @@ export class AdUnitFactory {
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
         overlay.onFullScreenButton.subscribe((fullScreen) => SplitScreenEventHandlers.onFullScreenButton(container, splitVideoEndScreen));
         this.prepareSplitScreenVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit, metaData);
-
-        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, splitAdUnit, deviceInfo);
-
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenEventHandlers.onPrepared(container, splitVideoEndScreen));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenEventHandlers.onVideoCompleted(container, splitVideoEndScreen));
-        const onVideoErrorObserver = splitAdUnit.onError.subscribe(() => SplitScreenEventHandlers.onError(container, splitVideoEndScreen));
-
-        splitAdUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
-            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
-            splitAdUnit.onError.unsubscribe(onVideoErrorObserver);
-        });
+        this.prepareSplitEndScreen(endScreen, nativeBridge, sessionManager, splitAdUnit, deviceInfo);
 
         splitAdUnit.onClose.subscribe(() => {
             splitAdUnit.hide();
@@ -208,7 +188,10 @@ export class AdUnitFactory {
 
     };
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, deviceInfo: DeviceInfo) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
+        endScreen.render();
+        endScreen.hide();
+        document.body.appendChild(endScreen.container());
         endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
         endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
 
@@ -303,22 +286,29 @@ export class AdUnitFactory {
                 && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE
                 && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT
                 && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
-                return true;
+                return false;
             }
         } else if(platform === Platform.ANDROID && options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT) {
-            return true;
+            return false;
         }
         return false;
     }
 
-    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
+    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: SplitScreenAdUnit, metaData: MetaData) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenVideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => SplitScreenVideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => SplitScreenVideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => SplitScreenVideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData));
 
+        const preparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenEventHandlers.onPrepared(container, adUnit));
+        const completedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenEventHandlers.onVideoCompleted(container, adUnit));
+        const errorObserver = adUnit.onError.subscribe(() => SplitScreenEventHandlers.onError(container, adUnit));
+
         adUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(preparedObserver);
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(completedObserver);
+            adUnit.onError.unsubscribe(errorObserver);
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
             nativeBridge.VideoPlayer.onPrepareTimeout.unsubscribe(onPrepareTimeoutObserver);
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
@@ -330,6 +320,21 @@ export class AdUnitFactory {
             this.prepareAndroidVideoPlayer(nativeBridge, adUnit);
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             this.prepareIosVideoPlayer(nativeBridge, <ViewController>container, adUnit);
+        }
+    }
+
+    private static prepareSplitEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: SplitScreenAdUnit, deviceInfo: DeviceInfo) {
+        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
+        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
         }
     }
 }
