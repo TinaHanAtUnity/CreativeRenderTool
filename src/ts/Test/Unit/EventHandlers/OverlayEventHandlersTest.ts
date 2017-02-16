@@ -48,7 +48,7 @@ describe('OverlayEventHandlersTest', () => {
             getVast: sinon.spy(),
                 getVideo: () => video,
                 getStreamingVideo: () => video
-        }, <Overlay><any>{hide: sinon.spy()}, null, endScreen);
+        }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('When calling onSkip', () => {
