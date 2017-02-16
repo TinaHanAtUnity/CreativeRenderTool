@@ -45,7 +45,7 @@ export class Activity extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
+        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
         if(forceLandscape) {
             orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         }
