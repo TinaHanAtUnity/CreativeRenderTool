@@ -17,7 +17,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import {StoreName} from "../../../Models/Campaign";
+import { StoreName } from "Models/PerformanceCampaign";
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -58,7 +58,8 @@ describe('EndScreenEventHandlersTest', () => {
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
                 trailerDownloadable: 'fake url',
                 appStoreId: 'fooAppId',
-                clickAttributionUrlFollowsRedirects: true
+                clickAttributionUrlFollowsRedirects: true,
+                store: 'google'
             }, 'asd', 10), overlay, null, endScreen);
         });
 
@@ -154,7 +155,8 @@ describe('EndScreenEventHandlersTest', () => {
                 appStoreId: '11111',
                 clickAttributionUrlFollowsRedirects: true,
                 bypassAppSheet: false,
-                clickAttributionUrl: ''
+                clickAttributionUrl: '',
+                store: 'apple'
             }, 'asd', 10), overlay, null, endScreen);
         });
 

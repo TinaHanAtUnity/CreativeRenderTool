@@ -8,7 +8,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { StoreName } from "Models/Campaign";
+import { StoreName } from "Models/PerformanceCampaign";
 
 export class EndScreenEventHandlers {
 
@@ -113,7 +113,7 @@ export class EndScreenEventHandlers {
                 return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
             }
             default: {
-                return "migamecenter://details?pkgname=store.not.set.correctly" + store;
+                return "";
             }
         }
 
