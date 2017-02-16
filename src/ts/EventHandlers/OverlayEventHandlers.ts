@@ -15,17 +15,7 @@ export class OverlayEventHandlers {
         adUnit.setFinishState(FinishState.SKIPPED);
         sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
-        if (nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
-
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-        } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-        }
+        adUnit.getContainer().reconfigure();
 
         const overlay = adUnit.getOverlay();
         if (overlay) {

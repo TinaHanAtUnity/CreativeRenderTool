@@ -75,7 +75,7 @@ export class Activity extends AdUnitContainer {
         // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
         return Promise.all([
             this._nativeBridge.AndroidAdUnit.setViews(['webview']),
-            this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR)
+            this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED)
         ]);
     }
 

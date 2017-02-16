@@ -187,11 +187,7 @@ export class VideoEventHandlers {
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
+        adUnit.getContainer().reconfigure();
 
         this.afterVideoCompleted(nativeBridge, adUnit);
     }
@@ -281,12 +277,6 @@ export class VideoEventHandlers {
             overlay.hide();
         }
         adUnit.onFinish.trigger();
-
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-        }
     };
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
@@ -294,11 +284,7 @@ export class VideoEventHandlers {
         videoAdUnit.getVideo().setActive(false);
         videoAdUnit.setFinishState(FinishState.ERROR);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
+        videoAdUnit.getContainer().reconfigure();
 
         const overlay = videoAdUnit.getOverlay();
         if(overlay) {
