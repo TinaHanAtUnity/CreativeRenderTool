@@ -8,7 +8,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { ForceOrientation } from '../../../AdUnits/Containers/AdUnitContainer';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -42,7 +42,7 @@ describe('IosAdUnitTest', () => {
 
         it('with all options false', () => {
             return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, defaultOptions).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, true);
+                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, false);
                 return;
             });
         });
