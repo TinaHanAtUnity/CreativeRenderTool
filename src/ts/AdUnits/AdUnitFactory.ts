@@ -35,7 +35,6 @@ import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
 import { SplitScreenEventHandlers } from 'EventHandlers/SplitScreenEventHandlers';
 import { SplitScreenVideoEventHandlers } from 'EventHandlers/SplitScreenVideoEventHandlers';
 
-
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
