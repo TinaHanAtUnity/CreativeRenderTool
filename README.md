@@ -8,6 +8,7 @@
 ### Optional
 
 - Python (`brew install python3`)
+- nginx (`brew install nginx`)
 - Watchman (`brew install watchman`)
 - exiftool (`brew install exiftool`) for integration tests
 
@@ -54,7 +55,7 @@ To build and test continuously (on file changes), use:
 
 - Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/dev/config.json`)
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
-- Start local web server in project root (`python3 -m http.server`)
+- Start local web server in project root (`make start-nginx`)
 
 ## Testing
 
