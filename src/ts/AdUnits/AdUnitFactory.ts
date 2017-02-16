@@ -30,9 +30,11 @@ import { Overlay } from 'Views/Overlay';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { SplitVideoEndScreen } from 'Views/SplitVideoEndScreen';
-import { SplitVideoEndScreenAdUnit } from 'AdUnits/SplitVideoEndScreenAdUnit';
-import { SplitVideoEndScreenEventHandlers } from 'EventHandlers/SplitVideoEndScreenEventHandlers';
+import { SplitScreen } from 'Views/SplitScreen';
+import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
+import { SplitScreenEventHandlers } from 'EventHandlers/SplitScreenEventHandlers';
+import { SplitScreenVideoEventHandlers } from 'EventHandlers/SplitScreenVideoEventHandlers';
+
 
 export class AdUnitFactory {
 
@@ -44,7 +46,7 @@ export class AdUnitFactory {
             return this.createHtmlAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
             if(this.isPortraitOnly(nativeBridge.getPlatform(), options, nativeBridge)) {
-                return this.createSplitVideoEndScreenAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+                return this.createSplitScreenAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
             } else {
                 return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
             }
@@ -135,10 +137,10 @@ export class AdUnitFactory {
         return thirdPartyAdUnit;
     }
 
-    private static createSplitVideoEndScreenAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createSplitScreenAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
-        const splitVideoEndScreen = new SplitVideoEndScreen(nativeBridge, campaign, endScreen, overlay);
+        const splitVideoEndScreen = new SplitScreen(nativeBridge, campaign, endScreen, overlay);
         splitVideoEndScreen.render();
         splitVideoEndScreen.show();
         document.body.appendChild(splitVideoEndScreen.container());
@@ -147,20 +149,26 @@ export class AdUnitFactory {
 
         const metaData = new MetaData(nativeBridge);
 
-        const splitAdUnit = new SplitVideoEndScreenAdUnit(nativeBridge, container, placement, campaign, options, splitVideoEndScreen);
+        const splitAdUnit = new SplitScreenAdUnit(nativeBridge, container, placement, campaign, options, splitVideoEndScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, splitAdUnit);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+        if(!placement.allowSkip()) {
+            overlay.setSkipEnabled(false);
+        } else {
+            overlay.setSkipEnabled(true);
+            overlay.setSkipDuration(placement.allowSkipInSeconds());
+        }
 
-        overlay.onSkip.subscribe((videoProgress) => SplitVideoEndScreenEventHandlers.onSkip(container, splitAdUnit));
-        overlay.onFullScreenButton.subscribe((fullScreen) => SplitVideoEndScreenEventHandlers.onFullScreenButton(container, splitVideoEndScreen));
-        this.prepareVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit, metaData);
+        overlay.onSkip.subscribe((videoProgress) => SplitScreenEventHandlers.onSkip(nativeBridge, sessionManager, container, splitAdUnit));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
+        overlay.onFullScreenButton.subscribe((fullScreen) => SplitScreenEventHandlers.onFullScreenButton(container, splitVideoEndScreen));
+        this.prepareSplitScreenVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit, metaData);
 
         this.prepareEndScreen(endScreen, nativeBridge, sessionManager, splitAdUnit, deviceInfo);
 
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitVideoEndScreenEventHandlers.onVideoPrepared(container, splitVideoEndScreen));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitVideoEndScreenEventHandlers.onVideoCompleted(container, splitVideoEndScreen));
-        const onVideoErrorObserver = splitAdUnit.onError.subscribe(() => SplitVideoEndScreenEventHandlers.onVideoError(container, splitVideoEndScreen));
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenEventHandlers.onPrepared(container, splitVideoEndScreen));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenEventHandlers.onVideoCompleted(container, splitVideoEndScreen));
+        const onVideoErrorObserver = splitAdUnit.onError.subscribe(() => SplitScreenEventHandlers.onError(container, splitVideoEndScreen));
 
         splitAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
@@ -176,6 +184,9 @@ export class AdUnitFactory {
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
+        overlay.render();
+        document.body.appendChild(overlay.container());
+
         if(!adUnit.getPlacement().allowSkip()) {
             overlay.setSkipEnabled(false);
         } else {
@@ -299,5 +310,27 @@ export class AdUnitFactory {
             return true;
         }
         return false;
+    }
+
+    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData) {
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenVideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
+        const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => SplitScreenVideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => SplitScreenVideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
+        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => SplitScreenVideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenVideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit, metaData));
+
+        adUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
+            nativeBridge.VideoPlayer.onPrepareTimeout.unsubscribe(onPrepareTimeoutObserver);
+            nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
+            nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+        });
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            this.prepareAndroidVideoPlayer(nativeBridge, adUnit);
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            this.prepareIosVideoPlayer(nativeBridge, <ViewController>container, adUnit);
+        }
     }
 }

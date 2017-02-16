@@ -1,18 +1,18 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { SplitVideoEndScreen } from 'Views/SplitVideoEndScreen';
+import { SplitScreen } from 'Views/SplitScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
 
-export class SplitVideoEndScreenAdUnit extends VideoAdUnit {
+export class SplitScreenAdUnit extends VideoAdUnit {
 
-    private _splitVideoEndScreen: SplitVideoEndScreen | undefined;
+    private _splitScreen: SplitScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, options: any, splitVideoEndScreen: SplitVideoEndScreen) {
-        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), splitVideoEndScreen.getOverlay(), options);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, options: any, splitScreen: SplitScreen) {
+        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), splitScreen.getOverlay(), options);
 
-        this._splitVideoEndScreen = splitVideoEndScreen;
+        this._splitScreen = splitScreen;
     }
 
     public show(): Promise<void> {
@@ -37,16 +37,16 @@ export class SplitVideoEndScreenAdUnit extends VideoAdUnit {
     }
 
     public description(): string {
-        return 'performanceSplitVideoEndScreen';
+        return 'performanceSplitScreen';
     }
 
-    public getSplitVideoEndScreen(): SplitVideoEndScreen | undefined {
-        return this._splitVideoEndScreen;
+    public getSplitVideoEndScreen(): SplitScreen | undefined {
+        return this._splitScreen;
     }
 
     protected unsetReferences() {
         super.unsetReferences();
-        delete this._splitVideoEndScreen;
+        delete this._splitScreen;
     }
 
 }

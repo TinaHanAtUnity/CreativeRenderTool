@@ -1,11 +1,14 @@
-import { SplitVideoEndScreen }  from 'Views/SplitVideoEndScreen';
-import { SplitVideoEndScreenAdUnit } from 'AdUnits/SplitVideoEndScreenAdUnit';
+import { SplitScreen }  from 'Views/SplitScreen';
+import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewConfiguration } from 'AdUnits/Containers/ViewConfiguration';
+import { NativeBridge } from 'Native/NativeBridge';
+import { FinishState } from 'Constants/FinishState';
+import { SessionManager } from 'Managers/SessionManager';
 
-export class SplitVideoEndScreenEventHandlers {
+export class SplitScreenEventHandlers {
 
-    public static onFullScreenButton(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onFullScreenButton(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
         if (!endScreen.isFullScreenVideo()) {
             endScreen!.setFullScreenVideo(true);
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO).then(() => {
@@ -18,7 +21,7 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onVideoCompleted(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onVideoCompleted(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 endScreen.showEndScreen();
@@ -28,7 +31,7 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onVideoError(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen): void {
+    public static onError(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
         if(endScreen!.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 endScreen.showEndScreen();
@@ -38,7 +41,17 @@ export class SplitVideoEndScreenEventHandlers {
         }
     }
 
-    public static onSkip(adUnitContainer: AdUnitContainer, adUnit: SplitVideoEndScreenAdUnit) {
+    public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnitContainer: AdUnitContainer, adUnit: SplitScreenAdUnit) {
+        nativeBridge.VideoPlayer.pause();
+        adUnit.getVideo().setActive(false);
+        adUnit.setFinishState(FinishState.SKIPPED);
+        sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
+
+        const overlay = adUnit.getOverlay();
+        if (overlay) {
+            overlay.hide();
+        }
+
         if(adUnit.getSplitVideoEndScreen()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
                 adUnit.getSplitVideoEndScreen()!.showEndScreen();
@@ -47,7 +60,7 @@ export class SplitVideoEndScreenEventHandlers {
         adUnit.onFinish.trigger();
     }
 
-    public static onVideoPrepared(adUnitContainer: AdUnitContainer, endScreen: SplitVideoEndScreen) {
+    public static onPrepared(adUnitContainer: AdUnitContainer, endScreen: SplitScreen) {
         endScreen.getOverlay().setFullScreenButtonVisible(true);
         if(!endScreen.isFullScreenVideo()) {
             adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN);

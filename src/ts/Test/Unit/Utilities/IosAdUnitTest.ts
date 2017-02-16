@@ -43,7 +43,7 @@ describe('IosAdUnitTest', () => {
 
         it('with all options false', () => {
             return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, defaultOptions).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, true);
+                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, false);
                 return;
             });
         });

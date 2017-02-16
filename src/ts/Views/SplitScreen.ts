@@ -1,4 +1,4 @@
-import SplitVideoEndScreenTemplate from 'html/SplitVideoEndScreen.html';
+import SplitScreenTemplate from 'html/SplitScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -7,7 +7,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { EndScreen } from 'Views/EndScreen';
 import { Overlay } from 'Views/Overlay';
 
-export class SplitVideoEndScreen extends View {
+export class SplitScreen extends View {
 
     private _endScreen: EndScreen;
     private _overlay: Overlay;
@@ -22,14 +22,14 @@ export class SplitVideoEndScreen extends View {
     private _fullScreenVideo: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, endScreen: EndScreen, videoOverlay: Overlay) {
-        super(nativeBridge, 'split-video-endscreen');
+        super(nativeBridge, 'split-screen');
         this._gameName = campaign.getGameName();
         this._endScreen = endScreen;
         this._overlay = videoOverlay;
 
         this._bindings = [];
 
-        this._template = new Template(SplitVideoEndScreenTemplate);
+        this._template = new Template(SplitScreenTemplate);
     }
 
     public render() {
