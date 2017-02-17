@@ -71,7 +71,7 @@ describe('VastVideoEventHandlers tests', () => {
             ]
         };
         const campaignWithTrackers = new VastCampaign(vast, '12345', 'gamerId', 1, 10, customTracking);
-        const adUnitWithTrackers = new VastAdUnit(nativeBridge, container, placement, campaignWithTrackers, overlay, null);
+        const adUnitWithTrackers = new VastAdUnit(nativeBridge, container, placement, campaignWithTrackers, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
         const mockEventManager = sinon.mock(eventManager);
         mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://customTrackingUrl/start');
@@ -114,7 +114,7 @@ describe('VastVideoEventHandlers tests', () => {
             vastEndScreen = <VastEndScreen><any> {
                 show: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, null, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
         });
 
         it('should show end screen when onVideoCompleted', () => {
@@ -168,7 +168,7 @@ describe('VastVideoEventHandlers tests', () => {
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
         sessionManager.setSession(new Session('123'));
-        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, null);
+        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
         sinon.spy(testAdUnit, 'hide');
     });
 
