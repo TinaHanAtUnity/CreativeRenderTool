@@ -76,12 +76,34 @@ describe('MediationMetaDataTest', () => {
         storageApi.setStorage({
             mediation: {
                 name: {value: 'test_name'},
+                version: {value: 'test_version'}
+            }
+        });
+
+        return MetaDataManager.fetchMediationMetaData(nativeBridge, false).then(metaData => {
+            assert.isDefined(metaData, 'MediationMetaData is not defined');
+            assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
+            assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+            assert.deepEqual(metaData.getDTO(), {
+                mediationName: 'test_name',
+                mediationVersion: 'test_version',
+                mediationOrdinal: undefined
+            }, 'MediationMetaData.getDTO() produced invalid output');
+        });
+    });
+
+    it('should update correctly', () => {
+        storageApi.setStorage({
+            mediation: {
+                name: {value: 'test_name'},
                 version: {value: 'test_version'},
                 ordinal: {value: 42}
             }
         });
 
-        return MetaDataManager.fetchMediationMetaData(nativeBridge, false).then(metaData => {
+        return MetaDataManager.updateMediationMetaData(nativeBridge).then(() => {
+            return MetaDataManager.fetchMediationMetaData(nativeBridge);
+        }).then(metaData => {
             assert.isDefined(metaData, 'MediationMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');

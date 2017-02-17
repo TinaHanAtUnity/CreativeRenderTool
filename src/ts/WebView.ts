@@ -201,6 +201,8 @@ export class WebView {
             this._cache.stop();
         }
 
+        MetaDataManager.updateMediationMetaData(this._nativeBridge);
+
         MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
             if(player) {
                 this._sessionManager.setGamerServerId(player.getServerId());
