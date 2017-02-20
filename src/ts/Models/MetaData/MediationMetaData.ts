@@ -6,8 +6,12 @@ export class MediationMetaData extends Model {
         return 'mediation';
     }
 
-    public static getKeys(): string[] {
-        return ['name', 'version', 'ordinal'];
+    public static getStaticKeys(): string[] {
+        return ['name', 'version'];
+    }
+
+    public static getOrdinalKey(): string {
+        return 'ordinal';
     }
 
     private _name: string;
@@ -18,7 +22,6 @@ export class MediationMetaData extends Model {
         super();
         this._name = data[0];
         this._version = data[1];
-        this._ordinal = parseInt(data[2], 10);
     }
 
     public getName(): string {
@@ -27,6 +30,10 @@ export class MediationMetaData extends Model {
 
     public getVersion(): string {
         return this._version;
+    }
+
+    public setOrdinal(ordinal: number) {
+        this._ordinal = ordinal;
     }
 
     public getOrdinal(): number {

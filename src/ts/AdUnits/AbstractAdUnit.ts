@@ -63,6 +63,10 @@ export abstract class AbstractAdUnit {
         this._showing = showing;
     }
 
+    public getContainer(): AdUnitContainer {
+        return this._container;
+    }
+
     public getPlacement(): Placement {
         return this._placement;
     }
