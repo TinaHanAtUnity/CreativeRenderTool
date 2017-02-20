@@ -99,7 +99,7 @@
     },
     {
       "parameter": "stores",
-      "required": "no",
+      "required": "yes",
       "queryString": true,
       "body": false
     },
