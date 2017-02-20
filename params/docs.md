@@ -103,6 +103,8 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
 
 
 
@@ -129,6 +131,8 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
 
 
 
@@ -156,6 +160,8 @@
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | skippedAt | all | False | True | Integer | Milliseconds from video start to video skip | SDK | all |
+| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
 
 
 
@@ -184,4 +190,6 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
 

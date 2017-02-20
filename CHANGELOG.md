@@ -1,3 +1,9 @@
+# Mon Feb 20 10:52:10 UTC 2017
+
+* Restore invocations of iOS setAutomaticallyWaitsToMinimizeStalling API
+* Use containers for all AdUnit API invocations
+* Send campaign_expired diagnostics only when show fails, not when cleanly refreshing campaigns
+
 # Mon Feb 13 10:40:14 UTC 2017
 
 * New retry policy: never retry 4xx or 5xx error responses
