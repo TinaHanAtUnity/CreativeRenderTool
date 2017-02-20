@@ -9,6 +9,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { INativeResponse } from 'Utilities/Request';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -211,7 +212,11 @@ export class SessionManager {
             if(videoProgress) {
                 infoJson.skippedAt = videoProgress;
             }
-            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
+
+            HttpKafka.sendEvent('events.skip.json', {
+                id: id,
+                ts: (new Date()).toISOString()
+            });
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
