@@ -213,10 +213,24 @@ export class SessionManager {
                 infoJson.skippedAt = videoProgress;
             }
 
-            HttpKafka.sendEvent('events.skip.json', {
-                id: id,
-                ts: (new Date()).toISOString()
-            });
+            // todo: clears duplicate data for httpkafka, should be cleaned up
+            delete infoJson.eventId;
+            delete infoJson.apiLevel;
+            delete infoJson.advertisingTrackingId;
+            delete infoJson.limitAdTracking;
+            delete infoJson.osVersion;
+            delete infoJson.sid;
+            delete infoJson.deviceMake;
+            delete infoJson.deviceModel;
+            delete infoJson.sdkVersion;
+            delete infoJson.webviewUa;
+            delete infoJson.networkType;
+            delete infoJson.connectionType;
+
+            infoJson.id = id;
+            infoJson.ts = (new Date()).toISOString();
+
+            HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
