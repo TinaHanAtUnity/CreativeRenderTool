@@ -103,18 +103,14 @@ export class EndScreenEventHandlers {
     private static getAppStoreUrl(campaign: PerformanceCampaign, packageName?: string) {
         const store = campaign.getStore();
         switch (store) {
-            case StoreName.APPLE: {
+            case StoreName.APPLE:
                 return 'https://itunes.apple.com/app/id' + campaign.getAppStoreId();
-            }
-            case StoreName.GOOGLE: {
+            case StoreName.GOOGLE:
                 return 'market://details?id=' + campaign.getAppStoreId();
-            }
-            case StoreName.XIAOMI: {
+            case StoreName.XIAOMI:
                 return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
-            }
-            default: {
+            default:
                 return "";
-            }
         }
 
     }

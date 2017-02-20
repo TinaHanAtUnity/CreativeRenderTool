@@ -59,21 +59,17 @@ export class PerformanceCampaign extends Campaign {
 
         const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
         switch(campaignStore) {
-            case 'apple': {
+            case 'apple':
                 this._store = StoreName.APPLE;
                 break;
-            }
-            case 'google': {
+            case 'google':
                 this._store = StoreName.GOOGLE;
                 break;
-            }
-            case 'xiaomi': {
+            case 'xiaomi':
                 this._store = StoreName.XIAOMI;
                 break;
-            }
-            default: {
+            default:
                 throw new Error('Unknown store value "' + campaign.store + '"');
-            }
         }
     }
 
