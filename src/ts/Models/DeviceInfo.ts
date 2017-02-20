@@ -90,8 +90,7 @@ export class DeviceInfo extends Model {
         let storeString = "";
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             storeString = "apple";
-        }
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        } else {
             if (this._isGoogleStoreInstalled) {
                 storeString = "google";
             }
@@ -100,6 +99,9 @@ export class DeviceInfo extends Model {
             }
             if (this._isXiaomiStoreInstalled && this._isGoogleStoreInstalled) {
                 storeString = "xiaomi,google";
+            }
+            if (!this._isXiaomiStoreInstalled && !this._isGoogleStoreInstalled) {
+                storeString = "none";
             }
         }
         return storeString;
