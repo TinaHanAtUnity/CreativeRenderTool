@@ -14,12 +14,6 @@
     width: 100%
     background-color: transparent
 
-  .video-overlay-full
-    height: 100%
-
-  .video-overlay-hidden
-    display: none
-
   .header
   .footer
     position: absolute
@@ -31,25 +25,11 @@
     height: 47%
     width: 100%
 
-  .split-end-screen-full
-    display: block
-    position: fixed
-    top: 0
-    height: 100%
-
-  .split-end-screen-hidden
-    display: none
-
   .game-background
     display: none
     top: 0
     width: 0
     height: 0
-
-  .game-background-full
-    display: block
-    width: 100%
-    height: 53%
 
   .end-screen-info-background
     position: absolute
@@ -58,12 +38,41 @@
     height: 100%
     background-color: #fafafa
 
-  .end-screen-info-background-full
+  .btn-close-region
+    display: none
+
+#split-screen[data-state='full-screen-video']
+  .video-overlay
+    height: 100%
+
+  .split-end-screen
+    display: none
+
+#split-screen[data-state='full-end-screen']
+  .btn-close-region
+    display: block
+
+  .video-overlay
+    display: none
+
+  .split-end-screen
+    display: block
+    position: fixed
+    top: 0
+    height: 100%
+
+  .game-background
+    display: block
+    width: 100%
+    height: 53%
+
+  .end-screen-info-background
     position: absolute
     top: 53%
     width: 100%
     height: 47%
     background-color: #fafafa
+
 
 @-webkit-keyframes fade-in
   from

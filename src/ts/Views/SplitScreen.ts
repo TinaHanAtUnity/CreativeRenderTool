@@ -13,12 +13,6 @@ export class SplitScreen extends View {
     private _overlay: Overlay;
     private _gameName: string;
 
-    private _closeElement: HTMLElement;
-    private _overlayContainer: HTMLElement;
-    private _endScreenContainer: HTMLElement;
-    private _gameBackgroundElement: HTMLElement;
-    private _endScreenInfoElement: HTMLElement;
-
     private _fullScreenVideo: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, endScreen: EndScreen, videoOverlay: Overlay) {
@@ -36,17 +30,12 @@ export class SplitScreen extends View {
         super.render();
 
         this._overlay.render();
-        this._overlayContainer = <HTMLElement>this._container.querySelector('.video-overlay');
-        this._overlayContainer.appendChild(this._overlay.container());
+        const overlayContainer = <HTMLElement>this._container.querySelector('.video-overlay');
+        overlayContainer.appendChild(this._overlay.container());
 
         this._endScreen.render();
-        this._endScreenContainer = <HTMLElement>this._container.querySelector('.split-end-screen');
-        this._endScreenContainer.appendChild(this._endScreen.container());
-
-        this._closeElement = <HTMLElement>this._endScreenContainer.querySelector('.btn-close-region');
-        this._closeElement.style.display = 'none';
-        this._gameBackgroundElement = <HTMLElement>this._endScreenContainer.querySelector('.game-background-portrait');
-        this._endScreenInfoElement = <HTMLElement>this._endScreenContainer.querySelector('.end-screen-info-background');
+        const endScreenContainer = <HTMLElement>this._container.querySelector('.split-end-screen');
+        endScreenContainer.appendChild(this._endScreen.container());
     }
 
     public show(): void {
@@ -65,28 +54,14 @@ export class SplitScreen extends View {
     }
 
     public showEndScreen() {
-        this._overlayContainer.classList.remove('video-overlay-full');
-        this._endScreenContainer.classList.remove('split-end-screen-hidden');
-
-        this._overlayContainer.classList.add('video-overlay-hidden');
-
-        this._gameBackgroundElement.classList.add('game-background-full');
-
-        this._endScreenInfoElement.classList.add('end-screen-info-background-full');
-
-        this._endScreenContainer.classList.add('split-end-screen-full');
-
-        this._closeElement.style.display = 'block';
-
+        this._container.setAttribute('data-state', 'full-end-screen');
     }
 
     public setFullScreenVideo(fullScreen: boolean) {
         if (fullScreen) {
-            this._endScreenContainer.classList.add('split-end-screen-hidden');
-            this._overlayContainer.classList.add('video-overlay-full');
+            this._container.setAttribute('data-state', 'full-screen-video');
         } else {
-            this._endScreenContainer.classList.remove('split-end-screen-hidden');
-            this._overlayContainer.classList.remove('video-overlay-full');
+            this._container.setAttribute('data-state', '');
         }
         this._fullScreenVideo = fullScreen;
     }
