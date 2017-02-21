@@ -288,8 +288,10 @@ export class AdUnitFactory {
                 && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
                 return true;
             }
-        } else if(platform === Platform.ANDROID && options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT) {
-            return true;
+        } else if(platform === Platform.ANDROID) {
+            if(options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT || options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT) {
+                return true;
+            }
         }
         return false;
     }
