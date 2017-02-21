@@ -323,13 +323,22 @@ export class CampaignManager {
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
 
-            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+            const metaDataPromises: Promise<any>[] = [];
+            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
+            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+
+            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
                     body.mediationName = mediation.getName();
                     body.mediationVersion = mediation.getVersion();
                     if(mediation.getOrdinal()) {
                         body.mediationOrdinal = mediation.getOrdinal();
                     }
+                }
+
+                if(framework) {
+                    body.frameworkName = framework.getName();
+                    body.frameworkVersion = framework.getVersion();
                 }
 
                 return JSON.stringify(body);
