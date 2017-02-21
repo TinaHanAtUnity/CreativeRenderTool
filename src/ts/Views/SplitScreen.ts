@@ -54,14 +54,15 @@ export class SplitScreen extends View {
     }
 
     public showEndScreen() {
-        this._container.setAttribute('data-state', 'full-end-screen');
+        this._container.classList.remove('full-screen-video');
+        this._container.classList.add('full-end-screen');
     }
 
     public setFullScreenVideo(fullScreen: boolean) {
         if (fullScreen) {
-            this._container.setAttribute('data-state', 'full-screen-video');
+            this._container.classList.add('full-screen-video');
         } else {
-            this._container.setAttribute('data-state', '');
+            this._container.classList.remove('full-screen-video');
         }
         this._fullScreenVideo = fullScreen;
     }
