@@ -7,12 +7,12 @@ export class InAppPurchaseApi extends NativeApi {
         super(nativeBridge, 'InAppPurchase');
     }
 
-    public getAppStoreReciept(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getAppStoreReciept');
+    public getAppStoreReceipt(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getAppStoreReceipt');
     }
 
-    public getAppStoreRecieptURL(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getAppStoreRecieptURL');
+    public getAppStoreReceiptURL(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getAppStoreReceiptURL');
     }
 
 }
