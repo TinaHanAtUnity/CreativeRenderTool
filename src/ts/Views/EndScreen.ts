@@ -46,7 +46,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .cocback, .coc_cta'
             },
             {
                 event: 'click',
@@ -91,6 +91,11 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign) {
+        const abGroup = campaign.getAbGroup();
+        const gameId = campaign.getGameId();
+        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
+            return 'animated';
+        }
         return undefined;
     }
 
