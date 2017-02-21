@@ -65,35 +65,28 @@ export class SplitScreen extends View {
     }
 
     public showEndScreen() {
-        this._overlayContainer.style.display = 'none';
+        this._overlayContainer.classList.remove('video-overlay-full');
+        this._endScreenContainer.classList.remove('split-end-screen-hidden');
 
-        this._gameBackgroundElement.style.display = 'block';
-        this._gameBackgroundElement.style.width = '100%';
-        this._gameBackgroundElement.style.height = '53%';
+        this._overlayContainer.classList.add('video-overlay-hidden');
 
-        this._endScreenContainer.style.top = "0";
-        this._endScreenContainer.style.height = "100%";
-        this._endScreenInfoElement.style.height = '47%';
-        this._endScreenInfoElement.style.top = '53%';
-        this._endScreenContainer.style.display = 'block';
+        this._gameBackgroundElement.classList.add('game-background-full');
 
-        this._gameBackgroundElement.style.webkitAnimation = 'fade-in';
-        this._gameBackgroundElement.style.webkitAnimationDuration = '1s';
+        this._endScreenInfoElement.classList.add('end-screen-info-background-full');
+
+        this._endScreenContainer.classList.add('split-end-screen-full');
+
         this._closeElement.style.display = 'block';
 
     }
 
     public setFullScreenVideo(fullScreen: boolean) {
         if (fullScreen) {
-            this._endScreenContainer.style.height = '0';
-            this._endScreenContainer.style.display = 'none';
-
-            this._overlayContainer.style.height = '100%';
+            this._endScreenContainer.classList.add('split-end-screen-hidden');
+            this._overlayContainer.classList.add('video-overlay-full');
         } else {
-            this._endScreenContainer.style.height = '47%';
-            this._endScreenContainer.style.display = 'block';
-
-            this._overlayContainer.style.height = '53%';
+            this._endScreenContainer.classList.remove('split-end-screen-hidden');
+            this._overlayContainer.classList.remove('video-overlay-full');
         }
         this._fullScreenVideo = fullScreen;
     }

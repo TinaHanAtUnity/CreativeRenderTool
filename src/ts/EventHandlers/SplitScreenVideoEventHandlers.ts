@@ -1,11 +1,12 @@
 import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class SplitScreenVideoEventHandlers extends VideoEventHandlers {
 
-    public static afterVideoCompleted(adUnit: SplitScreenAdUnit) {
-        const endScreen = adUnit.getSplitVideoEndScreen();
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+        const endScreen = (<SplitScreenAdUnit>adUnit).getSplitVideoEndScreen();
         if(endScreen) {
             if(endScreen!.isFullScreenVideo()) {
                 adUnit.getContainer().reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
@@ -23,8 +24,8 @@ export class SplitScreenVideoEventHandlers extends VideoEventHandlers {
         adUnit.onFinish.trigger();
     }
 
-    public static updateViewsOnVideoError(adUnit: SplitScreenAdUnit) {
-        const endScreen = adUnit.getSplitVideoEndScreen();
+    protected static updateViewsOnVideoError(adUnit: VideoAdUnit) {
+        const endScreen = (<SplitScreenAdUnit>adUnit).getSplitVideoEndScreen();
         if(endScreen) {
             if(endScreen!.isFullScreenVideo()) {
                 adUnit.getContainer().reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
