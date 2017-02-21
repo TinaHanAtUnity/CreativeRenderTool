@@ -66,12 +66,21 @@ export class SessionManagerEventMetadataCreator {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
 
-            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+            const metaDataPromises: Promise<any>[] = [];
+            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
+            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
                     infoJson.mediationName = mediation.getName();
                     infoJson.mediationVersion = mediation.getVersion();
                     infoJson.mediationOrdinal = mediation.getOrdinal();
                 }
+
+                if(framework) {
+                    infoJson.frameworkName = framework.getName();
+                    infoJson.frameworkVersion = framework.getVersion();
+                }
+
                 return [id, infoJson];
             });
         });
