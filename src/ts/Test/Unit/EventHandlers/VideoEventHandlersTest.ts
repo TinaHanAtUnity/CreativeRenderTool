@@ -179,25 +179,25 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             assert.isFalse(performanceAdUnit.getVideo().isActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             assert.equal(performanceAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendView, performanceAdUnit);
         });
 
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
             if(adUnitOverlay) {

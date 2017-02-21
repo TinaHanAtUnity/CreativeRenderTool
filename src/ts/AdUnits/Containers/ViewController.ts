@@ -2,7 +2,9 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { ViewConfiguration } from "AdUnits/Containers/AdUnitContainer";
+import { Double } from 'Utilities/Double';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -36,7 +38,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, forceLandscape: boolean, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
         this._showing = true;
 
         let views: string[] = ['webview'];
@@ -45,13 +47,19 @@ export class ViewController extends AdUnitContainer {
         }
 
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
-        if(forceLandscape) {
+        if(forceOrientation === ForceOrientation.LANDSCAPE) {
             if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
             } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
             } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
                 orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+            }
+        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
+            } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
             }
         }
 
@@ -61,7 +69,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
-        return this._nativeBridge.IosAdUnit.open(views, orientation, true, true);
+        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowOrientation);
     }
 
     public close(): Promise<void> {
@@ -72,12 +80,33 @@ export class ViewController extends AdUnitContainer {
         return this._nativeBridge.IosAdUnit.close();
     }
 
-    public reconfigure(): Promise<any[]> {
-        // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
-        return Promise.all([
-            this._nativeBridge.IosAdUnit.setViews(['webview']),
-            this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL)
-        ]);
+    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        const promises: Promise<any>[] = [];
+        const width = this._deviceInfo.getScreenWidth();
+        const height = this._deviceInfo.getScreenHeight() + this._deviceInfo.getStatusBarHeight();
+
+        switch (configuration) {
+            case ViewConfiguration.ENDSCREEN:
+                promises.push(this._nativeBridge.IosAdUnit.setViews(['webview']));
+                promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
+                break;
+
+            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
+                promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(0)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width ), new Double(height / 2)));
+                break;
+
+            case ViewConfiguration.LANDSCAPE_VIDEO:
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
+                promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
+                break;
+
+            default:
+                break;
+        }
+        return Promise.all(promises);
     }
 
     public isPaused() {
