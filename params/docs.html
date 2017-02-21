@@ -7,7 +7,7 @@
                }
                </style>
                <body><br><br><h3> TOC <h3>
-<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#skip-event">Skip event</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3> 
+<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3> 
  <table> <tr><th>key</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>adapterName</td><td>String</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>String</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
@@ -116,31 +116,6 @@
 <tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="skip-event"></a> <h3> Skip event </h3> 
- <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
-<tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
-<tr><td>sessionId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
-<tr><td>gamerId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
-<tr><td>campaignId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Internal campaign identifier</td><td>Server</td><td>all</td></tr>
-<tr><td>placementId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Internal placement identifier</td><td>Admin</td><td>all</td></tr>
-<tr><td>apiLevel</td><td>android</td><td>False</td><td>True</td><td>Integer</td><td>Android device API level</td><td>SDK</td><td>android</td></tr>
-<tr><td>cached</td><td>all</td><td>False</td><td>True</td><td>Boolean</td><td>If video is cached or streamed</td><td>SDK</td><td>all</td></tr>
-<tr><td>advertisingTrackingId</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
-<tr><td>limitAdTracking</td><td>no</td><td>False</td><td>True</td><td>Boolean</td><td>Boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
-<tr><td>osVersion</td><td>yes</td><td>False</td><td>True</td><td>String</td><td>Device operating system version</td><td>SDK</td><td>all</td></tr>
-<tr><td>sid</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Server side reward callback id</td><td>App</td><td>all</td></tr>
-<tr><td>deviceMake</td><td>android</td><td>False</td><td>True</td><td>String</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
-<tr><td>deviceModel</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
-<tr><td>sdkVersion</td><td>all</td><td>False</td><td>True</td><td>String</td><td>SDK version in four digits</td><td>SDK</td><td>all</td></tr>
-<tr><td>webviewUa</td><td>no</td><td>False</td><td>True</td><td>String</td><td>WebView user agent string</td><td>SDK</td><td>all</td></tr>
-<tr><td>networkType</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Detailed cellular network type</td><td>SDK</td><td>all</td></tr>
-<tr><td>connectionType</td><td>all</td><td>False</td><td>True</td><td>String</td><td>"wifi", "cellular" or "none"</td><td>SDK</td><td>all</td></tr>
-<tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
-<tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
-<tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
-<tr><td>skippedAt</td><td>all</td><td>False</td><td>True</td><td>Integer</td><td>Milliseconds from video start to video skip</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 

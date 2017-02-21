@@ -2,7 +2,6 @@ import ConfigRequestSpec from 'json/events/ConfigRequest.json';
 import AdRequestSpec from 'json/events/AdRequest.json';
 import VideoEventSpec from 'json/events/VideoEvents.json';
 import ClickEventSpec from 'json/events/ClickEvent.json';
-import SkipEventSpec from 'json/events/SkipEvent.json';
 
 export interface IEventParameter {
     parameter: string;
@@ -35,10 +34,6 @@ export class ParamsTestData {
 
     public static getClickEventParams(): IEventSpec {
         return ParamsTestData.getEventSpec(ClickEventSpec);
-    }
-
-    public static getSkipEventParams(): IEventSpec {
-        return ParamsTestData.getEventSpec(SkipEventSpec);
     }
 
     private static getEventSpec(rawData: any): IEventSpec {

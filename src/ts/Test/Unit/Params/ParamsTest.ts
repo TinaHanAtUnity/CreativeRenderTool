@@ -335,16 +335,6 @@ describe('Event parameters should match specifications', () => {
                 });
             });
 
-            it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit, 12345).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getSkipEventParams(), url, body);
-                    verifier.assert();
-                });
-            });
-
             it('with end event', () => {
                 return sessionManager.sendView(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
@@ -401,16 +391,6 @@ describe('Event parameters should match specifications', () => {
                     const body: string = requestSpy.getCall(0).args[1];
 
                     const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
-                    verifier.assert();
-                });
-            });
-
-            it('with skip event', () => {
-                return sessionManager.sendSkip(adUnit, 12345).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getSkipEventParams(), url, body);
                     verifier.assert();
                 });
             });
