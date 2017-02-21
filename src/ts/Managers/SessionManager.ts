@@ -254,19 +254,19 @@ export class SessionManager {
     public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
         const campaign = adUnit.getCampaign();
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, any]): Promise<INativeResponse> => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
+
+            if(campaign instanceof PerformanceCampaign) {
+                if(campaign.getClickAttributionUrl()) {
+                    return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
+                }
+            }
+
+            return Promise.reject('Missing click attribution url');
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
-
-        if(campaign instanceof PerformanceCampaign) {
-            if(campaign.getClickAttributionUrl()) {
-                return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
-            }
-        }
-
-        return Promise.reject('Missing click attribution url');
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public setGamerServerId(serverId: string): void {
