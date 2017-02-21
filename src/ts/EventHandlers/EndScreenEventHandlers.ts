@@ -8,7 +8,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { StoreName } from "Models/PerformanceCampaign";
+import { StoreName } from 'Models/PerformanceCampaign';
 
 export class EndScreenEventHandlers {
 
