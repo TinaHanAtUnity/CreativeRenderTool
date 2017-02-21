@@ -44,7 +44,7 @@ export class AdUnitFactory {
         } else if(campaign instanceof HtmlCampaign) {
             return this.createHtmlAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
-            if(this.isPortraitOnly(nativeBridge.getPlatform(), options)) {
+            if((campaign.getAbGroup() === 12 || campaign.getAbGroup() === 13) && this.isPortraitOnly(nativeBridge.getPlatform(), options)) {
                 return this.createSplitScreenAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
             } else {
                 return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
