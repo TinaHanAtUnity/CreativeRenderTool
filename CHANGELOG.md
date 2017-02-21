@@ -1,3 +1,8 @@
+# Tue Feb 21 11:31:53 UTC 2017
+
+* Send skip event to Kafka instead of comet
+* Send frameworkName and frameworkVersion parameters in ad requests and operative events
+
 # Mon Feb 20 10:52:10 UTC 2017
 
 * Restore invocations of iOS setAutomaticallyWaitsToMinimizeStalling API
