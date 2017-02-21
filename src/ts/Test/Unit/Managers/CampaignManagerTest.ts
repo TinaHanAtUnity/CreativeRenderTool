@@ -89,7 +89,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve({
             response: InsideOutsideJson
         }));
-        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
             response: VastInlineLinear
         }));
 
@@ -161,10 +161,10 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve({
             response: WrappedVastJson
         }));
-        mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
             response: WrappedVast1
         }));
-        mockRequest.expects('get').withArgs('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479', [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+        mockRequest.expects('get').withArgs('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
             response: WrappedVast2
         }));
 
@@ -313,7 +313,7 @@ describe('CampaignManager', () => {
         // given a VAST placement that wraps another VAST
         const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
-        mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 5, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
+        mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
         const assetManager = new AssetManager(new Cache(nativeBridge, new WakeUpManager(nativeBridge)), CacheMode.DISABLED);
         const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);

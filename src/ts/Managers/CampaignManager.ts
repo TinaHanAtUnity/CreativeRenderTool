@@ -94,8 +94,8 @@ export class CampaignManager {
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
-                retries: 5,
-                retryDelay: 5000,
+                retries: 2,
+                retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: true
             });
@@ -330,13 +330,22 @@ export class CampaignManager {
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
 
-            return MetaDataManager.fetchMediationMetaData(this._nativeBridge).then(mediation => {
+            const metaDataPromises: Promise<any>[] = [];
+            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
+            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+
+            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
                     body.mediationName = mediation.getName();
                     body.mediationVersion = mediation.getVersion();
                     if(mediation.getOrdinal()) {
                         body.mediationOrdinal = mediation.getOrdinal();
                     }
+                }
+
+                if(framework) {
+                    body.frameworkName = framework.getName();
+                    body.frameworkVersion = framework.getVersion();
                 }
 
                 return JSON.stringify(body);

@@ -5,13 +5,14 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: Overlay, options: any, endScreen: EndScreen) {
-        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), overlay, options);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
+        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), overlay, deviceInfo, options);
 
         this._endScreen = endScreen;
     }
@@ -22,7 +23,6 @@ export class PerformanceAdUnit extends VideoAdUnit {
             endScreen.hide();
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
-        this.unsetReferences();
         return super.hide();
     }
 

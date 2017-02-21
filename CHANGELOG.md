@@ -1,3 +1,25 @@
+# Mon Feb 20 10:52:10 UTC 2017
+
+* Restore invocations of iOS setAutomaticallyWaitsToMinimizeStalling API
+* Use containers for all AdUnit API invocations
+* Send campaign_expired diagnostics only when show fails, not when cleanly refreshing campaigns
+
+# Mon Feb 13 10:40:14 UTC 2017
+
+* New retry policy: never retry 4xx or 5xx error responses
+
+# Fri Feb 10 12:19:06 UTC 2017
+
+* Fixed overlay clicking and scrolling issues
+
+# Thu Feb  9 10:44:10 UTC 2017
+
+* Second deployment of major refactorings, including caching fixes to previous deployment
+
+# Wed Feb  8 07:52:00 UTC 2017
+
+* Revert previous deployment due to serious caching problems that cause no fill
+
 # Tue Feb  7 13:13:11 UTC 2017
 
 * Major refactorings (should improve programmatic caching)

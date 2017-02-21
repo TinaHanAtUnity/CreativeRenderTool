@@ -46,11 +46,28 @@ export class MetaDataManager {
             });
     }
 
+    // this method is for getting metadata object but it does not update the ordinal
     public static fetchMediationMetaData(nativeBridge: NativeBridge, cache = true): Promise<MediationMetaData> {
-        return MetaDataManager.fetch(MediationMetaData.getCategory(), MediationMetaData.getKeys(), nativeBridge, cache)
+        return MetaDataManager.fetch(MediationMetaData.getCategory(), MediationMetaData.getStaticKeys(), nativeBridge, cache)
             .then(result => {
                 return Promise.resolve(<MediationMetaData>result);
             });
+    }
+
+    // this method needs to be invoked when show is called to refresh mediation ordinal
+    public static updateMediationMetaData(nativeBridge: NativeBridge): Promise<void> {
+        const metaDataUtility: MetaData = new MetaData(nativeBridge);
+        let mediationObject: MediationMetaData;
+
+        return MetaDataManager.fetchMediationMetaData(nativeBridge, true).then(result => {
+            mediationObject = result;
+            return metaDataUtility.get(MediationMetaData.getCategory() + '.' + MediationMetaData.getOrdinalKey(), true);
+        }).then(([found, value]) => {
+            if(found) {
+                mediationObject.setOrdinal(parseInt(<string>value, 10));
+            }
+            return;
+        });
     }
 
     public static fetchPlayerMetaData(nativeBridge: NativeBridge): Promise<PlayerMetaData> {

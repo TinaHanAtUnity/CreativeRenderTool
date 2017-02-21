@@ -183,6 +183,12 @@ export class WebView {
         if(this._campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
             this.onCampaignExpired(this._campaign);
+
+            const error = new DiagnosticError(new Error('Campaign expired'), {
+                id: this._campaign.getId(),
+                timeoutInSeconds: this._campaign.getTimeout()
+            });
+            Diagnostics.trigger('campaign_expired', error);
             return;
         }
 
@@ -195,6 +201,8 @@ export class WebView {
         if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
             this._cache.stop();
         }
+
+        MetaDataManager.updateMediationMetaData(this._nativeBridge);
 
         MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
             if(player) {
@@ -280,13 +288,6 @@ export class WebView {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
         this._campaignManager.request();
-
-        const error = new DiagnosticError(new Error('Campaign expired'), {
-            id: this._campaign.getId(),
-            timeoutInSeconds: this._campaign.getTimeout()
-        });
-
-        Diagnostics.trigger('campaign_expired', error);
     }
 
     private onNewAdRequestAllowed(): void {
