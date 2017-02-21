@@ -91,12 +91,12 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign) {
-        const abGroup = campaign.getAbGroup();
-        const gameId = campaign.getGameId();
-        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
+        //const abGroup = campaign.getAbGroup();
+        //const gameId = campaign.getGameId();
+        //if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
             return 'animated';
-        }
-        return undefined;
+        //}
+        //return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
