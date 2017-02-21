@@ -10,6 +10,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
 
 export class VideoEventHandlers {
 
@@ -59,18 +60,16 @@ export class VideoEventHandlers {
             }
         }
 
-        metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
-            if(found && debugOverlayEnabled && overlay) {
-                overlay.setDebugMessageVisible(true);
-                let debugMessage = '';
-                if (adUnit instanceof VastAdUnit) {
-                    debugMessage = 'Programmatic Ad';
-                } else {
-                    debugMessage = 'Performance Ad';
-                }
-                overlay.setDebugMessage(debugMessage);
+        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
+            overlay.setDebugMessageVisible(true);
+            let debugMessage = '';
+            if(adUnit instanceof VastAdUnit) {
+                debugMessage = 'Programmatic Ad';
+            } else {
+                debugMessage = 'Performance Ad';
             }
-        });
+            overlay.setDebugMessage(debugMessage);
+        }
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideo().getPosition() > 0) {
