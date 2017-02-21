@@ -2,10 +2,8 @@ import { Double } from 'Utilities/Double';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { Platform } from 'Constants/Platform';
-import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class OverlayEventHandlers {
 
@@ -15,17 +13,7 @@ export class OverlayEventHandlers {
         adUnit.setFinishState(FinishState.SKIPPED);
         sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
-        if (nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
-
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-        } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-        }
+        adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
 
         const overlay = adUnit.getOverlay();
         if (overlay) {

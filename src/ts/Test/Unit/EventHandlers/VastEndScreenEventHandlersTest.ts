@@ -39,7 +39,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             const vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
-            }, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
+            }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
 
             VastEndScreenEventHandlers.onClose(vastAdUnit);
@@ -59,7 +59,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnit = new VastAdUnit(nativeBridge, container, <Placement><any>{}, <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
-            }, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
+            }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
         });
 
         it('should should use video click through url when companion click url is not present', () => {

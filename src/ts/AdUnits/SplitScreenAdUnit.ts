@@ -4,13 +4,14 @@ import { SplitScreen } from 'Views/SplitScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class SplitScreenAdUnit extends VideoAdUnit {
 
     private _splitScreen: SplitScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, options: any, splitScreen: SplitScreen) {
-        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), splitScreen.getOverlay(), options);
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, deviceInfo: DeviceInfo, options: any, splitScreen: SplitScreen) {
+        super(nativeBridge, container, placement, campaign, campaign.getVideo().isCached() ? campaign.getVideo() : campaign.getStreamingVideo(), splitScreen.getOverlay(), deviceInfo, options);
 
         this._splitScreen = splitScreen;
     }

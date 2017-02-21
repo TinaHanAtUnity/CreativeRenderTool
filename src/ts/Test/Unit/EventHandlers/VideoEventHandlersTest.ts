@@ -70,7 +70,7 @@ describe('VideoEventHandlersTest', () => {
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
             getStreamingVideo: () => video
-        }, overlay, null, endScreen);
+        }, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('with onVideoPlay', () => {
@@ -87,7 +87,7 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
                 getVideo: () => video,
                 getStreamingVideo: () => video
-            }, overlay, null, endScreen);
+            }, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
             sessionManager.setSession(new Session('123'));
         });
 
@@ -179,25 +179,25 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             assert.isFalse(performanceAdUnit.getVideo().isActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             assert.equal(performanceAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendView, performanceAdUnit);
         });
 
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, performanceAdUnit, metaData);
+            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
             if(adUnitOverlay) {
@@ -284,7 +284,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(metaData, 'get').returns(prom);
             const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
 
             return prom.then(() => {
@@ -307,7 +307,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);
@@ -319,7 +319,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, metaData);

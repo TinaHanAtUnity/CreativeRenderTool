@@ -69,7 +69,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
         sessionManager.setSession(new Session('123'));
 
-        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null);
+        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     describe('When calling onSkip', () => {
@@ -87,7 +87,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = <VastEndScreen><any> {
                     show: sinon.spy()
                 };
-                const vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, null, vastEndScreen);
+                const vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
                 VastOverlayEventHandlers.onSkip(vastAdUnit);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
@@ -128,7 +128,7 @@ describe('VastOverlayEventHandlersTest', () => {
             vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
-            }, <Overlay><any>{}, null);
+            }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());

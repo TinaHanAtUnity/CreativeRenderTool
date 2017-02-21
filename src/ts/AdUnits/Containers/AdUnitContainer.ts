@@ -1,11 +1,16 @@
 import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
 
 export const enum ForceOrientation {
     PORTRAIT,
     LANDSCAPE,
     NONE
+}
+
+export const enum ViewConfiguration {
+    CONFIGURATION_ENDSCREEN,
+    CONFIGURATION_SPLIT_VIDEO_ENDSCREEN,
+    CONFIGURATION_LANDSCAPE_VIDEO
 }
 
 export abstract class AdUnitContainer {

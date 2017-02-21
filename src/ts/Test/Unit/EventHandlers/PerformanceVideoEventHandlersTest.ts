@@ -39,7 +39,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
             getStreamingVideo: () => video
-        }, overlay, null, endScreen);
+        }, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('with onVideoCompleted', () => {

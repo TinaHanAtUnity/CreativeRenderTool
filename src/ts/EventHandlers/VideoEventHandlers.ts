@@ -3,16 +3,14 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class VideoEventHandlers {
 
@@ -182,18 +180,12 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
+    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.getVideo().setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
-
-        this.afterVideoCompleted(nativeBridge, adUnit);
+        this.afterVideoCompleted(adUnit);
     }
 
     public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
@@ -275,30 +267,26 @@ export class VideoEventHandlers {
         });
     }
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+        adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
+
         const overlay = adUnit.getOverlay();
         if(overlay) {
             overlay.hide();
         }
         adUnit.onFinish.trigger();
+    }
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-        }
-    };
+    protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit) {
+        videoAdUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
+    }
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         videoAdUnit.getVideo().setErrorStatus(true);
         videoAdUnit.getVideo().setActive(false);
         videoAdUnit.setFinishState(FinishState.ERROR);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.IosAdUnit.setViews(['webview']);
-        } else {
-            nativeBridge.AndroidAdUnit.setViews(['webview']);
-        }
+        this.updateViewsOnVideoError(videoAdUnit);
 
         const overlay = videoAdUnit.getOverlay();
         if(overlay) {

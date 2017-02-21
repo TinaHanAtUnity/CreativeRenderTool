@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
+import { ViewConfiguration } from "AdUnits/Containers/AdUnitContainer";
 import { Double } from 'Utilities/Double';
 
 interface IIosOptions {

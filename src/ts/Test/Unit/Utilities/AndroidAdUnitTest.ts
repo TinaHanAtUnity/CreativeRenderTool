@@ -10,8 +10,8 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { ForceOrientation } from '../../../AdUnits/Containers/AdUnitContainer';
-import { ViewConfiguration } from 'AdUnits/Containers/ViewConfiguration';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;

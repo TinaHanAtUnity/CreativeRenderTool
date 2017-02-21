@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewConfiguration } from "AdUnits/Containers/ViewConfiguration";
+import { ViewConfiguration } from "AdUnits/Containers/AdUnitContainer";
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
