@@ -11,11 +11,9 @@ export class SplitScreenEventHandlers {
     public static onFullScreenButton(adUnitContainer: AdUnitContainer, endScreen: SplitScreen): void {
         if (!endScreen.isFullScreenVideo()) {
             endScreen!.setFullScreenVideo(true);
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO).then(() => {
-                //
-            });
+            adUnitContainer.reconfigure(ViewConfiguration.LANDSCAPE_VIDEO);
         } else {
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+            adUnitContainer.reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
                 endScreen.setFullScreenVideo(false);
             });
         }
@@ -33,7 +31,7 @@ export class SplitScreenEventHandlers {
         }
 
         if(adUnit.getSplitVideoEndScreen()) {
-            adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+            adUnitContainer.reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
                 adUnit.getSplitVideoEndScreen()!.showEndScreen();
             });
         }
@@ -45,7 +43,7 @@ export class SplitScreenEventHandlers {
         if(endScreen) {
             endScreen.getOverlay().setFullScreenButtonVisible(true);
             if(!endScreen.isFullScreenVideo()) {
-                adUnitContainer.reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN);
+                adUnitContainer.reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN);
             }
         }
     }

@@ -86,18 +86,18 @@ export class ViewController extends AdUnitContainer {
         const height = this._deviceInfo.getScreenHeight() + this._deviceInfo.getStatusBarHeight();
 
         switch (configuration) {
-            case ViewConfiguration.CONFIGURATION_ENDSCREEN:
+            case ViewConfiguration.ENDSCREEN:
                 promises.push(this._nativeBridge.IosAdUnit.setViews(['webview']));
                 promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
                 break;
 
-            case ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN:
+            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
                 promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(0)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width ), new Double(height / 2)));
                 break;
 
-            case ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO:
+            case ViewConfiguration.LANDSCAPE_VIDEO:
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
                 promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679)));
                 promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));

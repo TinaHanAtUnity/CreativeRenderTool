@@ -13,7 +13,7 @@ export class OverlayEventHandlers {
         adUnit.setFinishState(FinishState.SKIPPED);
         sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
-        adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
+        adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
         const overlay = adUnit.getOverlay();
         if (overlay) {

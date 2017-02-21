@@ -1,4 +1,4 @@
-import { SplitScreenAdUnit } from '../AdUnits/SplitScreenAdUnit';
+import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
@@ -8,7 +8,7 @@ export class SplitScreenVideoEventHandlers extends VideoEventHandlers {
         const endScreen = adUnit.getSplitVideoEndScreen();
         if(endScreen) {
             if(endScreen!.isFullScreenVideo()) {
-                adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+                adUnit.getContainer().reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
                     endScreen.showEndScreen();
                 });
             } else {
@@ -27,7 +27,7 @@ export class SplitScreenVideoEventHandlers extends VideoEventHandlers {
         const endScreen = adUnit.getSplitVideoEndScreen();
         if(endScreen) {
             if(endScreen!.isFullScreenVideo()) {
-                adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN).then(() => {
+                adUnit.getContainer().reconfigure(ViewConfiguration.SPLIT_VIDEO_ENDSCREEN).then(() => {
                     endScreen.showEndScreen();
                 });
             } else {

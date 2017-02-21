@@ -268,7 +268,7 @@ export class VideoEventHandlers {
     }
 
     protected static afterVideoCompleted(adUnit: VideoAdUnit) {
-        adUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
+        adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
         const overlay = adUnit.getOverlay();
         if(overlay) {
@@ -278,7 +278,7 @@ export class VideoEventHandlers {
     }
 
     protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit) {
-        videoAdUnit.getContainer().reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN);
+        videoAdUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
     }
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {

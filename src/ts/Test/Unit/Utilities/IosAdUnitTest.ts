@@ -68,7 +68,7 @@ describe('IosAdUnitTest', () => {
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());
 
-        return container.reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN).then(() => {
+        return container.reconfigure(ViewConfiguration.ENDSCREEN).then(() => {
             sinon.assert.calledWith(<sinon.SinonSpy>stubViews, ['webview']);
             sinon.assert.calledWith(<sinon.SinonSpy>stubOrientation, UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
             return;

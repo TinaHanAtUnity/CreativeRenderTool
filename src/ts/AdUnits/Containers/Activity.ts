@@ -80,17 +80,17 @@ export class Activity extends AdUnitContainer {
         const height = this._deviceInfo.getScreenHeight();
 
         switch (configuration) {
-            case ViewConfiguration.CONFIGURATION_ENDSCREEN:
+            case ViewConfiguration.ENDSCREEN:
                 promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
                 promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
                 break;
 
-            case ViewConfiguration.CONFIGURATION_SPLIT_VIDEO_ENDSCREEN:
+            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
                 promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT));
                 promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, width, height / 2));
                 break;
 
-            case ViewConfiguration.CONFIGURATION_LANDSCAPE_VIDEO:
+            case ViewConfiguration.LANDSCAPE_VIDEO:
                 promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
                 promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, this._deviceInfo.getScreenHeight(), this._deviceInfo.getScreenWidth()));
                 break;

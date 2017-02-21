@@ -8,9 +8,9 @@ export const enum ForceOrientation {
 }
 
 export const enum ViewConfiguration {
-    CONFIGURATION_ENDSCREEN,
-    CONFIGURATION_SPLIT_VIDEO_ENDSCREEN,
-    CONFIGURATION_LANDSCAPE_VIDEO
+    ENDSCREEN,
+    SPLIT_VIDEO_ENDSCREEN,
+    LANDSCAPE_VIDEO
 }
 
 export abstract class AdUnitContainer {

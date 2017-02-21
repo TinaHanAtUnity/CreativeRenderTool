@@ -64,7 +64,7 @@ describe('AndroidAdUnitTest', () => {
         const stubViews = sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.AndroidAdUnit, 'setOrientation').returns(Promise.resolve());
 
-        return container.reconfigure(ViewConfiguration.CONFIGURATION_ENDSCREEN).then(() => {
+        return container.reconfigure(ViewConfiguration.ENDSCREEN).then(() => {
             sinon.assert.calledWith(<sinon.SinonSpy>stubViews, ['webview']);
             sinon.assert.calledWith(<sinon.SinonSpy>stubOrientation, ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR);
             return;
