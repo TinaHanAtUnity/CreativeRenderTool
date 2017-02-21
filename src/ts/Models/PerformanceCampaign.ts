@@ -34,7 +34,7 @@ export class PerformanceCampaign extends Campaign {
     private _store: StoreName;
 
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super(campaign.id, gamerId, abGroup, campaign.store);
+        super(campaign.id, gamerId, abGroup);
 
         this._appStoreId = campaign.appStoreId;
         this._appStoreCountry = campaign.appStoreCountry;
