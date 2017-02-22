@@ -437,7 +437,7 @@ export class WebView {
                 CampaignManager.setCampaignResponse(TestEnvironment.get('campaignResponse'));
             }
 
-            return Promise.resolve();
+            return;
         });
     }
 }

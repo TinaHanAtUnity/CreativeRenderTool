@@ -4,7 +4,6 @@ import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
@@ -14,7 +13,7 @@ import { TestEnvironment } from 'Utilities/TestEnvironment';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         if(adUnit.getVideo().getErrorStatus()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
@@ -178,7 +177,7 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
+    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.getVideo().setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
