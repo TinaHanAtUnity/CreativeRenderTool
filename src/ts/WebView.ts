@@ -33,6 +33,7 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { MetaData } from 'Utilities/MetaData';
 
 export class WebView {
 
@@ -398,7 +399,7 @@ export class WebView {
      */
 
     private setupTestEnvironment(): Promise<void> {
-        return TestEnvironment.setup(this._nativeBridge).then(() => {
+        return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
