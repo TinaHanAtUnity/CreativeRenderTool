@@ -134,8 +134,6 @@ export class AdUnitFactory {
 
         overlay.setFullScreenButtonVisible(true);
 
-        const metaData = new MetaData(nativeBridge);
-
         const splitAdUnit = new SplitScreenAdUnit(nativeBridge, container, placement, campaign, deviceInfo, options, splitVideoEndScreen);
 
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
@@ -149,7 +147,7 @@ export class AdUnitFactory {
         overlay.onSkip.subscribe((videoProgress) => SplitScreenEventHandlers.onSkip(nativeBridge, sessionManager, container, splitAdUnit));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
         overlay.onFullScreenButton.subscribe((fullScreen) => SplitScreenEventHandlers.onFullScreenButton(container, splitVideoEndScreen));
-        this.prepareSplitScreenVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit, metaData);
+        this.prepareSplitScreenVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit);
         this.prepareSplitEndScreen(endScreen, nativeBridge, sessionManager, splitAdUnit, deviceInfo);
 
         splitAdUnit.onClose.subscribe(() => {
@@ -293,8 +291,8 @@ export class AdUnitFactory {
         return false;
     }
 
-    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: SplitScreenAdUnit, metaData: MetaData) {
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenVideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
+    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: SplitScreenAdUnit) {
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenVideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => SplitScreenVideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => SplitScreenVideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => SplitScreenVideoEventHandlers.onVideoPlay(nativeBridge, adUnit));

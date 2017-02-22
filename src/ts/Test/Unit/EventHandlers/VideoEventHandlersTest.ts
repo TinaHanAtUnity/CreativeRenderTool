@@ -25,7 +25,7 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Video';
-import { TestEnvironment } from "../../../Utilities/TestEnvironment";
+import { TestEnvironment } from 'Utilities/TestEnvironment';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -264,7 +264,6 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set debug message to performance ad if the ad unit is not VAST', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
-            sinon.stub(TestEnvironment, 'get').returns(true);
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Performance Ad');
