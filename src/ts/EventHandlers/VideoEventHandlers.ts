@@ -4,17 +4,17 @@ import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         if(adUnit.getVideo().getErrorStatus()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
@@ -60,18 +60,16 @@ export class VideoEventHandlers {
             }
         }
 
-        metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
-            if(found && debugOverlayEnabled && overlay) {
-                overlay.setDebugMessageVisible(true);
-                let debugMessage = '';
-                if (adUnit instanceof VastAdUnit) {
-                    debugMessage = 'Programmatic Ad';
-                } else {
-                    debugMessage = 'Performance Ad';
-                }
-                overlay.setDebugMessage(debugMessage);
+        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
+            overlay.setDebugMessageVisible(true);
+            let debugMessage = '';
+            if(adUnit instanceof VastAdUnit) {
+                debugMessage = 'Programmatic Ad';
+            } else {
+                debugMessage = 'Performance Ad';
             }
-        });
+            overlay.setDebugMessage(debugMessage);
+        }
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideo().getPosition() > 0) {
