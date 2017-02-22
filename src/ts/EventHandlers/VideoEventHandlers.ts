@@ -4,16 +4,17 @@ import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { MetaData } from 'Utilities/MetaData';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, metaData: MetaData): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         if(adUnit.getVideo().getErrorStatus()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
@@ -59,18 +60,16 @@ export class VideoEventHandlers {
             }
         }
 
-        metaData.get<boolean>('test.debugOverlayEnabled', false).then(([found, debugOverlayEnabled]) => {
-            if(found && debugOverlayEnabled && overlay) {
-                overlay.setDebugMessageVisible(true);
-                let debugMessage = '';
-                if (adUnit instanceof VastAdUnit) {
-                    debugMessage = 'Programmatic Ad';
-                } else {
-                    debugMessage = 'Performance Ad';
-                }
-                overlay.setDebugMessage(debugMessage);
+        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
+            overlay.setDebugMessageVisible(true);
+            let debugMessage = '';
+            if(adUnit instanceof VastAdUnit) {
+                debugMessage = 'Programmatic Ad';
+            } else {
+                debugMessage = 'Performance Ad';
             }
-        });
+            overlay.setDebugMessage(debugMessage);
+        }
 
         nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideo().getPosition() > 0) {
@@ -179,14 +178,12 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, metaData: MetaData): void {
+    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.getVideo().setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        adUnit.getContainer().reconfigure();
-
-        this.afterVideoCompleted(nativeBridge, adUnit);
+        this.afterVideoCompleted(adUnit);
     }
 
     public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
@@ -268,20 +265,26 @@ export class VideoEventHandlers {
         });
     }
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+        adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
+
         const overlay = adUnit.getOverlay();
         if(overlay) {
             overlay.hide();
         }
         adUnit.onFinish.trigger();
-    };
+    }
+
+    protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit) {
+        videoAdUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
+    }
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         videoAdUnit.getVideo().setErrorStatus(true);
         videoAdUnit.getVideo().setActive(false);
         videoAdUnit.setFinishState(FinishState.ERROR);
 
-        videoAdUnit.getContainer().reconfigure();
+        this.updateViewsOnVideoError(videoAdUnit);
 
         const overlay = videoAdUnit.getOverlay();
         if(overlay) {

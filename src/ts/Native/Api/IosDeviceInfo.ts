@@ -30,4 +30,8 @@ export class IosDeviceInfoApi extends NativeApi {
     public isSimulator(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isSimulator');
     }
+
+    public getStatusBarHeight(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getStatusBarHeight');
+    }
 }

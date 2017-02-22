@@ -1,5 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { AdUnitFactory } from "AdUnits/AdUnitFactory";
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -16,10 +17,12 @@ import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
 
-import {VastAdUnit} from 'AdUnits/VastAdUnit';
-import {PerformanceAdUnit} from 'AdUnits/PerformanceAdUnit';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
+import { Campaign } from 'Models/Campaign';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -69,6 +72,70 @@ describe('AdUnitFactoryTest', () => {
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
+        });
+    });
+
+    describe('SplitScreen AdUnit', () => {
+        let campaign: Campaign;
+        before(() => {
+            campaign = TestFixtures.getCampaign();
+        });
+
+        it('should create SplitScreenAdUnit with orientation 1 and call hide on video close, Android ', () => {
+            sandbox.stub(campaign, 'getAbGroup').returns(12);
+
+            const videoAdUnit = AdUnitFactory.createAdUnit(TestFixtures.getNativeBridge(Platform.ANDROID), container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {'requestedOrientation': 1});
+            assert.instanceOf(videoAdUnit, SplitScreenAdUnit);
+            sandbox.stub(videoAdUnit, 'hide');
+            videoAdUnit.onClose.trigger();
+
+            sinon.assert.calledOnce(<sinon.SinonSpy>videoAdUnit.hide);
+        });
+
+        it('should create SplitScreenAdUnit with orientation 7 and call hide on video close, Android ', () => {
+            sandbox.stub(campaign, 'getAbGroup').returns(12);
+
+            const videoAdUnit = AdUnitFactory.createAdUnit(TestFixtures.getNativeBridge(Platform.ANDROID), container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {'requestedOrientation': 7});
+            assert.instanceOf(videoAdUnit, SplitScreenAdUnit);
+            sandbox.stub(videoAdUnit, 'hide');
+            videoAdUnit.onClose.trigger();
+
+            sinon.assert.calledOnce(<sinon.SinonSpy>videoAdUnit.hide);
+        });
+
+        it('should create SplitScreenAdUnit with orientation 2 and call hide on video close, iOS ', () => {
+            sandbox.stub(campaign, 'getAbGroup').returns(12);
+
+            const videoAdUnit = AdUnitFactory.createAdUnit(TestFixtures.getNativeBridge(Platform.IOS), container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {'supportedOrientations': 2});
+            assert.instanceOf(videoAdUnit, SplitScreenAdUnit);
+            sandbox.stub(videoAdUnit, 'hide');
+            videoAdUnit.onClose.trigger();
+
+            sinon.assert.calledOnce(<sinon.SinonSpy>videoAdUnit.hide);
+        });
+
+        it('should not create SplitScreenAdUnit, iOS ', () => {
+            sandbox.stub(campaign, 'getAbGroup').returns(12);
+
+            const videoAdUnit = AdUnitFactory.createAdUnit(TestFixtures.getNativeBridge(Platform.IOS), container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {'supportedOrientations': 30});
+            assert.notInstanceOf(videoAdUnit, SplitScreenAdUnit);
+            assert.instanceOf(videoAdUnit, PerformanceAdUnit);
+            sandbox.stub(videoAdUnit, 'hide');
+            videoAdUnit.onClose.trigger();
+
+            sinon.assert.calledOnce(<sinon.SinonSpy>videoAdUnit.hide);
+        });
+
+        it('should not create SplitScreenAdUnit, Android ', () => {
+            sandbox.stub(campaign, 'getAbGroup').returns(12);
+
+            const videoAdUnit = AdUnitFactory.createAdUnit(TestFixtures.getNativeBridge(Platform.IOS), container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {'requestedOrientation': -1});
+            assert.notInstanceOf(videoAdUnit, SplitScreenAdUnit);
+            assert.instanceOf(videoAdUnit, PerformanceAdUnit);
+            sandbox.stub(videoAdUnit, 'hide');
+            videoAdUnit.onClose.trigger();
+
+            sinon.assert.calledOnce(<sinon.SinonSpy>videoAdUnit.hide);
         });
     });
 });
