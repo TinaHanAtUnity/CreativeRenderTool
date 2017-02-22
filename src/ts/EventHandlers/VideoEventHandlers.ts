@@ -10,6 +10,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class VideoEventHandlers {
 
@@ -177,14 +178,12 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         adUnit.getVideo().setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
-        adUnit.getContainer().reconfigure();
-
-        this.afterVideoCompleted(nativeBridge, adUnit);
+        this.afterVideoCompleted(adUnit);
     }
 
     public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
@@ -266,20 +265,26 @@ export class VideoEventHandlers {
         });
     }
 
-    protected static afterVideoCompleted(nativeBridge: NativeBridge, adUnit: VideoAdUnit) {
+    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+        adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
+
         const overlay = adUnit.getOverlay();
         if(overlay) {
             overlay.hide();
         }
         adUnit.onFinish.trigger();
-    };
+    }
+
+    protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit) {
+        videoAdUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
+    }
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         videoAdUnit.getVideo().setErrorStatus(true);
         videoAdUnit.getVideo().setActive(false);
         videoAdUnit.setFinishState(FinishState.ERROR);
 
-        videoAdUnit.getContainer().reconfigure();
+        this.updateViewsOnVideoError(videoAdUnit);
 
         const overlay = videoAdUnit.getOverlay();
         if(overlay) {

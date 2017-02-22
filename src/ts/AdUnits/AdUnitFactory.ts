@@ -27,6 +27,12 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { SplitScreen } from 'Views/SplitScreen';
+import { SplitScreenAdUnit } from 'AdUnits/SplitScreenAdUnit';
+import { SplitScreenEventHandlers } from 'EventHandlers/SplitScreenEventHandlers';
+import { SplitScreenVideoEventHandlers } from 'EventHandlers/SplitScreenVideoEventHandlers';
 
 export class AdUnitFactory {
 
@@ -37,7 +43,11 @@ export class AdUnitFactory {
         } else if(campaign instanceof HtmlCampaign) {
             return this.createHtmlAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
-            return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+            if((campaign.getAbGroup() === 12 || campaign.getAbGroup() === 13) && this.isPortraitOnly(nativeBridge.getPlatform(), options)) {
+                return this.createSplitScreenAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+            } else {
+                return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+            }
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -114,6 +124,41 @@ export class AdUnitFactory {
         return thirdPartyAdUnit;
     }
 
+    private static createSplitScreenAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+        const splitVideoEndScreen = new SplitScreen(nativeBridge, campaign, endScreen, overlay);
+        splitVideoEndScreen.render();
+        splitVideoEndScreen.show();
+        document.body.appendChild(splitVideoEndScreen.container());
+
+        overlay.setFullScreenButtonVisible(true);
+
+        const metaData = new MetaData(nativeBridge);
+
+        const splitAdUnit = new SplitScreenAdUnit(nativeBridge, container, placement, campaign, deviceInfo, options, splitVideoEndScreen);
+
+        overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+        if(!placement.allowSkip()) {
+            overlay.setSkipEnabled(false);
+        } else {
+            overlay.setSkipEnabled(true);
+            overlay.setSkipDuration(placement.allowSkipInSeconds());
+        }
+
+        overlay.onSkip.subscribe((videoProgress) => SplitScreenEventHandlers.onSkip(nativeBridge, sessionManager, container, splitAdUnit));
+        overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
+        overlay.onFullScreenButton.subscribe((fullScreen) => SplitScreenEventHandlers.onFullScreenButton(container, splitVideoEndScreen));
+        this.prepareSplitScreenVideoPlayer(nativeBridge, container, sessionManager, splitAdUnit, metaData);
+        this.prepareSplitEndScreen(endScreen, nativeBridge, sessionManager, splitAdUnit, deviceInfo);
+
+        splitAdUnit.onClose.subscribe(() => {
+            splitAdUnit.hide();
+        });
+
+        return splitAdUnit;
+    }
+
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
         overlay.render();
         document.body.appendChild(overlay.container());
@@ -180,7 +225,7 @@ export class AdUnitFactory {
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(nativeBridge, sessionManager, adUnit));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(sessionManager, adUnit));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
@@ -232,4 +277,59 @@ export class AdUnitFactory {
         });
     }
 
+    private static isPortraitOnly(platform: Platform, options: any) {
+        if(platform === Platform.IOS) {
+            if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT
+                && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE
+                && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT
+                && (options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) !== UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
+                return true;
+            }
+        } else if(platform === Platform.ANDROID) {
+            if(options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT || options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static prepareSplitScreenVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, adUnit: SplitScreenAdUnit, metaData: MetaData) {
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenVideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, metaData));
+        const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => SplitScreenVideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => SplitScreenVideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, adUnit, position));
+        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => SplitScreenVideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => SplitScreenVideoEventHandlers.onVideoCompleted(sessionManager, adUnit));
+
+        const preparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((duration, width, height) => SplitScreenEventHandlers.onPrepared(container, adUnit));
+
+        adUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(preparedObserver);
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
+            nativeBridge.VideoPlayer.onPrepareTimeout.unsubscribe(onPrepareTimeoutObserver);
+            nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
+            nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+        });
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            this.prepareAndroidVideoPlayer(nativeBridge, adUnit);
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            this.prepareIosVideoPlayer(nativeBridge, <ViewController>container, adUnit);
+        }
+    }
+
+    private static prepareSplitEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: SplitScreenAdUnit, deviceInfo: DeviceInfo) {
+        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
+        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+            adUnit.onClose.subscribe(() => {
+                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+            });
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
+        }
+    }
 }
