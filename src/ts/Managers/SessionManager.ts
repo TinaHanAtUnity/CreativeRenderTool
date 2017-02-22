@@ -6,7 +6,6 @@ import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { INativeResponse } from 'Utilities/Request';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -251,19 +250,9 @@ export class SessionManager {
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
-        const campaign = adUnit.getCampaign();
-
-        const fulfilled = ([id, infoJson]: [string, any]): Promise<INativeResponse> => {
+    public sendClick(adUnit: AbstractAdUnit): Promise<void> {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
-
-            if(campaign instanceof PerformanceCampaign) {
-                if(campaign.getClickAttributionUrl()) {
-                    return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
-                }
-            }
-
-            return Promise.reject('Missing click attribution url');
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);

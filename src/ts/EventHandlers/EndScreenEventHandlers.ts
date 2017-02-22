@@ -17,20 +17,10 @@ export class EndScreenEventHandlers {
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        if(campaign.getClickAttributionUrlFollowsRedirects()) {
-            sessionManager.sendClick(adUnit).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
-                if(location) {
-                    nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': location
-                    });
-                } else {
-                    throw new Error('No location found');
-                }
-            });
+        sessionManager.sendClick(adUnit);
+        if(campaign.getClickAttributionUrl()) {
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
         } else {
-            sessionManager.sendClick(adUnit);
             nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': EndScreenEventHandlers.getAppStoreUrl(platform, campaign)
@@ -44,17 +34,10 @@ export class EndScreenEventHandlers {
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        if(campaign.getClickAttributionUrlFollowsRedirects()) {
-            sessionManager.sendClick(adUnit).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
-                if(location) {
-                    nativeBridge.UrlScheme.open(location);
-                } else {
-                    throw new Error('No location found');
-                }
-            });
+        sessionManager.sendClick(adUnit);
+        if(campaign.getClickAttributionUrl()) {
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
         } else {
-            sessionManager.sendClick(adUnit);
             if(IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()) || campaign.getBypassAppSheet()) {
                 nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
             } else {
@@ -76,6 +59,25 @@ export class EndScreenEventHandlers {
                 });
             }
         }
+    }
+
+    public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
+        const eventManager = sessionManager.getEventManager();
+        const platform = nativeBridge.getPlatform();
+
+        eventManager.clickAttributionEvent(sessionManager.getSession().getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects()).then(response => {
+            const location = Request.getHeader(response.headers, 'location');
+            if(location) {
+                if(platform === Platform.ANDROID) {
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': location
+                    });
+                } else if(platform === Platform.IOS) {
+                    nativeBridge.UrlScheme.open(location);
+                }
+            }
+        });
     }
 
     public static onPrivacy(nativeBridge: NativeBridge, url: string): void {
