@@ -214,6 +214,7 @@ describe('DeviceInfoTest iOS', () => {
                     getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
                     getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                    getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
                 }
             },
         };

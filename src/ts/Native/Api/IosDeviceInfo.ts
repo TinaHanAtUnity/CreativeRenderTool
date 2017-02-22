@@ -38,4 +38,8 @@ export class IosDeviceInfoApi extends NativeApi {
     public getSensorList(): Promise<string[]> {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSensorList');
     }
+
+    public getStatusBarHeight(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getStatusBarHeight');
+    }
 }

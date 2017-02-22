@@ -3,6 +3,7 @@ import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 export class OverlayEventHandlers {
 
@@ -12,7 +13,7 @@ export class OverlayEventHandlers {
         adUnit.setFinishState(FinishState.SKIPPED);
         sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 
-        adUnit.getContainer().reconfigure();
+        adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
         const overlay = adUnit.getOverlay();
         if (overlay) {

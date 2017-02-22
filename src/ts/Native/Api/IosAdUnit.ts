@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { Double } from 'Utilities/Double';
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,
@@ -73,6 +74,22 @@ export class IosAdUnitApi extends NativeApi {
 
     public getShouldAutorotate(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
+    }
+
+    public setTransform(rotation: Double): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setTransform', [rotation]);
+    }
+
+    public getTransform(): Promise<Double> {
+        return this._nativeBridge.invoke<Double>(this._apiClass, 'getTransform');
+    }
+
+    public setViewFrame(view: string, x: Double, y: Double, width: Double, height: Double): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+    }
+
+    public getViewFrame(view: string): Promise<Double[]> {
+        return this._nativeBridge.invoke<Double[]>(this._apiClass, 'getViewFrame', [view]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {
