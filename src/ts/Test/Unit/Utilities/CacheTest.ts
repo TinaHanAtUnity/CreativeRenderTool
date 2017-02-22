@@ -239,9 +239,9 @@ describe('CacheTest', () => {
         };
 
         cacheApi.setInternet(false);
-        setTimeout(() => triggerNetwork(), 50);
-        setTimeout(() => triggerNetwork(), 100);
         setTimeout(() => triggerNetwork(), 150);
+        setTimeout(() => triggerNetwork(), 200);
+        setTimeout(() => triggerNetwork(), 350);
 
         return cacheManager.cache(testUrl).then(() => {
             assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
@@ -255,7 +255,7 @@ describe('CacheTest', () => {
 
         cacheApi.setInternet(false);
 
-        setTimeout(() => { cacheManager.stop(); }, 50);
+        setTimeout(() => cacheManager.stop(), 150);
 
         return cacheManager.cache(testUrl).then(() => {
             assert.fail('Caching should fail when stopped');
