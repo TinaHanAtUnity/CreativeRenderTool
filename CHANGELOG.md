@@ -1,3 +1,7 @@
+# Wed Feb 22 13:33:10 UTC 2017
+
+* Split screen ad unit A/B test
+
 # Tue Feb 21 11:31:53 UTC 2017
 
 * Send skip event to Kafka instead of comet
