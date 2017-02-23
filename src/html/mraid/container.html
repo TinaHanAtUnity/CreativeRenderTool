@@ -53,6 +53,8 @@
                             break;
 
                         case 'resize':
+                            window.innerWidth = event.data.width;
+                            window.innerHeight = event.data.height;
                             trigger('sizeChange', [event.data.width, event.data.height]);
                             break;
 
