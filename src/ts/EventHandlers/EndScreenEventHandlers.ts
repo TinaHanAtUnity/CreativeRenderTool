@@ -8,6 +8,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class EndScreenEventHandlers {
 
@@ -76,6 +77,12 @@ export class EndScreenEventHandlers {
                 } else if(platform === Platform.IOS) {
                     nativeBridge.UrlScheme.open(location);
                 }
+            } else {
+                Diagnostics.trigger('click_attribution_failed', {
+                    url: campaign.getClickAttributionUrl(),
+                    followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                    response: response
+                });
             }
         });
     }
