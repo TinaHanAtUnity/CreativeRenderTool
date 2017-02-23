@@ -34,4 +34,12 @@ export class Url {
 
         return null;
     }
+
+    public static isValid(url: string): boolean {
+        if(url && (url.match(/^http:./i) || url.match(/^https:./i))) {
+            return true;
+        }
+
+        return false;
+    }
 }
