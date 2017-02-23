@@ -66,6 +66,7 @@ export class EndScreenEventHandlers {
         const platform = nativeBridge.getPlatform();
 
         eventManager.clickAttributionEvent(sessionManager.getSession().getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects()).then(response => {
+            console.dir(response);
             const location = Request.getHeader(response.headers, 'location');
             if(location) {
                 if(platform === Platform.ANDROID) {
