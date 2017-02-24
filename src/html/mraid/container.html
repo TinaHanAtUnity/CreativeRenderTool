@@ -4,7 +4,7 @@
     <title>Unity Ads MRAID WebView</title>
 
     <meta charset="utf-8"/>
-    <meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
@@ -40,6 +40,9 @@
                     }
                 };
 
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
                 var setState = function(newState) {
                     state = newState;
                     trigger('stateChange', [newState]);
@@ -53,9 +56,9 @@
                             break;
 
                         case 'resize':
-                            window.innerWidth = event.data.width;
-                            window.innerHeight = event.data.height;
-                            trigger('sizeChange', [event.data.width, event.data.height]);
+                            window.innerWidth = width = event.data.width;
+                            window.innerHeight = height = event.data.height;
+                            trigger('sizeChange', [width, height]);
                             break;
 
                         default:
@@ -96,8 +99,8 @@
                     return {
                         x: 0,
                         y: 0,
-                        width: screen.width,
-                        height: screen.height
+                        width: width,
+                        height: height
                     };
                 };
 
@@ -107,8 +110,8 @@
 
                 this.getMaxSize = this.getScreenSize = function() {
                     return {
-                        width: screen.width,
-                        height: screen.height
+                        width: width,
+                        height: height
                     };
                 };
 
@@ -165,8 +168,6 @@
                 };
 
                 this.setOrientationProperties = function(properties) {
-                    console.log('setOrientationProperties');
-                    console.dir(properties);
                     orientationProperties = properties;
                     window.parent.postMessage({
                         type: 'orientation',

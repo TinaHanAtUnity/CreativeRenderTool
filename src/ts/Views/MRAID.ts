@@ -144,15 +144,25 @@ export class MRAID extends View {
     }
 
     private createMRAID(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => {
-                const mraid = MRAIDContainer.replace('<body></body>', '<body>' + xhr.responseText.replace('<script src="mraid.js"></script>', '') + '</body>');
-                resolve(mraid);
-            }, false);
-            xhr.open('GET', decodeURIComponent(this._campaign.getResourceUrl().getUrl()));
-            xhr.send();
+        return this.fetchMRAID().then(mraid => {
+            return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
         });
+    }
+
+    private fetchMRAID(): Promise<string> {
+        const resourceUrl = this._campaign.getResourceUrl();
+        if(resourceUrl) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.addEventListener('load', () => {
+                    resolve(xhr.responseText);
+                }, false);
+                xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
+                xhr.send();
+            });
+        } else {
+            return Promise.resolve(this._campaign.getResource());
+        }
     }
 
 }

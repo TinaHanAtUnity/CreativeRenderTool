@@ -16,13 +16,6 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 
-// import TestMRAID from 'html/fixtures/mraid/TestMRAID.html';
-// import TestMRAID2 from 'html/fixtures/mraid/TestMRAID2.html';
-// import SimpleTestMRAID from 'html/fixtures/mraid/SimpleTestMRAID.html';
-// import DiagnosticMRAID from 'html/fixtures/mraid/DiagnosticMRAID.html';
-// import TresensaMRAID from 'html/fixtures/mraid/TresensaMRAID.html';
-// import AarkiMRAID from 'html/fixtures/mraid/AarkiMRAID5.html';
-
 export class CampaignManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
@@ -173,7 +166,7 @@ export class CampaignManager {
 
         const abGroup = campaign.getAbGroup();
         if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource, '');
+            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
         }
         return undefined;
     }

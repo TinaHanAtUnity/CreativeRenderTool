@@ -3,16 +3,16 @@ import { Asset } from 'Models/Asset';
 
 export class MRAIDCampaign extends Campaign {
 
-    private _resourceUrl: Asset;
-    private _resource: string;
+    private _resourceUrl: Asset | undefined;
+    private _resource: string | undefined;
 
-    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl: string, resource: string) {
+    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
         super(campaign.id, gamerId, abGroup);
-        this._resourceUrl = new Asset(resourceUrl);
+        this._resourceUrl = resourceUrl ? new Asset(resourceUrl) : undefined;
         this._resource = resource;
     }
 
-    public getResourceUrl(): Asset {
+    public getResourceUrl(): Asset | undefined {
         return this._resourceUrl;
     }
 
@@ -24,7 +24,7 @@ export class MRAIDCampaign extends Campaign {
         this._resource = resource;
     }
 
-    public getResource(): string {
+    public getResource(): string | undefined {
         return this._resource;
     }
 
