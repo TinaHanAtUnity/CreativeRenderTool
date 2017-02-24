@@ -229,9 +229,7 @@ describe('CacheTest', () => {
         });
     });
 
-    it('Cache one file with repeated network failures (expect to fail)', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
-        this.timeout(60000);
-
+    it('Cache one file with repeated network failures (expect to fail)', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
@@ -241,15 +239,14 @@ describe('CacheTest', () => {
         };
 
         cacheApi.setInternet(false);
-        setTimeout(() => triggerNetwork(), 5);
-        setTimeout(() => triggerNetwork(), 10);
-        setTimeout(() => triggerNetwork(), 15);
+        setTimeout(() => triggerNetwork(), 150);
+        setTimeout(() => triggerNetwork(), 200);
+        setTimeout(() => triggerNetwork(), 350);
 
-        cacheManager.cache(testUrl).then(() => {
-            done('Cache one file with repeated network failures: caching should not be successful with no internet');
+        return cacheManager.cache(testUrl).then(() => {
+            assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
         }).catch(error => {
             assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
-            done();
         });
     });
 
@@ -258,7 +255,7 @@ describe('CacheTest', () => {
 
         cacheApi.setInternet(false);
 
-        setTimeout(() => { cacheManager.stop(); }, 5);
+        setTimeout(() => cacheManager.stop(), 150);
 
         return cacheManager.cache(testUrl).then(() => {
             assert.fail('Caching should fail when stopped');

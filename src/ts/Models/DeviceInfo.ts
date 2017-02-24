@@ -42,6 +42,7 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
     private _simulator: boolean;
+    private _statusBarHeight: number;
 
     private _nativeBridge: NativeBridge;
 
@@ -69,6 +70,7 @@ export class DeviceInfo extends Model {
             promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this._screenScale = screenScale).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this._simulator = simulator).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this._totalInternalSpace = totalSpace).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getStatusBarHeight().then(statusBarHeight => this._statusBarHeight = statusBarHeight).catch(err => this.handleDeviceInfoError(err)));
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel).catch(err => this.handleDeviceInfoError(err)));
@@ -285,6 +287,10 @@ export class DeviceInfo extends Model {
 
     public getTotalMemory(): number {
         return this._totalMemory;
+    }
+
+    public getStatusBarHeight(): number {
+        return this._statusBarHeight;
     }
 
     public getDTO(): Promise<any> {

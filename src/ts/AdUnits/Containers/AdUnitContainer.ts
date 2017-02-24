@@ -7,6 +7,12 @@ export const enum ForceOrientation {
     NONE
 }
 
+export const enum ViewConfiguration {
+    ENDSCREEN,
+    SPLIT_VIDEO_ENDSCREEN,
+    LANDSCAPE_VIDEO
+}
+
 export abstract class AdUnitContainer {
 
     public onShow: Observable0 = new Observable0(); // ad unit becomes visible
@@ -20,7 +26,7 @@ export abstract class AdUnitContainer {
 
     // currently open ad unit is only reconfigured to move from video playback to endscreen with unlocked orientation
     // in the future, when we add more options, this method should be updated to handle future use cases
-    public abstract reconfigure(): Promise<any[]>;
+    public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
     public abstract reorient(allowOrientation: boolean, forceOrientation: ForceOrientation): Promise<any[]>;
 
     public abstract isPaused(): boolean;

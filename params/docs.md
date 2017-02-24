@@ -26,13 +26,12 @@
 | encrypted | Boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | eventId | String | Unique event identifier | SDK | all |
 | deviceFreeSpace | Integer | Free space in kilobytes | SDK | all |
-| frameworkName | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
-| frameworkVersion | Integer | Unity engine version | SDK | all |
+| frameworkName | String | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | String | Unity engine version | SDK | all |
 | gameId | String | Source game identifier | App | all |
 | gamerId | String | Internal gamer identifier | Server | all |
 | language | String | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | Boolean | Boolean if user has limited tracking or not | SDK | all |
-| mediation | JSONobject | mediation data in JSON object (Will get refactored) | App | all |
 | mediationOrdinal | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | mediationName | String | Mediation provider name | Mediation | all |
 | mediationVersion | String | Mediation SDK version | Mediation | all |
@@ -64,8 +63,8 @@
 | bundleId | all | True | False | String | Bundle identifier for the app | SDK | all |
 | encrypted | all | True | False | Boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | rooted | all | True | False | Boolean | Is the device rooted or jailbroken | SDK | all |
-| frameworkName | no | True | False | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
-| frameworkVersion | no | True | False | Integer | Unity engine version | SDK | all |
+| frameworkName | no | True | False | String | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | True | False | String | Unity engine version | SDK | all |
 | adapterName | no | True | False | String | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | String | SDK version name for adapter, should be in sync with SDK version | SDK | all |
 
@@ -102,8 +101,8 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
-| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
-| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
+| frameworkName | no | False | True | String | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | String | Unity engine version | SDK | all |
 
 
 
@@ -130,8 +129,8 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
-| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
-| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
+| frameworkName | no | False | True | String | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | String | Unity engine version | SDK | all |
 
 
 
@@ -160,6 +159,6 @@
 | mediationName | no | False | True | String | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | String | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | Integer | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
-| frameworkName | no | False | True | Integer | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
-| frameworkVersion | no | False | True | Integer | Unity engine version | SDK | all |
+| frameworkName | no | False | True | String | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
+| frameworkVersion | no | False | True | String | Unity engine version | SDK | all |
 

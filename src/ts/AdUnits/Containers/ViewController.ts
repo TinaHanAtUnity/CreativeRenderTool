@@ -2,7 +2,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { Double } from 'Utilities/Double';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -78,12 +79,33 @@ export class ViewController extends AdUnitContainer {
         return this._nativeBridge.IosAdUnit.close();
     }
 
-    public reconfigure(): Promise<any[]> {
-        // currently hardcoded for moving from video playback to endscreen, will be enhanced in the future
-        return Promise.all([
-            this._nativeBridge.IosAdUnit.setViews(['webview']),
-            this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL)
-        ]);
+    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        const promises: Promise<any>[] = [];
+        const width = this._deviceInfo.getScreenWidth();
+        const height = this._deviceInfo.getScreenHeight() + this._deviceInfo.getStatusBarHeight();
+
+        switch (configuration) {
+            case ViewConfiguration.ENDSCREEN:
+                promises.push(this._nativeBridge.IosAdUnit.setViews(['webview']));
+                promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
+                break;
+
+            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
+                promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(0)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width ), new Double(height / 2)));
+                break;
+
+            case ViewConfiguration.LANDSCAPE_VIDEO:
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
+                promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679)));
+                promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
+                break;
+
+            default:
+                break;
+        }
+        return Promise.all(promises);
     }
 
     public reorient(allowOrientation: boolean, forceOrientation: ForceOrientation): Promise<any> {

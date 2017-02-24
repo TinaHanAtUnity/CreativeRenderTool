@@ -106,14 +106,14 @@
   },
   {
     "key": "frameworkName",
-    "type": "Integer",
+    "type": "String",
     "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "frameworkVersion",
-    "type": "Integer",
+    "type": "String",
     "description": "Unity engine version",
     "provider": "SDK",
     "platforms": "all"
@@ -144,13 +144,6 @@
     "type": "Boolean",
     "description": "Boolean if user has limited tracking or not",
     "provider": "SDK",
-    "platforms": "all"
-  },
-  {
-    "key": "mediation",
-    "type": "JSONobject",
-    "description": "mediation data in JSON object (Will get refactored)",
-    "provider": "App",
     "platforms": "all"
   },
   {
