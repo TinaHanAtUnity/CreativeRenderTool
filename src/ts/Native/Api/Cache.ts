@@ -109,6 +109,10 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace');
     }
 
+    public getFileContent(fileId: string, encoding: string) {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileContent', [fileId, encoding]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:

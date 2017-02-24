@@ -18,8 +18,10 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 * Added WKWebView based bridge for new iOS versions
 * Raised minimum supported Android version to 4.1 (API level 16)
+* Fixed HLS support on iOS
 * Added Android LifeCycle API
 * Added init timestamp and reinitialized flag to Sdk.loadComplete call in init
+* Added Cache.getFileContent method to Android and iOS
 * Added Android Cache.getMetaData and iOS Cache.getVideoInfo methods
 * Added Android DeviceInfo methods: getGLString, getSensorList, getBoard, getBootloader, getDevice, getHardware, getHost, getProduct and getSupportedAbis
 * Added iOS DeviceInfo methods: getGLString and getSensorList
