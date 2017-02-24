@@ -38,7 +38,7 @@ describe('AndroidAdUnitTest', () => {
         it('with all options false', () => {
             nativeBridge.setApiLevel(16); // act like Android 4.1, hw acceleration should be disabled
             return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE }).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>stub, 1, ['webview'], ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, [], SystemUiVisibility.LOW_PROFILE, false);
+                sinon.assert.calledWith(<sinon.SinonSpy>stub, 1, ['webview'], ScreenOrientation.SCREEN_ORIENTATION_LOCKED, [], SystemUiVisibility.LOW_PROFILE, false);
                 return;
             });
         });

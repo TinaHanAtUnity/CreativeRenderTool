@@ -42,10 +42,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     }
 
     public show(): Promise<void> {
-        if(this.isShowing()) {
-            return Promise.resolve();
-        }
-
         this.setShowing(true);
         this._mraid.show();
         this.onStart.trigger();
@@ -62,7 +58,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         if(!this.isShowing()) {
             return Promise.resolve();
         }
-
         this.setShowing(false);
 
         this._container.onShow.unsubscribe(this._onShowObserver);

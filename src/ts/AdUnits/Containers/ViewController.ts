@@ -23,6 +23,7 @@ export class ViewController extends AdUnitContainer {
     private _deviceInfo: DeviceInfo;
     private _showing: boolean;
     private _paused = false;
+    private _options: IIosOptions;
 
     private _onViewControllerDidAppearObserver: any;
     private _onNotificationObserver: any;
@@ -37,7 +38,8 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+        this._options = options;
         this._showing = true;
 
         let views: string[] = ['webview'];
@@ -45,22 +47,7 @@ export class ViewController extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
-        if(forceOrientation === ForceOrientation.LANDSCAPE) {
-            if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
-            } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
-            } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
-            }
-        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
-            if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
-            } else if((options.supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
-            }
-        }
+        const orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
@@ -68,7 +55,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
-        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowOrientation);
+        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowRotation);
     }
 
     public close(): Promise<void> {
@@ -108,20 +95,34 @@ export class ViewController extends AdUnitContainer {
         return Promise.all(promises);
     }
 
-    public reorient(allowOrientation: boolean, forceOrientation: ForceOrientation): Promise<any> {
-        return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowOrientation).then(() => {
-            if(forceOrientation === ForceOrientation.PORTRAIT) {
-                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN);
-            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
-                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE);
-            } else {
-                return this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL);
-            }
+    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
+        return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
+            return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options.supportedOrientations, allowRotation, forceOrientation));
         });
     }
 
     public isPaused() {
         return this._paused;
+    }
+
+    private getOrientation(supportedOrientations: UIInterfaceOrientationMask, allowRotation: boolean, forceOrientation: ForceOrientation) {
+        let orientation: UIInterfaceOrientationMask = supportedOrientations;
+        if(forceOrientation === ForceOrientation.LANDSCAPE) {
+            if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
+            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
+            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+            }
+        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
+            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) {
+                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
+            }
+        }
+        return orientation;
     }
 
     private onViewDidAppear(): void {

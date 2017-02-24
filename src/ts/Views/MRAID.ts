@@ -109,7 +109,7 @@ export class MRAID extends View {
                 } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._nativeBridge.Intent.launch({
                         'action': 'android.intent.action.VIEW',
-                        'uri': encodeURI(event.data.url)
+                        'uri': encodeURI(event.data.url) // todo: these come from 3rd party sources, should be validated before general MRAID support
                     });
                 }
                 break;
