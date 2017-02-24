@@ -36,7 +36,7 @@ export class Url {
     }
 
     public static isValid(url: string): boolean {
-        if(url && (url.match(/^http:./i) || url.match(/^https:./i))) {
+        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([!#$&-;=?-[]_a-z~]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
 
