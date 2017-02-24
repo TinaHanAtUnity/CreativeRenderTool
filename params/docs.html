@@ -24,13 +24,12 @@
 <tr><td>encrypted</td><td>Boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
 <tr><td>eventId</td><td>String</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceFreeSpace</td><td>Integer</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkName</td><td>String</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkVersion</td><td>String</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameId</td><td>String</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>gamerId</td><td>String</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>language</td><td>String</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>Boolean</td><td>Boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
-<tr><td>mediation</td><td>JSONobject</td><td>mediation data in JSON object (Will get refactored)</td><td>App</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationName</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
@@ -58,8 +57,8 @@
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>String</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>encrypted</td><td>all</td><td>True</td><td>False</td><td>Boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
 <tr><td>rooted</td><td>all</td><td>True</td><td>False</td><td>Boolean</td><td>Is the device rooted or jailbroken</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>no</td><td>True</td><td>False</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkName</td><td>no</td><td>True</td><td>False</td><td>String</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>String</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterName</td><td>no</td><td>True</td><td>False</td><td>String</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>no</td><td>True</td><td>False</td><td>String</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3> 
@@ -92,8 +91,8 @@
 <tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>String</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
@@ -116,8 +115,8 @@
 <tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>String</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
@@ -142,6 +141,6 @@
 <tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
-<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
-<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>Integer</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
+<tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>String</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
  </table></body></html>
