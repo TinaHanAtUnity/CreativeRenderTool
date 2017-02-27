@@ -51,7 +51,7 @@ export class Overlay extends View {
 
     private _progressElement: HTMLElement;
 
-    private _fullScreenButtonElement: HTMLElement;
+    private _fullScreenHitAreaElement: HTMLElement;
     private _fullScreenButtonVisible: boolean = false;
 
     private _slideTimer: any;
@@ -73,12 +73,12 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip, .skip-hit-area'
+                selector: '.skip-hit-area'
             },
             {
                 event: 'click',
                 listener: (event: Event) => this.onMuteEvent(event),
-                selector: '.mute-button, .mute-hit-area'
+                selector: '.mute-button'
             },
             {
                 event: 'click',
@@ -88,7 +88,7 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onFullScreenButtonEvent(event),
-                selector: '.full-screen-button, .full-screen-hit-area'
+                selector: '.full-screen-hit-area'
             },
             {
                 event: 'click',
@@ -101,13 +101,13 @@ export class Overlay extends View {
         super.render();
         this._headerElement = <HTMLElement>this._container.querySelector('.header');
         this._footerElement = <HTMLElement>this._container.querySelector('.footer');
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip');
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        this._fullScreenButtonElement = <HTMLElement>this._container.querySelector('.full-screen-button');
+        this._fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -169,8 +169,6 @@ export class Overlay extends View {
         if(this._muteEnabled !== value) {
             this._muteEnabled = value;
             this._muteButtonElement.style.display = value ? 'block' : 'none';
-            const muteHitAreaElement = <HTMLElement>this._container.querySelector('.mute-hit-area');
-            muteHitAreaElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -192,9 +190,7 @@ export class Overlay extends View {
 
     public setFullScreenButtonVisible(value: boolean) {
         if(this._fullScreenButtonVisible !== value) {
-            this._fullScreenButtonElement.style.display = value ? 'block' : 'none';
-            const fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
-            fullScreenHitAreaElement.style.display = value ? 'block' : 'none';
+            this._fullScreenHitAreaElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -277,9 +273,8 @@ export class Overlay extends View {
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
-            this._skipElement.style.opacity = value ? '1' : '0.4';
-            const skipHitAreaElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
-            skipHitAreaElement.style.display = value ? 'block' : 'none';
+            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
+            skipIconElement.style.opacity = value ? '1' : '0.4';
         }
     }
 

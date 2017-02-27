@@ -15,20 +15,14 @@
     top: 0
 
   .skip-hit-area
-  .mute-hit-area
-  .full-screen-hit-area
-    display: none
     position: absolute
     width: 70px
     height: 100%
 
-  .full-screen-hit-area
-    right: 0
-
   .skip
     position: absolute
     top: 50%
-    left: 2%
+    left: 10px
     width: 36px
     height: 36px
     -webkit-transform: translate(0, -50%)
@@ -49,14 +43,15 @@
   .mute-button
     position: absolute
     display: none
-    left: 2%
     top: 50%
     -webkit-transform: translate(0, -50%)
-    width: 27px
+    width: 70px
     height: 27px
 
     .mute-icon
     .unmute-icon
+      position: absolute
+      left: 10px
       font-size: 27px
 
     .unmute-icon
@@ -69,10 +64,16 @@
       .unmute-icon
         display: block
 
-  .full-screen-button
+  .full-screen-hit-area
     display: none
     position: absolute
-    right: 2%
+    right:0
+    width: 70px
+    height: 100%
+
+  .full-screen-button
+    position: absolute
+    right: 10px
     top: 50%
     width: 27px
     height: 27px
@@ -82,7 +83,7 @@
   .call-button
     display: none
     position: absolute
-    right: 2%
+    right: 10px
     top: 50%
     font-weight: bold
     -webkit-transform: translate(0, -50%)
@@ -131,7 +132,7 @@
     display: none
     position: absolute
     top: 50%
-    right: 2%
+    right: 10px
     width: 36px
     height: 36px
     -webkit-transform: translate(0, -50%)
