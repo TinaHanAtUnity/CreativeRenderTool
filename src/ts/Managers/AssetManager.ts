@@ -37,9 +37,8 @@ export class AssetManager {
 
     private cache(assets: Asset[]): Promise<any> {
         let chain = Promise.resolve();
-        for(let i = 0; i < assets.length; ++i) {
+        for(const asset of assets) {
             chain = chain.then(() => {
-                const asset = assets[i];
                 return this._cache.cache(asset.getUrl()).then(fileUrl => asset.setCachedUrl(fileUrl));
             });
         }
@@ -48,16 +47,16 @@ export class AssetManager {
 
     private validateAssets(campaign: Campaign): boolean {
         const optionalAssets = campaign.getOptionalAssets();
-        for(let i = 0; i < optionalAssets.length; ++i) {
-            if(!Url.isValid(optionalAssets[i].getUrl())) {
-                this.reportInvalidUrl(campaign, optionalAssets[i], false);
+        for(const optionalAsset of optionalAssets) {
+            if(!Url.isValid(optionalAsset.getUrl())) {
+                this.reportInvalidUrl(campaign, optionalAsset, false);
             }
         }
 
         const requiredAssets = campaign.getRequiredAssets();
-        for(let i = 0; i < requiredAssets.length; ++i) {
-            if(!Url.isValid(requiredAssets[i].getUrl())) {
-                this.reportInvalidUrl(campaign, requiredAssets[i], true);
+        for(const requiredAsset of requiredAssets) {
+            if(!Url.isValid(requiredAsset.getUrl())) {
+                this.reportInvalidUrl(campaign, requiredAsset, true);
                 return false;
             }
         }

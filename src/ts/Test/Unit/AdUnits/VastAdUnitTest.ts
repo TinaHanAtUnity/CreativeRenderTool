@@ -191,9 +191,14 @@ describe('VastAdUnit', () => {
             const mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
-            const quartilePosition = campaign.getVast().getDuration() * 0.25 * quartile * 1000;
-            vastAdUnit.sendProgressEvents(eventManager, '123', 'sdkVersion', quartilePosition + 100, quartilePosition - 100);
-            mockEventManager.verify();
+            const duration = campaign.getVast().getDuration();
+            if(!duration) {
+                assert.fail('Missing duration in VAST ad');
+            } else {
+                const quartilePosition = duration * 0.25 * quartile * 1000;
+                vastAdUnit.sendProgressEvents(eventManager, '123', 'sdkVersion', quartilePosition + 100, quartilePosition - 100);
+                mockEventManager.verify();
+            }
         };
 
         it('sends first quartile events from VAST', () => {

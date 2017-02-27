@@ -56,7 +56,7 @@ class TestStorageApi extends StorageApi {
 }
 
 class TestRequestApi extends RequestApi {
-    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+    public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
             this.onComplete.trigger(id, url, '{"assetCaching": "forced", "placements": []}', 200, []);
@@ -64,7 +64,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+    public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             this.onComplete.trigger(id, url, '{}', 200, []);
         }, 1);

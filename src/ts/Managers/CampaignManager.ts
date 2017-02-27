@@ -284,7 +284,7 @@ export class CampaignManager {
             });
         }
 
-        const promises: Promise<any>[] = [];
+        const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this.fetchGamerId());
@@ -301,7 +301,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(): Promise<string> {
-        const promises: Promise<any>[] = [];
+        const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
@@ -322,7 +322,7 @@ export class CampaignManager {
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
 
-            const metaDataPromises: Promise<any>[] = [];
+            const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
             metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
 

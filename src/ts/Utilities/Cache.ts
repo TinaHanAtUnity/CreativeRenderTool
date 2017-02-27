@@ -26,7 +26,7 @@ export interface ICacheResponse {
     totalSize: number;
     duration: number;
     responseCode: number;
-    headers: [string, string][];
+    headers: Array<[string, string]>;
 }
 
 interface ICallbackObject {
@@ -150,10 +150,8 @@ export class Cache {
                 return n2.mtime - n1.mtime;
             });
 
-            for(let i = 0; i < files.length; i++) {
-                const file: IFileInfo = files[i];
+            for(const file of files) {
                 totalSize += file.size;
-
                 if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
                 }
@@ -165,7 +163,7 @@ export class Cache {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
             }
 
-            const promises: Promise<any>[] = [];
+            const promises: Array<Promise<any>> = [];
 
             deleteFiles.map(file => {
                 promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file));
@@ -273,7 +271,7 @@ export class Cache {
         delete this._callbacks[url];
     }
 
-    private createCacheResponse(fullyDownloaded: boolean, url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): ICacheResponse {
+    private createCacheResponse(fullyDownloaded: boolean, url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): ICacheResponse {
         return {
             fullyDownloaded: fullyDownloaded,
             url: url,
@@ -301,7 +299,7 @@ export class Cache {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
-    private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: [string, string][]): void {
+    private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: Array<[string, string]>): void {
         if(size === 0) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
         }
@@ -311,7 +309,7 @@ export class Cache {
         this._nativeBridge.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
     }
 
-    private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
+    private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): void {
         const callback = this._callbacks[url];
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
@@ -354,7 +352,7 @@ export class Cache {
         }
     }
 
-    private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: [string, string][]): void {
+    private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): void {
         const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));

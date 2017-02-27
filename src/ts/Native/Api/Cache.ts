@@ -28,10 +28,10 @@ export interface IFileInfo {
 
 export class CacheApi extends NativeApi {
 
-    public onDownloadStarted: Observable5<string, number, number, number, [string, string][]> = new Observable5();
+    public onDownloadStarted: Observable5<string, number, number, number, Array<[string, string]>> = new Observable5();
     public onDownloadProgress: Observable3<string, number, number> = new Observable3();
-    public onDownloadEnd: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
-    public onDownloadStopped: Observable6<string, number, number, number, number, [string, string][]> = new Observable6();
+    public onDownloadEnd: Observable6<string, number, number, number, number, Array<[string, string]>> = new Observable6();
+    public onDownloadStopped: Observable6<string, number, number, number, number, Array<[string, string]>> = new Observable6();
     public onDownloadError: Observable3<string, string, string> = new Observable3();
 
     constructor(nativeBridge: NativeBridge) {
