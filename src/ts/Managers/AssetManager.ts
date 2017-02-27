@@ -2,6 +2,8 @@ import { Cache } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Asset';
+import { Url } from 'Utilities/Url';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class AssetManager {
 
@@ -14,6 +16,10 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
+        if(!this.validateAssets(campaign)) {
+            throw new Error('Invalid required assets in campaign ' + campaign.getId());
+        }
+
         if(this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
@@ -40,4 +46,30 @@ export class AssetManager {
         return chain;
     }
 
+    private validateAssets(campaign: Campaign): boolean {
+        const optionalAssets = campaign.getOptionalAssets();
+        for(let i = 0; i < optionalAssets.length; ++i) {
+            if(!Url.isValid(optionalAssets[i].getUrl())) {
+                this.reportInvalidUrl(campaign, optionalAssets[i], false);
+            }
+        }
+
+        const requiredAssets = campaign.getRequiredAssets();
+        for(let i = 0; i < requiredAssets.length; ++i) {
+            if(!Url.isValid(requiredAssets[i].getUrl())) {
+                this.reportInvalidUrl(campaign, requiredAssets[i], true);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private reportInvalidUrl(campaign: Campaign, asset: Asset, required: boolean): void {
+        Diagnostics.trigger('invalid_asset_url', {
+            url: asset.getUrl(),
+            required: required,
+            id: campaign.getId()
+        });
+    }
 }
