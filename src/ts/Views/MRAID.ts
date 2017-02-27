@@ -46,6 +46,7 @@ export class MRAID extends View {
 
     public render() {
         const iframe: any = this._iframe = <HTMLIFrameElement>document.createElement('iframe');
+        iframe.sandbox = 'allow-scripts';
         iframe.id = this._id;
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
