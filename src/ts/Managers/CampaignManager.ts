@@ -168,14 +168,14 @@ export class CampaignManager {
             case '583dfc667f448e630ac6a4bc':
                 playable = 'https://cdn.unityads.unity3d.com/playables/SMA_android/index_android.html';
                 break;
-                
+
             // Mobile Strike New    
             case '58a76c09555c810c2a8e39c5':
             case '58a76c420dcfec0d2e6a330f':
             case '58a76d3a4aa1a602cab267f5':
             case '58a76d682a7bcd02fc215ce7':
             case '58a76d463aad520d2e3e9b12':
-                playable = 'http://10.35.4.62:8000/playables/sma_re2.0.0/index.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/sma_re2.0.0/index.html';
                 break;
 
             // Game Of War New
@@ -185,7 +185,7 @@ export class CampaignManager {
             case '58a77336fd228b040a141fae':
             case '58a7733c74bfe00d60012223':
             case '58a77332275cc301e4961df7':
-                playable = 'http://10.35.4.62:8000/playables/sg_re2.0.0/index.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/sg_re2.0.0/index.html';
                 break;
 
             default:
