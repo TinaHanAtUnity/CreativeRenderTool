@@ -130,20 +130,29 @@ export class CampaignManager {
 
     private parseMRAIDCampaign(json: any): MRAIDCampaign | undefined {
         const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-        let resource: string | undefined;
-        switch(campaign.getId()) {
+        const resource = this.selectPlayable(campaign.getId());
+        const abGroup = campaign.getAbGroup();
+        if(resource && abGroup !== 6 && abGroup !== 7) {
+            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
+        }
+        return undefined;
+    }
+
+    private selectPlayable(campaignId: string): string | undefined {
+        let playable = undefined;
+        switch(campaignId) {
             // Game of War iOS
             case '583dfda0d933a3630a53249c':
             case '583dfd52abb1feee0909882b':
             case '583dfd45669a903e086e38d2':
             case '583dfd4c9ceadb4708b021de':
-                resource = 'https://cdn.unityads.unity3d.com/playables/SG_ios/index_ios.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/SG_ios/index_ios.html';
                 break;
 
             // Game of War Android
             case '583dfca5a93bfa6700d8c6f3':
             case '583dfcb54622865a0a246bdf':
-                resource = 'https://cdn.unityads.unity3d.com/playables/SG_android/index_android.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/SG_android/index_android.html';
                 break;
 
             // Mobile Strike iOS
@@ -151,24 +160,38 @@ export class CampaignManager {
             case '583dfe483fe2166c0ac9e6fb':
             case '583dfba09bfc2a2d0a9a0b1c':
             case '583dfba69d308fe203d7d740':
-                resource = 'https://cdn.unityads.unity3d.com/playables/SMA_ios/index_ios.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/SMA_ios/index_ios.html';
                 break;
 
             // Mobile Strike Android
             case '583dfc532e4d9b5008c934d1':
             case '583dfc667f448e630ac6a4bc':
-                resource = 'https://cdn.unityads.unity3d.com/playables/SMA_android/index_android.html';
+                playable = 'https://cdn.unityads.unity3d.com/playables/SMA_android/index_android.html';
+                break;
+                
+            // Mobile Strike New    
+            case '58a76c09555c810c2a8e39c5':
+            case '58a76c420dcfec0d2e6a330f':
+            case '58a76d3a4aa1a602cab267f5':
+            case '58a76d682a7bcd02fc215ce7':
+            case '58a76d463aad520d2e3e9b12':
+                playable = 'http://10.35.4.62:8000/playables/sma_re2.0.0/index.html';
+                break;
+
+            // Game Of War New
+            case '58a76d9c3cdb870c48dae64a':
+            case '58a76da1e34fef0c345fd968':
+            case '58a76da807b3690d1af35ff6':
+            case '58a77336fd228b040a141fae':
+            case '58a7733c74bfe00d60012223':
+            case '58a77332275cc301e4961df7':
+                playable = 'http://10.35.4.62:8000/playables/sg_re2.0.0/index.html';
                 break;
 
             default:
                 break;
         }
-
-        const abGroup = campaign.getAbGroup();
-        if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
-        }
-        return undefined;
+        return playable;
     }
 
     private parseVastCampaign(json: any): Promise<void> {
