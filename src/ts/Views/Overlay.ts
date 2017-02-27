@@ -73,12 +73,12 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip'
+                selector: '.skip, .skip-hit-area'
             },
             {
                 event: 'click',
                 listener: (event: Event) => this.onMuteEvent(event),
-                selector: '.mute-button'
+                selector: '.mute-button, .mute-hit-area'
             },
             {
                 event: 'click',
@@ -88,7 +88,7 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onFullScreenButtonEvent(event),
-                selector: '.full-screen-button'
+                selector: '.full-screen-button, .full-screen-hit-area'
             },
             {
                 event: 'click',
@@ -169,6 +169,8 @@ export class Overlay extends View {
         if(this._muteEnabled !== value) {
             this._muteEnabled = value;
             this._muteButtonElement.style.display = value ? 'block' : 'none';
+            const muteHitAreaElement = <HTMLElement>this._container.querySelector('.mute-hit-area');
+            muteHitAreaElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -191,6 +193,8 @@ export class Overlay extends View {
     public setFullScreenButtonVisible(value: boolean) {
         if(this._fullScreenButtonVisible !== value) {
             this._fullScreenButtonElement.style.display = value ? 'block' : 'none';
+            const fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
+            fullScreenHitAreaElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -274,6 +278,8 @@ export class Overlay extends View {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
             this._skipElement.style.opacity = value ? '1' : '0.4';
+            const skipHitAreaElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
+            skipHitAreaElement.style.display = value ? 'block' : 'none';
         }
     }
 
