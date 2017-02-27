@@ -1,7 +1,7 @@
 import { MetaData } from 'Utilities/MetaData';
 
 export class TestEnvironment {
-    public static setup(metaData: MetaData): Promise<void[]> {
+    public static setup(metaData: MetaData): Promise<string[]> {
         return metaData.getKeys('test').then(keys => {
             const promises: any[] = [];
             for(const key in keys) {
@@ -13,7 +13,7 @@ export class TestEnvironment {
                     }));
                 }
             }
-            return promises;
+            return Promise.all(promises);
         });
     }
 
