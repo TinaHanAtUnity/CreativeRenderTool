@@ -183,7 +183,7 @@
   },
   {
     "key": "networkType",
-    "type": "String",
+    "type": "Integer",
     "description": "Detailed cellular network type",
     "provider": "SDK",
     "platforms": "all"
