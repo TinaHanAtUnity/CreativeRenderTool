@@ -33,13 +33,13 @@ class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
         if(storageType === StorageType.PUBLIC) {
             if(key === 'framework.name.value') {
-                return Promise.resolve(<any>['Unity']);
+                return Promise.resolve(<any>'Unity');
             } else if(key === 'framework.version.value') {
-                return Promise.resolve(<any>['1.2.3']);
+                return Promise.resolve(<any>'1.2.3');
             } else if(key === 'adapter.name.value') {
-                return Promise.resolve(<any>['AssetStore']);
+                return Promise.resolve(<any>'AssetStore');
             } else if(key === 'adapter.version.value') {
-                return Promise.resolve(<any>['2.0.0']);
+                return Promise.resolve(<any>'2.0.0');
             }
         }
         return Promise.reject(['COULDNT_GET_VALUE', key]);
