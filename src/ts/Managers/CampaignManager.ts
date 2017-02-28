@@ -369,7 +369,6 @@ export class CampaignManager {
         if(typeof value === expectedType) {
             return value;
         } else {
-            console.log('JNIDEBUG TYPE MISMATCH! field: ' + field + ' expected type: ' + expectedType + ' value: ' + JSON.stringify(value) + ' observedType: ' + typeof value);
             Diagnostics.trigger('campaign_request_type_error', {
                 field: field,
                 value: JSON.stringify(value),

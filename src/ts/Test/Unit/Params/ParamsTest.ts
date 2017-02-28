@@ -105,9 +105,12 @@ class SpecVerifier {
         if(this._queryParams) {
             for(let i: number = 0; i < this._queryParams.length; i++) {
                 const paramName: string = this._queryParams[i].split('=')[0];
+                const paramValue: any = this._queryParams[i].split('=')[1];
 
                 assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
+
+                this.assertQueryParamType(paramName, paramValue);
             }
         }
 
@@ -116,6 +119,7 @@ class SpecVerifier {
                 if(this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
+                    this.assertBodyParamType(key, this._bodyParams[key]);
                 }
             }
         }
@@ -144,6 +148,23 @@ class SpecVerifier {
                 }
             }
         }
+    }
+
+    private assertQueryParamType(name: string, value: string): void {
+        if(this._spec[name].type === 'boolean') {
+            assert.match(value, /(true|false)/i, 'Query parameter type mismatch: ' + name);
+        } else if(this._spec[name].type === 'number') {
+            assert.match(value, /[0-9]+/, 'Query parameter type mismatch: ' + name);
+        } else if(this._spec[name].type === 'string') {
+            // due to lack of better alternatives check that string has legal URL characters
+            assert.match(value, /^([\!\#\$\&-\;\=\?-\[\]_a-z\~]|%[0-9a-fA-F]{2})+$/i, 'Query parameter type mismatch: ' + name);
+        } else {
+            assert.fail('Query parameter ' + name + ' with unknown type: ' + this._spec[name].type);
+        }
+    }
+
+    private assertBodyParamType(name: string, value: any): void {
+        assert.equal(this._spec[name].type, typeof value, 'Body parameter type mismatch: ' + name);
     }
 
     private isRequired(required: string): boolean {

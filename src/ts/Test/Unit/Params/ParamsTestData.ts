@@ -29,11 +29,11 @@ interface IRawEventJson {
 }
 
 interface IRawParamDesc {
-    key: string,
-    type: string,
-    description: string,
-    provider: string,
-    platforms: string
+    key: string;
+    type: string;
+    description: string;
+    provider: string;
+    platforms: string;
 }
 
 export class ParamsTestData {
