@@ -253,7 +253,7 @@
   },
   {
     "key": "sdkVersion",
-    "type": "String",
+    "type": "Integer",
     "description": "SDK version in four digits",
     "provider": "SDK",
     "platforms": "all"

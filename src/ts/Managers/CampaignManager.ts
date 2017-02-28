@@ -249,7 +249,7 @@ export class CampaignManager {
             screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
             screenWidth: this.getParameter('screenWidth', this._deviceInfo.getScreenWidth(), 'number'),
             screenHeight: this.getParameter('screenHeight', this._deviceInfo.getScreenHeight(), 'number'),
-            sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'string'),
+            sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'number'),
             screenSize: this.getParameter('screenSize', this._deviceInfo.getScreenLayout(), 'number')
         });
 
