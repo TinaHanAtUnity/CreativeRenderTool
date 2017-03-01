@@ -1,3 +1,9 @@
+# Wed Mar  1 13:25:48 UTC 2017
+
+* Remove split screen ad unit A/B test
+* Add hit areas for overlay buttons
+* Fix campaign request parameters
+
 # Mon Feb 27 13:12:02 UTC 2017
 
 * Fix click attribution
