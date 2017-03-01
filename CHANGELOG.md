@@ -1,3 +1,9 @@
+# Mon Feb 27 13:12:02 UTC 2017
+
+* Fix click attribution
+* Simple validation of campaign asset URLs (videos, endscreen images)
+* Refactor test metadata fetching
+
 # Wed Feb 22 13:33:10 UTC 2017
 
 * Split screen ad unit A/B test
