@@ -279,6 +279,13 @@
     "provider": "SDK",
     "platforms": "all"
   },
+    {
+    "key": "stores",
+    "type": "string",
+    "description": "List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')",
+    "provider": "SDK",
+    "platforms": "all"
+  },
   {
     "key": "test",
     "type": "boolean",

@@ -2,6 +2,12 @@ import { Campaign } from 'Models/Campaign';
 import { Asset } from 'Models/Asset';
 import { Video } from 'Models/Video';
 
+export enum StoreName {
+    APPLE,
+    GOOGLE,
+    XIAOMI
+}
+
 export class PerformanceCampaign extends Campaign {
 
     private _appStoreId: string;
@@ -24,6 +30,8 @@ export class PerformanceCampaign extends Campaign {
     private _clickAttributionUrlFollowsRedirects: boolean;
 
     private _bypassAppSheet: boolean;
+
+    private _store: StoreName;
 
     constructor(campaign: any, gamerId: string, abGroup: number) {
         super(campaign.id, gamerId, abGroup);
@@ -48,6 +56,25 @@ export class PerformanceCampaign extends Campaign {
         this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
 
         this._bypassAppSheet = campaign.bypassAppSheet;
+
+        const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
+        switch(campaignStore) {
+            case 'apple':
+                this._store = StoreName.APPLE;
+                break;
+            case 'google':
+                this._store = StoreName.GOOGLE;
+                break;
+            case 'xiaomi':
+                this._store = StoreName.XIAOMI;
+                break;
+            default:
+                throw new Error('Unknown store value "' + campaign.store + '"');
+        }
+    }
+
+    public getStore(): StoreName {
+        return this._store;
     }
 
     public getAppStoreId(): string {

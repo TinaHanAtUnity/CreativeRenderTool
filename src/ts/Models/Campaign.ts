@@ -8,12 +8,12 @@ export abstract class Campaign {
     private _timeout: number;
     private _willExpireAt: number;
 
-    constructor(id: string, gamerId: string, abGroup: number, timeout?: number) {
+    constructor(id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
         this._id = id;
         this._gamerId = gamerId;
         this._abGroup = abGroup;
         this._timeout = typeof timeout !== 'undefined' ? timeout : 0;
-        if(this._timeout) {
+        if (this._timeout) {
             this._willExpireAt = Date.now() + timeout * 1000;
         }
     }
