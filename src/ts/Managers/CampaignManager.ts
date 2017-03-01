@@ -369,7 +369,8 @@ export class CampaignManager {
         if(typeof value === expectedType) {
             return value;
         } else {
-            Diagnostics.trigger('campaign_request_type_error', {
+            Diagnostics.trigger('internal_type_error', {
+                context: 'campaign_request',
                 field: field,
                 value: JSON.stringify(value),
                 expectedType: expectedType,
