@@ -65,7 +65,7 @@ describe('VastAdUnit', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
-            vastAdUnit.sendTrackingEvent(eventManager, 'eventName', 'sessionId', 'sdkVersion');
+            vastAdUnit.sendTrackingEvent(eventManager, 'eventName', 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast eventName', 'sessionId', 'http://foo.biz/' + placement.getId() + '/123');
@@ -77,10 +77,10 @@ describe('VastAdUnit', () => {
             const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
-            vastAdUnit.sendTrackingEvent(eventManager, 'start', 'sessionId', 'sdkVersion');
+            vastAdUnit.sendTrackingEvent(eventManager, 'start', 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast start', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/' + placement.getId() + '/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=sdkVersion');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast start', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/' + placement.getId() + '/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
         });
     });
 
@@ -97,7 +97,7 @@ describe('VastAdUnit', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 1234);
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
         });
@@ -105,28 +105,28 @@ describe('VastAdUnit', () => {
         it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
             const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/sdkVersion/456');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/1234/456');
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=sdkVersion');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
         });
 
         it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 'sdkVersion');
+            vastAdUnit.sendImpressionEvent(eventManager, 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>eventManager.thirdPartyEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/sdkVersion/456');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/1234/456');
         });
     });
 
@@ -173,14 +173,14 @@ describe('VastAdUnit', () => {
         it('should call video click tracking url', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent(eventManager, 'foo', 'sdkVersion');
+            vastAdUnit.sendVideoClickTrackingEvent(eventManager, 'foo', 1234);
             sinon.assert.calledTwice(<sinon.SinonSpy>eventManager.thirdPartyEvent);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns([]);
             sandbox.stub(eventManager, 'thirdPartyEvent').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent(eventManager, 'foo', 'sdkVersion');
+            vastAdUnit.sendVideoClickTrackingEvent(eventManager, 'foo', 1234);
             sinon.assert.notCalled(<sinon.SinonSpy>eventManager.thirdPartyEvent);
         });
     });
@@ -192,7 +192,7 @@ describe('VastAdUnit', () => {
             mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
             const quartilePosition = campaign.getVast().getDuration() * 0.25 * quartile * 1000;
-            vastAdUnit.sendProgressEvents(eventManager, '123', 'sdkVersion', quartilePosition + 100, quartilePosition - 100);
+            vastAdUnit.sendProgressEvents(eventManager, '123', 1234, quartilePosition + 100, quartilePosition - 100);
             mockEventManager.verify();
         };
 
@@ -221,7 +221,7 @@ describe('VastAdUnit', () => {
             const mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
-            vastAdUnit.sendVideoClickTrackingEvent(eventManager, '123', 'sdkVersion');
+            vastAdUnit.sendVideoClickTrackingEvent(eventManager, '123', 1234);
             mockEventManager.verify();
         });
     });
