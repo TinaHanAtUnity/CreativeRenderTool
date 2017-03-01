@@ -20,6 +20,8 @@ export class Placement {
     private _useDeviceOrientationForVideo: boolean;
     private _muteVideo: boolean;
 
+    private _state: PlacementState;
+
     constructor(data: any) {
         this._id = data.id;
         this._name = data.name;
@@ -32,6 +34,8 @@ export class Placement {
 
         this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
         this._muteVideo = data.muteVideo;
+
+        this._state = PlacementState.NOT_AVAILABLE;
     }
 
     public getId(): string {
@@ -65,4 +69,12 @@ export class Placement {
     public muteVideo(): boolean {
         return this._muteVideo;
     }
-}
+
+    public getState(): PlacementState {
+        return this._state;
+    }
+
+    public setState(state: PlacementState): void {
+        this._state = state;
+    }
+ }
