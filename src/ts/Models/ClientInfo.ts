@@ -9,7 +9,7 @@ export class ClientInfo extends Model {
 
     private _applicationName: string;
     private _applicationVersion: string;
-    private _sdkVersion: string;
+    private _sdkVersion: number;
     private _sdkVersionName: string;
 
     private _platform: Platform;
@@ -68,7 +68,7 @@ export class ClientInfo extends Model {
         return this._applicationName;
     }
 
-    public getSdkVersion(): string {
+    public getSdkVersion(): number {
         return this._sdkVersion;
     }
 

@@ -20,6 +20,7 @@ export class Tap {
     }
 
     private onTouchStart(event: TouchEvent) {
+        event.stopPropagation();
         event.preventDefault();
 
         this._onTouchMoveListener = (touchEvent) => this.onTouchMove(touchEvent);

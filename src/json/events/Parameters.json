@@ -1,301 +1,301 @@
 [
   {
     "key": "adapterName",
-    "type": "String",
+    "type": "string",
     "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "adapterVersion",
-    "type": "String",
+    "type": "string",
     "description": "SDK version name for adapter, should be in sync with SDK version",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "advertisingTrackingId",
-    "type": "String",
+    "type": "string",
     "description": "Advertising identifier in raw format",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "androidId",
-    "type": "String",
+    "type": "string",
     "description": "Android ID",
     "provider": "SDK",
     "platforms": "android"
   },
   {
     "key": "apiLevel",
-    "type": "Integer",
+    "type": "number",
     "description": "Android device API level",
     "provider": "SDK",
     "platforms": "android"
   },
   {
     "key": "bundleId",
-    "type": "String",
+    "type": "string",
     "description": "Bundle identifier for the app",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "bundleVersion",
-    "type": "String",
+    "type": "string",
     "description": "Game version",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "cached",
-    "type": "Boolean",
+    "type": "boolean",
     "description": "If video is cached or streamed",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "campaignId",
-    "type": "String",
+    "type": "string",
     "description": "Internal campaign identifier",
     "provider": "Server",
     "platforms": "all"
   },
   {
     "key": "connectionType",
-    "type": "String",
+    "type": "string",
     "description": "\"wifi\", \"cellular\" or \"none\"",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "deviceMake",
-    "type": "String",
+    "type": "string",
     "description": "Android device manufacturer",
     "provider": "SDK",
     "platforms": "android"
   },
   {
     "key": "deviceModel",
-    "type": "String",
+    "type": "string",
     "description": "Android or iOS device model, example 'iPhone7,1'",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "encrypted",
-    "type": "Boolean",
+    "type": "boolean",
     "description": "If true, app is encrypted for app store distribution and game is live",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "eventId",
-    "type": "String",
+    "type": "string",
     "description": "Unique event identifier",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "deviceFreeSpace",
-    "type": "Integer",
+    "type": "number",
     "description": "Free space in kilobytes",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "frameworkName",
-    "type": "String",
+    "type": "string",
     "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "frameworkVersion",
-    "type": "String",
+    "type": "string",
     "description": "Unity engine version",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "gameId",
-    "type": "String",
+    "type": "string",
     "description": "Source game identifier",
     "provider": "App",
     "platforms": "all"
   },
   {
     "key": "gamerId",
-    "type": "String",
+    "type": "string",
     "description": "Internal gamer identifier",
     "provider": "Server",
     "platforms": "all"
   },
   {
     "key": "language",
-    "type": "String",
+    "type": "string",
     "description": "Device language code (e.g. en_US or fr_CA)",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "limitAdTracking",
-    "type": "Boolean",
-    "description": "Boolean if user has limited tracking or not",
+    "type": "boolean",
+    "description": "boolean if user has limited tracking or not",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "mediationOrdinal",
-    "type": "Integer",
+    "type": "number",
     "description": "Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5",
     "provider": "Mediation",
     "platforms": "all"
   },
   {
     "key": "mediationName",
-    "type": "String",
+    "type": "string",
     "description": "Mediation provider name",
     "provider": "Mediation",
     "platforms": "all"
   },
   {
     "key": "mediationVersion",
-    "type": "String",
+    "type": "string",
     "description": "Mediation SDK version",
     "provider": "Mediation",
     "platforms": "all"
   },
   {
     "key": "networkOperator",
-    "type": "String",
+    "type": "string",
     "description": "MCC + MNC codes",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "networkOperatorName",
-    "type": "String",
+    "type": "string",
     "description": "Cell network operator name",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "networkType",
-    "type": "String",
+    "type": "number",
     "description": "Detailed cellular network type",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "osVersion",
-    "type": "String",
+    "type": "string",
     "description": "Device operating system version",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "placementId",
-    "type": "String",
+    "type": "string",
     "description": "Internal placement identifier",
     "provider": "Admin",
     "platforms": "all"
   },
   {
     "key": "platform",
-    "type": "String",
+    "type": "string",
     "description": "\"android\" or \"ios\"",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "redirect",
-    "type": "Boolean",
+    "type": "boolean",
     "description": "Legacy parameter, always false",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "rooted",
-    "type": "Boolean",
+    "type": "boolean",
     "description": "Is the device rooted or jailbroken",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "screenDensity",
-    "type": "Integer",
+    "type": "number",
     "description": "Screen density in DPI",
     "provider": "SDK",
     "platforms": "android"
   },
   {
     "key": "screenHeight",
-    "type": "Integer",
+    "type": "number",
     "description": "Screen height in pixels",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "screenSize",
-    "type": "Integer",
+    "type": "number",
     "description": "Android raw screen layout value",
     "provider": "SDK",
     "platforms": "android"
   },
   {
     "key": "screenWidth",
-    "type": "Integer",
+    "type": "number",
     "description": "Screen width in pixels",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "sdkVersion",
-    "type": "String",
+    "type": "number",
     "description": "SDK version in four digits",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "sessionId",
-    "type": "String",
+    "type": "string",
     "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "sid",
-    "type": "String",
+    "type": "string",
     "description": "Server side reward callback id",
     "provider": "App",
     "platforms": "all"
   },
   {
     "key": "skippedAt",
-    "type": "Integer",
+    "type": "number",
     "description": "Milliseconds from video start to video skip",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "test",
-    "type": "Boolean",
+    "type": "boolean",
     "description": "Test mode",
     "provider": "App",
     "platforms": "all"
   },
   {
     "key": "timeZone",
-    "type": "String",
+    "type": "string",
     "description": "Current timezone",
     "provider": "SDK",
     "platforms": "all"
   },
   {
     "key": "webviewUa",
-    "type": "String",
+    "type": "string",
     "description": "WebView user agent string",
     "provider": "SDK",
     "platforms": "all"
