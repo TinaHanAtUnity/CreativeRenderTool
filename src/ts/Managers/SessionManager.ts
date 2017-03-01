@@ -6,9 +6,9 @@ import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { INativeResponse } from 'Utilities/Request';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -211,7 +211,25 @@ export class SessionManager {
             if(videoProgress) {
                 infoJson.skippedAt = videoProgress;
             }
-            this._eventManager.operativeEvent('skip', id, this._currentSession.getId(), this.createVideoEventUrl(adUnit, 'video_skip'), JSON.stringify(infoJson));
+
+            // todo: clears duplicate data for httpkafka, should be cleaned up
+            delete infoJson.eventId;
+            delete infoJson.apiLevel;
+            delete infoJson.advertisingTrackingId;
+            delete infoJson.limitAdTracking;
+            delete infoJson.osVersion;
+            delete infoJson.sid;
+            delete infoJson.deviceMake;
+            delete infoJson.deviceModel;
+            delete infoJson.sdkVersion;
+            delete infoJson.webviewUa;
+            delete infoJson.networkType;
+            delete infoJson.connectionType;
+
+            infoJson.id = id;
+            infoJson.ts = (new Date()).toISOString();
+
+            HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
@@ -232,22 +250,12 @@ export class SessionManager {
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
-    public sendClick(adUnit: AbstractAdUnit): Promise<INativeResponse> {
-        const campaign = adUnit.getCampaign();
-
+    public sendClick(adUnit: AbstractAdUnit): Promise<void> {
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
-        this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
-
-        if(campaign instanceof PerformanceCampaign) {
-            if(campaign.getClickAttributionUrl()) {
-                return this._eventManager.clickAttributionEvent(this._currentSession.getId(), campaign.getClickAttributionUrl(), campaign.getClickAttributionUrlFollowsRedirects());
-            }
-        }
-
-        return Promise.reject('Missing click attribution url');
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
     }
 
     public setGamerServerId(serverId: string): void {

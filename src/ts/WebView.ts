@@ -21,7 +21,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
-import { MetaData } from 'Utilities/MetaData';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
@@ -33,6 +32,8 @@ import { WebViewError } from 'Errors/WebViewError';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { MetaData } from 'Utilities/MetaData';
 
 export class WebView {
 
@@ -397,63 +398,47 @@ export class WebView {
      TEST HELPERS
      */
 
-    private setupTestEnvironment(): void {
-        const metaData: MetaData = new MetaData(this._nativeBridge);
-
-        metaData.get<string>('test.serverUrl', true).then(([found, url]) => {
-            if(found && url) {
-                ConfigManager.setTestBaseUrl(url);
-                CampaignManager.setTestBaseUrl(url);
-                SessionManager.setTestBaseUrl(url);
+    private setupTestEnvironment(): Promise<void> {
+        return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
+            if(TestEnvironment.get('serverUrl')) {
+                ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                CampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
             }
-        });
 
-        metaData.get<string>('test.kafkaUrl', true).then(([found, url]) => {
-            if(found && url) {
-                HttpKafka.setTestBaseUrl(url);
+            if(TestEnvironment.get('kafkaUrl')) {
+                HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
             }
-        });
 
-        metaData.get<string>('test.abGroup', true).then(([found, abGroup]) => {
-            if(found && typeof abGroup === 'number') {
-                CampaignManager.setAbGroup(abGroup);
+            if(TestEnvironment.get('abGroup')) {
+                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
             }
-        });
 
-        metaData.get<string>('test.campaignId', true).then(([found, campaignId]) => {
-            if(found && typeof campaignId === 'string') {
-                CampaignManager.setCampaignId(campaignId);
+            if(TestEnvironment.get('campaignId')) {
+                CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
             }
-        });
 
-        metaData.get<string>('test.country', true).then(([found, country]) => {
-            if(found && typeof country === 'string') {
-                CampaignManager.setCountry(country);
+            if(TestEnvironment.get('country')) {
+                CampaignManager.setCountry(TestEnvironment.get('country'));
             }
-        });
 
-        metaData.get<boolean>('test.autoSkip', true).then(([found, autoSkip]) => {
-            if(found && autoSkip !== null) {
-                Overlay.setAutoSkip(autoSkip);
+            if(TestEnvironment.get('autoSkip')) {
+                Overlay.setAutoSkip(TestEnvironment.get('autoSkip'));
             }
-        });
 
-        metaData.get<boolean>('test.autoClose', false).then(([found, autoClose]) => {
-            if(found && autoClose) {
-                AbstractAdUnit.setAutoClose(autoClose);
+            if(TestEnvironment.get('autoClose')) {
+                AbstractAdUnit.setAutoClose(TestEnvironment.get('autoClose'));
             }
-        });
 
-        metaData.get<number>('test.autoCloseDelay', false).then(([found, autoCloseDelay]) => {
-            if(found && typeof autoCloseDelay === 'number') {
-                AbstractAdUnit.setAutoCloseDelay(autoCloseDelay);
+            if(TestEnvironment.get('autoCloseDelay')) {
+                AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
             }
-        });
 
-        metaData.get<string>('test.campaignResponse', false).then(([found, campaignResponse]) => {
-            if(found && typeof campaignResponse === 'string') {
-                CampaignManager.setCampaignResponse(campaignResponse);
+            if(TestEnvironment.get('campaignResponse')) {
+                CampaignManager.setCampaignResponse(TestEnvironment.get('campaignResponse'));
             }
+
+            return;
         });
     }
 }

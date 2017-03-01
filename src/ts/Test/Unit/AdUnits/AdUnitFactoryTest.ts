@@ -16,8 +16,8 @@ import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
 
-import {VastAdUnit} from 'AdUnits/VastAdUnit';
-import {PerformanceAdUnit} from 'AdUnits/PerformanceAdUnit';
+import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 

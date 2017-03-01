@@ -38,6 +38,7 @@ export class TestFixtures {
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',
+            2000,
             '2.0.0-alpha2',
             true,
             'http://example.com/config.json',

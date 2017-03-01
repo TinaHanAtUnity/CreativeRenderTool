@@ -18,6 +18,7 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { StoreName } from "Models/PerformanceCampaign";
+import { Session } from 'Models/Session';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -34,7 +35,7 @@ describe('EndScreenEventHandlersTest', () => {
             nativeBridge = new NativeBridge({
                 handleInvocation,
                 handleCallback
-            });
+            }, Platform.ANDROID);
 
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             overlay = <Overlay><any> {
@@ -49,6 +50,7 @@ describe('EndScreenEventHandlersTest', () => {
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
                 new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+            sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -57,8 +59,8 @@ describe('EndScreenEventHandlersTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
                 trailerDownloadable: 'fake url',
-                appStoreId: 'fooAppId',
                 store: 'google',
+                appStoreId: 'fooAppId',
                 clickAttributionUrlFollowsRedirects: true
             }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
@@ -71,17 +73,40 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
+                    trailerDownloadable: 'fake url',
+                    store: 'google',
+                    appStoreId: 'fooAppId',
+                    clickAttributionUrl: 'http://foobar.com',
+                    clickAttributionUrlFollowsRedirects: true
+                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+
+                sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200,
+                    headers: [['location', 'market://foobar.com']]
+                }));
+
                 EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
-                        'uri': 'http://foobar.com'
+                        'uri': 'market://foobar.com'
                     });
                 });
             });
 
-            it('with response that does not contain location, it should throw error', () => {
+            it('with response that does not contain location, it should not launch intent', () => {
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
+                    trailerDownloadable: 'fake url',
+                    store: 'google',
+                    appStoreId: 'fooAppId',
+                    clickAttributionUrl: 'http://foobar.com',
+                    clickAttributionUrlFollowsRedirects: true
+                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
@@ -144,6 +169,7 @@ describe('EndScreenEventHandlersTest', () => {
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
                 new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+            sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -152,11 +178,11 @@ describe('EndScreenEventHandlersTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
                 trailerDownloadable: 'fake url',
+                store: 'apple',
                 appStoreId: '11111',
                 clickAttributionUrlFollowsRedirects: true,
                 bypassAppSheet: false,
-                clickAttributionUrl: '',
-                store: 'apple'
+                clickAttributionUrl: ''
             }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
@@ -170,14 +196,29 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with follow redirects', () => {
             deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
             it('with response that contains location, it should open url scheme', () => {
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
+                    trailerDownloadable: 'fake url',
+                    store: 'apple',
+                    appStoreId: 'fooAppId',
+                    clickAttributionUrl: 'http://foobar.com',
+                    clickAttributionUrlFollowsRedirects: true
+                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+
+                sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200,
+                    headers: [['location', 'appstore://foobar.com']]
+                }));
+
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
                 return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foobar.com');
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'appstore://foobar.com');
                 });
             });
 
-            it('with response that does not contain location, it should throw error', () => {
+            it('with response that does not contain location, it should not call open', () => {
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
