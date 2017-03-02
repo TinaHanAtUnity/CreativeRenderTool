@@ -55,11 +55,33 @@ export class DeviceInfoApi extends NativeApi {
     }
 
     public getNetworkOperator(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator');
+        // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator').then(result => {
+                if(typeof result === 'string') {
+                    return result;
+                } else {
+                    return '';
+                }
+            });
+        } else {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator');
+        }
     }
 
     public getNetworkOperatorName(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName');
+        // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName').then(result => {
+                if(typeof result === 'string') {
+                    return result;
+                } else {
+                    return '';
+                }
+            });
+        } else {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName');
+        }
     }
 
     public isRooted(): Promise<boolean> {
