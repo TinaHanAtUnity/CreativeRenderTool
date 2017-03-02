@@ -1,6 +1,7 @@
 import { Campaign } from 'Models/Campaign';
 import { Asset } from 'Models/Asset';
 import { Video } from 'Models/Video';
+import { AbTest } from 'Utilities/AbTest';
 
 export class PerformanceCampaign extends Campaign {
 
@@ -25,6 +26,10 @@ export class PerformanceCampaign extends Campaign {
 
     private _bypassAppSheet: boolean;
 
+    private _backgroundImage: Asset;
+    private _backgroundLayerImage: Asset;
+    private _backgroundLogoImage: Asset;
+
     constructor(campaign: any, gamerId: string, abGroup: number) {
         super(campaign.id, gamerId, abGroup);
 
@@ -48,6 +53,17 @@ export class PerformanceCampaign extends Campaign {
         this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
 
         this._bypassAppSheet = campaign.bypassAppSheet;
+
+        if(AbTest.isCoCAnimatedTest(this)) {
+            this._backgroundImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_back2.gif');
+            this._backgroundLayerImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_char2.gif');
+            this._backgroundLogoImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_logo.gif');
+        }
+        if(AbTest.isCoCAnimatedTest2(this)) {
+            this._backgroundImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_back.jpg');
+            this._backgroundLayerImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_char2.gif');
+            this._backgroundLogoImage = new Asset('https://cdn.unityads.unity3d.com/abtests/20170302coc/coc_logo.gif');
+        }
     }
 
     public getAppStoreId(): string {
@@ -117,11 +133,37 @@ export class PerformanceCampaign extends Campaign {
     }
 
     public getOptionalAssets() {
-        return [
-            this.getGameIcon(),
-            this.getPortrait(),
-            this.getLandscape()
-        ];
+        if(AbTest.isCoCAnimatedTest(this) || AbTest.isCoCAnimatedTest2(this)) {
+            return [
+                this.getGameIcon(),
+                this.getPortrait(),
+                this.getLandscape(),
+                this.getBackgroundImage(),
+                this.getBackgroundLayerImage(),
+                this.getBackgroundLogoImage()
+            ];
+        } else {
+            return [
+                this.getGameIcon(),
+                this.getPortrait(),
+                this.getLandscape()
+            ];
+        }
+    }
+
+    public getBackgroundImage(): Asset {
+        return this._backgroundImage;
+
+    }
+
+    public getBackgroundLayerImage(): Asset {
+        return this._backgroundLayerImage;
+
+    }
+
+    public getBackgroundLogoImage(): Asset {
+        return this._backgroundLogoImage;
+
     }
 
 }

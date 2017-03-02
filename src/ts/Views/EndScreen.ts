@@ -8,6 +8,7 @@ import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { AbTest } from 'Utilities/AbTest';
 
 export class EndScreen extends View {
 
@@ -19,9 +20,11 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
+    private _campaign: PerformanceCampaign;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
+        this._campaign = campaign;
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
         this._localization = new Localization(language, 'endscreen');
@@ -64,6 +67,12 @@ export class EndScreen extends View {
     public show(): void {
         super.show();
 
+        if (AbTest.isCoCAnimatedTest(this._campaign) || AbTest.isCoCAnimatedTest2(this._campaign)) {
+            (<HTMLElement>this._container.querySelector('.cocback')).style.backgroundImage = 'url(' + this._campaign.getBackgroundImage().getUrl() + ')';
+            (<HTMLElement>this._container.querySelector('.cocchars')).style.backgroundImage = 'url(' + this._campaign.getBackgroundLayerImage().getUrl() + ')';
+            (<HTMLElement>this._container.querySelector('.coclogo')).style.backgroundImage = 'url(' + this._campaign.getBackgroundLogoImage().getUrl() + ')';
+        }
+
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
         // this is very strange because identical style works fine in 1.5
@@ -90,14 +99,12 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: PerformanceCampaign) {
-        const abGroup = campaign.getAbGroup();
-        const gameId = campaign.getGameId();
-        if((abGroup === 8 || abGroup === 9) && (gameId === 45236 || gameId === 45237)) {
+    private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
+        if(AbTest.isCoCAnimatedTest(campaign)) {
             return 'animated';
         }
-        if((abGroup === 10 || abGroup === 11) && (gameId === 45236 || gameId === 45237)) {
-            return 'animated2';
+        if(AbTest.isCoCAnimatedTest2(campaign)) {
+            return 'animated';
         }
         return undefined;
     }
