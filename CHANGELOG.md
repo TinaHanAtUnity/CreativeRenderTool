@@ -1,3 +1,7 @@
+# Thu Mar  2 09:31:13 UTC 2017
+
+* Add store detection (Google Play/Xiaomi) to ad requests
+
 # Wed Mar  1 13:25:48 UTC 2017
 
 * Remove split screen ad unit A/B test
