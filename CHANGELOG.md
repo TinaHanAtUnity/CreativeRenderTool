@@ -1,3 +1,7 @@
+# Thu Mar  2 15:06:13 UTC 2017
+
+* Fix iOS getNetworkOperator and getNetworkOperatorName methods when there is no SIM card present
+
 # Thu Mar  2 09:31:13 UTC 2017
 
 * Add store detection (Google Play/Xiaomi) to ad requests
