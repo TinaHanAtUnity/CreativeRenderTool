@@ -21,6 +21,7 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
+import { InAppPurchaseApi } from 'Native/Api/InAppPurchase';
 
 export enum CallbackStatus {
     OK,
@@ -52,6 +53,7 @@ export class NativeBridge implements INativeBridge {
     public Cache: CacheApi;
     public Connectivity: ConnectivityApi;
     public DeviceInfo: DeviceInfoApi;
+    public InAppPurchase: InAppPurchaseApi;
     public Intent: IntentApi;
     public IosAdUnit: IosAdUnitApi;
     public Listener: ListenerApi;
@@ -94,6 +96,7 @@ export class NativeBridge implements INativeBridge {
         this.Cache = new CacheApi(this);
         this.Connectivity = new ConnectivityApi(this);
         this.DeviceInfo = new DeviceInfoApi(this);
+        this.InAppPurchase = new InAppPurchaseApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
         this.Lifecycle = new LifecycleApi(this);
