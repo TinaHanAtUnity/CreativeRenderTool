@@ -9,6 +9,9 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 export class DeviceInfo extends Model {
 
+    public static GooglePlayPackageName = 'com.android.vending';
+    public static XiaomiPackageName = 'com.xiaomi.gamecenter.demo';
+
     private _androidId: string;
     private _advertisingIdentifier: string;
     private _limitAdTracking: boolean;
@@ -81,8 +84,8 @@ export class DeviceInfo extends Model {
             promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled("com.android.vending").then(isGoogleInstalled => this._isGoogleStoreInstalled = isGoogleInstalled).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled("com.xiaomi.gamecenter.demo").then(isXiaomiInstalled => this._isXiaomiStoreInstalled = isXiaomiInstalled).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this._isGoogleStoreInstalled = isGoogleInstalled).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this._isXiaomiStoreInstalled = isXiaomiInstalled).catch(err => this.handleDeviceInfoError(err)));
         }
 
         return Promise.all(promises);

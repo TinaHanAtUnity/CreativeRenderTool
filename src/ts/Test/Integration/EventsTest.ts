@@ -20,8 +20,8 @@ describe('EventsTest', () => {
         assert(requestLog[3].match('/mobile/gamers/[0-9a-f]+/video/first_quartile'), '4th request was not a first_quartile event');
         assert(requestLog[4].match('/mobile/gamers/[0-9a-f]+/video/midpoint'), '5th request was not a midpoint event');
         assert(requestLog[5].match('/mobile/gamers/[0-9a-f]+/video/third_quartile'), '6th request was not a third_quartile event');
-        assert(requestLog[6].match('/games/\\d+/fill'), '7th request was not a fill request');
-        assert(requestLog[7].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '8th request was not a video_end event');
+        assert(requestLog[6].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '7th request was not a video_end event');
+        assert(requestLog[7].match('/games/\\d+/fill'), '8th request was not a fill request');
     };
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
