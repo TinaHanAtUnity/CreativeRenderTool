@@ -12,16 +12,25 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 describe('EventsTest', () => {
 
+    const findEventCount = (requestLog: string[], regexp: string) => {
+        let count = 0;
+        requestLog.forEach(log => {
+             if(log.match(regexp)) {
+                 ++count;
+             }
+        });
+        return count;
+    };
+
     const validateRequestLog = (requestLog: string[]) => {
         assert.equal(requestLog.length, 8, 'Request log length should be 9 for showing one ad');
-        assert(requestLog[0].match('/games/\\d+/configuration'), '1st request was not a configuration request');
-        assert(requestLog[1].match('/games/\\d+/fill'), '2nd request was not a fill request');
-        assert(requestLog[2].match('/mobile/gamers/[0-9a-f]+/video/video_start'), '3th request was not a video_start event');
-        assert(requestLog[3].match('/mobile/gamers/[0-9a-f]+/video/first_quartile'), '4th request was not a first_quartile event');
-        assert(requestLog[4].match('/mobile/gamers/[0-9a-f]+/video/midpoint'), '5th request was not a midpoint event');
-        assert(requestLog[5].match('/mobile/gamers/[0-9a-f]+/video/third_quartile'), '6th request was not a third_quartile event');
-        assert(requestLog[6].match('/games/\\d+/fill'), '7th request was not a fill request');
-        assert(requestLog[7].match('/mobile/gamers/[0-9a-f]+/video/video_end'), '8th request was not a video_end event');
+        assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
+        assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile'), 1, 'Did not find a first_quartile event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint'), 1, 'Did not find a midpoint event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/third_quartile'), 1, 'Did not find a third_quartile event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_end'), 1, 'Did not find a video_end event');
     };
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {

@@ -1,3 +1,5 @@
+import { DeviceInfo as RealDeviceInfo } from 'Models/DeviceInfo';
+
 export class DeviceInfo {
 
     public static setAdvertisingTrackingId(value: string) {
@@ -250,6 +252,10 @@ export class DeviceInfo {
 
     public static isSimulator() {
         return DeviceInfo._simulator;
+    }
+
+    public static isAppInstalled(packageName: string) {
+        return packageName === RealDeviceInfo.GooglePlayPackageName;
     }
 
     private static _advertisingTrackingId: string;
