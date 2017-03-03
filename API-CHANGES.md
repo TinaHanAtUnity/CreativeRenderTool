@@ -26,6 +26,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android DeviceInfo methods: getGLString, getSensorList, getBoard, getBootloader, getDevice, getHardware, getHost, getProduct and getSupportedAbis
 * Added iOS DeviceInfo methods: getGLString and getSensorList
 * Added header parameter to Cache.download method
+* Added sendPlacementStateChangedEvent to Android and iOS
+* Added IAP metadata instrumentation to Android and iOS
 * Modified VideoPlayer events: all events have now video url as first parameter (except PROGRESS)
 * Modified iOS AdUnit API: remove VIEW_CONTROLLER prefix from callback error messages
 * Modified iOS AdUnit API: remove TARGET_VIEW_NULL error, use only UNKNOWN_VIEW
@@ -35,6 +37,7 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Fixed iOS Listener API, removed sending errors to webview if listener was null or didn’t respond to selector
 * Fixed iOS Request API: added MAPPING_HEADERS_FAILED error
 * Fixed iOS Request API: added response fail event if parsing headers to webview format fails
+* Fixed iOS DeviceInfo getNetworkOperator and getNetworkOperatorName methods to return an empty string when there is no SIM card present
 * Modified iOS Resolve API: make implementation similar to Android and send INVALID_HOST instead of UNEXPECTED_EXCEPTION
 * Modified Android VideoPlayer API, remove useless ’17’ from API_LEVEL_ERROR
 * Modified iOS Cache API events by adding request url to all errors
