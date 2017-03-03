@@ -20,11 +20,9 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
-    private _campaign: PerformanceCampaign;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
-        this._campaign = campaign;
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
         this._localization = new Localization(language, 'endscreen');
@@ -62,16 +60,18 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+
+        if(AbTest.isCoCAnimatedTest(campaign) || AbTest.isCoCAnimatedTest2(campaign)) {
+            // tslint:disable:no-string-literal
+            this._templateData['cocBackground'] = campaign.getBackgroundImage().getUrl();
+            this._templateData['cocChars'] = campaign.getBackgroundLayerImage().getUrl();
+            this._templateData['cocLogo'] = campaign.getBackgroundLogoImage().getUrl();
+            // tslint:enable:no-string-literal
+        }
     }
 
     public show(): void {
         super.show();
-
-        if (AbTest.isCoCAnimatedTest(this._campaign) || AbTest.isCoCAnimatedTest2(this._campaign)) {
-            (<HTMLElement>this._container.querySelector('.cocback')).style.backgroundImage = 'url(' + this._campaign.getBackgroundImage().getUrl() + ')';
-            (<HTMLElement>this._container.querySelector('.cocchars')).style.backgroundImage = 'url(' + this._campaign.getBackgroundLayerImage().getUrl() + ')';
-            (<HTMLElement>this._container.querySelector('.coclogo')).style.backgroundImage = 'url(' + this._campaign.getBackgroundLogoImage().getUrl() + ')';
-        }
 
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
