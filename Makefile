@@ -288,3 +288,10 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 else
 	@echo 'Skipping deployment for pull requests'
 endif
+
+start-nginx:
+	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g" nginx/nginx.conf.template > nginx/nginx.conf
+	nginx -c $(shell pwd)/nginx/nginx.conf
+
+stop-nginx:
+	nginx -s stop

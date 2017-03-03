@@ -5,7 +5,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 
 export enum CacheStatus {
@@ -217,7 +216,7 @@ export class Cache {
 
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
-        this._nativeBridge.Cache.download(url, fileId).catch(error => {
+        this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
             const callback = this._callbacks[url];
             if(callback) {
                 switch(error) {
@@ -363,24 +362,20 @@ export class Cache {
     }
 
     private onDownloadError(error: string, url: string, message: string): void {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            const callback = this._callbacks[this._currentUrl];
-            if(callback) {
-                this.handleRetry(callback, this._currentUrl, error);
-                return;
-            }
-        } else {
-            const callback = this._callbacks[url];
-            if(callback) {
-                switch (error) {
-                    case CacheError[CacheError.FILE_IO_ERROR]:
-                        this.handleRetry(callback, url, error);
-                        return;
+        const callback = this._callbacks[url];
+        if(callback) {
+            switch (error) {
+                case CacheError[CacheError.NETWORK_ERROR]:
+                    this.handleRetry(callback, url, error);
+                    return;
 
-                    default:
-                        this.fulfillCallback(url, CacheStatus.FAILED);
-                        return;
-                }
+                case CacheError[CacheError.NO_INTERNET]:
+                    this.handleRetry(callback, url, error);
+                    return;
+
+                default:
+                    this.fulfillCallback(url, CacheStatus.FAILED);
+                    return;
             }
         }
     }
