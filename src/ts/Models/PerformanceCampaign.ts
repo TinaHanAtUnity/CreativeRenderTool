@@ -154,28 +154,26 @@ export class PerformanceCampaign extends Campaign {
     }
 
     public getRequiredAssets() {
-        return [
-            this.getVideo()
-        ];
-    }
-
-    public getOptionalAssets() {
         if(AbTest.isCoCAnimatedTest(this) || AbTest.isCoCAnimatedTest2(this)) {
             return [
-                this.getGameIcon(),
-                this.getPortrait(),
-                this.getLandscape(),
+                this.getVideo(),
                 this.getBackgroundImage(),
                 this.getBackgroundLayerImage(),
                 this.getBackgroundLogoImage()
             ];
         } else {
             return [
-                this.getGameIcon(),
-                this.getPortrait(),
-                this.getLandscape()
+                this.getVideo()
             ];
         }
+    }
+
+    public getOptionalAssets() {
+        return [
+            this.getGameIcon(),
+            this.getPortrait(),
+            this.getLandscape()
+        ];
     }
 
     public getBackgroundImage(): Asset {
