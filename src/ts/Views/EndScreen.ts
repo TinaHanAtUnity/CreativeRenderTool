@@ -104,7 +104,7 @@ export class EndScreen extends View {
             return 'animated';
         }
         if(AbTest.isCoCAnimatedTest2(campaign)) {
-            return 'animated';
+            return 'animated2';
         }
         return undefined;
     }
