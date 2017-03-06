@@ -20,6 +20,7 @@ import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
+import { LifecycleApi } from 'Native/Api/Lifecycle';
 
 export enum CallbackStatus {
     OK,
@@ -54,6 +55,7 @@ export class NativeBridge implements INativeBridge {
     public Intent: IntentApi;
     public IosAdUnit: IosAdUnitApi;
     public Listener: ListenerApi;
+    public Lifecycle: LifecycleApi;
     public Notification: NotificationApi;
     public Placement: PlacementApi;
     public Request: RequestApi;
@@ -94,6 +96,7 @@ export class NativeBridge implements INativeBridge {
         this.DeviceInfo = new DeviceInfoApi(this);
         this.Intent = new IntentApi(this);
         this.Listener = new ListenerApi(this);
+        this.Lifecycle = new LifecycleApi(this);
         this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
         this.Request = new RequestApi(this);
@@ -195,6 +198,10 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.NOTIFICATION]:
                 this.Notification.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.LIFECYCLE]:
+                this.Lifecycle.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.REQUEST]:

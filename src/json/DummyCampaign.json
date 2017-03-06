@@ -1,5 +1,6 @@
 {
     "id": "123abc",
+    "store" : "apple",
     "appStoreId": "com.test",
     "appStoreCountry": "us",
     "gameId": 1234,

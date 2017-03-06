@@ -15,6 +15,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -237,33 +238,34 @@ export class CampaignManager {
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
+                advertisingTrackingId: this.getParameter('advertisingTrackingId', this._deviceInfo.getAdvertisingIdentifier(), 'string'),
+                limitAdTracking: this.getParameter('limitAdTracking', this._deviceInfo.getLimitAdTracking(), 'boolean')
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: this._deviceInfo.getAndroidId()
+                androidId: this.getParameter('androidId', this._deviceInfo.getAndroidId(), 'string')
             });
         }
 
         url = Url.addParameters(url, {
-            deviceMake: this._deviceInfo.getManufacturer(),
-            deviceModel: this._deviceInfo.getModel(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            screenDensity: this._deviceInfo.getScreenDensity(),
-            screenWidth: this._deviceInfo.getScreenWidth(),
-            screenHeight: this._deviceInfo.getScreenHeight(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            screenSize: this._deviceInfo.getScreenLayout()
+            deviceMake: this.getParameter('deviceMake', this._deviceInfo.getManufacturer(), 'string'),
+            deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
+            platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),
+            screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
+            screenWidth: this.getParameter('screenWidth', this._deviceInfo.getScreenWidth(), 'number'),
+            screenHeight: this.getParameter('screenHeight', this._deviceInfo.getScreenHeight(), 'number'),
+            sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'number'),
+            screenSize: this.getParameter('screenSize', this._deviceInfo.getScreenLayout(), 'number'),
+            stores: this.getParameter('stores', this._deviceInfo.getStores(), 'string')
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
-                osVersion: this._deviceInfo.getOsVersion()
+                osVersion: this.getParameter('osVersion', this._deviceInfo.getOsVersion(), 'string')
             });
         } else {
             url = Url.addParameters(url, {
-                apiLevel: this._deviceInfo.getApiLevel()
+                apiLevel: this.getParameter('apiLevel', this._deviceInfo.getApiLevel(), 'number')
             });
         }
 
@@ -296,9 +298,9 @@ export class CampaignManager {
 
         return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
             url = Url.addParameters(url, {
-                connectionType: connectionType,
-                networkType: networkType,
-                gamerId: gamerId
+                connectionType: this.getParameter('connectionType', connectionType, 'string'),
+                networkType: this.getParameter('networkType', networkType, 'number'),
+                gamerId: this.getParameter('gamerId', gamerId, 'string')
             });
 
             return url;
@@ -312,20 +314,20 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkOperatorName());
 
         const body: any = {
-            bundleVersion: this._clientInfo.getApplicationVersion(),
-            bundleId: this._clientInfo.getApplicationName(),
-            language: this._deviceInfo.getLanguage(),
-            timeZone: this._deviceInfo.getTimeZone(),
+            bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
+            bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
+            language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
+            timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            body.webviewUa = navigator.userAgent;
+            body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
-            body.deviceFreeSpace = freeSpace;
-            body.networkOperator = networkOperator;
-            body.networkOperatorName = networkOperatorName;
+            body.deviceFreeSpace = this.getParameter('deviceFreeSpace', freeSpace, 'number');
+            body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
+            body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
             const metaDataPromises: Promise<any>[] = [];
             metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
@@ -333,16 +335,16 @@ export class CampaignManager {
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
-                    body.mediationName = mediation.getName();
-                    body.mediationVersion = mediation.getVersion();
+                    body.mediationName = this.getParameter('mediationName', mediation.getName(), 'string');
+                    body.mediationVersion = this.getParameter('mediationVersion', mediation.getVersion(), 'string');
                     if(mediation.getOrdinal()) {
-                        body.mediationOrdinal = mediation.getOrdinal();
+                        body.mediationOrdinal = this.getParameter('mediationOrdinal', mediation.getOrdinal(), 'number');
                     }
                 }
 
                 if(framework) {
-                    body.frameworkName = framework.getName();
-                    body.frameworkVersion = framework.getVersion();
+                    body.frameworkName = this.getParameter('frameworkName', framework.getName(), 'string');
+                    body.frameworkVersion = this.getParameter('frameworkVersion', framework.getVersion(), 'string');
                 }
 
                 return JSON.stringify(body);
@@ -365,4 +367,36 @@ export class CampaignManager {
         ]);
     }
 
+    private getParameter(field: string, value: any, expectedType: string) {
+        if(value === undefined) {
+            return undefined;
+        }
+
+        if(typeof value === expectedType) {
+            return value;
+        } else {
+            Diagnostics.trigger('internal_type_error', {
+                context: 'campaign_request',
+                field: field,
+                value: JSON.stringify(value),
+                expectedType: expectedType,
+                observedType: typeof value
+            });
+
+            if(expectedType === 'string') {
+                return '';
+            }
+
+            if(expectedType === 'number') {
+                return 0;
+            }
+
+            if(expectedType === 'boolean') {
+                return false;
+            }
+
+            // we only use string, number and boolean so this code is not reachable
+            return value;
+        }
+    }
 }

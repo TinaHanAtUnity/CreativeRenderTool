@@ -1,3 +1,5 @@
+import { DeviceInfo as RealDeviceInfo } from 'Models/DeviceInfo';
+
 export class DeviceInfo {
 
     public static setAdvertisingTrackingId(value: string) {
@@ -72,7 +74,7 @@ export class DeviceInfo {
         DeviceInfo._networkType = value;
     }
 
-    public static setNetworkOperator(value: number) {
+    public static setNetworkOperator(value: string) {
         DeviceInfo._networkOperator = value;
     }
 
@@ -252,6 +254,10 @@ export class DeviceInfo {
         return DeviceInfo._simulator;
     }
 
+    public static isAppInstalled(packageName: string) {
+        return packageName === RealDeviceInfo.GooglePlayPackageName;
+    }
+
     private static _advertisingTrackingId: string;
     private static _limitAdTrackingFlag: boolean;
     private static _osVersion: string;
@@ -270,7 +276,7 @@ export class DeviceInfo {
     private static _screenLayout: number;
     private static _connectionType: string;
     private static _networkType: number;
-    private static _networkOperator: number;
+    private static _networkOperator: string;
     private static _networkOperatorName: string;
     private static _headset: boolean;
     private static _deviceVolume: number;

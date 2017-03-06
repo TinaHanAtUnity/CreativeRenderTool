@@ -251,9 +251,14 @@ export class WebView {
         for(const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
                 const placement: Placement = placements[placementId];
-                this._nativeBridge.Placement.setPlacementState(placement.getId(), placementState);
+                const oldState = placement.getState();
+                this._nativeBridge.Placement.setPlacementState(placementId, placementState);
+                if(oldState !== placementState) {
+                    this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
+                    placement.setState(placementState);
+                }
                 if(placementState === PlacementState.READY) {
-                    this._nativeBridge.Listener.sendReadyEvent(placement.getId());
+                    this._nativeBridge.Listener.sendReadyEvent(placementId);
                 }
             }
         }

@@ -12,3 +12,8 @@ build
 src/**/*.js
 src/**/*.js.map
 src/**/*.css
+
+# nginx
+nginx/access.log
+nginx/error.log
+nginx/nginx.conf

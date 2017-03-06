@@ -1,3 +1,23 @@
+# Thu Mar  2 15:06:13 UTC 2017
+
+* Fix iOS getNetworkOperator and getNetworkOperatorName methods when there is no SIM card present
+
+# Thu Mar  2 09:31:13 UTC 2017
+
+* Add store detection (Google Play/Xiaomi) to ad requests
+
+# Wed Mar  1 13:25:48 UTC 2017
+
+* Remove split screen ad unit A/B test
+* Add hit areas for overlay buttons
+* Fix campaign request parameters
+
+# Mon Feb 27 13:12:02 UTC 2017
+
+* Fix click attribution
+* Simple validation of campaign asset URLs (videos, endscreen images)
+* Refactor test metadata fetching
+
 # Wed Feb 22 13:33:10 UTC 2017
 
 * Split screen ad unit A/B test

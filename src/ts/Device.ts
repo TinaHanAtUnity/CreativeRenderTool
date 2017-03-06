@@ -1,9 +1,10 @@
 import 'Workarounds';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WebView } from 'WebView';
-import { IosWebViewBridge } from 'Native/IosWebViewBridge';
+import { WKWebViewBridge } from 'Native/WKWebViewBridge';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
+import { UIWebViewBridge } from 'Native/UIWebViewBridge';
 
 interface IExtendedWindow extends Window {
     nativebridge: NativeBridge;
@@ -33,7 +34,11 @@ if(typeof location !== 'undefined') {
             break;
 
         case 'ios':
-            nativeBridge = new NativeBridge(new IosWebViewBridge(), Platform.IOS, false);
+            if(window.webkit) {
+                nativeBridge = new NativeBridge(new WKWebViewBridge(), Platform.IOS, false);
+            } else {
+                nativeBridge = new NativeBridge(new UIWebViewBridge(), Platform.IOS, false);
+            }
             break;
 
         default:
