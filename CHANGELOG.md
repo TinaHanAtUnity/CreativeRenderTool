@@ -1,3 +1,7 @@
+# Mon Mar  6 13:17:37 UTC 2017
+
+* Empty deployment after 2.1 merge. Testing that everything works on older release branches after a big merge with lots of conflicts.
+
 # Thu Mar  2 15:06:13 UTC 2017
 
 * Fix iOS getNetworkOperator and getNetworkOperatorName methods when there is no SIM card present
