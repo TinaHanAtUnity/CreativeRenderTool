@@ -1,3 +1,4 @@
+import MRAIDTemplate from 'html/MRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -7,6 +8,7 @@ import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Template } from 'Utilities/Template';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -24,10 +26,13 @@ export class MRAID extends View {
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
 
+    private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
 
     private _resizeHandler: any;
+
+    private _canClose = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -35,28 +40,44 @@ export class MRAID extends View {
         this._placement = placement;
         this._campaign = campaign;
 
+        this._template = new Template(MRAIDTemplate);
+
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
+                selector: '.close-region'
             }
         ];
     }
 
     public render() {
-        const iframe: any = this._iframe = <HTMLIFrameElement>document.createElement('iframe');
-        iframe.sandbox = 'allow-scripts';
-        iframe.id = this._id;
+        super.render();
+
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
         });
         window.addEventListener('message', (event: MessageEvent) => this.onMessage(event), false);
-        this._container = iframe;
     }
 
     public show(): void {
         super.show();
+
+        const originalLength = 15;
+        let length = originalLength;
+        const updateInterval = setInterval(() => {
+            length--;
+            this.updateProgressCircle(this._closeElement, (originalLength - length) / originalLength);
+            if (length <= 0) {
+                clearInterval(updateInterval);
+                this._canClose = true;
+                this._closeElement.style.opacity = '1';
+            }
+        }, 1000);
+
         if(this._loaded) {
             this._iframe.contentWindow.postMessage('viewable', '*');
         } else {
@@ -92,9 +113,37 @@ export class MRAID extends View {
         super.hide();
     }
 
+    private updateProgressCircle(container: HTMLElement, value: number) {
+        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+            wrapperElement.style.display = 'none';
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+            return;
+        }
+
+        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
+
+        const degrees = value * 360;
+        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+        if(value >= 0.5) {
+            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+            rightCircleElement.style.webkitAnimationName = 'right-spin';
+        }
+    }
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        event.stopPropagation();
+        if(this._canClose) {
+            this.onClose.trigger();
+        }
     }
 
     private onMessage(event: MessageEvent) {
