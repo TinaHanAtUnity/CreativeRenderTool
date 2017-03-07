@@ -228,6 +228,7 @@ export class Cache {
             } else {
                 const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
                 return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+                    // note: the order of results might be different but since every value is checked for > 0, in this case it's ok to get e.g. width and duration mixed up
                     const width: number = results[0][1];
                     const height: number = results[1][1];
                     const duration: number = results[2][1];
