@@ -6,6 +6,9 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
+import { Video } from 'Models/Video';
+import { Platform } from 'Constants/Platform';
+import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 
 export enum CacheStatus {
     OK,
@@ -211,6 +214,29 @@ export class Cache {
     public getFileUrl(fileId: string): Promise<string> {
         return this._nativeBridge.Cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
+        });
+    }
+
+    public isVideoValid(video: Video): Promise<boolean> {
+        return this.getFileId(video.getOriginalUrl()).then(fileId => {
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
+                    return (width > 0 && height > 0 && duration > 0);
+                }).catch(error => {
+                    return false;
+                });
+            } else {
+                const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
+                return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+                    const width: number = results[0][1];
+                    const height: number = results[1][1];
+                    const duration: number = results[2][1];
+
+                    return (width > 0 && height > 0 && duration > 0);
+                }).catch(error => {
+                    return false;
+                });
+            }
         });
     }
 
