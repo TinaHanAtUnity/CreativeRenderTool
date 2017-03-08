@@ -50,6 +50,10 @@ export class Cache {
         throw CacheError.FILE_NOT_FOUND;
     }
 
+    public static getVideoInfo(fileId: string) {
+        return [640, 360, 10000];
+    }
+
     private static _fileIdMap: { [key: string]: string } = {};
 
 }
