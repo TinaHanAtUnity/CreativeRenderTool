@@ -75,9 +75,9 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager);
-            this._cache.cleanCache();
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
+            this._cache.cleanCache();
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);

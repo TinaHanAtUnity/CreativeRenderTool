@@ -7,6 +7,7 @@ import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
 
 class TestCacheApi extends CacheApi {
 
@@ -149,6 +150,7 @@ describe('CacheTest', () => {
 
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
+    let request: Request;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
 
@@ -161,7 +163,8 @@ describe('CacheTest', () => {
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, {retries: 3, retryDelay: 1});
+        request = new Request(nativeBridge, wakeUpManager);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
