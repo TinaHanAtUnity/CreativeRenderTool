@@ -123,11 +123,12 @@ export class WebView {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.NOT_AVAILABLE);
+
             this._campaignManager = new CampaignManager(this._nativeBridge, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onThirdPartyCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe(() => this.onNoFill());
+            this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
+            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill());
             this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
             return this._campaignManager.request();
         }).then(() => {

@@ -70,7 +70,7 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string): Promise<string> {
+    public cache(url: string): Promise<[string, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -81,14 +81,16 @@ export class Cache {
             ]);
         }).then(([isCached, fileId]) => {
             if(isCached) {
-                return Promise.resolve([CacheStatus.OK, fileId]);
+                return [CacheStatus.OK, fileId];
             }
             const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
             if(status === CacheStatus.OK) {
-                return this.getFileUrl(fileId);
+                return this.getFileUrl(fileId).then(fileUrl => {
+                    return [fileId, fileUrl];
+                });
             }
             throw status;
         }).catch(error => {
