@@ -3,7 +3,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { AdUnitContainer, ForceOrientation} from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Video';
 import { Overlay } from 'Views/Overlay';

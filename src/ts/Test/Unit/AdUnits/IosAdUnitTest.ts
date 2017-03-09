@@ -7,8 +7,8 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { ViewController } from 'AdUnits/Containers/ViewController';
 import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;

@@ -40,7 +40,10 @@ export class AssetManager {
         for(let i = 0; i < assets.length; ++i) {
             chain = chain.then(() => {
                 const asset = assets[i];
-                return this._cache.cache(asset.getUrl()).then(fileUrl => asset.setCachedUrl(fileUrl));
+                return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
+                    asset.setFileId(fileId);
+                    asset.setCachedUrl(fileUrl);
+                });
             });
         }
         return chain;

@@ -25,7 +25,19 @@ export class Storage {
     }
 
     public static getKeys(storage: string, key: string, recursive: boolean) {
-        return [];
+        const rawStorage = window.sessionStorage.getItem(storage);
+        const keys = [];
+
+        if(rawStorage) {
+            const object = JSON.parse(rawStorage);
+            for(const k in object[key]) {
+                if(k) {
+                    keys.push(k);
+                }
+            }
+        }
+
+        return keys;
     }
 
     public static write(storage: string) {
