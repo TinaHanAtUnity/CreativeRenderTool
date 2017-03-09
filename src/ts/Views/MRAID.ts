@@ -66,7 +66,11 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
-        const originalLength = 15;
+        let originalLength = 30;
+        if(this._placement.allowSkip()) {
+            originalLength = this._placement.allowSkipInSeconds();
+        }
+
         let length = originalLength;
         const updateInterval = setInterval(() => {
             length--;
