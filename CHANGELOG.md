@@ -1,3 +1,7 @@
+# Wed Mar  8 07:19:27 UTC 2017
+
+* Marvel Contest of Champions animated background A/B test
+
 # Thu Mar  2 15:06:13 UTC 2017
 
 * Fix iOS getNetworkOperator and getNetworkOperatorName methods when there is no SIM card present

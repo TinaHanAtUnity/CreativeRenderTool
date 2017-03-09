@@ -1,0 +1,52 @@
+body.iphone
+body.ipad
+body.android
+  .campaign-container.animated
+    
+    .cocback
+      display: block
+      position: absolute
+      top: 0
+      bottom: 0%
+      width: 60%
+      height: 100%
+      background-size: cover
+      background-position: center
+      background-repeat: no-repeat
+    
+    .cocchars
+      display: block
+      position: fixed
+      left: 0%
+      bottom: -50%
+      width: 50%
+      height: 100%
+      background-size: contain
+      background-repeat: no-repeat
+      -webkit-transform-origin: 50% 50%
+      
+    .coclogo
+      display: block
+      position: absolute
+      left: 5%
+      top: 5%
+      width: 40%
+      height: 40%
+      background-size: contain
+      background-repeat: no-repeat
+    
+  &.portrait
+    .campaign-container.animated
+      .cocback
+        width: 100%
+        height: 60%
+      
+      .cocchars
+        bottom: 25%
+        width: 100%
+        height: 50%
+      
+      .coc_cta
+        left: 50%
+        bottom: 15%
+        

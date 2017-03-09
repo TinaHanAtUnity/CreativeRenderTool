@@ -70,6 +70,23 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
+### Deployment tests
+
+#### Android
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-android-api/
+
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans/
+
+
+#### iOS
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-ios-api/
+
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-iOS-sans/
+
+#### Running deployment tests
+
+Follow the link for desired platform -> Build with Parameters -> Build. This job will start system test jobs, that run tests on real device in Testdroid cloud. The job iterates over all webview git branches with prefix 'origin/staging/', so staging branches must be deployed in order to run tests. Each found staging branch will result in a job under 'Results' link above.
+
 ## Releasing
 
 Before releasing, update dependencies to latest versions in `package.json`, then regenerate `npm-shrinkwrap.json` with `npm shrinkwrap` and then manually remove `fsevents` dependency from the `npm-shrinkwrap.json` file (`fsevents` breaks build on Linux machines. See [this](https://github.com/npm/npm/issues/2679#issuecomment-150084700))
