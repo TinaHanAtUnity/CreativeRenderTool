@@ -4,6 +4,7 @@ import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Video } from 'Models/Video';
 
 export class AssetManager {
 
@@ -24,10 +25,15 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const requiredChain = this.cache(campaign.getRequiredAssets());
+        const requiredChain = this.cache(campaign.getRequiredAssets()).then(() => {
+            return this.validateVideos(campaign.getRequiredAssets());
+        });
 
         if(this._cacheMode === CacheMode.FORCED) {
-            return requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
+            return requiredChain.then(() => {
+                this.cache(campaign.getOptionalAssets());
+                return campaign;
+            });
         } else {
             requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
         }
@@ -35,7 +41,7 @@ export class AssetManager {
         return Promise.resolve(campaign);
     }
 
-    private cache(assets: Asset[]): Promise<any> {
+    private cache(assets: Asset[]): Promise<void> {
         let chain = Promise.resolve();
         for(let i = 0; i < assets.length; ++i) {
             chain = chain.then(() => {
@@ -66,6 +72,24 @@ export class AssetManager {
         }
 
         return true;
+    }
+
+    private validateVideos(assets: Asset[]): Promise<void[]> {
+        const promises = [];
+        for(const asset of assets) {
+            if(asset instanceof Video) {
+                promises.push(this._cache.isVideoValid(asset).then(valid => {
+                    if(!valid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: asset.getOriginalUrl()
+                        });
+                        throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
+                    }
+                }));
+            }
+        }
+
+        return Promise.all(promises);
     }
 
     private reportInvalidUrl(campaign: Campaign, asset: Asset, required: boolean): void {
