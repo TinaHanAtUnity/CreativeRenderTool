@@ -20,12 +20,12 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { HtmlCampaign } from 'Models/HtmlCampaign';
-import { ThirdParty } from 'Views/ThirdParty';
-import { HtmlAdUnit } from 'AdUnits/HtmlAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class AdUnitFactory {
@@ -34,8 +34,8 @@ export class AdUnitFactory {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
-        } else if(campaign instanceof HtmlCampaign) {
-            return this.createHtmlAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
+        } else if(campaign instanceof MRAIDCampaign) {
+            return this.createMRAIDAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else {
@@ -102,16 +102,16 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static createHtmlAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: HtmlCampaign, options: any): AbstractAdUnit {
-        const thirdParty = new ThirdParty(nativeBridge, placement, campaign);
-        const thirdPartyAdUnit = new HtmlAdUnit(nativeBridge, container, sessionManager, placement, campaign, thirdParty, options);
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
+        const mraid = new MRAID(nativeBridge, placement, campaign);
+        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
-        thirdParty.render();
-        document.body.appendChild(thirdParty.container());
-        thirdParty.onClick.subscribe(() => sessionManager.sendClick(thirdPartyAdUnit));
-        thirdParty.onClose.subscribe(() => thirdPartyAdUnit.hide());
+        mraid.render();
+        document.body.appendChild(mraid.container());
+        mraid.onClick.subscribe(() => sessionManager.sendClick(mraidAdUnit));
+        mraid.onClose.subscribe(() => mraidAdUnit.hide());
 
-        return thirdPartyAdUnit;
+        return mraidAdUnit;
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {

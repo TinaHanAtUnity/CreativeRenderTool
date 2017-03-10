@@ -45,6 +45,7 @@ export class Cache {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
+    private _request: Request;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
@@ -54,9 +55,10 @@ export class Cache {
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, options?: ICacheOptions) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+        this._request = request;
 
         if(options) {
             this._maxRetries = options.retries;
@@ -73,7 +75,7 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string): Promise<string> {
+    public cache(url: string): Promise<[string, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -84,14 +86,16 @@ export class Cache {
             ]);
         }).then(([isCached, fileId]) => {
             if(isCached) {
-                return Promise.resolve([CacheStatus.OK, fileId]);
+                return [CacheStatus.OK, fileId];
             }
             const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
             if(status === CacheStatus.OK) {
-                return this.getFileUrl(fileId);
+                return this.getFileUrl(fileId).then(fileUrl => {
+                    return [fileId, fileUrl];
+                });
             }
             throw status;
         }).catch(error => {
@@ -355,6 +359,9 @@ export class Cache {
                     this.downloadFile(location, fileId);
                     return;
                 }
+            } else if(responseCode === 416) {
+                this.handleRequestRangeError(callback, url);
+                return;
             }
 
             const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
@@ -424,6 +431,35 @@ export class Cache {
         } else {
             this.fulfillCallback(url, CacheStatus.FAILED);
         }
+    }
+
+    private handleRequestRangeError(callback: ICallbackObject, url: string): void {
+        Promise.all([this._nativeBridge.Cache.getFileInfo(callback.fileId), this._request.head(url)]).then(([fileInfo, response]) => {
+            const contentLength = Request.getHeader(response.headers, 'Content-Length');
+
+            if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
+                Diagnostics.trigger('cache_desync_fixed', {
+                    url: url
+                });
+                this.writeCacheResponse(url, this.createCacheResponse(true, url, fileInfo.size, fileInfo.size, 0, 200, response.headers));
+                this.fulfillCallback(url, CacheStatus.OK);
+            } else {
+                Diagnostics.trigger('cache_desync_failure', {
+                    url: url
+                });
+                this.deleteCacheResponse(url);
+                if(fileInfo.found) {
+                    this._nativeBridge.Cache.deleteFile(callback.fileId);
+                }
+                this.fulfillCallback(url, CacheStatus.FAILED);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('cache_desync_failure', {
+                url: url
+            });
+            this.deleteCacheResponse(url);
+            this.fulfillCallback(url, CacheStatus.FAILED);
+        });
     }
 
     private onNetworkConnected(): void {

@@ -7,6 +7,7 @@ import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
 
 class TestCacheApi extends CacheApi {
 
@@ -149,6 +150,7 @@ describe('CacheTest', () => {
 
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
+    let request: Request;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
 
@@ -161,7 +163,8 @@ describe('CacheTest', () => {
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, {retries: 3, retryDelay: 1});
+        request = new Request(nativeBridge, wakeUpManager);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
@@ -182,8 +185,9 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
+            assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
@@ -199,14 +203,17 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl1).then(fileUrl => {
+        return cacheManager.cache(testUrl1).then(([fileId, fileUrl]) => {
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
+            assert.equal(fileId, '1647395140.jpg', 'Cache three files first fileId does not match');
             assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
-        }).then(() => cacheManager.cache(testUrl2)).then(fileUrl => {
+        }).then(() => cacheManager.cache(testUrl2)).then(([fileId, fileUrl]) => {
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
+            assert.equal(fileId, '158720486.jpg', 'Cache three files second fileId does not match');
             assert.equal(testFileUrl2, fileUrl, 'Cache three files second local file url does not match');
-        }).then(() => cacheManager.cache(testUrl3)).then(fileUrl => {
+        }).then(() => cacheManager.cache(testUrl3)).then(([fileId, fileUrl]) => {
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
+            assert.equal(fileId, '929022075.jpg', 'Cache three files third fileId does not match');
             assert.equal(testFileUrl3, fileUrl, 'Cache three files third local file url does not match');
         }).then(() => {
             assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
@@ -270,7 +277,8 @@ describe('CacheTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
+            assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });

@@ -1,6 +1,10 @@
-# Mon Mar  6 13:17:37 UTC 2017
+# Fri Mar 10 11:27:36 UTC 2017
 
-* Empty deployment after 2.1 merge. Testing that everything works on older release branches after a big merge with lots of conflicts.
+* Converted current MZ playables to use MRAID 
+
+# Wed Mar  8 07:19:27 UTC 2017
+
+* Marvel Contest of Champions animated background A/B test
 
 # Thu Mar  2 15:06:13 UTC 2017
 
