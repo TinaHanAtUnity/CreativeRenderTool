@@ -1,3 +1,7 @@
+# Fri Mar 10 11:27:36 UTC 2017
+
+* Converted current MZ playables to use MRAID 
+
 # Wed Mar  8 07:19:27 UTC 2017
 
 * Marvel Contest of Champions animated background A/B test
