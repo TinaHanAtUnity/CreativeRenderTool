@@ -30,7 +30,10 @@ export class AssetManager {
         });
 
         if(this._cacheMode === CacheMode.FORCED) {
-            return requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
+            return requiredChain.then(() => {
+                this.cache(campaign.getOptionalAssets());
+                return campaign;
+            });
         } else {
             requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
         }
@@ -38,7 +41,7 @@ export class AssetManager {
         return Promise.resolve(campaign);
     }
 
-    private cache(assets: Asset[]): Promise<any> {
+    private cache(assets: Asset[]): Promise<void> {
         let chain = Promise.resolve();
         for(let i = 0; i < assets.length; ++i) {
             chain = chain.then(() => {
