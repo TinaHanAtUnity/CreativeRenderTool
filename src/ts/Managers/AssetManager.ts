@@ -73,19 +73,16 @@ export class AssetManager {
 
     private validateVideos(assets: Asset[]): Promise<void[]> {
         const promises = [];
-        for(const i in assets) {
-            if(assets.hasOwnProperty(i)) {
-                const asset = assets[i];
-                if(asset instanceof Video) {
-                    promises.push(this._cache.isVideoValid(asset).then(valid => {
-                        if(!valid) {
-                            Diagnostics.trigger('video_validation_failed', {
-                                url: asset.getOriginalUrl()
-                            });
-                            throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
-                        }
-                    }));
-                }
+        for(const asset of assets) {
+            if(asset instanceof Video) {
+                promises.push(this._cache.isVideoValid(asset).then(valid => {
+                    if(!valid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: asset.getOriginalUrl()
+                        });
+                        throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
+                    }
+                }));
             }
         }
 

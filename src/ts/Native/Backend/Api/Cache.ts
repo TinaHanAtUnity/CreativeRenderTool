@@ -58,27 +58,23 @@ export class Cache {
     public static getMetaData(fileId: string, metadatas: number[]) {
         const retValue = [];
 
-        for(const i in metadatas) {
-            if(metadatas.hasOwnProperty(i)) {
-                const metadata: number = metadatas[i];
+        for(const metadata of metadatas) {
+            switch(metadata) {
+                case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                    retValue.push([VideoMetadata.METADATA_KEY_VIDEO_WIDTH, 640]);
+                    break;
 
-                switch(metadata) {
-                    case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
-                        retValue.push([VideoMetadata.METADATA_KEY_VIDEO_WIDTH, 640]);
-                        break;
+                case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                    retValue.push([VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, 360]);
+                    break;
 
-                    case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
-                        retValue.push([VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, 360]);
-                        break;
+                case VideoMetadata.METADATA_KEY_DURATION:
+                    retValue.push([VideoMetadata.METADATA_KEY_DURATION, 10000]);
+                    break;
 
-                    case VideoMetadata.METADATA_KEY_DURATION:
-                        retValue.push([VideoMetadata.METADATA_KEY_DURATION, 10000]);
-                        break;
-
-                    default:
-                        // error handling not implemented
-                        break;
-                }
+                default:
+                    // error handling not implemented
+                    break;
             }
         }
 
