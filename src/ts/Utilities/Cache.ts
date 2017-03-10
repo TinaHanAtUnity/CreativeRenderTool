@@ -232,8 +232,36 @@ export class Cache {
             } else {
                 const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
                 return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
-                    // note: the order of results might vary but since we are checking every number > 0, the order is irrelevant
-                    return (results[0][1] > 0 && results[1][1] > 0 && results[2][1] > 0);
+                    let width: number = 0;
+                    let height: number = 0;
+                    let duration: number = 0;
+
+                    for(const i in results) {
+                        if(results.hasOwnProperty(i)) {
+                            const key = results[i][0];
+                            const value = results[i][1];
+
+                            switch(key) {
+                                case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                                    width = value;
+                                    break;
+
+                                case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                                    height = value;
+                                    break;
+
+                                case VideoMetadata.METADATA_KEY_DURATION:
+                                    duration = value;
+                                    break;
+
+                                default:
+                                    // unknown key, ignore
+                                    break;
+                            }
+                        }
+                    }
+
+                    return (width > 0 && height > 0 && duration > 0);
                 }).catch(error => {
                     return false;
                 });
