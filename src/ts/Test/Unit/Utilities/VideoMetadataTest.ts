@@ -10,6 +10,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Video } from 'Models/Video';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { CacheError } from 'Native/Api/Cache';
+import { Request } from 'Utilities/Request';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';
@@ -22,6 +23,7 @@ describe('VideoMetadataTest', () => {
 
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
+    let request: Request;
     let cache: Cache;
 
     describe('on Android', () => {
@@ -30,7 +32,8 @@ describe('VideoMetadataTest', () => {
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             wakeUpManager = new WakeUpManager(nativeBridge);
-            cache = new Cache(nativeBridge, wakeUpManager);
+            request = new Request(nativeBridge, wakeUpManager);
+            cache = new Cache(nativeBridge, wakeUpManager, request);
         });
 
         it('should validate valid video', () => {
@@ -62,7 +65,8 @@ describe('VideoMetadataTest', () => {
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
             wakeUpManager = new WakeUpManager(nativeBridge);
-            cache = new Cache(nativeBridge, wakeUpManager);
+            request = new Request(nativeBridge, wakeUpManager);
+            cache = new Cache(nativeBridge, wakeUpManager, request);
         });
 
         it('should validate valid video', () => {
