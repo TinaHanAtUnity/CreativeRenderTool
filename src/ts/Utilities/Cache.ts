@@ -236,28 +236,26 @@ export class Cache {
                     let height: number = 0;
                     let duration: number = 0;
 
-                    for(const i in results) {
-                        if(results.hasOwnProperty(i)) {
-                            const key = results[i][0];
-                            const value = results[i][1];
+                    for(const entry of results) {
+                        const key = entry[0];
+                        const value = entry[1];
 
-                            switch(key) {
-                                case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
-                                    width = value;
-                                    break;
+                        switch(key) {
+                            case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                                width = value;
+                                break;
 
-                                case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
-                                    height = value;
-                                    break;
+                            case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                                height = value;
+                                break;
 
-                                case VideoMetadata.METADATA_KEY_DURATION:
-                                    duration = value;
-                                    break;
+                            case VideoMetadata.METADATA_KEY_DURATION:
+                                duration = value;
+                                break;
 
-                                default:
-                                    // unknown key, ignore
-                                    break;
-                            }
+                            default:
+                                // unknown key, ignore
+                                break;
                         }
                     }
 
