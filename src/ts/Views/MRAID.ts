@@ -158,6 +158,7 @@ export class MRAID extends View {
                 break;
 
             case 'open':
+                this.onClick.trigger();
                 if(this._nativeBridge.getPlatform() === Platform.IOS) {
                     this._nativeBridge.UrlScheme.open(encodeURI(event.data.url));
                 } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
