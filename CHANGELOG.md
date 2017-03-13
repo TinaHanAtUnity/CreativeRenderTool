@@ -1,3 +1,7 @@
+# Mon Mar 13 14:53:50 UTC 2017
+
+* Trigger click events on MRAID ads
+
 # Mon Mar 13 10:12:09 UTC 2017
 
 * Fix a bug where forced caching treated optional assets (like endscreen assets) as required assets
