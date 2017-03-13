@@ -108,7 +108,10 @@ export class AdUnitFactory {
 
         mraid.render();
         document.body.appendChild(mraid.container());
-        mraid.onClick.subscribe(() => sessionManager.sendClick(mraidAdUnit));
+        mraid.onClick.subscribe(() => {
+            nativeBridge.Listener.sendClickEvent(placement.getId());
+            sessionManager.sendClick(mraidAdUnit);
+        });
         mraid.onClose.subscribe(() => mraidAdUnit.hide());
 
         return mraidAdUnit;
