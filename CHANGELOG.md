@@ -1,3 +1,9 @@
+# Mon Mar 13 10:12:09 UTC 2017
+
+* Fix a bug where forced caching treated optional assets (like endscreen assets) as required assets
+* Workaround for desync in cached files and cache bookkeeping where SDK tries to resync status with HTTP 416 response
+* Add video validation for 2.1
+
 # Fri Mar 10 11:27:36 UTC 2017
 
 * Converted current MZ playables to use MRAID 
