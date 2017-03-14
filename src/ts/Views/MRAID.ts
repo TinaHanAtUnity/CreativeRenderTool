@@ -57,6 +57,9 @@ export class MRAID extends View {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        iframe.width = screen.width;
+        iframe.height = screen.height;
+
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
         });
@@ -65,6 +68,7 @@ export class MRAID extends View {
 
     public show(): void {
         super.show();
+        const iframe: any = this._iframe;
 
         let originalLength = 30;
         if(this._placement.allowSkip()) {
@@ -94,6 +98,8 @@ export class MRAID extends View {
             });
         }
         this._resizeHandler = (event: Event) => {
+            iframe.width = window.innerWidth;
+            iframe.height = window.innerHeight;
             if(this._iframe.contentWindow) {
                 this._iframe.contentWindow.postMessage({
                     type: 'resize',
