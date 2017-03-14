@@ -122,7 +122,7 @@ export class WebView {
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
-            this.setPlacementStates(PlacementState.NOT_AVAILABLE);
+            this.setPlacementStates(PlacementState.WAITING);
 
             this._campaignManager = new CampaignManager(this._nativeBridge, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
