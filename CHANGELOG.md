@@ -1,3 +1,7 @@
+# Tue Mar 14 12:03:13 UTC 2017
+
+* Fix iOS crash (ABT-183)
+
 # Mon Mar 13 14:53:50 UTC 2017
 
 * Trigger click events on MRAID ads
