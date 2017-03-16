@@ -6,6 +6,7 @@ import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { View } from 'Views/View';
+import { Campaign } from 'Models/Campaign';
 
 export class Overlay extends View {
 
@@ -57,8 +58,14 @@ export class Overlay extends View {
     private _slideTimer: any;
     private _slideStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
+    private _abTest: boolean = false;
+
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, campaign: Campaign) {
         super(nativeBridge, 'overlay');
+
+        if(campaign.getAbGroup() === 18 || campaign.getAbGroup() === 19) {
+            this._abTest = true;
+        }
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
@@ -108,6 +115,10 @@ export class Overlay extends View {
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
         this._fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
+
+        if(this._abTest) {
+            this._container.classList.add('ab-test');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -286,14 +297,24 @@ export class Overlay extends View {
     }
 
     private slide(value: boolean) {
-        if(value) {
-            this._headerElement.style.transform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
-            this._footerElement.style.transform = 'translateY(' + this._footerElement.clientHeight + 'px)';
-            this._slideStatus = false;
+        if(this._abTest) {
+            if(value) {
+                this._container.classList.add('fade');
+                this._slideStatus = false;
+            } else {
+                this._container.classList.remove('fade');
+                this._slideStatus = true;
+            }
         } else {
-            this._headerElement.style.transform = 'translateY(0px)';
-            this._footerElement.style.transform = 'translateY(0px)';
-            this._slideStatus = true;
+            if(value) {
+                this._headerElement.style.transform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
+                this._footerElement.style.transform = 'translateY(' + this._footerElement.clientHeight + 'px)';
+                this._slideStatus = false;
+            } else {
+                this._headerElement.style.transform = 'translateY(0px)';
+                this._footerElement.style.transform = 'translateY(0px)';
+                this._slideStatus = true;
+            }
         }
     }
 }
