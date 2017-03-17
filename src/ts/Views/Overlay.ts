@@ -287,12 +287,12 @@ export class Overlay extends View {
 
     private slide(value: boolean) {
         if(value) {
-            this._headerElement.style.transform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
-            this._footerElement.style.transform = 'translateY(' + this._footerElement.clientHeight + 'px)';
+            this._headerElement.style.webkitTransform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
+            this._footerElement.style.webkitTransform = 'translateY(' + this._footerElement.clientHeight + 'px)';
             this._slideStatus = false;
         } else {
-            this._headerElement.style.transform = 'translateY(0px)';
-            this._footerElement.style.transform = 'translateY(0px)';
+            this._headerElement.style.webkitTransform = 'translateY(0px)';
+            this._footerElement.style.webkitTransform = 'translateY(0px)';
             this._slideStatus = true;
         }
     }
