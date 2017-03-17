@@ -57,8 +57,14 @@ export class MRAID extends View {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        iframe.width = screen.width;
-        iframe.height = screen.height;
+
+        if(Math.abs(<number>window.orientation) === 90) {
+            iframe.width = screen.height;
+            iframe.height = screen.width;
+        } else {
+            iframe.width = screen.width;
+            iframe.height = screen.height;
+        }
 
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
