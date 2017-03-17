@@ -176,9 +176,6 @@ export class Cache {
                 }
             }
 
-            const promises: Promise<any>[] = [];
-            let dirty: boolean = false;
-
             if(deleteFiles.length > 0) {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             } else if(keepFiles.length > 0) {
@@ -186,6 +183,9 @@ export class Cache {
             } else {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: empty cache');
             }
+
+            const promises: Promise<any>[] = [];
+            let dirty: boolean = false;
 
             deleteFiles.map(file => {
                 if(keys.indexOf(file) !== -1) {
@@ -195,6 +195,10 @@ export class Cache {
                 promises.push(this._nativeBridge.Cache.deleteFile(file));
             });
 
+            if(dirty) {
+                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+            }
+
             // check consistency of kept files so that bookkeeping and files on device match
             keepFiles.map(file => {
                 promises.push(this.getCacheResponse(file).then(response => {
@@ -203,10 +207,10 @@ export class Cache {
                         return Promise.all([]);
                     } else {
                         // file not fully downloaded, deleting it
-                        dirty = true;
                         return Promise.all([
                             this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
                             this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file),
+                            this._nativeBridge.Storage.write(StorageType.PRIVATE),
                             this._nativeBridge.Cache.deleteFile(file)
                         ]);
                     }
@@ -218,10 +222,6 @@ export class Cache {
                     ]);
                 }));
             });
-
-            if(dirty) {
-                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
-            }
 
             return Promise.all(promises);
         });

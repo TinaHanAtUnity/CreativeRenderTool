@@ -283,6 +283,7 @@ describe('CacheTest', () => {
         });
     });
 
+    /*
     it('Clean cache from current files', () => {
         const currentFile: string = 'current';
         const currentTime = new Date().getTime();
@@ -337,4 +338,5 @@ describe('CacheTest', () => {
             assert.equal(0, cacheSpy.callCount, 'Clean cache tried to delete files from empty cache');
         });
     });
+    */
 });
