@@ -77,7 +77,6 @@ export class WebView {
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
-            this._cache.cleanCache();
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
@@ -85,6 +84,8 @@ export class WebView {
             HttpKafka.setClientInfo(this._clientInfo);
 
             return this._deviceInfo.fetch();
+        }).then(() => {
+            return this._cache.cleanCache();
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
