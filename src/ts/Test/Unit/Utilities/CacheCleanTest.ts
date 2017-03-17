@@ -257,6 +257,21 @@ describe('CacheCleanTest', () => {
         });
     });
 
+    it('should clean bookkeeping if cache is empty', () => {
+        const storageSpy = sinon.stub(storageApi, 'delete').returns(Promise.resolve());
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+
+        storageApi.addFile('foo', true);
+
+        return cache.cleanCache().then(() => {
+            assert.equal(storageSpy.callCount, 1, 'Cache cleanup did not invoke storage delete once');
+            assert.equal(storageSpy.getCall(0).args[0], StorageType.PRIVATE, 'Cache cleanup invoked wrong storage type');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup invoked wrong storage hierarchy');
+            assert.equal(cacheSpy.callCount, 0, 'Cache cleanup invoked Cache.delete with empty cache');
+            assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
+        });
+    });
+
     it('should clean partially downloaded files', () => {
         const fileId: string = 'test.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');

@@ -178,10 +178,8 @@ export class Cache {
 
             if(deleteFiles.length > 0) {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
-            } else if(keepFiles.length > 0) {
-                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             } else {
-                this._nativeBridge.Sdk.logInfo('Unity Ads cache: empty cache');
+                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             }
 
             const promises: Promise<any>[] = [];
