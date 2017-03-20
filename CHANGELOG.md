@@ -1,3 +1,8 @@
+# Mon Mar 20 13:06:36 UTC 2017
+
+* Clean cache desyncs in init
+* Stop cache cleaning on iOS older than 2.1.0 due to Cache.delete bugs
+
 # Mon Mar 20 09:06:29 UTC 2017
 
 * Added video overlay A/B test to groups 18 & 19
