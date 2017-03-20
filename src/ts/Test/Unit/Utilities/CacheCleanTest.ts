@@ -56,7 +56,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public get<T>(type: StorageType, key: string): Promise<T> {
-        if(key && key.startsWith('cache.')) {
+        if(key && key.match(/^cache\./)) {
             const id: string = key.substring(6);
 
             if(this._files[id]) {
@@ -68,7 +68,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public delete(type: StorageType, key: string): Promise<void> {
-        if(key && key.startsWith('cache.')) {
+        if(key && key.match(/^cache\./)) {
             const id: string = key.substring(6);
 
             if(this._files[id]) {
