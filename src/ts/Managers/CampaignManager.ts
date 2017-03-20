@@ -120,60 +120,13 @@ export class CampaignManager {
 
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
-        const mraidCampaign = this.parseMRAIDCampaign(json);
-        if(mraidCampaign) {
-            return this._assetManager.setup(mraidCampaign).then(() => this.onMRAIDCampaign.trigger(mraidCampaign));
+        if(json.campaign && json.campaign.mraidUrl) {
+            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
+            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
-    }
-
-    private parseMRAIDCampaign(json: any): MRAIDCampaign | undefined {
-        const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-        const resource = this.selectPlayable(campaign.getId());
-        const abGroup = campaign.getAbGroup();
-        if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
-        }
-        return undefined;
-    }
-
-    private selectPlayable(campaignId: string): string | undefined {
-        let playable = undefined;
-        switch(campaignId) {
-            // Game of War iOS
-            case '583dfda0d933a3630a53249c':
-            case '583dfd52abb1feee0909882b':
-            case '583dfd45669a903e086e38d2':
-            case '583dfd4c9ceadb4708b021de':
-                playable = 'https://cdn.unityads.unity3d.com/playables/SG_ios/index_ios.html';
-                break;
-
-            // Game of War Android
-            case '583dfca5a93bfa6700d8c6f3':
-            case '583dfcb54622865a0a246bdf':
-                playable = 'https://cdn.unityads.unity3d.com/playables/SG_android/index_android.html';
-                break;
-
-            // Mobile Strike iOS
-            case '583dfb9a5b79df3f0a274f0b':
-            case '583dfe483fe2166c0ac9e6fb':
-            case '583dfba09bfc2a2d0a9a0b1c':
-            case '583dfba69d308fe203d7d740':
-                playable = 'https://cdn.unityads.unity3d.com/playables/SMA_ios/index_ios.html';
-                break;
-
-            // Mobile Strike Android
-            case '583dfc532e4d9b5008c934d1':
-            case '583dfc667f448e630ac6a4bc':
-                playable = 'https://cdn.unityads.unity3d.com/playables/SMA_android/index_android.html';
-                break;
-
-            default:
-                break;
-        }
-        return playable;
     }
 
     private parseVastCampaign(json: any): Promise<void> {
