@@ -1,3 +1,8 @@
+# Mon Mar 20 09:06:29 UTC 2017
+
+* Added video overlay A/B test to groups 18 & 19
+* Init existing placements with WAITING stat
+
 # Tue Mar 14 12:03:13 UTC 2017
 
 * Fix iOS crash (ABT-183)
