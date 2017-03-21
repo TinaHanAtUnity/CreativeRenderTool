@@ -1,3 +1,7 @@
+# Tue Mar 21 15:05:53 UTC 2017
+
+* MRAID campaign support
+
 # Mon Mar 20 13:06:36 UTC 2017
 
 * Clean cache desyncs in init
