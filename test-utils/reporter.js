@@ -37,9 +37,13 @@ define([], function() {
         if(this.platform === 'android') {
             window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.api.' + className, methodName, parameters, 'null']]));
         } else if(this.platform === 'ios') {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
-            xhr.send(JSON.stringify([['UADSApi' + className, methodName, parameters, 'null']]));
+            if (window.webkit) {
+                window.webkit.messageHandlers.handleInvocation.postMessage(JSON.stringify([['UADSApi' + className, methodName, parameters, 'null']]));
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
+                xhr.send(JSON.stringify([['UADSApi' + className, methodName, parameters, 'null']]));
+            }
         }
     };
 
