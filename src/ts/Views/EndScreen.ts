@@ -9,6 +9,7 @@ import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AbTest } from 'Utilities/AbTest';
+// import * as Vibrant from 'node-vibrant';
 
 export class EndScreen extends View {
 
@@ -72,6 +73,40 @@ export class EndScreen extends View {
 
     public show(): void {
         super.show();
+
+        // const color   = require('dominant-color');
+        // const imgPath = '../img/unityads.png';
+        //
+        // color(imgPath, function(err: string, resultColor: string){
+        //     // hex color by default
+        //     console.log(color) // '5b6c6e'
+        // })
+        //
+        // color(imgPath, {format: 'rgb'}, function(err: string, resultColor: string){
+        //     console.log(color) // ['91', '108', '110']
+        // })
+
+        // const img = document.createElement('img');
+        // img.setAttribute('src', '../img/unityads.png');
+        //
+        // img.addEventListener('load', function() {
+        //     const vibrant = new Vibrant(img);
+        //     const swatches = vibrant.swatches();
+        //     for (const swatch in swatches) {
+        //         if (swatches.hasOwnProperty(swatch) && swatches[swatch]) {
+        //             console.log(swatch, swatches[swatch].getHex());
+        //         }
+        //     }
+        //
+        //     /*
+        //      * Results into:
+        //      * Vibrant #7a4426
+        //      * Muted #7b9eae
+        //      * DarkVibrant #348945
+        //      * DarkMuted #141414
+        //      * LightVibrant #f3ccb4
+        //      */
+        // });
 
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
