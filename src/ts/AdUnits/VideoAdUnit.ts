@@ -10,6 +10,8 @@ import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -88,6 +90,27 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             }
 
             this._nativeBridge.VideoPlayer.prepare(this.getVideo().getUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+
+            // hack to get diagnostics if cached file is not found in cache
+            // when the underlying problems are better understood, this should be refactored to proper error handling
+            // instead of diagnostic hack
+            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
+                this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                    if(!result.found) {
+                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                            url: this.getVideo().getUrl(),
+                            originalUrl: this.getVideo().getOriginalUrl(),
+                            campaignId: this._campaign.getId()
+                        }));
+                    }
+                }).catch(error => {
+                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
+                        url: this.getVideo().getUrl(),
+                        originalUrl: this.getVideo().getOriginalUrl(),
+                        campaignId: this._campaign.getId()
+                    }));
+                });
+            }
         }
     }
 
