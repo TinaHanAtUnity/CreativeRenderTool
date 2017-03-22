@@ -18,8 +18,8 @@ export enum AndroidVideoPlayerError {
 
 export class AndroidVideoPlayerApi extends NativeApi {
 
-    public onInfo: Observable3<number, number, string> = new Observable3();
-    public onGenericError: Observable3<number, number, string> = new Observable3();
+    public onInfo: Observable3<string, number, number> = new Observable3();
+    public onGenericError: Observable3<string, number, number> = new Observable3();
     public onPrepareError: Observable1<string> = new Observable1();
     public onSeekToError: Observable1<string> = new Observable1();
     public onPauseError: Observable1<string> = new Observable1();

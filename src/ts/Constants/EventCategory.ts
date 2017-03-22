@@ -8,5 +8,6 @@ export enum EventCategory {
     REQUEST,
     RESOLVE,
     BROADCAST,
-    NOTIFICATION
+    NOTIFICATION,
+    LIFECYCLE
 }

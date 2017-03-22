@@ -21,6 +21,9 @@ export class ClientInfo extends Model {
     private _webviewHash: string;
     private _webviewVersion: string;
 
+    private _initTimestamp: number;
+    private _reinitialized: boolean;
+
     constructor(platform: Platform, data: any[]) {
         super();
 
@@ -44,6 +47,9 @@ export class ClientInfo extends Model {
         this._webviewUrl = data.shift();
         this._webviewHash = data.shift();
         this._webviewVersion = data.shift();
+
+        this._initTimestamp = data.shift();
+        this._reinitialized = data.shift();
     }
 
     public getGameId(): string {
@@ -94,6 +100,14 @@ export class ClientInfo extends Model {
         return this._webviewVersion;
     }
 
+    public getInitTimestamp(): number {
+        return this._initTimestamp;
+    }
+
+    public isReinitialized(): boolean {
+        return this._reinitialized;
+    }
+
     public getDTO() {
         return {
             'gameId': this._gameId,
@@ -107,7 +121,9 @@ export class ClientInfo extends Model {
             'configUrl': this._configUrl,
             'webviewUrl': this._webviewUrl,
             'webviewHash': this._webviewHash,
-            'webviewVersion': this._webviewVersion
+            'webviewVersion': this._webviewVersion,
+            'initTimestamp': this._initTimestamp,
+            'reinitialized': this._reinitialized
         };
     }
 }

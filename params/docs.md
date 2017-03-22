@@ -51,6 +51,7 @@
 | sessionId | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
 | sid | string | Server side reward callback id | App | all |
 | skippedAt | number | Milliseconds from video start to video skip | SDK | all |
+| stores | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
 | test | boolean | Test mode | App | all |
 | timeZone | string | Current timezone | SDK | all |
 | webviewUa | string | WebView user agent string | SDK | all |
@@ -89,6 +90,7 @@
 | test | no | True | False | boolean | Test mode | App | all |
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
+| stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
 | gamerId | no | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |

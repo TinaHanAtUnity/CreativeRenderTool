@@ -7,6 +7,7 @@ import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
 
 class TestCacheApi extends CacheApi {
 
@@ -149,6 +150,7 @@ describe('CacheTest', () => {
 
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
+    let request: Request;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
 
@@ -161,7 +163,8 @@ describe('CacheTest', () => {
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, {retries: 3, retryDelay: 1});
+        request = new Request(nativeBridge, wakeUpManager);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
@@ -182,8 +185,9 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
+            assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
@@ -199,14 +203,17 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl1).then(fileUrl => {
+        return cacheManager.cache(testUrl1).then(([fileId, fileUrl]) => {
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
+            assert.equal(fileId, '1647395140.jpg', 'Cache three files first fileId does not match');
             assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
-        }).then(() => cacheManager.cache(testUrl2)).then(fileUrl => {
+        }).then(() => cacheManager.cache(testUrl2)).then(([fileId, fileUrl]) => {
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
+            assert.equal(fileId, '158720486.jpg', 'Cache three files second fileId does not match');
             assert.equal(testFileUrl2, fileUrl, 'Cache three files second local file url does not match');
-        }).then(() => cacheManager.cache(testUrl3)).then(fileUrl => {
+        }).then(() => cacheManager.cache(testUrl3)).then(([fileId, fileUrl]) => {
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
+            assert.equal(fileId, '929022075.jpg', 'Cache three files third fileId does not match');
             assert.equal(testFileUrl3, fileUrl, 'Cache three files third local file url does not match');
         }).then(() => {
             assert.equal(3, cacheSpy.callCount, 'Cache three files did not send three download requests');
@@ -270,63 +277,9 @@ describe('CacheTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
+            assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
-        });
-    });
-
-    it('Clean cache from current files', () => {
-        const currentFile: string = 'current';
-        const currentTime = new Date().getTime();
-
-        cacheApi.addFile(currentFile, currentTime, 1234);
-
-        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
-
-        return cacheManager.cleanCache().then(() => {
-            assert(!cacheSpy.calledOnce, 'Clean cache tried to delete current files');
-        });
-    });
-
-    it('Clean cache from old files', () => {
-        const currentFile: string = 'current';
-        const oldFile: string = 'old';
-        const currentTime = new Date().getTime();
-        const tenWeeksAgo = currentTime - 10 * 7 * 24 * 60 * 60 * 1000;
-
-        cacheApi.addFile(currentFile, currentTime, 1234);
-        cacheApi.addFile(oldFile, tenWeeksAgo, 1234);
-
-        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
-
-        return cacheManager.cleanCache().then(() => {
-            assert(cacheSpy.calledOnce, 'Clean cache from old files did not delete files');
-            assert.equal(oldFile, cacheSpy.getCall(0).args[0], 'Clean cache from old files deleted wrong file');
-        });
-    });
-
-    it('Clean cache from large disk usage', () => {
-        const olderFile: string = 'older';
-        const newerFile: string = 'newer';
-        const currentTime = new Date().getTime();
-        const size: number = 30 * 1024 * 1024;
-
-        cacheApi.addFile(olderFile, currentTime - 1, size);
-        cacheApi.addFile(newerFile, currentTime, size);
-
-        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
-
-        return cacheManager.cleanCache().then(() => {
-            assert(cacheSpy.calledOnce, 'Clean cache from large disk usage did not delete files');
-            assert.equal(olderFile, cacheSpy.getCall(0).args[0], 'Clean cache from large disk usage deleted wrong file');
-        });
-    });
-
-    it('Clean cache (nothing to clean)', () => {
-        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
-
-        return cacheManager.cleanCache().then(() => {
-            assert.equal(0, cacheSpy.callCount, 'Clean cache tried to delete files from empty cache');
         });
     });
 });

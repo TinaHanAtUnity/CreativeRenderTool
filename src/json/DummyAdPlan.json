@@ -2,6 +2,7 @@
   "abGroup": 3,
   "campaign": {
     "appStoreId": "12345678",
+    "store": "apple",
     "bypassAppSheet": false,
     "endScreenLandscape": "dummyEndScreenLandscape",
     "endScreenPortrait": "dummyEndScreenPortrait",

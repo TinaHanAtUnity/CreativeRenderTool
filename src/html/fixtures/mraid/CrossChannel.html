@@ -1,0 +1,129 @@
+
+<script src="mraid.js"></script>
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Muli:300">
+<link href="https://cdn.mdotm.com/mdotmplayableads/global/css/mraid_wrapper.css" rel="stylesheet" />
+<script>
+    var closelocation = 'topleft';
+    var closesize = '30';
+    var closeDelay = '5';
+    var ad_click_dest = "{URL}";
+    var ad_logroot = "https://g5.mdotm.com";
+    var ad_logging = false;
+    var ad_has_custom_load_screen = false;
+    var ad_dynamic_parameters = "";
+    var ad_footer_msg = '';
+    var pixels = '{PIXELS}';
+    pixels = parseInt(pixels);
+
+    var gameType = "run";
+
+    function openSite(url) {
+        log_event("click");
+        mraid.open(url);
+    }
+    function doReadyCheck() {
+        if(mraid.getState() == 'loading') {
+            mraid.addEventListener("ready", mraidIsReady);
+        } else{
+            showMyAd();
+        }
+    }
+    function mraidIsReady() {
+        removeEventListener('ready', mraidIsReady);
+        showMyAd();
+    }
+    function showMyAd(){
+        if ( mraid ) {
+            mraid.useCustomClose(true);
+            if ( mraid.isViewable() ) {
+                startAd();
+            } else {
+                mraid.addEventListener('viewableChange', function(viewable) {
+                    if(viewable) {
+                        mraid.removeEventListener('viewableChange', arguments.callee);
+                        startAd();
+                    }
+                });
+            }
+        } else {
+            startAd();
+        }
+    }
+    function startAd() {
+        showAd();
+        setTimeout(function(){
+            var closeElement = document.getElementById("closebtn");
+            var y = closesize + "px";
+            if ( closelocation == 'topright' ) {
+                closeElement.style.top = '10px';
+                closeElement.style.right = '10px';
+            } else if ( closelocation == 'topleft') {
+                closeElement.style.top = '10px';
+                closeElement.style.left = '10px';
+            } else if ( closelocation == 'bottomright' ) {
+                closeElement.style.bottom = '10px';
+                closeElement.style.right = '10px';
+            } else {
+                closeElement.style.bottom = '10px';
+                closeElement.style.left = '10px';
+            }
+            closeElement.style.display = "block";
+            closeElement.style.fontSize = y;
+        }, closeDelay * 1000);
+    }
+    function closeMyAd() {
+        log_event("skip");
+        mraid.close();
+    }
+    function log_event(eventID) {
+        console.log("[log_event] ==> " + eventID);
+    }
+    function log_level(gameType, event) {
+        console.log(gameType + ": " + event);
+    }
+
+</script>
+
+<meta charset="UTF-8" />
+
+<script type="text/javascript">
+    var ad_orientation= "landscape";
+    var ad_name = "jccd_ms_run";
+    var ad_title = "Mobile Strike";
+    var ad_webroot = "http://cdn.mdotm.com/mdotmplayableads/playable3";
+    var ad_lang = 'en';
+    var ad_splash_image = ad_webroot + "/" + ad_name + "/img/icon.jpg";
+</script>
+<script type='text/javascript' src='http://cdn.mdotm.com/mdotmplayableads/playable3/jccd_ms_run/js/phaser.min.js'></script>
+<script type='text/javascript' src='http://cdn.mdotm.com/mdotmplayableads/playable3/jccd_ms_run/js/scripts.min.js'></script>
+
+
+<body style='margin:0px;padding:0px;width:100%;height:100%;position:relative;'  onload='doReadyCheck();'>
+<div id="ad_header">
+    <div id="ad_title"></div>
+</div>
+<div id="orientation"></div>
+<div id="ad_footer" style="display:none">
+    <center><span id="ad_footer_span"></span></center>
+</div>
+<div id="splash" onclick="openSite(ad_click_dest);">
+    <div id="splash_icon_wrap">
+        <img src="" id="splash_icon">
+    </div>
+    <div id="splash_wait"></div>
+    <div id="splash_loading">
+        <div id="splash_loading_bar"></div>
+        <div id="splash_loading_bar_full"></div>
+    </div>
+</div>
+<div id="closebtn" style="color:#FFF; z-index:999; font-weight: bold; position: absolute; display:none;" onclick='closeMyAd();'>&#215;</div>
+</body>
+
+
+<script>
+    document.getElementById("ad_title").innerHTML = ad_title;
+    document.getElementById("ad_footer_span").innerHTML = ad_footer_msg;
+    document.getElementById("splash_icon").src = ad_splash_image;
+    document.getElementById("splash_wait").innerHTML = localization[ad_lang];
+</script>
+

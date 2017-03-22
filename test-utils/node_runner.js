@@ -123,4 +123,7 @@ Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
     if(coverageDir) {
         fs.writeFileSync(coverageDir + '/coverage.json', JSON.stringify(__coverage__));
     }
-}).catch(console.error.bind(console));
+}).catch(error => {
+    console.error(error);
+    process.exit(1);
+});

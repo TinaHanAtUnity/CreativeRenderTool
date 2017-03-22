@@ -42,15 +42,13 @@ describe('VastOverlayEventHandlersTest', () => {
             handleInvocation,
             handleCallback
         });
-        overlay = new Overlay(nativeBridge, false, 'en');
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-
         const vastParser = TestFixtures.getVastParser();
-
         const vastXml = EventTestVast;
-
         const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+
+        overlay = new Overlay(nativeBridge, false, 'en', campaign);
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         placement = new Placement({
             id: 'testPlacement',

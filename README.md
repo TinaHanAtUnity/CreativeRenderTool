@@ -8,6 +8,7 @@
 ### Optional
 
 - Python (`brew install python3`)
+- nginx (`brew install nginx`)
 - Watchman (`brew install watchman`)
 - exiftool (`brew install exiftool`) for integration tests
 
@@ -54,7 +55,7 @@ To build and test continuously (on file changes), use:
 
 - Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/dev/config.json`)
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
-- Start local web server in project root (`python3 -m http.server`)
+- Start local web server in project root (`make start-nginx`)
 
 ## Testing
 
@@ -68,6 +69,23 @@ To build and test continuously (on file changes), use:
 - Change webview test config (src/test-config.json) to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/test/index.html`)
 - `make build-test`
 - Run hybrid test suite from the SDK
+
+### Deployment tests
+
+#### Android
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-android-api/
+
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans/
+
+
+#### iOS
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-ios-api/
+
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-iOS-sans/
+
+#### Running deployment tests
+
+Follow the link for desired platform -> Build with Parameters -> Build. This job will start system test jobs, that run tests on real device in Testdroid cloud. The job iterates over all webview git branches with prefix 'origin/staging/', so staging branches must be deployed in order to run tests. Each found staging branch will result in a job under 'Results' link above.
 
 ## Releasing
 

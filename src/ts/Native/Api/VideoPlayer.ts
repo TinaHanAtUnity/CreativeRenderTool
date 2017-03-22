@@ -24,7 +24,7 @@ export class VideoPlayerApi extends NativeApi {
 
     public onProgress: Observable1<number> = new Observable1();
     public onCompleted: Observable1<string> = new Observable1();
-    public onPrepared: Observable4<number, number, number, string> = new Observable4();
+    public onPrepared: Observable4<string, number, number, number> = new Observable4();
     public onPrepareTimeout: Observable1<string> = new Observable1();
     public onPlay: Observable1<string> = new Observable1();
     public onPause: Observable1<string> = new Observable1();

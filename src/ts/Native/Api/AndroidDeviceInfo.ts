@@ -59,4 +59,36 @@ export class AndroidDeviceInfoApi extends NativeApi {
     public getTotalSpace(storageType: StorageType): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [StorageType[storageType]]);
     }
+
+    public getSensorList(): Promise<any[]> {
+        return this._nativeBridge.invoke<any[]>(this._apiClass, 'getSensorList');
+    }
+
+    public getBoard(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getBoard');
+    }
+
+    public getBootloader(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getBootloader');
+    }
+
+    public getDevice(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getDevice');
+    }
+
+    public getHardware(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getHardware');
+    }
+
+    public getHost(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getHost');
+    }
+
+    public getProduct(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getProduct');
+    }
+
+    public getSupportedAbis(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSupportedAbis');
+    }
 }

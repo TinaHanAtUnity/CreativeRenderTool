@@ -21,7 +21,7 @@ export class VideoPlayer {
                 const width = VideoPlayer._width = splitImageSize[0];
                 const height = VideoPlayer._height = splitImageSize[1];
                 VideoPlayer._url = url;
-                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, duration, width, height);
             });
             // tslint:enable:no-string-literal
         } else {
@@ -34,7 +34,7 @@ export class VideoPlayer {
                 const duration = VideoPlayer._duration = Math.round(videoView.duration * 1000);
                 const width = VideoPlayer._width = videoView.videoWidth;
                 const height = VideoPlayer._height = videoView.videoHeight;
-                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', duration, width, height, url);
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, duration, width, height);
             }, false);
             videoView.src = url;
         }
@@ -54,7 +54,7 @@ export class VideoPlayer {
         if(VideoPlayer._videoView) {
             const videoView = VideoPlayer._videoView;
             videoView.addEventListener('play', () => {
-                Backend.sendEvent('VIDEOPLAYER', 'PLAY');
+                Backend.sendEvent('VIDEOPLAYER', 'PLAY', VideoPlayer._url);
             }, false);
             videoView.addEventListener('timeupdate', () => {
                 Backend.sendEvent('VIDEOPLAYER', 'PROGRESS', Math.round(videoView.currentTime * 1000));

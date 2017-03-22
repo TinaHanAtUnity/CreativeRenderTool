@@ -138,16 +138,14 @@ describe('VastVideoEventHandlers tests', () => {
             handleCallback
         });
 
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-
-        overlay = new Overlay(nativeBridge, false, 'en');
-
         const vastParser = TestFixtures.getVastParser();
-
         const vastXml = EventTestVast;
-
         const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+
+        overlay = new Overlay(nativeBridge, false, 'en', campaign);
 
         placement = new Placement({
             id: '123',
