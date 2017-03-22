@@ -8,7 +8,6 @@ import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { AbTest } from 'Utilities/AbTest';
 
 export class EndScreen extends View {
 
@@ -47,7 +46,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .cocback'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
@@ -60,14 +59,6 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
-
-        if(AbTest.isCoCAnimatedTest(campaign) || AbTest.isCoCAnimatedTest2(campaign)) {
-            // tslint:disable:no-string-literal
-            this._templateData['cocBackground'] = campaign.getBackgroundImage().getUrl();
-            this._templateData['cocChars'] = campaign.getBackgroundLayerImage().getUrl();
-            this._templateData['cocLogo'] = campaign.getBackgroundLogoImage().getUrl();
-            // tslint:enable:no-string-literal
-        }
     }
 
     public show(): void {
@@ -100,12 +91,6 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
-        if(AbTest.isCoCAnimatedTest(campaign)) {
-            return 'animated';
-        }
-        if(AbTest.isCoCAnimatedTest2(campaign)) {
-            return 'animated2';
-        }
         return undefined;
     }
 
