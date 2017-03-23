@@ -38,7 +38,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._options = options;
         this.setShowing(false);
-        this.setFinishState(FinishState.COMPLETED);
     }
 
     public show(): Promise<void> {
@@ -64,9 +63,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         this._mraid.hide();
-
-        this._sessionManager.sendThirdQuartile(this);
-        this._sessionManager.sendView(this);
 
         this.onFinish.trigger();
         this.onClose.trigger();

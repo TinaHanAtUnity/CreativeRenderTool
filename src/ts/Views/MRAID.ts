@@ -18,6 +18,7 @@ export interface IOrientationProperties {
 export class MRAID extends View {
 
     public onClick: Observable0 = new Observable0();
+    public onSkip: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
     public onOrientationProperties: Observable1<IOrientationProperties> = new Observable1();
 
@@ -27,6 +28,8 @@ export class MRAID extends View {
     private _campaign: MRAIDCampaign;
 
     private _closeElement: HTMLElement;
+    private _skipElement: HTMLElement;
+
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
 
@@ -34,6 +37,7 @@ export class MRAID extends View {
     private _resizeHandler: any;
 
     private _canClose = false;
+    private _canSkip = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -48,6 +52,11 @@ export class MRAID extends View {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onSkipEvent(event),
+                selector: '.skip-region'
             }
         ];
     }
@@ -56,6 +65,9 @@ export class MRAID extends View {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._closeElement.style.display = 'none';
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-region');
+        this._skipElement.style.display = 'none';
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this.createMRAID().then(mraid => {
@@ -69,16 +81,40 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
-        let originalLength = 30;
+        const closeLength = 30;
+        let skipLength: number | undefined = undefined;
+
         if(this._placement.allowSkip()) {
-            originalLength = this._placement.allowSkipInSeconds();
+            skipLength = this._placement.allowSkipInSeconds();
+            this._skipElement.style.display = 'block';
+        } else {
+            this._closeElement.style.display = 'block';
         }
 
-        let length = originalLength;
+        let closeRemaining = closeLength;
+        let skipRemaining = skipLength;
         const updateInterval = setInterval(() => {
-            length--;
-            this.updateProgressCircle(this._closeElement, (originalLength - length) / originalLength);
-            if (length <= 0) {
+            closeRemaining--;
+            if(this._placement.allowSkip()) {
+                if(skipRemaining > 0) {
+                    skipRemaining--;
+                }
+                if(skipRemaining <= 0) {
+                    this._canSkip = true;
+                    this._skipElement.style.opacity = '1';
+                    this.updateProgressCircle(this._skipElement, 1);
+                } else {
+                    this.updateProgressCircle(this._skipElement, (skipLength - skipRemaining) / skipLength);
+                }
+            }
+
+            this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
+
+            if (closeRemaining <= 0) {
+                if(this._placement.allowSkip()) {
+                    this._skipElement.style.display = 'none';
+                    this._closeElement.style.display = 'block';
+                }
                 clearInterval(updateInterval);
                 this._canClose = true;
                 this._closeElement.style.opacity = '1';
@@ -154,6 +190,14 @@ export class MRAID extends View {
         event.stopPropagation();
         if(this._canClose) {
             this.onClose.trigger();
+        }
+    }
+
+    private onSkipEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        if(this._canSkip) {
+            this.onSkip.trigger();
         }
     }
 
