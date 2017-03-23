@@ -8,8 +8,6 @@ import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { AbTest } from 'Utilities/AbTest';
-// import * as Vibrant from 'node-vibrant';
 
 export class EndScreen extends View {
 
@@ -48,7 +46,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container, .cocback'
+                selector: '.game-background, .btn-download, .store-button, .game-icon, .store-badge-container'
             },
             {
                 event: 'click',
@@ -61,52 +59,10 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
-
-        if(AbTest.isCoCAnimatedTest(campaign) || AbTest.isCoCAnimatedTest2(campaign)) {
-            // tslint:disable:no-string-literal
-            this._templateData['cocBackground'] = campaign.getBackgroundImage().getUrl();
-            this._templateData['cocChars'] = campaign.getBackgroundLayerImage().getUrl();
-            this._templateData['cocLogo'] = campaign.getBackgroundLogoImage().getUrl();
-            // tslint:enable:no-string-literal
-        }
     }
 
     public show(): void {
         super.show();
-
-        // const color   = require('dominant-color');
-        // const imgPath = '../img/unityads.png';
-        //
-        // color(imgPath, function(err: string, resultColor: string){
-        //     // hex color by default
-        //     console.log(color) // '5b6c6e'
-        // })
-        //
-        // color(imgPath, {format: 'rgb'}, function(err: string, resultColor: string){
-        //     console.log(color) // ['91', '108', '110']
-        // })
-
-        // const img = document.createElement('img');
-        // img.setAttribute('src', '../img/unityads.png');
-        //
-        // img.addEventListener('load', function() {
-        //     const vibrant = new Vibrant(img);
-        //     const swatches = vibrant.swatches();
-        //     for (const swatch in swatches) {
-        //         if (swatches.hasOwnProperty(swatch) && swatches[swatch]) {
-        //             console.log(swatch, swatches[swatch].getHex());
-        //         }
-        //     }
-        //
-        //     /*
-        //      * Results into:
-        //      * Vibrant #7a4426
-        //      * Muted #7b9eae
-        //      * DarkVibrant #348945
-        //      * DarkMuted #141414
-        //      * LightVibrant #f3ccb4
-        //      */
-        // });
 
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
@@ -135,12 +91,6 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
-        if(AbTest.isCoCAnimatedTest(campaign)) {
-            return 'animated';
-        }
-        if(AbTest.isCoCAnimatedTest2(campaign)) {
-            return 'animated2';
-        }
         return undefined;
     }
 

@@ -1,3 +1,14 @@
+# Thu Mar 23 05:44:20 UTC 2017
+
+* Add check for showing cached files when they are not found in cache
+* Removed Marvel A/B test
+
+* MRAID campaign support
+
+# Tue Mar 21 15:05:53 UTC 2017
+
+* MRAID campaign support
+
 # Mon Mar 20 13:06:36 UTC 2017
 
 * Clean cache desyncs in init

@@ -30,6 +30,7 @@ export class MRAID extends View {
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
 
+    private _messageListener: any;
     private _resizeHandler: any;
 
     private _canClose = false;
@@ -57,14 +58,26 @@ export class MRAID extends View {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+
+        if(Math.abs(<number>window.orientation) === 90) {
+            iframe.width = screen.height;
+            iframe.height = screen.width;
+        } else {
+            iframe.width = screen.width;
+            iframe.height = screen.height;
+        }
+
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
         });
-        window.addEventListener('message', (event: MessageEvent) => this.onMessage(event), false);
+
+        this._messageListener = (event: MessageEvent) => this.onMessage(event);
+        window.addEventListener('message', this._messageListener, false);
     }
 
     public show(): void {
         super.show();
+        const iframe: any = this._iframe;
 
         let originalLength = 30;
         if(this._placement.allowSkip()) {
@@ -94,6 +107,8 @@ export class MRAID extends View {
             });
         }
         this._resizeHandler = (event: Event) => {
+            iframe.width = window.innerWidth;
+            iframe.height = window.innerHeight;
             if(this._iframe.contentWindow) {
                 this._iframe.contentWindow.postMessage({
                     type: 'resize',
@@ -110,6 +125,10 @@ export class MRAID extends View {
             type: 'viewable',
             value: false
         }, '*');
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
+        }
         if(this._resizeHandler) {
             window.removeEventListener('resize', this._resizeHandler, false);
             this._resizeHandler = undefined;
