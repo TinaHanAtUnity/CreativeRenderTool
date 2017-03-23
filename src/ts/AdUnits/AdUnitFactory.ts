@@ -27,7 +27,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { FinishState } from '../Constants/FinishState';
+import { FinishState } from 'Constants/FinishState';
 
 export class AdUnitFactory {
 
