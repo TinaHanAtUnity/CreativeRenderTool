@@ -1,9 +1,12 @@
+# Thu Mar 23 15:06:23 UTC 2017
+
+* If cached video is not found when video is starting, use streaming video as fallback
+* Revert "Set iframe height and width in pixels based on the screen size."
+
 # Thu Mar 23 05:44:20 UTC 2017
 
 * Add check for showing cached files when they are not found in cache
 * Removed Marvel A/B test
-
-* MRAID campaign support
 
 # Tue Mar 21 15:05:53 UTC 2017
 
