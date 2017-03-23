@@ -28,8 +28,6 @@ export class MRAID extends View {
     private _campaign: MRAIDCampaign;
 
     private _closeElement: HTMLElement;
-    private _skipElement: HTMLElement;
-
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
 
@@ -52,11 +50,6 @@ export class MRAID extends View {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip-region'
             }
         ];
     }
@@ -65,9 +58,6 @@ export class MRAID extends View {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._closeElement.style.display = 'none';
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-region');
-        this._skipElement.style.display = 'none';
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this.createMRAID().then(mraid => {
@@ -82,44 +72,43 @@ export class MRAID extends View {
         super.show();
 
         const closeLength = 30;
-        let skipLength: number | undefined = undefined;
-
         if(this._placement.allowSkip()) {
-            skipLength = this._placement.allowSkipInSeconds();
-            this._skipElement.style.display = 'block';
-        } else {
-            this._closeElement.style.display = 'block';
-        }
-
-        let closeRemaining = closeLength;
-        let skipRemaining = skipLength;
-        const updateInterval = setInterval(() => {
-            closeRemaining--;
-            if(this._placement.allowSkip()) {
+            const skipLength = this._placement.allowSkipInSeconds();
+            let closeRemaining = closeLength;
+            let skipRemaining = skipLength;
+            const updateInterval = setInterval(() => {
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                }
                 if(skipRemaining > 0) {
                     skipRemaining--;
+                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
                 }
                 if(skipRemaining <= 0) {
                     this._canSkip = true;
-                    this._skipElement.style.opacity = '1';
-                    this.updateProgressCircle(this._skipElement, 1);
-                } else {
-                    this.updateProgressCircle(this._skipElement, (skipLength - skipRemaining) / skipLength);
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
                 }
-            }
-
-            this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
-
-            if (closeRemaining <= 0) {
-                if(this._placement.allowSkip()) {
-                    this._skipElement.style.display = 'none';
-                    this._closeElement.style.display = 'block';
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
                 }
-                clearInterval(updateInterval);
-                this._canClose = true;
-                this._closeElement.style.opacity = '1';
-            }
-        }, 1000);
+            }, 1000);
+        } else {
+            let closeRemaining = closeLength;
+            const updateInterval = setInterval(() => {
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                    this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
+                }
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+            }, 1000);
+        }
 
         if(this._loaded) {
             this._iframe.contentWindow.postMessage('viewable', '*');
@@ -188,16 +177,10 @@ export class MRAID extends View {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._canClose) {
-            this.onClose.trigger();
-        }
-    }
-
-    private onSkipEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        if(this._canSkip) {
+        if(this._canSkip && !this._canClose) {
             this.onSkip.trigger();
+        } else if(this._canClose) {
+            this.onClose.trigger();
         }
     }
 
