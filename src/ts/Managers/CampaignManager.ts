@@ -72,8 +72,6 @@ export class CampaignManager {
 
         this._requesting = false;
         this._refillTimestamp = 0;
-
-        CampaignManager.setCampaignId('583dfda0d933a3630a53249c');
     }
 
     public request(): Promise<void> {
