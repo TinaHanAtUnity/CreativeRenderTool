@@ -90,6 +90,13 @@ export class Backend implements IWebViewBridge {
                 }
             }
         })();
+
+        if (!api[invocation.method]) {
+            // tslint:disable:no-console
+            console.info('WARNING! Missing backend API method: ' + invocation.className + '.' + invocation.method);
+            // tslint:enable:no-console
+        }
+
         try {
             return {
                 callbackId: invocation.callbackId,
