@@ -117,13 +117,10 @@ export class AdUnitFactory {
         });
         mraid.onSkip.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
-            sessionManager.sendSkip(mraidAdUnit);
             mraidAdUnit.hide();
         });
         mraid.onClose.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.COMPLETED);
-            sessionManager.sendThirdQuartile(mraidAdUnit);
-            sessionManager.sendView(mraidAdUnit);
             mraidAdUnit.hide();
         });
 
