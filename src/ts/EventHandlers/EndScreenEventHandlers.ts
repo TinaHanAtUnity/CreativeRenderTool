@@ -8,13 +8,14 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { StoreName } from 'Models/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class EndScreenEventHandlers {
 
     public static onDownloadAndroid(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
-        const platform = nativeBridge.getPlatform();
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
+        const packageName = sessionManager.getClientInfo().getApplicationName();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
@@ -24,13 +25,12 @@ export class EndScreenEventHandlers {
         } else {
             nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
-                'uri': EndScreenEventHandlers.getAppStoreUrl(platform, campaign)
+                'uri': EndScreenEventHandlers.getAppStoreUrl(campaign, packageName)
             });
         }
     }
 
     public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
-        const platform = nativeBridge.getPlatform();
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
@@ -40,7 +40,7 @@ export class EndScreenEventHandlers {
             EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
         } else {
             if(IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()) || campaign.getBypassAppSheet()) {
-                nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
+                nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(campaign));
             } else {
                 nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
                     if(canOpenAppSheet) {
@@ -51,11 +51,11 @@ export class EndScreenEventHandlers {
                             nativeBridge.AppSheet.destroy(options);
                         }).catch(([error]) => {
                             if(error === 'APPSHEET_NOT_FOUND') {
-                                nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
+                                nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(campaign));
                             }
                         });
                     } else {
-                        nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(platform, campaign));
+                        nativeBridge.UrlScheme.open(EndScreenEventHandlers.getAppStoreUrl(campaign));
                     }
                 });
             }
@@ -108,11 +108,18 @@ export class EndScreenEventHandlers {
         }
     }
 
-    private static getAppStoreUrl(platform: Platform, campaign: PerformanceCampaign) {
-        if(platform === Platform.IOS) {
-            return 'https://itunes.apple.com/app/id' + campaign.getAppStoreId();
-        } else {
-            return 'market://details?id=' + campaign.getAppStoreId();
+    private static getAppStoreUrl(campaign: PerformanceCampaign, packageName?: string) {
+        const store = campaign.getStore();
+        switch (store) {
+            case StoreName.APPLE:
+                return 'https://itunes.apple.com/app/id' + campaign.getAppStoreId();
+            case StoreName.GOOGLE:
+                return 'market://details?id=' + campaign.getAppStoreId();
+            case StoreName.XIAOMI:
+                return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
+            default:
+                return "";
         }
+
     }
 }

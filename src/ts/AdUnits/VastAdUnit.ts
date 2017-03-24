@@ -40,7 +40,7 @@ export class VastAdUnit extends VideoAdUnit {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
+    public sendImpressionEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
@@ -49,7 +49,7 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string, sdkVersion: string): void {
+    public sendTrackingEvent(eventManager: EventManager, eventName: string, sessionId: string, sdkVersion: number): void {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
@@ -58,7 +58,7 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendProgressEvents(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number) {
+    public sendProgressEvents(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number) {
         this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
         this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
         this.sendQuartileEvent(eventManager, sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
@@ -82,7 +82,7 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: string): void {
+    public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
@@ -96,7 +96,7 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: string, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
+    private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
             if (duration && duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
@@ -105,9 +105,9 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, sdkVersion: string, url: string): void {
+    private sendThirdPartyEvent(eventManager: EventManager, event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
-        url = url.replace(/%SDK_VERSION%/, sdkVersion);
+        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
         eventManager.thirdPartyEvent(event, sessionId, url);
     }
 

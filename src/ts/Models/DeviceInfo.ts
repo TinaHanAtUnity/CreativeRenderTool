@@ -9,6 +9,9 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 export class DeviceInfo extends Model {
 
+    public static GooglePlayPackageName = 'com.android.vending';
+    public static XiaomiPackageName = 'com.xiaomi.gamecenter.demo';
+
     private _androidId: string;
     private _advertisingIdentifier: string;
     private _limitAdTracking: boolean;
@@ -42,6 +45,8 @@ export class DeviceInfo extends Model {
     private _totalMemory: number;
     private _rooted: boolean;
     private _simulator: boolean;
+    private _isGoogleStoreInstalled: boolean;
+    private _isXiaomiStoreInstalled: boolean;
     private _statusBarHeight: number;
 
     private _nativeBridge: NativeBridge;
@@ -79,9 +84,32 @@ export class DeviceInfo extends Model {
             promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this._isGoogleStoreInstalled = isGoogleInstalled).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this._isXiaomiStoreInstalled = isXiaomiInstalled).catch(err => this.handleDeviceInfoError(err)));
         }
 
         return Promise.all(promises);
+    }
+
+    public getStores(): string {
+        let storeString = "";
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            storeString = "apple";
+        } else {
+            if (this._isGoogleStoreInstalled) {
+                storeString = "google";
+            }
+            if (this._isXiaomiStoreInstalled) {
+                storeString = "xiaomi";
+            }
+            if (this._isXiaomiStoreInstalled && this._isGoogleStoreInstalled) {
+                storeString = "xiaomi,google";
+            }
+            if (!this._isXiaomiStoreInstalled && !this._isGoogleStoreInstalled) {
+                storeString = "none";
+            }
+        }
+        return storeString;
     }
 
     public getAndroidId(): string {

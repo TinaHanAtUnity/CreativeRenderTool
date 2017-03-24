@@ -4,8 +4,7 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewConfiguration } from "AdUnits/Containers/AdUnitContainer";
+import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -37,7 +36,7 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowOrientation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
 
@@ -46,12 +45,7 @@ export class Activity extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        let orientation: ScreenOrientation = ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED;
-        if(forceOrientation === ForceOrientation.LANDSCAPE) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
-            orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-        }
+        const orientation = this.getOrientation(allowRotation, forceOrientation);
 
         let keyEvents: any[] = [];
         if(disableBackbutton) {
@@ -100,8 +94,32 @@ export class Activity extends AdUnitContainer {
         return Promise.all(promises);
     }
 
+    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
+        return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation));
+    }
+
     public isPaused() {
         return false;
+    }
+
+    private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation) {
+        let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
+        if(allowRotation) {
+            if(forceOrientation === ForceOrientation.PORTRAIT) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            }
+        } else {
+            if(forceOrientation === ForceOrientation.PORTRAIT) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
+            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
+            } else {
+                orientation = ScreenOrientation.SCREEN_ORIENTATION_LOCKED;
+            }
+        }
+        return orientation;
     }
 
     private onResume(activityId: number): void {

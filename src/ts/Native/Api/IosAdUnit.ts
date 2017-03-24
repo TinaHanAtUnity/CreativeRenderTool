@@ -13,6 +13,12 @@ enum AdUnitEvent {
     VIEW_CONTROLLER_DID_RECEIVE_MEMORY_WARNING
 }
 
+export enum IosAdUnitError {
+    ADUNIT_NULL,
+    NO_ROTATION_Z,
+    UNKNOWN_VIEW
+}
+
 export class IosAdUnitApi extends NativeApi {
 
     public onViewControllerInit: Observable0 = new Observable0();

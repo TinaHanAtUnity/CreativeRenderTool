@@ -1,3 +1,67 @@
+# Fri Mar 24 08:52:30 UTC 2017
+
+* When cached video is not found, use the correct video intended for streaming instead of the downloadable video
+
+# Thu Mar 23 15:06:23 UTC 2017
+
+* If cached video is not found when video is starting, use streaming video as fallback
+* Revert "Set iframe height and width in pixels based on the screen size."
+
+# Thu Mar 23 05:44:20 UTC 2017
+
+* Add check for showing cached files when they are not found in cache
+* Removed Marvel A/B test
+
+# Tue Mar 21 15:05:53 UTC 2017
+
+* MRAID campaign support
+
+# Mon Mar 20 13:06:36 UTC 2017
+
+* Clean cache desyncs in init
+* Stop cache cleaning on iOS older than 2.1.0 due to Cache.delete bugs
+
+# Mon Mar 20 09:06:29 UTC 2017
+
+* Added video overlay A/B test to groups 18 & 19
+* Init existing placements with WAITING stat
+
+# Tue Mar 14 12:03:13 UTC 2017
+
+* Fix iOS crash (ABT-183)
+
+# Mon Mar 13 14:53:50 UTC 2017
+
+* Trigger click events on MRAID ads
+
+# Mon Mar 13 10:12:09 UTC 2017
+
+* Fix a bug where forced caching treated optional assets (like endscreen assets) as required assets
+* Workaround for desync in cached files and cache bookkeeping where SDK tries to resync status with HTTP 416 response
+* Add video validation for 2.1
+
+# Fri Mar 10 11:27:36 UTC 2017
+
+* Converted current MZ playables to use MRAID 
+
+# Wed Mar  8 07:19:27 UTC 2017
+
+* Marvel Contest of Champions animated background A/B test
+
+# Thu Mar  2 15:06:13 UTC 2017
+
+* Fix iOS getNetworkOperator and getNetworkOperatorName methods when there is no SIM card present
+
+# Thu Mar  2 09:31:13 UTC 2017
+
+* Add store detection (Google Play/Xiaomi) to ad requests
+
+# Wed Mar  1 13:25:48 UTC 2017
+
+* Remove split screen ad unit A/B test
+* Add hit areas for overlay buttons
+* Fix campaign request parameters
+
 # Mon Feb 27 13:12:02 UTC 2017
 
 * Fix click attribution

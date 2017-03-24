@@ -90,7 +90,7 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: PerformanceCampaign) {
+    private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
         return undefined;
     }
 

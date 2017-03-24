@@ -5,8 +5,10 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
+import { Video } from 'Models/Video';
+import { Platform } from 'Constants/Platform';
+import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 
 export enum CacheStatus {
     OK,
@@ -43,6 +45,7 @@ export class Cache {
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
+    private _request: Request;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
     private _fileIds: { [key: string]: string } = {};
@@ -52,9 +55,10 @@ export class Cache {
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, options?: ICacheOptions) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
+        this._request = request;
 
         if(options) {
             this._maxRetries = options.retries;
@@ -71,7 +75,7 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
     }
 
-    public cache(url: string): Promise<string> {
+    public cache(url: string): Promise<[string, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -82,14 +86,16 @@ export class Cache {
             ]);
         }).then(([isCached, fileId]) => {
             if(isCached) {
-                return Promise.resolve([CacheStatus.OK, fileId]);
+                return [CacheStatus.OK, fileId];
             }
             const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
             if(status === CacheStatus.OK) {
-                return this.getFileUrl(fileId);
+                return this.getFileUrl(fileId).then(fileUrl => {
+                    return [fileId, fileUrl];
+                });
             }
             throw status;
         }).catch(error => {
@@ -133,17 +139,24 @@ export class Cache {
     }
 
     public cleanCache(): Promise<any[]> {
-        return this._nativeBridge.Cache.getFiles().then((files): Promise<any> => {
+        return Promise.all([this.getCacheKeys(), this._nativeBridge.Cache.getFiles()]).then(([keys, files]): Promise<any> => {
             if(!files || !files.length) {
-                return Promise.resolve();
+                if(keys && keys.length > 0) {
+                    return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache');
+                } else {
+                    return Promise.resolve();
+                }
             }
 
             // clean files older than three weeks and limit cache size to 50 megabytes
             const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
             const sizeThreshold: number = 50 * 1024 * 1024;
 
+            const keepFiles: string[] = [];
             const deleteFiles: string[] = [];
             let totalSize: number = 0;
+            let deleteSize: number = 0;
+            let keepSize: number = 0;
 
             // sort files from newest to oldest
             files.sort((n1: IFileInfo, n2: IFileInfo) => {
@@ -154,23 +167,57 @@ export class Cache {
                 totalSize += file.size;
                 if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
                     deleteFiles.push(file.id);
+                    deleteSize += file.size;
+                } else {
+                    keepFiles.push(file.id);
+                    keepSize += file.size;
                 }
             }
 
-            if(deleteFiles.length === 0) {
-                return Promise.resolve();
+            if(deleteFiles.length > 0) {
+                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             } else {
-                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files');
+                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             }
 
             const promises: Array<Promise<any>> = [];
+            let dirty: boolean = false;
 
             deleteFiles.map(file => {
-                promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file));
+                if(keys.indexOf(file) !== -1) {
+                    promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file));
+                    dirty = true;
+                }
                 promises.push(this._nativeBridge.Cache.deleteFile(file));
             });
 
-            promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+            if(dirty) {
+                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+            }
+
+            // check consistency of kept files so that bookkeeping and files on device match
+            keepFiles.map(file => {
+                promises.push(this.getCacheResponse(file).then(response => {
+                    if(response.fullyDownloaded === true) {
+                        // file and bookkeeping ok
+                        return Promise.all([]);
+                    } else {
+                        // file not fully downloaded, deleting it
+                        return Promise.all([
+                            this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
+                            this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + file),
+                            this._nativeBridge.Storage.write(StorageType.PRIVATE),
+                            this._nativeBridge.Cache.deleteFile(file)
+                        ]);
+                    }
+                }).catch(() => {
+                    // entry not found in bookkeeping so delete file
+                    return Promise.all([
+                        this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting desynced download ' + file),
+                        this._nativeBridge.Cache.deleteFile(file)
+                    ]);
+                }));
+            });
 
             return Promise.all(promises);
         });
@@ -213,9 +260,55 @@ export class Cache {
         });
     }
 
+    public isVideoValid(video: Video): Promise<boolean> {
+        return this.getFileId(video.getOriginalUrl()).then(fileId => {
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
+                    return (width > 0 && height > 0 && duration > 0);
+                }).catch(error => {
+                    return false;
+                });
+            } else {
+                const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
+                return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+                    let width: number = 0;
+                    let height: number = 0;
+                    let duration: number = 0;
+
+                    for(const entry of results) {
+                        const key = entry[0];
+                        const value = entry[1];
+
+                        switch(key) {
+                            case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                                width = value;
+                                break;
+
+                            case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                                height = value;
+                                break;
+
+                            case VideoMetadata.METADATA_KEY_DURATION:
+                                duration = value;
+                                break;
+
+                            default:
+                                // unknown key, ignore
+                                break;
+                        }
+                    }
+
+                    return (width > 0 && height > 0 && duration > 0);
+                }).catch(error => {
+                    return false;
+                });
+            }
+        });
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
-        this._nativeBridge.Cache.download(url, fileId).catch(error => {
+        this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
             const callback = this._callbacks[url];
             if(callback) {
                 switch(error) {
@@ -299,6 +392,14 @@ export class Cache {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
+    private getCacheKeys(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache', true).then(keys => {
+            return keys;
+        }).catch(() => {
+            return [];
+        });
+    }
+
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: Array<[string, string]>): void {
         if(size === 0) {
             this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
@@ -331,6 +432,9 @@ export class Cache {
                     this.downloadFile(location, fileId);
                     return;
                 }
+            } else if(responseCode === 416) {
+                this.handleRequestRangeError(callback, url);
+                return;
             }
 
             const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
@@ -361,24 +465,20 @@ export class Cache {
     }
 
     private onDownloadError(error: string, url: string, message: string): void {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            const callback = this._callbacks[this._currentUrl];
-            if(callback) {
-                this.handleRetry(callback, this._currentUrl, error);
-                return;
-            }
-        } else {
-            const callback = this._callbacks[url];
-            if(callback) {
-                switch (error) {
-                    case CacheError[CacheError.FILE_IO_ERROR]:
-                        this.handleRetry(callback, url, error);
-                        return;
+        const callback = this._callbacks[url];
+        if(callback) {
+            switch (error) {
+                case CacheError[CacheError.NETWORK_ERROR]:
+                    this.handleRetry(callback, url, error);
+                    return;
 
-                    default:
-                        this.fulfillCallback(url, CacheStatus.FAILED);
-                        return;
-                }
+                case CacheError[CacheError.NO_INTERNET]:
+                    this.handleRetry(callback, url, error);
+                    return;
+
+                default:
+                    this.fulfillCallback(url, CacheStatus.FAILED);
+                    return;
             }
         }
     }
@@ -404,6 +504,35 @@ export class Cache {
         } else {
             this.fulfillCallback(url, CacheStatus.FAILED);
         }
+    }
+
+    private handleRequestRangeError(callback: ICallbackObject, url: string): void {
+        Promise.all([this._nativeBridge.Cache.getFileInfo(callback.fileId), this._request.head(url)]).then(([fileInfo, response]) => {
+            const contentLength = Request.getHeader(response.headers, 'Content-Length');
+
+            if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
+                Diagnostics.trigger('cache_desync_fixed', {
+                    url: url
+                });
+                this.writeCacheResponse(url, this.createCacheResponse(true, url, fileInfo.size, fileInfo.size, 0, 200, response.headers));
+                this.fulfillCallback(url, CacheStatus.OK);
+            } else {
+                Diagnostics.trigger('cache_desync_failure', {
+                    url: url
+                });
+                this.deleteCacheResponse(url);
+                if(fileInfo.found) {
+                    this._nativeBridge.Cache.deleteFile(callback.fileId);
+                }
+                this.fulfillCallback(url, CacheStatus.FAILED);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('cache_desync_failure', {
+                url: url
+            });
+            this.deleteCacheResponse(url);
+            this.fulfillCallback(url, CacheStatus.FAILED);
+        });
     }
 
     private onNetworkConnected(): void {

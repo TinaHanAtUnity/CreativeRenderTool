@@ -8,7 +8,7 @@ export abstract class Campaign {
     private _timeout: number;
     private _willExpireAt: number;
 
-    constructor(id: string, gamerId: string, abGroup: number, timeout?: number) {
+    constructor(id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
         this._id = id;
         this._gamerId = gamerId;
         this._abGroup = abGroup;

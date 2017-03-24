@@ -11,10 +11,11 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
-import { HtmlCampaign } from 'Models/HtmlCampaign';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -47,7 +48,7 @@ export class CampaignManager {
 
     public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
-    public onThirdPartyCampaign: Observable1<HtmlCampaign> = new Observable1();
+    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<WebViewError> = new Observable1();
 
@@ -107,6 +108,7 @@ export class CampaignManager {
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
         }
+
         if('campaign' in json) {
             return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
@@ -118,56 +120,13 @@ export class CampaignManager {
 
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
-        const htmlCampaign = this.parseHtmlCampaign(json);
-        if(htmlCampaign) {
-            return this._assetManager.setup(htmlCampaign).then(() => this.onThirdPartyCampaign.trigger(htmlCampaign));
+        if(json.campaign && json.campaign.mraidUrl) {
+            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
+            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
-    }
-
-    private parseHtmlCampaign(json: any): HtmlCampaign | undefined {
-        const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-        let resource: string | undefined;
-        switch(campaign.getId()) {
-            // Game of War iOS
-            case '583dfda0d933a3630a53249c':
-            case '583dfd52abb1feee0909882b':
-            case '583dfd45669a903e086e38d2':
-            case '583dfd4c9ceadb4708b021de':
-                resource = 'https://static.applifier.com/playables/SG_ios/index_ios.html';
-                break;
-
-            // Game of War Android
-            case '583dfca5a93bfa6700d8c6f3':
-            case '583dfcb54622865a0a246bdf':
-                resource = 'https://static.applifier.com/playables/SG_android/index_android.html';
-                break;
-
-            // Mobile Strike iOS
-            case '583dfb9a5b79df3f0a274f0b':
-            case '583dfe483fe2166c0ac9e6fb':
-            case '583dfba09bfc2a2d0a9a0b1c':
-            case '583dfba69d308fe203d7d740':
-                resource = 'https://static.applifier.com/playables/SMA_ios/index_ios.html';
-                break;
-
-            // Mobile Strike Android
-            case '583dfc532e4d9b5008c934d1':
-            case '583dfc667f448e630ac6a4bc':
-                resource = 'https://static.applifier.com/playables/SMA_android/index_android.html';
-                break;
-
-            default:
-                break;
-        }
-
-        const abGroup = campaign.getAbGroup();
-        if(resource && abGroup !== 6 && abGroup !== 7) {
-            return new HtmlCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, resource);
-        }
-        return undefined;
     }
 
     private parseVastCampaign(json: any): Promise<void> {
@@ -210,7 +169,7 @@ export class CampaignManager {
                 this.onError.trigger(videoUrlError);
                 return;
             }
-            this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
+            return this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
         }).catch((error) => {
             this.onError.trigger(error);
         });
@@ -232,33 +191,34 @@ export class CampaignManager {
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
+                advertisingTrackingId: this.getParameter('advertisingTrackingId', this._deviceInfo.getAdvertisingIdentifier(), 'string'),
+                limitAdTracking: this.getParameter('limitAdTracking', this._deviceInfo.getLimitAdTracking(), 'boolean')
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: this._deviceInfo.getAndroidId()
+                androidId: this.getParameter('androidId', this._deviceInfo.getAndroidId(), 'string')
             });
         }
 
         url = Url.addParameters(url, {
-            deviceMake: this._deviceInfo.getManufacturer(),
-            deviceModel: this._deviceInfo.getModel(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            screenDensity: this._deviceInfo.getScreenDensity(),
-            screenWidth: this._deviceInfo.getScreenWidth(),
-            screenHeight: this._deviceInfo.getScreenHeight(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            screenSize: this._deviceInfo.getScreenLayout()
+            deviceMake: this.getParameter('deviceMake', this._deviceInfo.getManufacturer(), 'string'),
+            deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
+            platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),
+            screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
+            screenWidth: this.getParameter('screenWidth', this._deviceInfo.getScreenWidth(), 'number'),
+            screenHeight: this.getParameter('screenHeight', this._deviceInfo.getScreenHeight(), 'number'),
+            sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'number'),
+            screenSize: this.getParameter('screenSize', this._deviceInfo.getScreenLayout(), 'number'),
+            stores: this.getParameter('stores', this._deviceInfo.getStores(), 'string')
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
-                osVersion: this._deviceInfo.getOsVersion()
+                osVersion: this.getParameter('osVersion', this._deviceInfo.getOsVersion(), 'string')
             });
         } else {
             url = Url.addParameters(url, {
-                apiLevel: this._deviceInfo.getApiLevel()
+                apiLevel: this.getParameter('apiLevel', this._deviceInfo.getApiLevel(), 'number')
             });
         }
 
@@ -291,9 +251,9 @@ export class CampaignManager {
 
         return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
             url = Url.addParameters(url, {
-                connectionType: connectionType,
-                networkType: networkType,
-                gamerId: gamerId
+                connectionType: this.getParameter('connectionType', connectionType, 'string'),
+                networkType: this.getParameter('networkType', networkType, 'number'),
+                gamerId: this.getParameter('gamerId', gamerId, 'string')
             });
 
             return url;
@@ -307,20 +267,20 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkOperatorName());
 
         const body: any = {
-            bundleVersion: this._clientInfo.getApplicationVersion(),
-            bundleId: this._clientInfo.getApplicationName(),
-            language: this._deviceInfo.getLanguage(),
-            timeZone: this._deviceInfo.getTimeZone(),
+            bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
+            bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
+            language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
+            timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            body.webviewUa = navigator.userAgent;
+            body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
-            body.deviceFreeSpace = freeSpace;
-            body.networkOperator = networkOperator;
-            body.networkOperatorName = networkOperatorName;
+            body.deviceFreeSpace = this.getParameter('deviceFreeSpace', freeSpace, 'number');
+            body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
+            body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
             const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
@@ -328,16 +288,16 @@ export class CampaignManager {
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
-                    body.mediationName = mediation.getName();
-                    body.mediationVersion = mediation.getVersion();
+                    body.mediationName = this.getParameter('mediationName', mediation.getName(), 'string');
+                    body.mediationVersion = this.getParameter('mediationVersion', mediation.getVersion(), 'string');
                     if(mediation.getOrdinal()) {
-                        body.mediationOrdinal = mediation.getOrdinal();
+                        body.mediationOrdinal = this.getParameter('mediationOrdinal', mediation.getOrdinal(), 'number');
                     }
                 }
 
                 if(framework) {
-                    body.frameworkName = framework.getName();
-                    body.frameworkVersion = framework.getVersion();
+                    body.frameworkName = this.getParameter('frameworkName', framework.getName(), 'string');
+                    body.frameworkVersion = this.getParameter('frameworkVersion', framework.getVersion(), 'string');
                 }
 
                 return JSON.stringify(body);
@@ -360,4 +320,36 @@ export class CampaignManager {
         ]);
     }
 
+    private getParameter(field: string, value: any, expectedType: string) {
+        if(value === undefined) {
+            return undefined;
+        }
+
+        if(typeof value === expectedType) {
+            return value;
+        } else {
+            Diagnostics.trigger('internal_type_error', {
+                context: 'campaign_request',
+                field: field,
+                value: JSON.stringify(value),
+                expectedType: expectedType,
+                observedType: typeof value
+            });
+
+            if(expectedType === 'string') {
+                return '';
+            }
+
+            if(expectedType === 'number') {
+                return 0;
+            }
+
+            if(expectedType === 'boolean') {
+                return false;
+            }
+
+            // we only use string, number and boolean so this code is not reachable
+            return value;
+        }
+    }
 }
