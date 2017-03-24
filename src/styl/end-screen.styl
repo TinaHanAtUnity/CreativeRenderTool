@@ -15,6 +15,7 @@
     z-index: 1
     position: absolute
     top: 10px
+    right: 10px
     font-size: 28px
     width: 32px
     height: 32px
@@ -22,17 +23,16 @@
     text-shadow: 2px 2px 20px #7c7c7c
     text-align: center
     line-height: 28px
-    right: 10px
 
   .game-background
+    position: absolute
+    top: 0
+    bottom: 47%
     width: 100%
     background-size: cover
     background-position: center
     background-repeat: no-repeat
     background-color: #000
-    position: absolute
-    top: 0
-    bottom: 47%
     &.brand
       background-size: contain
       bottom: 0
@@ -45,8 +45,13 @@
     border-top: 4px solid #e6e6e6
     background-color: #fafafa
 
+  .end-screen-info
+    position: absolute
+    top: 50%
+    width: 100%
+    -webkit-transform: translate(0, -50%)
+
   .game-info
-    margin-top: 20px
     margin-left: 18px
 
   .game-icon
@@ -71,6 +76,8 @@
     color: #1f1e1e
 
   .store-container
+    margin-left: 10px
+    margin-top: 5px
     float: left
     display: -webkit-box
     display: -webkit-flex
@@ -79,9 +86,12 @@
     -webkit-justify-content: center
 
   .game-rating
-    color: #e6e6e6
     display: inline-block
     position: relative
+    font-size: 20px
+    letter-spacing: 5px
+    color: #e6e6e6
+    top: 50%
 
   .game-rating-mask
     color: #ff8e00
@@ -93,13 +103,8 @@
     font-size: inherit
 
   .game-rating-count
+    font-size: 17px
     color: #7c7c7c
-
-  .game-rating-br
-    display: none
-
-  .game-rating-postfix
-    display: none
 
   .download-container
     text-align: center
@@ -117,10 +122,12 @@
     background-image: url('../img/unityads.png')
     background-position: center
     background-size: cover
-    margin: auto
     position: absolute
-    left: 0px
-    right: 0px
+    bottom: 10px
+    left: 50%
+    height: 22px
+    width: 100px
+    -webkit-transform: translate(-50%, 0)
 
   .privacy-button
     position: absolute
@@ -167,17 +174,6 @@
     background: -webkit-linear-gradient(top, #4aaef0, #016add)
     color: #FFF
 
-  .store-container
-    margin-left: 10px
-    margin-top: 5px
-
-  .game-rating
-    font-size: 20px
-    letter-spacing: 5px
-
-  .game-rating-count
-    font-size: 17px
-
   .btn-download
     margin: 0 15px 0 15px
     padding: 10px 10px 10px 10px
@@ -185,11 +181,6 @@
     font-size: 18pt
     line-height: 24pt
     margin-top: 45px
-
-  .unityads-logo
-    width: 68px
-    height: 16px
-    bottom: 10px
 
 // END SCREEN landscape specific
 body.landscape
@@ -215,24 +206,8 @@ body.landscape
     a.btn-close
       color: #7c7c7c
       text-shadow: 0px 0px 0px #fafafa
-      text-align: center
-
-    .btn-close-region
-      top: 0
-      bottom: auto
-
-    a.btn-close
-      top: 10px
-      bottom: auto
-
-    .btn-close-region
-      left: 0
-      right: auto
-    a.btn-close
-      left: 10px
 
     .game-info
-      margin-top: 25px
       margin-left: auto
 
     .game-icon
@@ -263,9 +238,6 @@ body.landscape
       padding: 5px 10px 5px 10px
       margin-top: 15px
 
-    .unityads-logo
-      bottom: 20px
-
 // END SCREEN portrait specific
 body.portrait
   #end-screen
@@ -287,9 +259,6 @@ body.android
         height: 60px
         border-radius: 12pt
 
-      .game-info
-        margin-top: 15px
-
       .name-container
           font-size: 15pt
 
@@ -299,9 +268,6 @@ body.android
 
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 35px
-
         .name-container
             font-size: 13pt
 
@@ -315,21 +281,11 @@ body.android
   // 320 x 568 - iPhone 5
   @media screen and (min-height: 568px) and (min-width: 320px), screen and (min-height: 320px) and (min-width: 568px)
     #end-screen
-      .game-info
-        margin-top: 22px
-
-      .name-container
-        padding-top: 10px
-
       .store-container
         margin-top: 10px
 
       .btn-download
-        margin-top: 65px
         padding: 15px 10px 15px 10px
-
-      .unityads-logo
-        bottom: 20px
 
     &.landscape
       #end-screen
@@ -340,33 +296,24 @@ body.android
   @media screen and (min-height: 360px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 360px)
     #end-screen
       .btn-close-region
-          width: 75px
-          height: 75px
+        width: 75px
+        height: 75px
 
-        .game-info
-          margin-top: 35px
+      .game-icon
+        width: 85px
+        height: 85px
 
-        .game-icon
-          width: 85px
-          height: 85px
+      .name-container
+        font-size: 20pt
 
-        .name-container
-          font-size: 20pt
+      .game-rating
+        font-size: 25px
 
-        .game-rating
-          font-size: 25px
-
-        .game-rating-count
-          font-size: 21px
-
-        .btn-download
-          margin-top: 90px
+      .game-rating-count
+        font-size: 22px
 
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 20px
-
         .name-container
           padding-top: 115px
 
@@ -377,9 +324,6 @@ body.android
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 45px
-
         .btn-download
           padding: 15px 10px 15px 10px;
           font-size: 16pt;
@@ -387,36 +331,26 @@ body.android
   // 424 x 753 - LG Optimus 4X HD
   @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px)
     #end-screen
-      .game-info
-        margin-top: 50px
+      .name-container
+        font-size: 21pt
 
-        .name-container
-          font-size: 21pt
+    .game-icon
+      width: 100px
+      height: 100px
 
-      .game-icon
-        width: 100px
-        height: 100px
+    .game-rating
+      font-size: 30px
 
-      .game-rating
-        font-size: 30px
+    .game-rating-count
+      font-size: 24px
 
-      .game-rating-count
-        font-size: 24px
-
-      .btn-download
-        padding: 25px 20px 25px 20px
-        font-size: 22pt
-        line-height: 22pt
-
-      .unityads-logo
-        width: 102px
-        height: 24px
+    .btn-download
+      padding: 25px 20px 25px 20px
+      font-size: 22pt
+      line-height: 22pt
 
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 35px
-
         .name-container
           padding-top: 125px
 
@@ -433,21 +367,15 @@ body.android
 
       a.btn-close
         top: 20px
+        right: 20px
         width: 50px
         height: 50px
-        border-radius: 25px
         font-size: 42px
-
-      a.btn-close
-        right: 20px
         line-height: 45px
 
       .game-icon
         width: 130px
         height: 130px
-
-      .game-info
-        margin-top: 60px
 
       .name-container
         font-size: 27pt
@@ -462,18 +390,12 @@ body.android
         padding: 30px 25px 30px 25px
         font-size: 26pt
         line-height: 26pt
-        margin-top: 120px
 
     &.landscape
       #end-screen
-        .end-screen-info
-          margin: 30px
-
-        .end-screen
-          a.btn-close
-            top: 20px
-            left: 20px
-            right: auto
+        a.btn-close
+          top: 20px
+          right: 20px
 
         .name-container
           padding-top: 175px
@@ -486,26 +408,12 @@ body.android
   // 960 x 600 - Google Nexus 7
   @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px)
     #end-screen
-      .end-screen-info
-        margin: 30px
-
-      .game-info
-        margin-top: 70px
-
       .name-container
         font-size: 29pt
-
-    &.landscape
-      #end-screen
-        .game-info
-          margin-top: 70px
 
   // 1024 x 600 - Samsung Galaxy Tab 7"
   @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px)
     #end-screen
-      .game-info
-        margin-top: 50px
-
       .name-container
         font-size: 31pt
 
@@ -515,28 +423,17 @@ body.android
       .game-rating-count
         font-size: 35px
 
-      .unityads-logo
-        width: 153px
-        height: 36px
-
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 40px
-
         .btn-download
           padding: 30px 20px 30px 20px
           font-size: 24pt
           line-height: 24pt
-          margin-top: 30px
 
   // 1024 x 768 - iPad
   @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px)
     #end-screen
       font-weight: lighter
-
-      .game-info
-        margin-top: 50px
 
       .name-container
         padding-left: 30px
@@ -554,9 +451,6 @@ body.android
 
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 140px
-
         .name-container
           font-size: 32pt
           padding-left: 10px
@@ -577,14 +471,8 @@ body.android
       a.btn-close
         width: 75px
         height: 75px
-        border-radius: 45px
         font-size: 80px
-
-      a.btn-close
         line-height: 60px
-
-      .game-info
-        margin-top: 70px
 
       .game-icon
         width: 150px
@@ -600,14 +488,9 @@ body.android
         padding: 45px 25px 45px 25px
         font-size: 35pt
         line-height: 35pt
-        margin-top: 160px
-
 
     &.landscape
       #end-screen
-        .game-info
-          margin-top: 120px
-
         .name-container
           font-size: 37pt
           padding-top: 200px

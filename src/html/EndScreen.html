@@ -10,26 +10,23 @@
         <div class="name-container"><%= data.gameName %></div>
       </div>
       <div class="store-container">
-        <div class="game-store-info">
-          <span class="game-rating">
-            <span class="game-rating-mask" style="width: <%= data.rating %>%">
-            <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
-            </span>
-            <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+        <span class="game-rating">
+          <span class="game-rating-mask" style="width: <%= data.rating %>%">
+          <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
           </span>
-          <br class="game-rating-br">
-          <span class="game-rating-count">
-            (<span class="game-rating-count-number"><%= data.ratingCount %></span><span class="game-rating-postfix"> <%= data.t("Ratings") %></span>)
-          </span>
-        </div>
+          <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+        </span>
+        <span class="game-rating-count">
+          (<span class="game-rating-count-number"><%= data.ratingCount %>)
+        </span>
       </div>
       <div class="download-container">
         <a class="btn-download">
           <span class="download-text"><%= data.t("Download For Free") %></span>
         </a>
       </div>
-      <div class="unityads-logo"></div>
     </div>
     <div class="privacy-button"><span class="icon-info"></span></div>
+    <div class="unityads-logo"></div>
   </div>
 </div>
