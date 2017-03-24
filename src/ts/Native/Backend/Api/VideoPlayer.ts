@@ -95,6 +95,10 @@ export class VideoPlayer {
         }, 0);
     }
 
+    public static setAutomaticallyWaitsToMinimizeStalling(value: boolean) {
+        return;
+    }
+
     private static _url: string | undefined;
     private static _duration: number | undefined;
     private static _width: number | undefined;

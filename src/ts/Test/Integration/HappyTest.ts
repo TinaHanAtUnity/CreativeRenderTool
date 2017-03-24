@@ -120,6 +120,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
+        DeviceInfo.setStatusBarHeight(0);
 
         UnityAds.initialize(Platform.IOS, '14850', listener, true);
     });

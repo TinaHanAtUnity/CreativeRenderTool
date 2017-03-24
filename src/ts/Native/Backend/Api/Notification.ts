@@ -8,4 +8,11 @@ export class Notification {
         return;
     }
 
+    public static addAVNotificationObserver(name: string, keys: string[]) {
+        return;
+    }
+
+    public static removeAVNotificationObserver(name: string) {
+        return;
+    }
 }

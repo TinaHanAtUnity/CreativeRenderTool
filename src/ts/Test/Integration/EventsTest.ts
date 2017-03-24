@@ -164,6 +164,7 @@ describe('EventsTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
+        DeviceInfo.setStatusBarHeight(0);
 
         AbstractAdUnit.setAutoClose(true);
 
