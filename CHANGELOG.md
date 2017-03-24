@@ -1,3 +1,7 @@
+# Fri Mar 24 08:52:30 UTC 2017
+
+* When cached video is not found, use the correct video intended for streaming instead of the downloadable video
+
 # Thu Mar 23 15:06:23 UTC 2017
 
 * If cached video is not found when video is starting, use streaming video as fallback
