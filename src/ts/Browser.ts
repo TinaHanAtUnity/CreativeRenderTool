@@ -6,6 +6,7 @@ import { FinishState } from 'Constants/FinishState';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Sdk } from 'Native/Backend/Api/Sdk';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
+import { PlacementState } from 'Models/Placement';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -200,6 +201,9 @@ if(window.parent !== window) {
             },
             onUnityAdsClick: (placement: string) => {
                 console.log('onUnityAdsClick: ' + placement);
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                console.log('onUnityAdsPlacementStateChanged: ' + placement + ' ' + PlacementState[oldState] + ' -> ' + PlacementState[newState]);
             }
         };
         // tslint:enable:no-console
