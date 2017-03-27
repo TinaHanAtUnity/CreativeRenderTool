@@ -126,6 +126,10 @@ export class DeviceInfo {
         DeviceInfo._simulator = value;
     }
 
+    public static setStatusBarHeight(value: number) {
+        DeviceInfo._statusBarHeight = value;
+    }
+
     public static getAdvertisingTrackingId() {
         return DeviceInfo._advertisingTrackingId;
     }
@@ -258,6 +262,9 @@ export class DeviceInfo {
         return packageName === RealDeviceInfo.GooglePlayPackageName;
     }
 
+    public static getStatusBarHeight() {
+        return DeviceInfo._statusBarHeight;
+    }
     private static _advertisingTrackingId: string;
     private static _limitAdTrackingFlag: boolean;
     private static _osVersion: string;
@@ -289,6 +296,7 @@ export class DeviceInfo {
     private static _userInterfaceIdiom: number;
     private static _screenScale: number;
     private static _simulator: boolean;
+    private static _statusBarHeight: number;
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
