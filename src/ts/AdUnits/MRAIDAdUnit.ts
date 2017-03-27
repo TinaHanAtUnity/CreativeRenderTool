@@ -38,7 +38,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._options = options;
         this.setShowing(false);
-        this.setFinishState(FinishState.COMPLETED);
     }
 
     public show(): Promise<void> {
@@ -65,8 +64,13 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._mraid.hide();
 
-        this._sessionManager.sendThirdQuartile(this);
-        this._sessionManager.sendView(this);
+        const finishState = this.getFinishState();
+        if(finishState === FinishState.COMPLETED) {
+            this._sessionManager.sendThirdQuartile(this);
+            this._sessionManager.sendView(this);
+        } else if(finishState === FinishState.SKIPPED) {
+            this._sessionManager.sendSkip(this);
+        }
 
         this.onFinish.trigger();
         this.onClose.trigger();
@@ -85,6 +89,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private onShow() {
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
+                this.setFinishState(FinishState.COMPLETED);
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
         }

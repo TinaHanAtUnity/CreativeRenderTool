@@ -18,6 +18,7 @@ export interface IOrientationProperties {
 export class MRAID extends View {
 
     public onClick: Observable0 = new Observable0();
+    public onSkip: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
     public onOrientationProperties: Observable1<IOrientationProperties> = new Observable1();
 
@@ -34,6 +35,7 @@ export class MRAID extends View {
     private _resizeHandler: any;
 
     private _canClose = false;
+    private _canSkip = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -69,21 +71,44 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
-        let originalLength = 30;
+        const closeLength = 30;
         if(this._placement.allowSkip()) {
-            originalLength = this._placement.allowSkipInSeconds();
+            const skipLength = this._placement.allowSkipInSeconds();
+            let closeRemaining = closeLength;
+            let skipRemaining = skipLength;
+            const updateInterval = setInterval(() => {
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                }
+                if(skipRemaining > 0) {
+                    skipRemaining--;
+                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
+                }
+                if(skipRemaining <= 0) {
+                    this._canSkip = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
+                }
+            }, 1000);
+        } else {
+            let closeRemaining = closeLength;
+            const updateInterval = setInterval(() => {
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                    this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
+                }
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+            }, 1000);
         }
-
-        let length = originalLength;
-        const updateInterval = setInterval(() => {
-            length--;
-            this.updateProgressCircle(this._closeElement, (originalLength - length) / originalLength);
-            if (length <= 0) {
-                clearInterval(updateInterval);
-                this._canClose = true;
-                this._closeElement.style.opacity = '1';
-            }
-        }, 1000);
 
         if(this._loaded) {
             this._iframe.contentWindow.postMessage('viewable', '*');
@@ -152,7 +177,9 @@ export class MRAID extends View {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._canClose) {
+        if(this._canSkip && !this._canClose) {
+            this.onSkip.trigger();
+        } else if(this._canClose) {
             this.onClose.trigger();
         }
     }

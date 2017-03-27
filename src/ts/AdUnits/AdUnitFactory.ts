@@ -27,6 +27,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { FinishState } from 'Constants/FinishState';
 
 export class AdUnitFactory {
 
@@ -110,9 +111,18 @@ export class AdUnitFactory {
         document.body.appendChild(mraid.container());
         mraid.onClick.subscribe(() => {
             nativeBridge.Listener.sendClickEvent(placement.getId());
+            sessionManager.sendThirdQuartile(mraidAdUnit);
+            sessionManager.sendView(mraidAdUnit);
             sessionManager.sendClick(mraidAdUnit);
         });
-        mraid.onClose.subscribe(() => mraidAdUnit.hide());
+        mraid.onSkip.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.SKIPPED);
+            mraidAdUnit.hide();
+        });
+        mraid.onClose.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.COMPLETED);
+            mraidAdUnit.hide();
+        });
 
         return mraidAdUnit;
     }
