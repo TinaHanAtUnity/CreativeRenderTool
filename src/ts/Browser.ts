@@ -180,14 +180,14 @@ if(window.parent !== window) {
             onUnityAdsReady: (placement: string) => {
                 console.log('onUnityAdsReady: ' + placement);
                 const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                const listener = (placementButtonEvent: Event) => {
+                const placementButtonlistener = (placementButtonEvent: Event) => {
                     placementButtonEvent.preventDefault();
                     placementButton.disabled = true;
-                    placementButton.removeEventListener('click', listener, false);
+                    placementButton.removeEventListener('click', placementButtonlistener, false);
                     UnityAds.show(placement);
                 };
                 placementButton.disabled = false;
-                placementButton.addEventListener('click', listener, false);
+                placementButton.addEventListener('click', placementButtonlistener, false);
             },
             onUnityAdsStart: (placement: string) => {
                 console.log('onUnityAdsStart: ' + placement);

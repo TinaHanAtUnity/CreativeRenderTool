@@ -58,7 +58,7 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        const promises: Promise<any>[] = [];
+        const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
 
@@ -66,7 +66,7 @@ export class SessionManagerEventMetadataCreator {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
 
-            const metaDataPromises: Promise<any>[] = [];
+            const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
             metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {

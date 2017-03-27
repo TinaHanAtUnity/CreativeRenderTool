@@ -10,7 +10,7 @@ export class Request {
         Request._requestLog = requestLog;
     }
 
-    public static get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
+    public static get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
         Request._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
@@ -20,7 +20,7 @@ export class Request {
         xhr.send();
     }
 
-    public static head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
+    public static head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
         Request._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
@@ -30,7 +30,7 @@ export class Request {
         xhr.send();
     }
 
-    public static post(id: string, url: string, body: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
+    public static post(id: string, url: string, body: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
         Request._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {

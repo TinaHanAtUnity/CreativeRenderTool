@@ -10,14 +10,14 @@ export enum RequestEvent {
 
 export class RequestApi extends NativeApi {
 
-    public onComplete: Observable5<string, string, string, number, [string, string][]> = new Observable5();
+    public onComplete: Observable5<string, string, string, number, Array<[string, string]>> = new Observable5();
     public onFailed: Observable3<string, string, string> = new Observable3();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Request');
     }
 
-    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+    public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._apiClass, 'get', [id, url, headers, connectTimeout]);
         } else {
@@ -25,7 +25,7 @@ export class RequestApi extends NativeApi {
         }
     }
 
-    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+    public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._apiClass, 'post', [id, url, requestBody, headers, connectTimeout]);
         } else {
@@ -33,7 +33,7 @@ export class RequestApi extends NativeApi {
         }
     }
 
-    public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
+    public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._apiClass, 'head', [id, url, headers, connectTimeout]);
         } else {

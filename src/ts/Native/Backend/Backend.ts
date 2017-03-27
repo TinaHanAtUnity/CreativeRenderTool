@@ -19,7 +19,7 @@ import { UrlScheme } from 'Native/Backend/Api/UrlScheme';
 interface IInvocation {
     className: string;
     method: string;
-    parameters: [string | number][];
+    parameters: Array<[string | number]>;
     callbackId: number;
 }
 
