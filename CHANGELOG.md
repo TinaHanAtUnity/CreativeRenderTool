@@ -1,3 +1,8 @@
+# Mon Mar 27 13:44:09 UTC 2017
+
+* Fix MRAID events
+* Update code to be compliant with TypeScript 2.2
+
 # Fri Mar 24 08:52:30 UTC 2017
 
 * When cached video is not found, use the correct video intended for streaming instead of the downloadable video
