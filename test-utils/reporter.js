@@ -147,7 +147,8 @@ define([], function() {
         });
 
         runner.on('fail', function(test, err) {
-            logger.error('failed: ' + test.title);
+            ++failures;
+            logger.error('failed: ' + test.title + ' ** ' + err);
         });
 
         var self = this;
