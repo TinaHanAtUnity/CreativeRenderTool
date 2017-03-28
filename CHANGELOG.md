@@ -1,9 +1,21 @@
+# Mon Mar 27 13:44:09 UTC 2017
+
+* Fix MRAID events
+* Update code to be compliant with TypeScript 2.2
+
+# Fri Mar 24 08:52:30 UTC 2017
+
+* When cached video is not found, use the correct video intended for streaming instead of the downloadable video
+
+# Thu Mar 23 15:06:23 UTC 2017
+
+* If cached video is not found when video is starting, use streaming video as fallback
+* Revert "Set iframe height and width in pixels based on the screen size."
+
 # Thu Mar 23 05:44:20 UTC 2017
 
 * Add check for showing cached files when they are not found in cache
 * Removed Marvel A/B test
-
-* MRAID campaign support
 
 # Tue Mar 21 15:05:53 UTC 2017
 

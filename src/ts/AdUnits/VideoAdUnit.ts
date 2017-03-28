@@ -12,6 +12,7 @@ import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -89,28 +90,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                 }
             }
 
-            this._nativeBridge.VideoPlayer.prepare(this.getVideo().getUrl(), new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
-
-            // hack to get diagnostics if cached file is not found in cache
-            // when the underlying problems are better understood, this should be refactored to proper error handling
-            // instead of diagnostic hack
-            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-                this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
-                    if(!result.found) {
-                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
-                            url: this.getVideo().getUrl(),
-                            originalUrl: this.getVideo().getOriginalUrl(),
-                            campaignId: this._campaign.getId()
-                        }));
-                    }
-                }).catch(error => {
-                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
-                        url: this.getVideo().getUrl(),
-                        originalUrl: this.getVideo().getOriginalUrl(),
-                        campaignId: this._campaign.getId()
-                    }));
-                });
-            }
+            this.getValidVideoUrl().then(url => {
+                this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+            });
         }
     }
 
@@ -136,4 +118,44 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         }
     };
 
+    // todo: this is first attempt to get rid of around 1% of failed starts
+    // if this approach is successful, this should somehow be refactored as part of AssetManager to validate
+    // other things too, like endscreen assets
+    private getValidVideoUrl(): Promise<string> {
+        let streamingUrl: string = this.getVideo().getOriginalUrl();
+
+        // todo: hack to get streaming video, needs proper refactoring when this is put in AssetManager
+        if(this._campaign instanceof PerformanceCampaign) {
+            streamingUrl = (<PerformanceCampaign>this._campaign).getStreamingVideo().getUrl();
+        }
+
+        // check that if we think video has been cached, it is still available on device cache directory
+        if(this.getVideo().isCached() && this.getVideo().getFileId()) {
+            return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                if(result.found) {
+                    return this.getVideo().getUrl();
+                } else {
+                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                        url: this.getVideo().getUrl(),
+                        originalUrl: this.getVideo().getOriginalUrl(),
+                        campaignId: this._campaign.getId()
+                    }));
+
+                    // cached file not found (deleted by the system?), use streaming fallback
+                    return streamingUrl;
+                }
+            }).catch(error => {
+                Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
+                    url: this.getVideo().getUrl(),
+                    originalUrl: this.getVideo().getOriginalUrl(),
+                    campaignId: this._campaign.getId()
+                }));
+
+                // cached file not found (deleted by the system?), use streaming fallback
+                return streamingUrl;
+            });
+        } else {
+            return Promise.resolve(this.getVideo().getUrl());
+        }
+    }
 }

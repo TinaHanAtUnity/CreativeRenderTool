@@ -69,7 +69,7 @@ export class Activity extends AdUnitContainer {
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Promise<any>[] = [];
+        const promises: Array<Promise<any>> = [];
         const width = this._deviceInfo.getScreenWidth();
         const height = this._deviceInfo.getScreenHeight();
 

@@ -68,7 +68,7 @@ export class VideoPlayer {
             Backend.sendEvent('VIDEOPLAYER', 'PLAY');
             VideoPlayer._progressTimer = setInterval(() => {
                 currentTime += 250;
-                if(currentTime >= VideoPlayer._duration) {
+                if(VideoPlayer._duration && currentTime >= VideoPlayer._duration) {
                     Backend.sendEvent('VIDEOPLAYER', 'PROGRESS', VideoPlayer._duration);
                     setTimeout(() => {
                         Backend.sendEvent('VIDEOPLAYER', 'COMPLETED', VideoPlayer._url);
@@ -93,6 +93,10 @@ export class VideoPlayer {
             Backend.sendEvent('VIDEOPLAYER', 'PAUSE', VideoPlayer._url);
             Backend.sendEvent('VIDEOPLAYER', 'STOP', VideoPlayer._url);
         }, 0);
+    }
+
+    public static setAutomaticallyWaitsToMinimizeStalling(value: boolean) {
+        return;
     }
 
     private static _url: string | undefined;

@@ -16,6 +16,12 @@
     "no-bitwise": false,
     "object-literal-sort-keys": false,
     "one-variable-per-declaration": false,
-    "prefer-const": true
+    "prefer-const": true,
+    "ordered-imports": false,
+    "only-arrow-functions": false,
+    "arrow-parens": false,
+    "max-classes-per-file": false,
+    "object-literal-key-quotes": false,
+    "object-literal-shorthand": false
   }
 }

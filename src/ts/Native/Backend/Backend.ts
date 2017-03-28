@@ -19,7 +19,7 @@ import { UrlScheme } from 'Native/Backend/Api/UrlScheme';
 interface IInvocation {
     className: string;
     method: string;
-    parameters: [string | number][];
+    parameters: Array<[string | number]>;
     callbackId: number;
 }
 
@@ -90,6 +90,13 @@ export class Backend implements IWebViewBridge {
                 }
             }
         })();
+
+        if (!api[invocation.method]) {
+            // tslint:disable:no-console
+            console.info('WARNING! Missing backend API method: ' + invocation.className + '.' + invocation.method);
+            // tslint:enable:no-console
+        }
+
         try {
             return {
                 callbackId: invocation.callbackId,

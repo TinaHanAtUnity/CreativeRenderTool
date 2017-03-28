@@ -23,8 +23,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added init timestamp and reinitialized flag to Sdk.loadComplete call in init
 * Added Cache.getFileContent method to Android and iOS
 * Added Android Cache.getMetaData and iOS Cache.getVideoInfo methods
-* Added Android DeviceInfo methods: getGLString, getSensorList, getBoard, getBootloader, getDevice, getHardware, getHost, getProduct and getSupportedAbis
-* Added iOS DeviceInfo methods: getGLString and getSensorList
+* Added Android DeviceInfo methods: getSensorList, getBoard, getBootloader, getDevice, getHardware, getHost, getProduct and getSupportedAbis
+* Added iOS DeviceInfo method: getSensorList
 * Added header parameter to Cache.download method
 * Added sendPlacementStateChangedEvent to Android and iOS
 * Added IAP metadata instrumentation to Android and iOS
@@ -41,6 +41,7 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Modified iOS Resolve API: make implementation similar to Android and send INVALID_HOST instead of UNEXPECTED_EXCEPTION
 * Modified Android VideoPlayer API, remove useless ’17’ from API_LEVEL_ERROR
 * Modified iOS Cache API events by adding request url to all errors
+* Modified iOS Cache.getFiles response to match Android
 * Added iOS Cache API events: NO_INTERNET, FILE_IO_ERROR, MALFORMED_URL and NETWORK_ERROR
 * Added Android Cache API events: NETWORK_ERROR and ILLEGAL_STATE
 * Modified Cache API on both platforms to add existing file size to expected content size (not just totalBytes from request)

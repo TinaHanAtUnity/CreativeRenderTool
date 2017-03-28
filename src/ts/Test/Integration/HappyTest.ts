@@ -6,6 +6,7 @@ import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
+import { PlacementState } from 'Models/Placement';
 
 describe('IntegrationTest', () => {
 
@@ -28,6 +29,9 @@ describe('IntegrationTest', () => {
                 return;
             },
             onUnityAdsClick: (placement: string) => {
+                return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
                 return;
             }
         };
@@ -84,6 +88,9 @@ describe('IntegrationTest', () => {
             },
             onUnityAdsClick: (placement: string) => {
                 return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                return;
             }
         };
 
@@ -113,6 +120,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
+        DeviceInfo.setStatusBarHeight(0);
 
         UnityAds.initialize(Platform.IOS, '14850', listener, true);
     });

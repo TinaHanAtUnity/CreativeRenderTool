@@ -52,9 +52,9 @@ export class Storage {
         const objects = key.split('.');
         let parentObject = storage;
 
-        for(let i = 0; i < objects.length; ++i) {
-            if(objects[i] in parentObject) {
-                parentObject = parentObject[objects[i]];
+        for(const object of objects) {
+            if(object in parentObject) {
+                parentObject = parentObject[object];
             } else {
                 return null;
             }

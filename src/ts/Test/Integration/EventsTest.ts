@@ -9,6 +9,7 @@ import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { PlacementState } from 'Models/Placement';
 
 describe('EventsTest', () => {
 
@@ -59,6 +60,9 @@ describe('EventsTest', () => {
                 done(new Error(message));
             },
             onUnityAdsClick: (placement: string) => {
+                return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
                 return;
             }
         };
@@ -126,6 +130,9 @@ describe('EventsTest', () => {
             },
             onUnityAdsClick: (placement: string) => {
                 return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                return;
             }
         };
 
@@ -157,6 +164,7 @@ describe('EventsTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
+        DeviceInfo.setStatusBarHeight(0);
 
         AbstractAdUnit.setAutoClose(true);
 

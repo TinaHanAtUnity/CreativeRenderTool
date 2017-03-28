@@ -6,6 +6,7 @@ import { FinishState } from 'Constants/FinishState';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Sdk } from 'Native/Backend/Api/Sdk';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
+import { PlacementState } from 'Models/Placement';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -180,14 +181,14 @@ if(window.parent !== window) {
             onUnityAdsReady: (placement: string) => {
                 console.log('onUnityAdsReady: ' + placement);
                 const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                const listener = (placementButtonEvent: Event) => {
+                const placementButtonlistener = (placementButtonEvent: Event) => {
                     placementButtonEvent.preventDefault();
                     placementButton.disabled = true;
-                    placementButton.removeEventListener('click', listener, false);
+                    placementButton.removeEventListener('click', placementButtonlistener, false);
                     UnityAds.show(placement);
                 };
                 placementButton.disabled = false;
-                placementButton.addEventListener('click', listener, false);
+                placementButton.addEventListener('click', placementButtonlistener, false);
             },
             onUnityAdsStart: (placement: string) => {
                 console.log('onUnityAdsStart: ' + placement);
@@ -200,6 +201,9 @@ if(window.parent !== window) {
             },
             onUnityAdsClick: (placement: string) => {
                 console.log('onUnityAdsClick: ' + placement);
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                console.log('onUnityAdsPlacementStateChanged: ' + placement + ' ' + PlacementState[oldState] + ' -> ' + PlacementState[newState]);
             }
         };
         // tslint:enable:no-console

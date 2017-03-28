@@ -6,7 +6,7 @@ export class AndroidCacheApi extends NativeApi {
         super(nativeBridge, 'Cache');
     }
 
-    public getMetaData(fileId: string, properties: number[]): Promise<[number, any][]> {
-        return this._nativeBridge.invoke<[number, any][]>(this._apiClass, 'getMetaData', [fileId, properties]);
+    public getMetaData(fileId: string, properties: number[]): Promise<Array<[number, any]>> {
+        return this._nativeBridge.invoke<Array<[number, any]>>(this._apiClass, 'getMetaData', [fileId, properties]);
     }
 }

@@ -125,8 +125,7 @@ export class Vast {
             const companionAds = ad.getCompanionAds();
 
             if (companionAds) {
-                for (let i = 0; i < companionAds.length; i++) {
-                    const companionAd = companionAds[i];
+                for(const companionAd of companionAds) {
                     if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
                         return companionAd.getStaticResourceURL();
                     }
@@ -143,8 +142,7 @@ export class Vast {
             const companionAds = ad.getCompanionAds();
 
             if (companionAds) {
-                for (let i = 0; i < companionAds.length; i++) {
-                    const companionAd = companionAds[i];
+                for(const companionAd of companionAds) {
                     if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
                         return companionAd.getStaticResourceURL();
                     }
@@ -161,8 +159,7 @@ export class Vast {
             const companionAds = ad.getCompanionAds();
 
             if (companionAds) {
-                for (let i = 0; i < companionAds.length; i++) {
-                    const companionAd = companionAds[i];
+                for(const companionAd of companionAds) {
                     const url = companionAd.getCompanionClickThroughURLTemplate();
                     const height = companionAd.getHeight();
                     const width = companionAd.getWidth();
