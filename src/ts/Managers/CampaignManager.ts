@@ -16,6 +16,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Configuration } from 'Models/Configuration';
 
 export class CampaignManager {
 
@@ -53,6 +54,7 @@ export class CampaignManager {
     public onError: Observable1<WebViewError> = new Observable1();
 
     private _nativeBridge: NativeBridge;
+    private _configuration: Configuration;
     private _assetManager: AssetManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -62,8 +64,9 @@ export class CampaignManager {
     private _requesting: boolean;
     private _refillTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
+        this._configuration = configuration;
         this._assetManager = assetManager;
         this._request = request;
         this._clientInfo = clientInfo;
@@ -183,11 +186,21 @@ export class CampaignManager {
     }
 
     private createRequestUrl(): Promise<string> {
-        let url: string = [
-            CampaignManager.CampaignBaseUrl,
-            this._clientInfo.getGameId(),
-            'fill'
-        ].join('/');
+        let url: string;
+
+        if(this._configuration.isPlacementLevelControl()) {
+            url = [
+                'http://worker-public-0.ads-delivery-perf-kube.applifier.info:30300/games',
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        } else {
+            url = [
+                CampaignManager.CampaignBaseUrl,
+                this._clientInfo.getGameId(),
+                'fill'
+            ].join('/');
+        }
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
@@ -275,6 +288,19 @@ export class CampaignManager {
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
+        }
+
+        if(this._configuration.isPlacementLevelControl()) {
+            const placementRequest: any = {};
+
+            const placements = this._configuration.getPlacements();
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
+                    placementRequest[placement] = {};
+                }
+            }
+
+            body.placements = placementRequest;
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
