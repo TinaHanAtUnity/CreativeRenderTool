@@ -86,8 +86,8 @@ export class VastAdUnit extends VideoAdUnit {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
-            for (let i = 0; i < clickTrackingEventUrls.length; i++) {
-                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrls[i]);
+            for (const clickTrackingEventUrl of clickTrackingEventUrls) {
+                this.sendThirdPartyEvent(eventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrl);
             }
         }
     }
@@ -99,7 +99,7 @@ export class VastAdUnit extends VideoAdUnit {
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
-            if (duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
+            if (duration && duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
                 this.sendTrackingEvent(eventManager, quartileEventName, sessionId, sdkVersion);
             }
         }

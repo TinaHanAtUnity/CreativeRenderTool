@@ -12,7 +12,7 @@ class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
 
-    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
+    public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -58,7 +58,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
+    public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -88,7 +88,7 @@ class TestRequestApi extends RequestApi {
         this._toggleUrl = status;
     }
 
-    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
+    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: Array<[string, string]>) {
         setTimeout(() => {
             this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]);
         }, 0);

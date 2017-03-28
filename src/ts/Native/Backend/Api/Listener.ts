@@ -1,6 +1,7 @@
 import { UnityAds } from 'Native/Backend/UnityAds';
 import { FinishState } from 'Constants/FinishState';
 import { UnityAdsError } from 'Constants/UnityAdsError';
+import { PlacementState } from 'Models/Placement';
 
 export class Listener {
 
@@ -36,6 +37,13 @@ export class Listener {
         const listener = UnityAds.getListener();
         if(listener) {
             listener.onUnityAdsClick(placement);
+        }
+    }
+
+    public static sendPlacementStateChangedEvent(placement: string, oldState: string, newState: string) {
+        const listener = UnityAds.getListener();
+        if(listener) {
+            listener.onUnityAdsPlacementStateChanged(placement, PlacementState[oldState], PlacementState[newState]);
         }
     }
 

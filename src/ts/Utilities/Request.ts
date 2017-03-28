@@ -25,7 +25,7 @@ interface INativeRequest {
     method: RequestMethod;
     url: string;
     data?: string;
-    headers: [string, string][];
+    headers: Array<[string, string]>;
     retryCount: number;
     options: IRequestOptions;
 }
@@ -34,7 +34,7 @@ export interface INativeResponse {
     url: string;
     response: string;
     responseCode: number;
-    headers: [string, string][];
+    headers: Array<[string, string]>;
 }
 
 export class Request {
@@ -43,9 +43,8 @@ export class Request {
     public static RedirectResponseCodes = new RegExp('30[0-8]');
     public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
 
-    public static getHeader(headers: [string, string][], headerName: string): string | null {
-        for(let i = 0; i < headers.length; ++i) {
-            const header = headers[i];
+    public static getHeader(headers: Array<[string, string]>, headerName: string): string | null {
+        for(const header of headers) {
             const key = header[0];
             const value = header[1];
             if (key && key.match(new RegExp(headerName, 'i'))) {
@@ -83,7 +82,7 @@ export class Request {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public get(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
         }
@@ -100,7 +99,7 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data: string = '', headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
         }
@@ -120,7 +119,7 @@ export class Request {
         return promise;
     }
 
-    public head(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
         }
@@ -190,7 +189,7 @@ export class Request {
         }
     }
 
-    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
+    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: Array<[string, string]>): void {
         const id = parseInt(rawId, 10);
         const nativeResponse: INativeResponse = {
             url: url,

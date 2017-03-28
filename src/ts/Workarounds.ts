@@ -3,7 +3,7 @@ import 'es6-promise';
 /* tslint:disable:no-unused-expression */
 
 if(!Array.prototype.forEach) {
-    Array.prototype.forEach = function<T>(this: Array<T>, callback: Function, thisArg: any) {
+    Array.prototype.forEach = function<T>(this: T[], callback: Function, thisArg: any) {
         if(typeof(callback) !== 'function') {
             throw new TypeError(callback + ' is not a function!');
         }

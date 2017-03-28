@@ -13,7 +13,7 @@ export abstract class Campaign {
         this._gamerId = gamerId;
         this._abGroup = abGroup;
         this._timeout = typeof timeout !== 'undefined' ? timeout : 0;
-        if (this._timeout) {
+        if(timeout) {
             this._willExpireAt = Date.now() + timeout * 1000;
         }
     }

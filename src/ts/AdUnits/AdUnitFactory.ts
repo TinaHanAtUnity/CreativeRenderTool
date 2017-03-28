@@ -27,6 +27,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { FinishState } from 'Constants/FinishState';
 
 export class AdUnitFactory {
 
@@ -44,7 +45,7 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), campaign);
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options, endScreen);
@@ -72,7 +73,7 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), campaign);
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
@@ -110,9 +111,18 @@ export class AdUnitFactory {
         document.body.appendChild(mraid.container());
         mraid.onClick.subscribe(() => {
             nativeBridge.Listener.sendClickEvent(placement.getId());
+            sessionManager.sendThirdQuartile(mraidAdUnit);
+            sessionManager.sendView(mraidAdUnit);
             sessionManager.sendClick(mraidAdUnit);
         });
-        mraid.onClose.subscribe(() => mraidAdUnit.hide());
+        mraid.onSkip.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.SKIPPED);
+            mraidAdUnit.hide();
+        });
+        mraid.onClose.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.COMPLETED);
+            mraidAdUnit.hide();
+        });
 
         return mraidAdUnit;
     }

@@ -200,7 +200,7 @@ export class WebView {
             this._mustReinitialize = reinitialize;
         });
 
-        if(this._configuration.getCacheMode() === CacheMode.ALLOWED) {
+        if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
             this._cache.stop();
         }
 
