@@ -1,0 +1,10 @@
+{
+  "content": [
+    "https://cdn.unityads.unity3d.com/playables/SG_android/manifest.json",
+    "https://cdn.unityads.unity3d.com/playables/SG_ios/manifest.json",
+    "https://cdn.unityads.unity3d.com/playables/SMA_android/manifest.json",
+    "https://cdn.unityads.unity3d.com/playables/SMA_ios/manifest.json",
+    "https://cdn.unityads.unity3d.com/playables/piggy_android/manifest.json",
+    "https://cdn.unityads.unity3d.com/playables/piggy_ios/manifest.json"
+  ]
+}
