@@ -6,7 +6,6 @@ import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { View } from 'Views/View';
-import { Campaign } from 'Models/Campaign';
 
 export class Overlay extends View {
 
@@ -42,8 +41,6 @@ export class Overlay extends View {
 
     private _callButtonVisible: boolean = false;
 
-    private _headerElement: HTMLElement;
-    private _footerElement: HTMLElement;
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
@@ -55,17 +52,11 @@ export class Overlay extends View {
     private _fullScreenHitAreaElement: HTMLElement;
     private _fullScreenButtonVisible: boolean = false;
 
-    private _slideTimer: any;
-    private _slideStatus: boolean = true;
+    private _fadeTimer: any;
+    private _fadeStatus: boolean = true;
 
-    private _abTest: boolean = false;
-
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
-
-        if(campaign.getAbGroup() === 18 || campaign.getAbGroup() === 19) {
-            this._abTest = true;
-        }
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
@@ -106,8 +97,6 @@ export class Overlay extends View {
 
     public render(): void {
         super.render();
-        this._headerElement = <HTMLElement>this._container.querySelector('.header');
-        this._footerElement = <HTMLElement>this._container.querySelector('.footer');
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
@@ -115,10 +104,6 @@ export class Overlay extends View {
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
         this._fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
-
-        if(this._abTest) {
-            this._container.classList.add('ab-test');
-        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -155,10 +140,10 @@ export class Overlay extends View {
             this.onSkip.trigger(value);
         }
 
-        if(!this._slideTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            this._slideTimer = setTimeout(() => {
-                this.slide(true);
-                this._slideTimer = undefined;
+        if(!this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
+            this._fadeTimer = setTimeout(() => {
+                this.fade(true);
+                this._fadeTimer = undefined;
             }, 3000);
         }
 
@@ -220,7 +205,7 @@ export class Overlay extends View {
     private onMuteEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        this.resetSlideTimer();
+        this.resetFadeTimer();
         if(this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
@@ -234,24 +219,24 @@ export class Overlay extends View {
     private onCallButtonEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        this.resetSlideTimer();
+        this.resetFadeTimer();
         this.onCallButton.trigger(true);
     }
 
     private onClick(event: Event) {
-        this.resetSlideTimer();
+        this.resetFadeTimer();
 
-        if(!this._slideStatus) {
-            this.slide(false);
+        if(!this._fadeStatus) {
+            this.fade(false);
         } else {
-            this.slide(true);
+            this.fade(true);
         }
     }
 
     private onFullScreenButtonEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        this.resetSlideTimer();
+        this.resetFadeTimer();
         this.onFullScreenButton.trigger(true);
 
     }
@@ -289,32 +274,20 @@ export class Overlay extends View {
         }
     }
 
-    private resetSlideTimer() {
-        if(this._slideTimer) {
-            clearTimeout(this._slideTimer);
-            this._slideTimer = undefined;
+    private resetFadeTimer() {
+        if(this._fadeTimer) {
+            clearTimeout(this._fadeTimer);
+            this._fadeTimer = undefined;
         }
     }
 
-    private slide(value: boolean) {
-        if(this._abTest) {
-            if(value) {
-                this._container.classList.add('fade');
-                this._slideStatus = false;
-            } else {
-                this._container.classList.remove('fade');
-                this._slideStatus = true;
-            }
+    private fade(value: boolean) {
+        if(value) {
+            this._container.classList.add('fade');
+            this._fadeStatus = false;
         } else {
-            if(value) {
-                this._headerElement.style.webkitTransform = 'translateY(-' + this._headerElement.clientHeight + 'px)';
-                this._footerElement.style.webkitTransform = 'translateY(' + this._footerElement.clientHeight + 'px)';
-                this._slideStatus = false;
-            } else {
-                this._headerElement.style.webkitTransform = 'translateY(0px)';
-                this._footerElement.style.webkitTransform = 'translateY(0px)';
-                this._slideStatus = true;
-            }
+            this._container.classList.remove('fade');
+            this._fadeStatus = true;
         }
     }
 }
