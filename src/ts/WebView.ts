@@ -128,15 +128,15 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             if(this._configuration.isPlacementLevelControl()) {
+                this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
+                this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
+                this._campaignManager.onPlcError.subscribe(error => this.onPlcError(error));
+            } else {
                 this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
                 this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
                 this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
                 this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill());
                 this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
-            } else {
-                this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
-                this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
-                this._campaignManager.onPlcError.subscribe(error => this.onPlcError(error));
             }
             return this._campaignManager.request();
         }).then(() => {
