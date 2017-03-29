@@ -131,7 +131,7 @@ define([], function() {
         });
 
         runner.on('pending', function(test) {
-            logger.log(test.title);
+            logger.log('pending: ' + test.title);
         });
 
         runner.on('pass', function(test) {
@@ -147,7 +147,8 @@ define([], function() {
         });
 
         runner.on('fail', function(test, err) {
-            logger.error(++failures + ') ' + test.title, err);
+            ++failures;
+            logger.error('failed: ' + test.title + ' ** ' + err);
         });
 
         var self = this;
@@ -192,7 +193,7 @@ define([], function() {
                 // indent stack trace without msg
                 stack = stack.slice(index ? index + 1 : index).replace(/^/gm, '  ');
 
-                logger.error((i + 1) + ') ' + test.fullTitle() + '\n' + msg + '\n' + stack);
+                logger.error('fail: ' + (i + 1) + ') ' + test.fullTitle() + '\n' + msg + '\n' + stack);
             });
         }
     }
