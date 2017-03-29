@@ -22,7 +22,7 @@ export class EndScreenEventHandlers {
         if(campaign.getClickAttributionUrl()) {
             EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
 
-            if (!campaign.getClickAttributionUrlFollowsRedirects()) {
+            if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign);
             }
         } else {
@@ -39,7 +39,7 @@ export class EndScreenEventHandlers {
         if(campaign.getClickAttributionUrl()) {
             EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
 
-            if (!campaign.getClickAttributionUrlFollowsRedirects()) {
+            if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
             }
         } else {
