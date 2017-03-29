@@ -272,6 +272,7 @@ export class CampaignManager {
         let url: string;
 
         if(this._configuration.isPlacementLevelControl()) {
+            // todo: temp server address for testing
             url = [
                 'http://worker-public-0.ads-delivery-perf-kube.applifier.info:30300/games',
                 this._clientInfo.getGameId(),
