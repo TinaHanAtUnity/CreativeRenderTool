@@ -1,3 +1,8 @@
+# Wed Mar 29 09:13:44 UTC 2017
+
+* Remove transparent header and footer bars from the video overlay
+* Style file clean up
+
 # Mon Mar 27 13:44:09 UTC 2017
 
 * Fix MRAID events
