@@ -63,8 +63,7 @@ export class Configuration {
     }
 
     public isPlacementLevelControl(): boolean {
-        // return this._placementLevelControl;
-        return true;
+        return this._placementLevelControl;
     }
 
     public getCacheMode(): CacheMode {
