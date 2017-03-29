@@ -1,4 +1,4 @@
-import { Observable1 } from 'Utilities/Observable';
+import { Observable1, Observable2 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -17,6 +17,7 @@ import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Configuration } from 'Models/Configuration';
+import { Campaign } from 'Models/Campaign';
 
 export class CampaignManager {
 
@@ -53,6 +54,10 @@ export class CampaignManager {
     public onNoFill: Observable1<number> = new Observable1();
     public onError: Observable1<WebViewError> = new Observable1();
 
+    public onPlcCampaign: Observable2<string, Campaign> = new Observable2();
+    public onPlcNoFill: Observable1<string> = new Observable1();
+    public onPlcError: Observable1<WebViewError> = new Observable1();
+
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
     private _assetManager: AssetManager;
@@ -63,6 +68,7 @@ export class CampaignManager {
 
     private _requesting: boolean;
     private _refillTimestamp: number;
+    private _plcRefillTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
@@ -97,13 +103,29 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             });
         }).then(response => {
-            return this.parseCampaign(response);
+            if(this._configuration.isPlacementLevelControl()) {
+                return this.parseCampaignWithPlacements(response);
+            } else {
+                return this.parseCampaign(response);
+            }
         }).then(() => {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
             this.onError.trigger(error);
         });
+    }
+
+    public shouldPlcRefill(): boolean {
+        if(this._requesting) {
+            return false;
+        }
+
+        if(this._plcRefillTimestamp !== 0 && Date.now() > this._plcRefillTimestamp) {
+            return true;
+        }
+
+        return false;
     }
 
     private parseCampaign(response: INativeResponse) {
@@ -119,6 +141,37 @@ export class CampaignManager {
         } else {
             return this.handleNoFill();
         }
+    }
+
+    private parseCampaignWithPlacements(response: INativeResponse) {
+        // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
+        this._plcRefillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
+
+        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+
+        if('placements' in json) {
+            const placements = this._configuration.getPlacements();
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
+                    if(json.placements[placement]) {
+                        this.handlePlacementCampaign(placement, json.placements[placement].contentType, json.placements[placement].payload);
+                    }
+                }
+            }
+
+            return Promise.resolve();
+        } else {
+            return this.handlePlacementError();
+        }
+    }
+
+    private handlePlacementCampaign(placement: string, contentType: string, payload: string) {
+        console.log('JNIDEBUG placement: ' + placement + ', content-type: ' + contentType + ', payload: ' + payload);
+    }
+
+    private handlePlacementError(): Promise<void> {
+        console.log('JNIDEBUG handlePlacementError');
+        return Promise.resolve();
     }
 
     private parsePerformanceCampaign(json: any): Promise<void> {
