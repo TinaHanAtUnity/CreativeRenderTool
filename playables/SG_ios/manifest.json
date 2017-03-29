@@ -1,5 +1,5 @@
 {
-  "content": [
-    "https://cdn.unityads.unity3d.com/playables/SG_ios/index_ios.html"
-  ]
+  "index": "https://unityads-cdn-origin.s3.amazonaws.com/playables/SG_ios/index_ios.html",
+  "content": [],
+  "platform": "ios"
 }

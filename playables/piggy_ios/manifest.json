@@ -1,8 +1,9 @@
 {
+  "index": "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_ios/index.html",
   "content": [
-    "https://cdn.unityads.unity3d.com/playables/piggy_ios/index.html",
-    "https://cdn.unityads.unity3d.com/playables/piggy_ios/assets_v3.html",
-    "https://cdn.unityads.unity3d.com/playables/piggy_ios/portrait.jpg",
-    "https://cdn.unityads.unity3d.com/playables/piggy_ios/webfont.js"
-  ]
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_ios/assets_v3.png",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_ios/portrait.jpg",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_ios/webfont.js"
+  ],
+  "platform": "ios"
 }

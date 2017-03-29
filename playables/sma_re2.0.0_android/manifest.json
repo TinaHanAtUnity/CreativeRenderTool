@@ -1,5 +1,5 @@
 {
-  "content": [
-    "https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_android/index.html"
-  ]
+  "index": "https://unityads-cdn-origin.s3.amazonaws.com/playables/sma_re2.0.0_android/index.html",
+  "content": [],
+  "platform": "android"
 }
