@@ -1,45 +1,35 @@
-body.iphone
-body.ipad
-body.android
+#end-screen
   .campaign-container.whitespace
-    .btn-download
-      color: #ffffff
-      background-image: #167dfb
-      background: #167dfb
-      padding: 15% 5% 15% 5%
 
-    .end-screen-info-background
+    .end-screen-stripe
+      display: none
+
+    .info-container
+      display: block
       position: absolute
-      bottom: 0
+      top:0
+      left:0
       width: 100%
       height: 100%
-      opacity: 0.96
-      border-radius: 30px
-    
-    .end-screen-info
-      margin-top: 80%
-      
+      box-sizing:border-box
+      padding: 8px
+      margin: 0
+
+    .end-screen-info-background
+      display: block
+      position: relative
+      width: 100%
+      height: 100%
+      opacity: 0.9
+      box-sizing:border-box
+      border: 0
+      border-radius: 10px
+
     .game-background
       top: 0
       bottom: 0
       width: 100%
       height: 100%
       
-    .unityads-logo
-      right: 10
-      
   a.btn-close
     color: #7c7c7c
-
-  &.landscape
-    .campaign-container.whitespace
-      .end-screen-info-background
-        width: 100%
-        height: 100%
-        right: 0 
-        
-      .end-screen-info
-        margin-top: 0%
-      
-      .btn-download
-        padding: 4% 5% 4% 5%
