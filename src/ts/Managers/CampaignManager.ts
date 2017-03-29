@@ -105,7 +105,7 @@ export class CampaignManager {
             });
         }).then(response => {
             if(this._configuration.isPlacementLevelControl()) {
-                return this.parseCampaignWithPlacements(response);
+                return this.parsePlcCampaigns(response);
             } else {
                 return this.parseCampaign(response);
             }
@@ -144,7 +144,7 @@ export class CampaignManager {
         }
     }
 
-    private parseCampaignWithPlacements(response: INativeResponse) {
+    private parsePlcCampaigns(response: INativeResponse) {
         // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
         this._plcRefillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
 
