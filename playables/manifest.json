@@ -1,0 +1,14 @@
+{
+  "content": [
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/SG_android/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/SG_ios/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/SMA_android/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/SMA_ios/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_android/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_ios/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/sg_re2.0.0_android/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/sg_re2.0.0_ios/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/sma_re2.0.0_android/manifest.json",
+    "https://unityads-cdn-origin.s3.amazonaws.com/playables/sma_re2.0.0_ios/manifest.json"
+  ]
+}
