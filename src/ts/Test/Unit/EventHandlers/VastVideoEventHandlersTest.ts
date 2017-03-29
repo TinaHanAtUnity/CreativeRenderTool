@@ -145,7 +145,7 @@ describe('VastVideoEventHandlers tests', () => {
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        overlay = new Overlay(nativeBridge, false, 'en', campaign);
+        overlay = new Overlay(nativeBridge, false, 'en');
 
         placement = new Placement({
             id: '123',

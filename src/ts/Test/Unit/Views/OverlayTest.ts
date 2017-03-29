@@ -4,7 +4,6 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -21,7 +20,7 @@ describe('Overlay', () => {
     });
 
     it('should render', () => {
-        const overlay = new Overlay(nativeBridge, true, 'en', TestFixtures.getCampaign());
+        const overlay = new Overlay(nativeBridge, true, 'en');
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-icon'));
