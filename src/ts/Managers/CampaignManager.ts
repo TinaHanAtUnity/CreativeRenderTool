@@ -94,6 +94,7 @@ export class CampaignManager {
         }
         this._requesting = true;
         this._refillTimestamp = 0;
+        this._plcRefillTimestamp = 0;
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
@@ -150,27 +151,56 @@ export class CampaignManager {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
+            let chain = Promise.resolve();
+
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
                     if(json.placements[placement]) {
-                        this.handlePlacementCampaign(placement, json.placements[placement].contentType, json.placements[placement].payload);
+                        chain = chain.then(() => {
+                            return this.handlePlcCampaign(placement, json.placements[placement].contentType, json.placements[placement].payload);
+                        });
+                    } else {
+                        chain = chain.then(() => {
+                            return this.handlePlcNoFill(placement);
+                        });
                     }
                 }
             }
 
-            return Promise.resolve();
+            return chain.catch(error => {
+                return this.handlePlcError(error);
+            });
         } else {
-            return this.handlePlacementError();
+            return this.handlePlcError(new Error('No placements found'));
         }
     }
 
-    private handlePlacementCampaign(placement: string, contentType: string, payload: string) {
-        console.log('JNIDEBUG placement: ' + placement + ', content-type: ' + contentType + ', payload: ' + payload);
+    private handlePlcCampaign(placement: string, contentType: string, payload: string): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + ')');
+        if(contentType === 'comet/campaign') {
+            const json = JsonParser.parse(payload);
+            if(json.campaign && json.campaign.mraidUrl) {
+                const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
+                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+            } else {
+                const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+            }
+        }
+
+        return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
     }
 
-    private handlePlacementError(): Promise<void> {
-        console.log('JNIDEBUG handlePlacementError');
+    private handlePlcNoFill(placement: string): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
+        this.onPlcNoFill.trigger(placement);
+        return Promise.resolve();
+    }
+
+    private handlePlcError(error: any): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
+        this.onPlcError.trigger(error);
         return Promise.resolve();
     }
 
