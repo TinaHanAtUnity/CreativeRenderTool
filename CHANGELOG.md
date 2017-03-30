@@ -1,3 +1,8 @@
+# Thu Mar 30 09:22:20 UTC 2017
+
+* Orientation & iframe size fixes for playables
+* Click attribution fixes
+
 # Wed Mar 29 09:13:44 UTC 2017
 
 * Remove transparent header and footer bars from the video overlay
