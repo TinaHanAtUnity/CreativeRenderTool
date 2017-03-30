@@ -177,14 +177,17 @@ export class CampaignManager {
     }
 
     private handlePlcCampaign(placement: string, contentType: string, payload: string): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + ')');
+        const abGroup: number = 0; // todo: fix abGroup handling
+        const gamerId: string = '58906d633797a2005933fc6f'; // todo: fix gamerId handling, this is gamerId for JanneN's test device
+
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + payload);
         if(contentType === 'comet/campaign') {
             const json = JsonParser.parse(payload);
-            if(json.campaign && json.campaign.mraidUrl) {
-                const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
+            if(json && json.mraidUrl) {
+                const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
                 return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
             } else {
-                const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+                const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                 return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
             }
         }

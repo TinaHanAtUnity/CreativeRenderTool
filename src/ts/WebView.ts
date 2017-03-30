@@ -225,7 +225,7 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
             this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._currentAdUnit.onClose.subscribe(() => this.onClose());
 
