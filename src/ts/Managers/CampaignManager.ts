@@ -156,7 +156,7 @@ export class CampaignManager {
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    if(json.placements[placement]) {
+                    if(json.placements[placement] && json.placements[placement].contentType) {
                         chain = chain.then(() => {
                             return this.handlePlcCampaign(placement, json.placements[placement].contentType, json.placements[placement].payload);
                         });
@@ -274,7 +274,8 @@ export class CampaignManager {
         if(this._configuration.isPlacementLevelControl()) {
             // todo: temp server address for testing
             url = [
-                'http://worker-public-0.ads-delivery-perf-kube.applifier.info:30300/games',
+                'http://worker-public-0.delivery-prod-us-east-1b.applifier.info:30300/games',
+                // 'http://worker-public-0.ads-delivery-perf-kube.applifier.info:30300/games',
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
