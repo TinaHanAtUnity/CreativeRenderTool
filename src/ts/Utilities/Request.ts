@@ -208,7 +208,7 @@ export class Request {
         } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
             if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
-                if(location && location.match(/^https?/i)) {
+                if(location && location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
