@@ -1,3 +1,7 @@
+# Fri Mar 31 07:02:57 UTC 2017
+
+* Do not allow redirection to https://itunes.apple.com
+
 # Thu Mar 30 09:22:20 UTC 2017
 
 * Orientation & iframe size fixes for playables
