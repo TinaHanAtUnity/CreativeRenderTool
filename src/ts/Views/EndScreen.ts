@@ -91,11 +91,11 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
-        //const abGroup = campaign.getAbGroup();
-        //if((abGroup === 10 || abGroup === 11)) {
+        const abGroup = campaign.getAbGroup();
+        if((abGroup === 10 || abGroup === 11)) {
             return 'unitylogotest';
-        //}
-        //return undefined;
+        }
+        return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
