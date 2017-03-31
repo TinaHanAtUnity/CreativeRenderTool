@@ -95,6 +95,10 @@ export class EndScreen extends View {
         if((abGroup === 8 || abGroup === 9)) {
             return 'whitespace';
         }
+
+        if((abGroup === 10 || abGroup === 11)) {
+            return 'unitylogotest';
+        }
         return undefined;
     }
 
