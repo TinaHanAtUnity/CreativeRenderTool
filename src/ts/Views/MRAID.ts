@@ -87,6 +87,9 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe;
         const closeLength = 30;
+        let resizeTimeout: any;
+        const self = this;
+
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
             let closeRemaining = closeLength;
@@ -136,6 +139,16 @@ export class MRAID extends View {
                 this.onLoaded.unsubscribe(observer);
             });
         }
+
+        function resizeThrottler(event: Event) {
+            if (!resizeTimeout) {
+                resizeTimeout = setTimeout(function() {
+                    resizeTimeout = null;
+                    self._resizeHandler(event);
+                }, 200);
+            }
+        }
+
         this._resizeHandler = (event: Event) => {
             iframe.width = window.innerWidth;
             iframe.height = window.innerHeight;
@@ -147,7 +160,7 @@ export class MRAID extends View {
                 }, '*');
             }
         };
-        window.addEventListener('resize', this._resizeHandler, false);
+        window.addEventListener('resize', resizeThrottler, false);
     }
 
     public hide() {
