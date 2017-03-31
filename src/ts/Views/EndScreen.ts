@@ -90,7 +90,11 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: PerformanceCampaign): string | undefined {
+    private getEndscreenAlt(campaign: PerformanceCampaign) {
+        const abGroup = campaign.getAbGroup();
+        if((abGroup === 8 || abGroup === 9)) {
+            return 'whitespace';
+        }
         return undefined;
     }
 
