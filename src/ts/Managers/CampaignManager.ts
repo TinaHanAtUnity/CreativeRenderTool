@@ -277,8 +277,7 @@ export class CampaignManager {
         if(this._configuration.isPlacementLevelControl()) {
             // todo: temp server address for testing
             url = [
-                'http://worker-public-0.delivery-prod-us-east-1b.applifier.info:30300/games',
-                // 'http://worker-public-0.ads-delivery-perf-kube.applifier.info:30300/games',
+                'https://auction.unityads.unity3d.com/games',
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
