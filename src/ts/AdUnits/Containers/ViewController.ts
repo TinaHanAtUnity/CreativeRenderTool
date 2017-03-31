@@ -96,7 +96,9 @@ export class ViewController extends AdUnitContainer {
     }
 
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
-        return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options.supportedOrientations, allowRotation, forceOrientation));
+        return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
+            return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options.supportedOrientations, allowRotation, forceOrientation));
+        });
     }
 
     public isPaused() {
