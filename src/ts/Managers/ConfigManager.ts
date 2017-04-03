@@ -11,16 +11,17 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
 import { Platform } from 'Constants/Platform';
+import { StorageType } from 'Native/Api/Storage';
 
 export class ConfigManager {
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return Promise.all<FrameworkMetaData, AdapterMetaData>([
+        return Promise.all<FrameworkMetaData, AdapterMetaData, string>([
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
-            MetaDataManager.fetchAdapterMetaData(nativeBridge)
-            // todo: fetch gamerId from storage
-        ]).then(([framework, adapter]) => {
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
+            MetaDataManager.fetchAdapterMetaData(nativeBridge),
+            ConfigManager.fetchGamerId(nativeBridge)
+        ]).then(([framework, adapter, gamerId]) => {
+            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,
@@ -31,7 +32,10 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for A/B group ' + config.getAbGroup());
+                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + '(A/B group ' + config.getAbGroup() + ')');
+                    if(config.getGamerId()) {
+                        ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                    }
                     return config;
                 } catch(error) {
                     nativeBridge.Sdk.logError('Config request failed ' + error);
@@ -61,7 +65,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData): string {
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData, gamerId: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -77,6 +81,7 @@ export class ConfigManager {
             deviceModel: deviceInfo.getModel(),
             language: deviceInfo.getLanguage(),
             test: clientInfo.getTestMode(),
+            gamerId: gamerId,
             forceAbGroup: ConfigManager.AbGroup
         });
 
@@ -108,4 +113,18 @@ export class ConfigManager {
         return url;
     }
 
+    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string> {
+        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+            return gamerId;
+        }).catch(error => {
+            return undefined;
+        });
+    }
+
+    private static storeGamerId(nativeBridge: NativeBridge, gamerId: string): Promise<void[]> {
+        return Promise.all([
+            nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
 }

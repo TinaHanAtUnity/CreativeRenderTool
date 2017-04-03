@@ -10,7 +10,6 @@ import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { StorageType } from 'Native/Api/Storage';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
@@ -103,9 +102,6 @@ export class CampaignManager {
 
     private parseCampaign(response: INativeResponse) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-        if(json.gamerId) {
-            this.storeGamerId(json.gamerId);
-        }
 
         if('campaign' in json) {
             return this.parsePerformanceCampaign(json);
@@ -119,10 +115,10 @@ export class CampaignManager {
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
         if(json.campaign && json.campaign.mraidUrl) {
-            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, this._configuration.getAbGroup(), json.campaign.mraidUrl);
+            const campaign = new MRAIDCampaign(json.campaign, this._configuration.getGamerId(), this._configuration.getAbGroup(), json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, this._configuration.getAbGroup());
+            const campaign = new PerformanceCampaign(json.campaign, this._configuration.getGamerId(), this._configuration.getAbGroup());
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
@@ -142,7 +138,7 @@ export class CampaignManager {
             } else {
                 campaignId = 'UNKNOWN';
             }
-            const campaign = new VastCampaign(vast, campaignId, json.gamerId, this._configuration.getAbGroup(), json.cacheTTL, json.vast.tracking);
+            const campaign = new VastCampaign(vast, campaignId, this._configuration.getGamerId(), this._configuration.getAbGroup(), json.cacheTTL, json.vast.tracking);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                 return;
@@ -239,13 +235,11 @@ export class CampaignManager {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this.fetchGamerId());
 
-        return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
+        return Promise.all(promises).then(([connectionType, networkType]) => {
             url = Url.addParameters(url, {
                 connectionType: this.getParameter('connectionType', connectionType, 'string'),
                 networkType: this.getParameter('networkType', networkType, 'number'),
-                gamerId: this.getParameter('gamerId', gamerId, 'string')
             });
 
             return url;
@@ -295,21 +289,6 @@ export class CampaignManager {
                 return JSON.stringify(body);
             });
         });
-    }
-
-    private fetchGamerId(): Promise<string> {
-        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
-            return gamerId;
-        }).catch(error => {
-            return undefined;
-        });
-    }
-
-    private storeGamerId(gamerId: string): Promise<void[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
     }
 
     private getParameter(field: string, value: any, expectedType: string) {
