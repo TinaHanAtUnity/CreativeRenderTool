@@ -16,15 +16,12 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Configuration } from 'Models/Configuration';
 
 export class CampaignManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
-    }
-
-    public static setAbGroup(abGroup: number) {
-        CampaignManager.AbGroup = abGroup;
     }
 
     public static setCampaignId(campaignId: string) {
@@ -41,7 +38,6 @@ export class CampaignManager {
 
     private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static CampaignResponse: string | undefined;
@@ -53,6 +49,7 @@ export class CampaignManager {
     public onError: Observable1<WebViewError> = new Observable1();
 
     private _nativeBridge: NativeBridge;
+    private _configuration: Configuration;
     private _assetManager: AssetManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -62,8 +59,9 @@ export class CampaignManager {
     private _requesting: boolean;
     private _refillTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
+        this._configuration = configuration;
         this._assetManager = assetManager;
         this._request = request;
         this._clientInfo = clientInfo;
@@ -119,12 +117,12 @@ export class CampaignManager {
     }
 
     private parsePerformanceCampaign(json: any): Promise<void> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement');
         if(json.campaign && json.campaign.mraidUrl) {
-            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
+            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, this._configuration.getAbGroup(), json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, this._configuration.getAbGroup());
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
@@ -133,7 +131,7 @@ export class CampaignManager {
         if(json.vast === null) {
             return this.handleNoFill();
         }
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement');
         const decodedVast = decodeURIComponent(json.vast.data).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             let campaignId: string;
@@ -144,7 +142,7 @@ export class CampaignManager {
             } else {
                 campaignId = 'UNKNOWN';
             }
-            const campaign = new VastCampaign(vast, campaignId, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.cacheTTL, json.vast.tracking);
+            const campaign = new VastCampaign(vast, campaignId, json.gamerId, this._configuration.getAbGroup(), json.cacheTTL, json.vast.tracking);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 this.onError.trigger(new Error('Campaign does not have an impression url'));
                 return;
@@ -229,12 +227,6 @@ export class CampaignManager {
         if(CampaignManager.CampaignId) {
             url = Url.addParameters(url, {
                 forceCampaignId: CampaignManager.CampaignId
-            });
-        }
-
-        if(CampaignManager.AbGroup) {
-            url = Url.addParameters(url, {
-                forceAbGroup: CampaignManager.AbGroup
             });
         }
 

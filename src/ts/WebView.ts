@@ -418,9 +418,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('abGroup')) {
-                // todo: remove duplicate
                 ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
-                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
             }
 
             if(TestEnvironment.get('campaignId')) {

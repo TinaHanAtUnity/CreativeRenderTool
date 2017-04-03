@@ -31,7 +31,7 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
+                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for A/B group ' + config.getAbGroup());
                     return config;
                 } catch(error) {
                     nativeBridge.Sdk.logError('Config request failed ' + error);
