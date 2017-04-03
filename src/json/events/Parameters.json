@@ -119,6 +119,27 @@
     "platforms": "all"
   },
   {
+    "key": "forceAbGroup",
+    "type": "number",
+    "description": "Force A/B group for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "forceCampaignId",
+    "type": "string",
+    "description": "Force campaign ID for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "force_country",
+    "type": "string",
+    "description": "Force country targeting for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "gameId",
     "type": "string",
     "description": "Source game identifier",

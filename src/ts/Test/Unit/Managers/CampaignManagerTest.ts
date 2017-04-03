@@ -16,7 +16,7 @@ import { Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { AssetManager } from 'Managers/AssetManager';
 import { Cache } from 'Utilities/Cache';
-import { CacheMode } from 'Models/Configuration';
+import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
 
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
@@ -49,6 +49,11 @@ describe('CampaignManager', () => {
     let request: Request;
     let vastParser: VastParser;
     let warningSpy: sinon.SinonSpy;
+    let configuration: Configuration;
+
+    beforeEach(() => {
+        configuration = TestFixtures.getConfiguration();
+    });
 
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
@@ -59,7 +64,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -77,8 +82,6 @@ describe('CampaignManager', () => {
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.equal(triggeredCampaign.getAbGroup(), 3);
-            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
         });
     });
@@ -96,14 +99,12 @@ describe('CampaignManager', () => {
 
         vastParser.setMaxWrapperDepth(1);
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.equal(triggeredCampaign.getAbGroup(), 3);
-            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
             assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'http://myErrorURL/error',
@@ -171,14 +172,12 @@ describe('CampaignManager', () => {
 
         vastParser.setMaxWrapperDepth(2);
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.equal(triggeredCampaign.getAbGroup(), 3);
-            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
             assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                 'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
@@ -279,7 +278,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         campaignManager.onError.subscribe((err: Error) => {
             assert.equal(err.message, 'VAST wrapper depth exceeded');
             done();
@@ -295,7 +294,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
             triggeredError = error;
@@ -317,7 +316,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredError: WebViewError | Error;
         const verify = () => {
             // then the onError observable is triggered with an appropriate error
@@ -386,9 +385,7 @@ describe('CampaignManager', () => {
         it('should trigger onError after requesting a vast placement with no vast data', () => {
             const response = {
                 response: `{
-                    "abGroup": 3,
-                    "vast": {},
-                    "gamerId": "5712983c481291b16e1be03b"
+                    "vast": {}
                 }`
             };
             return verifyErrorForResponse(response, 'VAST xml data is missing');
@@ -408,9 +405,7 @@ describe('CampaignManager', () => {
             // given a VAST placement with null vast
             const response = {
                 response: `{
-                    "abGroup": 3,
-                    "vast": null,
-                    "gamerId": "5712983c481291b16e1be03b"
+                    "vast": null
                 }`
             };
 
@@ -418,7 +413,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
             let triggeredRetryTime: number;
             let triggeredError: any;
             campaignManager.onNoFill.subscribe((retryTime: number) => {
@@ -470,7 +465,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -488,8 +483,6 @@ describe('CampaignManager', () => {
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.equal(triggeredCampaign.getAbGroup(), 3);
-            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
         });
     };
@@ -592,7 +585,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -610,8 +603,6 @@ describe('CampaignManager', () => {
 
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
-            assert.equal(triggeredCampaign.getAbGroup(), 3);
-            assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
 
             assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
