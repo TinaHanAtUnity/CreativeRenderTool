@@ -20,6 +20,66 @@
       "body": false
     },
     {
+      "parameter": "sdkVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "osVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceModel",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "test",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "forceAbGroup",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "advertisingTrackingId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "limitAdTracking",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "androidId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "frameworkName",
       "required": "no",
       "queryString": true,

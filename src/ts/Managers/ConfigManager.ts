@@ -10,6 +10,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
+import { Platform } from 'Constants/Platform';
 
 export class ConfigManager {
 
@@ -17,6 +18,7 @@ export class ConfigManager {
         return Promise.all<FrameworkMetaData, AdapterMetaData>([
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
             MetaDataManager.fetchAdapterMetaData(nativeBridge)
+            // todo: fetch gamerId from storage
         ]).then(([framework, adapter]) => {
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
@@ -52,7 +54,12 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
+    public static setAbGroup(abGroup: number) {
+        ConfigManager.AbGroup = abGroup;
+    }
+
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static AbGroup: number | undefined;
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData): string {
         let url: string = [
@@ -64,8 +71,31 @@ export class ConfigManager {
         url = Url.addParameters(url, {
             bundleId: clientInfo.getApplicationName(),
             encrypted: !clientInfo.isDebuggable(),
-            rooted: deviceInfo.isRooted()
+            rooted: deviceInfo.isRooted(),
+            sdkVersion: clientInfo.getSdkVersion(),
+            osVersion: deviceInfo.getOsVersion(),
+            deviceModel: deviceInfo.getModel(),
+            language: deviceInfo.getLanguage(),
+            test: clientInfo.getTestMode(),
+            forceAbGroup: ConfigManager.AbGroup
         });
+
+        if(clientInfo.getPlatform() === Platform.ANDROID) {
+            url = Url.addParameters(url, {
+                deviceMake: deviceInfo.getManufacturer()
+            });
+        }
+
+        if(deviceInfo.getAdvertisingIdentifier()) {
+            url = Url.addParameters(url, {
+                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: deviceInfo.getLimitAdTracking()
+            });
+        } else if(clientInfo.getPlatform() === Platform.ANDROID) {
+            url = Url.addParameters(url, {
+                androidId: deviceInfo.getAndroidId()
+            });
+        }
 
         if(framework) {
             url = Url.addParameters(url, framework.getDTO());
