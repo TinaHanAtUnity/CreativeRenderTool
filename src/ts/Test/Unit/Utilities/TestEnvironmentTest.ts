@@ -13,7 +13,9 @@ describe('MetaDataTest', () => {
         metaData = new MetaData(TestFixtures.getNativeBridge());
 
         sinon.stub(metaData, 'getKeys').returns(Promise.resolve(['testNumber']));
-        sinon.stub(metaData, 'get').withArgs('test.testNumber').returns(Promise.resolve([true, 1234]));
+        sinon.stub(metaData, 'get')
+            .withArgs('test.clearTestMetaData').returns(Promise.resolve([false, undefined]))
+            .withArgs('test.testNumber').returns(Promise.resolve([true, 1234]));
     });
 
     it('should get defined number', () => {
