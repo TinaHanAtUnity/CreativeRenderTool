@@ -32,7 +32,7 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + '(A/B group ' + config.getAbGroup() + ')');
+                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getGamerId()) {
                         ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
                     }
