@@ -250,12 +250,11 @@ describe('EventManagerTest', () => {
     });
 
     it('Send click attribution event', () => {
-        const sessionId: string = '1234';
         const url: string = 'https://www.example.net/third_party_event';
 
         const requestSpy = sinon.spy(request, 'get');
 
-        return eventManager.clickAttributionEvent(sessionId, url, false).then(() => {
+        return eventManager.clickAttributionEvent(url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
         });

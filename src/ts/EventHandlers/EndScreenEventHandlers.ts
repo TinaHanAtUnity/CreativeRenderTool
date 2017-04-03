@@ -10,6 +10,8 @@ import { IosUtils } from 'Utilities/IosUtils';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { StoreName } from 'Models/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { RequestError } from 'Errors/RequestError';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class EndScreenEventHandlers {
 
@@ -52,7 +54,7 @@ export class EndScreenEventHandlers {
         const platform = nativeBridge.getPlatform();
 
         if(campaign.getClickAttributionUrlFollowsRedirects()) {
-            eventManager.clickAttributionEvent(sessionManager.getSession().getId(), campaign.getClickAttributionUrl(), true).then(response => {
+            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -64,15 +66,26 @@ export class EndScreenEventHandlers {
                         nativeBridge.UrlScheme.open(location);
                     }
                 } else {
-                    Diagnostics.trigger('click_attribution_failed', {
+                    Diagnostics.trigger('click_attribution_misconfigured', {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
                     });
                 }
+            }).catch(error => {
+                if(error instanceof RequestError) {
+                    error = new DiagnosticError(new Error(error.message), {
+                        request: (<RequestError>error).nativeRequest,
+                        event: event,
+                        sessionId: sessionManager.getSession().getId(),
+                        url: campaign.getClickAttributionUrl(),
+                        response: (<RequestError>error).nativeResponse
+                    });
+                }
+                Diagnostics.trigger('click_attribution_failed', error);
             });
         } else {
-            eventManager.clickAttributionEvent(sessionManager.getSession().getId(), campaign.getClickAttributionUrl(), false);
+            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), false);
         }
     }
 

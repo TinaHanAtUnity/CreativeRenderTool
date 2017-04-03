@@ -2,7 +2,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 
@@ -56,23 +55,12 @@ export class EventManager {
         });
     }
 
-    public clickAttributionEvent(sessionId: string, url: string, redirects: boolean): Promise<INativeResponse> {
+    public clickAttributionEvent(url: string, redirects: boolean): Promise<INativeResponse> {
         return this._request.get(url, [], {
             retries: 0,
             retryDelay: 0,
             followRedirects: redirects,
             retryWithConnectionEvents: false
-        }).catch(error => {
-            if(error instanceof RequestError) {
-                error = new DiagnosticError(new Error(error.message), {
-                    request: (<RequestError>error).nativeRequest,
-                    event: event,
-                    sessionId: sessionId,
-                    url: url,
-                    response: (<RequestError>error).nativeResponse
-                });
-            }
-            return Diagnostics.trigger('click_attribution_failed', error);
         });
     }
 
