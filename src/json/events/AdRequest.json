@@ -105,7 +105,7 @@
     },
     {
       "parameter": "gamerId",
-      "required": "no",
+      "required": "yes",
       "queryString": true,
       "body": false
     },
