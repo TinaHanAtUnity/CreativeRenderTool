@@ -17,7 +17,6 @@
     left: 10px
     width: 36px
     height: 36px
-    opacity: 0.4
 
   .skip-icon
     position: absolute
@@ -27,6 +26,22 @@
     height: 29px
     font-size: 27px
     -webkit-transform: translate(0, -50%)
+
+  .skip
+    .circle-left
+    .circle-right
+      border: 4px solid #777777
+
+    .skip-icon
+      color: #777777
+
+  .skip.enabled
+    .circle-left
+    .circle-right
+      border: 4px solid #FFF
+
+    .skip-icon
+      color: #FFF
 
   .mute-button
     position: fixed

@@ -270,7 +270,11 @@ export class Overlay extends View {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
-            skipIconElement.style.opacity = value ? '1' : '0.4';
+            if(value) {
+                skipIconElement.classList.add('enabled');
+            } else {
+                skipIconElement.classList.remove('enabled');
+            }
         }
     }
 

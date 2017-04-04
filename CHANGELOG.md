@@ -1,3 +1,13 @@
+# Mon Apr 3 07:49:45 UTC 2017
+
+* Fixed skip button animation on Android 4.1.2 (ABT-202)
+* End screen AB test with a blank fullscreen card
+* AB test of replacing the UnityAds logo with just Unity logo (groups 10 & 11)
+
+# Fri Mar 31 07:02:57 UTC 2017
+
+* Do not allow redirection to https://itunes.apple.com
+
 # Thu Mar 30 09:22:20 UTC 2017
 
 * Orientation & iframe size fixes for playables

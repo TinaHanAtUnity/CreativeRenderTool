@@ -10,7 +10,7 @@ export class MetaData {
 
     public get<T>(key: string, deleteValue: boolean): Promise<[boolean, T | null]> {
         return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T): Promise<[boolean, T | null]> => {
-            if(value && deleteValue) {
+            if(deleteValue) {
                 this._nativeBridge.Storage.delete(StorageType.PUBLIC, key);
                 this._nativeBridge.Storage.write(StorageType.PUBLIC);
             }

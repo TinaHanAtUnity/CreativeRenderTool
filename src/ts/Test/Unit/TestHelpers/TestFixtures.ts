@@ -8,6 +8,7 @@ import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import DummyCampaign from 'json/DummyCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Configuration } from 'Models/Configuration';
 
 export class TestFixtures {
 
@@ -84,5 +85,18 @@ export class TestFixtures {
             }
         };
         return new NativeBridge(backend, platform);
+    }
+
+    public static getConfiguration(): Configuration {
+        return new Configuration({
+            enabled: true,
+            country: 'US',
+            coppaCompliant: false,
+            placementLevelControl: false,
+            assetCaching: 'disabled',
+            placements: [],
+            gamerId: 'abc123',
+            abGroup: 0
+        });
     }
 }

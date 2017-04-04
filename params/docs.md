@@ -28,6 +28,9 @@
 | deviceFreeSpace | number | Free space in kilobytes | SDK | all |
 | frameworkName | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | string | Unity engine version | SDK | all |
+| forceAbGroup | number | Force A/B group for internal testing purposes | SDK | all |
+| forceCampaignId | string | Force campaign ID for internal testing purposes | SDK | all |
+| force_country | string | Force country targeting for internal testing purposes | SDK | all |
 | gameId | string | Source game identifier | App | all |
 | gamerId | string | Internal gamer identifier | Server | all |
 | language | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -64,6 +67,17 @@
 | bundleId | all | True | False | string | Bundle identifier for the app | SDK | all |
 | encrypted | all | True | False | boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | rooted | all | True | False | boolean | Is the device rooted or jailbroken | SDK | all |
+| sdkVersion | all | True | False | number | SDK version in four digits | SDK | all |
+| osVersion | all | True | False | string | Device operating system version | SDK | all |
+| deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
+| language | all | True | False | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
+| test | all | True | False | boolean | Test mode | App | all |
+| forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
+| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
+| deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
+| advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
+| limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
+| androidId | no | True | False | string | Android ID | SDK | android |
 | frameworkName | no | True | False | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
@@ -91,7 +105,7 @@
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
 | stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
-| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
+| gamerId | yes | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -105,6 +119,8 @@
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
+| forceCampaignId | no | True | False | string | Force campaign ID for internal testing purposes | SDK | all |
+| force_country | no | True | False | string | Force country targeting for internal testing purposes | SDK | all |
 
 
 
