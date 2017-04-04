@@ -105,7 +105,7 @@
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
 | stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
-| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
+| gamerId | yes | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
