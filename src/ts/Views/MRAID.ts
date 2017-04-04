@@ -33,6 +33,8 @@ export class MRAID extends View {
 
     private _messageListener: any;
     private _resizeHandler: any;
+    private _resizeDelayer: any;
+    private _resizeTimeout: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -87,7 +89,6 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe;
         const closeLength = 30;
-        let resizeTimeout: any;
         const self = this;
 
         if(this._placement.allowSkip()) {
@@ -140,14 +141,11 @@ export class MRAID extends View {
             });
         }
 
-        function resizeThrottler(event: Event) {
-            if (!resizeTimeout) {
-                resizeTimeout = setTimeout(function() {
-                    resizeTimeout = null;
-                    self._resizeHandler(event);
-                }, 200);
-            }
-        }
+        this._resizeDelayer = (event: Event) => {
+            self._resizeTimeout = setTimeout(function() {
+                self._resizeHandler(event);
+            }, 200);
+        };
 
         this._resizeHandler = (event: Event) => {
             iframe.width = window.innerWidth;
@@ -160,7 +158,12 @@ export class MRAID extends View {
                 }, '*');
             }
         };
-        window.addEventListener('resize', resizeThrottler, false);
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            window.addEventListener('resize', this._resizeDelayer, false);
+        } else {
+            window.addEventListener('resize', this._resizeHandler, false);
+        }
     }
 
     public hide() {
@@ -174,6 +177,11 @@ export class MRAID extends View {
         }
         if(this._resizeHandler) {
             window.removeEventListener('resize', this._resizeHandler, false);
+            this._resizeHandler = undefined;
+        }
+        if(this._resizeDelayer) {
+            window.removeEventListener('resize', this._resizeDelayer, false);
+            clearTimeout(this._resizeTimeout);
             this._resizeHandler = undefined;
         }
         super.hide();
