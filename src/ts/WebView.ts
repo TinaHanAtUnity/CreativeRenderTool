@@ -125,7 +125,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.WAITING);
 
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            this._campaignManager = new CampaignManager(this._nativeBridge, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
@@ -418,7 +418,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('abGroup')) {
-                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
+                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
             }
 
             if(TestEnvironment.get('campaignId')) {
