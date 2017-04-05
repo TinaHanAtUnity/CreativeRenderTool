@@ -105,7 +105,7 @@
     },
     {
       "parameter": "gamerId",
-      "required": "yes",
+      "required": "no",
       "queryString": true,
       "body": false
     },
@@ -186,18 +186,6 @@
       "required": "no",
       "queryString": false,
       "body": true
-    },
-    {
-      "parameter": "forceCampaignId",
-      "required": "no",
-      "queryString": true,
-      "body": false
-    },
-    {
-      "parameter": "force_country",
-      "required": "no",
-      "queryString": true,
-      "body": false
     }
   ]
 }

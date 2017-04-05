@@ -26,9 +26,6 @@
 <tr><td>deviceFreeSpace</td><td>number</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkName</td><td>string</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
-<tr><td>forceAbGroup</td><td>number</td><td>Force A/B group for internal testing purposes</td><td>SDK</td><td>all</td></tr>
-<tr><td>forceCampaignId</td><td>string</td><td>Force campaign ID for internal testing purposes</td><td>SDK</td><td>all</td></tr>
-<tr><td>force_country</td><td>string</td><td>Force country targeting for internal testing purposes</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameId</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>gamerId</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>language</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
@@ -49,10 +46,10 @@
 <tr><td>screenSize</td><td>number</td><td>Android raw screen layout value</td><td>SDK</td><td>android</td></tr>
 <tr><td>screenWidth</td><td>number</td><td>Screen width in pixels</td><td>SDK</td><td>all</td></tr>
 <tr><td>sdkVersion</td><td>number</td><td>SDK version in four digits</td><td>SDK</td><td>all</td></tr>
+<tr><td>stores</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
 <tr><td>sessionId</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>sid</td><td>string</td><td>Server side reward callback id</td><td>App</td><td>all</td></tr>
 <tr><td>skippedAt</td><td>number</td><td>Milliseconds from video start to video skip</td><td>SDK</td><td>all</td></tr>
-<tr><td>stores</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
 <tr><td>test</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
 <tr><td>timeZone</td><td>string</td><td>Current timezone</td><td>SDK</td><td>all</td></tr>
 <tr><td>webviewUa</td><td>string</td><td>WebView user agent string</td><td>SDK</td><td>all</td></tr>
@@ -61,17 +58,6 @@
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>encrypted</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
 <tr><td>rooted</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Is the device rooted or jailbroken</td><td>SDK</td><td>all</td></tr>
-<tr><td>sdkVersion</td><td>all</td><td>True</td><td>False</td><td>number</td><td>SDK version in four digits</td><td>SDK</td><td>all</td></tr>
-<tr><td>osVersion</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Device operating system version</td><td>SDK</td><td>all</td></tr>
-<tr><td>deviceModel</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
-<tr><td>language</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
-<tr><td>test</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
-<tr><td>forceAbGroup</td><td>no</td><td>True</td><td>False</td><td>number</td><td>Force A/B group for internal testing purposes</td><td>SDK</td><td>all</td></tr>
-<tr><td>gamerId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
-<tr><td>deviceMake</td><td>android</td><td>True</td><td>False</td><td>string</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
-<tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
-<tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
-<tr><td>androidId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
 <tr><td>frameworkName</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterName</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
@@ -95,7 +81,7 @@
 <tr><td>connectionType</td><td>all</td><td>True</td><td>False</td><td>string</td><td>"wifi", "cellular" or "none"</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkType</td><td>no</td><td>True</td><td>False</td><td>number</td><td>Detailed cellular network type</td><td>SDK</td><td>all</td></tr>
 <tr><td>stores</td><td>yes</td><td>True</td><td>False</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
-<tr><td>gamerId</td><td>yes</td><td>True</td><td>False</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
+<tr><td>gamerId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>bundleVersion</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Game version</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
@@ -109,8 +95,6 @@
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
 <tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
-<tr><td>forceCampaignId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Force campaign ID for internal testing purposes</td><td>SDK</td><td>all</td></tr>
-<tr><td>force_country</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Force country targeting for internal testing purposes</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>

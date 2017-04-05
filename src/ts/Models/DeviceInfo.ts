@@ -10,7 +10,7 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 export class DeviceInfo extends Model {
 
     public static GooglePlayPackageName = 'com.android.vending';
-    public static XiaomiPackageName = 'com.xiaomi.gamecenter.demo';
+    public static XiaomiPackageName = 'com.xiaomi.gamecenter';
 
     private _androidId: string;
     private _advertisingIdentifier: string;

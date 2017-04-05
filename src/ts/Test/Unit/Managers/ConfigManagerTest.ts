@@ -11,7 +11,6 @@ import ConfigurationJson from 'json/Configuration.json';
 import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 class TestStorageApi extends StorageApi {
 
@@ -50,7 +49,7 @@ describe('ConfigManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    let requestMock: any;
+    let requestMock: any, clientInfoMock: any, deviceInfoMock: any;
     let configPromise: Promise<INativeResponse>;
 
     beforeEach(() => {
@@ -59,6 +58,15 @@ describe('ConfigManagerTest', () => {
             handleCallback
         });
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
+
+        clientInfoMock = {
+            getApplicationName: sinon.mock().returns('test_application'),
+            getGameId: sinon.mock().returns(123),
+            isDebuggable: sinon.mock().returns(false),
+        };
+        deviceInfoMock = {
+            isRooted: sinon.mock().returns(false)
+        };
     });
 
     describe('with correctly formed configuration json', () => {
@@ -75,7 +83,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return configuration', () => {
-            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo());
+            ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -97,7 +105,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return error', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, Error);
@@ -121,7 +129,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, ConfigError);
@@ -145,7 +153,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, clientInfoMock, deviceInfoMock).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, DiagnosticError);
