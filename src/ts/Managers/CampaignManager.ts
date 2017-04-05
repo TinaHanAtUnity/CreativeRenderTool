@@ -178,8 +178,8 @@ export class CampaignManager {
     }
 
     private handlePlcCampaign(placement: string, contentType: string, payload: string): Promise<void> {
-        const abGroup: number = 0; // todo: fix abGroup handling
-        const gamerId: string = '58906d633797a2005933fc6f'; // todo: fix gamerId handling, this is gamerId for JanneN's test device
+        const abGroup: number = this._configuration.getAbGroup();
+        const gamerId: string = this._configuration.getGamerId();
 
         this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + payload);
         if(contentType === 'comet/campaign') {
