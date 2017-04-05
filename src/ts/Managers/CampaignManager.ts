@@ -203,7 +203,6 @@ export class CampaignManager {
         url = Url.addParameters(url, {
             deviceMake: this.getParameter('deviceMake', this._deviceInfo.getManufacturer(), 'string'),
             deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
-            gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string'),
             platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),
             screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
             screenWidth: this.getParameter('screenWidth', this._deviceInfo.getScreenWidth(), 'number'),
