@@ -7,6 +7,7 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Sdk } from 'Native/Backend/Api/Sdk';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 const resizeHandler = (event?: Event) => {
     const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
@@ -165,10 +166,7 @@ if(window.parent !== window) {
             };
         }
         if(campaignResponseElement.value.length) {
-            publicStorage.test.campaignResponse = {
-                value: campaignResponseElement.value,
-                ts: Date.now()
-            };
+            CampaignManager.setCampaignResponse(campaignResponseElement.value);
         }
 
         window.sessionStorage.clear();
