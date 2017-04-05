@@ -1,9 +1,0 @@
-{
-  "index": "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_android_new/index.html",
-  "content": [
-    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_android_new/assets_v3.png",
-    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_android_new/portrait.jpg",
-    "https://unityads-cdn-origin.s3.amazonaws.com/playables/piggy_android_new/webfont.js"
-  ],
-  "platform": "android"
-}
