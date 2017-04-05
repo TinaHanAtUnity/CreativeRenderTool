@@ -89,7 +89,6 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe;
         const closeLength = 30;
-        const self = this;
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -142,8 +141,8 @@ export class MRAID extends View {
         }
 
         this._resizeDelayer = (event: Event) => {
-            self._resizeTimeout = setTimeout(function() {
-                self._resizeHandler(event);
+            this._resizeTimeout = setTimeout(() => {
+                this._resizeHandler(event);
             }, 200);
         };
 
