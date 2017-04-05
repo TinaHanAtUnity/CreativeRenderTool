@@ -156,9 +156,10 @@ export class CampaignManager {
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    if(json.placements[placement] && json.placements[placement].contentType) {
+                    if(json.placements[placement]) {
                         chain = chain.then(() => {
-                            return this.handlePlcCampaign(placement, json.placements[placement].contentType, json.placements[placement].payload);
+                            // todo: this is lacking all json validation, just assuming the format is correct
+                            return this.handlePlcCampaign(placement, json.media[json.placements[placement]].contentType, json.media[json.placements[placement]].payload);
                         });
                     } else {
                         chain = chain.then(() => {
