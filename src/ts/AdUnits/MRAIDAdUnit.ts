@@ -7,6 +7,7 @@ import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
 import { MRAID, IOrientationProperties } from 'Views/MRAID';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Platform } from 'Constants/Platform';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -30,7 +31,11 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         mraid.onOrientationProperties.subscribe((properties) => {
             if(this.isShowing()) {
-                container.reorient(properties.allowOrientationChange, properties.forceOrientation);
+                if(nativeBridge.getPlatform() === Platform.IOS) {
+                    container.reorient(true, properties.forceOrientation);
+                } else {
+                    container.reorient(properties.allowOrientationChange, properties.forceOrientation);
+                }
             } else {
                 this._orientationProperties = properties;
             }
