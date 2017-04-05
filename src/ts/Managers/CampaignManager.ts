@@ -360,7 +360,7 @@ export class CampaignManager {
                 url = Url.addParameters(url, {
                     gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
                 });
-            } else {
+            } else if(gamerId) {
                 url = Url.addParameters(url, {
                     gamerId: this.getParameter('gamerId', gamerId, 'string')
                 });

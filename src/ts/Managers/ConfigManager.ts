@@ -11,7 +11,7 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
 import { StorageType } from 'Native/Api/Storage';
-import { Platform } from "../Constants/Platform";
+import { Platform } from 'Constants/Platform';
 
 export class ConfigManager {
 
