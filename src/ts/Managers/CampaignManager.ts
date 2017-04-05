@@ -353,8 +353,18 @@ export class CampaignManager {
             url = Url.addParameters(url, {
                 connectionType: this.getParameter('connectionType', connectionType, 'string'),
                 networkType: this.getParameter('networkType', networkType, 'number'),
-                gamerId: this.getParameter('gamerId', gamerId, 'string')
             });
+
+            if(this._configuration.isPlacementLevelControl()) {
+                // todo: it's slightly wasteful to read gamerId from storage and then ignore the value
+                url = Url.addParameters(url, {
+                    gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
+                });
+            } else {
+                url = Url.addParameters(url, {
+                    gamerId: this.getParameter('gamerId', gamerId, 'string')
+                });
+            }
 
             return url;
         });
