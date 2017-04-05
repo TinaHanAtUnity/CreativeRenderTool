@@ -12,6 +12,8 @@ export class Configuration {
     private _country: string;
     private _coppaCompliant: boolean;
     private _placementLevelControl: boolean;
+    private _abGroup: number;
+    private _gamerId: string;
     private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement;
@@ -21,6 +23,11 @@ export class Configuration {
         this._country = configJson.country;
         this._coppaCompliant = configJson.coppaCompliant;
         this._placementLevelControl = configJson.placementLevelControl;
+
+        if(this._placementLevelControl) {
+            this._abGroup = configJson.abGroup;
+            this._gamerId = configJson.gamerId;
+        }
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -64,6 +71,14 @@ export class Configuration {
 
     public isPlacementLevelControl(): boolean {
         return this._placementLevelControl;
+    }
+
+    public getAbGroup(): number {
+        return this._abGroup;
+    }
+
+    public getGamerId(): string {
+        return this._gamerId;
     }
 
     public getCacheMode(): CacheMode {

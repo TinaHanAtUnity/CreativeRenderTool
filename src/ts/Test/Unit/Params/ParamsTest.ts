@@ -240,14 +240,7 @@ describe('Event parameters should match specifications', () => {
         let configuration: Configuration;
 
         beforeEach(() => {
-            configuration = new Configuration({
-                enabled: true,
-                country: 'US',
-                coppaCompliant: false,
-                placementLevelControl: false,
-                assetCaching: 'disabled',
-                placements: []
-            });
+            configuration = TestFixtures.getConfiguration();
         });
 
         it('on Android', () => {

@@ -10,15 +10,18 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
+import { StorageType } from 'Native/Api/Storage';
+import { Platform } from "../Constants/Platform";
 
 export class ConfigManager {
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return Promise.all<FrameworkMetaData, AdapterMetaData>([
+        return Promise.all<FrameworkMetaData, AdapterMetaData, string>([
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
-            MetaDataManager.fetchAdapterMetaData(nativeBridge)
-        ]).then(([framework, adapter]) => {
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter);
+            MetaDataManager.fetchAdapterMetaData(nativeBridge),
+            ConfigManager.fetchGamerId(nativeBridge)
+        ]).then(([framework, adapter, gamerId]) => {
+            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,
@@ -29,7 +32,14 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
+                    if(config.isPlacementLevelControl()) {
+                        nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
+                        if(config.getGamerId()) {
+                            ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                        }
+                    } else {
+                        nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
+                    }
                     return config;
                 } catch(error) {
                     nativeBridge.Sdk.logError('Config request failed ' + error);
@@ -52,9 +62,14 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
-    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    public static setAbGroup(abGroup: number) {
+        ConfigManager.AbGroup = abGroup;
+    }
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData): string {
+    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static AbGroup: number | undefined;
+
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData, gamerId: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -64,8 +79,32 @@ export class ConfigManager {
         url = Url.addParameters(url, {
             bundleId: clientInfo.getApplicationName(),
             encrypted: !clientInfo.isDebuggable(),
-            rooted: deviceInfo.isRooted()
+            rooted: deviceInfo.isRooted(),
+            sdkVersion: clientInfo.getSdkVersion(),
+            osVersion: deviceInfo.getOsVersion(),
+            deviceModel: deviceInfo.getModel(),
+            language: deviceInfo.getLanguage(),
+            test: clientInfo.getTestMode(),
+            gamerId: gamerId,
+            forceAbGroup: ConfigManager.AbGroup
         });
+
+        if(clientInfo.getPlatform() === Platform.ANDROID) {
+            url = Url.addParameters(url, {
+                deviceMake: deviceInfo.getManufacturer()
+            });
+        }
+
+        if(deviceInfo.getAdvertisingIdentifier()) {
+            url = Url.addParameters(url, {
+                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: deviceInfo.getLimitAdTracking()
+            });
+        } else if(clientInfo.getPlatform() === Platform.ANDROID) {
+            url = Url.addParameters(url, {
+                androidId: deviceInfo.getAndroidId()
+            });
+        }
 
         if(framework) {
             url = Url.addParameters(url, framework.getDTO());
@@ -78,4 +117,18 @@ export class ConfigManager {
         return url;
     }
 
+    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string> {
+        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+            return gamerId;
+        }).catch(error => {
+            return undefined;
+        });
+    }
+
+    private static storeGamerId(nativeBridge: NativeBridge, gamerId: string): Promise<void[]> {
+        return Promise.all([
+            nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
 }

@@ -493,6 +493,8 @@ export class WebView {
             }
 
             if(TestEnvironment.get('abGroup')) {
+                // needed in both due to placement level control support
+                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
                 CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
             }
 
