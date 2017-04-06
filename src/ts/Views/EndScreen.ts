@@ -92,12 +92,14 @@ export class EndScreen extends View {
 
     private getEndscreenAlt(campaign: PerformanceCampaign) {
         const abGroup = campaign.getAbGroup();
-        if((abGroup === 10 || abGroup === 11)) {
-            return 'unitylogotest';
+        if(abGroup !== 8 && abGroup !== 9 && abGroup !== 10 && abGroup !== 11) {
+            return 'easter2016';
+        }
+        if((abGroup === 8 || abGroup === 9)) {
+            return 'easter2017';
         }
         return undefined;
     }
-
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
         this.onDownload.trigger();
