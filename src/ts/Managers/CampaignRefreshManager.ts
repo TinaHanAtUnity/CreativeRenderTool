@@ -48,11 +48,13 @@ export class CampaignRefreshManager {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
         if(this._currentAdUnit) {
-            this._currentAdUnit.onStart.unsubscribe(() =>  this.clearCampaigns());
             delete this._currentAdUnit;
         }
         this._currentAdUnit = adUnit;
-        this._currentAdUnit.onStart.subscribe(() =>  this.clearCampaigns());
+        const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
+            this._currentAdUnit.onStart.unsubscribe(onStartObserver);
+            this.clearCampaigns();
+        });
     }
 
     public refresh(): Promise<void> {
@@ -98,16 +100,7 @@ export class CampaignRefreshManager {
         const placements: { [id: string]: Placement } = this._configuration.getPlacements();
         for(const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
-                const placement: Placement = placements[placementId];
-                const oldState = placement.getState();
-                this._nativeBridge.Placement.setPlacementState(placementId, placementState);
-                if(oldState !== placementState) {
-                    this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
-                    placement.setState(placementState);
-                }
-                if(placementState === PlacementState.READY) {
-                    this._nativeBridge.Listener.sendReadyEvent(placementId);
-                }
+                this.setPlacementState(placementId, placementState);
             }
         }
     }
@@ -154,31 +147,27 @@ export class CampaignRefreshManager {
 
     private onPlcCampaign(placementId: string, campaign: Campaign) {
         this._plcCampaigns[placementId] = campaign;
-        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
-            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' is ready');
-                this.setPlacementState(placementId, PlacementState.READY);
-            });
-        } else {
-            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' is ready');
-            this.setPlacementState(placementId, PlacementState.READY);
-        }
+        this.plcHandlePlacementState(placementId, PlacementState.READY);
     }
 
     private onPlcNoFill(placementId: string) {
         if(this._plcCampaigns[placementId]) {
             delete this._plcCampaigns[placementId];
         }
+
+        this.plcHandlePlacementState(placementId, PlacementState.NO_FILL);
+    }
+
+    private plcHandlePlacementState(placementId: string, placementState: PlacementState) {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' has no fill');
-                this.setPlacementState(placementId, PlacementState.NO_FILL);
+                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to: ' + placementState);
+                this.setPlacementState(placementId, placementState);
             });
         } else {
-            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' has no fill');
-            this.setPlacementState(placementId, PlacementState.NO_FILL);
+            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to: ' + placementState);
+            this.setPlacementState(placementId, placementState);
         }
     }
 
