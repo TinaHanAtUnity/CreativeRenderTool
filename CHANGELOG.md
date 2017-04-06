@@ -2,7 +2,7 @@
 
 * Remove .demo from Xiaomi package name
 * Remove end screen AB test from groups 8 & 9
-* Fix sending dublicate diagnostic events on click attribution error
+* Fix sending duplicate diagnostic events on click attribution error
 
 # Mon Apr 3 07:49:45 UTC 2017
 
