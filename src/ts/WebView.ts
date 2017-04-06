@@ -33,7 +33,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
-import {CampaignRefreshManager} from "./Managers/CampaignRefreshManager";
+import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 
 export class WebView {
 
