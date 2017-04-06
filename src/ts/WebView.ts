@@ -52,6 +52,7 @@ export class WebView {
 
     private _currentAdUnit: AbstractAdUnit;
     private _campaign: Campaign;
+    private _plcCampaigns: { [id: string]: Campaign } = {};
 
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
@@ -125,12 +126,18 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.WAITING);
 
-            this._campaignManager = new CampaignManager(this._nativeBridge, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
-            this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill());
-            this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            if(this._configuration.isPlacementLevelControl()) {
+                this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
+                this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
+                this._campaignManager.onPlcError.subscribe(error => this.onPlcError(error));
+            } else {
+                this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
+                this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
+                this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
+                this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill());
+                this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
+            }
             return this._campaignManager.request();
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -177,18 +184,25 @@ export class WebView {
             return;
         }
 
-        if(!this._campaign) {
+        let campaign: Campaign;
+        if(this._configuration.isPlacementLevelControl()) {
+            campaign = this._plcCampaigns[placementId];
+        } else {
+            campaign = this._campaign;
+        }
+
+        if(!campaign) {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
 
-        if(this._campaign.isExpired()) {
+        if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
-            this.onCampaignExpired(this._campaign);
+            this.onCampaignExpired(campaign);
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
-                id: this._campaign.getId(),
-                timeoutInSeconds: this._campaign.getTimeout()
+                id: campaign.getId(),
+                timeoutInSeconds: campaign.getTimeout()
             });
             Diagnostics.trigger('campaign_expired', error);
             return;
@@ -211,14 +225,14 @@ export class WebView {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
 
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, this._campaign, this._configuration, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
             this._currentAdUnit.onFinish.subscribe(() => this.onNewAdRequestAllowed());
             this._currentAdUnit.onClose.subscribe(() => this.onClose());
 
-            if (this._nativeBridge.getPlatform() === Platform.IOS && this._campaign instanceof PerformanceCampaign) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !this._campaign.getBypassAppSheet()) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
-                        id: parseInt(this._campaign.getAppStoreId(), 10)
+                        id: parseInt(campaign.getAppStoreId(), 10)
                     };
                     this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
                         const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
@@ -234,7 +248,12 @@ export class WebView {
 
             this._currentAdUnit.show();
 
-            delete this._campaign;
+            if(this._configuration.isPlacementLevelControl()) {
+                this._plcCampaigns = {};
+            } else {
+                delete this._campaign;
+            }
+
             this.setPlacementStates(PlacementState.WAITING);
         });
     }
@@ -251,17 +270,21 @@ export class WebView {
         const placements: { [id: string]: Placement } = this._configuration.getPlacements();
         for(const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
-                const placement: Placement = placements[placementId];
-                const oldState = placement.getState();
-                this._nativeBridge.Placement.setPlacementState(placementId, placementState);
-                if(oldState !== placementState) {
-                    this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
-                    placement.setState(placementState);
-                }
-                if(placementState === PlacementState.READY) {
-                    this._nativeBridge.Listener.sendReadyEvent(placementId);
-                }
+                this.setPlacementState(placementId, placementState);
             }
+        }
+    }
+
+    private setPlacementState(placementId: string, placementState: PlacementState): void {
+        const placement = this._configuration.getPlacement(placementId);
+        const oldState = placement.getState();
+        this._nativeBridge.Placement.setPlacementState(placementId, placementState);
+        if(oldState !== placementState) {
+            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
+            placement.setState(placementState);
+        }
+        if(placementState === PlacementState.READY) {
+            this._nativeBridge.Listener.sendReadyEvent(placementId);
         }
     }
 
@@ -297,9 +320,49 @@ export class WebView {
         this._campaignManager.request();
     }
 
+    private onPlcCampaign(placementId: string, campaign: Campaign) {
+        this._plcCampaigns[placementId] = campaign;
+        if(this._showing) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' is ready');
+                this.setPlacementState(placementId, PlacementState.READY);
+            });
+        } else {
+            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' is ready');
+            this.setPlacementState(placementId, PlacementState.READY);
+        }
+    }
+
+    private onPlcNoFill(placementId: string) {
+        if(this._plcCampaigns[placementId]) {
+            delete this._plcCampaigns[placementId];
+        }
+        if(this._showing) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' has no fill');
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
+            });
+        } else {
+            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' has no fill');
+            this.setPlacementState(placementId, PlacementState.NO_FILL);
+        }
+    }
+
+    private onPlcError(error: WebViewError | Error) {
+        this._plcCampaigns = {};
+        this.onCampaignError(error);
+    }
+
     private onNewAdRequestAllowed(): void {
-        if(!this._mustReinitialize && !this._campaign) {
-            this._campaignManager.request();
+        if(this._configuration.isPlacementLevelControl()) {
+            // todo: should request for new ads here but for now, just wait for onClose
+            return;
+        } else {
+            if(!this._mustReinitialize && !this._campaign) {
+                this._campaignManager.request();
+            }
         }
     }
 
@@ -311,8 +374,12 @@ export class WebView {
             this.reinitialize();
         } else {
             this._sessionManager.create();
-            if(!this._campaign) {
+            if(this._configuration.isPlacementLevelControl()) {
                 this._campaignManager.request();
+            } else {
+                if(!this._campaign) {
+                    this._campaignManager.request();
+                }
             }
         }
     }
@@ -352,10 +419,18 @@ export class WebView {
     }
 
     private checkCampaignStatus(): void {
-        if(!this._campaign) {
-            this._campaignManager.request();
-        } else if(this._campaign.isExpired()) {
-            this.onCampaignExpired(this._campaign);
+        if(this._configuration.isPlacementLevelControl()) {
+            if(this._campaignManager.shouldPlcRefill()) {
+                this._plcCampaigns = {};
+                this.setPlacementStates(PlacementState.WAITING);
+                this._campaignManager.request();
+            }
+        } else {
+            if (!this._campaign) {
+                this._campaignManager.request();
+            } else if (this._campaign.isExpired()) {
+                this.onCampaignExpired(this._campaign);
+            }
         }
     }
 
@@ -418,6 +493,8 @@ export class WebView {
             }
 
             if(TestEnvironment.get('abGroup')) {
+                // needed in both due to placement level control support
+                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
                 CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
             }
 
