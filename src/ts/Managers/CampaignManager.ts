@@ -26,7 +26,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v1/games'
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v1/games';
     }
 
     public static setAbGroup(abGroup: number) {
