@@ -492,6 +492,10 @@ export class WebView {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
             }
 
+            if(TestEnvironment.get('auctionUrl')) {
+                CampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
+            }
+
             if(TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
                 ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
