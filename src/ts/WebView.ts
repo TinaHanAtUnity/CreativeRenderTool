@@ -125,7 +125,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
-            return this._campaignRefreshManager.initialize();
+            return this._campaignRefreshManager.refresh();
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -180,7 +180,7 @@ export class WebView {
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
-            this._campaignRefreshManager.refreshIfNeeded();
+            this._campaignRefreshManager.refresh();
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
@@ -248,7 +248,7 @@ export class WebView {
             return;
         } else {
             if(!this._mustReinitialize) {
-                this._campaignRefreshManager.refreshIfNeeded();
+                this._campaignRefreshManager.refresh();
             }
         }
     }
@@ -261,7 +261,7 @@ export class WebView {
             this.reinitialize();
         } else {
             this._sessionManager.create();
-            this._campaignRefreshManager.refreshIfNeeded();
+            this._campaignRefreshManager.refresh();
         }
     }
 
@@ -284,7 +284,7 @@ export class WebView {
                         this.reinitialize();
                     }
                 } else {
-                    this._campaignRefreshManager.refreshIfNeeded();
+                    this._campaignRefreshManager.refresh();
                     this._eventManager.sendUnsentSessions();
                 }
             });
@@ -292,11 +292,11 @@ export class WebView {
     }
 
     private onScreenOn(): void {
-        this._campaignRefreshManager.refreshIfNeeded();
+        this._campaignRefreshManager.refresh();
     }
 
     private onAppForeground(): void {
-        this._campaignRefreshManager.refreshIfNeeded();
+        this._campaignRefreshManager.refresh();
     }
 
     /*

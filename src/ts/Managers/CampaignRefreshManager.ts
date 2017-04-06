@@ -22,9 +22,7 @@ export class CampaignRefreshManager {
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
         this._configuration = configuration;
-    }
 
-    public initialize(): Promise<void> {
         if(this._configuration.isPlacementLevelControl()) {
             this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
             this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
@@ -38,7 +36,6 @@ export class CampaignRefreshManager {
         }
 
         this.setPlacementStates(PlacementState.WAITING);
-        return this._campaignManager.request();
     }
 
     public getCampaign(placementId: string): Campaign {
@@ -58,7 +55,7 @@ export class CampaignRefreshManager {
         this._currentAdUnit.onStart.subscribe(() =>  this.clearCampaigns());
     }
 
-    public refreshIfNeeded(): void {
+    public refresh(): Promise<void> {
         if(this._configuration.isPlacementLevelControl()) {
             let campaignsEmpty = true;
             const placements: { [id: string]: Placement } = this._configuration.getPlacements();
@@ -71,15 +68,17 @@ export class CampaignRefreshManager {
             if(this._campaignManager.shouldPlcRefill() || campaignsEmpty) {
                 this._plcCampaigns = {};
                 this.setPlacementStates(PlacementState.WAITING);
-                this._campaignManager.request();
+                return this._campaignManager.request();
             }
         } else {
             if(!this._campaign) {
-                this._campaignManager.request();
+                return this._campaignManager.request();
             } else if (this._campaign.isExpired()) {
                 this.onCampaignExpired(this._campaign);
             }
         }
+
+        return Promise.resolve();
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
