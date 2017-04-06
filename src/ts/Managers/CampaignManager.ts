@@ -25,6 +25,10 @@ export class CampaignManager {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
     }
 
+    public static setAuctionBaseUrl(baseUrl: string): void {
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v1/games'
+    }
+
     public static setAbGroup(abGroup: number) {
         CampaignManager.AbGroup = abGroup;
     }
@@ -43,6 +47,7 @@ export class CampaignManager {
 
     private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v1/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -277,7 +282,7 @@ export class CampaignManager {
 
         if(this._configuration.isPlacementLevelControl()) {
             url = [
-                'https://auction.unityads.unity3d.com/v1/games',
+                CampaignManager.AuctionBaseUrl,
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
