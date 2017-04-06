@@ -208,12 +208,13 @@ export class Request {
         } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
             if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
-                if(location && location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
+                if(location && this.followRedirects(location)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
                     this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
                 }
+
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
@@ -221,6 +222,14 @@ export class Request {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
         } else {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
+        }
+    }
+
+    private followRedirects(location: string) {
+        if(location && (location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/^https:\/\/www\.masterclass.com/i))) {
+            return true;
+        } else {
+            return false;
         }
     }
 

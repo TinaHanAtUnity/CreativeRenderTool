@@ -19,12 +19,17 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
+    private _isMasterClassCampaign = false;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._gameName = campaign.getGameName();
         this._localization = new Localization(language, 'endscreen');
+
+        if (campaign.getId() === '58e2c6139b4fd70d2454b051') {
+            this._isMasterClassCampaign = true;
+        }
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
@@ -61,6 +66,15 @@ export class EndScreen extends View {
         ];
     }
 
+    public render(): void {
+        super.render();
+
+        if(this._isMasterClassCampaign) {
+            const downloadText: HTMLElement = <HTMLElement>this._container.querySelector('.download-text');
+            downloadText.innerHTML = 'Find Out More';
+        }
+    }
+
     public show(): void {
         super.show();
 
@@ -91,6 +105,10 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign: PerformanceCampaign) {
+        if (this._isMasterClassCampaign) {
+            return 'masterclass';
+        }
+
         const abGroup = campaign.getAbGroup();
         if((abGroup === 10 || abGroup === 11)) {
             return 'unitylogotest';
