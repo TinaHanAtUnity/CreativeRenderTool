@@ -47,9 +47,6 @@ export class CampaignRefreshManager {
     }
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
-        if(this._currentAdUnit) {
-            delete this._currentAdUnit;
-        }
         this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);
