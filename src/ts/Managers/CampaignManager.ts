@@ -276,9 +276,8 @@ export class CampaignManager {
         let url: string;
 
         if(this._configuration.isPlacementLevelControl()) {
-            // todo: temp server address for testing
             url = [
-                'https://auction.unityads.unity3d.com/games',
+                'https://auction.unityads.unity3d.com/v1/games',
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
