@@ -1,3 +1,9 @@
+# Thu Apr  6 07:38:15 UTC 2017
+
+* Remove .demo from Xiaomi package name
+* Remove end screen AB test from groups 8 & 9
+* Fix sending dublicate diagnostic events on click attribution error
+
 # Mon Apr 3 07:49:45 UTC 2017
 
 * Fixed skip button animation on Android 4.1.2 (ABT-202)
