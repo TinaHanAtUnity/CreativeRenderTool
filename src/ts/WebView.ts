@@ -213,9 +213,9 @@ export class WebView {
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if (this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !(campaign as PerformanceCampaign).getBypassAppSheet()) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
-                        id: parseInt((campaign as PerformanceCampaign).getAppStoreId(), 10)
+                        id: parseInt(campaign.getAppStoreId(), 10)
                     };
                     this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
                         const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
