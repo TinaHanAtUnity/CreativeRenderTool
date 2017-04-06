@@ -11,7 +11,7 @@ import ConfigurationJson from 'json/Configuration.json';
 import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { TestFixtures } from "../TestHelpers/TestFixtures";
 
 class TestStorageApi extends StorageApi {
 

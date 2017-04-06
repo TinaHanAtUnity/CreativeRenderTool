@@ -10,8 +10,8 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
-import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/Storage';
+import { Platform } from 'Constants/Platform';
 
 export class ConfigManager {
 
@@ -32,9 +32,13 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
-                    if(config.getGamerId()) {
-                        ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                    if(config.isPlacementLevelControl()) {
+                        nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
+                        if(config.getGamerId()) {
+                            ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                        }
+                    } else {
+                        nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
                     }
                     return config;
                 } catch(error) {

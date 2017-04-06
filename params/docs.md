@@ -105,7 +105,7 @@
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
 | stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
-| gamerId | yes | True | False | string | Internal gamer identifier | Server | all |
+| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -119,6 +119,7 @@
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
+| forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
 | forceCampaignId | no | True | False | string | Force campaign ID for internal testing purposes | SDK | all |
 | force_country | no | True | False | string | Force country targeting for internal testing purposes | SDK | all |
 
