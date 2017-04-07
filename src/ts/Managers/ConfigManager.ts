@@ -12,6 +12,7 @@ import { ConfigError } from 'Errors/ConfigError';
 import { RequestError } from 'Errors/RequestError';
 import { StorageType } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ConfigManager {
 
@@ -37,6 +38,12 @@ export class ConfigManager {
                         if(config.getGamerId()) {
                             ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
                         }
+
+                        Diagnostics.trigger('plc_config_received', {
+                            placementCount: config.getPlacementCount(),
+                            gamerId: config.getGamerId(),
+                            abGroup: config.getAbGroup()
+                        });
                     } else {
                         nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
                     }
