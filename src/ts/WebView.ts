@@ -352,7 +352,13 @@ export class WebView {
 
     private onPlcError(error: WebViewError | Error) {
         this._plcCampaigns = {};
-        this.onCampaignError(error);
+
+        if(error instanceof Error) {
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+        }
+        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+        Diagnostics.trigger('plc_request_failed', error);
+        this.onNoFill();
     }
 
     private onNewAdRequestAllowed(): void {
