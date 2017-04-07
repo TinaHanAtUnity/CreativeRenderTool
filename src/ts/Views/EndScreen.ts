@@ -110,8 +110,11 @@ export class EndScreen extends View {
         }
 
         const abGroup = campaign.getAbGroup();
-        if((abGroup === 10 || abGroup === 11)) {
-            return 'unitylogotest';
+        if(abGroup !== 8 && abGroup !== 9 && abGroup !== 10 && abGroup !== 11) {
+            return 'easter2016';
+        }
+        if((abGroup === 8 || abGroup === 9)) {
+            return 'easter2017';
         }
         return undefined;
     }
