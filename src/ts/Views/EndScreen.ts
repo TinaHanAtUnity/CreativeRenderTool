@@ -118,6 +118,7 @@ export class EndScreen extends View {
         }
         return undefined;
     }
+
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
         this.onDownload.trigger();
