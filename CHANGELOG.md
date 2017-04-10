@@ -1,3 +1,13 @@
+# Mon Apr 10 07:23:56 UTC 2017
+
+* Easter holiday themes
+* Add simple diagnostics for placement level control support
+
+# Thu Apr  6 13:30:20 UTC 2017
+
+* Initial support for placement level controls
+* Support for Gordon Ramsay MasterClass campaign
+
 # Thu Apr  6 07:38:15 UTC 2017
 
 * Remove .demo from Xiaomi package name

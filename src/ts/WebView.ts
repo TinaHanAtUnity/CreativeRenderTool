@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { Cache } from 'Utilities/Cache';
-import { Placement, PlacementState } from 'Models/Placement';
+import { Placement } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -230,7 +230,6 @@ export class WebView {
             }
 
             this._currentAdUnit.show();
-            this._campaignRefreshManager.setPlacementStates(PlacementState.WAITING);
         });
     }
 
@@ -355,6 +354,10 @@ export class WebView {
 
             if(TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
+            }
+
+            if(TestEnvironment.get('auctionUrl')) {
+                CampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {
