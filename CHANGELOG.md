@@ -1,3 +1,8 @@
+# Mon Apr 10 07:23:56 UTC 2017
+
+* Easter holiday themes
+* Add simple diagnostics for placement level control support
+
 # Thu Apr  6 13:30:20 UTC 2017
 
 * Initial support for placement level controls
