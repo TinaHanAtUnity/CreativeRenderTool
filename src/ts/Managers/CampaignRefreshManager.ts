@@ -9,6 +9,8 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class CampaignRefreshManager {
+    private static NoFillDelay = 3600;
+
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
@@ -16,12 +18,17 @@ export class CampaignRefreshManager {
     private _plcCampaigns: { [id: string]: Campaign } = {};
     private _configuration: Configuration;
     private _currentAdUnit: AbstractAdUnit;
+    private _refillTimestamp: number;
+    private _plcRefillTimestamp: number;
+    private _needsRefill = true;
 
     constructor (nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
         this._configuration = configuration;
+        this._refillTimestamp = 0;
+        this._plcRefillTimestamp = 0;
 
         if(this._configuration.isPlacementLevelControl()) {
             this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
@@ -31,11 +38,9 @@ export class CampaignRefreshManager {
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe(retryLimit => this.onNoFill());
+            this._campaignManager.onNoFill.subscribe(() => this.onNoFill());
             this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
         }
-
-        this.setPlacementStates(PlacementState.WAITING);
     }
 
     public getCampaign(placementId: string): Campaign {
@@ -50,34 +55,43 @@ export class CampaignRefreshManager {
         this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);
-            this.clearCampaigns();
+            this.invalidateCampaigns();
+            this.setPlacementStates(PlacementState.WAITING);
         });
     }
 
     public refresh(): Promise<void> {
         if(this._configuration.isPlacementLevelControl()) {
-            let campaignsEmpty = true;
-            const placements: { [id: string]: Placement } = this._configuration.getPlacements();
-            for(const placementId in placements) {
-                if(this._plcCampaigns.hasOwnProperty(placementId)) {
-                    campaignsEmpty = false;
-                    break;
-                }
-            }
-            if(this._campaignManager.shouldPlcRefill() || campaignsEmpty) {
-                this._plcCampaigns = {};
+            if(this.shouldRefill(this._plcRefillTimestamp)) {
                 this.setPlacementStates(PlacementState.WAITING);
+                this._plcRefillTimestamp = 0;
+                this._needsRefill = false;
+                this._plcCampaigns = {};
                 return this._campaignManager.request();
             }
         } else {
-            if(!this._campaign) {
+            if(this.shouldRefill(this._refillTimestamp)) {
+                this.setPlacementStates(PlacementState.WAITING);
+                this._refillTimestamp = 0;
+                this._needsRefill = false;
                 return this._campaignManager.request();
-            } else if (this._campaign.isExpired()) {
-                this.onCampaignExpired(this._campaign);
+            } else if(this._campaign && this._campaign.isExpired()) {
+                return this.onCampaignExpired(this._campaign);
             }
         }
 
         return Promise.resolve();
+    }
+
+    public shouldRefill(timestamp: number): boolean {
+        if(this._needsRefill) {
+            return true;
+        }
+        if(timestamp !== 0 && Date.now() > timestamp) {
+            return true;
+        }
+
+        return false;
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
@@ -102,7 +116,8 @@ export class CampaignRefreshManager {
         }
     }
 
-    private clearCampaigns () {
+    private invalidateCampaigns() {
+        this._needsRefill = true;
         if(this._configuration.isPlacementLevelControl()) {
             this._plcCampaigns = {};
         } else {
@@ -123,6 +138,8 @@ export class CampaignRefreshManager {
     }
 
     private onNoFill() {
+        delete this._campaign;
+        this._refillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
         this.setPlacementStates(PlacementState.NO_FILL);
     }
@@ -136,13 +153,15 @@ export class CampaignRefreshManager {
         this.onNoFill();
     }
 
-    private onCampaignExpired(campaign: Campaign) {
+    private onCampaignExpired(campaign: Campaign): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
-        this._campaignManager.request();
+        return this._campaignManager.request();
     }
 
     private onPlcCampaign(placementId: string, campaign: Campaign) {
+        // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
+        this._plcRefillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
         this._plcCampaigns[placementId] = campaign;
         this.plcHandlePlacementState(placementId, PlacementState.READY);
     }
@@ -170,6 +189,12 @@ export class CampaignRefreshManager {
 
     private onPlcError(error: WebViewError | Error) {
         this._plcCampaigns = {};
-        this.onCampaignError(error);
+
+        if(error instanceof Error) {
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+        }
+        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+        Diagnostics.trigger('plc_request_failed', error);
+        this.setPlacementStates(PlacementState.NO_FILL);
     }
 }
