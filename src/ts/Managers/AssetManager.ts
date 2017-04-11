@@ -10,10 +10,12 @@ export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
+    private _stopped: boolean;
 
     constructor(cache: Cache, cacheMode: CacheMode) {
         this._cache = cache;
         this._cacheMode = cacheMode;
+        this._stopped = false;
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -41,10 +43,23 @@ export class AssetManager {
         return Promise.resolve(campaign);
     }
 
+    public enableCaching(): void {
+        this._stopped = false;
+    }
+
+    public stopCaching(): void {
+        this._stopped = true;
+        this._cache.stop();
+    }
+
     private cache(assets: Asset[]): Promise<void> {
         let chain = Promise.resolve();
         for(const asset of assets) {
             chain = chain.then(() => {
+                if(this._stopped) {
+                    throw new Error('Caching stopped');
+                }
+
                 return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);

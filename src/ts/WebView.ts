@@ -47,6 +47,7 @@ export class WebView {
     private _configuration: Configuration;
 
     private _campaignManager: CampaignManager;
+    private _assetManager: AssetManager;
     private _cache: Cache;
     private _container: AdUnitContainer;
 
@@ -126,7 +127,8 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
             this.setPlacementStates(PlacementState.WAITING);
 
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             if(this._configuration.isPlacementLevelControl()) {
                 this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
                 this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
@@ -215,7 +217,7 @@ export class WebView {
         });
 
         if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
-            this._cache.stop();
+            this._assetManager.stopCaching();
         }
 
         MetaDataManager.updateMediationMetaData(this._nativeBridge);

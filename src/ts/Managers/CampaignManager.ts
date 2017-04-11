@@ -97,6 +97,9 @@ export class CampaignManager {
         if(this._refillTimestamp !== 0 && Date.now() <= this._refillTimestamp) {
             return Promise.resolve();
         }
+
+        this._assetManager.enableCaching();
+
         this._requesting = true;
         this._refillTimestamp = 0;
         this._plcRefillTimestamp = 0;
