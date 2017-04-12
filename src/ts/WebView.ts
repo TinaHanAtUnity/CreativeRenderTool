@@ -48,6 +48,7 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _campaignRefreshManager: CampaignRefreshManager;
+    private _assetManager: AssetManager;
     private _cache: Cache;
     private _container: AdUnitContainer;
 
@@ -123,7 +124,9 @@ export class WebView {
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, new AssetManager(this._cache, this._configuration.getCacheMode()), this._request, this._clientInfo, this._deviceInfo, new VastParser());
+
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser());
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -197,7 +200,7 @@ export class WebView {
         });
 
         if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
-            this._cache.stop();
+            this._assetManager.stopCaching();
         }
 
         MetaDataManager.updateMediationMetaData(this._nativeBridge);

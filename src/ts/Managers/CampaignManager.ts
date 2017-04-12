@@ -88,6 +88,9 @@ export class CampaignManager {
         if(this._requesting) {
             return Promise.resolve();
         }
+
+        this._assetManager.enableCaching();
+
         this._requesting = true;
 
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
