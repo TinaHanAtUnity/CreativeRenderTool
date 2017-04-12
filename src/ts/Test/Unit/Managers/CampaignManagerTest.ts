@@ -431,8 +431,10 @@ describe('CampaignManager', () => {
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+            let noFillTriggered = false;
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
+                noFillTriggered = true;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -446,6 +448,7 @@ describe('CampaignManager', () => {
 
                 // then the onNoFill observable is triggered
                 mockRequest.verify();
+                assert.isTrue(noFillTriggered);
             });
         });
 
