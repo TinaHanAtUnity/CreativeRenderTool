@@ -6,8 +6,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Observable2 } from 'Utilities/Observable';
-import { Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 
 import VastRaw from 'xml/VastRaw.xml';
@@ -261,6 +260,10 @@ describe('VastParser', () => {
             },
             Notification: {
                 onNotification: new Observable2()
+            },
+            Lifecycle: {
+                onActivityResumed: new Observable1(),
+                onActivityPaused: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;
