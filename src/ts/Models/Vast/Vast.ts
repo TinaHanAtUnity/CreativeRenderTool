@@ -1,12 +1,14 @@
 import { VastAd } from 'Models/Vast/VastAd';
+import { Model } from 'Models/Model';
 
-export class Vast {
+export class Vast extends Model {
 
     private _ads: VastAd[];
     private _errorURLTemplates: string[];
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(ads: VastAd[], errorURLTemplates: any[]) {
+        super();
         this._ads = ads;
         this._errorURLTemplates = errorURLTemplates;
         this._additionalTrackingEvents = {};
@@ -175,6 +177,19 @@ export class Vast {
         return null;
     }
 
+    public getDTO(): { [key: string]: any } {
+        const ads: Array<{ [key: string]: any }> = [];
+        for (const ad of this._ads) {
+            ads.push(ad.getDTO());
+        }
+
+        return {
+            'ads': ads,
+            'errorURLTemplates': this._errorURLTemplates,
+            'additionalTrackingEvents': this._additionalTrackingEvents,
+        };
+    }
+
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
         const minHeight = 320;
         const minWidth = 480;
@@ -197,4 +212,5 @@ export class Vast {
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
     }
+
 }
