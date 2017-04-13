@@ -245,15 +245,9 @@ export class WebView {
     }
 
     private onAdUnitFinish(): void {
-        /*
-        if(this._configuration.isPlacementLevelControl()) {
-            // todo: should request for new ads here but for now, just wait for onClose
-            return;
-        } else {*/
         if(!this._mustReinitialize) {
             this._campaignRefreshManager.refresh();
         }
-        // }
     }
 
     private onAdUnitClose(): void {
