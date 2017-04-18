@@ -67,6 +67,7 @@
 | bundleId | all | True | False | string | Bundle identifier for the app | SDK | all |
 | encrypted | all | True | False | boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
 | rooted | all | True | False | boolean | Is the device rooted or jailbroken | SDK | all |
+| platform | all | True | False | string | "android" or "ios" | SDK | all |
 | sdkVersion | all | True | False | number | SDK version in four digits | SDK | all |
 | osVersion | all | True | False | string | Device operating system version | SDK | all |
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
