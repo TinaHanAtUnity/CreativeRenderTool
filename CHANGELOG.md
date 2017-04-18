@@ -1,3 +1,8 @@
+# Tue Apr 18 11:13:24 UTC 2017
+
+* Add platform to configuration request parameters to fix iOS 10 fingerprinting with placement level controls
+* Stop caching when ad is shown
+
 # Mon Apr 10 07:23:56 UTC 2017
 
 * Easter holiday themes
