@@ -21,6 +21,7 @@
 | cached | boolean | If video is cached or streamed | SDK | all |
 | campaignId | string | Internal campaign identifier | Server | all |
 | connectionType | string | "wifi", "cellular" or "none" | SDK | all |
+| coppa | boolean | True for COPPA compliant (games targeted for children) | Server | all |
 | deviceMake | string | Android device manufacturer | SDK | android |
 | deviceModel | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | encrypted | boolean | If true, app is encrypted for app store distribution and game is live | SDK | all |
@@ -114,6 +115,7 @@
 | webviewUa | no | False | True | string | WebView user agent string | SDK | all |
 | deviceFreeSpace | all | False | True | number | Free space in kilobytes | SDK | all |
 | networkOperator | no | False | True | string | MCC + MNC codes | SDK | all |
+| coppa | all | False | True | boolean | True for COPPA compliant (games targeted for children) | Server | all |
 | networkOperatorName | no | False | True | string | Cell network operator name | SDK | all |
 | mediationName | no | False | True | string | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | string | Mediation SDK version | Mediation | all |
