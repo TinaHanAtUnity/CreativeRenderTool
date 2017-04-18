@@ -152,6 +152,12 @@
       "body": true
     },
     {
+      "parameter": "coppa",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "networkOperatorName",
       "required": "no",
       "queryString": false,

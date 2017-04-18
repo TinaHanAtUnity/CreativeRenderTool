@@ -26,7 +26,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v1/games';
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v2/games';
     }
 
     public static setAbGroup(abGroup: number) {
@@ -47,7 +47,7 @@ export class CampaignManager {
 
     private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v1/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v2/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -167,7 +167,7 @@ export class CampaignManager {
                     if(json.placements[placement]) {
                         chain = chain.then(() => {
                             // todo: this is lacking all json validation, just assuming the format is correct
-                            return this.handlePlcCampaign(placement, json.media[json.placements[placement]].contentType, json.media[json.placements[placement]].payload);
+                            return this.handlePlcCampaign(placement, json.media[json.placements[placement]].contentType, json.media[json.placements[placement]].content);
                         });
                     } else {
                         chain = chain.then(() => {
@@ -185,13 +185,13 @@ export class CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placement: string, contentType: string, payload: string): Promise<void> {
+    private handlePlcCampaign(placement: string, contentType: string, content: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + payload);
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + content);
         if(contentType === 'comet/campaign') {
-            const json = JsonParser.parse(payload);
+            const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
                 return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
@@ -387,6 +387,7 @@ export class CampaignManager {
         const body: any = {
             bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
             bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
+            coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
