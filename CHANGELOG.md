@@ -1,3 +1,8 @@
+# Tue Apr 18 15:11:37 UTC 2017
+
+* Remove Easter theme
+* Support auction v2 ad plan format with placement level controls
+
 # Tue Apr 18 11:13:24 UTC 2017
 
 * Add platform to configuration request parameters to fix iOS 10 fingerprinting with placement level controls
