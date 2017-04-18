@@ -87,6 +87,7 @@ export class ConfigManager {
             bundleId: clientInfo.getApplicationName(),
             encrypted: !clientInfo.isDebuggable(),
             rooted: deviceInfo.isRooted(),
+            platform: Platform[clientInfo.getPlatform()].toLowerCase(),
             sdkVersion: clientInfo.getSdkVersion(),
             osVersion: deviceInfo.getOsVersion(),
             deviceModel: deviceInfo.getModel(),

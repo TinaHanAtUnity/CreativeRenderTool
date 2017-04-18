@@ -20,6 +20,12 @@
       "body": false
     },
     {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "sdkVersion",
       "required": "all",
       "queryString": true,
