@@ -54,6 +54,7 @@ export class Overlay extends View {
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
+    private _fadeEnabled: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
         super(nativeBridge, 'overlay');
@@ -140,7 +141,7 @@ export class Overlay extends View {
             this.onSkip.trigger(value);
         }
 
-        if(!this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
+        if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
             this._fadeTimer = setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
@@ -192,6 +193,12 @@ export class Overlay extends View {
 
     public isMuted(): boolean {
         return this._muted;
+    }
+
+    public setFadeEnabled(value: boolean) {
+        if(this._fadeEnabled !== value) {
+            this._fadeEnabled = value;
+        }
     }
 
     private onSkipEvent(event: Event): void {
