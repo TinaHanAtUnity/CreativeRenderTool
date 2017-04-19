@@ -159,21 +159,39 @@ export class CampaignManager {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
-            let chain = Promise.resolve();
+            const fill: { [mediaId: string]: string[] } = {};
+            const noFill: string[] = [];
 
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    if(json.placements[placement]) {
-                        chain = chain.then(() => {
-                            // todo: this is lacking all json validation, just assuming the format is correct
-                            return this.handlePlcCampaign(placement, json.media[json.placements[placement]].contentType, json.media[json.placements[placement]].content);
-                        });
+                    const mediaId: string = json.placements[placement];
+
+                    if(mediaId) {
+                        if(fill[mediaId]) {
+                            fill[mediaId].push(placement);
+                        } else {
+                            fill[mediaId] = [placement];
+                        }
                     } else {
-                        chain = chain.then(() => {
-                            return this.handlePlcNoFill(placement);
-                        });
+                        noFill.push(placement);
                     }
+                }
+            }
+
+            let chain = Promise.resolve();
+
+            for(const placement of noFill) {
+                chain = chain.then(() => {
+                    return this.handlePlcNoFill(placement);
+                });
+            }
+
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
+                    chain = chain.then(() => {
+                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content);
+                    });
                 }
             }
 
@@ -185,19 +203,27 @@ export class CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placement: string, contentType: string, content: string): Promise<void> {
+    private handlePlcCampaign(placements: string[], contentType: string, content: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + content);
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
         if(contentType === 'comet/campaign') {
             const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+                return this._assetManager.setup(campaign).then(() => {
+                    for(const placement of placements) {
+                        this.onPlcCampaign.trigger(placement, campaign);
+                    }
+                });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+                return this._assetManager.setup(campaign).then(() => {
+                    for(const placement of placements) {
+                        this.onPlcCampaign.trigger(placement, campaign);
+                    }
+                });
             }
         }
 
