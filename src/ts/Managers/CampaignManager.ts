@@ -1,4 +1,4 @@
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -45,7 +45,6 @@ export class CampaignManager {
         CampaignManager.CampaignResponse = campaignResponse;
     }
 
-    private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v2/games';
     private static AbGroup: number | undefined;
@@ -56,7 +55,7 @@ export class CampaignManager {
     public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
     public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
-    public onNoFill: Observable1<number> = new Observable1();
+    public onNoFill: Observable0 = new Observable0();
     public onError: Observable1<WebViewError> = new Observable1();
 
     public onPlcCampaign: Observable2<string, Campaign> = new Observable2();
@@ -70,10 +69,7 @@ export class CampaignManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
-
     private _requesting: boolean;
-    private _refillTimestamp: number;
-    private _plcRefillTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
@@ -85,7 +81,6 @@ export class CampaignManager {
         this._vastParser = vastParser;
 
         this._requesting = false;
-        this._refillTimestamp = 0;
     }
 
     public request(): Promise<void> {
@@ -93,16 +88,11 @@ export class CampaignManager {
         if(this._requesting) {
             return Promise.resolve();
         }
-        // prevent ad request until no fill delay has passed
-        if(this._refillTimestamp !== 0 && Date.now() <= this._refillTimestamp) {
-            return Promise.resolve();
-        }
 
         this._assetManager.enableCaching();
 
         this._requesting = true;
-        this._refillTimestamp = 0;
-        this._plcRefillTimestamp = 0;
+
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
@@ -125,18 +115,6 @@ export class CampaignManager {
         });
     }
 
-    public shouldPlcRefill(): boolean {
-        if(this._requesting) {
-            return false;
-        }
-
-        if(this._plcRefillTimestamp !== 0 && Date.now() > this._plcRefillTimestamp) {
-            return true;
-        }
-
-        return false;
-    }
-
     private parseCampaign(response: INativeResponse) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
@@ -153,9 +131,6 @@ export class CampaignManager {
     }
 
     private parsePlcCampaigns(response: INativeResponse) {
-        // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
-        this._plcRefillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
-
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
@@ -300,9 +275,8 @@ export class CampaignManager {
     }
 
     private handleNoFill(): Promise<void> {
-        this._refillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
-        this.onNoFill.trigger(CampaignManager.NoFillDelay);
+        this.onNoFill.trigger();
         return Promise.resolve();
     }
 

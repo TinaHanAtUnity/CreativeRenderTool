@@ -431,10 +431,10 @@ describe('CampaignManager', () => {
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
-            let triggeredRetryTime: number;
+            let noFillTriggered = false;
             let triggeredError: any;
-            campaignManager.onNoFill.subscribe((retryTime: number) => {
-                triggeredRetryTime = retryTime;
+            campaignManager.onNoFill.subscribe(() => {
+                noFillTriggered = true;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -448,7 +448,7 @@ describe('CampaignManager', () => {
 
                 // then the onNoFill observable is triggered
                 mockRequest.verify();
-                assert.equal(triggeredRetryTime, 3600);
+                assert.isTrue(noFillTriggered);
             });
         });
 
