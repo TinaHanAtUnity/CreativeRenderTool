@@ -1,3 +1,8 @@
+# Thu Apr 20 08:36:43 UTC 2017
+
+* Refactor campaign refresh logic to CampaignRefreshManager
+* Parse each campaign only once when placement level controls are enabled to fix caching race conditions
+
 # Tue Apr 18 15:11:37 UTC 2017
 
 * Remove Easter theme
