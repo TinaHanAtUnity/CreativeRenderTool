@@ -1,3 +1,8 @@
+# Thu Apr 20 10:50:08 UTC 2017
+
+* Disable layout fadeout for brand ads with clickthrough URL
+* Fail config request and send diagnostics if gamerId is missing from PLC config response
+
 # Thu Apr 20 08:36:43 UTC 2017
 
 * Refactor campaign refresh logic to CampaignRefreshManager
