@@ -57,6 +57,7 @@ export class VideoEventHandlers {
 
             if (adUnit instanceof VastAdUnit && (<VastAdUnit>adUnit).getVideoClickThroughURL()) {
                 overlay.setCallButtonVisible(true);
+                overlay.setFadeEnabled(false);
             }
         }
 
