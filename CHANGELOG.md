@@ -1,3 +1,7 @@
+# Thu Apr 20 11:26:47 UTC 2017
+
+* Add config request URL with query parameters to plc_config_failure diagnostic message
+
 # Thu Apr 20 10:50:08 UTC 2017
 
 * Disable layout fadeout for brand ads with clickthrough URL
