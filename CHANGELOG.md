@@ -1,3 +1,31 @@
+# Fri Apr 21 09:44:05 UTC 2017
+
+* Remove plc_config_received diagnostic message
+
+# Thu Apr 20 11:26:47 UTC 2017
+
+* Add config request URL with query parameters to plc_config_failure diagnostic message
+
+# Thu Apr 20 10:50:08 UTC 2017
+
+* Disable layout fadeout for brand ads with clickthrough URL
+* Fail config request and send diagnostics if gamerId is missing from PLC config response
+
+# Thu Apr 20 08:36:43 UTC 2017
+
+* Refactor campaign refresh logic to CampaignRefreshManager
+* Parse each campaign only once when placement level controls are enabled to fix caching race conditions
+
+# Tue Apr 18 15:11:37 UTC 2017
+
+* Remove Easter theme
+* Support auction v2 ad plan format with placement level controls
+
+# Tue Apr 18 11:13:24 UTC 2017
+
+* Add platform to configuration request parameters to fix iOS 10 fingerprinting with placement level controls
+* Stop caching when ad is shown
+
 # Mon Apr 10 07:23:56 UTC 2017
 
 * Easter holiday themes
