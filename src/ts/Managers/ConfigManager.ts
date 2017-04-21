@@ -45,12 +45,6 @@ export class ConfigManager {
 
                             throw new Error('gamerId missing in PLC config');
                         }
-
-                        Diagnostics.trigger('plc_config_received', {
-                            placementCount: config.getPlacementCount(),
-                            gamerId: config.getGamerId(),
-                            abGroup: config.getAbGroup()
-                        });
                     } else {
                         nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements');
                     }
