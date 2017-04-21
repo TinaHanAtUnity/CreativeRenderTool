@@ -53,7 +53,7 @@ export class VastCreativeCompanionAd extends Model {
             'type': this._type,
             'staticResourceURL': this._staticResourceURL,
             'creativeType': this._creativeType,
-            'companionClickThroughURLTemplate': this._companionClickThroughURLTemplate,
+            'companionClickThroughURLTemplate': this._companionClickThroughURLTemplate
         };
     }
 }

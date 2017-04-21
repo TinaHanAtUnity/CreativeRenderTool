@@ -86,4 +86,17 @@ export class Video extends Asset {
         this._active = active;
     }
 
+    public getDTO(): { [key: string]: any } {
+        return {
+            'asset': super.getDTO(),
+            'size': this._size,
+            'started': this._started,
+            'errorStatus': this._errorStatus,
+            'duration': this._duration,
+            'position': this._position,
+            'positionRepeats': this._positionRepeats,
+            'quartile': this._quartile,
+            'active': this._active
+        };
+    }
 }

@@ -31,7 +31,7 @@ export abstract class VastCreative extends Model {
     public getDTO(): { [key: string]: any } {
         return {
             'type': this._type,
-            'trackingEvents': this._trackingEvents,
+            'trackingEvents': this._trackingEvents
         };
     }
 

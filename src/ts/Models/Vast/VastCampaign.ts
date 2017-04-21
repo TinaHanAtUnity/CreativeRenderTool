@@ -66,6 +66,27 @@ export class VastCampaign extends Campaign {
         return this._portrait;
     }
 
+    public getDTO(): { [key: string]: any } {
+        let portrait;
+        if (this._portrait) {
+            portrait = this._portrait.getDTO();
+        }
+
+        let landscape;
+        if (this._landscape) {
+            landscape = this._landscape.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'vast': this._vast.getDTO(),
+            'video': this._video.getDTO(),
+            'hasEndscreen': this._hasEndscreen,
+            'portrait': portrait,
+            'landscape': landscape,
+        };
+    }
+
     private processCustomTracking(tracking: any) {
         if (tracking) {
             for (const trackingEventName in tracking) {

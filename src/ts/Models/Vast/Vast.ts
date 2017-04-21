@@ -178,7 +178,7 @@ export class Vast extends Model {
     }
 
     public getDTO(): { [key: string]: any } {
-        const ads: Array<{ [key: string]: any }> = [];
+        const ads = [];
         for (const ad of this._ads) {
             ads.push(ad.getDTO());
         }
@@ -186,7 +186,7 @@ export class Vast extends Model {
         return {
             'ads': ads,
             'errorURLTemplates': this._errorURLTemplates,
-            'additionalTrackingEvents': this._additionalTrackingEvents,
+            'additionalTrackingEvents': this._additionalTrackingEvents
         };
     }
 

@@ -119,12 +119,12 @@ export class VastAd {
     }
 
     public getDTO(): { [key: string]: any } {
-        const vastCreatives: Array<{ [key: string]: any }> = [];
+        const vastCreatives = [];
         for (const vastCreative of this._creatives) {
             vastCreatives.push(vastCreative.getDTO());
         }
 
-        const companionAds: Array<{ [key: string]: any }> = [];
+        const companionAds = [];
         for (const companionAd of this._companionAds) {
             companionAds.push(companionAd.getDTO());
         }
@@ -135,7 +135,7 @@ export class VastAd {
             'impressionURLTemplates': this._impressionURLTemplates,
             'wrapperURLs': this._wrapperURLs,
             'vastCreatives': vastCreatives,
-            'companionAds': companionAds,
+            'companionAds': companionAds
         };
     }
 }

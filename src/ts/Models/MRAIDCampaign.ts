@@ -36,4 +36,16 @@ export class MRAIDCampaign extends Campaign {
         return [];
     }
 
+    public getDTO(): { [key: string]: any } {
+        let resourceUrl: any;
+        if (this._resourceUrl) {
+            resourceUrl = this._resourceUrl.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'resourceUrl': resourceUrl,
+            'resource': this._resource
+        };
+    }
 }
