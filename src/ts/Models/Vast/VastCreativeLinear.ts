@@ -74,11 +74,16 @@ export class VastCreativeLinear extends VastCreative {
     }
 
     public getDTO(): { [key: string]: any } {
+        const mediaFiles = [];
+        for (const mediaFile of this._mediaFiles) {
+            mediaFiles.push(mediaFile.getDTO());
+        }
+
         return {
             'vastCreative': super.getDTO(),
             'duration': this._duration,
             'skipDelay': this._skipDelay,
-            'mediaFiles': this._mediaFiles,
+            'mediaFiles': mediaFiles,
             'videoClickThroughURLTemplate': this._videoClickThroughURLTemplate,
             'videoClickTrackingURLTemplates': this._videoClickTrackingURLTemplates,
             'videoCustomClickURLTemplates': this._videoCustomClickURLTemplates,
