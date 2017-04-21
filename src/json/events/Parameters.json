@@ -70,6 +70,13 @@
     "platforms": "all"
   },
   {
+    "key": "coppa",
+    "type": "boolean",
+    "description": "True for COPPA compliant (games targeted for children)",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "deviceMake",
     "type": "string",
     "description": "Android device manufacturer",

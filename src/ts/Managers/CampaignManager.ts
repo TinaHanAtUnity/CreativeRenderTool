@@ -1,4 +1,4 @@
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -26,7 +26,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v1/games';
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v2/games';
     }
 
     public static setAbGroup(abGroup: number) {
@@ -45,9 +45,8 @@ export class CampaignManager {
         CampaignManager.CampaignResponse = campaignResponse;
     }
 
-    private static NoFillDelay = 3600;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v1/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v2/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -56,7 +55,7 @@ export class CampaignManager {
     public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
     public onVastCampaign: Observable1<VastCampaign> = new Observable1();
     public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
-    public onNoFill: Observable1<number> = new Observable1();
+    public onNoFill: Observable0 = new Observable0();
     public onError: Observable1<WebViewError> = new Observable1();
 
     public onPlcCampaign: Observable2<string, Campaign> = new Observable2();
@@ -70,10 +69,7 @@ export class CampaignManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
-
     private _requesting: boolean;
-    private _refillTimestamp: number;
-    private _plcRefillTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
         this._nativeBridge = nativeBridge;
@@ -85,7 +81,6 @@ export class CampaignManager {
         this._vastParser = vastParser;
 
         this._requesting = false;
-        this._refillTimestamp = 0;
     }
 
     public request(): Promise<void> {
@@ -93,16 +88,11 @@ export class CampaignManager {
         if(this._requesting) {
             return Promise.resolve();
         }
-        // prevent ad request until no fill delay has passed
-        if(this._refillTimestamp !== 0 && Date.now() <= this._refillTimestamp) {
-            return Promise.resolve();
-        }
 
         this._assetManager.enableCaching();
 
         this._requesting = true;
-        this._refillTimestamp = 0;
-        this._plcRefillTimestamp = 0;
+
         return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
@@ -125,18 +115,6 @@ export class CampaignManager {
         });
     }
 
-    public shouldPlcRefill(): boolean {
-        if(this._requesting) {
-            return false;
-        }
-
-        if(this._plcRefillTimestamp !== 0 && Date.now() > this._plcRefillTimestamp) {
-            return true;
-        }
-
-        return false;
-    }
-
     private parseCampaign(response: INativeResponse) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
@@ -153,27 +131,42 @@ export class CampaignManager {
     }
 
     private parsePlcCampaigns(response: INativeResponse) {
-        // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
-        this._plcRefillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
-
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
-            let chain = Promise.resolve();
+            const fill: { [mediaId: string]: string[] } = {};
+            const noFill: string[] = [];
 
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    if(json.placements[placement]) {
-                        chain = chain.then(() => {
-                            // todo: this is lacking all json validation, just assuming the format is correct
-                            return this.handlePlcCampaign(placement, json.media[json.placements[placement]].contentType, json.media[json.placements[placement]].payload);
-                        });
+                    const mediaId: string = json.placements[placement];
+
+                    if(mediaId) {
+                        if(fill[mediaId]) {
+                            fill[mediaId].push(placement);
+                        } else {
+                            fill[mediaId] = [placement];
+                        }
                     } else {
-                        chain = chain.then(() => {
-                            return this.handlePlcNoFill(placement);
-                        });
+                        noFill.push(placement);
                     }
+                }
+            }
+
+            let chain = Promise.resolve();
+
+            for(const placement of noFill) {
+                chain = chain.then(() => {
+                    return this.handlePlcNoFill(placement);
+                });
+            }
+
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
+                    chain = chain.then(() => {
+                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content);
+                    });
                 }
             }
 
@@ -185,19 +178,27 @@ export class CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placement: string, contentType: string, payload: string): Promise<void> {
+    private handlePlcCampaign(placements: string[], contentType: string, content: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign for placement ' + placement + ' (' + contentType + '): ' + payload);
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
         if(contentType === 'comet/campaign') {
-            const json = JsonParser.parse(payload);
+            const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+                return this._assetManager.setup(campaign).then(() => {
+                    for(const placement of placements) {
+                        this.onPlcCampaign.trigger(placement, campaign);
+                    }
+                });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                return this._assetManager.setup(campaign).then(() => this.onPlcCampaign.trigger(placement, campaign));
+                return this._assetManager.setup(campaign).then(() => {
+                    for(const placement of placements) {
+                        this.onPlcCampaign.trigger(placement, campaign);
+                    }
+                });
             }
         }
 
@@ -274,9 +275,8 @@ export class CampaignManager {
     }
 
     private handleNoFill(): Promise<void> {
-        this._refillTimestamp = Date.now() + CampaignManager.NoFillDelay * 1000;
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
-        this.onNoFill.trigger(CampaignManager.NoFillDelay);
+        this.onNoFill.trigger();
         return Promise.resolve();
     }
 
@@ -387,6 +387,7 @@ export class CampaignManager {
         const body: any = {
             bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
             bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
+            coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };

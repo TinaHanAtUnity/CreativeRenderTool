@@ -37,6 +37,13 @@ export class ConfigManager {
                         nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                         if(config.getGamerId()) {
                             ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                        } else {
+                            Diagnostics.trigger('plc_config_failure', {
+                                configUrl: url,
+                                configResponse: response.response
+                            });
+
+                            throw new Error('gamerId missing in PLC config');
                         }
 
                         Diagnostics.trigger('plc_config_received', {
@@ -87,6 +94,7 @@ export class ConfigManager {
             bundleId: clientInfo.getApplicationName(),
             encrypted: !clientInfo.isDebuggable(),
             rooted: deviceInfo.isRooted(),
+            platform: Platform[clientInfo.getPlatform()].toLowerCase(),
             sdkVersion: clientInfo.getSdkVersion(),
             osVersion: deviceInfo.getOsVersion(),
             deviceModel: deviceInfo.getModel(),

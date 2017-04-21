@@ -56,7 +56,8 @@ describe('VideoEventHandlersTest', () => {
             setVideoDurationEnabled: sinon.spy(),
             setDebugMessage: sinon.spy(),
             setDebugMessageVisible: sinon.spy(),
-            setCallButtonVisible: sinon.spy()
+            setCallButtonVisible: sinon.spy(),
+            setFadeEnabled: sinon.spy()
         };
 
         endScreen = <EndScreen><any> {
@@ -320,6 +321,36 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setCallButtonVisible);
+        });
+
+        it('should set fade enabled to false if the ad unit is VAST and has a click trough URL', () => {
+            const vastCampaign = <VastCampaign><any>{
+                getVideo: () => video
+            };
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>overlay.setFadeEnabled, false);
+        });
+
+        it('should not set fade enabled to false if the ad unit is VAST but there is no click trough URL', () => {
+            const vastCampaign = <VastCampaign><any>{
+                getVideo: () => video
+            };
+            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+
+            sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>overlay.setFadeEnabled);
+        });
+
+        it('should fade out overlay controls if the ad unit is not VAST', () => {
+            VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>overlay.setFadeEnabled);
         });
     });
 
