@@ -1,3 +1,7 @@
+# Fri Apr 21 09:44:05 UTC 2017
+
+* Remove plc_config_received diagnostic message
+
 # Thu Apr 20 11:26:47 UTC 2017
 
 * Add config request URL with query parameters to plc_config_failure diagnostic message
