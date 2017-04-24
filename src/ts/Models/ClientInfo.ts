@@ -1,129 +1,151 @@
-import { Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
+import { Optional, TypedModel, ISchema } from 'Models/TypedModel';
 
-export class ClientInfo extends Model {
+interface IClientInfo extends ISchema {
+    gameId: string;
+    testMode: boolean;
 
-    private _gameId: string;
-    private _testMode: boolean;
+    applicationName: string;
+    applicationVersion: string;
+    sdkVersion: number;
+    sdkVersionName: string;
 
-    private _applicationName: string;
-    private _applicationVersion: string;
-    private _sdkVersion: number;
-    private _sdkVersionName: string;
+    platform: Platform;
 
-    private _platform: Platform;
+    debuggable: boolean;
 
-    private _debuggable: boolean;
+    configUrl: string;
+    webviewUrl: string;
+    webviewHash: string;
+    webviewVersion: string;
 
-    private _configUrl: string;
-    private _webviewUrl: string;
-    private _webviewHash: string;
-    private _webviewVersion: string;
+    initTimestamp: number;
+    reinitialized: boolean;
 
-    private _initTimestamp: number;
-    private _reinitialized: boolean;
+    foobar: Optional<string>;
+}
+
+export class ClientInfo extends TypedModel<IClientInfo> {
 
     constructor(platform: Platform, data: any[]) {
-        super();
+        super({
+            gameId: '',
+            testMode: false,
+            applicationName: '',
+            applicationVersion: '',
+            sdkVersion: 0,
+            sdkVersionName: '',
+            platform: Platform.TEST,
+            debuggable: false,
+            configUrl: '',
+            webviewUrl: '',
+            webviewHash: '',
+            webviewVersion: '',
+            initTimestamp: 0,
+            reinitialized: false,
+            foobar: new Optional<string>()
+        });
 
-        this._platform = platform;
+        this.set('platform', platform);
 
         const gameIdString = data.shift();
         if(typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
-            this._gameId = gameIdString;
+            this.set('gameId', gameIdString);
         } else {
             throw new Error(UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
         }
 
-        this._testMode = data.shift();
-        this._applicationName = data.shift();
-        this._applicationVersion = data.shift();
-        this._sdkVersion = data.shift();
-        this._sdkVersionName = data.shift();
+        this.set('testMode', data.shift());
+        this.set('applicationName', data.shift());
+        this.set('applicationVersion', data.shift());
+        this.set('sdkVersion', data.shift());
+        this.set('sdkVersionName', data.shift());
 
-        this._debuggable = data.shift();
-        this._configUrl = data.shift();
-        this._webviewUrl = data.shift();
-        this._webviewHash = data.shift();
-        this._webviewVersion = data.shift();
+        this.set('debuggable', data.shift());
+        this.set('configUrl', data.shift());
+        this.set('webviewUrl', data.shift());
+        this.set('webviewHash', data.shift());
+        this.set('webviewVersion', data.shift());
 
-        this._initTimestamp = data.shift();
-        this._reinitialized = data.shift();
+        this.set('initTimestamp', data.shift());
+        this.set('reinitialized', data.shift());
+
+        this.set('foobar', new Optional<string>());
     }
 
     public getGameId(): string {
-        return this._gameId;
+        return this.get('gameId');
     }
 
     public getTestMode(): boolean {
-        return this._testMode;
+        return this.get('testMode');
     }
 
     public getApplicationVersion(): string {
-        return this._applicationVersion;
+        return this.get('applicationVersion');
     }
 
     public getApplicationName(): string {
-        return this._applicationName;
+        return this.get('applicationName');
     }
 
     public getSdkVersion(): number {
-        return this._sdkVersion;
+        return this.get('sdkVersion');
     }
 
     public getSdkVersionName(): string {
-        return this._sdkVersionName;
+        return this.get('sdkVersionName');
     }
 
     public getPlatform(): Platform {
-        return this._platform;
+        return this.get('platform');
     }
 
     public isDebuggable(): boolean {
-        return this._debuggable;
+        return this.get('debuggable');
     }
 
     public getConfigUrl(): string {
-        return this._configUrl;
+        return this.get('configUrl');
     }
 
     public getWebviewUrl(): string {
-        return this._webviewUrl;
+        return this.get('webviewUrl');
     }
 
     public getWebviewHash(): string {
-        return this._webviewHash;
+        return this.get('webviewHash');
     }
 
     public getWebviewVersion(): string {
-        return this._webviewVersion;
+        return this.get('webviewVersion');
     }
 
     public getInitTimestamp(): number {
-        return this._initTimestamp;
+        return this.get('initTimestamp');
     }
 
     public isReinitialized(): boolean {
-        return this._reinitialized;
+        return this.get('reinitialized');
     }
 
     public getDTO() {
         return {
-            'gameId': this._gameId,
-            'testMode': this._testMode,
-            'bundleId': this._applicationName,
-            'bundleVersion': this._applicationVersion,
-            'sdkVersion': this._sdkVersion,
-            'sdkVersionName': this._sdkVersionName,
-            'platform': Platform[this._platform].toLowerCase(),
-            'encrypted': !this._debuggable,
-            'configUrl': this._configUrl,
-            'webviewUrl': this._webviewUrl,
-            'webviewHash': this._webviewHash,
-            'webviewVersion': this._webviewVersion,
-            'initTimestamp': this._initTimestamp,
-            'reinitialized': this._reinitialized
+            'gameId': this.get('gameId'),
+            'testMode': this.get('testMode'),
+            'bundleId': this.get('applicationName'),
+            'bundleVersion': this.get('applicationVersion'),
+            'sdkVersion': this.get('sdkVersion'),
+            'sdkVersionName': this.get('sdkVersionName'),
+            'platform': Platform[this.get('platform')].toLowerCase(),
+            'encrypted': !this.get('debuggable'),
+            'configUrl': this.get('configUrl'),
+            'webviewUrl': this.get('webviewUrl'),
+            'webviewHash': this.get('webviewHash'),
+            'webviewVersion': this.get('webviewVersion'),
+            'initTimestamp': this.get('initTimestamp'),
+            'reinitialized': this.get('reinitialized')
         };
     }
 }
