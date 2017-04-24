@@ -1,6 +1,11 @@
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export class AdapterMetaData extends Model {
+interface IAdapterMetaData extends ISchema {
+    name: [string, string[]];
+    version: [string, string[]];
+}
+
+export class AdapterMetaData extends Model<IAdapterMetaData> {
 
     public static getCategory(): string {
         return 'adapter';
@@ -10,27 +15,28 @@ export class AdapterMetaData extends Model {
         return ['name', 'version'];
     }
 
-    private _name: string;
-    private _version: string;
-
     constructor(data: string[]) {
-        super();
-        this._name = data[0];
-        this._version = data[1];
+        super({
+            name: ['', ['string']],
+            version: ['', ['string']]
+        });
+
+        this.set('name', data[0]);
+        this.set('version', data[1]);
     }
 
     public getName(): string {
-        return this._name;
+        return this.get('name');
     }
 
     public getVersion(): string {
-        return this._version;
+        return this.get('version');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'adapterName': this._name,
-            'adapterVersion': this._version
+            'adapterName': this.getName(),
+            'adapterVersion': this.getVersion()
         };
     }
 

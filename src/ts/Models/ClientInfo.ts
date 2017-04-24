@@ -1,50 +1,47 @@
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { Optional, TypedModel, ISchema } from 'Models/TypedModel';
+import { Model, ISchema } from 'Models/Model';
 
 interface IClientInfo extends ISchema {
-    gameId: string;
-    testMode: boolean;
+    gameId: [string, string[]];
+    testMode: [boolean, string[]];
 
-    applicationName: string;
-    applicationVersion: string;
-    sdkVersion: number;
-    sdkVersionName: string;
+    applicationName: [string, string[]];
+    applicationVersion: [string, string[]];
+    sdkVersion: [number, string[]];
+    sdkVersionName: [string, string[]];
 
-    platform: Platform;
+    platform: [Platform, string[]];
 
-    debuggable: boolean;
+    debuggable: [boolean, string[]];
 
-    configUrl: string;
-    webviewUrl: string;
-    webviewHash: string;
-    webviewVersion: string;
+    configUrl: [string, string[]];
+    webviewUrl: [string, string[]];
+    webviewHash: [string, string[]];
+    webviewVersion: [string, string[]];
 
-    initTimestamp: number;
-    reinitialized: boolean;
-
-    foobar: Optional<string>;
+    initTimestamp: [number, string[]];
+    reinitialized: [boolean, string[]];
 }
 
-export class ClientInfo extends TypedModel<IClientInfo> {
+export class ClientInfo extends Model<IClientInfo> {
 
     constructor(platform: Platform, data: any[]) {
         super({
-            gameId: '',
-            testMode: false,
-            applicationName: '',
-            applicationVersion: '',
-            sdkVersion: 0,
-            sdkVersionName: '',
-            platform: Platform.TEST,
-            debuggable: false,
-            configUrl: '',
-            webviewUrl: '',
-            webviewHash: '',
-            webviewVersion: '',
-            initTimestamp: 0,
-            reinitialized: false,
-            foobar: new Optional<string>()
+            gameId: ['', ['string']],
+            testMode: [false, ['boolean']],
+            applicationName: ['', ['string']],
+            applicationVersion: ['', ['string']],
+            sdkVersion: [0, ['number']],
+            sdkVersionName: ['', ['string']],
+            platform: [Platform.TEST, ['object']],
+            debuggable: [false, ['boolean']],
+            configUrl: ['', ['string']],
+            webviewUrl: ['', ['string']],
+            webviewHash: ['', ['string']],
+            webviewVersion: ['', ['string']],
+            initTimestamp: [0, ['number']],
+            reinitialized: [false, ['boolean']],
         });
 
         this.set('platform', platform);
@@ -70,8 +67,6 @@ export class ClientInfo extends TypedModel<IClientInfo> {
 
         this.set('initTimestamp', data.shift());
         this.set('reinitialized', data.shift());
-
-        this.set('foobar', new Optional<string>());
     }
 
     public getGameId(): string {
