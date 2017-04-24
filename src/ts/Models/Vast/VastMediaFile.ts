@@ -1,4 +1,5 @@
-export class VastMediaFile {
+import { Model } from 'Models/Model';
+export class VastMediaFile extends Model {
 
     private _fileURL: string | null;
     private _deliveryType: string;
@@ -18,6 +19,8 @@ export class VastMediaFile {
                 minBitrate: number, maxBitrate: number, width: number, height: number);
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
                 minBitrate?: number, maxBitrate?: number, width?: number, height?: number) {
+        super();
+
         this._fileURL = fileURL || null;
         this._deliveryType = deliveryType || 'progressive';
         this._mimeType = mimeType || null;
@@ -38,5 +41,22 @@ export class VastMediaFile {
 
     public getMIMEType(): string | null {
         return this._mimeType;
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'fileURL': this._fileURL,
+            'deliveryType': this._deliveryType,
+            'mimeType': this._mimeType,
+            'codec': this._codec,
+            'bitrate': this._bitrate,
+            'minBitrate': this._minBitrate,
+            'maxBitrate': this._maxBitrate,
+            'width': this._width,
+            'height': this._height,
+            'apiFramework': this._apiFramework,
+            'scalable': this._scalable,
+            'maintainAspectRatio': this._maintainAspectRatio
+        };
     }
 }

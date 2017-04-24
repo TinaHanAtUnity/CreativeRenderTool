@@ -1,4 +1,6 @@
-export class Session {
+import { Model } from 'Models/Model';
+
+export class Session extends Model {
     public startSent: boolean = false;
     public firstQuartileSent: boolean = false;
     public midpointSent: boolean = false;
@@ -12,6 +14,7 @@ export class Session {
     private _id: string;
 
     constructor(id: string) {
+        super();
         this._id = id;
     }
 
@@ -19,4 +22,9 @@ export class Session {
         return this._id;
     }
 
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this._id
+        };
+    }
 }

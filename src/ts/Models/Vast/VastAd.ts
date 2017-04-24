@@ -117,4 +117,25 @@ export class VastAd {
             creative.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
         }
     }
+
+    public getDTO(): { [key: string]: any } {
+        const vastCreatives = [];
+        for (const vastCreative of this._creatives) {
+            vastCreatives.push(vastCreative.getDTO());
+        }
+
+        const companionAds = [];
+        for (const companionAd of this._companionAds) {
+            companionAds.push(companionAd.getDTO());
+        }
+
+        return {
+            'id': this._id,
+            'errorURLTemplates': this._errorURLTemplates,
+            'impressionURLTemplates': this._impressionURLTemplates,
+            'wrapperURLs': this._wrapperURLs,
+            'vastCreatives': vastCreatives,
+            'companionAds': companionAds
+        };
+    }
 }

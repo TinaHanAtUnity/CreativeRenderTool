@@ -1,4 +1,5 @@
 import { Placement } from 'Models/Placement';
+import { Model } from 'Models/Model';
 
 export enum CacheMode {
     FORCED,
@@ -6,7 +7,7 @@ export enum CacheMode {
     DISABLED
 }
 
-export class Configuration {
+export class Configuration extends Model {
 
     private _enabled: boolean;
     private _country: string;
@@ -19,6 +20,8 @@ export class Configuration {
     private _defaultPlacement: Placement;
 
     constructor(configJson: any) {
+        super();
+
         this._enabled = configJson.enabled;
         this._country = configJson.country;
         this._coppaCompliant = configJson.coppaCompliant;
@@ -106,6 +109,27 @@ export class Configuration {
         }
 
         return count;
+    }
+
+    public getDTO(): { [key: string]: any } {
+        const placements = [];
+        for(const placement in this._placements) {
+            if(this._placements.hasOwnProperty(placement)) {
+                placements.push(this._placements[placement].getDTO());
+            }
+        }
+
+        return {
+            'enabled': this._enabled,
+            'country': this._country,
+            'coppaCompliant': this._coppaCompliant,
+            'placementLevelControl': this._placementLevelControl,
+            'abGroup': this._abGroup,
+            'gamerId': this._gamerId,
+            'cacheMode': CacheMode[this._cacheMode].toLowerCase(),
+            'placements': placements,
+            'defaultPlacement': this._defaultPlacement.getId()
+        };
     }
 
     public getDefaultPlacement(): Placement {

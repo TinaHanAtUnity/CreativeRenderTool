@@ -150,4 +150,50 @@ export class PerformanceCampaign extends Campaign {
             this.getLandscape()
         ];
     }
+
+    public getDTO(): { [key: string]: any } {
+        let gameIcon: any = undefined;
+        if (this._gameIcon) {
+            gameIcon = this._gameIcon.getDTO();
+        }
+
+        let landscapeImage: any = undefined;
+        if (this._landscapeImage) {
+            landscapeImage = this._landscapeImage.getDTO();
+        }
+
+        let portraitImage: any = undefined;
+        if (this._portraitImage) {
+            portraitImage = this._portraitImage.getDTO();
+        }
+
+        let video: any = undefined;
+        if (this._video) {
+            video = this._video.getDTO();
+        }
+
+        let streamingVideo: any = undefined;
+        if (this._streamingVideo) {
+            streamingVideo = this._streamingVideo.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'appStoreId': this._appStoreId,
+            'appStoreCountry': this._appStoreCountry,
+            'gameId': this._gameId,
+            'gameName': this._gameName,
+            'gameIcon': gameIcon,
+            'rating': this._rating,
+            'ratingCount': this._ratingCount,
+            'landscapeImage': landscapeImage,
+            'portraitImage': portraitImage,
+            'video': video,
+            'streamingVideo': streamingVideo,
+            'clickAttributionUrl': this._clickAttributionUrl,
+            'clickAttributionUrlFollowsRedirects': this._clickAttributionUrlFollowsRedirects,
+            'bypassAppSheet': this._bypassAppSheet,
+            'store': StoreName[this._store].toLowerCase()
+        };
+    }
 }

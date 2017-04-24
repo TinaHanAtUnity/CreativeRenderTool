@@ -1,4 +1,6 @@
-export class VastCreativeCompanionAd {
+import { Model } from 'Models/Model';
+
+export class VastCreativeCompanionAd extends Model {
     private _id: string | null;
     private _width: number;
     private _height: number;
@@ -8,6 +10,8 @@ export class VastCreativeCompanionAd {
     private _companionClickThroughURLTemplate: string | null;
 
     constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
+        super();
+
         this._id = id || null;
         this._width = width || 0;
         this._height = height || 0;
@@ -39,5 +43,17 @@ export class VastCreativeCompanionAd {
 
     public getWidth(): number {
         return this._width;
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this._id,
+            'width': this._width,
+            'height': this._height,
+            'type': this._type,
+            'staticResourceURL': this._staticResourceURL,
+            'creativeType': this._creativeType,
+            'companionClickThroughURLTemplate': this._companionClickThroughURLTemplate
+        };
     }
 }

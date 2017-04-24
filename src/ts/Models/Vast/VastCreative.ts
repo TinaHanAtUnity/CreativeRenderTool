@@ -1,12 +1,14 @@
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { Model } from 'Models/Model';
 
-export abstract class VastCreative {
+export abstract class VastCreative extends Model {
 
     private _type: string;
     private _trackingEvents: { [eventName: string]: string[] };
 
     constructor(type: string);
     constructor(type: string, trackingEvents?: { [eventName: string]: string[] }) {
+        super();
         this._type = type;
         this._trackingEvents = trackingEvents || {};
     }
@@ -26,7 +28,13 @@ export abstract class VastCreative {
         this._trackingEvents[eventName].push(trackingURLTemplate);
     }
 
+    public getDTO(): { [key: string]: any } {
+        return {
+            'type': this._type,
+            'trackingEvents': this._trackingEvents
+        };
+    }
+
     public abstract getMediaFiles(): VastMediaFile[];
     public abstract getDuration(): number;
-
 }

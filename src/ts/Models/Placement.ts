@@ -1,3 +1,4 @@
+import { Model } from 'Models/Model';
 export enum PlacementState {
     READY,
     NOT_AVAILABLE,
@@ -6,7 +7,7 @@ export enum PlacementState {
     NO_FILL
 }
 
-export class Placement {
+export class Placement extends Model {
 
     private _id: string;
     private _name: string;
@@ -23,6 +24,8 @@ export class Placement {
     private _state: PlacementState;
 
     constructor(data: any) {
+        super();
+
         this._id = data.id;
         this._name = data.name;
         this._default = data.default;
@@ -76,5 +79,19 @@ export class Placement {
 
     public setState(state: PlacementState): void {
         this._state = state;
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this._id,
+            'name': this._name,
+            'default': this._default,
+            'allowSkip': this._allowSkip,
+            'skipInSeconds': this._skipInSeconds,
+            'disableBackButton': this._disableBackButton,
+            'useDeviceOrientationForVideo': this._useDeviceOrientationForVideo,
+            'muteVideo': this._muteVideo,
+            'state': PlacementState[this._state].toLowerCase()
+        };
     }
  }

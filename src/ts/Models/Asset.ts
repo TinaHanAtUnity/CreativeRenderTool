@@ -1,10 +1,12 @@
-export class Asset {
+import { Model } from 'Models/Model';
+export class Asset extends Model {
 
     private readonly _url: string;
     private _cachedUrl: string | undefined;
     private _fileId: string | undefined;
 
     constructor(url: string) {
+        super();
         this._url = url;
     }
 
@@ -39,4 +41,11 @@ export class Asset {
         return this._fileId;
     }
 
+    public getDTO(): { [key: string]: any } {
+        return {
+            'url': this._url,
+            'cachedUrl': this._cachedUrl,
+            'fileId': this._fileId
+        };
+    }
 }

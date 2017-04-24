@@ -73,4 +73,21 @@ export class VastCreativeLinear extends VastCreative {
         return this._adParameters;
     }
 
+    public getDTO(): { [key: string]: any } {
+        const mediaFiles = [];
+        for (const mediaFile of this._mediaFiles) {
+            mediaFiles.push(mediaFile.getDTO());
+        }
+
+        return {
+            'vastCreative': super.getDTO(),
+            'duration': this._duration,
+            'skipDelay': this._skipDelay,
+            'mediaFiles': mediaFiles,
+            'videoClickThroughURLTemplate': this._videoClickThroughURLTemplate,
+            'videoClickTrackingURLTemplates': this._videoClickTrackingURLTemplates,
+            'videoCustomClickURLTemplates': this._videoCustomClickURLTemplates,
+            'adParameters': this._adParameters
+        };
+    }
 }
