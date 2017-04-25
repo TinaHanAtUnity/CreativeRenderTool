@@ -12,6 +12,7 @@ export class Configuration {
     private _country: string;
     private _coppaCompliant: boolean;
     private _placementLevelControl: boolean;
+    private _analytics: boolean;
     private _abGroup: number;
     private _gamerId: string;
     private _cacheMode: CacheMode;
@@ -28,6 +29,8 @@ export class Configuration {
             this._abGroup = configJson.abGroup;
             this._gamerId = configJson.gamerId;
         }
+
+        this._analytics = configJson.analytics ? true : false;
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -71,6 +74,10 @@ export class Configuration {
 
     public isPlacementLevelControl(): boolean {
         return this._placementLevelControl;
+    }
+
+    public isAnalyticsEnabled(): boolean {
+        return this._analytics;
     }
 
     public getAbGroup(): number {

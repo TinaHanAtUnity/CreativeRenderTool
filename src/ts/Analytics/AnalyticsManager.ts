@@ -1,11 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { StorageType } from 'Native/Api/Storage';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Request } from 'Utilities/Request';
-import { AnalyticsProtocol, IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
+import { Request, INativeResponse } from 'Utilities/Request';
+import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;
@@ -18,7 +17,7 @@ export class AnalyticsManager {
     private _sessionStartTimestamp: number;
     private _storage: AnalyticsStorage;
 
-    private _endpoint: string = 'http://10.1.66.20:1234';
+    private _endpoint: string = 'http://10.35.4.43:1234';
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
@@ -29,13 +28,14 @@ export class AnalyticsManager {
         this._storage = new AnalyticsStorage(nativeBridge);
     }
 
-    public webviewStart(): Promise<void> {
-        const promises: Promise<any>[] = [];
-        promises.push(this.getUserId());
-        promises.push(this._storage.getValue('analytics.appversion'));
-        promises.push(this._storage.getValue('analytics.osversion'));
+    public start(): Promise<void> {
+        const promises: Array<Promise<any>> = [];
+        promises.push(this._storage.getUserId());
+        promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
+        promises.push(this._storage.getAppVersion());
+        promises.push(this._storage.getOsVersion());
 
-        return Promise.all(promises).then(([userId, appVersion, osVersion]) => {
+        return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
             this._userId = userId;
 
             this.newSession();
@@ -59,14 +59,13 @@ export class AnalyticsManager {
 
             if(updateDeviceInfo) {
                 this.deviceInfoChange();
-
-                this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.appversion', this._clientInfo.getApplicationVersion());
-                this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.osversion', this._deviceInfo.getOsVersion());
-                this._nativeBridge.Storage.write(StorageType.PRIVATE);
+                this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
             }
 
             this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
             this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
+            this._wakeUpManager.onActivityResumed.subscribe(() => this.onAppForeground());
+            this._wakeUpManager.onActivityPaused.subscribe(() => this.onAppBackground());
         });
     }
 
@@ -74,21 +73,19 @@ export class AnalyticsManager {
         this._sessionId = Math.floor(Math.random() * 1000000); // todo: replace with call to native method
         this._sessionStartTimestamp = Date.now();
 
-        this._storage.setCommonObject(AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo));
-
-        this._storage.pushEvent(AnalyticsProtocol.getStartObject());
+        this.send(AnalyticsProtocol.getStartObject());
     }
 
     private newInstall(): void {
-        this._storage.pushEvent(AnalyticsProtocol.getInstallObject(this._clientInfo));
+        this.send(AnalyticsProtocol.getInstallObject(this._clientInfo));
     }
 
     private appUpdate(): void {
-        this._storage.pushEvent(AnalyticsProtocol.getUpdateObject(this._clientInfo));
+        this.send(AnalyticsProtocol.getUpdateObject(this._clientInfo));
     }
 
     private deviceInfoChange(): void {
-        this._storage.pushEvent(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
+        this.send(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
     }
 
     private onAppForeground(): void {
@@ -96,33 +93,14 @@ export class AnalyticsManager {
     }
 
     private onAppBackground(): void {
-        this._storage.pushEvent(AnalyticsProtocol.getRunningObject((Date.now() - this._sessionStartTimestamp) / 1000));
-
-        this.send();
+        this.send(AnalyticsProtocol.getRunningObject((Date.now() - this._sessionStartTimestamp) / 1000));
     }
 
-    private send(): void {
-        const events: IAnalyticsObject[] = this._storage.getEvents();
-        this._storage.clearEvents(); // todo: clean storage only after a successful send
+    private send(event: IAnalyticsObject): Promise<INativeResponse> {
+        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo);
+        const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
-        const newline: string = '\n';
-        let data: string = JSON.stringify(this._storage.getCommonObject()) + newline;
-        for(const event in events) {
-            if(events.hasOwnProperty(event)) {
-                data += JSON.stringify(events[event]) + newline;
-            }
-        }
-
-        this._request.post(this._endpoint, data);
+        return this._request.post(this._endpoint, data);
     }
 
-    private getUserId(): Promise<string> {
-        return this._storage.getValue('analytics.userid').then(userId => {
-            if(userId) {
-                return userId;
-            } else {
-                return this._nativeBridge.DeviceInfo.getUniqueEventId();
-            }
-        });
-    }
 }

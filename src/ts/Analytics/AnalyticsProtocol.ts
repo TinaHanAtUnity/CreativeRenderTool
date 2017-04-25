@@ -4,7 +4,7 @@ import { Platform } from 'Constants/Platform';
 
 export interface IAnalyticsObject {
     type: string;
-    msg: any;
+    msg: IAnalyticsDeviceInfoEvent | IAnalyticsStartEvent | IAnalyticsInstallEvent | IAnalyticsUpdateEvent | IAnalyticsAppRunningEvent;
 }
 
 export interface IAnalyticsCommonObject {
@@ -65,10 +65,6 @@ interface IAnalyticsInstallEvent {
 interface IAnalyticsUpdateEvent {
     ts: number;
     app_ver: string;
-}
-
-interface IAnalyticsStopEvent {
-    ts: number;
 }
 
 interface IAnalyticsAppRunningEvent {
@@ -166,16 +162,6 @@ export class AnalyticsProtocol {
         return {
             type: 'analytics.appUpdate.v1',
             msg: updateEvent
-        };
-    }
-
-    public static getStopObject(): IAnalyticsObject {
-        const stopEvent: IAnalyticsStopEvent = {
-            ts: Date.now()
-        };
-        return {
-            type: 'analytics.appStop.v1',
-            msg: stopEvent
         };
     }
 
