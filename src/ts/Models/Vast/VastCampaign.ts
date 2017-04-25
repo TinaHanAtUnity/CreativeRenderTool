@@ -1,31 +1,43 @@
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { Vast } from 'Models/Vast/Vast';
 import { Video } from 'Models/Video';
 import { Asset } from 'Models/Asset';
 
-export class VastCampaign extends Campaign {
+interface IVastCampaign extends ICampaign {
+    vast: [Vast, string[]];
+    video: [Video, string[]];
+    hasEndscreen: [boolean, string[]];
+    portrait: [Asset | undefined, string[]];
+    landscape: [Asset | undefined, string[]];
+}
 
-    private _vast: Vast;
-    private _video: Video;
-    private _hasEndscreen: boolean;
-    private _portrait: Asset | undefined;
-    private _landscape: Asset | undefined;
-
+export class VastCampaign extends Campaign<IVastCampaign> {
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super(campaignId, gamerId, abGroup, cacheTTL || 3600);
-
-        this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
         const portraitUrl = vast.getCompanionPortraitUrl();
+        let portraitAsset = undefined;
         if(portraitUrl) {
-            this._portrait = new Asset(portraitUrl);
+            portraitAsset = new Asset(portraitUrl);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
+        let landscapeAsset = undefined;
         if(landscapeUrl) {
-            this._landscape = new Asset(landscapeUrl);
+            landscapeAsset = new Asset(landscapeUrl);
         }
 
-        this._vast = vast;
+        super({
+            id: ['', ['string']],
+            gamerId: ['', ['string']],
+            abGroup: [0, ['number']],
+            timeout: [cacheTTL || 3600, ['number']],
+            willExpireAt: [0, ['number']],
+            vast: [vast, ['object']],
+            video: [new Video(vast.getVideoUrl()), ['object']],
+            hasEndscreen: [!!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(), ['boolean']],
+            portrait: [portraitAsset, ['object', 'undefined']],
+            landscape: [landscapeAsset, ['object', 'undefined']]
+        });
+
         this.processCustomTracking(tracking);
     }
 
