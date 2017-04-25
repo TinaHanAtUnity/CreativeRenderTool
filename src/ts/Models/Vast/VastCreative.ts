@@ -1,37 +1,39 @@
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export abstract class VastCreative extends Model {
+export interface IVastCreative extends ISchema {
+    type: [string, string[]];
+    trackingEvents: [{ [eventName: string]: string[] }, string[]];
+}
 
-    private _type: string;
-    private _trackingEvents: { [eventName: string]: string[] };
+export abstract class VastCreative<T extends IVastCreative> extends Model<T> {
+    constructor(data: T) {
+        super(data);
 
-    constructor(type: string);
-    constructor(type: string, trackingEvents?: { [eventName: string]: string[] }) {
-        super();
-        this._type = type;
-        this._trackingEvents = trackingEvents || {};
+        this.set('type', data.type[0]);
+        const trackingEvents = data.trackingEvents[0];
+        this.set('trackingEvents', trackingEvents || {});
     }
 
     public getType(): string {
-        return this._type;
+        return this.get('type');
     }
 
     public getTrackingEvents(): { [eventName: string]: string[] } {
-        return this._trackingEvents;
+        return this.get('trackingEvents');
     }
 
     public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
-        if (this._trackingEvents[eventName] == null) {
-            this._trackingEvents[eventName] = [];
+        if (this.get('trackingEvents')[eventName] == null) {
+            this.get('trackingEvents')[eventName] = [];
         }
-        this._trackingEvents[eventName].push(trackingURLTemplate);
+        this.get('trackingEvents')[eventName].push(trackingURLTemplate);
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'type': this._type,
-            'trackingEvents': this._trackingEvents
+            'type': this.getType(),
+            'trackingEvents': this.getTrackingEvents()
         };
     }
 

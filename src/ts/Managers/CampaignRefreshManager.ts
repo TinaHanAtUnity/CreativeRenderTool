@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
@@ -14,8 +14,8 @@ export class CampaignRefreshManager {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
-    private _campaign: Campaign;
-    private _plcCampaigns: { [id: string]: Campaign } = {};
+    private _campaign: Campaign<ICampaign>;
+    private _plcCampaigns: { [id: string]: Campaign<ICampaign> } = {};
     private _configuration: Configuration;
     private _currentAdUnit: AbstractAdUnit;
     private _refillTimestamp: number;
@@ -43,7 +43,7 @@ export class CampaignRefreshManager {
         }
     }
 
-    public getCampaign(placementId: string): Campaign {
+    public getCampaign(placementId: string): Campaign<ICampaign> {
         if(this._configuration.isPlacementLevelControl()) {
             return this._plcCampaigns[placementId];
         } else {
@@ -125,7 +125,7 @@ export class CampaignRefreshManager {
         }
     }
 
-    private onCampaign(campaign: Campaign) {
+    private onCampaign(campaign: Campaign<ICampaign>) {
         this._campaign = campaign;
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
@@ -153,13 +153,13 @@ export class CampaignRefreshManager {
         this.onNoFill();
     }
 
-    private onCampaignExpired(campaign: Campaign): Promise<void> {
+    private onCampaignExpired(campaign: Campaign<ICampaign>): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
         return this._campaignManager.request();
     }
 
-    private onPlcCampaign(placementId: string, campaign: Campaign) {
+    private onPlcCampaign(placementId: string, campaign: Campaign<ICampaign>) {
         // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
         this._plcRefillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
         this._plcCampaigns[placementId] = campaign;

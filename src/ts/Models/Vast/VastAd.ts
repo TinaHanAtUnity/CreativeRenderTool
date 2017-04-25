@@ -1,11 +1,11 @@
-import { VastCreative } from 'Models/Vast/VastCreative';
+import { IVastCreative, VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { ISchema, Model } from 'Models/Model';
 
 interface IVastAd extends ISchema {
     id: [string | undefined, string[]];
-    creatives: [VastCreative[], string[]];
+    creatives: [Array<VastCreative<IVastCreative>>, string[]];
     companionAds: [VastCreativeCompanionAd[], string[]];
     errorURLTemplates: [string[], string[]];
     impressionURLTemplates: [string[], string[]];
@@ -15,7 +15,7 @@ interface IVastAd extends ISchema {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
+    constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super({
             id: [undefined, ['string', 'undefined']],
             creatives: [[], ['array']],
@@ -41,11 +41,11 @@ export class VastAd extends Model<IVastAd> {
         this.set('id', id);
     }
 
-    public getCreatives(): VastCreative[] {
+    public getCreatives(): Array<VastCreative<IVastCreative>> {
         return this.get('creatives');
     }
 
-    public getCreative(): VastCreative | null {
+    public getCreative(): VastCreative<IVastCreative> | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
         }
@@ -53,7 +53,7 @@ export class VastAd extends Model<IVastAd> {
         return null;
     }
 
-    public addCreative(creative: VastCreative) {
+    public addCreative(creative: VastCreative<IVastCreative>) {
         this.get('creatives').push(creative);
     }
 
@@ -83,6 +83,10 @@ export class VastAd extends Model<IVastAd> {
 
     public getWrapperURL(): string {
         return this.get('wrapperURLs')[0];
+    }
+
+    public getWrapperURLs(): string[] {
+        return this.get('wrapperURLs');
     }
 
     public addWrapperURL(url: string) {
@@ -146,7 +150,7 @@ export class VastAd extends Model<IVastAd> {
             'id': this.getId(),
             'errorURLTemplates': this.getErrorURLTemplates(),
             'impressionURLTemplates': this.getImpressionURLTemplates(),
-            'wrapperURLs': this.get('wrapperURLs'),
+            'wrapperURLs': this.getWrapperURLs(),
             'vastCreatives': vastCreatives,
             'companionAds': companionAds
         };

@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
@@ -8,10 +8,10 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { MetaData } from 'Utilities/MetaData';
 
 interface IMetaDataCaches {
-    framework: Model | undefined;
-    adapter: Model | undefined;
-    mediation: Model | undefined;
-    player: Model | undefined;
+    framework: Model<ISchema> | undefined;
+    adapter: Model<ISchema> | undefined;
+    mediation: Model<ISchema> | undefined;
+    player: Model<ISchema> | undefined;
 }
 
 export class MetaDataManager {
@@ -81,7 +81,7 @@ export class MetaDataManager {
             });
     }
 
-    public static fetch(category: string, keys: string[], nativeBridge: NativeBridge, cache = true): Promise<Model> {
+    public static fetch(category: string, keys: string[], nativeBridge: NativeBridge, cache = true): Promise<Model<ISchema>> {
         if(cache && MetaDataManager.caches[category]) {
             return Promise.resolve(MetaDataManager.caches[category]);
         }
@@ -104,7 +104,7 @@ export class MetaDataManager {
         return MetaDataManager.createByCategory(category, data);
     }
 
-    public static createByCategory(category: string, data: string[]): Model | undefined {
+    public static createByCategory(category: string, data: string[]): Model<ISchema> | undefined {
         switch(category) {
             case 'framework':
                 return new FrameworkMetaData(data);

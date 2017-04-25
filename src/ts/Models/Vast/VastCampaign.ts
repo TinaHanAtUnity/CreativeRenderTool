@@ -1,7 +1,7 @@
-import { Campaign, ICampaign } from 'Models/Campaign';
 import { Vast } from 'Models/Vast/Vast';
 import { Video } from 'Models/Video';
 import { Asset } from 'Models/Asset';
+import { Campaign, ICampaign } from 'Models/Campaign';
 
 interface IVastCampaign extends ICampaign {
     vast: [Vast, string[]];
@@ -30,7 +30,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
             gamerId: ['', ['string']],
             abGroup: [0, ['number']],
             timeout: [cacheTTL || 3600, ['number']],
-            willExpireAt: [0, ['number']],
+            willExpireAt: [undefined, ['number']],
             vast: [vast, ['object']],
             video: [new Video(vast.getVideoUrl()), ['object']],
             hasEndscreen: [!!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(), ['boolean']],
@@ -42,58 +42,60 @@ export class VastCampaign extends Campaign<IVastCampaign> {
     }
 
     public getVast(): Vast {
-        return this._vast;
+        return this.get('vast');
     }
 
     public getVideo() {
-        if(!this._video) {
-            this._video = new Video(this._vast.getVideoUrl());
+        if(!this.get('video')) {
+            this.set('video', new Video(this.get('vast').getVideoUrl()));
         }
-        return this._video;
+        return this.get('video');
     }
 
     public getOriginalVideoUrl(): string {
-        return this._vast.getVideoUrl() || '';
+        return this.get('vast').getVideoUrl() || '';
     }
 
-    public getRequiredAssets() {
+    public getRequiredAssets(): Asset[] {
         return [
-            this._video
+            this.get('video')
         ];
     }
 
-    public getOptionalAssets() {
+    public getOptionalAssets(): Asset[] {
         return [];
     }
 
     public hasEndscreen(): boolean {
-        return this._hasEndscreen;
+        return this.get('hasEndscreen');
     }
 
     public getLandscape(): Asset | undefined {
-        return this._landscape;
+        return this.get('landscape');
     }
 
     public getPortrait(): Asset | undefined {
-        return this._portrait;
+        return this.get('portrait');
     }
 
     public getDTO(): { [key: string]: any } {
         let portrait;
-        if (this._portrait) {
-            portrait = this._portrait.getDTO();
+        const portraitAsset = this.get('portrait');
+        if (portraitAsset) {
+            portrait = portraitAsset.getDTO();
         }
 
         let landscape;
-        if (this._landscape) {
-            landscape = this._landscape.getDTO();
+        const landscapeAsset = this.get('landscape');
+        if (landscapeAsset) {
+            landscape = landscapeAsset.getDTO();
         }
 
         return {
             'campaign': super.getDTO(),
-            'vast': this._vast.getDTO(),
-            'video': this._video.getDTO(),
-            'hasEndscreen': this._hasEndscreen,
+            'vast': this.getVast().getDTO(),
+            'video': this.getVast().getDTO(),
+            'hasEndscreen': this.hasEndscreen(),
             'portrait': portrait,
             'landscape': landscape,
         };
@@ -106,7 +108,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
                     const urls = tracking[trackingEventName];
                     if (urls) {
                         urls.forEach((url: string) => {
-                            this._vast.addTrackingEventUrl(trackingEventName, url);
+                            this.getVast().addTrackingEventUrl(trackingEventName, url);
                         });
                     }
                 }

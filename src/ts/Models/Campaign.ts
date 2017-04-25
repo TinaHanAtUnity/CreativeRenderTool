@@ -5,12 +5,11 @@ export interface ICampaign extends ISchema {
     id: [string, string[]];
     gamerId: [string, string[]];
     abGroup: [number, string[]];
-    timeout: [number, string[]];
-    willExpireAt: [number, string[]];
+    timeout: [number | undefined, string[]];
+    willExpireAt: [number | undefined, string[]];
 }
 
 export abstract class Campaign<T extends ICampaign> extends Model<T> {
-    // constructor(id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
     constructor(data: T) {
         super(data);
 
@@ -19,8 +18,9 @@ export abstract class Campaign<T extends ICampaign> extends Model<T> {
         this.set('abGroup', data.abGroup[0]);
         this.set('timeout', typeof data.timeout[0] !== 'undefined' ? data.timeout[0] : 0);
 
-        if(data.timeout[0]) {
-            this.set('willExpireAt', Date.now() +  data.timeout[0] * 1000);
+        const timeout = data.timeout[0];
+        if(timeout) {
+            this.set('willExpireAt', Date.now() + timeout * 1000);
         }
     }
 
@@ -36,12 +36,13 @@ export abstract class Campaign<T extends ICampaign> extends Model<T> {
         return this.get('abGroup');
     }
 
-    public getTimeout(): number {
+    public getTimeout(): number | undefined {
         return this.get('timeout');
     }
 
-    public isExpired() {
-        return this.get('willExpireAt') && Date.now() > this.get('willExpireAt');
+    public isExpired(): boolean {
+        const willExpireAt = this.get('willExpireAt');
+        return willExpireAt !== undefined && Date.now() > willExpireAt;
     }
 
     public getDTO(): { [key: string]: any } {

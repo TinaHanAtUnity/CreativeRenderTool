@@ -1,59 +1,73 @@
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export class VastCreativeCompanionAd extends Model {
-    private _id: string | null;
-    private _width: number;
-    private _height: number;
-    private _type: string;
-    private _staticResourceURL: string | null;
-    private _creativeType: string | null;
-    private _companionClickThroughURLTemplate: string | null;
+interface IVastCreativeCompanionAd extends ISchema {
+    id: [string | null, string[]];
+    width: [number, string[]];
+    height: [number, string[]];
+    type: [string, string[]];
+    staticResourceURL: [string | null, string[]];
+    creativeType: [string | null, string[]];
+    companionClickThroughURLTemplate: [string | null, string[]];
+}
 
+export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
     constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
-        super();
+        super({
+            id: [null, ['string', 'null']],
+            width: [0, ['number']],
+            height: [0, ['number']],
+            type: ['', ['string']],
+            staticResourceURL: [null, ['string', 'null']],
+            creativeType: [null, ['string', 'null']],
+            companionClickThroughURLTemplate: [null, ['string', 'null']]
+        });
 
-        this._id = id || null;
-        this._width = width || 0;
-        this._height = height || 0;
-        this._type = '';
-        this._creativeType = creativeType || null;
-        this._staticResourceURL = staticResourceURL || null;
-        this._companionClickThroughURLTemplate = companionClickThroughURLTemplate || null;
+        this.set('id', id || null);
+        this.set('width', width || 0);
+        this.set('height', height || 0);
+        this.set('type', '');
+        this.set('creativeType', creativeType || null);
+        this.set('staticResourceURL', staticResourceURL || null);
+        this.set('companionClickThroughURLTemplate', companionClickThroughURLTemplate || null);
     }
 
     public getId(): string | null {
-        return this._id;
+        return this.get('id');
     }
 
     public getCreativeType(): string | null {
-        return this._creativeType;
+        return this.get('creativeType');
+    }
+
+    public getType(): string {
+        return this.get('type');
     }
 
     public getStaticResourceURL(): string | null {
-        return this._staticResourceURL;
+        return this.get('staticResourceURL');
     }
 
     public getCompanionClickThroughURLTemplate(): string | null {
-        return this._companionClickThroughURLTemplate;
+        return this.get('companionClickThroughURLTemplate');
     }
 
     public getHeight(): number {
-        return this._height;
+        return this.get('height');
     }
 
     public getWidth(): number {
-        return this._width;
+        return this.get('width');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'id': this._id,
-            'width': this._width,
-            'height': this._height,
-            'type': this._type,
-            'staticResourceURL': this._staticResourceURL,
-            'creativeType': this._creativeType,
-            'companionClickThroughURLTemplate': this._companionClickThroughURLTemplate
+            'id': this.getId(),
+            'width': this.getWidth(),
+            'height': this.getHeight(),
+            'type': this.getType(),
+            'staticResourceURL': this.getStaticResourceURL(),
+            'creativeType': this.getCreativeType(),
+            'companionClickThroughURLTemplate': this.getCompanionClickThroughURLTemplate()
         };
     }
 }
