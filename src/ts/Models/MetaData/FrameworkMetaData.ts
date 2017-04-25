@@ -1,6 +1,11 @@
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export class FrameworkMetaData extends Model {
+interface IFrameworkMetaData extends ISchema {
+    name: [string, string[]];
+    version: [string, string[]];
+}
+
+export class FrameworkMetaData extends Model<IFrameworkMetaData> {
 
     public static getCategory(): string {
         return 'framework';
@@ -10,27 +15,28 @@ export class FrameworkMetaData extends Model {
         return ['name', 'version'];
     }
 
-    private _name: string;
-    private _version: string;
-
     constructor(data: string[]) {
-        super();
-        this._name = data[0];
-        this._version = data[1];
+        super({
+            name: ['', ['string']],
+            version: ['', ['string']]
+        });
+
+        this.set('name', data[0]);
+        this.set('version', data[1]);
     }
 
     public getName(): string {
-        return this._name;
+        return this.get('name');
     }
 
     public getVersion(): string {
-        return this._version;
+        return this.get('version');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'frameworkName': this._name,
-            'frameworkVersion': this._version
+            'name': this.getName(),
+            'version': this.getVersion()
         };
     }
 

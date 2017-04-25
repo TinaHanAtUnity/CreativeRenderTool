@@ -1,6 +1,12 @@
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export class MediationMetaData extends Model {
+interface IMediationMetaData extends ISchema {
+    name: [string, string[]];
+    version: [string, string[]];
+    ordinal: [number | undefined, string[]];
+}
+
+export class MediationMetaData extends Model<IMediationMetaData> {
 
     public static getCategory(): string {
         return 'mediation';
@@ -14,37 +20,38 @@ export class MediationMetaData extends Model {
         return 'ordinal';
     }
 
-    private _name: string;
-    private _version: string;
-    private _ordinal: number;
-
     constructor(data: string[]) {
-        super();
-        this._name = data[0];
-        this._version = data[1];
+        super({
+            name: ['', ['string']],
+            version: ['', ['string']],
+            ordinal: [undefined, ['number', 'undefined']]
+        });
+
+        this.set('name', data[0]);
+        this.set('version', data[1]);
     }
 
     public getName(): string {
-        return this._name;
+        return this.get('name');
     }
 
     public getVersion(): string {
-        return this._version;
+        return this.get('version');
     }
 
     public setOrdinal(ordinal: number) {
-        this._ordinal = ordinal;
+        this.set('ordinal', ordinal);
     }
 
-    public getOrdinal(): number {
-        return this._ordinal;
+    public getOrdinal(): number | undefined {
+        return this.get('ordinal');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'mediationName': this._name,
-            'mediationVersion': this._version,
-            'mediationOrdinal': this._ordinal
+            'name': this.getName(),
+            'version': this.getVersion(),
+            'ordinal': this.getOrdinal()
         };
     }
 

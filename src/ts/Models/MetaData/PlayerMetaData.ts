@@ -1,6 +1,10 @@
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
-export class PlayerMetaData extends Model {
+interface IPlayerMetaData extends ISchema {
+    serverId: [string, string[]];
+}
+
+export class PlayerMetaData extends Model<IPlayerMetaData> {
 
     public static getCategory(): string {
         return 'player';
@@ -10,20 +14,21 @@ export class PlayerMetaData extends Model {
         return ['server_id'];
     }
 
-    private _serverId: string;
-
     constructor(data: string[]) {
-        super();
-        this._serverId = data[0];
+        super({
+            serverId: ['', ['string']]
+        });
+
+        this.set('serverId', data[0]);
     }
 
     public getServerId(): string {
-        return this._serverId;
+        return this.get('serverId');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'sid': this._serverId
+            'sid': this.getServerId()
         };
     }
 
