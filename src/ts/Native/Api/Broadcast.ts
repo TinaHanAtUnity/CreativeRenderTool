@@ -7,7 +7,7 @@ enum BroadcastEvent {
 }
 
 export class BroadcastApi extends NativeApi {
-    public onBroadcastAction: Observable4<string, string, string, any> = new Observable4();
+    public onBroadcastAction: Observable4<string, string, string, any> = new Observable4<string, string, string, any>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Broadcast');

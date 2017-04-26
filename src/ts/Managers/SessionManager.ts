@@ -5,7 +5,6 @@ import { Url } from 'Utilities/Url';
 import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -58,32 +57,7 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        const promises: Array<Promise<any>> = [];
-        promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this._deviceInfo.getConnectionType());
-
-        return Promise.all(promises).then(([networkType, connectionType]) => {
-            infoJson.networkType = networkType;
-            infoJson.connectionType = connectionType;
-
-            const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
-                if(mediation) {
-                    infoJson.mediationName = mediation.getName();
-                    infoJson.mediationVersion = mediation.getVersion();
-                    infoJson.mediationOrdinal = mediation.getOrdinal();
-                }
-
-                if(framework) {
-                    infoJson.frameworkName = framework.getName();
-                    infoJson.frameworkVersion = framework.getVersion();
-                }
-
-                return [id, infoJson];
-            });
-        });
+        return Promise.resolve<[string, any]>([id, infoJson]);
     }
 
 }

@@ -64,8 +64,11 @@ describe('ConfigManagerTest', () => {
     describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            const nativeResponse = {
-                response: ConfigurationJson
+            const nativeResponse: INativeResponse = {
+                url: '',
+                response: ConfigurationJson,
+                responseCode: 200,
+                headers: []
             };
             configPromise = Promise.resolve(nativeResponse);
 
@@ -86,8 +89,11 @@ describe('ConfigManagerTest', () => {
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            const nativeResponse = {
-                response: '{bad json here,'
+            const nativeResponse: INativeResponse = {
+                url: '',
+                response: '{bad json..',
+                responseCode: 200,
+                headers: []
             };
             configPromise = Promise.resolve(nativeResponse);
 

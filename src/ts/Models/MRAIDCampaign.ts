@@ -16,9 +16,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             willExpireAt: ['number'],
             resourceUrl: ['object', 'undefined'],
             resource: ['string']
-        }, campaign.id, gamerId, abGroup);
+        });
 
-        this.set('resourceUrl', resourceUrl ? new Asset(resourceUrl) : undefined);
+        this.set('id', campaign.id);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
+
+        this.set('resourceUrl', resourceUrl ? new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']},resourceUrl) : undefined);
         this.set('resource', resource);
     }
 
@@ -27,7 +34,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     }
 
     public setResourceUrl(url: string): void {
-        this.set('resourceUrl', new Asset(url));
+        this.set('resourceUrl', new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, url));
     }
 
     public setResource(resource: string): void {

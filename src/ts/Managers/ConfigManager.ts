@@ -17,7 +17,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 export class ConfigManager {
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return Promise.all<FrameworkMetaData, AdapterMetaData, string>([
+        return Promise.all<FrameworkMetaData, AdapterMetaData, string | undefined>([
             MetaDataManager.fetchFrameworkMetaData(nativeBridge),
             MetaDataManager.fetchAdapterMetaData(nativeBridge),
             ConfigManager.fetchGamerId(nativeBridge)
@@ -77,7 +77,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData, gamerId: string): string {
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData, gamerId?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -126,7 +126,7 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string> {
+    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string | undefined> {
         return nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {

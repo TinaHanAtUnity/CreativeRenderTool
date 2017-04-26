@@ -7,7 +7,7 @@ import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
-export class DeviceInfo extends Model {
+export class DeviceInfo extends Model<{}> {
 
     public static GooglePlayPackageName = 'com.android.vending';
     public static XiaomiPackageName = 'com.xiaomi.gamecenter';
@@ -52,7 +52,7 @@ export class DeviceInfo extends Model {
     private _nativeBridge: NativeBridge;
 
     constructor(nativeBridge: NativeBridge) {
-        super();
+        super({});
         this._nativeBridge = nativeBridge;
     }
 

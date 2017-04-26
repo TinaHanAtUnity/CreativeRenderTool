@@ -16,13 +16,19 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset = undefined;
         if(portraitUrl) {
-            portraitAsset = new Asset(portraitUrl);
+            portraitAsset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, portraitUrl);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset = undefined;
         if(landscapeUrl) {
-            landscapeAsset = new Asset(landscapeUrl);
+            landscapeAsset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, landscapeUrl);
         }
 
         super({
@@ -36,7 +42,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
             hasEndscreen: ['boolean'],
             portrait: ['object', 'undefined'],
             landscape: ['object', 'undefined']
-        }, campaignId, gamerId, abGroup, cacheTTL || 3600);
+        });
 
         this.set('vast', vast);
         this.set('video', new Video(vast.getVideoUrl()));

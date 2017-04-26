@@ -56,20 +56,33 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             clickAttributionUrlFollowsRedirects: ['boolean'],
             bypassAppSheet: ['boolean'],
             store: ['object']
-        }, campaign.id, gamerId, abGroup);
+        });
+
+        this.set('id', campaign.id);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
 
         this.set('appStoreId', campaign.appStoreId);
         this.set('appStoreCountry', campaign.appStoreCountry);
 
         this.set('gameId', campaign.gameId);
         this.set('gameName', campaign.gameName);
-        this.set('gameIcon', new Asset(campaign.gameIcon));
+        this.set('gameIcon', new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, campaign.gameIcon));
 
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
-        this.set('landscapeImage', new Asset(campaign.endScreenLandscape));
-        this.set('portraitImage', new Asset(campaign.endScreenPortrait));
+        this.set('landscapeImage', new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, campaign.endScreenLandscape));
+        this.set('portraitImage', new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, campaign.endScreenPortrait));
 
         this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
         this.set('streamingVideo', new Video(campaign.trailerStreaming));

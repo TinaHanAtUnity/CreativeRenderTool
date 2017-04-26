@@ -37,11 +37,11 @@ export class CacheApi extends NativeApi {
     public Android: AndroidCacheApi;
     public Ios: IosCacheApi;
 
-    public onDownloadStarted: Observable5<string, number, number, number, Array<[string, string]>> = new Observable5();
-    public onDownloadProgress: Observable3<string, number, number> = new Observable3();
-    public onDownloadEnd: Observable6<string, number, number, number, number, Array<[string, string]>> = new Observable6();
-    public onDownloadStopped: Observable6<string, number, number, number, number, Array<[string, string]>> = new Observable6();
-    public onDownloadError: Observable3<string, string, string> = new Observable3();
+    public onDownloadStarted = new Observable5<string, number, number, number, Array<[string, string]>>();
+    public onDownloadProgress = new Observable3<string, number, number>();
+    public onDownloadEnd = new Observable6<string, number, number, number, number, Array<[string, string]>>();
+    public onDownloadStopped = new Observable6<string, number, number, number, number, Array<[string, string]>>();
+    public onDownloadError = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Cache');

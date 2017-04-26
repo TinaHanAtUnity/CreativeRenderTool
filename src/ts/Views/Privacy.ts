@@ -7,7 +7,7 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 
 export class Privacy extends View {
 
-    public onPrivacy: Observable1<string> = new Observable1();
+    public onPrivacy: Observable1<string> = new Observable1<string> ();
     public onClose: Observable0 = new Observable0();
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {

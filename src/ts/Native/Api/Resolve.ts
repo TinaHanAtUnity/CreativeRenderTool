@@ -9,8 +9,8 @@ export enum ResolveEvent {
 
 export class ResolveApi extends NativeApi {
 
-    public onComplete: Observable3<string, string, string> = new Observable3();
-    public onFailed: Observable4<string, string, string, string> = new Observable4();
+    public onComplete: Observable3<string, string, string> = new Observable3<string, string, string> ();
+    public onFailed: Observable4<string, string, string, string> = new Observable4<string, string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Resolve');
