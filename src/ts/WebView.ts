@@ -125,7 +125,7 @@ export class WebView {
 
             if(this._configuration.isAnalyticsEnabled()) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
-                this._analyticsManager.start();
+                this._analyticsManager.init();
             }
 
             return this._sessionManager.create();

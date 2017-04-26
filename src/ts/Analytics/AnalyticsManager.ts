@@ -14,7 +14,7 @@ export class AnalyticsManager {
     private _deviceInfo: DeviceInfo;
     private _userId: string;
     private _sessionId: number;
-    private _sessionStartTimestamp: number;
+    // private _sessionStartTimestamp: number;
     private _storage: AnalyticsStorage;
 
     private _endpoint: string = 'http://10.35.4.43:1234';
@@ -28,59 +28,75 @@ export class AnalyticsManager {
         this._storage = new AnalyticsStorage(nativeBridge);
     }
 
-    public start(): Promise<void> {
-        const promises: Array<Promise<any>> = [];
-        promises.push(this._storage.getUserId());
-        promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
-        promises.push(this._storage.getAppVersion());
-        promises.push(this._storage.getOsVersion());
+    public init(): Promise<void> {
+        if(this._clientInfo.isReinitialized()) {
+            const promises: Array<Promise<any>> = [];
+            promises.push(this._storage.getUserId());
+            promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
 
-        return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
-            this._userId = userId;
+            return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
+                this._userId = userId;
+                this._sessionId = sessionId;
 
-            this.newSession();
+                this.subscribeListeners();
+            });
+        } else {
+            const promises: Array<Promise<any>> = [];
+            promises.push(this._storage.getUserId());
+            promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
+            promises.push(this._storage.getAppVersion());
+            promises.push(this._storage.getOsVersion());
 
-            let updateDeviceInfo: boolean = false;
-            if(appVersion) {
-                if(this._clientInfo.getApplicationVersion() !== appVersion) {
-                    this.appUpdate();
+            return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
+                this._userId = userId;
+                this._sessionId = sessionId;
+                this._storage.setIds(userId, sessionId);
+
+                this.sendNewSession();
+
+                let updateDeviceInfo: boolean = false;
+                if(appVersion) {
+                    if (this._clientInfo.getApplicationVersion() !== appVersion) {
+                        this.sendAppUpdate();
+                        updateDeviceInfo = true;
+                    }
+                } else {
+                    this.sendNewInstall();
                     updateDeviceInfo = true;
                 }
-            } else {
-                this.newInstall();
-                updateDeviceInfo = true;
-            }
 
-            if(osVersion) {
-                if(this._deviceInfo.getOsVersion() !== osVersion) {
-                    updateDeviceInfo = true;
+                if(osVersion) {
+                    if (this._deviceInfo.getOsVersion() !== osVersion) {
+                        updateDeviceInfo = true;
+                    }
                 }
-            }
 
-            if(updateDeviceInfo) {
-                this.deviceInfoChange();
-                this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
-            }
+                if(updateDeviceInfo) {
+                    this.deviceInfoChange();
+                    this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
+                }
 
-            this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
-            this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
-            this._wakeUpManager.onActivityResumed.subscribe(() => this.onAppForeground());
-            this._wakeUpManager.onActivityPaused.subscribe(() => this.onAppBackground());
-        });
+                this.subscribeListeners();
+            });
+        }
     }
 
-    private newSession(): void {
-        this._sessionId = Math.floor(Math.random() * 1000000); // todo: replace with call to native method
-        this._sessionStartTimestamp = Date.now();
+    private subscribeListeners(): void {
+        this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
+        this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
+        this._wakeUpManager.onActivityResumed.subscribe(() => this.onAppForeground());
+        this._wakeUpManager.onActivityPaused.subscribe(() => this.onAppBackground());
+    }
 
+    private sendNewSession(): void {
         this.send(AnalyticsProtocol.getStartObject());
     }
 
-    private newInstall(): void {
+    private sendNewInstall(): void {
         this.send(AnalyticsProtocol.getInstallObject(this._clientInfo));
     }
 
-    private appUpdate(): void {
+    private sendAppUpdate(): void {
         this.send(AnalyticsProtocol.getUpdateObject(this._clientInfo));
     }
 
@@ -93,7 +109,7 @@ export class AnalyticsManager {
     }
 
     private onAppBackground(): void {
-        this.send(AnalyticsProtocol.getRunningObject((Date.now() - this._sessionStartTimestamp) / 1000));
+        this.send(AnalyticsProtocol.getRunningObject((Date.now() - this._clientInfo.getInitTimestamp()) / 1000));
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

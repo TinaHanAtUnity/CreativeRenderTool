@@ -37,6 +37,12 @@ export class AnalyticsStorage {
         return this.getValue<string>('analytics.osversion');
     }
 
+    public setIds(userId: string, sessionId: number): void {
+        this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.userid', userId);
+        this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'analytics.sessionId', sessionId);
+        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
     public setVersions(appVersion: string, osVersion: string): void {
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.appversion', appVersion);
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.osversion', osVersion);
