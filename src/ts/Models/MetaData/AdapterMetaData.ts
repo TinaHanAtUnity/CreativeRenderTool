@@ -1,8 +1,8 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IAdapterMetaData extends ISchema {
-    name: [string, string[]];
-    version: [string, string[]];
+interface IAdapterMetaData {
+    name: string;
+    version: string;
 }
 
 export class AdapterMetaData extends Model<IAdapterMetaData> {
@@ -17,8 +17,8 @@ export class AdapterMetaData extends Model<IAdapterMetaData> {
 
     constructor(data: string[]) {
         super({
-            name: ['', ['string']],
-            version: ['', ['string']]
+            name: ['string'],
+            version: ['string']
         });
 
         this.set('name', data[0]);

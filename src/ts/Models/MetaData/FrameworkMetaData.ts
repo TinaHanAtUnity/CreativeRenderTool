@@ -1,8 +1,8 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IFrameworkMetaData extends ISchema {
-    name: [string, string[]];
-    version: [string, string[]];
+interface IFrameworkMetaData {
+    name: string;
+    version: string;
 }
 
 export class FrameworkMetaData extends Model<IFrameworkMetaData> {
@@ -17,8 +17,8 @@ export class FrameworkMetaData extends Model<IFrameworkMetaData> {
 
     constructor(data: string[]) {
         super({
-            name: ['', ['string']],
-            version: ['', ['string']]
+            name: ['string'],
+            version: ['string']
         });
 
         this.set('name', data[0]);

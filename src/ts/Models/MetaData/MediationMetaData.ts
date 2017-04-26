@@ -1,9 +1,9 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IMediationMetaData extends ISchema {
-    name: [string, string[]];
-    version: [string, string[]];
-    ordinal: [number | undefined, string[]];
+interface IMediationMetaData {
+    name: string;
+    version: string;
+    ordinal: number | undefined;
 }
 
 export class MediationMetaData extends Model<IMediationMetaData> {
@@ -22,9 +22,9 @@ export class MediationMetaData extends Model<IMediationMetaData> {
 
     constructor(data: string[]) {
         super({
-            name: ['', ['string']],
-            version: ['', ['string']],
-            ordinal: [undefined, ['number', 'undefined']]
+            name: ['string'],
+            version: ['string'],
+            ordinal: ['number', 'undefined']
         });
 
         this.set('name', data[0]);
