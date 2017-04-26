@@ -9,54 +9,54 @@ export enum StoreName {
 }
 
 interface IPerformanceCampaign extends ICampaign {
-    appStoreId: [string, string[]];
-    appStoreCountry: [string, string[]];
+    appStoreId: string;
+    appStoreCountry: string;
 
-    gameId: [number, string[]];
-    gameName: [string, string[]];
-    gameIcon: [Asset, string[]];
+    gameId: number;
+    gameName: string;
+    gameIcon: Asset;
 
-    rating: [number, string[]];
-    ratingCount: [number, string[]];
+    rating: number;
+    ratingCount: number;
 
-    landscapeImage: [Asset, string[]];
-    portraitImage: [Asset, string[]];
+    landscapeImage: Asset;
+    portraitImage: Asset;
 
-    video: [Video, string[]];
-    streamingVideo: [Video, string[]];
+    video: Video;
+    streamingVideo: Video;
 
-    clickAttributionUrl: [string, string[]];
-    clickAttributionUrlFollowsRedirects: [boolean, string[]];
+    clickAttributionUrl: string;
+    clickAttributionUrlFollowsRedirects: boolean;
 
-    bypassAppSheet: [boolean, string[]];
+    bypassAppSheet: boolean;
 
-    store: [StoreName, string[]];
+    store: StoreName;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
         super({
-            id: [campaign.id, ['string']],
-            gamerId: [gamerId, ['string']],
-            abGroup: [abGroup, ['number']],
-            timeout: [undefined, ['number', 'undefined']],
-            willExpireAt: [undefined, ['number', 'undefined']],
-            appStoreId: ['', ['string']],
-            appStoreCountry: ['', ['string']],
-            gameId: [0, ['number']],
-            gameName: ['', ['string']],
-            gameIcon: [new Asset(''), ['object']],
-            rating: [0, ['number']],
-            ratingCount: [0, ['number']],
-            landscapeImage: [new Asset(''), ['object']],
-            portraitImage: [new Asset(''), ['object']],
-            video: [new Video(''), ['object']],
-            streamingVideo: [new Video(''), ['object']],
-            clickAttributionUrl: ['', ['string']],
-            clickAttributionUrlFollowsRedirects: [false, ['boolean']],
-            bypassAppSheet: [false, ['boolean']],
-            store: [StoreName.APPLE, ['object']]
-        });
+            id: ['string'],
+            gamerId: ['string'],
+            abGroup: ['number'],
+            timeout: ['number'],
+            willExpireAt: ['number'],
+            appStoreId: ['string'],
+            appStoreCountry: ['string'],
+            gameId: ['number'],
+            gameName: ['string'],
+            gameIcon: ['object'],
+            rating: ['number'],
+            ratingCount: ['number'],
+            landscapeImage: ['object'],
+            portraitImage: ['object'],
+            video: ['object'],
+            streamingVideo: ['object'],
+            clickAttributionUrl: ['string'],
+            clickAttributionUrlFollowsRedirects: ['boolean'],
+            bypassAppSheet: ['boolean'],
+            store: ['object']
+        }, campaign.id, gamerId, abGroup);
 
         this.set('appStoreId', campaign.appStoreId);
         this.set('appStoreCountry', campaign.appStoreCountry);
@@ -96,63 +96,63 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getStore(): StoreName {
-        return this._store;
+        return this.get('store');
     }
 
     public getAppStoreId(): string {
-        return this._appStoreId;
+        return this.get('appStoreId');
     }
 
     public getAppStoreCountry(): string {
-        return this._appStoreCountry;
+        return this.get('appStoreCountry');
     }
 
     public getGameId(): number {
-        return this._gameId;
+        return this.get('gameId');
     }
 
     public getGameName(): string {
-        return this._gameName;
+        return this.get('gameName');
     }
 
     public getGameIcon(): Asset {
-        return this._gameIcon;
+        return this.get('gameIcon');
     }
 
-    public getRating() {
-        return this._rating;
+    public getRating(): number {
+        return this.get('rating');
     }
 
-    public getRatingCount() {
-        return this._ratingCount;
+    public getRatingCount(): number {
+        return this.get('ratingCount');
     }
 
     public getPortrait(): Asset {
-        return this._portraitImage;
+        return this.get('portraitImage');
     }
 
     public getLandscape(): Asset {
-        return this._landscapeImage;
+        return this.get('landscapeImage');
     }
 
     public getVideo(): Video {
-        return this._video;
+        return this.get('video');
     }
 
     public getStreamingVideo(): Video {
-        return this._streamingVideo;
+        return this.get('streamingVideo');
     }
 
     public getClickAttributionUrl(): string {
-        return this._clickAttributionUrl;
+        return this.get('clickAttributionUrl');
     }
 
     public getClickAttributionUrlFollowsRedirects(): boolean {
-        return this._clickAttributionUrlFollowsRedirects;
+        return this.get('clickAttributionUrlFollowsRedirects');
     }
 
     public getBypassAppSheet(): boolean {
-        return this._bypassAppSheet;
+        return this.get('bypassAppSheet');
     }
 
     public getTimeoutInSeconds(): number {
@@ -175,47 +175,52 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
     public getDTO(): { [key: string]: any } {
         let gameIcon: any = undefined;
-        if (this._gameIcon) {
-            gameIcon = this._gameIcon.getDTO();
+        const gameIconObject = this.getGameIcon();
+        if (gameIconObject) {
+            gameIcon = gameIconObject.getDTO();
         }
 
         let landscapeImage: any = undefined;
-        if (this._landscapeImage) {
-            landscapeImage = this._landscapeImage.getDTO();
+        const landscapeImageObject = this.getLandscape();
+        if (landscapeImageObject) {
+            landscapeImage = landscapeImageObject.getDTO();
         }
 
         let portraitImage: any = undefined;
-        if (this._portraitImage) {
-            portraitImage = this._portraitImage.getDTO();
+        const portraitImageObject = this.getPortrait();
+        if (portraitImageObject) {
+            portraitImage = portraitImageObject.getDTO();
         }
 
         let video: any = undefined;
-        if (this._video) {
-            video = this._video.getDTO();
+        const videoObject = this.getVideo();
+        if (videoObject) {
+            video = videoObject.getDTO();
         }
 
         let streamingVideo: any = undefined;
-        if (this._streamingVideo) {
-            streamingVideo = this._streamingVideo.getDTO();
+        const streamingVideoObject = this.getStreamingVideo();
+        if (streamingVideoObject) {
+            streamingVideo = streamingVideoObject.getDTO();
         }
 
         return {
             'campaign': super.getDTO(),
-            'appStoreId': this._appStoreId,
-            'appStoreCountry': this._appStoreCountry,
-            'gameId': this._gameId,
-            'gameName': this._gameName,
+            'appStoreId': this.getAppStoreId(),
+            'appStoreCountry': this.getAppStoreCountry(),
+            'gameId': this.getGameId(),
+            'gameName': this.getGameName(),
             'gameIcon': gameIcon,
-            'rating': this._rating,
-            'ratingCount': this._ratingCount,
+            'rating': this.getRating(),
+            'ratingCount': this.getRatingCount(),
             'landscapeImage': landscapeImage,
             'portraitImage': portraitImage,
             'video': video,
             'streamingVideo': streamingVideo,
-            'clickAttributionUrl': this._clickAttributionUrl,
-            'clickAttributionUrlFollowsRedirects': this._clickAttributionUrlFollowsRedirects,
-            'bypassAppSheet': this._bypassAppSheet,
-            'store': StoreName[this._store].toLowerCase()
+            'clickAttributionUrl': this.getClickAttributionUrl(),
+            'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
+            'bypassAppSheet': this.getBypassAppSheet(),
+            'store': StoreName[this.getStore()].toLowerCase()
         };
     }
 }

@@ -7,91 +7,105 @@ export enum PlacementState {
     NO_FILL
 }
 
-export class Placement extends Model {
+interface IPlacement {
+    id: string;
+    name: string;
+    default: boolean;
 
-    private _id: string;
-    private _name: string;
-    private _default: boolean;
+    allowSkip: boolean;
+    skipInSeconds: number;
 
-    private _allowSkip: boolean;
-    private _skipInSeconds: number;
+    disableBackButton: boolean;
 
-    private _disableBackButton: boolean;
+    useDeviceOrientationForVideo: boolean;
+    muteVideo: boolean;
 
-    private _useDeviceOrientationForVideo: boolean;
-    private _muteVideo: boolean;
+    state: PlacementState;
+}
 
-    private _state: PlacementState;
+export class Placement extends Model<IPlacement> {
+
+
 
     constructor(data: any) {
-        super();
+        super({
+            id: ['string'],
+            name: ['string'],
+            default: ['boolean'],
+            allowSkip: ['boolean'],
+            skipInSeconds: ['number'],
+            disableBackButton: ['boolean'],
+            useDeviceOrientationForVideo: ['boolean'],
+            muteVideo: ['boolean'],
+            state: ['object']
+        });
 
-        this._id = data.id;
-        this._name = data.name;
-        this._default = data.default;
+        this.set('id', data.id);
+        this.set('name', data.name);
+        this.set('default', data.default);
 
-        this._allowSkip = data.allowSkip;
-        this._skipInSeconds = data.skipInSeconds;
+        this.set('allowSkip', data.allowSkip);
+        this.set('skipInSeconds', data.skipInSeconds);
 
-        this._disableBackButton = data.disableBackButton;
+        this.set('disableBackButton', data.disableBackButton);
 
-        this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
-        this._muteVideo = data.muteVideo;
+        this.set('useDeviceOrientationForVideo', data.useDeviceOrientationForVideo);
+        this.set('muteVideo', data.muteVideo);
 
-        this._state = PlacementState.NOT_AVAILABLE;
+        this.set('state', PlacementState.NOT_AVAILABLE);
     }
 
     public getId(): string {
-        return this._id;
+        return this.get('id');
     }
 
     public getName(): string {
-        return this._name;
+        return this.get('name');
     }
 
     public isDefault(): boolean {
-        return this._default;
+        return this.get('default');
     }
 
     public allowSkip(): boolean {
-        return this._allowSkip;
+        return this.get('allowSkip');
     }
 
     public allowSkipInSeconds(): number {
-        return this._skipInSeconds;
+        return this.get('skipInSeconds');
     }
 
     public disableBackButton(): boolean {
-        return this._disableBackButton;
+        return this.get('disableBackButton');
     }
 
     public useDeviceOrientationForVideo(): boolean {
-        return this._useDeviceOrientationForVideo;
+        return this.get('useDeviceOrientationForVideo');
     }
 
     public muteVideo(): boolean {
-        return this._muteVideo;
+        return this.get('muteVideo');
     }
 
     public getState(): PlacementState {
-        return this._state;
+        return this.get('state');
     }
 
     public setState(state: PlacementState): void {
-        this._state = state;
+        this.set('state', state);
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'id': this._id,
-            'name': this._name,
-            'default': this._default,
-            'allowSkip': this._allowSkip,
-            'skipInSeconds': this._skipInSeconds,
-            'disableBackButton': this._disableBackButton,
-            'useDeviceOrientationForVideo': this._useDeviceOrientationForVideo,
-            'muteVideo': this._muteVideo,
-            'state': PlacementState[this._state].toLowerCase()
+            'id': this.getId(),
+            'name': this.getName(),
+            'default': this.isDefault(),
+            'allowSkip': this.allowSkip(),
+            'skipInSeconds': this.allowSkipInSeconds(),
+            'disableBackButton': this.disableBackButton(),
+            'useDeviceOrientationForVideo': this.useDeviceOrientationForVideo(),
+            'muteVideo': this.muteVideo(),
+            'state': PlacementState[this.getState()].toLowerCase()
         };
     }
  }

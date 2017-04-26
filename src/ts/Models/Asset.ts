@@ -1,17 +1,17 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IAsset extends ISchema {
-    url: [string, string[]];
-    cachedUrl: [string | undefined, string[]];
-    fileId: [string | undefined, string[]];
+interface IAsset {
+    url: string;
+    cachedUrl: string | undefined;
+    fileId: string | undefined;
 }
 
 export class Asset extends Model<IAsset> {
     constructor(url: string) {
         super({
-            url: ['', ['string']],
-            cachedUrl: [undefined, ['string', 'undefined']],
-            fileId: [undefined, ['string', 'undefined']]
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']
         });
 
         this.set('url', url);

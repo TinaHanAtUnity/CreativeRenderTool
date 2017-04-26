@@ -1,42 +1,42 @@
 import { Platform } from 'Constants/Platform';
 import { UnityAdsError } from 'Constants/UnityAdsError';
-import { Model, ISchema } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IClientInfo extends ISchema {
-    gameId: [string, string[]];
-    testMode: [boolean, string[]];
-    applicationName: [string, string[]];
-    applicationVersion: [string, string[]];
-    sdkVersion: [number, string[]];
-    sdkVersionName: [string, string[]];
-    platform: [Platform, string[]];
-    debuggable: [boolean, string[]];
-    configUrl: [string, string[]];
-    webviewUrl: [string, string[]];
-    webviewHash: [string, string[]];
-    webviewVersion: [string, string[]];
-    initTimestamp: [number, string[]];
-    reinitialized: [boolean, string[]];
+interface IClientInfo {
+    gameId: string;
+    testMode: boolean;
+    applicationName: string;
+    applicationVersion: string;
+    sdkVersion: number;
+    sdkVersionName: string;
+    platform: Platform;
+    debuggable: boolean;
+    configUrl: string;
+    webviewUrl: string;
+    webviewHash: string;
+    webviewVersion: string;
+    initTimestamp: number;
+    reinitialized: boolean;
 }
 
 export class ClientInfo extends Model<IClientInfo> {
 
     constructor(platform: Platform, data: any[]) {
         super({
-            gameId: ['', ['string']],
-            testMode: [false, ['boolean']],
-            applicationName: ['', ['string']],
-            applicationVersion: ['', ['string']],
-            sdkVersion: [0, ['number']],
-            sdkVersionName: ['', ['string']],
-            platform: [Platform.TEST, ['object']],
-            debuggable: [false, ['boolean']],
-            configUrl: ['', ['string']],
-            webviewUrl: ['', ['string']],
-            webviewHash: ['', ['string']],
-            webviewVersion: ['', ['string']],
-            initTimestamp: [0, ['number']],
-            reinitialized: [false, ['boolean']],
+            gameId: ['string'],
+            testMode: ['boolean'],
+            applicationName: ['string'],
+            applicationVersion: ['string'],
+            sdkVersion: ['number'],
+            sdkVersionName: ['string'],
+            platform: ['object'],
+            debuggable: ['boolean'],
+            configUrl: ['string'],
+            webviewUrl: ['string'],
+            webviewHash: ['string'],
+            webviewVersion: ['string'],
+            initTimestamp: ['number'],
+            reinitialized: ['boolean'],
         });
 
         this.set('platform', platform);

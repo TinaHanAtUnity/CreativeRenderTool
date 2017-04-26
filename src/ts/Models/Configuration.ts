@@ -1,5 +1,5 @@
 import { Placement } from 'Models/Placement';
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
 export enum CacheMode {
     FORCED,
@@ -7,30 +7,30 @@ export enum CacheMode {
     DISABLED
 }
 
-interface IConfiguration extends ISchema {
-    enabled: [boolean, string[]];
-    country: [string, string[]];
-    coppaCompliant: [boolean, string[]];
-    placementLevelControl: [boolean, string[]];
-    abGroup: [number, string[]];
-    gamerId: [string, string[]];
-    cacheMode: [CacheMode, string[]];
-    placements: [{ [id: string]: Placement }, string[]];
-    defaultPlacement: [Placement | undefined, string[]];
+interface IConfiguration {
+    enabled: boolean;
+    country: string;
+    coppaCompliant: boolean;
+    placementLevelControl: boolean;
+    abGroup: number;
+    gamerId: string;
+    cacheMode: CacheMode;
+    placements: { [id: string]: Placement };
+    defaultPlacement: Placement;
 }
 
 export class Configuration extends Model<IConfiguration> {
     constructor(configJson: any) {
         super({
-            enabled: [false, ['boolean']],
-            country: ['', ['string']],
-            coppaCompliant: [false, ['boolean']],
-            placementLevelControl: [false, ['boolean']],
-            abGroup: [0, ['number']],
-            gamerId: ['', ['string']],
-            cacheMode: [CacheMode.FORCED, ['object']],
-            placements: [{}, ['object']],
-            defaultPlacement: [undefined, ['object', 'undefined']]
+            enabled: ['boolean'],
+            country: ['string'],
+            coppaCompliant: ['boolean'],
+            placementLevelControl: ['boolean'],
+            abGroup: ['number'],
+            gamerId: ['string'],
+            cacheMode: ['object'],
+            placements: ['object'],
+            defaultPlacement: ['object']
         });
 
         this.set('enabled', configJson.enabled);
@@ -123,7 +123,7 @@ export class Configuration extends Model<IConfiguration> {
         return count;
     }
 
-    public getDefaultPlacement(): Placement | undefined {
+    public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
     }
 

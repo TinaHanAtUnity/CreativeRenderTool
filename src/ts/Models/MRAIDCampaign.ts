@@ -2,21 +2,21 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Asset';
 
 interface IMRAIDCampaign extends ICampaign {
-    resourceUrl: [Asset | undefined, string[]];
-    resource: [string | undefined, string[]];
+    resourceUrl: Asset | undefined;
+    resource: string | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
         super({
-            id: [campaign, ['string']],
-            gamerId: [gamerId, ['string']],
-            abGroup: [abGroup, ['number']],
-            timeout: [undefined, ['number', 'undefined']],
-            willExpireAt: [undefined, ['number', 'undefined']],
-            resourceUrl: [undefined, ['object', 'undefined']],
-            resource: [undefined, ['string', 'undefined']]
-        });
+            id: ['string'],
+            gamerId: ['string'],
+            abGroup: ['number'],
+            timeout: ['number'],
+            willExpireAt: ['number'],
+            resourceUrl: ['object', 'undefined'],
+            resource: ['string']
+        }, campaign.id, gamerId, abGroup);
 
         this.set('resourceUrl', resourceUrl ? new Asset(resourceUrl) : undefined);
         this.set('resource', resource);
