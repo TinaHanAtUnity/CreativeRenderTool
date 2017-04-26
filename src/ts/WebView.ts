@@ -126,6 +126,10 @@ export class WebView {
             if(this._configuration.isAnalyticsEnabled()) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
                 this._analyticsManager.init();
+
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._wakeUpManager.setListenAndroidLifecycle(true);
+                }
             }
 
             return this._sessionManager.create();

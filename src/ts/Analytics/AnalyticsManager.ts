@@ -14,8 +14,9 @@ export class AnalyticsManager {
     private _deviceInfo: DeviceInfo;
     private _userId: string;
     private _sessionId: number;
-    // private _sessionStartTimestamp: number;
     private _storage: AnalyticsStorage;
+
+    private _bgTimestamp: number;
 
     private _endpoint: string = 'http://10.35.4.43:1234';
 
@@ -72,7 +73,7 @@ export class AnalyticsManager {
                 }
 
                 if(updateDeviceInfo) {
-                    this.deviceInfoChange();
+                    this.sendDeviceInfo();
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
 
@@ -100,7 +101,7 @@ export class AnalyticsManager {
         this.send(AnalyticsProtocol.getUpdateObject(this._clientInfo));
     }
 
-    private deviceInfoChange(): void {
+    private sendDeviceInfo(): void {
         this.send(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
     }
 
@@ -109,7 +110,9 @@ export class AnalyticsManager {
     }
 
     private onAppBackground(): void {
-        this.send(AnalyticsProtocol.getRunningObject((Date.now() - this._clientInfo.getInitTimestamp()) / 1000));
+        this._bgTimestamp = Date.now();
+
+        this.send(AnalyticsProtocol.getRunningObject(Math.round((this._bgTimestamp - this._clientInfo.getInitTimestamp()) / 1000)));
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

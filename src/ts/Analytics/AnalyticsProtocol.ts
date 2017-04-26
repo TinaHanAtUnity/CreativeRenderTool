@@ -118,7 +118,7 @@ export class AnalyticsProtocol {
             // cpu?: string;
             // cpu_count?: number;
             // cpu_freq?: number;
-            ram: deviceInfo.getTotalMemory() / (1024 * 1024),
+            ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
             // vram?: number;
             screen: screenWidth + ' x ' + screenHeight,
             // dpi?: number; TODO: should be possible to get from device info but maybe not directly

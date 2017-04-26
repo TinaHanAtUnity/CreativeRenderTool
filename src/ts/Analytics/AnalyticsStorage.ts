@@ -24,7 +24,7 @@ export class AnalyticsStorage {
         } else {
             return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
                 // session ids are decimal numbers in analytics so parse native hex string format to a decimal number
-                return parseInt(id.replace(/-/g, ''), 16);
+                return parseInt(id.replace(/-/g, '').substring(0,12), 16);
             });
         }
     }
