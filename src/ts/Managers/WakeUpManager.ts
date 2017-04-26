@@ -4,11 +4,15 @@ import { NativeBridge } from 'Native/NativeBridge';
 export class WakeUpManager {
 
     private static _appForegroundNotification: string = 'UIApplicationDidBecomeActiveNotification';
+    private static _appBackgroundNotification: string = 'UIApplicationWillResignActiveNotification';
 
     public onNetworkConnected: Observable0 = new Observable0();
     public onScreenOn: Observable0 = new Observable0();
     public onScreenOff: Observable0 = new Observable0();
     public onAppForeground: Observable0 = new Observable0();
+    public onAppBackground: Observable0 = new Observable0();
+    public onActivityResumed: Observable0 = new Observable0();
+    public onActivityPaused: Observable0 = new Observable0();
 
     private _nativeBridge: NativeBridge;
     private _firstConnection: number;
@@ -25,6 +29,8 @@ export class WakeUpManager {
         this._nativeBridge.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
         this._nativeBridge.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
         this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        this._nativeBridge.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
+        this._nativeBridge.Lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
     }
 
     public setListenConnectivity(status: boolean): Promise<void> {
@@ -44,6 +50,22 @@ export class WakeUpManager {
             return this._nativeBridge.Notification.addNotificationObserver(WakeUpManager._appForegroundNotification, []);
         } else {
             return this._nativeBridge.Notification.removeNotificationObserver(WakeUpManager._appForegroundNotification);
+        }
+    }
+
+    public setListenAppBackground(status: boolean): Promise<void> {
+        if(status) {
+            return this._nativeBridge.Notification.addNotificationObserver(WakeUpManager._appBackgroundNotification, []);
+        } else {
+            return this._nativeBridge.Notification.removeNotificationObserver(WakeUpManager._appBackgroundNotification);
+        }
+    }
+
+    public setListenAndroidLifecycle(status: boolean): Promise<void> {
+        if(status) {
+            return this._nativeBridge.Lifecycle.register(['onActivityResumed', 'onActivityPaused']);
+        } else {
+            return this._nativeBridge.Lifecycle.unregister();
         }
     }
 
@@ -87,7 +109,16 @@ export class WakeUpManager {
     private onNotification(event: string, parameters: any): void {
         if(event === WakeUpManager._appForegroundNotification) {
             this.onAppForeground.trigger();
+        } else if(event === WakeUpManager._appBackgroundNotification) {
+            this.onAppBackground.trigger();
         }
     }
 
+    private onResume(activity: string) {
+        this.onActivityResumed.trigger();
+    }
+
+    private onPause(activity: string) {
+        this.onActivityPaused.trigger();
+    }
 }

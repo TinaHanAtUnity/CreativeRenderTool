@@ -8,7 +8,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { Observable0, Observable2, Observable4 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
@@ -97,6 +97,10 @@ describe('CampaignRefreshManager', () => {
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
                 getNetworkType: sinon.stub().returns(Promise.resolve(0))
+            },
+            Lifecycle: {
+                onActivityResumed: new Observable1(),
+                onActivityPaused: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;

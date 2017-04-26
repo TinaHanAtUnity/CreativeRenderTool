@@ -11,8 +11,7 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { VastParser } from 'Utilities/VastParser';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Observable2, Observable0 } from 'Utilities/Observable';
-import { Observable4 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { AssetManager } from 'Managers/AssetManager';
 import { Cache } from 'Utilities/Cache';
@@ -585,6 +584,10 @@ describe('CampaignManager', () => {
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
                 getNetworkType: sinon.stub().returns(Promise.resolve(0))
+            },
+            Lifecycle: {
+                onActivityResumed: new Observable1(),
+                onActivityPaused: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;
