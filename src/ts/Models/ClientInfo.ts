@@ -5,21 +5,16 @@ import { Model, ISchema } from 'Models/Model';
 interface IClientInfo extends ISchema {
     gameId: [string, string[]];
     testMode: [boolean, string[]];
-
     applicationName: [string, string[]];
     applicationVersion: [string, string[]];
     sdkVersion: [number, string[]];
     sdkVersionName: [string, string[]];
-
     platform: [Platform, string[]];
-
     debuggable: [boolean, string[]];
-
     configUrl: [string, string[]];
     webviewUrl: [string, string[]];
     webviewHash: [string, string[]];
     webviewVersion: [string, string[]];
-
     initTimestamp: [number, string[]];
     reinitialized: [boolean, string[]];
 }
@@ -58,13 +53,11 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('applicationVersion', data.shift());
         this.set('sdkVersion', data.shift());
         this.set('sdkVersionName', data.shift());
-
         this.set('debuggable', data.shift());
         this.set('configUrl', data.shift());
         this.set('webviewUrl', data.shift());
         this.set('webviewHash', data.shift());
         this.set('webviewVersion', data.shift());
-
         this.set('initTimestamp', data.shift());
         this.set('reinitialized', data.shift());
     }
@@ -127,20 +120,20 @@ export class ClientInfo extends Model<IClientInfo> {
 
     public getDTO() {
         return {
-            'gameId': this.get('gameId'),
-            'testMode': this.get('testMode'),
-            'bundleId': this.get('applicationName'),
-            'bundleVersion': this.get('applicationVersion'),
-            'sdkVersion': this.get('sdkVersion'),
-            'sdkVersionName': this.get('sdkVersionName'),
-            'platform': Platform[this.get('platform')].toLowerCase(),
-            'encrypted': !this.get('debuggable'),
-            'configUrl': this.get('configUrl'),
-            'webviewUrl': this.get('webviewUrl'),
-            'webviewHash': this.get('webviewHash'),
-            'webviewVersion': this.get('webviewVersion'),
-            'initTimestamp': this.get('initTimestamp'),
-            'reinitialized': this.get('reinitialized')
+            'gameId': this.getGameId(),
+            'testMode': this.getTestMode(),
+            'bundleId': this.getApplicationName(),
+            'bundleVersion': this.getApplicationVersion(),
+            'sdkVersion': this.getSdkVersion(),
+            'sdkVersionName': this.getSdkVersionName(),
+            'platform': Platform[this.getPlatform()].toLowerCase(),
+            'encrypted': !this.isDebuggable(),
+            'configUrl': this.getConfigUrl(),
+            'webviewUrl': this.getWebviewUrl(),
+            'webviewHash': this.getWebviewHash(),
+            'webviewVersion': this.getWebviewVersion(),
+            'initTimestamp': this.getInitTimestamp(),
+            'reinitialized': this.isReinitialized()
         };
     }
 }

@@ -1,5 +1,5 @@
 import { Placement } from 'Models/Placement';
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
 export enum CacheMode {
     FORCED,
@@ -7,42 +7,54 @@ export enum CacheMode {
     DISABLED
 }
 
-export class Configuration extends Model {
+interface IConfiguration extends ISchema {
+    enabled: [boolean, string[]];
+    country: [string, string[]];
+    coppaCompliant: [boolean, string[]];
+    placementLevelControl: [boolean, string[]];
+    abGroup: [number, string[]];
+    gamerId: [string, string[]];
+    cacheMode: [CacheMode, string[]];
+    placements: [{ [id: string]: Placement }, string[]];
+    defaultPlacement: [Placement | undefined, string[]];
+}
 
-    private _enabled: boolean;
-    private _country: string;
-    private _coppaCompliant: boolean;
-    private _placementLevelControl: boolean;
-    private _abGroup: number;
-    private _gamerId: string;
-    private _cacheMode: CacheMode;
-    private _placements: { [id: string]: Placement } = {};
-    private _defaultPlacement: Placement;
-
+export class Configuration extends Model<IConfiguration> {
     constructor(configJson: any) {
-        super();
+        super({
+            enabled: [false, ['boolean']],
+            country: ['', ['string']],
+            coppaCompliant: [false, ['boolean']],
+            placementLevelControl: [false, ['boolean']],
+            abGroup: [0, ['number']],
+            gamerId: ['', ['string']],
+            cacheMode: [CacheMode.FORCED, ['object']],
+            placements: [{}, ['object']],
+            defaultPlacement: [undefined, ['object', 'undefined']]
+        });
 
-        this._enabled = configJson.enabled;
-        this._country = configJson.country;
-        this._coppaCompliant = configJson.coppaCompliant;
-        this._placementLevelControl = configJson.placementLevelControl;
+        this.set('enabled', configJson.enabled);
+        this.set('country', configJson.country);
+        this.set('coppaCompliant', configJson.coppaCompliant);
+        const placementLevelControl: boolean = configJson.placementLevelControl;
+        this.set('placementLevelControl', placementLevelControl);
 
-        if(this._placementLevelControl) {
-            this._abGroup = configJson.abGroup;
-            this._gamerId = configJson.gamerId;
+        if(placementLevelControl) {
+            this.set('abGroup', configJson.abGroup);
+            this.set('gamerId', configJson.gamerId);
         }
 
         switch(configJson.assetCaching) {
             case 'forced':
-                this._cacheMode = CacheMode.FORCED;
+                this.set('cacheMode', CacheMode.FORCED);
                 break;
 
             case 'allowed':
-                this._cacheMode = CacheMode.ALLOWED;
+                this.set('cacheMode', CacheMode.ALLOWED);
                 break;
 
             case 'disabled':
-                this._cacheMode = CacheMode.DISABLED;
+                this.set('cacheMode', CacheMode.DISABLED);
                 break;
 
             default:
@@ -53,57 +65,57 @@ export class Configuration extends Model {
 
         placements.forEach((rawPlacement: any): void => {
             const placement: Placement = new Placement(rawPlacement);
-            this._placements[placement.getId()] = placement;
+            this.getPlacements()[placement.getId()] = placement;
             if(placement.isDefault()) {
-                this._defaultPlacement = placement;
+                this.set('defaultPlacement', placement);
             }
         });
     }
 
     public isEnabled(): boolean {
-        return this._enabled;
+        return this.get('enabled');
     }
 
     public getCountry(): string {
-        return this._country;
+        return this.get('country');
     }
 
     public isCoppaCompliant(): boolean {
-        return this._coppaCompliant;
+        return this.get('coppaCompliant');
     }
 
     public isPlacementLevelControl(): boolean {
-        return this._placementLevelControl;
+        return this.get('placementLevelControl');
     }
 
     public getAbGroup(): number {
-        return this._abGroup;
+        return this.get('abGroup');
     }
 
     public getGamerId(): string {
-        return this._gamerId;
+        return this.get('gamerId');
     }
 
     public getCacheMode(): CacheMode {
-        return this._cacheMode;
+        return this.get('cacheMode');
     }
 
     public getPlacement(placementId: string): Placement {
-        return this._placements[placementId];
+        return this.getPlacements()[placementId];
     }
 
     public getPlacements(): { [id: string]: Placement } {
-        return this._placements;
+        return this.get('placements');
     }
 
     public getPlacementCount(): number {
-        if(!this._placements) {
+        if(!this.getPlacements()) {
             return 0;
         }
 
         let count = 0;
-        for(const placement in this._placements) {
-            if(this._placements.hasOwnProperty(placement)) {
+        for(const placement in this.getPlacements()) {
+            if(this.getPlacements().hasOwnProperty(placement)) {
                 count++;
             }
         }
@@ -111,28 +123,33 @@ export class Configuration extends Model {
         return count;
     }
 
+    public getDefaultPlacement(): Placement | undefined {
+        return this.get('defaultPlacement');
+    }
+
     public getDTO(): { [key: string]: any } {
         const placements = [];
-        for(const placement in this._placements) {
-            if(this._placements.hasOwnProperty(placement)) {
-                placements.push(this._placements[placement].getDTO());
+        for(const placement in this.getPlacements()) {
+            if(this.getPlacements().hasOwnProperty(placement)) {
+                placements.push(this.getPlacements()[placement].getDTO());
             }
         }
 
+        let defaultPlacementId: string | undefined = undefined;
+        const defaultPlacement = this.getDefaultPlacement();
+        if (defaultPlacement) {
+            defaultPlacementId = defaultPlacement.getId();
+        }
         return {
-            'enabled': this._enabled,
-            'country': this._country,
-            'coppaCompliant': this._coppaCompliant,
-            'placementLevelControl': this._placementLevelControl,
-            'abGroup': this._abGroup,
-            'gamerId': this._gamerId,
-            'cacheMode': CacheMode[this._cacheMode].toLowerCase(),
+            'enabled': this.isEnabled(),
+            'country': this.getCountry(),
+            'coppaCompliant': this.isCoppaCompliant(),
+            'placementLevelControl': this.isPlacementLevelControl(),
+            'abGroup': this.getAbGroup(),
+            'gamerId': this.getGamerId(),
+            'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': this._defaultPlacement.getId()
+            'defaultPlacement': defaultPlacementId
         };
-    }
-
-    public getDefaultPlacement(): Placement {
-        return this._defaultPlacement;
     }
 }

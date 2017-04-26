@@ -26,11 +26,11 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         }
 
         super({
-            id: ['', ['string']],
-            gamerId: ['', ['string']],
-            abGroup: [0, ['number']],
-            timeout: [cacheTTL || 3600, ['number']],
-            willExpireAt: [undefined, ['number']],
+            id: [campaignId, ['string']],
+            gamerId: [gamerId, ['string']],
+            abGroup: [abGroup, ['number']],
+            timeout: [cacheTTL || 3600, ['number', 'undefined']],
+            willExpireAt: [undefined, ['number', 'undefined']],
             vast: [vast, ['object']],
             video: [new Video(vast.getVideoUrl()), ['object']],
             hasEndscreen: [!!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(), ['boolean']],

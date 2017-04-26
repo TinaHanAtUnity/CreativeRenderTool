@@ -1,51 +1,60 @@
-import { Model } from 'Models/Model';
-export class Asset extends Model {
+import { ISchema, Model } from 'Models/Model';
 
-    private readonly _url: string;
-    private _cachedUrl: string | undefined;
-    private _fileId: string | undefined;
+interface IAsset extends ISchema {
+    url: [string, string[]];
+    cachedUrl: [string | undefined, string[]];
+    fileId: [string | undefined, string[]];
+}
 
+export class Asset extends Model<IAsset> {
     constructor(url: string) {
-        super();
-        this._url = url;
+        super({
+            url: ['', ['string']],
+            cachedUrl: [undefined, ['string', 'undefined']],
+            fileId: [undefined, ['string', 'undefined']]
+        });
+
+        this.set('url', url);
     }
 
     public getUrl(): string {
-        if(typeof this._cachedUrl !== 'undefined') {
-            return this._cachedUrl;
+        const cachedUrl = this.getCachedUrl();
+        if(typeof cachedUrl !== 'undefined') {
+            return cachedUrl;
         }
-        return this._url;
+        return this.getOriginalUrl();
     }
 
     public getOriginalUrl() {
-        return this._url;
+        return this.get('url');
     }
 
     public isCached() {
-        return typeof this._cachedUrl !== 'undefined';
+        const cachedUrl = this.getCachedUrl();
+        return typeof cachedUrl !== 'undefined';
     }
 
     public getCachedUrl() {
-        return this._cachedUrl;
+        return this.get('cachedUrl');
     }
 
     public setCachedUrl(url: string) {
-        this._cachedUrl = url;
+        this.set('cachedUrl', url);
     }
 
     public setFileId(fileId: string) {
-        this._fileId = fileId;
+        this.set('fileId', fileId);
     }
 
     public getFileId() {
-        return this._fileId;
+        return this.get('fileId');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'url': this._url,
-            'cachedUrl': this._cachedUrl,
-            'fileId': this._fileId
+            'url': this.getOriginalUrl(),
+            'cachedUrl': this.getCachedUrl(),
+            'fileId': this.getFileId()
         };
     }
 }

@@ -1,35 +1,46 @@
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Asset';
 
-export class MRAIDCampaign extends Campaign {
+interface IMRAIDCampaign extends ICampaign {
+    resourceUrl: [Asset | undefined, string[]];
+    resource: [string | undefined, string[]];
+}
 
-    private _resourceUrl: Asset | undefined;
-    private _resource: string | undefined;
-
+export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
-        super(campaign.id, gamerId, abGroup);
-        this._resourceUrl = resourceUrl ? new Asset(resourceUrl) : undefined;
-        this._resource = resource;
+        super({
+            id: [campaign, ['string']],
+            gamerId: [gamerId, ['string']],
+            abGroup: [abGroup, ['number']],
+            timeout: [undefined, ['number', 'undefined']],
+            willExpireAt: [undefined, ['number', 'undefined']],
+            resourceUrl: [undefined, ['object', 'undefined']],
+            resource: [undefined, ['string', 'undefined']]
+        });
+
+        this.set('resourceUrl', resourceUrl ? new Asset(resourceUrl) : undefined);
+        this.set('resource', resource);
     }
 
     public getResourceUrl(): Asset | undefined {
-        return this._resourceUrl;
+        return this.get('resourceUrl');
     }
 
     public setResourceUrl(url: string): void {
-        this._resourceUrl = new Asset(url);
+        this.set('resourceUrl', new Asset(url));
     }
 
     public setResource(resource: string): void {
-        this._resource = resource;
+        this.set('resource', resource);
     }
 
     public getResource(): string | undefined {
-        return this._resource;
+        return this.get('resource');
     }
 
     public getRequiredAssets() {
-        return this._resourceUrl ? [this._resourceUrl] : [];
+        const resourceUrl =  this.getResourceUrl();
+        return resourceUrl ? [resourceUrl] : [];
     }
 
     public getOptionalAssets() {
@@ -37,15 +48,16 @@ export class MRAIDCampaign extends Campaign {
     }
 
     public getDTO(): { [key: string]: any } {
-        let resourceUrl: any;
-        if (this._resourceUrl) {
-            resourceUrl = this._resourceUrl.getDTO();
+        let resourceUrlDTO: any;
+        const resourceUrlAsset = this.getResourceUrl();
+        if (resourceUrlAsset) {
+            resourceUrlDTO = resourceUrlAsset.getDTO();
         }
 
         return {
             'campaign': super.getDTO(),
-            'resourceUrl': resourceUrl,
-            'resource': this._resource
+            'resourceUrl': resourceUrlDTO,
+            'resource': this.getResource()
         };
     }
 }

@@ -1,4 +1,4 @@
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Asset';
 import { Video } from 'Models/Video';
 
@@ -8,65 +8,87 @@ export enum StoreName {
     XIAOMI
 }
 
-export class PerformanceCampaign extends Campaign {
+interface IPerformanceCampaign extends ICampaign {
+    appStoreId: [string, string[]];
+    appStoreCountry: [string, string[]];
 
-    private _appStoreId: string;
-    private _appStoreCountry: string;
+    gameId: [number, string[]];
+    gameName: [string, string[]];
+    gameIcon: [Asset, string[]];
 
-    private _gameId: number;
-    private _gameName: string;
-    private _gameIcon: Asset;
+    rating: [number, string[]];
+    ratingCount: [number, string[]];
 
-    private _rating: number;
-    private _ratingCount: number;
+    landscapeImage: [Asset, string[]];
+    portraitImage: [Asset, string[]];
 
-    private _landscapeImage: Asset;
-    private _portraitImage: Asset;
+    video: [Video, string[]];
+    streamingVideo: [Video, string[]];
 
-    private _video: Video;
-    private _streamingVideo: Video;
+    clickAttributionUrl: [string, string[]];
+    clickAttributionUrlFollowsRedirects: [boolean, string[]];
 
-    private _clickAttributionUrl: string;
-    private _clickAttributionUrlFollowsRedirects: boolean;
+    bypassAppSheet: [boolean, string[]];
 
-    private _bypassAppSheet: boolean;
+    store: [StoreName, string[]];
+}
 
-    private _store: StoreName;
-
+export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super(campaign.id, gamerId, abGroup);
+        super({
+            id: [campaign.id, ['string']],
+            gamerId: [gamerId, ['string']],
+            abGroup: [abGroup, ['number']],
+            timeout: [undefined, ['number', 'undefined']],
+            willExpireAt: [undefined, ['number', 'undefined']],
+            appStoreId: ['', ['string']],
+            appStoreCountry: ['', ['string']],
+            gameId: [0, ['number']],
+            gameName: ['', ['string']],
+            gameIcon: [new Asset(''), ['object']],
+            rating: [0, ['number']],
+            ratingCount: [0, ['number']],
+            landscapeImage: [new Asset(''), ['object']],
+            portraitImage: [new Asset(''), ['object']],
+            video: [new Video(''), ['object']],
+            streamingVideo: [new Video(''), ['object']],
+            clickAttributionUrl: ['', ['string']],
+            clickAttributionUrlFollowsRedirects: [false, ['boolean']],
+            bypassAppSheet: [false, ['boolean']],
+            store: [StoreName.APPLE, ['object']]
+        });
 
-        this._appStoreId = campaign.appStoreId;
-        this._appStoreCountry = campaign.appStoreCountry;
+        this.set('appStoreId', campaign.appStoreId);
+        this.set('appStoreCountry', campaign.appStoreCountry);
 
-        this._gameId = campaign.gameId;
-        this._gameName = campaign.gameName;
-        this._gameIcon = new Asset(campaign.gameIcon);
+        this.set('gameId', campaign.gameId);
+        this.set('gameName', campaign.gameName);
+        this.set('gameIcon', new Asset(campaign.gameIcon));
 
-        this._rating = campaign.rating;
-        this._ratingCount = campaign.ratingCount;
+        this.set('rating', campaign.rating);
+        this.set('ratingCount', campaign.ratingCount);
 
-        this._landscapeImage = new Asset(campaign.endScreenLandscape);
-        this._portraitImage = new Asset(campaign.endScreenPortrait);
+        this.set('landscapeImage', new Asset(campaign.endScreenLandscape));
+        this.set('portraitImage', new Asset(campaign.endScreenPortrait));
 
-        this._video = new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize);
-        this._streamingVideo = new Video(campaign.trailerStreaming);
+        this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
+        this.set('streamingVideo', new Video(campaign.trailerStreaming));
 
-        this._clickAttributionUrl = campaign.clickAttributionUrl;
-        this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
+        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
+        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
-        this._bypassAppSheet = campaign.bypassAppSheet;
+        this.set('bypassAppSheet', campaign.bypassAppSheet);
 
         const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
         switch(campaignStore) {
             case 'apple':
-                this._store = StoreName.APPLE;
+                this.set('store', StoreName.APPLE);
                 break;
             case 'google':
-                this._store = StoreName.GOOGLE;
+                this.set('store', StoreName.GOOGLE);
                 break;
             case 'xiaomi':
-                this._store = StoreName.XIAOMI;
+                this.set('store', StoreName.XIAOMI);
                 break;
             default:
                 throw new Error('Unknown store value "' + campaign.store + '"');
