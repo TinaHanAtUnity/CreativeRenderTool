@@ -1,17 +1,16 @@
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import { ISchema, Model } from 'Models/Model';
+import { IRuntimeSchema, Model } from 'Models/Model';
 
-export interface IVastCreative extends ISchema {
-    type: [string, string[]];
-    trackingEvents: [{ [eventName: string]: string[] }, string[]];
+export interface IVastCreative {
+    type: string;
+    trackingEvents: { [eventName: string]: string[] };
 }
 
 export abstract class VastCreative<T extends IVastCreative> extends Model<T> {
-    constructor(data: T) {
-        super(data);
+    constructor(runtimeSchema: IRuntimeSchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
+        super(runtimeSchema);
 
-        this.set('type', data.type[0]);
-        const trackingEvents = data.trackingEvents[0];
+        this.set('type', type);
         this.set('trackingEvents', trackingEvents || {});
     }
 

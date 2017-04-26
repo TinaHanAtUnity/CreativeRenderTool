@@ -2,13 +2,13 @@ import { IVastCreative, VastCreative } from 'Models/Vast/VastCreative';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 interface IVastCreativeLinear extends IVastCreative {
-    duration: [number, string[]];
-    skipDelay: [number | null, string[]];
-    mediaFiles: [VastMediaFile[], string[]];
-    videoClickThroughURLTemplate: [string | null, string[]];
-    videoClickTrackingURLTemplates: [string[], string[]];
-    videoCustomClickURLTemplates: [string[], string[]];
-    adParameters: [{} | null, string[]];
+    duration: number;
+    skipDelay: number | null;
+    mediaFiles: VastMediaFile[];
+    videoClickThroughURLTemplate: string | null;
+    videoClickTrackingURLTemplates: string[];
+    videoCustomClickURLTemplates: string[];
+    adParameters: object | null;
 }
 
 export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
@@ -17,16 +17,16 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
                 videoCustomClickURLTemplates?: string[], adParameters?: any) {
         super({
-            type: ['linear', ['string']],
-            trackingEvents: [{}, ['object']],
-            duration: [0, ['number']],
-            skipDelay: [null, ['number', 'null']],
-            mediaFiles: [[], ['array']],
-            videoClickThroughURLTemplate: [null, ['string', 'null']],
-            videoClickTrackingURLTemplates: [[], ['array']],
-            videoCustomClickURLTemplates: [[], ['array']],
-            adParameters: [{}, ['object']]
-        });
+            type: ['string'],
+            trackingEvents: ['object'],
+            duration: ['number'],
+            skipDelay: ['number', 'null'],
+            mediaFiles: ['array'],
+            videoClickThroughURLTemplate: ['string', 'null'],
+            videoClickTrackingURLTemplates: ['array'],
+            videoCustomClickURLTemplates: ['array'],
+            adParameters: ['object']
+        }, 'linear');
 
         this.set('duration', duration || 0);
         this.set('skipDelay', skipDelay || null);

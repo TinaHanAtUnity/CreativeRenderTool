@@ -1,18 +1,18 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IVastMediaFile extends ISchema {
-    fileURL: [string | null, string[]];
-    deliveryType: [string, string[]];
-    mimeType: [string | null, string[]];
-    codec: [string | null, string[]];
-    bitrate: [number, string[]];
-    minBitrate: [number, string[]];
-    maxBitrate: [number, string[]];
-    width: [number, string[]];
-    height: [number, string[]];
-    apiFramework: [string | null, string[]];
-    scalable: [boolean | null, string[]];
-    maintainAspectRatio: [boolean | null, string[]];
+interface IVastMediaFile {
+    fileURL: string | null;
+    deliveryType: string;
+    mimeType: string | null;
+    codec: string | null;
+    bitrate: number;
+    minBitrate: number;
+    maxBitrate: number;
+    width: number;
+    height: number;
+    apiFramework: string | null;
+    scalable: boolean | null;
+    maintainAspectRatio: boolean | null;
 }
 
 export class VastMediaFile extends Model<IVastMediaFile> {
@@ -22,18 +22,18 @@ export class VastMediaFile extends Model<IVastMediaFile> {
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
                 minBitrate?: number, maxBitrate?: number, width?: number, height?: number) {
         super({
-            fileURL: [null, ['string', 'null']],
-            deliveryType: ['', ['string']],
-            mimeType: [null, ['string', 'null']],
-            codec: [null, ['string', 'null']],
-            bitrate: [0, ['number']],
-            minBitrate: [0, ['number']],
-            maxBitrate: [0, ['number']],
-            width: [0, ['number']],
-            height: [0, ['number']],
-            apiFramework: [null, ['string', 'null']],
-            scalable: [null, ['boolean', 'null']],
-            maintainAspectRatio: [null, ['boolean', 'null']]
+            fileURL: ['string', 'null'],
+            deliveryType: ['string'],
+            mimeType: ['string', 'null'],
+            codec: ['string', 'null'],
+            bitrate: ['number'],
+            minBitrate: ['number'],
+            maxBitrate: ['number'],
+            width: ['number'],
+            height: ['number'],
+            apiFramework: ['string', 'null'],
+            scalable: ['boolean', 'null'],
+            maintainAspectRatio: ['boolean', 'null']
         });
 
         this.set('fileURL', fileURL || null);

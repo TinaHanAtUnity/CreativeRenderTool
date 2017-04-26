@@ -1,19 +1,19 @@
 import { VastAd } from 'Models/Vast/VastAd';
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IVast extends ISchema {
-    ads: [VastAd[], string[]];
-    errorURLTemplates: [string[], string[]];
-    additionalTrackingEvents: [{ [eventName: string]: string[] }, string[]];
+interface IVast {
+    ads: VastAd[];
+    errorURLTemplates: string[];
+    additionalTrackingEvents: { [eventName: string]: string[] };
 }
 
 export class Vast extends Model<IVast> {
 
     constructor(ads: VastAd[], errorURLTemplates: any[]) {
         super({
-            ads: [[], ['array']],
-            errorURLTemplates: [[], ['array']],
-            additionalTrackingEvents: [{}, ['object']]
+            ads: ['array'],
+            errorURLTemplates: ['array'],
+            additionalTrackingEvents: ['object']
         });
 
         this.set('ads', ads);

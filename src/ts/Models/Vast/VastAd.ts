@@ -1,15 +1,15 @@
 import { IVastCreative, VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IVastAd extends ISchema {
-    id: [string | undefined, string[]];
-    creatives: [Array<VastCreative<IVastCreative>>, string[]];
-    companionAds: [VastCreativeCompanionAd[], string[]];
-    errorURLTemplates: [string[], string[]];
-    impressionURLTemplates: [string[], string[]];
-    wrapperURLs: [string[], string[]];
+interface IVastAd {
+    id: string | undefined;
+    creatives: Array<VastCreative<IVastCreative>>;
+    companionAds: VastCreativeCompanionAd[];
+    errorURLTemplates: string[];
+    impressionURLTemplates: string[];
+    wrapperURLs: string[];
 }
 
 export class VastAd extends Model<IVastAd> {
@@ -17,12 +17,12 @@ export class VastAd extends Model<IVastAd> {
     constructor();
     constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super({
-            id: [undefined, ['string', 'undefined']],
-            creatives: [[], ['array']],
-            companionAds: [[], ['array']],
-            errorURLTemplates: [[], ['array']],
-            impressionURLTemplates: [[], ['array']],
-            wrapperURLs: [[], ['array']]
+            id: ['string', 'undefined'],
+            creatives: ['array'],
+            companionAds: ['array'],
+            errorURLTemplates: ['array'],
+            impressionURLTemplates: ['array'],
+            wrapperURLs: ['array']
         });
 
         this.set('id', id || undefined);

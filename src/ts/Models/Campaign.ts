@@ -1,24 +1,23 @@
 import { Asset } from 'Models/Asset';
-import { ISchema, Model } from 'Models/Model';
+import { IRuntimeSchema, Model } from 'Models/Model';
 
-export interface ICampaign extends ISchema {
-    id: [string, string[]];
-    gamerId: [string, string[]];
-    abGroup: [number, string[]];
-    timeout: [number | undefined, string[]];
-    willExpireAt: [number | undefined, string[]];
+export interface ICampaign {
+    id: string;
+    gamerId: string;
+    abGroup: number;
+    timeout: number;
+    willExpireAt: number;
 }
 
 export abstract class Campaign<T extends ICampaign> extends Model<T> {
-    constructor(data: T) {
-        super(data);
+    constructor(runtimeSchema: IRuntimeSchema<T>, id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
+        super(runtimeSchema);
 
-        this.set('id', data.id[0]);
-        this.set('gamerId', data.gamerId[0]);
-        this.set('abGroup', data.abGroup[0]);
-        this.set('timeout', typeof data.timeout[0] !== 'undefined' ? data.timeout[0] : 0);
+        this.set('id', id);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
+        this.set('timeout', typeof timeout !== 'undefined' ? timeout : 0);
 
-        const timeout = data.timeout[0];
         if(timeout) {
             this.set('willExpireAt', Date.now() + timeout * 1000);
         }

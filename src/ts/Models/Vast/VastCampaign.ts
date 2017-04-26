@@ -4,11 +4,11 @@ import { Asset } from 'Models/Asset';
 import { Campaign, ICampaign } from 'Models/Campaign';
 
 interface IVastCampaign extends ICampaign {
-    vast: [Vast, string[]];
-    video: [Video, string[]];
-    hasEndscreen: [boolean, string[]];
-    portrait: [Asset | undefined, string[]];
-    landscape: [Asset | undefined, string[]];
+    vast: Vast;
+    video: Video;
+    hasEndscreen: boolean;
+    portrait: Asset | undefined;
+    landscape: Asset | undefined;
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
@@ -26,17 +26,23 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         }
 
         super({
-            id: [campaignId, ['string']],
-            gamerId: [gamerId, ['string']],
-            abGroup: [abGroup, ['number']],
-            timeout: [cacheTTL || 3600, ['number', 'undefined']],
-            willExpireAt: [undefined, ['number', 'undefined']],
-            vast: [vast, ['object']],
-            video: [new Video(vast.getVideoUrl()), ['object']],
-            hasEndscreen: [!!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(), ['boolean']],
-            portrait: [portraitAsset, ['object', 'undefined']],
-            landscape: [landscapeAsset, ['object', 'undefined']]
-        });
+            id: ['string'],
+            gamerId: ['string'],
+            abGroup: ['number'],
+            timeout: ['number'],
+            willExpireAt: ['number'],
+            vast: ['object'],
+            video: ['object'],
+            hasEndscreen: ['boolean'],
+            portrait: ['object', 'undefined'],
+            landscape: ['object', 'undefined']
+        }, campaignId, gamerId, abGroup, cacheTTL || 3600);
+
+        this.set('vast', vast);
+        this.set('video', new Video(vast.getVideoUrl()));
+        this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
+        this.set('portrait', portraitAsset);
+        this.set('landscape', landscapeAsset);
 
         this.processCustomTracking(tracking);
     }

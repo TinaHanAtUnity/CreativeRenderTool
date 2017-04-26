@@ -1,25 +1,25 @@
-import { ISchema, Model } from 'Models/Model';
+import { Model } from 'Models/Model';
 
-interface IVastCreativeCompanionAd extends ISchema {
-    id: [string | null, string[]];
-    width: [number, string[]];
-    height: [number, string[]];
-    type: [string, string[]];
-    staticResourceURL: [string | null, string[]];
-    creativeType: [string | null, string[]];
-    companionClickThroughURLTemplate: [string | null, string[]];
+interface IVastCreativeCompanionAd {
+    id: string | null;
+    width: number;
+    height: number;
+    type: string;
+    staticResourceURL: string | null;
+    creativeType: string | null;
+    companionClickThroughURLTemplate: string | null;
 }
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
     constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
         super({
-            id: [null, ['string', 'null']],
-            width: [0, ['number']],
-            height: [0, ['number']],
-            type: ['', ['string']],
-            staticResourceURL: [null, ['string', 'null']],
-            creativeType: [null, ['string', 'null']],
-            companionClickThroughURLTemplate: [null, ['string', 'null']]
+            id: ['string', 'null'],
+            width: ['number'],
+            height: ['number'],
+            type: ['string'],
+            staticResourceURL: ['string', 'null'],
+            creativeType: ['string', 'null'],
+            companionClickThroughURLTemplate: ['string', 'null']
         });
 
         this.set('id', id || null);
