@@ -1,10 +1,14 @@
-import { ISchema, Model } from 'Models/Model';
+import { IRuntimeSchema, ISchema, Model } from 'Models/Model';
 
 interface IPlayerMetaData extends ISchema {
-    serverId: [string, string[]];
+    serverId: string;
 }
 
-export class PlayerMetaData extends Model<IPlayerMetaData> {
+interface IPlayerMetaDataRuntimeSchema {
+    serverId: string[];
+}
+
+export class PlayerMetaData extends Model<IPlayerMetaData, IPlayerMetaDataRuntimeSchema> {
 
     public static getCategory(): string {
         return 'player';
@@ -16,7 +20,8 @@ export class PlayerMetaData extends Model<IPlayerMetaData> {
 
     constructor(data: string[]) {
         super({
-            serverId: ['', ['string']]
+            serverId: ['string'],
+            madadsa: []
         });
 
         this.set('serverId', data[0]);

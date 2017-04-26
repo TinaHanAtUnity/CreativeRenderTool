@@ -1,29 +1,35 @@
 type AllowedTypes = string | number | boolean | null | undefined | object;
 
 export interface ISchema {
-    [key: string]: [AllowedTypes | AllowedTypes[], string[]];
+    [key: string]: AllowedTypes | AllowedTypes[];
 }
 
-export abstract class Model<T extends ISchema> {
-    protected _data: T;
+export interface IRuntimeSchema {
+    [key: string]: string[];
+}
 
-    constructor(data: T) {
-        this._data = data;
+export abstract class Model<T extends ISchema, K> {
+    protected _data: T;
+    private _runtimeSchema: K;
+
+    constructor(runtimeSchema: K) {
+        this._runtimeSchema = runtimeSchema;
+        // this._data = data;
     }
 
     public abstract getDTO(): { [key: string]: any }
 
-    public set<K extends keyof T>(key: K, value: T[K][0]): void {
-        const keyType = typeof this._data[key];
-        const valueType = typeof value;
-        if(this.checkValue(value, this._data[key][1])) {
-            this._data[key][0] = value;
+    public set<K extends keyof T>(key: K, value: T[K]): void {
+       // const keyType = typeof this._data[key];
+       // const valueType = typeof value;
+        if(this.checkValue(value, this._runtimeSchema[key])) {
+            this._data[key] = value;
         } else {
-            throw new Error(key + ': ' + keyType + ' is not ' + value + ': ' + valueType);
+//            throw new Error(key + ': ' + keyType + ' is not ' + value + ': ' + valueType);
         }
     }
 
-    public get<K extends keyof T>(key: K): T[K][0] {
+    public get<K extends keyof T>(key: K): T[K] {
         return this._data[key][0];
     }
 
