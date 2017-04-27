@@ -17,8 +17,10 @@ export class AnalyticsManager {
     private _storage: AnalyticsStorage;
 
     private _bgTimestamp: number;
+    private _topActivity: string;
 
     private _endpoint: string = 'http://10.35.4.43:1234';
+    private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
@@ -85,12 +87,16 @@ export class AnalyticsManager {
     private subscribeListeners(): void {
         this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
         this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
-        this._wakeUpManager.onActivityResumed.subscribe(() => this.onAppForeground());
-        this._wakeUpManager.onActivityPaused.subscribe(() => this.onAppBackground());
+        this._wakeUpManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
+        this._wakeUpManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
     }
 
     private sendNewSession(): void {
         this.send(AnalyticsProtocol.getStartObject());
+    }
+
+    private sendAppRunning(): void {
+        this.send(AnalyticsProtocol.getRunningObject(Math.round((this._bgTimestamp - this._clientInfo.getInitTimestamp()) / 1000)));
     }
 
     private sendNewInstall(): void {
@@ -106,13 +112,41 @@ export class AnalyticsManager {
     }
 
     private onAppForeground(): void {
-        // todo: check if a new session should be started
+        if(this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+            this._storage.getSessionId(false).then(sessionId => {
+                this._sessionId = sessionId;
+                this._storage.setIds(this._userId, this._sessionId);
+                this.sendNewSession();
+            });
+        }
     }
 
     private onAppBackground(): void {
         this._bgTimestamp = Date.now();
+        this.sendAppRunning();
+    }
 
-        this.send(AnalyticsProtocol.getRunningObject(Math.round((this._bgTimestamp - this._clientInfo.getInitTimestamp()) / 1000)));
+    private onActivityResumed(activity: string): void {
+        if(this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+            this._storage.getSessionId(false).then(sessionId => {
+                this._sessionId = sessionId;
+                this._storage.setIds(this._userId, this._sessionId);
+                this.sendNewSession();
+            });
+        }
+
+        this._topActivity = activity;
+    }
+
+    private onActivityPaused(activity: string): void {
+        if(this._topActivity === activity || !this._topActivity) {
+            this._bgTimestamp = Date.now();
+            this.sendAppRunning();
+        }
+
+        if(!this._topActivity) {
+            this._topActivity = activity;
+        }
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

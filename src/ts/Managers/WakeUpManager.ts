@@ -1,4 +1,4 @@
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable1 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class WakeUpManager {
@@ -11,8 +11,8 @@ export class WakeUpManager {
     public onScreenOff: Observable0 = new Observable0();
     public onAppForeground: Observable0 = new Observable0();
     public onAppBackground: Observable0 = new Observable0();
-    public onActivityResumed: Observable0 = new Observable0();
-    public onActivityPaused: Observable0 = new Observable0();
+    public onActivityResumed: Observable1<string> = new Observable1();
+    public onActivityPaused: Observable1<string> = new Observable1();
 
     private _nativeBridge: NativeBridge;
     private _firstConnection: number;
@@ -115,10 +115,10 @@ export class WakeUpManager {
     }
 
     private onResume(activity: string) {
-        this.onActivityResumed.trigger();
+        this.onActivityResumed.trigger(activity);
     }
 
     private onPause(activity: string) {
-        this.onActivityPaused.trigger();
+        this.onActivityPaused.trigger(activity);
     }
 }
