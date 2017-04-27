@@ -6,7 +6,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 

@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { CacheError } from 'Native/Api/Cache';
 import { Request } from 'Utilities/Request';

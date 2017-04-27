@@ -20,7 +20,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
