@@ -1,5 +1,5 @@
 import { Asset } from 'Models/Asset';
-import { IRuntimeSchema, Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
 export interface ICampaign {
     id: string;
@@ -17,8 +17,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         timeout: ['number'],
         willExpireAt: ['number'],
     };
-    constructor(runtimeSchema: IRuntimeSchema<T>) {
-        super(runtimeSchema);
+    constructor(schema: ISchema<T>) {
+        super(schema);
     }
 
     public getId(): string {

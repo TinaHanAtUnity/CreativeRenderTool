@@ -1,5 +1,5 @@
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import { IRuntimeSchema, Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
 export interface IVastCreative {
     type: string;
@@ -7,8 +7,8 @@ export interface IVastCreative {
 }
 
 export abstract class VastCreative<T extends IVastCreative = IVastCreative> extends Model<T> {
-    constructor(runtimeSchema: IRuntimeSchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
-        super(runtimeSchema);
+    constructor(schema: ISchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
+        super(schema);
 
         this.set('type', type);
         this.set('trackingEvents', trackingEvents || {});

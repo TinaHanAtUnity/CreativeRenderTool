@@ -1,4 +1,4 @@
-import { IRuntimeSchema, Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
 export interface IAsset {
     url: string;
@@ -7,7 +7,7 @@ export interface IAsset {
 }
 
 export class Asset<T extends IAsset = IAsset> extends Model<T> {
-    constructor(schema: IRuntimeSchema<T>, url: string) {
+    constructor(schema: ISchema<T>, url: string) {
         super(schema);
 
         this.set('url', url);
