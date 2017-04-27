@@ -29,7 +29,7 @@ export class ClientInfo extends Model<IClientInfo> {
             applicationVersion: ['string'],
             sdkVersion: ['number'],
             sdkVersionName: ['string'],
-            platform: ['object'],
+            platform: ['number'],
             debuggable: ['boolean'],
             configUrl: ['string'],
             webviewUrl: ['string'],

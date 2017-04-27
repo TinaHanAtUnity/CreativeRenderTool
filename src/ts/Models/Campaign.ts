@@ -10,7 +10,7 @@ export interface ICampaign {
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
-    public static Schema: {
+    public static Schema: ISchema<ICampaign> = {
         id: ['string'],
         gamerId: ['string'],
         abGroup: ['number'],

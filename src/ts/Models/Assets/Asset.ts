@@ -7,7 +7,7 @@ export interface IAsset {
 }
 
 export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
-    public static Schema: {
+    public static Schema: ISchema<IAsset> = {
         url: ['string'],
         cachedUrl: ['string', 'undefined'],
         fileId: ['string', 'undefined']
