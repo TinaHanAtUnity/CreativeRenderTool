@@ -1,0 +1,18 @@
+{
+  "id": "TestCampaignId2",
+  "appStoreId": "TestAppstoreId",
+  "appStoreCountry": "US",
+  "gameId": 12345,
+  "gameName": "TestGameName",
+  "gameIcon": "https://TestGameIcon",
+  "rating": 5,
+  "endScreenLandscape": "https://TestEndScreenLandscape",
+  "endScreenPortrait": "https://TestEndScreenPortrait",
+  "trailerDownloadable": "https://TestTrailerDownloadable",
+  "trailerDownloadableSize": 12345,
+  "trailerStreaming": "https://TestTrailerStreaming",
+  "clickAttributionUrl": "https://TestClickAttributionUrl",
+  "clickAttributionUrlFollowsRedirects": false,
+  "bypassAppSheet": false,
+  "store": "google"
+}
