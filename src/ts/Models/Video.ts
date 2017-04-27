@@ -1,102 +1,108 @@
-import { Asset } from 'Models/Asset';
+import { Asset, IAsset } from 'Models/Asset';
+
+interface IVideo extends IAsset {
+    readonly size: number | undefined;
+    started: boolean;
+    errorStatus: boolean;
+    duration: number;
+    position: number;
+    positionRepeats: number;
+    quartile: number;
+    active: boolean;
+}
 
 export class Video extends Asset {
-
-    private readonly _size: number | undefined;
-    private _started: boolean;
-    private _errorStatus: boolean;
-    private _duration: number;
-    private _position: number;
-    private _positionRepeats: number;
-    private _quartile: number;
-    private _active: boolean;
-
     constructor(url: string, size?: number) {
-        super(url);
-        this._size = size;
-        this._started = false;
-        this._errorStatus = false;
-        this._duration = 0;
-        this._position = 0;
-        this._positionRepeats = 0;
-        this._quartile = 0;
-        this._active = true;
+        super({
+            ...Asset.Schema,
+
+        });
+
+        this.set('size', size);
+        this.set('started', false);
+        this.set('errorStatus', false);
+        this.set('duration', 0);
+        this.set('position', 0);
+        this.set('positionRepeats', 0);
+        this.set('quartile', 0);
+        this.set('active', true);
     }
 
     public getSize() {
-        return this._size;
+        return this.get('size');
     }
 
     public hasStarted() {
-        return this._started;
+        return this.get('started');
     }
 
     public setStarted(started: boolean) {
-        this._started = started;
+        this.set('started', started);
     }
 
     public getErrorStatus() {
-        return this._errorStatus;
+        return this.get('errorStatus');
     }
 
     public setErrorStatus(status: boolean) {
-        this._errorStatus = status;
+        this.get('errorStatus', status);
     }
 
     public getDuration() {
-        return this._duration;
+        return this.get('duration');
     }
 
     public setDuration(duration: number) {
-        this._duration = duration;
+        this.set('duration', duration);
     }
 
     public getPosition() {
-        return this._position;
+        return this.get('position');
     }
 
     public setPosition(position: number) {
-        this._position = position;
-        if(this._duration) {
-            this._quartile = Math.floor((this._position * 4) / this._duration);
+        this.set('position', position);
+        const duration = this.get('duration');
+        if(duration) {
+            this.set('quartile', Math.floor((this.get('position') * 4) / duration));
         }
     }
 
     public getPositionRepeats() {
-        return this._positionRepeats;
+        return this.get('positionRepeats');
     }
 
     public setPositionRepeats(repeats: number) {
-        this._positionRepeats = repeats;
+        this.set('positionRepeats', repeats);
     }
 
     public getQuartile() {
-        return this._quartile;
+        return this.get('quartile');
     }
 
     public setQuartile(quartile: number) {
-        this._quartile = quartile;
+        this.set('quartile', quartile);
     }
 
     public isActive() {
-        return this._active;
+        return this.get('active');
     }
 
     public setActive(active: boolean) {
-        this._active = active;
+        this.set('active', active);
     }
 
     public getDTO(): { [key: string]: any } {
         return {
             'asset': super.getDTO(),
-            'size': this._size,
-            'started': this._started,
-            'errorStatus': this._errorStatus,
-            'duration': this._duration,
-            'position': this._position,
-            'positionRepeats': this._positionRepeats,
-            'quartile': this._quartile,
-            'active': this._active
+            'size': this.getSize(),
+            'started': this.hasStarted(),
+            'errorStatus': this.getErrorStatus(),
+            'duration': this.getDuration(),
+            'position': this.getPosition(),
+            'positionRepeats': this.getPositionRepeats(),
+            'quartile': this.getQuartile(),
+            'active': this.isActive()
         };
     }
 }
