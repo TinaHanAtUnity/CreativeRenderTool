@@ -36,11 +36,7 @@ interface IPerformanceCampaign extends ICampaign {
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
         super({
-            id: ['string'],
-            gamerId: ['string'],
-            abGroup: ['number'],
-            timeout: ['number'],
-            willExpireAt: ['number'],
+            ... Campaign.Schema,
             appStoreId: ['string'],
             appStoreCountry: ['string'],
             gameId: ['number'],

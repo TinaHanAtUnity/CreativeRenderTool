@@ -10,6 +10,14 @@ export interface ICampaign {
 }
 
 export abstract class Campaign<T extends ICampaign> extends Model<T> {
+    public static Schema: {
+        id: ['string'],
+        gamerId: ['string'],
+        abGroup: ['number'],
+        timeout: ['number'],
+        willExpireAt: ['number'],
+    };
+
     constructor(runtimeSchema: IRuntimeSchema<T>, id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
         super(runtimeSchema);
 
