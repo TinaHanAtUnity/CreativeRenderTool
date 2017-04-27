@@ -15,11 +15,11 @@ export class Overlay extends View {
 
     protected static AutoSkip: boolean = false;
 
-    public onSkip: Observable1<number> = new Observable1();
-    public onMute: Observable1<boolean> = new Observable1();
-    public onCallButton: Observable1<boolean> = new Observable1();
+    public onSkip: Observable1<number> = new Observable1<number>();
+    public onMute: Observable1<boolean> = new Observable1<boolean>();
+    public onCallButton: Observable1<boolean> = new Observable1<boolean>();
 
-    public onFullScreenButton: Observable1<boolean> = new Observable1();
+    public onFullScreenButton: Observable1<boolean> = new Observable1<boolean>();
 
     private _localization: Localization;
 

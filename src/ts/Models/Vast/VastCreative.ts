@@ -6,7 +6,7 @@ export interface IVastCreative {
     trackingEvents: { [eventName: string]: string[] };
 }
 
-export abstract class VastCreative<T extends IVastCreative> extends Model<T> {
+export abstract class VastCreative<T extends IVastCreative = IVastCreative> extends Model<T> {
     constructor(runtimeSchema: IRuntimeSchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
         super(runtimeSchema);
 

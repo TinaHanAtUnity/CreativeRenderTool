@@ -1,27 +1,19 @@
-import { Model } from 'Models/Model';
+import { IRuntimeSchema, Model } from 'Models/Model';
 
-interface IAsset {
+export interface IAsset {
     url: string;
     cachedUrl: string | undefined;
     fileId: string | undefined;
 }
 
-export class Asset extends Model<IAsset> {
-    constructor(url: string) {
-        super({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']
-        });
+export class Asset<T extends IAsset = IAsset> extends Model<T> {
+    constructor(schema: IRuntimeSchema<T>, url: string) {
+        super(schema);
 
         this.set('url', url);
     }
 
     public getUrl(): string {
-        const cachedUrl = this.getCachedUrl();
-        if(typeof cachedUrl !== 'undefined') {
-            return cachedUrl;
-        }
         return this.getOriginalUrl();
     }
 

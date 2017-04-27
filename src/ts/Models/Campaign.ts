@@ -9,7 +9,7 @@ export interface ICampaign {
     willExpireAt: number;
 }
 
-export abstract class Campaign<T extends ICampaign> extends Model<T> {
+export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
     public static Schema: {
         id: ['string'],
         gamerId: ['string'],
@@ -17,18 +17,8 @@ export abstract class Campaign<T extends ICampaign> extends Model<T> {
         timeout: ['number'],
         willExpireAt: ['number'],
     };
-
-    constructor(runtimeSchema: IRuntimeSchema<T>, id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
+    constructor(runtimeSchema: IRuntimeSchema<T>) {
         super(runtimeSchema);
-
-        this.set('id', id);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('timeout', typeof timeout !== 'undefined' ? timeout : 0);
-
-        if(timeout) {
-            this.set('willExpireAt', Date.now() + timeout * 1000);
-        }
     }
 
     public getId(): string {

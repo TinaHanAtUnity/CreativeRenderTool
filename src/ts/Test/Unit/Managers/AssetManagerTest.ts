@@ -130,7 +130,13 @@ class TestCampaign extends Campaign {
     private _optional: Asset[];
 
     constructor(required: Asset[], optional: Asset[]) {
-        super('campaignId', 'gamerId', 10);
+        super({
+            id: ['string'],
+            gamerId: ['string'],
+            abGroup: ['number'],
+            timeout: ['number'],
+            willExpireAt: ['number']
+        });
         this._required = required;
         this._optional = optional;
     }
@@ -179,7 +185,10 @@ describe('AssetManagerTest', () => {
     it('should cache required assets', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request);
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
-        const asset = new Asset('https://www.google.fi');
+        const asset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, 'https://www.google.fi');
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');
         return assetManager.setup(campaign).then(() => {
@@ -191,7 +200,10 @@ describe('AssetManagerTest', () => {
     it('should cache optional assets', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request);
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
-        const asset = new Asset('https://www.google.fi');
+        const asset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, 'https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         const spy = sinon.spy(cache, 'cache');
         return assetManager.setup(campaign).then(() => {
@@ -205,7 +217,10 @@ describe('AssetManagerTest', () => {
     it('should not wait for optional assets when cache mode is allowed', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request);
         const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
-        const asset = new Asset('https://www.google.fi');
+        const asset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, 'https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         return assetManager.setup(campaign).then(() => {
             assert(!asset.isCached(), 'Asset was cached');
@@ -215,7 +230,10 @@ describe('AssetManagerTest', () => {
     it('should swallow optional errors when cache mode is allowed', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request, {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
-        const asset = new Asset('https://www.google.fi');
+        const asset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, 'https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         cacheApi.setInternet(false);
         return assetManager.setup(campaign).then(() => {
@@ -226,7 +244,10 @@ describe('AssetManagerTest', () => {
     it('should not swallow errors when cache mode is forced', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request, {retries: 0, retryDelay: 1});
         const assetManager = new AssetManager(cache, CacheMode.FORCED);
-        const asset = new Asset('https://www.google.fi');
+        const asset = new Asset({
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined']}, 'https://www.google.fi');
         const campaign = new TestCampaign([asset], []);
         cacheApi.setInternet(false);
         return assetManager.setup(campaign).then(() => {

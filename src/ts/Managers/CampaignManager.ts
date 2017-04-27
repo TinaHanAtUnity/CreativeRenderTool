@@ -52,15 +52,15 @@ export class CampaignManager {
     private static Country: string | undefined;
     private static CampaignResponse: string | undefined;
 
-    public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
-    public onVastCampaign: Observable1<VastCampaign> = new Observable1();
-    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
+    public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1<PerformanceCampaign>();
+    public onVastCampaign: Observable1<VastCampaign> = new Observable1<VastCampaign>();
+    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1<MRAIDCampaign>();
     public onNoFill: Observable0 = new Observable0();
     public onError: Observable1<WebViewError> = new Observable1();
 
-    public onPlcCampaign: Observable2<string, Campaign> = new Observable2();
-    public onPlcNoFill: Observable1<string> = new Observable1();
-    public onPlcError: Observable1<WebViewError> = new Observable1();
+    public onPlcCampaign: Observable2<string, Campaign> = new Observable2<string, Campaign>();
+    public onPlcNoFill: Observable1<string> = new Observable1<string>();
+    public onPlcError: Observable1<WebViewError> = new Observable1<WebViewError>();
 
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
@@ -437,7 +437,7 @@ export class CampaignManager {
         });
     }
 
-    private fetchGamerId(): Promise<string> {
+    private fetchGamerId(): Promise<string | undefined> {
         return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {

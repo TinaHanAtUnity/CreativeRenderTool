@@ -8,7 +8,7 @@ enum NotificationEvent {
 
 export class NotificationApi extends NativeApi {
 
-    public onNotification: Observable2<string, any> = new Observable2();
+    public onNotification: Observable2<string, any> = new Observable2<string, any>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Notification');

@@ -20,7 +20,7 @@ export class MRAID extends View {
     public onClick: Observable0 = new Observable0();
     public onSkip: Observable0 = new Observable0();
     public onClose: Observable0 = new Observable0();
-    public onOrientationProperties: Observable1<IOrientationProperties> = new Observable1();
+    public onOrientationProperties: Observable1<IOrientationProperties> = new Observable1<IOrientationProperties>();
 
     private onLoaded: Observable0 = new Observable0();
 
@@ -282,7 +282,7 @@ export class MRAID extends View {
             if(fileId) {
                 return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
             } else {
-                return new Promise((resolve, reject) => {
+                return new Promise<string>((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
@@ -292,7 +292,8 @@ export class MRAID extends View {
                 });
             }
         } else {
-            return Promise.resolve(this._campaign.getResource());
+            const resource = this._campaign.getResource();
+            return Promise.resolve(resource ? resource : '');
         }
     }
 

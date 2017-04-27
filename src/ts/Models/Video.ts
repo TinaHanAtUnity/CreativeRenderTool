@@ -1,7 +1,7 @@
 import { Asset, IAsset } from 'Models/Asset';
 
-interface IVideo extends IAsset {
-    readonly size: number | undefined;
+export interface IVideo extends IAsset {
+    size: number | undefined;
     started: boolean;
     errorStatus: boolean;
     duration: number;
@@ -11,12 +11,22 @@ interface IVideo extends IAsset {
     active: boolean;
 }
 
-export class Video extends Asset {
+export class Video extends Asset<IVideo> {
+
     constructor(url: string, size?: number) {
         super({
-            ...Asset.Schema,
-
-        });
+            url: ['string'],
+            cachedUrl: ['string', 'undefined'],
+            fileId: ['string', 'undefined'],
+            size: ['number', 'undefined'],
+            started: ['boolean'],
+            errorStatus: ['boolean'],
+            duration: ['number'],
+            position: ['number'],
+            positionRepeats: ['number'],
+            quartile: ['number'],
+            active: ['boolean']
+        }, url);
 
         this.set('size', size);
         this.set('started', false);
@@ -45,7 +55,7 @@ export class Video extends Asset {
     }
 
     public setErrorStatus(status: boolean) {
-        this.get('errorStatus', status);
+        this.set('errorStatus', status);
     }
 
     public getDuration() {
