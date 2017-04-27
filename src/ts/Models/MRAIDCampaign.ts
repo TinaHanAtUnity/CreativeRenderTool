@@ -1,8 +1,8 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
-import { Asset } from 'Models/Asset';
+import { HTML } from 'Models/Assets/HTML';
 
 interface IMRAIDCampaign extends ICampaign {
-    resourceUrl: Asset | undefined;
+    resourceAsset: HTML | undefined;
     resource: string | undefined;
 }
 
@@ -10,7 +10,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
         super({
             ... Campaign.Schema,
-            resourceUrl: ['object', 'undefined'],
+            resourceAsset: ['object', 'undefined'],
             resource: ['string']
         });
 
@@ -18,22 +18,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 
-        this.set('resourceUrl', resourceUrl ? new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']},resourceUrl) : undefined);
+        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
         this.set('resource', resource);
     }
 
-    public getResourceUrl(): Asset | undefined {
-        return this.get('resourceUrl');
+    public getResourceUrl(): HTML | undefined {
+        return this.get('resourceAsset');
     }
 
     public setResourceUrl(url: string): void {
-        this.set('resourceUrl', new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, url));
+        this.set('resourceAsset', new HTML(url));
     }
 
     public setResource(resource: string): void {

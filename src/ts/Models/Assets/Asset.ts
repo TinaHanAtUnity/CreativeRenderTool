@@ -6,11 +6,15 @@ export interface IAsset {
     fileId: string | undefined;
 }
 
-export class Asset<T extends IAsset = IAsset> extends Model<T> {
-    constructor(schema: ISchema<T>, url: string) {
-        super(schema);
+export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
+    public static Schema: {
+        url: ['string'],
+        cachedUrl: ['string', 'undefined'],
+        fileId: ['string', 'undefined']
+    };
 
-        this.set('url', url);
+    constructor(schema: ISchema<T>) {
+        super(schema);
     }
 
     public getUrl(): string {

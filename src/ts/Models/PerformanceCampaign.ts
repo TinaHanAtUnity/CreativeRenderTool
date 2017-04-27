@@ -1,6 +1,6 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
-import { Asset } from 'Models/Asset';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
+import { Image } from 'Models/Assets/Image';
 
 export enum StoreName {
     APPLE,
@@ -14,13 +14,13 @@ interface IPerformanceCampaign extends ICampaign {
 
     gameId: number;
     gameName: string;
-    gameIcon: Asset;
+    gameIcon: Image;
 
     rating: number;
     ratingCount: number;
 
-    landscapeImage: Asset;
-    portraitImage: Asset;
+    landscapeImage: Image;
+    portraitImage: Image;
 
     video: Video;
     streamingVideo: Video;
@@ -63,22 +63,13 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
         this.set('gameId', campaign.gameId);
         this.set('gameName', campaign.gameName);
-        this.set('gameIcon', new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, campaign.gameIcon));
+        this.set('gameIcon', new Image(campaign.gameIcon));
 
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
-        this.set('landscapeImage', new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, campaign.endScreenLandscape));
-        this.set('portraitImage', new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, campaign.endScreenPortrait));
+        this.set('landscapeImage', new Image(campaign.endScreenLandscape));
+        this.set('portraitImage', new Image(campaign.endScreenPortrait));
 
         this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
         this.set('streamingVideo', new Video(campaign.trailerStreaming));
@@ -124,7 +115,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('gameName');
     }
 
-    public getGameIcon(): Asset {
+    public getGameIcon(): Image {
         return this.get('gameIcon');
     }
 
@@ -136,11 +127,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('ratingCount');
     }
 
-    public getPortrait(): Asset {
+    public getPortrait(): Image {
         return this.get('portraitImage');
     }
 
-    public getLandscape(): Asset {
+    public getLandscape(): Image {
         return this.get('landscapeImage');
     }
 

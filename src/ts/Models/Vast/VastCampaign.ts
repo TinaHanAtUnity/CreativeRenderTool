@@ -1,36 +1,19 @@
 import { Vast } from 'Models/Vast/Vast';
-import { Video } from 'Models/Video';
-import { Asset } from 'Models/Asset';
+import { Video } from 'Models/Assets/Video';
+import { Asset } from 'Models/Assets/Asset';
 import { Campaign, ICampaign } from 'Models/Campaign';
+import { Image } from 'Models/Assets/Image';
 
 interface IVastCampaign extends ICampaign {
     vast: Vast;
     video: Video;
     hasEndscreen: boolean;
-    portrait: Asset | undefined;
-    landscape: Asset | undefined;
+    portrait: Image | undefined;
+    landscape: Image | undefined;
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset = undefined;
-        if(portraitUrl) {
-            portraitAsset = new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, portraitUrl);
-        }
-
-        const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset = undefined;
-        if(landscapeUrl) {
-            landscapeAsset = new Asset({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined']}, landscapeUrl);
-        }
-
         super({
             ... Campaign.Schema,
             vast: ['object'],
@@ -39,6 +22,18 @@ export class VastCampaign extends Campaign<IVastCampaign> {
             portrait: ['object', 'undefined'],
             landscape: ['object', 'undefined']
         });
+
+        const portraitUrl = vast.getCompanionPortraitUrl();
+        let portraitAsset = undefined;
+        if(portraitUrl) {
+            portraitAsset = new Image(portraitUrl);
+        }
+
+        const landscapeUrl = vast.getCompanionLandscapeUrl();
+        let landscapeAsset = undefined;
+        if(landscapeUrl) {
+            landscapeAsset = new Image(landscapeUrl);
+        }
 
         this.set('vast', vast);
         this.set('video', new Video(vast.getVideoUrl()));

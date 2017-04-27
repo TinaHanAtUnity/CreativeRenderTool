@@ -1,4 +1,4 @@
-import { Asset } from 'Models/Asset';
+import { Asset } from 'Models/Assets/Asset';
 import { ISchema, Model } from 'Models/Model';
 
 export interface ICampaign {

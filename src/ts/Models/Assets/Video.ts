@@ -1,4 +1,4 @@
-import { Asset, IAsset } from 'Models/Asset';
+import { Asset, IAsset } from 'Models/Assets/Asset';
 
 export interface IVideo extends IAsset {
     size: number | undefined;
@@ -12,12 +12,9 @@ export interface IVideo extends IAsset {
 }
 
 export class Video extends Asset<IVideo> {
-
     constructor(url: string, size?: number) {
         super({
-            url: ['string'],
-            cachedUrl: ['string', 'undefined'],
-            fileId: ['string', 'undefined'],
+            ... Asset.Schema,
             size: ['number', 'undefined'],
             started: ['boolean'],
             errorStatus: ['boolean'],
@@ -26,8 +23,9 @@ export class Video extends Asset<IVideo> {
             positionRepeats: ['number'],
             quartile: ['number'],
             active: ['boolean']
-        }, url);
+        });
 
+        this.set('url', url);
         this.set('size', size);
         this.set('started', false);
         this.set('errorStatus', false);
