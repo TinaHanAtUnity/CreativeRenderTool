@@ -46,5 +46,4 @@ export class MetaDataManager {
 
     public static clearCaches() {
     }
-
 }
