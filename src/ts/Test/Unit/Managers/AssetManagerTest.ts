@@ -131,13 +131,7 @@ class TestCampaign extends Campaign {
     private _optional: Asset[];
 
     constructor(required: Asset[], optional: Asset[]) {
-        super({
-            id: ['string'],
-            gamerId: ['string'],
-            abGroup: ['number'],
-            timeout: ['number'],
-            willExpireAt: ['number']
-        });
+        super(Campaign.Schema);
         this._required = required;
         this._optional = optional;
     }
