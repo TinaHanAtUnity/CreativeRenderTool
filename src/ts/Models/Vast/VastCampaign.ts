@@ -26,11 +26,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         }
 
         super({
-            id: ['string'],
-            gamerId: ['string'],
-            abGroup: ['number'],
-            timeout: ['number'],
-            willExpireAt: ['number'],
+            ... Campaign.Schema,
             vast: ['object'],
             video: ['object'],
             hasEndscreen: ['boolean'],
