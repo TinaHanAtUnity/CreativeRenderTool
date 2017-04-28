@@ -18,12 +18,12 @@ export enum AndroidVideoPlayerError {
 
 export class AndroidVideoPlayerApi extends NativeApi {
 
-    public onInfo: Observable3<string, number, number> = new Observable3<string, number, number>();
-    public onGenericError: Observable3<string, number, number> = new Observable3<string, number, number>();
-    public onPrepareError: Observable1<string> = new Observable1<string>();
-    public onSeekToError: Observable1<string> = new Observable1<string>();
-    public onPauseError: Observable1<string> = new Observable1<string>();
-    public onIllegalStateError: Observable0 = new Observable0();
+    public readonly onInfo = new Observable3<string, number, number>();
+    public readonly onGenericError = new Observable3<string, number, number>();
+    public readonly onPrepareError = new Observable1<string>();
+    public readonly onSeekToError = new Observable1<string>();
+    public readonly onPauseError = new Observable1<string>();
+    public readonly onIllegalStateError = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');

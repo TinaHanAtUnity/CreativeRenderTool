@@ -52,15 +52,15 @@ export class CampaignManager {
     private static Country: string | undefined;
     private static CampaignResponse: string | undefined;
 
-    public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1<PerformanceCampaign>();
-    public onVastCampaign: Observable1<VastCampaign> = new Observable1<VastCampaign>();
-    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1<MRAIDCampaign>();
-    public onNoFill: Observable0 = new Observable0();
-    public onError: Observable1<WebViewError> = new Observable1();
+    public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
+    public readonly onVastCampaign = new Observable1<VastCampaign>();
+    public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
+    public readonly onNoFill = new Observable0();
+    public readonly onError = new Observable1<WebViewError>();
 
-    public onPlcCampaign: Observable2<string, Campaign> = new Observable2<string, Campaign>();
-    public onPlcNoFill: Observable1<string> = new Observable1<string>();
-    public onPlcError: Observable1<WebViewError> = new Observable1<WebViewError>();
+    public readonly onPlcCampaign = new Observable2<string, Campaign>();
+    public readonly onPlcNoFill = new Observable1<string>();
+    public readonly onPlcError = new Observable1<WebViewError>();
 
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;

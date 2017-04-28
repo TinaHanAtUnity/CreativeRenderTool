@@ -9,8 +9,8 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VastEndScreen extends View {
 
-    public onClick: Observable0 = new Observable0();
-    public onClose: Observable0 = new Observable0();
+    public readonly onClick = new Observable0();
+    public readonly onClose = new Observable0();
 
     constructor(nativeBridge: NativeBridge, campaign: VastCampaign) {
         super(nativeBridge, 'end-screen');

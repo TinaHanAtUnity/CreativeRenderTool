@@ -10,8 +10,8 @@ export enum RequestEvent {
 
 export class RequestApi extends NativeApi {
 
-    public onComplete: Observable5<string, string, string, number, Array<[string, string]>> = new Observable5<string, string, string, number, Array<[string, string]>>();
-    public onFailed: Observable3<string, string, string> = new Observable3<string, string, string>();
+    public readonly onComplete = new Observable5<string, string, string, number, Array<[string, string]>>();
+    public readonly onFailed = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Request');
