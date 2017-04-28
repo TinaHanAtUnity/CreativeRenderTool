@@ -23,7 +23,7 @@ export class AndroidVideoPlayerApi extends NativeApi {
     public readonly onPrepareError = new Observable1<string>();
     public readonly onSeekToError = new Observable1<string>();
     public readonly onPauseError = new Observable1<string>();
-    public readonly onIllegalStateError: Observable0 = new Observable0();
+    public readonly onIllegalStateError = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
