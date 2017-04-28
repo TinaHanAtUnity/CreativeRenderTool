@@ -1,6 +1,7 @@
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
+import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 
 export interface IAnalyticsObject {
     type: string;
@@ -70,6 +71,20 @@ interface IAnalyticsUpdateEvent {
 interface IAnalyticsAppRunningEvent {
     ts: number;
     duration: number;
+}
+
+interface IAnalyticsTransactionEvent {
+    ts: number;
+    transactionId: number;
+    productId: string;
+    amount: number;
+    currency: string;
+    receipt?: IAnalyticsTransactionReceipt;
+}
+
+interface IAnalyticsTransactionReceipt {
+    data?: string;
+    signature?: string;
 }
 
 export class AnalyticsProtocol {
@@ -174,5 +189,27 @@ export class AnalyticsProtocol {
             type: 'analytics.appRunning.v1',
             msg: appRunningEvent
         };
+    }
+
+    public static getIAPTransactionObject(transactionId: number, instrumentation: IIAPInstrumentation): IAnalyticsObject {
+        let transactionEvent: IAnalyticsTransactionEvent = {
+            ts: Date.now(),
+            transactionId: transactionId,
+            productId: instrumentation.productId,
+            amount: instrumentation.price,
+            currency: instrumentation.currency,
+        };
+
+        if(instrumentation.signature || instrumentation.receiptPurchaseData) {
+            transactionEvent.receipt = {
+                data: instrumentation.receiptPurchaseData,
+                signature: instrumentation.signature
+            }
+        }
+
+        return {
+            type: 'analytics.transaction.v1',
+            msg: transactionEvent
+        }
     }
 }

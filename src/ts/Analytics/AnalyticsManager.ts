@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
@@ -79,6 +79,10 @@ export class AnalyticsManager {
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
 
+                this._storage.getIAPTransactions().then(transactions => {
+                    this.sendIAPTransactions(transactions);
+                });
+
                 this.subscribeListeners();
             });
         }
@@ -89,6 +93,7 @@ export class AnalyticsManager {
         this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._wakeUpManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
         this._wakeUpManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
+        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     private sendNewSession(): void {
@@ -109,6 +114,14 @@ export class AnalyticsManager {
 
     private sendDeviceInfo(): void {
         this.send(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
+    }
+
+    private sendIAPTransactions(transactions: Array<IIAPInstrumentation>): void {
+        for(const item of transactions) {
+            this._storage.getIntegerId().then(id => {
+                this.send(AnalyticsProtocol.getIAPTransactionObject(id, item));
+            });
+        }
     }
 
     private onAppForeground(): void {
@@ -149,11 +162,18 @@ export class AnalyticsManager {
         }
     }
 
+    private onStorageSet(eventType: string, data: string) {
+        if(data && data.indexOf('price') !== -1 && data.indexOf('currency') !== -1) {
+            this._storage.getIAPTransactions().then(transactions => {
+                this.sendIAPTransactions(transactions);
+            });
+        }
+    }
+
     private send(event: IAnalyticsObject): Promise<INativeResponse> {
         const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo);
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return this._request.post(this._endpoint, data);
     }
-
 }

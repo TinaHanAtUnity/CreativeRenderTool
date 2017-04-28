@@ -1,6 +1,15 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType, StorageError } from 'Native/Api/Storage';
 
+export interface IIAPInstrumentation {
+    price: number;
+    currency: string;
+    productId: string;
+    signature?: string;
+    receiptPurchaseData?: string;
+    ts: number;
+}
+
 export class AnalyticsStorage {
     private _nativeBridge: NativeBridge;
 
@@ -22,10 +31,7 @@ export class AnalyticsStorage {
         if(reinit) {
             return this.getValue<number>('analytics.sessionid');
         } else {
-            return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-                // session ids are decimal numbers in analytics so parse native hex string format to a decimal number
-                return parseInt(id.replace(/-/g, '').substring(0, 12), 16);
-            });
+            return this.getIntegerId();
         }
     }
 
@@ -35,6 +41,25 @@ export class AnalyticsStorage {
 
     public getOsVersion(): Promise<string> {
         return this.getValue<string>('analytics.osversion');
+    }
+
+    public getIAPTransactions(): Promise<Array<IIAPInstrumentation>> {
+        return this._nativeBridge.Storage.get<Array<IIAPInstrumentation>>(StorageType.PUBLIC, 'iap.purchases').then(value => {
+            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'iap.purchases');
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
+            return value;
+        }).catch(([error]) => {
+            switch (error) {
+                case StorageError[StorageError.COULDNT_GET_VALUE]:
+                    return [];
+
+                case StorageError[StorageError.COULDNT_GET_STORAGE]:
+                    return [];
+
+                default:
+                    throw new Error(error);
+            }
+        });
     }
 
     public setIds(userId: string, sessionId: number): void {
@@ -47,6 +72,13 @@ export class AnalyticsStorage {
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.appversion', appVersion);
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.osversion', osVersion);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
+    public getIntegerId(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+            // parse hex based native id to a safe decimal integer
+            return parseInt(id.replace(/-/g, '').substring(0, 12), 16);
+        });
     }
 
     private getValue<T>(key: string): Promise<T | undefined> {
