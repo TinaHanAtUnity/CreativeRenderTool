@@ -22,14 +22,14 @@ export class VideoPlayerApi extends NativeApi {
     public Ios: IosVideoPlayerApi;
     public Android: AndroidVideoPlayerApi;
 
-    public onProgress: Observable1<number> = new Observable1<number>();
-    public onCompleted: Observable1<string> = new Observable1<string>();
-    public onPrepared: Observable4<string, number, number, number> = new Observable4<string, number, number, number>();
-    public onPrepareTimeout: Observable1<string> = new Observable1<string>();
-    public onPlay: Observable1<string> = new Observable1<string>();
-    public onPause: Observable1<string> = new Observable1<string>();
-    public onSeek: Observable1<string> = new Observable1<string>();
-    public onStop: Observable1<string> = new Observable1<string>();
+    public readonly onProgress = new Observable1<number>();
+    public readonly onCompleted = new Observable1<string>();
+    public readonly onPrepared = new Observable4<string, number, number, number>();
+    public readonly onPrepareTimeout = new Observable1<string>();
+    public readonly onPlay = new Observable1<string>();
+    public readonly onPause = new Observable1<string>();
+    public readonly onSeek = new Observable1<string>();
+    public readonly onStop = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');

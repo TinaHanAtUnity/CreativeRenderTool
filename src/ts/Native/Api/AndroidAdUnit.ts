@@ -30,14 +30,14 @@ export enum AndroidAdUnitError {
 
 export class AndroidAdUnitApi extends NativeApi {
 
-    public onStart = new Observable1<number>();
-    public onCreate = new Observable1<number>();
-    public onResume: Observable1<number> = new Observable1<number>();
-    public onDestroy: Observable2<boolean, number> = new Observable2<boolean, number>();
-    public onPause: Observable2<boolean, number> = new Observable2<boolean, number>();
-    public onKeyDown: Observable5<number, number, number, number, number> = new Observable5<number, number, number, number, number>();
-    public onRestore: Observable1<number> = new Observable1<number>();
-    public onStop: Observable1<number> = new Observable1<number>();
+    public readonly onStart = new Observable1<number>();
+    public readonly onCreate = new Observable1<number>();
+    public readonly onResume = new Observable1<number>();
+    public readonly onDestroy = new Observable2<boolean, number>();
+    public readonly onPause = new Observable2<boolean, number>();
+    public readonly onKeyDown = new Observable5<number, number, number, number, number>();
+    public readonly onRestore = new Observable1<number>();
+    public readonly onStop = new Observable1<number>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit');
