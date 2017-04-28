@@ -17,14 +17,6 @@ export class PlayerMetaData extends MetaData<IPlayerMetaData> {
         this.set('serverId', data[0]);
     }
 
-    public getCategory(): string {
-        return this.get('category');
-    }
-
-    public getKeys(): string[] {
-        return this.get('keys');
-    }
-
     public getServerId(): string {
         return this.get('serverId');
     }

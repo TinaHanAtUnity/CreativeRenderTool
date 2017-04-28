@@ -19,14 +19,6 @@ export class AdapterMetaData extends MetaData<IAdapterMetaData> {
         this.set('version', data[1]);
     }
 
-    public getCategory(): string {
-        return this.get('category');
-    }
-
-    public getKeys(): string[] {
-        return this.get('keys');
-    }
-
     public getName(): string {
         return this.get('name');
     }

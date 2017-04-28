@@ -14,4 +14,12 @@ export abstract class MetaData<T extends IMetaData = IMetaData> extends Model<T>
     constructor(schema: ISchema<T>) {
         super(schema);
     }
+
+    public getCategory(): string {
+        return this.get('category');
+    }
+
+    public getKeys(): string[] {
+        return this.get('keys');
+    }
 }

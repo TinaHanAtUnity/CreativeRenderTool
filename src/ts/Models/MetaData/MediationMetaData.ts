@@ -25,14 +25,6 @@ export class MediationMetaData extends MetaData<IMediationMetaData> {
         this.set('version', data[1]);
     }
 
-    public getCategory(): string {
-        return this.get('category');
-    }
-
-    public getKeys(): string[] {
-        return this.get('keys');
-    }
-
     public getOrdinalKey(): string {
         return this.get('ordinalKey');
     }
