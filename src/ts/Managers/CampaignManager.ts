@@ -7,7 +7,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+// import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
@@ -415,8 +415,8 @@ export class CampaignManager {
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
             const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            // metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
+            // metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {

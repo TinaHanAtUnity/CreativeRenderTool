@@ -5,7 +5,7 @@ import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+// import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Errors/ConfigError';
@@ -17,9 +17,9 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 export class ConfigManager {
 
     public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return Promise.all<FrameworkMetaData, AdapterMetaData, string | undefined>([
-            MetaDataManager.fetchFrameworkMetaData(nativeBridge),
-            MetaDataManager.fetchAdapterMetaData(nativeBridge),
+        return Promise.all<FrameworkMetaData, AdapterMetaData, string | undefined>([new FrameworkMetaData(), new AdapterMetaData(),
+            // MetaDataManager.fetchFrameworkMetaData(nativeBridge),
+            // MetaDataManager.fetchAdapterMetaData(nativeBridge),
             ConfigManager.fetchGamerId(nativeBridge)
         ]).then(([framework, adapter, gamerId]) => {
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
