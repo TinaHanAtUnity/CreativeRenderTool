@@ -1,28 +1,30 @@
-import { Model } from 'Models/Model';
+import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
 
-interface IAdapterMetaData {
+interface IAdapterMetaData extends IMetaData {
     name: string;
     version: string;
 }
 
-export class AdapterMetaData extends Model<IAdapterMetaData> {
-
-    public static getCategory(): string {
-        return 'adapter';
-    }
-
-    public static getKeys(): string[] {
-        return ['name', 'version'];
-    }
-
+export class AdapterMetaData extends MetaData<IAdapterMetaData> {
     constructor(data: string[]) {
         super({
+            ... MetaData.Schema,
             name: ['string'],
             version: ['string']
         });
 
+        this.set('category', 'adapter');
+        this.set('keys', ['name', 'version']);
         this.set('name', data[0]);
         this.set('version', data[1]);
+    }
+
+    public getCategory(): string {
+        return this.get('category');
+    }
+
+    public getKeys(): string[] {
+        return this.get('keys');
     }
 
     public getName(): string {
@@ -39,5 +41,4 @@ export class AdapterMetaData extends Model<IAdapterMetaData> {
             'version': this.getVersion()
         };
     }
-
 }

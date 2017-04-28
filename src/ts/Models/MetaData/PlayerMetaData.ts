@@ -1,25 +1,28 @@
-import { Model } from 'Models/Model';
+import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
 
-interface IPlayerMetaData {
+interface IPlayerMetaData extends IMetaData {
     serverId: string;
 }
 
-export class PlayerMetaData extends Model<IPlayerMetaData> {
-
-    public static getCategory(): string {
-        return 'player';
-    }
-
-    public static getKeys(): string[] {
-        return ['server_id'];
-    }
+export class PlayerMetaData extends MetaData<IPlayerMetaData> {
 
     constructor(data: string[]) {
         super({
+            ... MetaData.Schema,
             serverId: ['string'],
         });
 
+        this.set('keys', ['server_id']);
+        this.set('category', 'player');
         this.set('serverId', data[0]);
+    }
+
+    public getCategory(): string {
+        return this.get('category');
+    }
+
+    public getKeys(): string[] {
+        return this.get('keys');
     }
 
     public getServerId(): string {
@@ -28,8 +31,9 @@ export class PlayerMetaData extends Model<IPlayerMetaData> {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'sid': this.getServerId()
+            'sid': this.getServerId(),
+            'keys': this.getKeys(),
+            'category': this.getCategory()
         };
     }
-
 }

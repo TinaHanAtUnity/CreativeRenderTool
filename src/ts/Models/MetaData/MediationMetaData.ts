@@ -1,34 +1,40 @@
-import { Model } from 'Models/Model';
+import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
 
-interface IMediationMetaData {
+interface IMediationMetaData extends IMetaData {
     name: string;
     version: string;
     ordinal: number | undefined;
+    ordinalKey: string;
 }
 
-export class MediationMetaData extends Model<IMediationMetaData> {
-
-    public static getCategory(): string {
-        return 'mediation';
-    }
-
-    public static getStaticKeys(): string[] {
-        return ['name', 'version'];
-    }
-
-    public static getOrdinalKey(): string {
-        return 'ordinal';
-    }
+export class MediationMetaData extends MetaData<IMediationMetaData> {
 
     constructor(data: string[]) {
         super({
+            ... MetaData.Schema,
             name: ['string'],
             version: ['string'],
-            ordinal: ['number', 'undefined']
+            ordinal: ['number', 'undefined'],
+            ordinalKey: ['string']
         });
 
+        this.set('ordinalKey', 'ordinal');
+        this.set('category', 'mediation');
+        this.set('keys', ['name', 'version']);
         this.set('name', data[0]);
         this.set('version', data[1]);
+    }
+
+    public getCategory(): string {
+        return this.get('category');
+    }
+
+    public getKeys(): string[] {
+        return this.get('keys');
+    }
+
+    public getOrdinalKey(): string {
+        return this.get('ordinalKey');
     }
 
     public getName(): string {
@@ -51,8 +57,9 @@ export class MediationMetaData extends Model<IMediationMetaData> {
         return {
             'name': this.getName(),
             'version': this.getVersion(),
-            'ordinal': this.getOrdinal()
+            'ordinal': this.getOrdinal(),
+            'keys': this.getKeys(),
+            'category': this.getCategory()
         };
     }
-
 }

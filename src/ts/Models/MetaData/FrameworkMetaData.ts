@@ -1,28 +1,30 @@
-import { Model } from 'Models/Model';
+import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
 
-interface IFrameworkMetaData {
+interface IFrameworkMetaData extends IMetaData {
     name: string;
     version: string;
 }
 
-export class FrameworkMetaData extends Model<IFrameworkMetaData> {
-
-    public static getCategory(): string {
-        return 'framework';
-    }
-
-    public static getKeys(): string[] {
-        return ['name', 'version'];
-    }
-
+export class FrameworkMetaData extends MetaData<IFrameworkMetaData> {
     constructor(data: string[]) {
         super({
+            ... MetaData.Schema,
             name: ['string'],
             version: ['string']
         });
 
+        this.set('category', 'framework');
+        this.set('keys', ['name', 'version']);
         this.set('name', data[0]);
         this.set('version', data[1]);
+    }
+
+    public getCategory(): string {
+        return this.get('category');
+    }
+
+    public getKeys(): string[] {
+        return this.get('keys');
     }
 
     public getName(): string {
@@ -36,8 +38,9 @@ export class FrameworkMetaData extends Model<IFrameworkMetaData> {
     public getDTO(): { [key: string]: any } {
         return {
             'name': this.getName(),
-            'version': this.getVersion()
+            'version': this.getVersion(),
+            'keys': this.getKeys(),
+            'category': this.getCategory()
         };
     }
-
 }
