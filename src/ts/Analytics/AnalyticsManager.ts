@@ -116,7 +116,7 @@ export class AnalyticsManager {
         this.send(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
     }
 
-    private sendIAPTransactions(transactions: Array<IIAPInstrumentation>): void {
+    private sendIAPTransactions(transactions: IIAPInstrumentation[]): void {
         for(const item of transactions) {
             this._storage.getIntegerId().then(id => {
                 this.send(AnalyticsProtocol.getIAPTransactionObject(id, item));

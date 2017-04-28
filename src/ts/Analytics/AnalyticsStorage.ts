@@ -43,8 +43,8 @@ export class AnalyticsStorage {
         return this.getValue<string>('analytics.osversion');
     }
 
-    public getIAPTransactions(): Promise<Array<IIAPInstrumentation>> {
-        return this._nativeBridge.Storage.get<Array<IIAPInstrumentation>>(StorageType.PUBLIC, 'iap.purchases').then(value => {
+    public getIAPTransactions(): Promise<IIAPInstrumentation[]> {
+        return this._nativeBridge.Storage.get<IIAPInstrumentation[]>(StorageType.PUBLIC, 'iap.purchases').then(value => {
             this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'iap.purchases');
             this._nativeBridge.Storage.write(StorageType.PUBLIC);
             return value;

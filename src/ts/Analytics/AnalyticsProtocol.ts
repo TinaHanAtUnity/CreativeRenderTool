@@ -192,7 +192,7 @@ export class AnalyticsProtocol {
     }
 
     public static getIAPTransactionObject(transactionId: number, instrumentation: IIAPInstrumentation): IAnalyticsObject {
-        let transactionEvent: IAnalyticsTransactionEvent = {
+        const transactionEvent: IAnalyticsTransactionEvent = {
             ts: Date.now(),
             transactionId: transactionId,
             productId: instrumentation.productId,
@@ -204,12 +204,12 @@ export class AnalyticsProtocol {
             transactionEvent.receipt = {
                 data: instrumentation.receiptPurchaseData,
                 signature: instrumentation.signature
-            }
+            };
         }
 
         return {
             type: 'analytics.transaction.v1',
             msg: transactionEvent
-        }
+        };
     }
 }
