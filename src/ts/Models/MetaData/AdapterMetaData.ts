@@ -1,29 +1,27 @@
-import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
 
 interface IAdapterMetaData extends IMetaData {
-    name: string;
-    version: string;
+    name: string | undefined;
+    version: string | undefined;
 }
 
-export class AdapterMetaData extends MetaData<IAdapterMetaData> {
-    constructor(data: string[]) {
+export class AdapterMetaData extends BaseMetaData<IAdapterMetaData> {
+    constructor() {
         super({
-            ... MetaData.Schema,
-            name: ['string'],
-            version: ['string']
+            ... BaseMetaData.Schema,
+            name: ['string', 'undefined'],
+            version: ['string', 'undefined']
         });
 
         this.set('category', 'adapter');
         this.set('keys', ['name', 'version']);
-        this.set('name', data[0]);
-        this.set('version', data[1]);
     }
 
-    public getName(): string {
+    public getName(): string | undefined {
         return this.get('name');
     }
 
-    public getVersion(): string {
+    public getVersion(): string | undefined {
         return this.get('version');
     }
 

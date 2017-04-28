@@ -1,29 +1,27 @@
-import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
 
 interface IFrameworkMetaData extends IMetaData {
-    name: string;
-    version: string;
+    name: string | undefined;
+    version: string | undefined;
 }
 
-export class FrameworkMetaData extends MetaData<IFrameworkMetaData> {
-    constructor(data: string[]) {
+export class FrameworkMetaData extends BaseMetaData<IFrameworkMetaData> {
+    constructor() {
         super({
-            ... MetaData.Schema,
-            name: ['string'],
-            version: ['string']
+            ... BaseMetaData.Schema,
+            name: ['string', 'undefined'],
+            version: ['string', 'undefined']
         });
 
         this.set('category', 'framework');
         this.set('keys', ['name', 'version']);
-        this.set('name', data[0]);
-        this.set('version', data[1]);
     }
 
-    public getName(): string {
+    public getName(): string | undefined {
         return this.get('name');
     }
 
-    public getVersion(): string {
+    public getVersion(): string | undefined {
         return this.get('version');
     }
 
@@ -31,8 +29,6 @@ export class FrameworkMetaData extends MetaData<IFrameworkMetaData> {
         return {
             'name': this.getName(),
             'version': this.getVersion(),
-            'keys': this.getKeys(),
-            'category': this.getCategory()
         };
     }
 }

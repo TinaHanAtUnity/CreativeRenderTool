@@ -1,39 +1,30 @@
-import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
 
 interface IMediationMetaData extends IMetaData {
-    name: string;
-    version: string;
+    name: string | undefined;
+    version: string | undefined;
     ordinal: number | undefined;
-    ordinalKey: string;
 }
 
-export class MediationMetaData extends MetaData<IMediationMetaData> {
+export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
 
-    constructor(data: string[]) {
+    constructor() {
         super({
-            ... MetaData.Schema,
-            name: ['string'],
-            version: ['string'],
+            ... BaseMetaData.Schema,
+            name: ['string', 'undefined'],
+            version: ['string', 'undefined'],
             ordinal: ['number', 'undefined'],
-            ordinalKey: ['string']
         });
 
-        this.set('ordinalKey', 'ordinal');
         this.set('category', 'mediation');
-        this.set('keys', ['name', 'version']);
-        this.set('name', data[0]);
-        this.set('version', data[1]);
+        this.set('keys', ['name', 'version', 'ordinal']);
     }
 
-    public getOrdinalKey(): string {
-        return this.get('ordinalKey');
-    }
-
-    public getName(): string {
+    public getName(): string | undefined {
         return this.get('name');
     }
 
-    public getVersion(): string {
+    public getVersion(): string | undefined {
         return this.get('version');
     }
 
@@ -50,8 +41,6 @@ export class MediationMetaData extends MetaData<IMediationMetaData> {
             'name': this.getName(),
             'version': this.getVersion(),
             'ordinal': this.getOrdinal(),
-            'keys': this.getKeys(),
-            'category': this.getCategory()
         };
     }
 }

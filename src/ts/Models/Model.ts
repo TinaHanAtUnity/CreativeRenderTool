@@ -14,6 +14,9 @@ export abstract class Model<T extends object> {
     public abstract getDTO(): { [key: string]: any }
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
+        if(!(key in this._schema)) {
+            throw new Error('Key:' + key + ' not in schema');
+        }
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {

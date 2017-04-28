@@ -1,31 +1,42 @@
-import { IMetaData, MetaData } from 'Models/MetaData/MetaData';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
+import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType } from 'Native/Api/Storage';
 
 interface IPlayerMetaData extends IMetaData {
-    serverId: string;
+    server_id: string;
 }
 
-export class PlayerMetaData extends MetaData<IPlayerMetaData> {
+export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
 
-    constructor(data: string[]) {
+    constructor() {
         super({
-            ... MetaData.Schema,
-            serverId: ['string'],
+            ... BaseMetaData.Schema,
+            server_id: ['string'],
         });
 
         this.set('keys', ['server_id']);
         this.set('category', 'player');
-        this.set('serverId', data[0]);
+    }
+
+    public fetch(nativeBridge: NativeBridge, keys?: string[]): Promise<boolean> {
+        return super.fetch(nativeBridge, keys).then((exists) => {
+            if (exists) {
+                return nativeBridge.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
+                    return true;
+                });
+            } else {
+                return Promise.resolve(false);
+            }
+        });
     }
 
     public getServerId(): string {
-        return this.get('serverId');
+        return this.get('server_id');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
             'sid': this.getServerId(),
-            'keys': this.getKeys(),
-            'category': this.getCategory()
         };
     }
 }
