@@ -19,13 +19,14 @@ export enum LifecycleEvent {
 }
 
 export class LifecycleApi extends NativeApi {
-    public onActivityCreated: Observable1<string> = new Observable1();
-    public onActivityStarted: Observable1<string> = new Observable1();
-    public onActivityResumed: Observable1<string> = new Observable1();
-    public onActivityPaused: Observable1<string> = new Observable1();
-    public onActivityStopped: Observable1<string> = new Observable1();
-    public onActivitySaveInstanceState: Observable1<string> = new Observable1();
-    public onActivityDestroyed: Observable1<string> = new Observable1();
+
+    public readonly onActivityCreated = new Observable1<string>();
+    public readonly onActivityStarted = new Observable1<string>();
+    public readonly onActivityResumed = new Observable1<string>();
+    public readonly onActivityPaused = new Observable1<string>();
+    public readonly onActivityStopped = new Observable1<string>();
+    public readonly onActivitySaveInstanceState = new Observable1<string>();
+    public readonly onActivityDestroyed = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Lifecycle');

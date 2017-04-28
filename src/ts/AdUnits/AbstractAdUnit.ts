@@ -26,10 +26,10 @@ export abstract class AbstractAdUnit {
     private static _autoClose = false;
     private static _autoCloseDelay: number = 0;
 
-    public readonly onStart: Observable0 = new Observable0();
-    public readonly onFinish: Observable0 = new Observable0();
-    public readonly onClose: Observable0 = new Observable0();
-    public readonly onError: Observable0 = new Observable0();
+    public readonly onStart = new Observable0();
+    public readonly onFinish = new Observable0();
+    public readonly onClose = new Observable0();
+    public readonly onError = new Observable0();
 
     protected readonly _nativeBridge: NativeBridge;
     protected readonly _container: AdUnitContainer;

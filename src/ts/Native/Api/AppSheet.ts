@@ -53,10 +53,10 @@ export enum AppSheetEvent {
 
 export class AppSheetApi extends NativeApi {
 
-    public onPrepared: Observable1<IAppSheetOptions> = new Observable1();
-    public onOpen: Observable1<IAppSheetOptions> = new Observable1();
-    public onClose: Observable1<IAppSheetOptions> = new Observable1();
-    public onError: Observable2<string, IAppSheetOptions> = new Observable2();
+    public readonly onPrepared = new Observable1<IAppSheetOptions>();
+    public readonly onOpen = new Observable1<IAppSheetOptions>();
+    public readonly onClose = new Observable1<IAppSheetOptions>();
+    public readonly onError = new Observable2<string, IAppSheetOptions>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AppSheet');
