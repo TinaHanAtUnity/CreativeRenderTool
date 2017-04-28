@@ -21,7 +21,7 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+// import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
@@ -207,7 +207,7 @@ class TestHelper {
 
 describe('Event parameters should match specifications', () => {
     beforeEach(() => {
-        MetaDataManager.clearCaches();
+        // MetaDataManager.clearCaches();
     });
 
     describe('with config request', () => {
