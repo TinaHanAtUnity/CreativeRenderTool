@@ -34,6 +34,8 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 
 export class WebView {
 
@@ -63,6 +65,8 @@ export class WebView {
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
+
+    private _metadataManager: MetaDataManager;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -203,9 +207,9 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        MetaDataManager.updateMediationMetaData(this._nativeBridge);
-
-        MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
+        this._metadataManager = new MetaDataManager(this._nativeBridge);
+        this._metadataManager.fetch(MediationMetaData);
+        this._metadataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
                 this._sessionManager.setGamerServerId(player.getServerId());
             }
