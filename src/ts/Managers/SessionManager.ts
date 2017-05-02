@@ -8,7 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+// import { MetaDataManager } from 'Managers/MetaDataManager';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -67,8 +67,8 @@ export class SessionManagerEventMetadataCreator {
             infoJson.connectionType = connectionType;
 
             const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            // metaDataPromises.push(MetaDataManager.fetch(mediation(this._nativeBridge));
+            // metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
                     infoJson.mediationName = mediation.getName();
