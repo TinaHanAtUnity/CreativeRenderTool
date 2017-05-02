@@ -27,6 +27,11 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
+import CampaignRefreshManagerTestCampaign1 from 'json/CampaignRefreshManagerTestCampaign1.json';
+import CampaignRefreshManagerTestCampaign2 from 'json/CampaignRefreshManagerTestCampaign2.json';
+import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
+import CampaignRefreshManagerTestPLCConfig from 'json/CampaignRefreshManagerTestPLCConfig.json';
+
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
@@ -40,6 +45,7 @@ describe('CampaignRefreshManager', () => {
     let sessionManager: SessionManager;
     let eventManager: EventManager;
     let container: AdUnitContainer;
+    let campaignRefreshManager: CampaignRefreshManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -119,50 +125,22 @@ describe('CampaignRefreshManager', () => {
 
     describe('Non-PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration({
-                enabled: true,
-                country: 'US',
-                coppaCompliant: false,
-                placementLevelControl: false,
-                assetCaching: 'disabled',
-                placements: [
-                    {id: 'rewardedVideo', name: 'Video', default: true, allowSkip: true, disableBackButton: true, muteVideo: false, useDeviceOrientationForVideo: false, skipInSeconds: 5},
-                    {id: 'incentivizedVideo', name: 'Video', default: true, allowSkip: true, disableBackButton: true, muteVideo: false, useDeviceOrientationForVideo: false, skipInSeconds: 5}
-                ]
-            });
+            configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestConfig));
+            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
         });
 
         it('get campaign should return undefined', () => {
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             assert.equal(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
         });
 
         it('get campaign should return a campaign (Performance)', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPerformanceCampaign.trigger(new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof PerformanceCampaign);
@@ -179,7 +157,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof VastCampaign);
@@ -190,24 +167,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (MRAID)', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const mraid = new MRAIDCampaign(campaignObject, 'TestGamerId', 12345);
@@ -215,7 +175,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof MRAIDCampaign);
@@ -226,43 +185,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should not refresh', () => {
-            let campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
-            const campaignObject2: any = {
-                id: 'TestCampaignId2',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            let campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPerformanceCampaign.trigger(new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
@@ -270,7 +194,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
@@ -293,8 +216,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
-
             assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.NOT_AVAILABLE);
             assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.NOT_AVAILABLE);
 
@@ -306,43 +227,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it ('should refresh because of expired campaign', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
-            const campaignObject2: any = {
-                id: 'TestCampaignId2',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             let campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             sinon.stub(campaign, 'isExpired').callsFake(() => {
@@ -356,8 +242,6 @@ describe('CampaignRefreshManager', () => {
                 campaign = campaign2;
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
@@ -375,25 +259,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should invalidate campaigns', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
             const campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
             const currentAdUnit = new TestAdUnit(nativeBridge, container, placement, campaign);
@@ -402,8 +268,6 @@ describe('CampaignRefreshManager', () => {
                 campaignManager.onPerformanceCampaign.trigger(campaign);
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
@@ -420,44 +284,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it ('should set campaign status to ready after close', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
-            const campaignObject2: any = {
-                id: 'TestCampaignId2',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
             let campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const campaign2 = new PerformanceCampaign(campaignObject2, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
@@ -468,8 +296,6 @@ describe('CampaignRefreshManager', () => {
                 campaign = campaign2;
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
@@ -493,7 +319,6 @@ describe('CampaignRefreshManager', () => {
 
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
-
                 });
             });
         });
@@ -507,7 +332,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.NOT_AVAILABLE);
             assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.NOT_AVAILABLE);
 
@@ -521,68 +345,22 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration({
-                enabled: true,
-                country: 'US',
-                coppaCompliant: true,
-                placementLevelControl: true,
-                assetCaching: 'disabled',
-                placements: [
-                    {
-                        id: 'rewardedVideo',
-                        name: 'Video',
-                        default: true,
-                        allowSkip: true,
-                        disableBackButton: true,
-                        muteVideo: false,
-                        useDeviceOrientationForVideo: false,
-                        skipInSeconds: 5
-                    },
-                    {
-                        id: 'incentivizedVideo',
-                        name: 'Video',
-                        default: true,
-                        allowSkip: true,
-                        disableBackButton: true,
-                        muteVideo: false,
-                        useDeviceOrientationForVideo: false,
-                        skipInSeconds: 5
-                    }
-                ]
-            });
+            configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestPLCConfig));
+            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
         });
 
         it('get campaign should return undefined', () => {
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             assert.equal(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
         });
 
         it('get campaign should return a campaign (Performance)', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof PerformanceCampaign);
@@ -606,7 +384,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof VastCampaign);
@@ -624,25 +401,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (MRAID)', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
             const mraid = new MRAIDCampaign(campaignObject, 'TestGamerId', 12345);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
@@ -650,7 +409,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof MRAIDCampaign);
@@ -667,43 +425,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should not refresh', () => {
-            let campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
-            const campaignObject2: any = {
-                id: 'TestCampaignId2',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            let campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
@@ -711,7 +434,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
@@ -729,32 +451,13 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('placement states should end up with NO_FILL', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 campaignManager.onPlcNoFill.trigger('rewardedVideo');
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.NOT_AVAILABLE);
             assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.NOT_AVAILABLE);
@@ -771,25 +474,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should invalidate campaigns', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
             const campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
             const currentAdUnit = new TestAdUnit(nativeBridge, container, placement, campaign);
@@ -798,8 +483,6 @@ describe('CampaignRefreshManager', () => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
@@ -821,44 +504,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it ('should set campaign status to ready after close', () => {
-            const campaignObject: any = {
-                id: 'TestCampaignId',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
-            const campaignObject2: any = {
-                id: 'TestCampaignId2',
-                appStoreId: 'TestAppstoreId',
-                appStoreCountry: 'US',
-                gameId: 12345,
-                gameName: 'TestGameName',
-                gameIcon: 'https://TestGameIcon',
-                rating: 5,
-                endScreenLandscape: 'https://TestEndScreenLandscape',
-                endScreenPortrait: 'https://TestEndScreenPortrait',
-                trailerDownloadable: 'https://TestTrailerDownloadable',
-                trailerDownloadableSize: 12345,
-                trailerStreaming: 'https://TestTrailerStreaming',
-                clickAttributionUrl: 'https://TestClickAttributionUrl',
-                clickAttributionUrlFollowsRedirects: false,
-                bypassAppSheet: false,
-                store: 'google'
-            };
-
+            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
             let campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const campaign2 = new PerformanceCampaign(campaignObject2, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
@@ -869,8 +516,6 @@ describe('CampaignRefreshManager', () => {
                 campaign = campaign2;
                 return Promise.resolve();
             });
-
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
@@ -918,7 +563,6 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            const campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
             assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.NOT_AVAILABLE);
             assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.NOT_AVAILABLE);
 
