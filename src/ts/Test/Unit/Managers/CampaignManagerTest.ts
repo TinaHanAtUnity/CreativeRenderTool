@@ -113,6 +113,7 @@ describe('CampaignManager', () => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
+
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
@@ -184,10 +185,14 @@ describe('CampaignManager', () => {
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
         let triggeredCampaign: VastCampaign;
+        campaignManager.onError.subscribe((error) => {
+            assert.equal(1, 2, error.message);
+        });
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
+
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');

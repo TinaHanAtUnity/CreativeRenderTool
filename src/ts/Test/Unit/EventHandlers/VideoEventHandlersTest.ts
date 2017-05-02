@@ -274,7 +274,9 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set debug message to programmatic ad if the ad unit is VAST', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
-            const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
+            const vast = new Vast([], []);
+            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
+            const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);

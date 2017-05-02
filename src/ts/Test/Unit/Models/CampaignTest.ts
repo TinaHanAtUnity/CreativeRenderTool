@@ -28,7 +28,9 @@ describe('PerformanceCampaign', () => {
             assert.equal(campaign.getRatingCount(), json.campaign.ratingCount);
         });
     });
+});
 
+describe('VastCampaign', () => {
     describe('when created with VAST json', () => {
         it('should have correct data from the json', () => {
             const vastXml = SimpleVast;
@@ -66,4 +68,4 @@ describe('PerformanceCampaign', () => {
             assert.equal(campaign.getVideo().getUrl(), 'file://some/cache/path.mp4');
         });
     });
-});
+})

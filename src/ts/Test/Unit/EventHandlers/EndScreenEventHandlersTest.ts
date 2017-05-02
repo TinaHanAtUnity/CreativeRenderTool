@@ -20,6 +20,8 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { StoreName } from "Models/PerformanceCampaign";
 import { Session } from 'Models/Session';
 
+import EndScreenTestPerformanceCampaign1 from 'json/EndScreenTestPerformanceCampaign1.json';
+
 describe('EndScreenEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
@@ -57,12 +59,9 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
-                trailerDownloadable: 'fake url',
-                store: 'google',
-                appStoreId: 'fooAppId',
-                clickAttributionUrlFollowsRedirects: true
-            }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+            const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
+                new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -73,13 +72,9 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
-                    trailerDownloadable: 'fake url',
-                    store: 'google',
-                    appStoreId: 'fooAppId',
-                    clickAttributionUrl: 'http://foobar.com',
-                    clickAttributionUrlFollowsRedirects: true
-                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -99,13 +94,9 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
-                    trailerDownloadable: 'fake url',
-                    store: 'google',
-                    appStoreId: 'fooAppId',
-                    clickAttributionUrl: 'http://foobar.com',
-                    clickAttributionUrlFollowsRedirects: true
-                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
@@ -176,14 +167,11 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
-                trailerDownloadable: 'fake url',
-                store: 'apple',
-                appStoreId: '11111',
-                clickAttributionUrlFollowsRedirects: true,
-                bypassAppSheet: false,
-                clickAttributionUrl: ''
-            }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+            const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
+            campaignObj.store = 'apple';
+            campaignObj.appStoreId = '11111';
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
+                new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -196,13 +184,10 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with follow redirects', () => {
             deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
             it('with response that contains location, it should open url scheme', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), new PerformanceCampaign({
-                    trailerDownloadable: 'fake url',
-                    store: 'apple',
-                    appStoreId: 'fooAppId',
-                    clickAttributionUrl: 'http://foobar.com',
-                    clickAttributionUrlFollowsRedirects: true
-                }, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
+                campaignObj.store = 'apple';
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',

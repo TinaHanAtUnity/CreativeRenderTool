@@ -21,6 +21,8 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
+import ConfigurationJson from 'json/Configuration.json';
+
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
@@ -40,7 +42,7 @@ describe('AdUnitFactoryTest', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         const eventManager = new EventManager(nativeBridge, request);
-        config = new Configuration({'assetCaching': 'forced', 'placements': []});
+        config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager);
     });

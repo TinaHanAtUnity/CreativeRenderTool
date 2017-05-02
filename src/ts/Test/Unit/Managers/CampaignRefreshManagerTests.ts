@@ -153,6 +153,7 @@ describe('CampaignRefreshManager', () => {
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const vast = new Vast([new VastAd()], ['ErrorUrl']);
+                sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
                 campaignManager.onVastCampaign.trigger(new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
                 return Promise.resolve();
             });
@@ -378,6 +379,7 @@ describe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Vast)', () => {
             const vast = new Vast([new VastAd()], ['ErrorUrl']);
+            sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
