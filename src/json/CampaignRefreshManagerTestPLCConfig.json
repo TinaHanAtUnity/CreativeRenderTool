@@ -4,6 +4,8 @@
   "coppaCompliant": false,
   "placementLevelControl": true,
   "assetCaching": "disabled",
+  "abGroup": 3,
+  "gamerId": "testGamerId",
   "placements": [
     {
       "id": "rewardedVideo",

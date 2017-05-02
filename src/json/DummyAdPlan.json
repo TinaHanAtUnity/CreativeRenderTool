@@ -2,6 +2,7 @@
   "abGroup": 3,
   "campaign": {
     "appStoreId": "12345678",
+    "appStoreCountry": "FI",
     "store": "apple",
     "bypassAppSheet": false,
     "endScreenLandscape": "dummyEndScreenLandscape",
@@ -10,8 +11,8 @@
     "gameId": 1234,
     "gameName": "dummyGameName",
     "id": "12345",
-    "rating": "5",
-    "ratingCount": "123456",
+    "rating": 5,
+    "ratingCount": 123456,
     "trailerDownloadable": "dummyTrailerDownloadable",
     "trailerDownloadableSize": 123,
     "trailerStreaming": "dummyTrailerStreaming"
