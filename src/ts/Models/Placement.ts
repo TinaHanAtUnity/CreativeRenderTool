@@ -25,8 +25,6 @@ interface IPlacement {
 
 export class Placement extends Model<IPlacement> {
 
-
-
     constructor(data: any) {
         super({
             id: ['string'],
@@ -37,7 +35,7 @@ export class Placement extends Model<IPlacement> {
             disableBackButton: ['boolean'],
             useDeviceOrientationForVideo: ['boolean'],
             muteVideo: ['boolean'],
-            state: ['object']
+            state: ['number']
         });
 
         this.set('id', data.id);

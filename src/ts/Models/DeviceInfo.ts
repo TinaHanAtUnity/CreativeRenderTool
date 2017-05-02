@@ -9,8 +9,8 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 interface IDeviceInfo {
     androidId: string;
-    advertisingIdentifier: string;
-    limitAdTracking: boolean;
+    advertisingIdentifier: string | undefined;
+    limitAdTracking: boolean | undefined;
     apiLevel: number;
     osVersion: string;
     manufacturer: string;
@@ -56,8 +56,8 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     constructor(nativeBridge: NativeBridge) {
         super({
             androidId: ['string'],
-            advertisingIdentifier: ['string'],
-            limitAdTracking: ['boolean'],
+            advertisingIdentifier: ['string', 'undefined'],
+            limitAdTracking: ['boolean', 'undefined'],
             apiLevel: ['number'],
             osVersion: ['string'],
             manufacturer: ['string'],
@@ -164,11 +164,11 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         return this.get('androidId');
     }
 
-    public getAdvertisingIdentifier(): string {
+    public getAdvertisingIdentifier(): string | undefined {
         return this.get('advertisingIdentifier');
     }
 
-    public getLimitAdTracking(): boolean {
+    public getLimitAdTracking(): boolean | undefined {
         return this.get('limitAdTracking');
     }
 

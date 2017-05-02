@@ -18,19 +18,24 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
     }
 
     public getUrl(): string {
+        const cachedUrl = this.getCachedUrl();
+        if (cachedUrl) {
+            return cachedUrl;
+        }
+
         return this.getOriginalUrl();
     }
 
-    public getOriginalUrl() {
+    public getOriginalUrl(): string {
         return this.get('url');
     }
 
-    public isCached() {
+    public isCached(): boolean {
         const cachedUrl = this.getCachedUrl();
         return typeof cachedUrl !== 'undefined';
     }
 
-    public getCachedUrl() {
+    public getCachedUrl(): string | undefined {
         return this.get('cachedUrl');
     }
 
@@ -42,7 +47,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         this.set('fileId', fileId);
     }
 
-    public getFileId() {
+    public getFileId(): string | undefined {
         return this.get('fileId');
     }
 

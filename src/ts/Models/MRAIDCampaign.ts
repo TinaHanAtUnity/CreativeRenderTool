@@ -11,7 +11,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         super({
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
-            resource: ['string']
+            resource: ['string', 'undefined']
         });
 
         this.set('id', campaign.id);

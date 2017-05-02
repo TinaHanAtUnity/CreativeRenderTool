@@ -28,7 +28,7 @@ export class Configuration extends Model<IConfiguration> {
             placementLevelControl: ['boolean'],
             abGroup: ['number'],
             gamerId: ['string'],
-            cacheMode: ['object'],
+            cacheMode: ['number'],
             placements: ['object'],
             defaultPlacement: ['object']
         });
@@ -37,9 +37,9 @@ export class Configuration extends Model<IConfiguration> {
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
         const placementLevelControl: boolean = configJson.placementLevelControl;
-        this.set('placementLevelControl', placementLevelControl);
 
         if(placementLevelControl) {
+            this.set('placementLevelControl', placementLevelControl);
             this.set('abGroup', configJson.abGroup);
             this.set('gamerId', configJson.gamerId);
         }
@@ -63,13 +63,16 @@ export class Configuration extends Model<IConfiguration> {
 
         const placements = configJson.placements;
 
-        placements.forEach((rawPlacement: any): void => {
-            const placement: Placement = new Placement(rawPlacement);
-            this.getPlacements()[placement.getId()] = placement;
-            if(placement.isDefault()) {
-                this.set('defaultPlacement', placement);
-            }
-        });
+        if (placements) {
+            this.set('placements', {});
+            placements.forEach((rawPlacement: any): void => {
+                const placement: Placement = new Placement(rawPlacement);
+                this.getPlacements()[placement.getId()] = placement;
+                if(placement.isDefault()) {
+                    this.set('defaultPlacement', placement);
+                }
+            });
+        }
     }
 
     public isEnabled(): boolean {

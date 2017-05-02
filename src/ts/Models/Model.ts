@@ -21,7 +21,7 @@ export abstract class Model<T extends object> {
             this._data[key] = value;
         } else {
             const valueType = typeof value;
-            throw new Error(value + ': ' + valueType + ' is not in: ' + this._schema[key]);
+            throw new Error('key: ' + key + ' with value: ' + value + ': ' + valueType + ' is not in: ' + this._schema[key]);
         }
     }
 

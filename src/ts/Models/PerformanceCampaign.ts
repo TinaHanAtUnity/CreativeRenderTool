@@ -25,8 +25,8 @@ interface IPerformanceCampaign extends ICampaign {
     video: Video;
     streamingVideo: Video;
 
-    clickAttributionUrl: string;
-    clickAttributionUrlFollowsRedirects: boolean;
+    clickAttributionUrl: string | undefined;
+    clickAttributionUrlFollowsRedirects: boolean | undefined;
 
     bypassAppSheet: boolean;
 
@@ -48,10 +48,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             portraitImage: ['object'],
             video: ['object'],
             streamingVideo: ['object'],
-            clickAttributionUrl: ['string'],
-            clickAttributionUrlFollowsRedirects: ['boolean'],
+            clickAttributionUrl: ['string', 'undefined'],
+            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             bypassAppSheet: ['boolean'],
-            store: ['object']
+            store: ['number']
         });
 
         this.set('id', campaign.id);
@@ -143,11 +143,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('streamingVideo');
     }
 
-    public getClickAttributionUrl(): string {
+    public getClickAttributionUrl(): string | undefined {
         return this.get('clickAttributionUrl');
     }
 
-    public getClickAttributionUrlFollowsRedirects(): boolean {
+    public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
         return this.get('clickAttributionUrlFollowsRedirects');
     }
 

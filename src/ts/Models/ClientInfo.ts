@@ -13,7 +13,7 @@ interface IClientInfo {
     debuggable: boolean;
     configUrl: string;
     webviewUrl: string;
-    webviewHash: string;
+    webviewHash: string | null;
     webviewVersion: string;
     initTimestamp: number;
     reinitialized: boolean;
@@ -33,7 +33,7 @@ export class ClientInfo extends Model<IClientInfo> {
             debuggable: ['boolean'],
             configUrl: ['string'],
             webviewUrl: ['string'],
-            webviewHash: ['string'],
+            webviewHash: ['string', 'null'],
             webviewVersion: ['string'],
             initTimestamp: ['number'],
             reinitialized: ['boolean'],
@@ -102,7 +102,7 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('webviewUrl');
     }
 
-    public getWebviewHash(): string {
+    public getWebviewHash(): string | null {
         return this.get('webviewHash');
     }
 

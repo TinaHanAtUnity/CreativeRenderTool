@@ -41,6 +41,11 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('portrait', portraitAsset);
         this.set('landscape', landscapeAsset);
 
+        this.set('id', campaignId);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
+        this.set('timeout', cacheTTL || 3600);
+
         this.processCustomTracking(tracking);
     }
 

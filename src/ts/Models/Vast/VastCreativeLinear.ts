@@ -66,7 +66,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     }
 
     public setVideoClickThroughURLTemplate(videoClickThroughURLTemplate: string) {
-        this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate);
+        this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate || null);
     }
 
     public getVideoClickTrackingURLTemplates(): string[] {
