@@ -104,7 +104,6 @@ class SpecVerifier {
 
     private assertUnspecifiedParams(): void {
         if(this._queryParams) {
-            console.log(this._queryParams);
             for(let i: number = 0; i < this._queryParams.length; i++) {
                 const paramName: string = this._queryParams[i].split('=')[0];
                 const paramValue: any = this._queryParams[i].split('=')[1];
