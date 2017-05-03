@@ -19,6 +19,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { StoreName } from "Models/PerformanceCampaign";
 import { Session } from 'Models/Session';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EndScreenTestPerformanceCampaign1 from 'json/EndScreenTestPerformanceCampaign1.json';
 
@@ -29,6 +30,7 @@ describe('EndScreenEventHandlersTest', () => {
     let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: EndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
+    let metaDataManager: MetaDataManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -50,8 +52,10 @@ describe('EndScreenEventHandlersTest', () => {
                 hide: sinon.spy(),
             };
 
+            metaDataManager = new MetaDataManager(nativeBridge);
+
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -159,7 +163,7 @@ describe('EndScreenEventHandlersTest', () => {
             };
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());

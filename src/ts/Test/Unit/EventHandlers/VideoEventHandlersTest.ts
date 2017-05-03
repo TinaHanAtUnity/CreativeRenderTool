@@ -26,6 +26,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -36,6 +37,7 @@ describe('VideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
     let video: Video;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -43,6 +45,7 @@ describe('VideoEventHandlersTest', () => {
             handleCallback
         });
 
+        metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         overlay = <Overlay><any> {
@@ -66,7 +69,7 @@ describe('VideoEventHandlersTest', () => {
             container: sinon.spy()
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,

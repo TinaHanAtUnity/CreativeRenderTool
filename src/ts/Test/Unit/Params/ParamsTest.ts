@@ -21,14 +21,13 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
-// import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -186,7 +185,8 @@ class TestHelper {
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
         const eventManager: EventManager = new EventManager(nativeBridge, request);
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager);
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
         sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
@@ -248,11 +248,12 @@ describe('Event parameters should match specifications', () => {
 
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -264,11 +265,12 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];

@@ -20,6 +20,7 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import ConfigurationJson from 'json/Configuration.json';
 
@@ -31,6 +32,7 @@ describe('AdUnitFactoryTest', () => {
     let deviceInfo: DeviceInfo;
     let sessionManager: SessionManager;
     let config: Configuration;
+    let metaDataManager: MetaDataManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -38,13 +40,14 @@ describe('AdUnitFactoryTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
+        metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         const eventManager = new EventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
     });
 
     afterEach(() => {
