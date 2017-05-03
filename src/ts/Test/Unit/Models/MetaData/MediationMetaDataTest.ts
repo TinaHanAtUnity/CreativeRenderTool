@@ -88,9 +88,9 @@ describe('MediationMetaDataTest', () => {
             assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
             assert.deepEqual(metaData.getDTO(), {
-                name: 'test_name',
-                version: 'test_version',
-                ordinal: undefined
+                mediationName: 'test_name',
+                mediationVersion: 'test_version',
+                mediationOrdinal: undefined
             }, 'MediationMetaData.getDTO() produced invalid output');
         });
     });
@@ -118,9 +118,9 @@ describe('MediationMetaDataTest', () => {
                 assert.equal(metaData2.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
                 assert.equal(metaData2.getOrdinal(), 42, 'MediationMetaData.getOrdinal() did not pass through correctly');
                 assert.deepEqual(metaData2.getDTO(), {
-                    name: 'test_name',
-                    version: 'test_version',
-                    ordinal: 42
+                    mediationName: 'test_name',
+                    mediationVersion: 'test_version',
+                    mediationOrdinal: 42
                 }, 'MediationMetaData.getDTO() produced invalid output');
             });
         });
