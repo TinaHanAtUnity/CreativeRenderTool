@@ -85,6 +85,8 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
+            this._metadataManager = new MetaDataManager(this._nativeBridge);
+
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
 
@@ -120,7 +122,7 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
@@ -207,7 +209,6 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        this._metadataManager = new MetaDataManager(this._nativeBridge);
         this._metadataManager.fetch(MediationMetaData);
         this._metadataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
