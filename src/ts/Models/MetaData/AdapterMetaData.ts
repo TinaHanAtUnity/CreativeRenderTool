@@ -27,8 +27,8 @@ export class AdapterMetaData extends BaseMetaData<IAdapterMetaData> {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'name': this.getName(),
-            'version': this.getVersion()
+            'adapterName': this.getName(),
+            'adapterVersion': this.getVersion()
         };
     }
 }
