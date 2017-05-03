@@ -42,8 +42,12 @@ export class Placement extends Model<IPlacement> {
         this.set('name', data.name);
         this.set('default', data.default);
 
-        this.set('allowSkip', data.allowSkip);
-        this.set('skipInSeconds', data.skipInSeconds);
+        const allowSkip: boolean = data.allowSkip;
+        this.set('allowSkip', allowSkip);
+
+        if (allowSkip) {
+            this.set('skipInSeconds', data.skipInSeconds);
+        }
 
         this.set('disableBackButton', data.disableBackButton);
 
