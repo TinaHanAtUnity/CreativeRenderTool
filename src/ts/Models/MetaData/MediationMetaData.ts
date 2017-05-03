@@ -38,9 +38,9 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'name': this.getName(),
-            'version': this.getVersion(),
-            'ordinal': this.getOrdinal(),
+            'mediationName': this.getName(),
+            'mediationVersion': this.getVersion(),
+            'mediationOrdinal': this.getOrdinal(),
         };
     }
 }
