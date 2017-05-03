@@ -28,6 +28,7 @@ import { AssetManager } from 'Managers/AssetManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -59,7 +60,7 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
-            this.onComplete.trigger(id, url, '{"assetCaching": "forced", "placements": []}', 200, []);
+            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "placements": []}', 200, []);
         }, 1);
         return Promise.resolve(id);
     }
@@ -103,6 +104,7 @@ class SpecVerifier {
 
     private assertUnspecifiedParams(): void {
         if(this._queryParams) {
+            console.log(this._queryParams);
             for(let i: number = 0; i < this._queryParams.length; i++) {
                 const paramName: string = this._queryParams[i].split('=')[0];
                 const paramValue: any = this._queryParams[i].split('=')[1];
@@ -191,7 +193,7 @@ class TestHelper {
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
-        const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
+        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
         let container: AdUnitContainer;
@@ -213,9 +215,10 @@ describe('Event parameters should match specifications', () => {
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
@@ -225,9 +228,10 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);

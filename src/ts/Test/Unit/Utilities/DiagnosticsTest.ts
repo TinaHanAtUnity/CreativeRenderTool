@@ -83,12 +83,16 @@ describe('DiagnosticsTest', () => {
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',
-            '2000',
+            2000,
             '2.0.0-alpha2',
             true,
             'http://example.com/config.json',
             'http://example.com/index.html',
-            null
+            null,
+            '2.0.0-webview-test',
+            0,
+            false,
+            {'asd': 'asd'}
         ]);
 
         const configuration = new Configuration(JSON.parse(ConfigurationJson));
@@ -100,7 +104,7 @@ describe('DiagnosticsTest', () => {
 
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":"2000","sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null},"device":null,"country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"test":true}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion","2.0.0-webview-test","initTimestamp":0,"reinitialized":false},"device":null,"country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","error":{"test":true}}}');
         });
     });
 });

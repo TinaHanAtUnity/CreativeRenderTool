@@ -1,4 +1,5 @@
 import 'mocha';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
@@ -9,12 +10,16 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 
 describe('VastCampaign', () => {
     it('should return default cache TTL of 1 hour represented in seconds', () => {
-        const campaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 1);
+        const vast = new Vast([], []);
+        sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
+        const campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
         assert.equal(campaign.getTimeout(), 3600);
     });
 
     it('should return default cache TTL represented in seconds if server provides TTL of 0', () => {
-        const campaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 1, 0);
+        const vast = new Vast([], []);
+        sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
+        const campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1, 0);
         assert.equal(campaign.getTimeout(), 3600);
     });
 
@@ -35,7 +40,9 @@ describe('VastCampaign', () => {
             'cacheTTL': 5000,
             'gamerId': '5712983c481291b16e1be03b'
         };
-        const campaign = new VastCampaign(new Vast([], []), 'campaignId', json.gamerId, json.abGroup, json.cacheTTL);
+        const vast = new Vast([], []);
+        sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
+        const campaign = new VastCampaign(vast, 'campaignId', json.gamerId, json.abGroup, json.cacheTTL);
         assert.equal(campaign.getTimeout(), 5000);
     });
 
