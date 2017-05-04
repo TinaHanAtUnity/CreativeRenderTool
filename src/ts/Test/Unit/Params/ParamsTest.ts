@@ -207,10 +207,6 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
-    beforeEach(() => {
-        // MetaDataManager.clearCaches();
-    });
-
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
