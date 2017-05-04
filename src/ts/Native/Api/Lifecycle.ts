@@ -19,6 +19,7 @@ export enum LifecycleEvent {
 }
 
 export class LifecycleApi extends NativeApi {
+
     public readonly onActivityCreated = new Observable1<string>();
     public readonly onActivityStarted = new Observable1<string>();
     public readonly onActivityResumed = new Observable1<string>();

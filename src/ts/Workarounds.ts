@@ -2,6 +2,18 @@ import 'es6-promise';
 
 /* tslint:disable:no-unused-expression */
 
+if(!Array.prototype.forEach) {
+    Array.prototype.forEach = <any>function(this: any, callback: Function, thisArg: any) {
+        if(typeof(callback) !== 'function') {
+            throw new TypeError(callback + ' is not a function!');
+        }
+        const len = this.length;
+        for(let i = 0; i < len; i++) {
+            callback.call(thisArg, this[i], i, this);
+        }
+    };
+}
+
 if(!('classList' in document.documentElement) && Object.defineProperty && typeof HTMLElement !== 'undefined') {
     Object.defineProperty(HTMLElement.prototype, 'classList', {
         get: function(this: HTMLElement) {
