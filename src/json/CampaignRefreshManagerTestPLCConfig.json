@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "country": "US",
+  "coppaCompliant": false,
+  "placementLevelControl": true,
+  "assetCaching": "disabled",
+  "placements": [
+    {
+      "id": "rewardedVideo",
+      "name": "Video",
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    },
+    {
+      "id": "incentivizedVideo",
+      "name": "Video",
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    }
+  ]
+}

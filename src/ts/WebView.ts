@@ -15,7 +15,6 @@ import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
@@ -215,37 +214,29 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        MetaDataManager.updateMediationMetaData(this._nativeBridge);
+        this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
+        this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+        this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+        this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
-        MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
-            if(player) {
-                this._sessionManager.setGamerServerId(player.getServerId());
-            }
-
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
-            this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
-            this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
-            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
-
-            if (this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
-                    const appSheetOptions = {
-                        id: parseInt(campaign.getAppStoreId(), 10)
-                    };
-                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
-                        });
-                        this._currentAdUnit.onClose.subscribe(() => {
-                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
-                        });
+        if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
+            if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                const appSheetOptions = {
+                    id: parseInt(campaign.getAppStoreId(), 10)
+                };
+                this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
+                    const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.prepare(appSheetOptions);
                     });
-                }
+                    this._currentAdUnit.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                        this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                    });
+                });
             }
+        }
 
-            this._currentAdUnit.show();
-        });
+        this._currentAdUnit.show();
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {

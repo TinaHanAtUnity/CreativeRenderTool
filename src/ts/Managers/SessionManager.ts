@@ -151,7 +151,15 @@ export class SessionManager {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        return MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
+            if(player) {
+                this.setGamerServerId(player.getServerId());
+            }
+
+            return MetaDataManager.updateMediationMetaData(this._nativeBridge);
+        }).then(() => {
+            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        });
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
