@@ -22,7 +22,7 @@ export class MRAID extends View {
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
 
-    private onLoaded: Observable0 = new Observable0();
+    private readonly onLoaded = new Observable0();
 
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
