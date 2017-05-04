@@ -74,7 +74,7 @@ export class WebView {
         }
     }
 
-    public initialize(): Promise<void | any[]> {
+    public initialize(): Promise<void> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);

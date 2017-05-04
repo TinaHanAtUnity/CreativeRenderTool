@@ -441,7 +441,7 @@ export class CampaignManager {
         });
     }
 
-    private fetchGamerId(): Promise<string | undefined> {
+    private fetchGamerId(): Promise<string> {
         return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {

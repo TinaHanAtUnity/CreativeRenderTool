@@ -118,7 +118,7 @@ export class NativeBridge implements INativeBridge {
             if(!this._autoBatch) {
                 this._autoBatch = new BatchInvocation(this);
             }
-            const promise = this._autoBatch.queue<T>(className, methodName, parameters);
+            const promise = this._autoBatch.queue(className, methodName, parameters);
             if(!this._autoBatchTimer) {
                 this._autoBatchTimer = setTimeout(() => {
                     this.invokeBatch(this._autoBatch);
@@ -129,7 +129,7 @@ export class NativeBridge implements INativeBridge {
             return promise;
         } else {
             const batch = new BatchInvocation(this);
-            const promise = batch.queue<T>(className, methodName, parameters);
+            const promise = batch.queue(className, methodName, parameters);
             this.invokeBatch(batch);
             return promise;
         }
@@ -137,7 +137,7 @@ export class NativeBridge implements INativeBridge {
 
     public rawInvoke(fullClassName: string, methodName: string, parameters?: any[]): Promise<any[]> {
         const batch: BatchInvocation = new BatchInvocation(this);
-        const promise = batch.rawQueue<any>(fullClassName, methodName, parameters);
+        const promise = batch.rawQueue(fullClassName, methodName, parameters);
         this.invokeBatch(batch);
         return promise;
     }

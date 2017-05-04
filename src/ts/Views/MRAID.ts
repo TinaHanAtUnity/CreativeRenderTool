@@ -282,7 +282,7 @@ export class MRAID extends View {
             if(fileId) {
                 return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
             } else {
-                return new Promise<string>((resolve, reject) => {
+                return new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
@@ -292,8 +292,7 @@ export class MRAID extends View {
                 });
             }
         } else {
-            const resource = this._campaign.getResource();
-            return Promise.resolve(resource ? resource : '');
+            return Promise.resolve(this._campaign.getResource());
         }
     }
 
