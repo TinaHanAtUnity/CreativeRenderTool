@@ -25,7 +25,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
             videoClickThroughURLTemplate: ['string', 'null'],
             videoClickTrackingURLTemplates: ['array'],
             videoCustomClickURLTemplates: ['array'],
-            adParameters: ['object']
+            adParameters: ['object', 'null']
         }, 'linear');
 
         this.set('duration', duration || 0);
