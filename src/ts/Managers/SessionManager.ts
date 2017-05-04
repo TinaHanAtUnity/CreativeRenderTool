@@ -11,6 +11,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -107,6 +108,7 @@ export class SessionManager {
     private _deviceInfo: DeviceInfo;
     private _eventManager: EventManager;
     private _eventMetadataCreator: SessionManagerEventMetadataCreator;
+    private _metaDataManager: MetaDataManager;
 
     private _currentSession: Session;
 
@@ -117,6 +119,7 @@ export class SessionManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._eventManager = eventManager;
+        this._metaDataManager = metaDataManager;
         this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge, metaDataManager);
     }
 
@@ -155,12 +158,12 @@ export class SessionManager {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         };
 
-        return MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
+        return this._metaDataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
                 this.setGamerServerId(player.getServerId());
             }
 
-            return MetaDataManager.updateMediationMetaData(this._nativeBridge);
+            return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
             return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
         });
