@@ -20,7 +20,13 @@ export abstract class Model<T extends object> {
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
-            const valueType = typeof value;
+            let valueType: string = typeof value;
+            if (Array.isArray(value)) {
+                valueType = 'array';
+            } else if (value === null) {
+                valueType = 'null';
+            }
+
             throw new Error('key: ' + key + ' with value: ' + value + ': ' + valueType + ' is not in: ' + this._schema[key]);
         }
     }
