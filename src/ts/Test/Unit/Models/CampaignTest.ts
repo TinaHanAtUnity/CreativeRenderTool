@@ -68,4 +68,4 @@ describe('VastCampaign', () => {
             assert.equal(campaign.getVideo().getUrl(), 'file://some/cache/path.mp4');
         });
     });
-})
+});

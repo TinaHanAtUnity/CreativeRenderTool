@@ -12,7 +12,7 @@ import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { TestFixtures } from "../TestHelpers/TestFixtures";
-import { MetaDataManager } from 'Managers/MetaDataManager'
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
 
