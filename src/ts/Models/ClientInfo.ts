@@ -14,7 +14,7 @@ interface IClientInfo {
     configUrl: string;
     webviewUrl: string;
     webviewHash: string | null;
-    webviewVersion: string;
+    webviewVersion: string | null;
     initTimestamp: number;
     reinitialized: boolean;
 }
@@ -34,7 +34,7 @@ export class ClientInfo extends Model<IClientInfo> {
             configUrl: ['string'],
             webviewUrl: ['string'],
             webviewHash: ['string', 'null'],
-            webviewVersion: ['string'],
+            webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
             reinitialized: ['boolean'],
         });
@@ -106,7 +106,7 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('webviewHash');
     }
 
-    public getWebviewVersion(): string {
+    public getWebviewVersion(): string | null {
         return this.get('webviewVersion');
     }
 
