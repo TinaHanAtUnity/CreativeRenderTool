@@ -20,14 +20,7 @@ export abstract class Model<T extends object> {
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
-            let valueType: string = typeof value;
-            if (Array.isArray(value)) {
-                valueType = 'array';
-            } else if (value === null) {
-                valueType = 'null';
-            }
-
-            throw new Error('key: ' + key + ' with value: ' + value + ': ' + valueType + ' is not in: ' + this._schema[key]);
+            throw new Error('key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key]);
         }
     }
 
@@ -35,13 +28,20 @@ export abstract class Model<T extends object> {
         return this._data[key];
     }
 
+    private getTypeOf(value: any): string {
+        let valueType: string = typeof value;
+        if (Array.isArray(value)) {
+            valueType = 'array';
+        } else if (value === null) {
+            valueType = 'null';
+        }
+
+        return valueType;
+    }
+
     private checkValue(value: any, allowedTypes: string[]): boolean {
         for(const currentType of allowedTypes) {
-            if(typeof value === currentType) {
-                return true;
-            } else if(currentType === 'array' && Array.isArray(value)) {
-                return true;
-            } else if(currentType === 'null' && value === null) {
+            if(this.getTypeOf(value) === currentType) {
                 return true;
             }
         }
