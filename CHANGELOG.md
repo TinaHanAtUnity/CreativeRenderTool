@@ -1,3 +1,7 @@
+# Wed May  3 11:10:45 UTC 2017
+
+* Read metadata only after ad unit has been opened to make opening ad unit faster
+
 # Fri Apr 21 09:44:05 UTC 2017
 
 * Remove plc_config_received diagnostic message
