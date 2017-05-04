@@ -13,11 +13,11 @@ export enum IosVideoPlayerEvent {
 
 export class IosVideoPlayerApi extends NativeApi {
 
-    public onLikelyToKeepUp: Observable2<string, boolean> = new Observable2();
-    public onBufferEmpty: Observable2<string, boolean> = new Observable2();
-    public onBufferFull: Observable2<string, boolean> = new Observable2();
-    public onGenericError: Observable2<string, string> = new Observable2();
-    public onPrepareError: Observable1<string> = new Observable1();
+    public readonly onLikelyToKeepUp = new Observable2<string, boolean>();
+    public readonly onBufferEmpty = new Observable2<string, boolean>();
+    public readonly onBufferFull = new Observable2<string, boolean>();
+    public readonly onGenericError = new Observable2<string, string>();
+    public readonly onPrepareError = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
