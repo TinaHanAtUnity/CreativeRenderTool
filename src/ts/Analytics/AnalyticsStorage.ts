@@ -64,7 +64,7 @@ export class AnalyticsStorage {
 
     public setIds(userId: string, sessionId: number): void {
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.userid', userId);
-        this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'analytics.sessionId', sessionId);
+        this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'analytics.sessionid', sessionId);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
