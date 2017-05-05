@@ -19,7 +19,7 @@ export class AnalyticsManager {
     private _bgTimestamp: number;
     private _topActivity: string;
 
-    private _endpoint: string = 'http://10.35.4.43:1234';
+    private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
@@ -29,6 +29,8 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._storage = new AnalyticsStorage(nativeBridge);
+
+        this._endpoint = 'https://10.35.4.44:4567/ack/' + clientInfo.getGameId();
     }
 
     public init(): Promise<void> {
