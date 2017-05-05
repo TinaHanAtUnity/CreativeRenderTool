@@ -17,3 +17,6 @@ src/**/*.css
 nginx/access.log
 nginx/error.log
 nginx/nginx.conf
+
+# VS Code
+.vscode

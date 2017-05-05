@@ -86,7 +86,7 @@ export class Cache {
             ]);
         }).then(([isCached, fileId]) => {
             if(isCached) {
-                return [CacheStatus.OK, fileId];
+                return Promise.resolve([CacheStatus.OK, fileId]);
             }
             const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);

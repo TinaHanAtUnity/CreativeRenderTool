@@ -6,13 +6,13 @@ export class WakeUpManager {
     private static _appForegroundNotification: string = 'UIApplicationDidBecomeActiveNotification';
     private static _appBackgroundNotification: string = 'UIApplicationWillResignActiveNotification';
 
-    public onNetworkConnected: Observable0 = new Observable0();
-    public onScreenOn: Observable0 = new Observable0();
-    public onScreenOff: Observable0 = new Observable0();
-    public onAppForeground: Observable0 = new Observable0();
-    public onAppBackground: Observable0 = new Observable0();
-    public onActivityResumed: Observable1<string> = new Observable1();
-    public onActivityPaused: Observable1<string> = new Observable1();
+    public readonly onNetworkConnected = new Observable0();
+    public readonly onScreenOn = new Observable0();
+    public readonly onScreenOff = new Observable0();
+    public readonly onAppForeground = new Observable0();
+    public readonly onAppBackground = new Observable0();
+    public readonly onActivityResumed = new Observable1<string>();
+    public readonly onActivityPaused = new Observable1<string>();
 
     private _nativeBridge: NativeBridge;
     private _firstConnection: number;

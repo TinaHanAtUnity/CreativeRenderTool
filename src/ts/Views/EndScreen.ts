@@ -11,9 +11,9 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 export class EndScreen extends View {
 
-    public onDownload: Observable0 = new Observable0();
-    public onPrivacy: Observable1<string> = new Observable1();
-    public onClose: Observable0 = new Observable0();
+    public readonly onDownload = new Observable0();
+    public readonly onPrivacy = new Observable1<string>();
+    public readonly onClose = new Observable0();
 
     private _coppaCompliant: boolean;
     private _gameName: string;
