@@ -1,3 +1,5 @@
+import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 export type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'undefined' | 'null';
 
 export type ISchema<T extends object> = {
@@ -17,12 +19,12 @@ export abstract class Model<T extends object> {
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
         if(!(key in this._schema)) {
-            throw new Error('Key:' + key + ' not in schema');
+            this.handleError(new WebViewError('Key:' + key + ' not in schema', 'SchemaError'));
         }
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
-            throw new Error('key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key]);
+            this.handleError(new WebViewError('key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
         }
     }
 
@@ -49,5 +51,10 @@ export abstract class Model<T extends object> {
         }
 
         return false;
+    }
+
+    private handleError(error: WebViewError) {
+        Diagnostics.trigger('set_model_value_failed', error);
+        throw error;
     }
 }
