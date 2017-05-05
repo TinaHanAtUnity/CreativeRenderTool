@@ -1,7 +1,6 @@
 {
   "id": "TestCampaignId2",
   "appStoreId": "TestAppstoreId",
-  "appStoreCountry": "US",
   "gameId": 12345,
   "gameName": "TestGameName",
   "gameIcon": "https://TestGameIcon",

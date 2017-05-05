@@ -3,7 +3,6 @@
   "gamerId": "testGamerId",
   "abGroup": 12345,
   "appStoreId": "fooAppId",
-  "appStoreCountry": "fi",
   "gameId": 12345,
   "gameName": "testGameName1",
   "gameIcon": "https://game.icon.url",

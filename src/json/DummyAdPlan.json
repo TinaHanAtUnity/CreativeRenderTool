@@ -2,7 +2,6 @@
   "abGroup": 3,
   "campaign": {
     "appStoreId": "12345678",
-    "appStoreCountry": "FI",
     "store": "apple",
     "bypassAppSheet": false,
     "endScreenLandscape": "dummyEndScreenLandscape",
