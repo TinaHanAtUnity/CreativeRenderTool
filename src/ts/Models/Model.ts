@@ -1,5 +1,7 @@
+export type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'undefined' | 'null';
+
 export type ISchema<T extends object> = {
-    [P in keyof T]: ['string' | 'number' | 'boolean' | 'array' | 'object' | 'undefined' | 'null'];
+    [P in keyof T]: SchemaType[];
 };
 
 export abstract class Model<T extends object> {
@@ -39,7 +41,7 @@ export abstract class Model<T extends object> {
         return valueType;
     }
 
-    private checkValue(value: any, allowedTypes: string[]): boolean {
+    private checkValue(value: any, allowedTypes: SchemaType[]): boolean {
         for(const currentType of allowedTypes) {
             if(this.getTypeOf(value) === currentType) {
                 return true;
