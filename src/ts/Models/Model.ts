@@ -24,7 +24,7 @@ export abstract class Model<T extends object> {
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
-            this.handleError(new WebViewError('key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
+            this.handleError(new WebViewError('Key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
         }
     }
 
