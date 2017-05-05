@@ -62,14 +62,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         this.set('gameName', campaign.gameName);
         this.set('gameIcon', new Image(campaign.gameIcon));
 
-        // TODO: REMOVE THIS HACK! Comet or Yield is sending rating as string sometimes
-        const rating = campaign.rating;
-        if (typeof rating === 'string') {
-            this.set('rating', parseFloat(rating));
-        } else {
-            this.set('rating', rating);
-        }
-
+        this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
         this.set('landscapeImage', new Image(campaign.endScreenLandscape));
