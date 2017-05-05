@@ -10,7 +10,6 @@ export enum StoreName {
 
 interface IPerformanceCampaign extends ICampaign {
     appStoreId: string;
-    appStoreCountry: string;
 
     gameId: number;
     gameName: string;
@@ -38,7 +37,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         super({
             ... Campaign.Schema,
             appStoreId: ['string'],
-            appStoreCountry: ['string'],
             gameId: ['number'],
             gameName: ['string'],
             gameIcon: ['object'],
@@ -59,7 +57,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         this.set('abGroup', abGroup);
 
         this.set('appStoreId', campaign.appStoreId);
-        this.set('appStoreCountry', campaign.appStoreCountry);
 
         this.set('gameId', campaign.gameId);
         this.set('gameName', campaign.gameName);
@@ -108,10 +105,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
     public getAppStoreId(): string {
         return this.get('appStoreId');
-    }
-
-    public getAppStoreCountry(): string {
-        return this.get('appStoreCountry');
     }
 
     public getGameId(): number {
@@ -214,7 +207,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return {
             'campaign': super.getDTO(),
             'appStoreId': this.getAppStoreId(),
-            'appStoreCountry': this.getAppStoreCountry(),
             'gameId': this.getGameId(),
             'gameName': this.getGameName(),
             'gameIcon': gameIcon,
