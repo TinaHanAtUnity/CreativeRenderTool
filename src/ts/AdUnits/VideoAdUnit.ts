@@ -91,9 +91,6 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             }
 
             this.getValidVideoUrl().then(url => {
-                Diagnostics.trigger('prepare', {
-                    cached: url !== this.getVideo().getOriginalUrl()
-                });
                 this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
             });
         }
