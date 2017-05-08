@@ -9,11 +9,19 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
+import { StorageApi, StorageType, StorageError, StorageEvent } from 'Native/Api/Storage';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
+import { RequestApi } from 'Native/Api/Request';
+import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 
 class FakeStorageApi extends StorageApi {
+    private _values: { [key: string]: any } = {};
+
     public get<T>(type: StorageType, key: string): Promise<T> {
+        if(this._values[key]) {
+            return Promise.resolve(this._values[key]);
+        }
+
         return Promise.reject([StorageError[StorageError.COULDNT_GET_VALUE], key]);
     }
 
@@ -23,6 +31,25 @@ class FakeStorageApi extends StorageApi {
 
     public delete(type: StorageType, key: string): Promise<void> {
         return Promise.resolve();
+    }
+
+    public setValue(key: string, value: any) {
+        this._values[key] = value;
+    }
+}
+
+class FakeRequestApi extends RequestApi {
+    private _postCallback: Function;
+
+    constructor(nativeBridge: NativeBridge, postCallback: Function) {
+        super(nativeBridge);
+
+        this._postCallback = postCallback;
+    }
+
+    public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
+        this._postCallback(url, requestBody);
+        return Promise.resolve(id);
     }
 }
 
@@ -74,6 +101,27 @@ describe('AnalyticsManagerTest', () => {
 
             sinon.assert.called(requestSpy);
             assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
+        });
+    });
+
+    it('should send transaction event', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
+        const transaction: IIAPInstrumentation = {
+            receiptPurchaseData: 'test_purchase_data',
+            'price': 1,
+            'currency': 'USD',
+            'signature': 'test_signature',
+            'productId': 'test_id',
+            'ts': 1493905891004
+        };
+        storage.setValue('iap.purchases', [transaction]);
+
+        analyticsManager.init().then(() => {
+            nativeBridge.Request = new FakeRequestApi(nativeBridge, (url: string, body: string) => {
+                assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
+                done();
+            });
+
+            this.nativeBridge.Storage.onSet.trigger(StorageEvent.SET, 'price=1, currency=USD');
         });
     });
 });
