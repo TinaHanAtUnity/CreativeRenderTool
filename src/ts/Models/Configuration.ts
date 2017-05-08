@@ -17,6 +17,7 @@ interface IConfiguration {
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
+    analytics: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -30,7 +31,8 @@ export class Configuration extends Model<IConfiguration> {
             gamerId: ['string'],
             cacheMode: ['number'],
             placements: ['object'],
-            defaultPlacement: ['object']
+            defaultPlacement: ['object'],
+            analytics: ['boolean']
         });
 
         this.set('enabled', configJson.enabled);
@@ -43,6 +45,8 @@ export class Configuration extends Model<IConfiguration> {
             this.set('abGroup', configJson.abGroup);
             this.set('gamerId', configJson.gamerId);
         }
+
+        this.set('analytics', configJson.analytics ? true : false);
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -89,6 +93,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public isPlacementLevelControl(): boolean {
         return this.get('placementLevelControl');
+    }
+
+    public isAnalyticsEnabled(): boolean {
+        return this.get('analytics');
     }
 
     public getAbGroup(): number {

@@ -34,6 +34,7 @@ import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 
 export class WebView {
 
@@ -57,6 +58,7 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
+    private _analyticsManager: AnalyticsManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -124,6 +126,16 @@ export class WebView {
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
+
+            if(this._configuration.isAnalyticsEnabled()) {
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
+                this._analyticsManager.init();
+
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._wakeUpManager.setListenAndroidLifecycle(true);
+                }
+            }
+
             return this._sessionManager.create();
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
