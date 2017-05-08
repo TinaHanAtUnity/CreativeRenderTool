@@ -26,7 +26,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v2/games';
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v3/games';
     }
 
     public static setAbGroup(abGroup: number) {
@@ -46,7 +46,7 @@ export class CampaignManager {
     }
 
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v2/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v3/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -407,6 +407,7 @@ export class CampaignManager {
             }
 
             body.placements = placementRequest;
+            body.properties = this._configuration.getProperties();
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {

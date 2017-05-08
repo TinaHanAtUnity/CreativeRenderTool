@@ -15,6 +15,7 @@ export class Configuration {
     private _analytics: boolean;
     private _abGroup: number;
     private _gamerId: string;
+    private _properties: string;
     private _cacheMode: CacheMode;
     private _placements: { [id: string]: Placement } = {};
     private _defaultPlacement: Placement;
@@ -28,6 +29,7 @@ export class Configuration {
         if(this._placementLevelControl) {
             this._abGroup = configJson.abGroup;
             this._gamerId = configJson.gamerId;
+            this._properties = configJson.properties;
         }
 
         this._analytics = configJson.analytics ? true : false;
@@ -86,6 +88,10 @@ export class Configuration {
 
     public getGamerId(): string {
         return this._gamerId;
+    }
+
+    public getProperties(): string {
+        return this._properties;
     }
 
     public getCacheMode(): CacheMode {
