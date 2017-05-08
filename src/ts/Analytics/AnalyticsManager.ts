@@ -30,7 +30,7 @@ export class AnalyticsManager {
         this._deviceInfo = deviceInfo;
         this._storage = new AnalyticsStorage(nativeBridge);
 
-        this._endpoint = 'https://10.35.4.44:4567/ack/' + clientInfo.getGameId();
+        this._endpoint = 'https://fake-ads-backend.applifier.info/ack/' + clientInfo.getGameId();
     }
 
     public init(): Promise<void> {
