@@ -24,7 +24,7 @@ describe('EventsTest', () => {
     };
 
     const validateRequestLog = (requestLog: string[]) => {
-        assert.equal(requestLog.length, 9, 'Request log length should be 9 for showing one ad');
+        assert.equal(requestLog.length, 8, 'Request log length should be 9 for showing one ad');
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
