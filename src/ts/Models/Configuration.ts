@@ -14,6 +14,7 @@ interface IConfiguration {
     placementLevelControl: boolean;
     abGroup: number;
     gamerId: string;
+    properties: string;
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
@@ -29,6 +30,7 @@ export class Configuration extends Model<IConfiguration> {
             placementLevelControl: ['boolean'],
             abGroup: ['number'],
             gamerId: ['string'],
+            properties: ['string'],
             cacheMode: ['number'],
             placements: ['object'],
             defaultPlacement: ['object'],
@@ -44,6 +46,7 @@ export class Configuration extends Model<IConfiguration> {
             this.set('placementLevelControl', placementLevelControl);
             this.set('abGroup', configJson.abGroup);
             this.set('gamerId', configJson.gamerId);
+            this.set('properties', configJson.properties);
         }
 
         this.set('analytics', configJson.analytics ? true : false);
@@ -105,6 +108,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getGamerId(): string {
         return this.get('gamerId');
+    }
+
+    public getProperties(): string {
+        return this.get('properties');
     }
 
     public getCacheMode(): CacheMode {

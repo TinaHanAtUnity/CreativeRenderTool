@@ -1,3 +1,9 @@
+# Tue May  9 09:26:30 UTC 2017
+
+* Support auction v3, send properties parameter in ad requests
+* Support TypeScript 2.3
+* First version of analytics events from Unity Ads SDK, not enabled by default
+
 # Wed May  3 11:10:45 UTC 2017
 
 * Read metadata only after ad unit has been opened to make opening ad unit faster
