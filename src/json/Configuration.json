@@ -1,17 +1,29 @@
 {
   "enabled": true,
   "country": "fi",
+  "coppaCompliant": false,
+  "placementLevelControl": false,
   "assetCaching": "forced",
   "placements": [
     {
       "id": "1",
       "name": "placementName1",
-      "default": false
+      "default": false,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
     },
     {
       "id": "2",
       "name": "placementName2",
-      "default": true
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
     }
   ]
 }

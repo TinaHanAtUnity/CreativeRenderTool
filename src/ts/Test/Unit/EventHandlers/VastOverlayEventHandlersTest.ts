@@ -20,9 +20,10 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -30,6 +31,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let overlay: Overlay;
+    let metaDataManager: MetaDataManager;
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -42,6 +44,8 @@ describe('VastOverlayEventHandlersTest', () => {
             handleInvocation,
             handleCallback
         });
+
+        metaDataManager = new MetaDataManager(nativeBridge);
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
@@ -64,7 +68,7 @@ describe('VastOverlayEventHandlersTest', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
 
         clientInfo = TestFixtures.getClientInfo();
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         sessionManager.setSession(new Session('123'));
 
         testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);

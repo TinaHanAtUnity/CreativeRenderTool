@@ -15,7 +15,6 @@ import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
@@ -34,6 +33,8 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 
 export class WebView {
 
@@ -57,12 +58,15 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
+    private _analyticsManager: AnalyticsManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
     private _initializedAt: number;
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
+
+    private _metadataManager: MetaDataManager;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -81,6 +85,8 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
+            this._metadataManager = new MetaDataManager(this._nativeBridge);
+
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
 
@@ -102,7 +108,7 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, this._metadataManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -116,17 +122,27 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
+
+            if(this._configuration.isAnalyticsEnabled()) {
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
+                this._analyticsManager.init();
+
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._wakeUpManager.setListenAndroidLifecycle(true);
+                }
+            }
+
             return this._sessionManager.create();
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -203,37 +219,29 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        MetaDataManager.updateMediationMetaData(this._nativeBridge);
+        this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
+        this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+        this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+        this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
-        MetaDataManager.fetchPlayerMetaData(this._nativeBridge).then(player => {
-            if(player) {
-                this._sessionManager.setGamerServerId(player.getServerId());
-            }
-
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
-            this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
-            this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
-            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
-
-            if (this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
-                    const appSheetOptions = {
-                        id: parseInt(campaign.getAppStoreId(), 10)
-                    };
-                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
-                        });
-                        this._currentAdUnit.onClose.subscribe(() => {
-                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
-                        });
+        if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
+            if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                const appSheetOptions = {
+                    id: parseInt(campaign.getAppStoreId(), 10)
+                };
+                this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
+                    const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.prepare(appSheetOptions);
                     });
-                }
+                    this._currentAdUnit.onClose.subscribe(() => {
+                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                        this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                    });
+                });
             }
+        }
 
-            this._currentAdUnit.show();
-        });
+        this._currentAdUnit.show();
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {

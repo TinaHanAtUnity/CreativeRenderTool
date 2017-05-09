@@ -5,10 +5,13 @@ import { Url } from 'Utilities/Url';
 import { EventManager } from 'Managers/EventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -16,12 +19,14 @@ export class SessionManagerEventMetadataCreator {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _nativeBridge: NativeBridge;
+    private _metaDataManager: MetaDataManager;
 
-    constructor(eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, nativeBridge: NativeBridge) {
+    constructor(eventManager: EventManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, nativeBridge: NativeBridge, metaDataManager: MetaDataManager) {
         this._eventManager = eventManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._nativeBridge = nativeBridge;
+        this._metaDataManager = metaDataManager;
     }
 
     public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gamerSid: string): Promise<[string, any]> {
@@ -67,8 +72,8 @@ export class SessionManagerEventMetadataCreator {
             infoJson.connectionType = connectionType;
 
             const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
+            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
                     infoJson.mediationName = mediation.getName();
@@ -84,7 +89,7 @@ export class SessionManagerEventMetadataCreator {
                 return [id, infoJson];
             });
         });
-    }
+}
 
 }
 
@@ -103,17 +108,19 @@ export class SessionManager {
     private _deviceInfo: DeviceInfo;
     private _eventManager: EventManager;
     private _eventMetadataCreator: SessionManagerEventMetadataCreator;
+    private _metaDataManager: MetaDataManager;
 
     private _currentSession: Session;
 
     private _gamerServerId: string;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, metaDataManager: MetaDataManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._eventManager = eventManager;
-        this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge);
+        this._metaDataManager = metaDataManager;
+        this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge, metaDataManager);
     }
 
     public create(): Promise<void[]> {
@@ -151,7 +158,15 @@ export class SessionManager {
             this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        return this._metaDataManager.fetch(PlayerMetaData).then(player => {
+            if(player) {
+                this.setGamerServerId(player.getServerId());
+            }
+
+            return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
+        }).then(() => {
+            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId).then(fulfilled);
+        });
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {

@@ -18,6 +18,8 @@ import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 
 export class CampaignManager {
 
@@ -26,7 +28,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v2/games';
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v3/games';
     }
 
     public static setAbGroup(abGroup: number) {
@@ -46,32 +48,33 @@ export class CampaignManager {
     }
 
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v2/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v3/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static CampaignResponse: string | undefined;
 
-    public onPerformanceCampaign: Observable1<PerformanceCampaign> = new Observable1();
-    public onVastCampaign: Observable1<VastCampaign> = new Observable1();
-    public onMRAIDCampaign: Observable1<MRAIDCampaign> = new Observable1();
-    public onNoFill: Observable0 = new Observable0();
-    public onError: Observable1<WebViewError> = new Observable1();
+    public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
+    public readonly onVastCampaign = new Observable1<VastCampaign>();
+    public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
+    public readonly onNoFill = new Observable0();
+    public readonly onError = new Observable1<WebViewError>();
 
-    public onPlcCampaign: Observable2<string, Campaign> = new Observable2();
-    public onPlcNoFill: Observable1<string> = new Observable1();
-    public onPlcError: Observable1<WebViewError> = new Observable1();
+    public readonly onPlcCampaign = new Observable2<string, Campaign>();
+    public readonly onPlcNoFill = new Observable1<string>();
+    public readonly onPlcError = new Observable1<WebViewError>();
 
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
     private _assetManager: AssetManager;
+    private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -79,6 +82,7 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._vastParser = vastParser;
+        this._metaDataManager = metaDataManager;
 
         this._requesting = false;
     }
@@ -407,6 +411,7 @@ export class CampaignManager {
             }
 
             body.placements = placementRequest;
+            body.properties = this._configuration.getProperties();
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
@@ -415,8 +420,8 @@ export class CampaignManager {
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
             const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
+            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {

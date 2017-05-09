@@ -1,39 +1,63 @@
-import { Campaign } from 'Models/Campaign';
-import { Asset } from 'Models/Asset';
+import { Campaign, ICampaign } from 'Models/Campaign';
+import { HTML } from 'Models/Assets/HTML';
 
-export class MRAIDCampaign extends Campaign {
+interface IMRAIDCampaign extends ICampaign {
+    resourceAsset: HTML | undefined;
+    resource: string | undefined;
+}
 
-    private _resourceUrl: Asset | undefined;
-    private _resource: string | undefined;
-
+export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
-        super(campaign.id, gamerId, abGroup);
-        this._resourceUrl = resourceUrl ? new Asset(resourceUrl) : undefined;
-        this._resource = resource;
+        super({
+            ... Campaign.Schema,
+            resourceAsset: ['object', 'undefined'],
+            resource: ['string', 'undefined']
+        });
+
+        this.set('id', campaign.id);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
+
+        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
+        this.set('resource', resource);
     }
 
-    public getResourceUrl(): Asset | undefined {
-        return this._resourceUrl;
+    public getResourceUrl(): HTML | undefined {
+        return this.get('resourceAsset');
     }
 
     public setResourceUrl(url: string): void {
-        this._resourceUrl = new Asset(url);
+        this.set('resourceAsset', new HTML(url));
     }
 
     public setResource(resource: string): void {
-        this._resource = resource;
+        this.set('resource', resource);
     }
 
     public getResource(): string | undefined {
-        return this._resource;
+        return this.get('resource');
     }
 
     public getRequiredAssets() {
-        return this._resourceUrl ? [this._resourceUrl] : [];
+        const resourceUrl =  this.getResourceUrl();
+        return resourceUrl ? [resourceUrl] : [];
     }
 
     public getOptionalAssets() {
         return [];
     }
 
+    public getDTO(): { [key: string]: any } {
+        let resourceUrlDTO: any;
+        const resourceUrlAsset = this.getResourceUrl();
+        if (resourceUrlAsset) {
+            resourceUrlDTO = resourceUrlAsset.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'resourceUrl': resourceUrlDTO,
+            'resource': this.getResource()
+        };
+    }
 }

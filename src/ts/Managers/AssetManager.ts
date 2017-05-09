@@ -1,10 +1,10 @@
 import { Cache } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
-import { Asset } from 'Models/Asset';
+import { Asset } from 'Models/Assets/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 export class AssetManager {
 

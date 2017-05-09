@@ -1,37 +1,34 @@
-import { Model } from 'Models/Model';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
 
-export class AdapterMetaData extends Model {
+interface IAdapterMetaData extends IMetaData {
+    name: string | undefined;
+    version: string | undefined;
+}
 
-    public static getCategory(): string {
-        return 'adapter';
+export class AdapterMetaData extends BaseMetaData<IAdapterMetaData> {
+    constructor() {
+        super({
+            ... BaseMetaData.Schema,
+            name: ['string', 'undefined'],
+            version: ['string', 'undefined']
+        });
+
+        this.set('category', 'adapter');
+        this.set('keys', ['name', 'version']);
     }
 
-    public static getKeys(): string[] {
-        return ['name', 'version'];
+    public getName(): string | undefined {
+        return this.get('name');
     }
 
-    private _name: string;
-    private _version: string;
-
-    constructor(data: string[]) {
-        super();
-        this._name = data[0];
-        this._version = data[1];
-    }
-
-    public getName(): string {
-        return this._name;
-    }
-
-    public getVersion(): string {
-        return this._version;
+    public getVersion(): string | undefined {
+        return this.get('version');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'adapterName': this._name,
-            'adapterVersion': this._version
+            'adapterName': this.getName(),
+            'adapterVersion': this.getVersion()
         };
     }
-
 }

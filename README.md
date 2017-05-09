@@ -70,6 +70,11 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
+#### Hybrid tests triggered with github webhook
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-ios-hybrid-tests-webview-webhook/
+
+Tests can also be launched manually: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_tests/build
+
 ### Deployment tests
 
 #### Android

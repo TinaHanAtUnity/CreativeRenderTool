@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
+import { Observable2 } from 'Utilities/Observable';
 
 export enum StorageType {
     PRIVATE,
@@ -15,7 +16,12 @@ export enum StorageError {
     COULDNT_DELETE_VALUE
 }
 
+export enum StorageEvent {
+    SET
+}
+
 export class StorageApi extends NativeApi {
+    public onSet: Observable2<string, string> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Storage');
@@ -51,9 +57,12 @@ export class StorageApi extends NativeApi {
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
+            case StorageEvent[StorageEvent.SET]:
+                this.onSet.trigger(parameters[0], parameters[1]);
+                break;
+
             default:
-                break; // todo: ignore storage events for now
+                break;
         }
     }
-
 }

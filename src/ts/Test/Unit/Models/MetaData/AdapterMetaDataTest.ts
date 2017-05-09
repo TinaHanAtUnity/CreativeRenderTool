@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 
 class TestStorageApi extends StorageApi {
 
@@ -64,7 +65,8 @@ describe('AdapterMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return MetaDataManager.fetchAdapterMetaData(nativeBridge, false).then(metaData => {
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(AdapterMetaData).then(metaData => {
             assert.isUndefined(metaData, 'Returned AdapterMetaData even when it doesnt exist');
         });
     });
@@ -77,7 +79,8 @@ describe('AdapterMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchAdapterMetaData(nativeBridge, false).then(metaData => {
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(AdapterMetaData).then(metaData => {
             assert.isDefined(metaData, 'AdapterMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
@@ -88,7 +91,7 @@ describe('AdapterMetaDataTest', () => {
         });
     });
 
-    it('should fetch correctly when data is undefined', () => {
+    it('should not fetch when data is undefined', () => {
         storageApi.setStorage({
             adapter: {
                 name: undefined,
@@ -96,10 +99,9 @@ describe('AdapterMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchAdapterMetaData(nativeBridge, false).then(metaData => {
-            assert.isDefined(metaData, 'AdapterMetaData is not defined');
-            assert.equal(metaData.getName(), undefined, 'AdapterMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(AdapterMetaData).then(metaData => {
+            assert.isUndefined(metaData, 'AdapterMetaData is defined');
         });
     });
 
@@ -110,11 +112,11 @@ describe('AdapterMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchAdapterMetaData(nativeBridge, false).then(metaData => {
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(AdapterMetaData).then(metaData => {
             assert.isDefined(metaData, 'AdapterMetaData is not defined');
             assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
             assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
         });
     });
-
 });

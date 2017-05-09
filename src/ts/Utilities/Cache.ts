@@ -6,7 +6,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 
@@ -86,7 +86,7 @@ export class Cache {
             ]);
         }).then(([isCached, fileId]) => {
             if(isCached) {
-                return [CacheStatus.OK, fileId];
+                return Promise.resolve([CacheStatus.OK, fileId]);
             }
             const promise = this.registerCallback(url, fileId);
             this.downloadFile(url, fileId);

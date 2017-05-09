@@ -59,7 +59,7 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
-            this.onComplete.trigger(id, url, '{"assetCaching": "forced", "placements": []}', 200, []);
+            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "placements": []}', 200, []);
         }, 1);
         return Promise.resolve(id);
     }
@@ -185,13 +185,14 @@ class TestHelper {
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
         const eventManager: EventManager = new EventManager(nativeBridge, request);
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager);
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
         sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
-        const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
+        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
         let container: AdUnitContainer;
@@ -206,16 +207,13 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
-    beforeEach(() => {
-        MetaDataManager.clearCaches();
-    });
-
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
@@ -225,9 +223,10 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
@@ -245,11 +244,12 @@ describe('Event parameters should match specifications', () => {
 
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -261,11 +261,12 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];

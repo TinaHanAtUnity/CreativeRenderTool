@@ -1,79 +1,96 @@
-import { VastCreative } from 'Models/Vast/VastCreative';
+import { IVastCreative, VastCreative } from 'Models/Vast/VastCreative';
 import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
+import { Model } from 'Models/Model';
 
-export class VastAd {
+interface IVastAd {
+    id: string | undefined;
+    creatives: Array<VastCreative<IVastCreative>>;
+    companionAds: VastCreativeCompanionAd[];
+    errorURLTemplates: string[];
+    impressionURLTemplates: string[];
+    wrapperURLs: string[];
+}
 
-    private _id: string | undefined;
-    private _creatives: VastCreative[];
-    private _companionAds: VastCreativeCompanionAd[];
-    private _errorURLTemplates: string[];
-    private _impressionURLTemplates: string[];
-    private _wrapperURLs: string[];
+export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
-        this._id = id || undefined;
-        this._creatives = creatives || [];
-        this._companionAds = companionAds || [];
-        this._errorURLTemplates = errorURLTemplates || [];
-        this._impressionURLTemplates = impressionURLTemplates || [];
-        this._wrapperURLs = wrapperURLs || [];
+    constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
+        super({
+            id: ['string', 'undefined'],
+            creatives: ['array'],
+            companionAds: ['array'],
+            errorURLTemplates: ['array'],
+            impressionURLTemplates: ['array'],
+            wrapperURLs: ['array']
+        });
+
+        this.set('id', id || undefined);
+        this.set('creatives', creatives || []);
+        this.set('companionAds', companionAds || []);
+        this.set('errorURLTemplates', errorURLTemplates || []);
+        this.set('impressionURLTemplates', impressionURLTemplates || []);
+        this.set('wrapperURLs', wrapperURLs || []);
     }
 
     public getId(): string | undefined {
-        return this._id;
+        return this.get('id');
     }
 
-    public setId(id: string) {
-        this._id = id;
+    public setId(id: string | undefined) {
+        this.set('id', id);
     }
 
-    public getCreatives(): VastCreative[] {
-        return this._creatives;
+    public getCreatives(): Array<VastCreative<IVastCreative>> {
+        return this.get('creatives');
     }
 
-    public getCreative(): VastCreative | null {
+    public getCreative(): VastCreative<IVastCreative> | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
         }
+
         return null;
     }
 
-    public addCreative(creative: VastCreative) {
-        this._creatives.push(creative);
+    public addCreative(creative: VastCreative<IVastCreative>) {
+        this.get('creatives').push(creative);
     }
 
     public getCompanionAds(): VastCreativeCompanionAd[] {
-        return this._companionAds;
+        return this.get('companionAds');
     }
 
     public addCompanionAd(companionAd: VastCreativeCompanionAd) {
-        this._companionAds.push(companionAd);
+        this.get('companionAds').push(companionAd);
     }
 
     public getErrorURLTemplates(): string[] {
-        return this._errorURLTemplates;
+        return this.get('errorURLTemplates');
     }
 
     public addErrorURLTemplate(errorURLTemplate: string) {
-        this._errorURLTemplates.push(errorURLTemplate);
+        this.get('errorURLTemplates').push(errorURLTemplate);
     }
 
     public getImpressionURLTemplates(): string[] {
-        return this._impressionURLTemplates;
+        return this.get('impressionURLTemplates');
     }
 
     public addImpressionURLTemplate(impressionURLTemplate: string) {
-        this._impressionURLTemplates.push(impressionURLTemplate);
+        this.get('impressionURLTemplates').push(impressionURLTemplate);
     }
 
     public getWrapperURL(): string {
-        return this._wrapperURLs[0];
+        return this.get('wrapperURLs')[0];
+    }
+
+    public getWrapperURLs(): string[] {
+        return this.get('wrapperURLs');
     }
 
     public addWrapperURL(url: string) {
-        this._wrapperURLs.push(url);
+        this.get('wrapperURLs').push(url);
     }
 
     public getTrackingEventUrls(eventName: string) {
@@ -116,5 +133,26 @@ export class VastAd {
         if (creative instanceof VastCreativeLinear) {
             creative.addVideoClickTrackingURLTemplate(videoClickTrackingURL);
         }
+    }
+
+    public getDTO(): { [key: string]: any } {
+        const vastCreatives = [];
+        for (const vastCreative of this.get('creatives')) {
+            vastCreatives.push(vastCreative.getDTO());
+        }
+
+        const companionAds = [];
+        for (const companionAd of this.get('companionAds')) {
+            companionAds.push(companionAd.getDTO());
+        }
+
+        return {
+            'id': this.getId(),
+            'errorURLTemplates': this.getErrorURLTemplates(),
+            'impressionURLTemplates': this.getImpressionURLTemplates(),
+            'wrapperURLs': this.getWrapperURLs(),
+            'vastCreatives': vastCreatives,
+            'companionAds': companionAds
+        };
     }
 }

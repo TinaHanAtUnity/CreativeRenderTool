@@ -5,7 +5,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';

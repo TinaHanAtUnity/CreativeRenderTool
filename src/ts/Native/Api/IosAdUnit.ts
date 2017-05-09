@@ -21,12 +21,12 @@ export enum IosAdUnitError {
 
 export class IosAdUnitApi extends NativeApi {
 
-    public onViewControllerInit: Observable0 = new Observable0();
-    public onViewControllerDidLoad: Observable0 = new Observable0();
-    public onViewControllerDidAppear: Observable0 = new Observable0();
-    public onViewControllerWillDisappear: Observable0 = new Observable0();
-    public onViewControllerDidDisappear: Observable0 = new Observable0();
-    public onViewControllerDidReceiveMemoryWarning: Observable0 = new Observable0();
+    public readonly onViewControllerInit = new Observable0();
+    public readonly onViewControllerDidLoad = new Observable0();
+    public readonly onViewControllerDidAppear = new Observable0();
+    public readonly onViewControllerWillDisappear = new Observable0();
+    public readonly onViewControllerDidDisappear = new Observable0();
+    public readonly onViewControllerDidReceiveMemoryWarning = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit');

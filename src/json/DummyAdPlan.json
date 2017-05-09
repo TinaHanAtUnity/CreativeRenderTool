@@ -10,8 +10,8 @@
     "gameId": 1234,
     "gameName": "dummyGameName",
     "id": "12345",
-    "rating": "5",
-    "ratingCount": "123456",
+    "rating": 5,
+    "ratingCount": 123456,
     "trailerDownloadable": "dummyTrailerDownloadable",
     "trailerDownloadableSize": 123,
     "trailerStreaming": "dummyTrailerStreaming"
