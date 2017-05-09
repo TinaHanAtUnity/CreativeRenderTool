@@ -281,10 +281,23 @@ export class CampaignManager {
     }
 
     private parseMraidCampaign(json: any): Promise<void> {
+        let campaignId: string;
+
         if(json.mraid === null) {
             return this.handleNoFill();
         }
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            campaignId = 'UNKNOWN';
+        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            campaignId = 'UNKNOWN';
+        } else {
+            campaignId = 'UNKNOWN';
+        }
+
+        json.mraid.id = campaignId;
+
         if(json.mraid.inlinedURL || json.mraid.markup) {
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.mraid.inlinedURL, json.mraid.markup, json.mraid.tracking);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));

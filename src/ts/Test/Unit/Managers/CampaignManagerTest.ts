@@ -752,7 +752,7 @@ describe('CampaignManager', () => {
 
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getId(), json.mraid.id);
+                assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
                 assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
                 assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
                 assert.deepEqual(triggeredCampaign.getResourceUrl(), asset);
@@ -787,7 +787,7 @@ describe('CampaignManager', () => {
 
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getId(), json.mraid.id);
+                assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
                 assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
                 assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
