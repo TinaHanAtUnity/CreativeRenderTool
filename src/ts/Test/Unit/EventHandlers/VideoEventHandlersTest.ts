@@ -24,8 +24,9 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -36,6 +37,7 @@ describe('VideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
     let video: Video;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -43,6 +45,7 @@ describe('VideoEventHandlersTest', () => {
             handleCallback
         });
 
+        metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         overlay = <Overlay><any> {
@@ -66,7 +69,7 @@ describe('VideoEventHandlersTest', () => {
             container: sinon.spy()
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
@@ -274,7 +277,9 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set debug message to programmatic ad if the ad unit is VAST', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
-            const vastCampaign = new VastCampaign(new Vast([], []), 'campaignId', 'gamerId', 12);
+            const vast = new Vast([], []);
+            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
+            const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);

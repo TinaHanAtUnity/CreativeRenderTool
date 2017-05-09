@@ -11,7 +11,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 

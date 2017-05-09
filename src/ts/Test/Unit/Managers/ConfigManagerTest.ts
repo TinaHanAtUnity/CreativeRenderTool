@@ -12,6 +12,7 @@ import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { TestFixtures } from "../TestHelpers/TestFixtures";
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
 
@@ -52,6 +53,7 @@ describe('ConfigManagerTest', () => {
     let nativeBridge: NativeBridge;
     let requestMock: any;
     let configPromise: Promise<INativeResponse>;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -59,13 +61,17 @@ describe('ConfigManagerTest', () => {
             handleCallback
         });
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
+        metaDataManager = new MetaDataManager(nativeBridge);
     });
 
     describe('with correctly formed configuration json', () => {
 
         beforeEach(() => {
-            const nativeResponse = {
-                response: ConfigurationJson
+            const nativeResponse: INativeResponse = {
+                url: '',
+                response: ConfigurationJson,
+                responseCode: 200,
+                headers: []
             };
             configPromise = Promise.resolve(nativeResponse);
 
@@ -75,7 +81,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return configuration', () => {
-            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo());
+            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -86,8 +92,11 @@ describe('ConfigManagerTest', () => {
     describe('with badly formed configuration json', () => {
 
         beforeEach(() => {
-            const nativeResponse = {
-                response: '{bad json here,'
+            const nativeResponse: INativeResponse = {
+                url: '',
+                response: '{bad json..',
+                responseCode: 200,
+                headers: []
             };
             configPromise = Promise.resolve(nativeResponse);
 
@@ -97,7 +106,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return error', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, Error);
@@ -121,7 +130,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, ConfigError);
@@ -145,7 +154,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo()).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, DiagnosticError);

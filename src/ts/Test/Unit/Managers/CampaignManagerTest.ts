@@ -17,6 +17,7 @@ import { AssetManager } from 'Managers/AssetManager';
 import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
 import InsideOutsideJson from 'json/InsideOutside.json';
@@ -49,6 +50,7 @@ describe('CampaignManager', () => {
     let vastParser: VastParser;
     let warningSpy: sinon.SinonSpy;
     let configuration: Configuration;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         configuration = new Configuration({
@@ -61,6 +63,70 @@ describe('CampaignManager', () => {
         });
     });
 
+    beforeEach(() => {
+        clientInfo = TestFixtures.getClientInfo();
+        vastParser = TestFixtures.getVastParser();
+        warningSpy = sinon.spy();
+        nativeBridge = <NativeBridge><any>{
+            Storage: {
+                get: function(storageType: number, key: string) {
+                    return Promise.resolve('123');
+                },
+                set: () => {
+                    return Promise.resolve();
+                },
+                write: () => {
+                    return Promise.resolve();
+                },
+                getKeys: sinon.stub().returns(Promise.resolve([]))
+            },
+            Request: {
+                onComplete: {
+                    subscribe: sinon.spy()
+                },
+                onFailed: {
+                    subscribe: sinon.spy()
+                }
+            },
+            Cache: {
+                setProgressInterval: sinon.spy(),
+                onDownloadStarted: new Observable0(),
+                onDownloadProgress: new Observable0(),
+                onDownloadEnd: new Observable0(),
+                onDownloadStopped: new Observable0(),
+                onDownloadError: new Observable0(),
+            },
+            Sdk: {
+                logWarning: warningSpy,
+                logInfo: sinon.spy()
+            },
+            Connectivity: {
+                onConnected: new Observable2()
+            },
+            Broadcast: {
+                onBroadcastAction: new Observable4()
+            },
+            Notification: {
+                onNotification: new Observable2()
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+            },
+            Lifecycle: {
+                onActivityResumed: new Observable1(),
+                onActivityPaused: new Observable1()
+            },
+            getPlatform: () => {
+                return Platform.TEST;
+            }
+        };
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        request = new Request(nativeBridge, wakeUpManager);
+        deviceInfo = new DeviceInfo(nativeBridge);
+        metaDataManager = new MetaDataManager(nativeBridge);
+    });
+
     it('should trigger onVastCampaign after requesting a valid vast placement', () => {
 
         // given a valid VAST placement
@@ -70,7 +136,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -107,12 +173,13 @@ describe('CampaignManager', () => {
 
         vastParser.setMaxWrapperDepth(1);
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
+
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
@@ -182,12 +249,16 @@ describe('CampaignManager', () => {
 
         vastParser.setMaxWrapperDepth(2);
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
+        campaignManager.onError.subscribe((error) => {
+            assert.equal(1, 2, error.message);
+        });
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
             triggeredCampaign = campaign;
             // then the onVastCampaign observable is triggered with the correct campaign data
             mockRequest.verify();
+
             assert.equal(triggeredCampaign.getAbGroup(), 3);
             assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
             assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
@@ -290,7 +361,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         campaignManager.onError.subscribe((err: Error) => {
             assert.equal(err.message, 'VAST wrapper depth exceeded');
             done();
@@ -306,7 +377,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
             triggeredError = error;
@@ -328,7 +399,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredError: WebViewError | Error;
         const verify = () => {
             // then the onError observable is triggered with an appropriate error
@@ -429,7 +500,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let noFillTriggered = false;
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
@@ -481,7 +552,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -535,69 +606,6 @@ describe('CampaignManager', () => {
         });
     });
 
-    beforeEach(() => {
-        clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
-        warningSpy = sinon.spy();
-        nativeBridge = <NativeBridge><any>{
-            Storage: {
-                get: function(storageType: number, key: string) {
-                    return Promise.resolve('123');
-                },
-                set: () => {
-                    return Promise.resolve();
-                },
-                write: () => {
-                    return Promise.resolve();
-                },
-                getKeys: sinon.stub().returns(Promise.resolve([]))
-            },
-            Request: {
-                onComplete: {
-                    subscribe: sinon.spy()
-                },
-                onFailed: {
-                    subscribe: sinon.spy()
-                }
-            },
-            Cache: {
-                setProgressInterval: sinon.spy(),
-                onDownloadStarted: new Observable0(),
-                onDownloadProgress: new Observable0(),
-                onDownloadEnd: new Observable0(),
-                onDownloadStopped: new Observable0(),
-                onDownloadError: new Observable0(),
-            },
-            Sdk: {
-                logWarning: warningSpy,
-                logInfo: sinon.spy()
-            },
-            Connectivity: {
-                onConnected: new Observable2()
-            },
-            Broadcast: {
-                onBroadcastAction: new Observable4()
-            },
-            Notification: {
-                onNotification: new Observable2()
-            },
-            DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
-            },
-            Lifecycle: {
-                onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1()
-            },
-            getPlatform: () => {
-                return Platform.TEST;
-            }
-        };
-        wakeUpManager = new WakeUpManager(nativeBridge);
-        request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = new DeviceInfo(nativeBridge);
-    });
-
     it('should process custom tracking urls', () => {
 
         // given a valid VAST placement
@@ -607,7 +615,7 @@ describe('CampaignManager', () => {
         }));
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {

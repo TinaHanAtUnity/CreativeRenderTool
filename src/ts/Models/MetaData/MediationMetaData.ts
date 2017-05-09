@@ -1,51 +1,46 @@
-import { Model } from 'Models/Model';
+import { IMetaData, BaseMetaData } from 'Models/MetaData/BaseMetaData';
 
-export class MediationMetaData extends Model {
+interface IMediationMetaData extends IMetaData {
+    name: string | undefined;
+    version: string | undefined;
+    ordinal: number | undefined;
+}
 
-    public static getCategory(): string {
-        return 'mediation';
+export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
+
+    constructor() {
+        super({
+            ... BaseMetaData.Schema,
+            name: ['string', 'undefined'],
+            version: ['string', 'undefined'],
+            ordinal: ['number', 'undefined'],
+        });
+
+        this.set('category', 'mediation');
+        this.set('keys', ['name', 'version', 'ordinal']);
     }
 
-    public static getStaticKeys(): string[] {
-        return ['name', 'version'];
+    public getName(): string | undefined {
+        return this.get('name');
     }
 
-    public static getOrdinalKey(): string {
-        return 'ordinal';
-    }
-
-    private _name: string;
-    private _version: string;
-    private _ordinal: number;
-
-    constructor(data: string[]) {
-        super();
-        this._name = data[0];
-        this._version = data[1];
-    }
-
-    public getName(): string {
-        return this._name;
-    }
-
-    public getVersion(): string {
-        return this._version;
+    public getVersion(): string | undefined {
+        return this.get('version');
     }
 
     public setOrdinal(ordinal: number) {
-        this._ordinal = ordinal;
+        this.set('ordinal', ordinal);
     }
 
-    public getOrdinal(): number {
-        return this._ordinal;
+    public getOrdinal(): number | undefined {
+        return this.get('ordinal');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
-            'mediationName': this._name,
-            'mediationVersion': this._version,
-            'mediationOrdinal': this._ordinal
+            'mediationName': this.getName(),
+            'mediationVersion': this.getVersion(),
+            'mediationOrdinal': this.getOrdinal(),
         };
     }
-
 }

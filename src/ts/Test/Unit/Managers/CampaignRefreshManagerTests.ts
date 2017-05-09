@@ -31,6 +31,7 @@ import CampaignRefreshManagerTestCampaign1 from 'json/CampaignRefreshManagerTest
 import CampaignRefreshManagerTestCampaign2 from 'json/CampaignRefreshManagerTestCampaign2.json';
 import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
 import CampaignRefreshManagerTestPLCConfig from 'json/CampaignRefreshManagerTestPLCConfig.json';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -46,6 +47,7 @@ describe('CampaignRefreshManager', () => {
     let eventManager: EventManager;
     let container: AdUnitContainer;
     let campaignRefreshManager: CampaignRefreshManager;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -113,13 +115,14 @@ describe('CampaignRefreshManager', () => {
             }
         };
 
+        metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
         deviceInfo = new DeviceInfo(nativeBridge);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager);
+        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-        campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser);
+        campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         container = new TestContainer();
     });
 
@@ -153,6 +156,7 @@ describe('CampaignRefreshManager', () => {
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const vast = new Vast([new VastAd()], ['ErrorUrl']);
+                sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
                 campaignManager.onVastCampaign.trigger(new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
                 return Promise.resolve();
             });
@@ -378,6 +382,7 @@ describe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Vast)', () => {
             const vast = new Vast([new VastAd()], ['ErrorUrl']);
+            sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onPlcCampaign.trigger('rewardedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));

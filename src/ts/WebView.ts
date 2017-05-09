@@ -33,6 +33,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 
 export class WebView {
@@ -65,6 +66,8 @@ export class WebView {
     private _mustReinitialize: boolean = false;
     private _configJsonCheckedAt: number;
 
+    private _metadataManager: MetaDataManager;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -82,6 +85,8 @@ export class WebView {
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._eventManager = new EventManager(this._nativeBridge, this._request);
+            this._metadataManager = new MetaDataManager(this._nativeBridge);
+
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
 
@@ -103,7 +108,7 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, this._metadataManager);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -117,7 +122,7 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo);
+            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
@@ -137,7 +142,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser());
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {

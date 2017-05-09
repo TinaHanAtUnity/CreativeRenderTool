@@ -18,6 +18,8 @@ import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
+import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 
 export class CampaignManager {
 
@@ -65,13 +67,14 @@ export class CampaignManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
     private _assetManager: AssetManager;
+    private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -79,6 +82,7 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._vastParser = vastParser;
+        this._metaDataManager = metaDataManager;
 
         this._requesting = false;
     }
@@ -416,8 +420,8 @@ export class CampaignManager {
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
             const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(MetaDataManager.fetchMediationMetaData(this._nativeBridge));
-            metaDataPromises.push(MetaDataManager.fetchFrameworkMetaData(this._nativeBridge));
+            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
+            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {

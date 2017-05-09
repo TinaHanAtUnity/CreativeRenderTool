@@ -1,69 +1,112 @@
-import { Campaign } from 'Models/Campaign';
 import { Vast } from 'Models/Vast/Vast';
-import { Video } from 'Models/Video';
-import { Asset } from 'Models/Asset';
+import { Video } from 'Models/Assets/Video';
+import { Asset } from 'Models/Assets/Asset';
+import { Campaign, ICampaign } from 'Models/Campaign';
+import { Image } from 'Models/Assets/Image';
 
-export class VastCampaign extends Campaign {
+interface IVastCampaign extends ICampaign {
+    vast: Vast;
+    video: Video;
+    hasEndscreen: boolean;
+    portrait: Image | undefined;
+    landscape: Image | undefined;
+}
 
-    private _vast: Vast;
-    private _video: Video;
-    private _hasEndscreen: boolean;
-    private _portrait: Asset | undefined;
-    private _landscape: Asset | undefined;
-
+export class VastCampaign extends Campaign<IVastCampaign> {
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super(campaignId, gamerId, abGroup, cacheTTL || 3600);
+        super({
+            ... Campaign.Schema,
+            vast: ['object'],
+            video: ['object'],
+            hasEndscreen: ['boolean'],
+            portrait: ['object', 'undefined'],
+            landscape: ['object', 'undefined']
+        });
 
-        this._hasEndscreen = !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl();
         const portraitUrl = vast.getCompanionPortraitUrl();
+        let portraitAsset = undefined;
         if(portraitUrl) {
-            this._portrait = new Asset(portraitUrl);
+            portraitAsset = new Image(portraitUrl);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
+        let landscapeAsset = undefined;
         if(landscapeUrl) {
-            this._landscape = new Asset(landscapeUrl);
+            landscapeAsset = new Image(landscapeUrl);
         }
 
-        this._vast = vast;
+        this.set('vast', vast);
+        this.set('video', new Video(vast.getVideoUrl()));
+        this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
+        this.set('portrait', portraitAsset);
+        this.set('landscape', landscapeAsset);
+
+        this.set('id', campaignId);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
+        this.set('timeout', cacheTTL || 3600);
+
         this.processCustomTracking(tracking);
     }
 
     public getVast(): Vast {
-        return this._vast;
+        return this.get('vast');
     }
 
     public getVideo() {
-        if(!this._video) {
-            this._video = new Video(this._vast.getVideoUrl());
+        if(!this.get('video')) {
+            this.set('video', new Video(this.get('vast').getVideoUrl()));
         }
-        return this._video;
+        return this.get('video');
     }
 
     public getOriginalVideoUrl(): string {
-        return this._vast.getVideoUrl() || '';
+        return this.get('vast').getVideoUrl() || '';
     }
 
-    public getRequiredAssets() {
+    public getRequiredAssets(): Asset[] {
         return [
-            this._video
+            this.get('video')
         ];
     }
 
-    public getOptionalAssets() {
+    public getOptionalAssets(): Asset[] {
         return [];
     }
 
     public hasEndscreen(): boolean {
-        return this._hasEndscreen;
+        return this.get('hasEndscreen');
     }
 
     public getLandscape(): Asset | undefined {
-        return this._landscape;
+        return this.get('landscape');
     }
 
     public getPortrait(): Asset | undefined {
-        return this._portrait;
+        return this.get('portrait');
+    }
+
+    public getDTO(): { [key: string]: any } {
+        let portrait;
+        const portraitAsset = this.get('portrait');
+        if (portraitAsset) {
+            portrait = portraitAsset.getDTO();
+        }
+
+        let landscape;
+        const landscapeAsset = this.get('landscape');
+        if (landscapeAsset) {
+            landscape = landscapeAsset.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'vast': this.getVast().getDTO(),
+            'video': this.getVast().getDTO(),
+            'hasEndscreen': this.hasEndscreen(),
+            'portrait': portrait,
+            'landscape': landscape,
+        };
     }
 
     private processCustomTracking(tracking: any) {
@@ -73,7 +116,7 @@ export class VastCampaign extends Campaign {
                     const urls = tracking[trackingEventName];
                     if (urls) {
                         urls.forEach((url: string) => {
-                            this._vast.addTrackingEventUrl(trackingEventName, url);
+                            this.getVast().addTrackingEventUrl(trackingEventName, url);
                         });
                     }
                 }

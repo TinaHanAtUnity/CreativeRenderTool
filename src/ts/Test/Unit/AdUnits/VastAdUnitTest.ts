@@ -14,7 +14,7 @@ import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -137,6 +137,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
             const video = new Video('');
+            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
@@ -239,6 +240,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const placement = TestFixtures.getPlacement();
             const video = new Video('');
+            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);

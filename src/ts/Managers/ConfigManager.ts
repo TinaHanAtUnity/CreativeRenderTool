@@ -16,10 +16,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
+    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager): Promise<Configuration> {
         return Promise.all<FrameworkMetaData, AdapterMetaData, string>([
-            MetaDataManager.fetchFrameworkMetaData(nativeBridge),
-            MetaDataManager.fetchAdapterMetaData(nativeBridge),
+            metaDataManager.fetch(FrameworkMetaData),
+            metaDataManager.fetch(AdapterMetaData),
             ConfigManager.fetchGamerId(nativeBridge)
         ]).then(([framework, adapter, gamerId]) => {
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);

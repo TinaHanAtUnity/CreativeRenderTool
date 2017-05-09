@@ -1,32 +1,41 @@
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { ISchema, Model } from 'Models/Model';
 
-export abstract class VastCreative {
+export interface IVastCreative {
+    type: string;
+    trackingEvents: { [eventName: string]: string[] };
+}
 
-    private _type: string;
-    private _trackingEvents: { [eventName: string]: string[] };
+export abstract class VastCreative<T extends IVastCreative = IVastCreative> extends Model<T> {
+    constructor(schema: ISchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
+        super(schema);
 
-    constructor(type: string);
-    constructor(type: string, trackingEvents?: { [eventName: string]: string[] }) {
-        this._type = type;
-        this._trackingEvents = trackingEvents || {};
+        this.set('type', type);
+        this.set('trackingEvents', trackingEvents || {});
     }
 
     public getType(): string {
-        return this._type;
+        return this.get('type');
     }
 
     public getTrackingEvents(): { [eventName: string]: string[] } {
-        return this._trackingEvents;
+        return this.get('trackingEvents');
     }
 
     public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
-        if (this._trackingEvents[eventName] == null) {
-            this._trackingEvents[eventName] = [];
+        if (this.get('trackingEvents')[eventName] == null) {
+            this.get('trackingEvents')[eventName] = [];
         }
-        this._trackingEvents[eventName].push(trackingURLTemplate);
+        this.get('trackingEvents')[eventName].push(trackingURLTemplate);
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'type': this.getType(),
+            'trackingEvents': this.getTrackingEvents()
+        };
     }
 
     public abstract getMediaFiles(): VastMediaFile[];
     public abstract getDuration(): number;
-
 }

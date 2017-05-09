@@ -18,7 +18,7 @@ interface IAnalyticsCommonObjectInternal {
     sessionid: number;
     platform: string;
     platformid: number;
-    deviceid: string;
+    deviceid?: string;
     sdkver: string;
     debug_device?: boolean;
 }

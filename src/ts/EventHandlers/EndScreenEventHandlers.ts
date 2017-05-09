@@ -52,9 +52,10 @@ export class EndScreenEventHandlers {
     public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
         const eventManager = sessionManager.getEventManager();
         const platform = nativeBridge.getPlatform();
+        const clickAttributionUrl = campaign.getClickAttributionUrl();
 
-        if(campaign.getClickAttributionUrlFollowsRedirects()) {
-            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), true).then(response => {
+        if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
+            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -85,7 +86,9 @@ export class EndScreenEventHandlers {
                 Diagnostics.trigger('click_attribution_failed', error);
             });
         } else {
-            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), false);
+            if (clickAttributionUrl) {
+                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+            }
         }
     }
 
