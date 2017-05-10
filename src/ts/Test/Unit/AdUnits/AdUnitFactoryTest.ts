@@ -104,6 +104,10 @@ describe('AdUnitFactoryTest', () => {
             });
 
             campaign = TestFixtures.getMRAIDCampaign();
+            const resourceUrl = campaign.getResourceUrl();
+            if(resourceUrl) {
+                resourceUrl.setFileId('1234');
+            }
 
             MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
         });
