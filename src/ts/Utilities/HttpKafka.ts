@@ -4,6 +4,8 @@ import { INativeResponse, Request } from 'Utilities/Request';
 import { Configuration } from 'Models/Configuration';
 
 export class HttpKafka {
+    private static _deviceInfoUpdating: boolean = false;
+
     public static setRequest(request: Request) {
         HttpKafka._request = request;
     }
@@ -54,11 +56,14 @@ export class HttpKafka {
             }
         };
 
-        if (deviceInfo) {
+        if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
+            HttpKafka._deviceInfoUpdating = true;
             return deviceInfo.getDTO().then(deviceInfoDTO => {
+                HttpKafka._deviceInfoUpdating = false;
                 common.common.device = deviceInfoDTO;
                 return common;
             }).catch(err => {
+                HttpKafka._deviceInfoUpdating = false;
                 return common;
             });
         } else {
