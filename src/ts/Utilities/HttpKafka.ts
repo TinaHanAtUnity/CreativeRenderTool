@@ -44,6 +44,7 @@ export class HttpKafka {
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
     private static _configuration: Configuration | undefined;
+    private static _deviceInfoUpdating: boolean = false;
 
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
         const common: any = {
@@ -54,11 +55,14 @@ export class HttpKafka {
             }
         };
 
-        if (deviceInfo) {
+        if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
+            HttpKafka._deviceInfoUpdating = true;
             return deviceInfo.getDTO().then(deviceInfoDTO => {
+                HttpKafka._deviceInfoUpdating = false;
                 common.common.device = deviceInfoDTO;
                 return common;
             }).catch(err => {
+                HttpKafka._deviceInfoUpdating = false;
                 return common;
             });
         } else {
