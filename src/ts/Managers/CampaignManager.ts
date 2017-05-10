@@ -129,6 +129,8 @@ export class CampaignManager {
             return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
             return this.parseVastCampaign(json);
+        } else if('mraid' in json) {
+            return this.parseMraidCampaign(json);
         } else {
             return this.handleNoFill();
         }
@@ -276,6 +278,37 @@ export class CampaignManager {
         }).catch((error) => {
             this.onError.trigger(error);
         });
+    }
+
+    private parseMraidCampaign(json: any): Promise<void> {
+        let campaignId: string;
+
+        if(json.mraid === null) {
+            return this.handleNoFill();
+        }
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            campaignId = '00005472656d6f7220694f53';
+        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            campaignId = '005472656d6f7220416e6472';
+        } else {
+            campaignId = 'UNKNOWN';
+        }
+
+        json.mraid.id = campaignId;
+
+        if(json.mraid.inlinedURL || json.mraid.markup) {
+            const campaign = new MRAIDCampaign(json.mraid, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.mraid.inlinedURL, json.mraid.markup, json.mraid.tracking);
+            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
+        } else {
+            const MRAIDUrlError = new DiagnosticError(
+                new Error('MRAID Campaign missing markup'),
+                {mraid: json.mraid}
+            );
+            this.onError.trigger(MRAIDUrlError);
+            return Promise.resolve();
+        }
     }
 
     private handleNoFill(): Promise<void> {

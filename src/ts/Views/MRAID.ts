@@ -186,6 +186,17 @@ export class MRAID extends View {
         super.hide();
     }
 
+    public createMRAID(): Promise<string> {
+        return this.fetchMRAID().then(mraid => {
+            const markup = this._campaign.getDynamicMarkup();
+            if(markup) {
+                mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+            }
+
+            return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
+        });
+    }
+
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
@@ -267,12 +278,6 @@ export class MRAID extends View {
             default:
                 break;
         }
-    }
-
-    private createMRAID(): Promise<string> {
-        return this.fetchMRAID().then(mraid => {
-            return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
-        });
     }
 
     private fetchMRAID(): Promise<string> {

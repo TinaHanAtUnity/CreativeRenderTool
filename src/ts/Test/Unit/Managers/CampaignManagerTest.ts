@@ -4,6 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -18,7 +19,10 @@ import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { HTML } from 'Models/Assets/HTML';
 
+import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
+import DummyMRAIDNonInlined from 'json/DummyMRAIDCampaignNonInlined.json';
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
 import InsideOutsideJson from 'json/InsideOutside.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
@@ -606,6 +610,69 @@ describe('CampaignManager', () => {
         });
     });
 
+    beforeEach(() => {
+        clientInfo = TestFixtures.getClientInfo();
+        vastParser = TestFixtures.getVastParser();
+        warningSpy = sinon.spy();
+        nativeBridge = <NativeBridge><any>{
+            Storage: {
+                get: function(storageType: number, key: string) {
+                    return Promise.resolve('123');
+                },
+                set: () => {
+                    return Promise.resolve();
+                },
+                write: () => {
+                    return Promise.resolve();
+                },
+                getKeys: sinon.stub().returns(Promise.resolve([]))
+            },
+            Request: {
+                onComplete: {
+                    subscribe: sinon.spy()
+                },
+                onFailed: {
+                    subscribe: sinon.spy()
+                }
+            },
+            Cache: {
+                setProgressInterval: sinon.spy(),
+                onDownloadStarted: new Observable0(),
+                onDownloadProgress: new Observable0(),
+                onDownloadEnd: new Observable0(),
+                onDownloadStopped: new Observable0(),
+                onDownloadError: new Observable0(),
+            },
+            Sdk: {
+                logWarning: warningSpy,
+                logInfo: sinon.spy()
+            },
+            Connectivity: {
+                onConnected: new Observable2()
+            },
+            Broadcast: {
+                onBroadcastAction: new Observable4()
+            },
+            Notification: {
+                onNotification: new Observable2()
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+            },
+            Lifecycle: {
+                onActivityResumed: new Observable1(),
+                onActivityPaused: new Observable1()
+            },
+            getPlatform: () => {
+                return Platform.TEST;
+            }
+        };
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        request = new Request(nativeBridge, wakeUpManager);
+        deviceInfo = new DeviceInfo(nativeBridge);
+    });
+
     it('should process custom tracking urls', () => {
 
         // given a valid VAST placement
@@ -656,4 +723,134 @@ describe('CampaignManager', () => {
             ]);
         });
     });
+
+    describe('on MRAID campaign', () => {
+
+        it('should trigger onMRAIDCampaign after receiving a MRAID campaign inlined', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: DummyMRAIDCampaign
+            }));
+
+            const json = JSON.parse(DummyMRAIDCampaign);
+            const asset = new HTML(json.mraid.inlinedURL);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredCampaign: MRAIDCampaign;
+            let triggeredError: any;
+            campaignManager.onMRAIDCampaign.subscribe((campaign: MRAIDCampaign) => {
+                triggeredCampaign = campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
+                assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
+                assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
+                assert.deepEqual(triggeredCampaign.getResourceUrl(), asset);
+                assert.deepEqual(triggeredCampaign.getRequiredAssets(), [asset]);
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredCampaign.getDynamicMarkup(), json.mraid.dynamicMarkup);
+            });
+        });
+
+        it('should trigger onMRAIDCampaign after receiving a MRAID campaign non-inlined', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: DummyMRAIDNonInlined
+            }));
+
+            const json = JSON.parse(DummyMRAIDNonInlined);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredCampaign: MRAIDCampaign;
+            let triggeredError: any;
+            campaignManager.onMRAIDCampaign.subscribe((campaign: MRAIDCampaign) => {
+                triggeredCampaign = campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
+                assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
+                assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredCampaign.getResource(), json.mraid.markup);
+            });
+        });
+
+        it('should trigger onNoFill if mraid property is null', (done) => {
+            const response = {
+                response: `{
+                    "abGroup": 3,
+                    "mraid": null,
+                    "gamerId": "5712983c481291b16e1be03b"
+                }`
+            };
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve(response));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredError: any;
+            campaignManager.onNoFill.subscribe(() => {
+                done();
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+            });
+        });
+
+        it('should trigger onNoFill if there is no inlinedURL or markup', () => {
+            const response = {
+                response: `{
+                    "abGroup": 3,
+                    "mraid": {},
+                    "gamerId": "5712983c481291b16e1be03b"
+                }`
+            };
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve(response));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredError: any;
+
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'MRAID Campaign missing markup');
+            });
+        });
+    });
+
 });

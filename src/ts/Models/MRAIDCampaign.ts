@@ -4,14 +4,18 @@ import { HTML } from 'Models/Assets/HTML';
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
+    dynamicMarkup: string | undefined;
+    additionalTrackingEvents: { [eventName: string]: string[] };
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string) {
+    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }) {
         super({
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
-            resource: ['string', 'undefined']
+            resource: ['string', 'undefined'],
+            dynamicMarkup: ['string', 'undefined'],
+            additionalTrackingEvents: ['object', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -20,6 +24,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
         this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
         this.set('resource', resource);
+        this.set('dynamicMarkup', campaign.dynamicMarkup);
+        this.set('additionalTrackingEvents', additionalTrackingEvents || {});
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -47,6 +53,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return [];
     }
 
+    public getDynamicMarkup(): string | undefined {
+        return this.get('dynamicMarkup');
+    }
+
+    public getTrackingEventUrls(): { [eventName: string]: string[] } {
+        return this.get('additionalTrackingEvents');
+    }
+
     public getDTO(): { [key: string]: any } {
         let resourceUrlDTO: any;
         const resourceUrlAsset = this.getResourceUrl();
@@ -57,7 +71,9 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return {
             'campaign': super.getDTO(),
             'resourceUrl': resourceUrlDTO,
-            'resource': this.getResource()
+            'resource': this.getResource(),
+            'dynamicMarkup': this.getDynamicMarkup(),
+            'additionalTrackingEvents': this.getTrackingEventUrls()
         };
     }
 }

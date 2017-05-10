@@ -1,7 +1,8 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
-import { AdUnitFactory } from "AdUnits/AdUnitFactory";
+import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { EventManager } from 'Managers/EventManager';
@@ -21,6 +22,9 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { FinishState } from 'Constants/FinishState';
 
 import ConfigurationJson from 'json/Configuration.json';
 
@@ -48,6 +52,10 @@ describe('AdUnitFactoryTest', () => {
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
+        sandbox.stub(sessionManager, 'sendStart').returns(Promise.resolve());
+        sandbox.stub(sessionManager, 'sendView').returns(Promise.resolve());
+        sandbox.stub(sessionManager, 'sendThirdQuartile').returns(Promise.resolve());
+        sandbox.stub(sessionManager, 'sendSkip').returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -74,6 +82,104 @@ describe('AdUnitFactoryTest', () => {
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
+        });
+    });
+
+    describe('MRAID AdUnit', () => {
+        let MRAIDAdUnit: MRAIDAdUnit;
+        let eventManager: any;
+        let campaign: MRAIDCampaign;
+
+        beforeEach(() => {
+            eventManager = {
+                thirdPartyEvent: sinon.stub().returns(Promise.resolve())
+            };
+
+            sandbox.stub(sessionManager, 'getEventManager').returns(
+                eventManager
+            );
+
+            sandbox.stub(sessionManager, 'getSession').returns({
+                getId: sinon.stub().returns('1111')
+            });
+
+            campaign = TestFixtures.getMRAIDCampaign();
+
+            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+        });
+
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                MRAIDAdUnit.setShowing(true);
+                MRAIDAdUnit.onClose.subscribe(() => {
+                    assert.equal(MRAIDAdUnit.isShowing(), false);
+                    done();
+                });
+
+                MRAIDAdUnit.hide();
+            });
+
+            it('should trigger onFinish when hide is called', (done) => {
+                MRAIDAdUnit.setShowing(true);
+                MRAIDAdUnit.onFinish.subscribe(() => {
+                    done();
+                });
+
+                MRAIDAdUnit.hide();
+            });
+
+            it('should call trackers on on finish state completed', () => {
+                MRAIDAdUnit.setShowing(true);
+                MRAIDAdUnit.setFinishState(FinishState.COMPLETED);
+
+                MRAIDAdUnit.hide();
+
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid complete', '1111', 'http://test.complete.com/complete1');
+            });
+
+            it('should call sendSkip on finish state skipped', () => {
+                MRAIDAdUnit.setShowing(true);
+                MRAIDAdUnit.setFinishState(FinishState.SKIPPED);
+
+                MRAIDAdUnit.hide();
+
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendSkip);
+            });
+        });
+
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                MRAIDAdUnit.onStart.subscribe(() => {
+                    done();
+                });
+
+                MRAIDAdUnit.show();
+            });
+
+            it('should call sendStart', () => {
+                MRAIDAdUnit.show();
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+            });
+
+            it('should send impressions', () => {
+                MRAIDAdUnit.show();
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
+            });
+
+            it('should replace macros in the postback impression url', () => {
+                MRAIDAdUnit.show();
+                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+            });
+        });
+
+        it('should call click tracker', () => {
+            MRAIDAdUnit.sendClick();
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
         });
     });
 });
