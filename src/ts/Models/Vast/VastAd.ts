@@ -4,7 +4,7 @@ import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { Model } from 'Models/Model';
 
 interface IVastAd {
-    id: string | undefined;
+    id: string | null;
     creatives: Array<VastCreative<IVastCreative>>;
     companionAds: VastCreativeCompanionAd[];
     errorURLTemplates: string[];
@@ -17,7 +17,7 @@ export class VastAd extends Model<IVastAd> {
     constructor();
     constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super({
-            id: ['string', 'undefined'],
+            id: ['string', 'null'],
             creatives: ['array'],
             companionAds: ['array'],
             errorURLTemplates: ['array'],
@@ -25,7 +25,7 @@ export class VastAd extends Model<IVastAd> {
             wrapperURLs: ['array']
         });
 
-        this.set('id', id || undefined);
+        this.set('id', id || null);
         this.set('creatives', creatives || []);
         this.set('companionAds', companionAds || []);
         this.set('errorURLTemplates', errorURLTemplates || []);
@@ -33,11 +33,11 @@ export class VastAd extends Model<IVastAd> {
         this.set('wrapperURLs', wrapperURLs || []);
     }
 
-    public getId(): string | undefined {
+    public getId(): string | null {
         return this.get('id');
     }
 
-    public setId(id: string | undefined) {
+    public setId(id: string | null) {
         this.set('id', id);
     }
 
