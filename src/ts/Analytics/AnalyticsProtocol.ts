@@ -18,7 +18,7 @@ interface IAnalyticsCommonObjectInternal {
     sessionid: number;
     platform: string;
     platformid: number;
-    deviceid?: string;
+    deviceid: string | undefined | null;
     sdkver: string;
     debug_device?: boolean;
 }
@@ -26,7 +26,7 @@ interface IAnalyticsCommonObjectInternal {
 interface IAnalyticsDeviceInfoEvent {
     ts: number;
     app_ver?: string;
-    adsid?: string;
+    adsid: string | undefined | null;
     ads_tracking?: boolean;
     os_ver?: string;
     model?: string;

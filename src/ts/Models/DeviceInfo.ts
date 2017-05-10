@@ -9,7 +9,7 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 interface IDeviceInfo {
     androidId: string;
-    advertisingIdentifier: string | undefined;
+    advertisingIdentifier: string | undefined | null;
     limitAdTracking: boolean | undefined;
     apiLevel: number;
     osVersion: string;
@@ -56,7 +56,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     constructor(nativeBridge: NativeBridge) {
         super({
             androidId: ['string'],
-            advertisingIdentifier: ['string', 'undefined'],
+            advertisingIdentifier: ['string', 'undefined', 'null'],
             limitAdTracking: ['boolean', 'undefined'],
             apiLevel: ['number'],
             osVersion: ['string'],
@@ -164,7 +164,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         return this.get('androidId');
     }
 
-    public getAdvertisingIdentifier(): string | undefined {
+    public getAdvertisingIdentifier(): string | undefined | null {
         return this.get('advertisingIdentifier');
     }
 
