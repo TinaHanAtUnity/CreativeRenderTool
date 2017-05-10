@@ -289,9 +289,9 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            campaignId = 'UNKNOWN';
+            campaignId = '00005472656d6f7220694f53';
         } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            campaignId = 'UNKNOWN';
+            campaignId = '005472656d6f7220416e6472';
         } else {
             campaignId = 'UNKNOWN';
         }
