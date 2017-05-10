@@ -1,3 +1,7 @@
+# Wed May 10 14:43:26 UTC 2017
+
+* Programmatic MRAID support for CrossInstall
+
 # Wed May 10 12:05:57 UTC 2017
 
 * Typed models
