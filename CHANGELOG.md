@@ -1,3 +1,7 @@
+# Wed May 10 12:05:57 UTC 2017
+
+* Typed models
+
 # Tue May  9 09:26:30 UTC 2017
 
 * Support auction v3, send properties parameter in ad requests
