@@ -18,7 +18,7 @@ export class AssetManager {
         this._stopped = false;
     }
 
-    public setup(campaign: Campaign): Promise<Campaign> {
+    public setup(campaign: Campaign, plc?: boolean): Promise<Campaign> {
         if(!this.validateAssets(campaign)) {
             throw new Error('Invalid required assets in campaign ' + campaign.getId());
         }
@@ -31,10 +31,17 @@ export class AssetManager {
             return this.validateVideos(campaign.getRequiredAssets());
         });
 
-        if(this._cacheMode === CacheMode.FORCED) {
+        if(this._cacheMode === CacheMode.FORCED || plc) {
             return requiredChain.then(() => {
-                this.cache(campaign.getOptionalAssets());
-                return campaign;
+                if(plc) {
+                    // hack to avoid race conditions with plc when there are multiple different campaigns
+                    // proper fix is to refactor AssetManager to trigger events instead of returning one promise
+                    return this.cache(campaign.getOptionalAssets()).then(() => {
+                        return campaign;
+                    });
+                } else {
+                    return campaign;
+                }
             });
         } else {
             requiredChain.then(() => this.cache(campaign.getOptionalAssets()));

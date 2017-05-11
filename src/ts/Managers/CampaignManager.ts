@@ -197,14 +197,14 @@ export class CampaignManager {
             const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign).then(() => {
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
                 });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                return this._assetManager.setup(campaign).then(() => {
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
