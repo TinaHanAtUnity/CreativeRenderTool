@@ -40,6 +40,7 @@ export class AssetManager {
                         return campaign;
                     });
                 } else {
+                    this.cache(campaign.getOptionalAssets());
                     return campaign;
                 }
             });
