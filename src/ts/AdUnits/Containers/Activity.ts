@@ -70,18 +70,11 @@ export class Activity extends AdUnitContainer {
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
-        const width = this._deviceInfo.getScreenWidth();
-        const height = this._deviceInfo.getScreenHeight();
 
         switch (configuration) {
             case ViewConfiguration.ENDSCREEN:
                 promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
                 promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
-                break;
-
-            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT));
-                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, width, height / 2));
                 break;
 
             case ViewConfiguration.LANDSCAPE_VIDEO:
