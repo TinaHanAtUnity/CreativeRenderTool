@@ -115,7 +115,11 @@ export class CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            this.onError.trigger(error);
+            if(this._configuration.isPlacementLevelControl()) {
+                this.onPlcError.trigger(error);
+            } else {
+                this.onError.trigger(error);
+            }
         });
     }
 
