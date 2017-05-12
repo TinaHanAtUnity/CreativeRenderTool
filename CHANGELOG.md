@@ -1,3 +1,8 @@
+# Fri May 12 12:04:09 UTC 2017
+
+* Fix a racing condition when caching PLC ad plan with two or more campaigns
+* Remove unused code for split screen portrait videos
+
 # Fri May 12 09:02:18 UTC 2017
 
 * Fix type error with VAST id
