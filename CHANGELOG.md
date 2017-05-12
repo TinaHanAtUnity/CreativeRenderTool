@@ -1,3 +1,9 @@
+# Fri May 12 09:02:18 UTC 2017
+
+* Fix type error with VAST id
+* Allow networkOperator and networkOperatorName to be null
+* Report campaign_request_failed and plc_request_failed diagnostic events separately
+
 # Wed May 10 14:43:26 UTC 2017
 
 * Programmatic MRAID support for CrossInstall
