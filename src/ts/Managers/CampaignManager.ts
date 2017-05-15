@@ -205,7 +205,7 @@ export class CampaignManager {
                 });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                this.sendNegativeTargetingEvent(campaign);
+                this.sendNegativeTargetingEvent(campaign, gamerId);
                 return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
@@ -236,7 +236,7 @@ export class CampaignManager {
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-            this.sendNegativeTargetingEvent(campaign);
+            this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
@@ -497,7 +497,7 @@ export class CampaignManager {
         ]);
     }
 
-    private sendNegativeTargetingEvent(campaign: PerformanceCampaign) {
+    private sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return;
         }
@@ -506,20 +506,16 @@ export class CampaignManager {
 
         this._nativeBridge.DeviceInfo.Android.isAppInstalled(packageName).then(installed => {
             if(installed) {
-                this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-                    // todo: msg format
-                    const msg: any = {
-                        id: id,
-                        ts: Date.now(),
-                        bundleId: packageName,
-                        targetGameId: campaign.getGameId(),
-                        sourceGameId: this._clientInfo.getGameId(),
-                        campaignId: campaign.getId()
-                    };
+                const msg: any = {
+                    ts: Date.now(),
+                    gamerId: gamerId,
+                    campaignId: campaign.getId(),
+                    targetBundleId: packageName,
+                    targetGameId: campaign.getGameId(),
+                    coppa: this._configuration.isCoppaCompliant()
+                };
 
-                    // todo: kafka topic
-                    HttpKafka.sendEvent('events.negativetargeting.json', msg);
-                });
+                HttpKafka.sendEvent('ads.sdk2.events.negtargeting.json', msg);
             }
         });
     }
