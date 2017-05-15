@@ -116,7 +116,11 @@ export class CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            this.onError.trigger(error);
+            if(this._configuration.isPlacementLevelControl()) {
+                this.onPlcError.trigger(error);
+            } else {
+                this.onError.trigger(error);
+            }
         });
     }
 
@@ -194,7 +198,7 @@ export class CampaignManager {
             const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign).then(() => {
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
@@ -202,7 +206,7 @@ export class CampaignManager {
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                 this.sendNegativeTargetingEvent(campaign);
-                return this._assetManager.setup(campaign).then(() => {
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
