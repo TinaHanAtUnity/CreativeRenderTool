@@ -21,6 +21,8 @@ interface IPlacement {
     muteVideo: boolean;
 
     state: PlacementState;
+    previousState: PlacementState;
+    placementStateChanged: boolean;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -35,7 +37,9 @@ export class Placement extends Model<IPlacement> {
             disableBackButton: ['boolean'],
             useDeviceOrientationForVideo: ['boolean'],
             muteVideo: ['boolean'],
-            state: ['number']
+            state: ['number'],
+            previousState: ['number'],
+            placementStateChanged: ['boolean']
         });
 
         this.set('id', data.id);
@@ -94,7 +98,23 @@ export class Placement extends Model<IPlacement> {
     }
 
     public setState(state: PlacementState): void {
+        if (this.getState() !== state) {
+            this.set('previousState', this.getState());
+            this.setPlacementStateChanged(true);
+        }
         this.set('state', state);
+    }
+
+    public getPlacementStateChanged(): boolean {
+        return this.get('placementStateChanged');
+    }
+
+    public setPlacementStateChanged(changed: boolean) {
+        this.set('placementStateChanged', changed);
+    }
+
+    public getPreviousState(): number {
+        return this.get('previousState');
     }
 
     public getDTO(): { [key: string]: any } {
