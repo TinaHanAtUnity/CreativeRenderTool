@@ -502,15 +502,13 @@ export class CampaignManager {
             return;
         }
 
-        const packageName: string = campaign.getAppStoreId().split('&')[0];
-
-        this._nativeBridge.DeviceInfo.Android.isAppInstalled(packageName).then(installed => {
+        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
             if(installed) {
                 const msg: any = {
                     ts: Date.now(),
                     gamerId: gamerId,
                     campaignId: campaign.getId(),
-                    targetBundleId: packageName,
+                    targetBundleId: campaign.getAppStoreId(),
                     targetGameId: campaign.getGameId(),
                     coppa: this._configuration.isCoppaCompliant()
                 };
