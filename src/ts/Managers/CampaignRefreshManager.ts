@@ -96,17 +96,8 @@ export class CampaignRefreshManager {
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
         const placement = this._configuration.getPlacement(placementId);
-        // const oldState = placement.getState();
         placement.setState(placementState);
         this._nativeBridge.Placement.setPlacementState(placementId, placementState);
-        /*
-        if(oldState !== placementState) {
-            placement.setState(placementState);
-            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
-        }
-        if(placementState === PlacementState.READY) {
-            this._nativeBridge.Listener.sendReadyEvent(placementId);
-        }*/
     }
 
     public sendPlacementStateEvents(placementId: string): void {
