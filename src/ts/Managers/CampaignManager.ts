@@ -513,7 +513,7 @@ export class CampaignManager {
                     coppa: this._configuration.isCoppaCompliant()
                 };
 
-                HttpKafka.sendEvent('ads.sdk2.events.negtargeting.json', msg);
+                HttpKafka.sendEvent('events.negtargeting.json', msg);
             }
         });
     }
