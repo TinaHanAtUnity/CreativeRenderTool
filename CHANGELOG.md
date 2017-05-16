@@ -1,3 +1,8 @@
+# Tue May 16 08:10:53 UTC 2017
+
+* Prevent a single ad unit from sending multiple click and click attribution events
+* Start sending negative targeting events to Kafka if an advertised game is already installed on the device
+
 # Fri May 12 12:04:09 UTC 2017
 
 * Fix a racing condition when caching PLC ad plan with two or more campaigns
