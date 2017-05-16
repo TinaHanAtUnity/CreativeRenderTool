@@ -1,3 +1,7 @@
+# Tue May 16 10:49:04 UTC 2017
+
+* Fix negative targeting event topic name
+
 # Tue May 16 08:10:53 UTC 2017
 
 * Prevent a single ad unit from sending multiple click and click attribution events
