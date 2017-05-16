@@ -20,6 +20,7 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class CampaignManager {
 
@@ -115,7 +116,11 @@ export class CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            this.onError.trigger(error);
+            if(this._configuration.isPlacementLevelControl()) {
+                this.onPlcError.trigger(error);
+            } else {
+                this.onError.trigger(error);
+            }
         });
     }
 
@@ -129,6 +134,8 @@ export class CampaignManager {
             return this.parsePerformanceCampaign(json);
         } else if('vast' in json) {
             return this.parseVastCampaign(json);
+        } else if('mraid' in json) {
+            return this.parseMraidCampaign(json);
         } else {
             return this.handleNoFill();
         }
@@ -191,14 +198,15 @@ export class CampaignManager {
             const json = JsonParser.parse(content);
             if(json && json.mraidUrl) {
                 const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign).then(() => {
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
                 });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                return this._assetManager.setup(campaign).then(() => {
+                this.sendNegativeTargetingEvent(campaign, gamerId);
+                return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
                     }
@@ -228,6 +236,7 @@ export class CampaignManager {
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+            this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
@@ -276,6 +285,37 @@ export class CampaignManager {
         }).catch((error) => {
             this.onError.trigger(error);
         });
+    }
+
+    private parseMraidCampaign(json: any): Promise<void> {
+        let campaignId: string;
+
+        if(json.mraid === null) {
+            return this.handleNoFill();
+        }
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            campaignId = '00005472656d6f7220694f53';
+        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            campaignId = '005472656d6f7220416e6472';
+        } else {
+            campaignId = 'UNKNOWN';
+        }
+
+        json.mraid.id = campaignId;
+
+        if(json.mraid.inlinedURL || json.mraid.markup) {
+            const campaign = new MRAIDCampaign(json.mraid, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.mraid.inlinedURL, json.mraid.markup, json.mraid.tracking);
+            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
+        } else {
+            const MRAIDUrlError = new DiagnosticError(
+                new Error('MRAID Campaign missing markup'),
+                {mraid: json.mraid}
+            );
+            this.onError.trigger(MRAIDUrlError);
+            return Promise.resolve();
+        }
     }
 
     private handleNoFill(): Promise<void> {
@@ -455,6 +495,27 @@ export class CampaignManager {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
+    }
+
+    private sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return;
+        }
+
+        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
+            if(installed) {
+                const msg: any = {
+                    ts: Date.now(),
+                    gamerId: gamerId,
+                    campaignId: campaign.getId(),
+                    targetBundleId: campaign.getAppStoreId(),
+                    targetGameId: campaign.getGameId(),
+                    coppa: this._configuration.isCoppaCompliant()
+                };
+
+                HttpKafka.sendEvent('ads.sdk2.events.negtargeting.json', msg);
+            }
+        });
     }
 
     private getParameter(field: string, value: any, expectedType: string) {

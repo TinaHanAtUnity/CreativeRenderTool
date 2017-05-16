@@ -9,7 +9,7 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
 interface IDeviceInfo {
     androidId: string;
-    advertisingIdentifier: string | undefined;
+    advertisingIdentifier: string | undefined | null;
     limitAdTracking: boolean | undefined;
     apiLevel: number;
     osVersion: string;
@@ -23,8 +23,8 @@ interface IDeviceInfo {
     screenHeight: number;
     screenScale: number;
     userInterfaceIdiom: UIUserInterfaceIdiom;
-    networkOperator: string;
-    networkOperatorName: string;
+    networkOperator: string | null;
+    networkOperatorName: string | null;
     timeZone: string;
     headset: boolean;
     ringerMode: RingerMode;
@@ -56,7 +56,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     constructor(nativeBridge: NativeBridge) {
         super({
             androidId: ['string'],
-            advertisingIdentifier: ['string', 'undefined'],
+            advertisingIdentifier: ['string', 'undefined', 'null'],
             limitAdTracking: ['boolean', 'undefined'],
             apiLevel: ['number'],
             osVersion: ['string'],
@@ -70,8 +70,8 @@ export class DeviceInfo extends Model<IDeviceInfo> {
             screenHeight: ['number'],
             screenScale: ['number'],
             userInterfaceIdiom: ['number'],
-            networkOperator: ['string'],
-            networkOperatorName: ['string'],
+            networkOperator: ['string', 'null'],
+            networkOperatorName: ['string', 'null'],
             timeZone: ['string'],
             headset: ['boolean'],
             ringerMode: ['number'],
@@ -164,7 +164,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         return this.get('androidId');
     }
 
-    public getAdvertisingIdentifier(): string | undefined {
+    public getAdvertisingIdentifier(): string | undefined | null {
         return this.get('advertisingIdentifier');
     }
 
@@ -191,7 +191,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         });
     }
 
-    public getNetworkOperator(): Promise<string> {
+    public getNetworkOperator(): Promise<string | null> {
         if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => {
                 this.set('networkOperator', networkOperator);
@@ -202,7 +202,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         }
     }
 
-    public getNetworkOperatorName(): Promise<string> {
+    public getNetworkOperatorName(): Promise<string | null> {
         if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
                 this.set('networkOperatorName', networkOperatorName);

@@ -1,4 +1,4 @@
-import { Session } from 'Models/Session';
+import { EventType, Session } from 'Models/Session';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Url } from 'Utilities/Url';
@@ -148,10 +148,10 @@ export class SessionManager {
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
-            if(this._currentSession.startSent) {
+            if(this._currentSession.getEventSent(EventType.START)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.startSent = true;
+            this._currentSession.setEventSent(EventType.START);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -171,10 +171,10 @@ export class SessionManager {
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
-            if(this._currentSession.firstQuartileSent) {
+            if(this._currentSession.getEventSent(EventType.FIRST_QUARTILE)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.firstQuartileSent = true;
+            this._currentSession.setEventSent(EventType.FIRST_QUARTILE);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -186,10 +186,10 @@ export class SessionManager {
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
-            if(this._currentSession.midpointSent) {
+            if(this._currentSession.getEventSent(EventType.MIDPOINT)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.midpointSent = true;
+            this._currentSession.setEventSent(EventType.MIDPOINT);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -201,10 +201,10 @@ export class SessionManager {
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
-            if (this._currentSession.thirdQuartileSent) {
+            if (this._currentSession.getEventSent(EventType.THIRD_QUARTILE)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.thirdQuartileSent = true;
+            this._currentSession.setEventSent(EventType.THIRD_QUARTILE);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -216,10 +216,10 @@ export class SessionManager {
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
         if(this._currentSession) {
-            if(this._currentSession.skipSent) {
+            if(this._currentSession.getEventSent(EventType.SKIP)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.skipSent = true;
+            this._currentSession.setEventSent(EventType.SKIP);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -252,10 +252,10 @@ export class SessionManager {
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
-            if(this._currentSession.viewSent) {
+            if(this._currentSession.getEventSent(EventType.VIEW)) {
                 return Promise.resolve(void(0));
             }
-            this._currentSession.viewSent = true;
+            this._currentSession.setEventSent(EventType.VIEW);
         }
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -266,6 +266,13 @@ export class SessionManager {
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
+        if(this._currentSession) {
+            if(this._currentSession.getEventSent(EventType.CLICK)) {
+                return Promise.resolve(void(0));
+            }
+            this._currentSession.setEventSent(EventType.CLICK);
+        }
+
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };

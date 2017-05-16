@@ -178,11 +178,11 @@ export class CampaignRefreshManager {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to: ' + placementState);
+                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
             });
         } else {
-            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to: ' + placementState);
+            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
         }
     }

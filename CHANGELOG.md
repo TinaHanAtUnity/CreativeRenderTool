@@ -1,3 +1,27 @@
+# Tue May 16 08:10:53 UTC 2017
+
+* Prevent a single ad unit from sending multiple click and click attribution events
+* Start sending negative targeting events to Kafka if an advertised game is already installed on the device
+
+# Fri May 12 12:04:09 UTC 2017
+
+* Fix a racing condition when caching PLC ad plan with two or more campaigns
+* Remove unused code for split screen portrait videos
+
+# Fri May 12 09:02:18 UTC 2017
+
+* Fix type error with VAST id
+* Allow networkOperator and networkOperatorName to be null
+* Report campaign_request_failed and plc_request_failed diagnostic events separately
+
+# Wed May 10 14:43:26 UTC 2017
+
+* Programmatic MRAID support for CrossInstall
+
+# Wed May 10 12:05:57 UTC 2017
+
+* Typed models
+
 # Tue May  9 09:26:30 UTC 2017
 
 * Support auction v3, send properties parameter in ad requests

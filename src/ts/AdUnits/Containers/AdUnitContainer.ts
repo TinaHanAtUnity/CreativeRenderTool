@@ -9,7 +9,6 @@ export const enum ForceOrientation {
 
 export const enum ViewConfiguration {
     ENDSCREEN,
-    SPLIT_VIDEO_ENDSCREEN,
     LANDSCAPE_VIDEO
 }
 
