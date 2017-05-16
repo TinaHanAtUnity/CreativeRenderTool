@@ -28,7 +28,7 @@ import { AssetManager } from 'Managers/AssetManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { ClientInfo } from "../../../Models/ClientInfo";
+import { ClientInfo } from 'Models/ClientInfo';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {

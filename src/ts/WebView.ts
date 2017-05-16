@@ -35,7 +35,7 @@ import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { AnalyticsStorage } from "./Analytics/AnalyticsStorage";
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 
 export class WebView {
 
