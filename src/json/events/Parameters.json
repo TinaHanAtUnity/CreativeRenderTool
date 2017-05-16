@@ -288,8 +288,8 @@
   },
   {
     "key": "sessionId",
-    "type": "string",
-    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
+    "type": "number",
+    "description": "Unique game session identifier. This identifier is shared with analytics events.",
     "provider": "SDK",
     "platforms": "all"
   },

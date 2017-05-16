@@ -164,6 +164,12 @@
       "body": true
     },
     {
+      "parameter": "sessionId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "mediationName",
       "required": "no",
       "queryString": false,
