@@ -436,7 +436,7 @@ export class CampaignManager {
             bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
             coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
-            sessionId: this.getParameter('sessionId', this._sessionManager.getGameSessionId(), 'number'),
+            gameSessionId: this.getParameter('sessionId', this._sessionManager.getGameSessionId(), 'number'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
 

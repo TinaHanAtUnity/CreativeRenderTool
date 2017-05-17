@@ -161,6 +161,13 @@
     "platforms": "all"
   },
   {
+    "key": "gameSessionId",
+    "type": "number",
+    "description": "Unique game session identifier. This identifier is shared with analytics events.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "language",
     "type": "string",
     "description": "Device language code (e.g. en_US or fr_CA)",
@@ -288,8 +295,8 @@
   },
   {
     "key": "sessionId",
-    "type": "number",
-    "description": "Unique game session identifier. This identifier is shared with analytics events.",
+    "type": "string",
+    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
     "provider": "SDK",
     "platforms": "all"
   },

@@ -164,7 +164,7 @@
       "body": true
     },
     {
-      "parameter": "sessionId",
+      "parameter": "gameSessionId",
       "required": "all",
       "queryString": false,
       "body": true
