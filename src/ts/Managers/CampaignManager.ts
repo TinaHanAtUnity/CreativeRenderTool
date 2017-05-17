@@ -21,6 +21,7 @@ import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import {PromoCampaign} from "../Models/PromoCampaign";
 
 export class CampaignManager {
 
@@ -58,6 +59,7 @@ export class CampaignManager {
     public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
     public readonly onVastCampaign = new Observable1<VastCampaign>();
     public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
+    public readonly onPromoCampaign = new Observable1<PromoCampaign>()
     public readonly onNoFill = new Observable0();
     public readonly onError = new Observable1<WebViewError>();
 
@@ -231,6 +233,10 @@ export class CampaignManager {
 
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
+        /* if(false && json.campaign && json.campaign.inAppPurchaseString) {
+            //const campaign = new PromoCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.inAppPurchaseString);
+            //return this._assetManager.setup(campaign).then(() => this.onPromoCampaign.trigger(campaign));
+        } else */
         if(json.campaign && json.campaign.mraidUrl) {
             const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
