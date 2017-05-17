@@ -7,10 +7,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import DummyCampaign from 'json/DummyCampaign.json';
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
+import { PromoCampaign } from 'Models/PromoCampaign';
 
 export class TestFixtures {
 
@@ -29,6 +31,11 @@ export class TestFixtures {
 
     public static getCampaign(): PerformanceCampaign {
         return new PerformanceCampaign(JSON.parse(DummyCampaign), 'abc123', 123);
+    }
+
+    public static getPromoCampaign(): PromoCampaign {
+        const json = JSON.parse(DummyPromoCampaign);
+        return new PromoCampaign(json, 'abc123', 123, json.appStoreId);
     }
 
     public static getMRAIDCampaign(): MRAIDCampaign {

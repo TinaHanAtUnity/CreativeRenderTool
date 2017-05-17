@@ -27,6 +27,8 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 
 import ConfigurationJson from 'json/Configuration.json';
+import { PromoCampaign } from 'Models/PromoCampaign';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -82,6 +84,23 @@ describe('AdUnitFactoryTest', () => {
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
+        });
+    });
+
+    describe('Promo AdUnit', () => {
+        let PromoAdUnit: PromoAdUnit;
+        let campaign: PromoCampaign;
+        beforeEach(() => {
+            campaign = TestFixtures.getPromoCampaign();
+            PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+        });
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                PromoAdUnit.onStart.subscribe(() => {
+                    done();
+                });
+                PromoAdUnit.show();
+            });
         });
     });
 
