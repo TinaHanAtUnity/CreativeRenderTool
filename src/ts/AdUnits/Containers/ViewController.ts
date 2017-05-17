@@ -10,6 +10,7 @@ interface IIosOptions {
     supportedOrientationsPlist: UIInterfaceOrientationMask;
     shouldAutorotate: boolean;
     statusBarOrientation: number;
+    isTransparent: boolean;
 }
 
 export class ViewController extends AdUnitContainer {
@@ -48,6 +49,7 @@ export class ViewController extends AdUnitContainer {
         }
 
         const orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
+        const isTransparent = options.isTransparent ? options.isTransparent : false;
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
@@ -55,7 +57,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
-        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowRotation);
+        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowRotation, isTransparent);
     }
 
     public close(): Promise<void> {
