@@ -382,13 +382,13 @@ export class Cache {
         });
     }
 
-    private writeCacheResponse(url: string, cacheResponse: ICacheResponse): void {
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.' + this._fileIds[url], JSON.stringify(cacheResponse));
+    private writeCacheResponse(fileId: string, cacheResponse: ICacheResponse): void {
+        this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.' + fileId, JSON.stringify(cacheResponse));
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
-    private deleteCacheResponse(url: string): void {
-        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + this._fileIds[url]);
+    private deleteCacheResponse(fileId: string): void {
+        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.' + fileId);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
@@ -402,7 +402,8 @@ export class Cache {
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: Array<[string, string]>): void {
         if(size === 0) {
-            this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
+            const callback = this._callbacks[url];
+            this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, url, size, totalSize, 0, responseCode, headers));
         }
     }
 
@@ -414,21 +415,23 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
-                this.writeCacheResponse(url, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
+                this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, url, size, totalSize, duration, responseCode, headers));
                 this.fulfillCallback(url, CacheStatus.OK);
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
-                this.deleteCacheResponse(url);
+                this.deleteCacheResponse(callback.fileId);
                 if(size > 0) {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
                 }
                 const location = Request.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
+                    let originalUrl = url;
                     if(callback.originalUrl) {
                         fileId = this._callbacks[callback.originalUrl].fileId;
+                        originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, url);
+                    this.registerCallback(location, fileId, originalUrl);
                     this.downloadFile(location, fileId);
                     return;
                 }
@@ -447,7 +450,7 @@ export class Cache {
             });
             Diagnostics.trigger('cache_error', error);
 
-            this.deleteCacheResponse(url);
+            this.deleteCacheResponse(callback.fileId);
             if(size > 0) {
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
             }
@@ -459,7 +462,7 @@ export class Cache {
     private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): void {
         const callback = this._callbacks[url];
         if(callback) {
-            this.writeCacheResponse(url, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
+            this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
             this.fulfillCallback(url, CacheStatus.STOPPED);
         }
     }
@@ -514,13 +517,13 @@ export class Cache {
                 Diagnostics.trigger('cache_desync_fixed', {
                     url: url
                 });
-                this.writeCacheResponse(url, this.createCacheResponse(true, url, fileInfo.size, fileInfo.size, 0, 200, response.headers));
+                this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, url, fileInfo.size, fileInfo.size, 0, 200, response.headers));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
                 Diagnostics.trigger('cache_desync_failure', {
                     url: url
                 });
-                this.deleteCacheResponse(url);
+                this.deleteCacheResponse(callback.fileId);
                 if(fileInfo.found) {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
                 }
@@ -530,7 +533,7 @@ export class Cache {
             Diagnostics.trigger('cache_desync_failure', {
                 url: url
             });
-            this.deleteCacheResponse(url);
+            this.deleteCacheResponse(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
         });
     }
