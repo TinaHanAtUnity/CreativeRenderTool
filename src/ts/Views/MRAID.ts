@@ -287,7 +287,14 @@ export class MRAID extends View {
             if(fileId) {
                 return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
             } else {
-                throw new Error('Missing fileId');
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.addEventListener('load', () => {
+                        resolve(xhr.responseText);
+                    }, false);
+                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
+                    xhr.send();
+                });
             }
         } else {
             return Promise.resolve(this._campaign.getResource());
