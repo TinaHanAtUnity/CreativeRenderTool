@@ -97,13 +97,13 @@ export class CampaignRefreshManager {
     public setPlacementState(placementId: string, placementState: PlacementState): void {
         const placement = this._configuration.getPlacement(placementId);
         placement.setState(placementState);
-        this._nativeBridge.Placement.setPlacementState(placementId, placementState);
     }
 
-    public sendPlacementStateEvents(placementId: string): void {
+    public sendPlacementStateChanges(placementId: string): void {
         const placement = this._configuration.getPlacement(placementId);
         if (placement.getPlacementStateChanged()) {
             placement.setPlacementStateChanged(false);
+            this._nativeBridge.Placement.setPlacementState(placementId, placement.getState());
             this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
         }
         if(placement.getState() === PlacementState.READY) {
@@ -120,7 +120,7 @@ export class CampaignRefreshManager {
         }
         for (const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
-                this.sendPlacementStateEvents(placementId);
+                this.sendPlacementStateChanges(placementId);
             }
         }
     }
@@ -189,12 +189,12 @@ export class CampaignRefreshManager {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
-                this.sendPlacementStateEvents(placementId);
+                this.sendPlacementStateChanges(placementId);
             });
         } else {
             this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
-            this.sendPlacementStateEvents(placementId);
+            this.sendPlacementStateChanges(placementId);
         }
     }
 
