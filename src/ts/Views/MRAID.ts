@@ -292,7 +292,7 @@ export class MRAID extends View {
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
                     }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
+                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
                     xhr.send();
                 });
             }
