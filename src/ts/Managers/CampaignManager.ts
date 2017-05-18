@@ -20,6 +20,7 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class CampaignManager {
 
@@ -204,6 +205,7 @@ export class CampaignManager {
                 });
             } else {
                 const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                this.sendNegativeTargetingEvent(campaign, gamerId);
                 return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
@@ -234,6 +236,7 @@ export class CampaignManager {
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+            this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
     }
@@ -492,6 +495,27 @@ export class CampaignManager {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
+    }
+
+    private sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return;
+        }
+
+        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
+            if(installed) {
+                const msg: any = {
+                    ts: Date.now(),
+                    gamerId: gamerId,
+                    campaignId: campaign.getId(),
+                    targetBundleId: campaign.getAppStoreId(),
+                    targetGameId: campaign.getGameId(),
+                    coppa: this._configuration.isCoppaCompliant()
+                };
+
+                HttpKafka.sendEvent('events.negtargeting.json', msg);
+            }
+        });
     }
 
     private getParameter(field: string, value: any, expectedType: string) {

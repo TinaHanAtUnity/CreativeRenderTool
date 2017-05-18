@@ -12,6 +12,7 @@ import { StoreName } from 'Models/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { EventType } from 'Models/Session';
 
 export class EndScreenEventHandlers {
 
@@ -50,6 +51,14 @@ export class EndScreenEventHandlers {
     }
 
     public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
+        const currentSession = sessionManager.getSession();
+        if(currentSession) {
+            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
+                return;
+            }
+            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
+        }
+
         const eventManager = sessionManager.getEventManager();
         const platform = nativeBridge.getPlatform();
         const clickAttributionUrl = campaign.getClickAttributionUrl();
