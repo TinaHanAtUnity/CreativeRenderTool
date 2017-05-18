@@ -1,3 +1,7 @@
+# Thu May 18 08:32:22 UTC 2017
+
+* Fix cache redirection support for more than one redirect
+
 # Tue May 16 10:49:04 UTC 2017
 
 * Fix negative targeting event topic name
