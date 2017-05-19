@@ -52,6 +52,18 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceVolume', [streamType]);
     }
 
+    public getDeviceMaxVolume(streamType: StreamType): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceMaxVolume', [streamType]);
+    }
+
+    public registerVolumeChangeListener(streamType: StreamType): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'registerVolumeChangeListener', [streamType]);
+    }
+
+    public unregisterVolumeChangeListener(streamType: StreamType): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'unregisterVolumeChangeListener', [streamType]);
+    }
+
     public getFreeSpace(storageType: StorageType): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace', [StorageType[storageType]]);
     }
