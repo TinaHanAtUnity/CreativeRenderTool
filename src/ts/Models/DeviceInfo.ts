@@ -225,12 +225,18 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         return this.get('screenDensity');
     }
 
-    public getScreenWidth(): number {
-        return this.get('screenWidth');
+    public getScreenWidth(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => {
+            this.set('screenWidth', screenWidth);
+            return screenWidth;
+        }).catch(err => this.handleDeviceInfoError(err));
     }
 
-    public getScreenHeight(): number {
-        return this.get('screenHeight');
+    public getScreenHeight(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => {
+            this.set('screenHeight', screenHeight);
+            return screenHeight;
+        }).catch(err => this.handleDeviceInfoError(err));
     }
 
     public getScreenScale(): number {
@@ -370,66 +376,91 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     }
 
     public getDTO(): Promise<any> {
-        const promises: Array<Promise<any>> = [];
-        promises.push(this.getConnectionType().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkType().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getHeadset().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getFreeSpace().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getFreeMemory().catch(err => this.handleDeviceInfoError(err)));
-
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this.getRingerMode().catch(err => this.handleDeviceInfoError(err)));
-        }
-
-        return Promise.all(promises).then(values => {
+        return Promise.all<any>([
+            this.getConnectionType().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkType().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)),
+            this.getHeadset().catch(err => this.handleDeviceInfoError(err)),
+            this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenWidth().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenHeight().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)),
+            this.getFreeSpace().catch(err => this.handleDeviceInfoError(err)),
+            this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)),
+            this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)),
+            this.getFreeMemory().catch(err => this.handleDeviceInfoError(err))
+        ]).then(([
+            connectionType,
+            networkType,
+            networkOperator,
+            networkOperatorName,
+            headset,
+            deviceVolume,
+            screenWidth,
+            screenHeight,
+            screenBrightness,
+            freeSpace,
+            batteryLevel,
+            batteryStatus,
+            freeMemory
+        ]) => {
             const dto: any = {
                 'apiLevel': this.getApiLevel(),
                 'osVersion': this.getOsVersion(),
                 'deviceMake': this.getManufacturer(),
                 'deviceModel': this.getModel(),
-                'connectionType': values[0],
-                'networkType': values[1],
+                'connectionType': connectionType,
+                'networkType': networkType,
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'screenWidth': this.getScreenWidth(),
-                'screenHeight': this.getScreenHeight(),
+                'screenWidth': screenWidth,
+                'screenHeight': screenHeight,
                 'screenScale': this.getScreenScale(),
                 'userInterfaceIdiom': this.getUserInterfaceIdiom(),
-                'networkOperator': values[2],
-                'networkOperatorName': values[3],
+                'networkOperator': networkOperator,
+                'networkOperatorName': networkOperatorName,
                 'timeZone': this.getTimeZone(),
-                'headset': values[4],
-                'ringerMode': values[12],
+                'headset': headset,
                 'language': this.getLanguage(),
-                'deviceVolume': values[5],
-                'screenBrightness': values[6],
-                'freeSpaceInternal': values[7],
+                'deviceVolume': deviceVolume,
+                'screenBrightness': screenBrightness,
+                'freeSpaceInternal': freeSpace,
                 'totalSpaceInternal': this.getTotalSpace(),
-                'freeSpaceExternal': values[11],
                 'totalSpaceExternal': this.getTotalSpaceExternal(),
-                'batteryLevel': values[8],
-                'batteryStatus': values[9],
-                'freeMemory': values[10],
+                'batteryLevel': batteryLevel,
+                'batteryStatus': batteryStatus,
+                'freeMemory': freeMemory,
                 'totalMemory': this.getTotalMemory(),
                 'rooted': this.isRooted(),
                 'simulator': this.isSimulator(),
             };
 
-            if(this.getAdvertisingIdentifier()) {
-                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
-                dto.limitAdTracking = this.getLimitAdTracking();
-            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                dto.androidId = this.getAndroidId();
-            }
+            const sendDto = () => {
+                if(this.getAdvertisingIdentifier()) {
+                    dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+                    dto.limitAdTracking = this.getLimitAdTracking();
+                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    dto.androidId = this.getAndroidId();
+                }
+                return dto;
+            };
 
-            return dto;
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                return Promise.all([
+                    this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
+                    this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+                ]).then(([
+                    freeSpaceExternal,
+                    ringerMode
+                ]) => {
+                    dto.freeSpaceExternal = freeSpaceExternal;
+                    dto.ringerMode = ringerMode;
+                    return sendDto();
+                });
+            } else {
+                return sendDto();
+            }
         });
     }
 
