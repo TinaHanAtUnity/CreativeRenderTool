@@ -220,6 +220,10 @@ export class NativeBridge implements INativeBridge {
                 this.Storage.handleEvent(event, parameters);
                 break;
 
+            case EventCategory[EventCategory.DEVICEINFO]:
+                this.DeviceInfo.handleEvent(event, parameters);
+                break;
+
             default:
                 throw new Error('Unknown event category: ' + category);
         }
