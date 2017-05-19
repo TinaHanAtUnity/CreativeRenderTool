@@ -3,10 +3,16 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { AndroidDeviceInfoApi } from 'Native/Api/AndroidDeviceInfo';
 import { IosDeviceInfoApi } from 'Native/Api/IosDeviceInfo';
 import { Platform } from 'Constants/Platform';
+import { Observable3 } from 'Utilities/Observable';
+
+enum DeviceInfoEvent {
+    VOLUME_CHANGED
+}
 
 export class DeviceInfoApi extends NativeApi {
     public Android: AndroidDeviceInfoApi;
     public Ios: IosDeviceInfoApi;
+    public readonly onVolumeChanged = new Observable3<number, number, number>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo');
@@ -122,5 +128,15 @@ export class DeviceInfoApi extends NativeApi {
 
     public getGLVersion(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getGLVersion');
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
+        switch (event) {
+            case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
+                this.onVolumeChanged.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+            default:
+                super.handleEvent(event, parameters);
+        }
     }
 }
