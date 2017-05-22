@@ -79,10 +79,6 @@ describe('OverlayEventHandlersTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
         });
 
-        it('should set views through AdUnit API', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
-        });
-
         it('should hide overlay', () => {
             const overlay = performanceAdUnit.getOverlay();
             if(overlay) {

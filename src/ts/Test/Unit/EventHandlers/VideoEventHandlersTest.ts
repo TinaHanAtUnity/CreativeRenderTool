@@ -383,7 +383,6 @@ describe('VideoEventHandlersTest', () => {
             if(adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
@@ -414,7 +413,6 @@ describe('VideoEventHandlersTest', () => {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.hide);
         });
 
@@ -429,7 +427,6 @@ describe('VideoEventHandlersTest', () => {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
