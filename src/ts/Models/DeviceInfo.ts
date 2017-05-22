@@ -66,8 +66,8 @@ export class DeviceInfo extends Model<IDeviceInfo> {
             networkType: ['number'],
             screenLayout: ['number'],
             screenDensity: ['number'],
-            screenWidth: ['number'],
-            screenHeight: ['number'],
+            screenWidth: ['integer'],
+            screenHeight: ['integer'],
             screenScale: ['number'],
             userInterfaceIdiom: ['number'],
             networkOperator: ['string', 'null'],
@@ -229,14 +229,14 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         return this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => {
             this.set('screenWidth', screenWidth);
             return screenWidth;
-        }).catch(err => this.handleDeviceInfoError(err));
+        });
     }
 
     public getScreenHeight(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => {
             this.set('screenHeight', screenHeight);
             return screenHeight;
-        }).catch(err => this.handleDeviceInfoError(err));
+        });
     }
 
     public getScreenScale(): number {
