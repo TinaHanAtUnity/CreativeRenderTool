@@ -7,7 +7,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { WebViewError } from '../../../Errors/WebViewError';
+import { WebViewError } from 'Errors/WebViewError';
 
 describe('DeviceInfoTest', () => {
 
