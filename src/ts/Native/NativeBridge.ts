@@ -221,7 +221,11 @@ export class NativeBridge implements INativeBridge {
                 break;
 
             case EventCategory[EventCategory.DEVICEINFO]:
-                this.DeviceInfo.handleEvent(event, parameters);
+                if (this.getPlatform() === Platform.IOS) {
+                    this.DeviceInfo.Ios.handleEvent(event, parameters);
+                } else {
+                    this.DeviceInfo.Android.handleEvent(event, parameters);
+                }
                 break;
 
             default:
