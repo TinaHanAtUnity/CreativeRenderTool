@@ -16,7 +16,7 @@ import { Double } from 'Utilities/Double';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
@@ -59,6 +59,7 @@ describe('OverlayEventHandlersTest', () => {
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.spy(sessionManager, 'sendSkip');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+            sinon.spy(container, 'reconfigure');
 
             OverlayEventHandlers.onSkip(nativeBridge, sessionManager, performanceAdUnit);
         });
@@ -77,6 +78,10 @@ describe('OverlayEventHandlersTest', () => {
 
         it('should send skip', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
+        });
+
+        it('should call reconfigure', () => {
+            sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
         });
 
         it('should hide overlay', () => {

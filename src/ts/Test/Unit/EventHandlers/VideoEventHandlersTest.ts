@@ -21,7 +21,7 @@ import { Session } from 'Models/Session';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
@@ -367,6 +367,7 @@ describe('VideoEventHandlersTest', () => {
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.stub(performanceAdUnit, 'hide');
+            sinon.spy(container, 'reconfigure');
         });
 
         afterEach(() => {
@@ -383,6 +384,7 @@ describe('VideoEventHandlersTest', () => {
             if(adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
+            sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
@@ -395,6 +397,7 @@ describe('VideoEventHandlersTest', () => {
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.stub(performanceAdUnit, 'hide');
+            sinon.spy(container, 'reconfigure');
         });
 
         afterEach(() => {
@@ -413,6 +416,7 @@ describe('VideoEventHandlersTest', () => {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
+            sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.hide);
         });
 
@@ -427,6 +431,7 @@ describe('VideoEventHandlersTest', () => {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
+            sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
         });
     });
