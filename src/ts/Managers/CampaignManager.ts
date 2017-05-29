@@ -357,8 +357,6 @@ export class CampaignManager {
             deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
             platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),
             screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
-            screenWidth: this.getParameter('screenWidth', this._deviceInfo.getScreenWidth(), 'number'),
-            screenHeight: this.getParameter('screenHeight', this._deviceInfo.getScreenHeight(), 'number'),
             sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'number'),
             screenSize: this.getParameter('screenSize', this._deviceInfo.getScreenLayout(), 'number'),
             stores: this.getParameter('stores', this._deviceInfo.getStores(), 'string')
@@ -397,12 +395,16 @@ export class CampaignManager {
         }
 
         const promises: Array<Promise<any>> = [];
+        promises.push(this._deviceInfo.getScreenWidth());
+        promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this.fetchGamerId());
 
-        return Promise.all(promises).then(([connectionType, networkType, gamerId]) => {
+        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType, gamerId]) => {
             url = Url.addParameters(url, {
+                screenWidth: this.getParameter('screenWidth', screenWidth, 'number'),
+                screenHeight: this.getParameter('screenHeight', screenHeight, 'number'),
                 connectionType: this.getParameter('connectionType', connectionType, 'string'),
                 networkType: this.getParameter('networkType', networkType, 'number'),
             });

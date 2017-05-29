@@ -104,48 +104,53 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getDeviceInfoObject(clientInfo: ClientInfo, deviceInfo: DeviceInfo): IAnalyticsObject {
-        let screenWidth: number = deviceInfo.getScreenWidth();
-        let screenHeight: number = deviceInfo.getScreenHeight();
-        if(deviceInfo.getScreenHeight() > deviceInfo.getScreenWidth()) {
-            screenWidth = deviceInfo.getScreenHeight();
-            screenHeight = deviceInfo.getScreenWidth();
-        }
+    public static getDeviceInfoObject(clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
+        return Promise.all([
+            deviceInfo.getScreenWidth(),
+            deviceInfo.getScreenHeight()
+        ]).then(([width, height]) => {
+            let screenWidth = width;
+            let screenHeight = height;
+            if(screenHeight > screenWidth) {
+                screenWidth = height;
+                screenHeight = width;
+            }
 
-        const event: IAnalyticsDeviceInfoEvent = {
-            ts: Date.now(),
-            app_ver: clientInfo.getApplicationVersion(),
-            adsid: deviceInfo.getAdvertisingIdentifier(),
-            ads_tracking: !deviceInfo.getLimitAdTracking(),
-            os_ver: deviceInfo.getOsVersion(),
-            model: deviceInfo.getModel(),
-            make: deviceInfo.getManufacturer(), // empty for iOS
-            app_name: clientInfo.getApplicationName(),
-            // gfx_name?: string;
-            // gfx_vendor?: string;
-            // gfx_ver?: string;
-            // gfx_driver?: string;
-            // gfx_shader?: number;
-            // gfx_api?: number;
-            // gfx_tex?: number;
-            // gfx_rt?: number;
-            // gfx_flags?: number;
-            // cpu?: string;
-            // cpu_count?: number;
-            // cpu_freq?: number;
-            ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
-            // vram?: number;
-            screen: screenWidth + ' x ' + screenHeight,
-            // dpi?: number; TODO: should be possible to get from device info but maybe not directly
-            lang: deviceInfo.getLanguage(), // todo: ads probably has stuff like 'en_US', analytics has 'en'
-            // sensors?: number;
-            // flags?: number;
-            rooted_jailbroken: deviceInfo.isRooted() ? true : undefined
-        };
-        return {
-            type: 'analytics.deviceInfo.v1',
-            msg: event
-        };
+            const event: IAnalyticsDeviceInfoEvent = {
+                ts: Date.now(),
+                app_ver: clientInfo.getApplicationVersion(),
+                adsid: deviceInfo.getAdvertisingIdentifier(),
+                ads_tracking: !deviceInfo.getLimitAdTracking(),
+                os_ver: deviceInfo.getOsVersion(),
+                model: deviceInfo.getModel(),
+                make: deviceInfo.getManufacturer(), // empty for iOS
+                app_name: clientInfo.getApplicationName(),
+                // gfx_name?: string;
+                // gfx_vendor?: string;
+                // gfx_ver?: string;
+                // gfx_driver?: string;
+                // gfx_shader?: number;
+                // gfx_api?: number;
+                // gfx_tex?: number;
+                // gfx_rt?: number;
+                // gfx_flags?: number;
+                // cpu?: string;
+                // cpu_count?: number;
+                // cpu_freq?: number;
+                ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
+                // vram?: number;
+                screen: screenWidth + ' x ' + screenHeight,
+                // dpi?: number; TODO: should be possible to get from device info but maybe not directly
+                lang: deviceInfo.getLanguage(), // todo: ads probably has stuff like 'en_US', analytics has 'en'
+                // sensors?: number;
+                // flags?: number;
+                rooted_jailbroken: deviceInfo.isRooted() ? true : undefined
+            };
+            return {
+                type: 'analytics.deviceInfo.v1',
+                msg: event
+            };
+        });
     }
 
     public static getStartObject(): IAnalyticsObject {
