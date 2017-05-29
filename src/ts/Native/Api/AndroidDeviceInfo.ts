@@ -9,6 +9,15 @@ export enum StorageType {
     INTERNAL
 }
 
+export interface IPackageInfo {
+    installer: string;
+    firstInstallTime: number;
+    lastUpdateTime: number;
+    versionCode: number;
+    versionName: string;
+    packageName: string;
+}
+
 export class AndroidDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable3<number, number, number>();
 
@@ -42,6 +51,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
 
     public getInstalledPackages(md5: boolean): Promise<string[]> {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getInstalledPackages', [md5]);
+    }
+
+    public getPackageInfo(packageName: string): Promise<IPackageInfo> {
+        return this._nativeBridge.invoke<IPackageInfo>(this._apiClass, 'getPackageInfo', [packageName]);
     }
 
     public getSystemProperty(propertyName: string, defaultValue: string): Promise<string> {

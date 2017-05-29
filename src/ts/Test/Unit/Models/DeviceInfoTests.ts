@@ -10,6 +10,7 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { EventCategory } from 'Constants/EventCategory';
 import { DeviceInfoApi, DeviceInfoEvent } from 'Native/Api/DeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
+import { WebViewError } from 'Errors/WebViewError';
 
 describe('DeviceInfoTest', () => {
 
@@ -45,6 +46,33 @@ describe('DeviceInfoTest', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
         return deviceInfo.fetch();
 
+    });
+
+    it('should not let floating values as screenWidth or screenHeight', (done) => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.TEST;
+            },
+            DeviceInfo: {
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200.123)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800.123)),
+            }
+        };
+
+        deviceInfo = new DeviceInfo(nativeBridge);
+
+        Promise.all([
+            deviceInfo.getScreenWidth(),
+            deviceInfo.getScreenHeight()
+        ]).then(() => {
+            assert.fail('should not pass');
+        }).catch(err => {
+            if(err instanceof WebViewError) {
+                done();
+            } else {
+                done(err);
+            }
+        });
     });
 
     it('Get DeviceInfo DTO', () => {
