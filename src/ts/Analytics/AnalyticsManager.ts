@@ -115,7 +115,9 @@ export class AnalyticsManager {
     }
 
     private sendDeviceInfo(): void {
-        this.send(AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo));
+        AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
+            this.send(deviceInfoObject);
+        });
     }
 
     private sendIAPTransactions(transactions: IIAPInstrumentation[]): void {
