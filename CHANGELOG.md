@@ -1,3 +1,7 @@
+# Tue May 23 08:56:18 UTC 2017
+
+* CampaignRefreshManager placement state race condition fix
+
 # Thu May 18 08:32:22 UTC 2017
 
 * Fix cache redirection support for more than one redirect
