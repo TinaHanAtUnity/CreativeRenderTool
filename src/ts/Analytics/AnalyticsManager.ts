@@ -5,6 +5,7 @@ import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorag
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
+import { StorageType } from 'Native/Api/Storage';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;
@@ -166,11 +167,11 @@ export class AnalyticsManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: string) {
-        if(data && data.indexOf('price') !== -1 && data.indexOf('currency') !== -1) {
-            this._storage.getIAPTransactions().then(transactions => {
-                this.sendIAPTransactions(transactions);
-            });
+    private onStorageSet(eventType: string, data: object) {
+        if(data && Array.isArray(data)) {
+            this.sendIAPTransactions(data);
+            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'iap.purchases');
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
         }
     }
 
