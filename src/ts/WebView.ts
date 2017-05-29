@@ -241,6 +241,8 @@ export class WebView {
             }
         }
 
+        this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+        this._campaignManager.setPreviousPlacementId(placementId);
         this._currentAdUnit.show();
     }
 
