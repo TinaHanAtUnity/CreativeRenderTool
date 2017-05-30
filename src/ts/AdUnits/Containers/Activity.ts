@@ -71,20 +71,25 @@ export class Activity extends AdUnitContainer {
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
 
-        switch (configuration) {
-            case ViewConfiguration.ENDSCREEN:
-                promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
-                break;
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            switch (configuration) {
+                case ViewConfiguration.ENDSCREEN:
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                    break;
 
-            case ViewConfiguration.LANDSCAPE_VIDEO:
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
-                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, this._deviceInfo.getScreenHeight(), this._deviceInfo.getScreenWidth()));
-                break;
-            default:
-                break;
-        }
-        return Promise.all(promises);
+                case ViewConfiguration.LANDSCAPE_VIDEO:
+                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
+                    break;
+                default:
+                    break;
+            }
+            return Promise.all(promises);
+        });
     }
 
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
