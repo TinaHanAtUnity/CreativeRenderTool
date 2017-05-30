@@ -74,7 +74,7 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
-    private _previousPlacementId: string;
+    private _previousPlacementId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -125,11 +125,11 @@ export class CampaignManager {
         });
     }
 
-    public setPreviousPlacementId(id: string) {
+    public setPreviousPlacementId(id: string | undefined) {
         this._previousPlacementId = id;
     }
 
-    public getPreviousPlacementId(): string {
+    public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
     }
 

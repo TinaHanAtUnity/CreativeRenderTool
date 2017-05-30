@@ -29,13 +29,13 @@ export class SessionManagerEventMetadataCreator {
         this._metaDataManager = metaDataManager;
     }
 
-    public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gamerSid: string, previousPlacementId: string): Promise<[string, any]> {
+    public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         return this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id, session, gamerSid, previousPlacementId);
         });
     };
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string, previousPlacementId: string): Promise<[string, any]> {
+    private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'sessionId': currentSession.getId(),
@@ -114,7 +114,7 @@ export class SessionManager {
     private _currentSession: Session;
 
     private _gamerServerId: string;
-    private _previousPlacementId: string;
+    private _previousPlacementId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, eventManager: EventManager, metaDataManager: MetaDataManager, eventMetadataCreator?: SessionManagerEventMetadataCreator) {
         this._nativeBridge = nativeBridge;
@@ -148,11 +148,11 @@ export class SessionManager {
         return this._clientInfo;
     }
 
-    public setPreviousPlacementId(id: string) {
+    public setPreviousPlacementId(id: string | undefined) {
         this._previousPlacementId = id;
     }
 
-    public getPreviousPlacementId(): string {
+    public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
     }
 
