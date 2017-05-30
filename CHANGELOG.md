@@ -1,3 +1,8 @@
+# Tue May 30 11:04:37 UTC 2017
+
+* Refresh screenWidth and screenHeight on access
+* Validate above values as integers instead of JS numbers
+
 # Tue May 23 08:56:18 UTC 2017
 
 * CampaignRefreshManager placement state race condition fix
