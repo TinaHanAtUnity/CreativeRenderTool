@@ -1,6 +1,8 @@
 import { NativeApi } from 'Native/NativeApi';
 import { StreamType } from 'Constants/Android/StreamType';
 import { NativeBridge } from 'Native/NativeBridge';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { Observable3 } from 'Utilities/Observable';
 
 export enum StorageType {
     EXTERNAL,
@@ -17,6 +19,8 @@ export interface IPackageInfo {
 }
 
 export class AndroidDeviceInfoApi extends NativeApi {
+    public readonly onVolumeChanged = new Observable3<number, number, number>();
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo');
     }
@@ -65,6 +69,18 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceVolume', [streamType]);
     }
 
+    public getDeviceMaxVolume(streamType: StreamType): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceMaxVolume', [streamType]);
+    }
+
+    public registerVolumeChangeListener(streamType: StreamType): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'registerVolumeChangeListener', [streamType]);
+    }
+
+    public unregisterVolumeChangeListener(streamType: StreamType): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'unregisterVolumeChangeListener', [streamType]);
+    }
+
     public getFreeSpace(storageType: StorageType): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace', [StorageType[storageType]]);
     }
@@ -103,5 +119,15 @@ export class AndroidDeviceInfoApi extends NativeApi {
 
     public getSupportedAbis(): Promise<string[]> {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSupportedAbis');
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
+        switch (event) {
+            case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
+                this.onVolumeChanged.trigger(parameters[0], parameters[1], parameters[2]);
+                break;
+            default:
+                super.handleEvent(event, parameters);
+        }
     }
 }

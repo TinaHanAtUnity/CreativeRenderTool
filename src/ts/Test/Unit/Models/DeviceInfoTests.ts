@@ -7,6 +7,9 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { EventCategory } from 'Constants/EventCategory';
+import { DeviceInfoApi, DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { StreamType } from 'Constants/Android/StreamType';
 import { WebViewError } from 'Errors/WebViewError';
 
 describe('DeviceInfoTest', () => {
@@ -97,6 +100,7 @@ describe('DeviceInfoTest Android', () => {
 
     let deviceInfo: DeviceInfo;
     let nativeBridge: NativeBridge;
+    let deviceInfoApi: DeviceInfoApi;
 
     it('Get DeviceInfo DTO Android with GAID', () => {
         nativeBridge = <NativeBridge><any>{
@@ -137,7 +141,6 @@ describe('DeviceInfoTest Android', () => {
                     isAppInstalled: sinon.stub().returns(Promise.resolve(true))
                 }
             },
-
         };
         deviceInfo = new DeviceInfo(nativeBridge);
 
@@ -204,17 +207,99 @@ describe('DeviceInfoTest Android', () => {
             assert.equal(dto.androidId, '17');
         });
     });
+
+    it ('Volume change', (done) => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.ANDROID;
+            },
+            handleEvent: (parameters: any[]) => {
+                const receivedCategory = parameters.shift();
+
+                if (receivedCategory === EventCategory[EventCategory.DEVICEINFO]) {
+                    const receivedEvent = parameters.shift();
+                    deviceInfoApi.Android.handleEvent(receivedEvent, parameters);
+                }
+            },
+            DeviceInfo: {
+                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
+                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
+                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+                getModel: sinon.stub().returns(Promise.resolve('testModel')),
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+                isRooted: sinon.stub().returns(Promise.resolve(true)),
+                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
+                getHeadset: sinon.stub().returns(Promise.resolve(true)),
+                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+
+                Android: {
+                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
+                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
+                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
+                    getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
+                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
+                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+                    isAppInstalled: sinon.stub().returns(Promise.resolve(true))
+                }
+            },
+        };
+        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfoApi = new DeviceInfoApi(nativeBridge);
+
+        let receivedStreamType = -1;
+        let triggered = false;
+        let receivedVolume = 0;
+        let receivedMaxVolume = 0;
+
+        deviceInfoApi.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => {
+            triggered = true;
+            receivedStreamType = streamType;
+            receivedVolume = volume;
+            receivedMaxVolume = maxVolume;
+
+            assert.equal(triggered, true);
+            assert.equal(receivedStreamType, StreamType.STREAM_MUSIC);
+            assert.equal(receivedVolume, 0.5);
+            assert.equal(receivedMaxVolume, 1.0);
+
+            done();
+        });
+
+        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], StreamType.STREAM_MUSIC, 0.5, 1.0]);
+    });
 });
 
 describe('DeviceInfoTest iOS', () => {
 
     let deviceInfo: DeviceInfo;
     let nativeBridge: NativeBridge;
+    let deviceInfoApi: DeviceInfoApi;
 
     beforeEach(() => {
         nativeBridge = <NativeBridge><any>{
             getPlatform: () => {
                 return Platform.IOS;
+            },
+            handleEvent: (parameters: any[]) => {
+                const receivedCategory = parameters.shift();
+
+                if (receivedCategory === EventCategory[EventCategory.DEVICEINFO]) {
+                    const receivedEvent = parameters.shift();
+                    deviceInfoApi.Ios.handleEvent(receivedEvent, parameters);
+                }
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
@@ -249,6 +334,7 @@ describe('DeviceInfoTest iOS', () => {
             },
         };
         deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfoApi = new DeviceInfoApi(nativeBridge);
         return deviceInfo.fetch();
     });
 
@@ -263,6 +349,26 @@ describe('DeviceInfoTest iOS', () => {
             assert.equal(dto.deviceVolume, 0.5);
             assert.equal(dto.totalSpaceInternal, 1024);
         });
+    });
+
+    it ('Volume change', (done) => {
+        let triggered = false;
+        let receivedVolume = 0;
+        let receivedMaxVolume = 0;
+
+        deviceInfoApi.Ios.onVolumeChanged.subscribe((volume, maxVolume) => {
+            triggered = true;
+            receivedVolume = volume;
+            receivedMaxVolume = maxVolume;
+
+            assert.equal(triggered, true);
+            assert.equal(receivedVolume, 0.5);
+            assert.equal(receivedMaxVolume, 1.0);
+
+            done();
+        });
+
+        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], 0.5, 1.0]);
     });
 });
 
