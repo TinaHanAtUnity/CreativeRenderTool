@@ -96,13 +96,17 @@ export class CampaignRefreshManager {
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
         const placement = this._configuration.getPlacement(placementId);
-        const oldState = placement.getState();
-        this._nativeBridge.Placement.setPlacementState(placementId, placementState);
-        if(oldState !== placementState) {
-            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[placementState]);
-            placement.setState(placementState);
+        placement.setState(placementState);
+    }
+
+    public sendPlacementStateChanges(placementId: string): void {
+        const placement = this._configuration.getPlacement(placementId);
+        if (placement.getPlacementStateChanged()) {
+            placement.setPlacementStateChanged(false);
+            this._nativeBridge.Placement.setPlacementState(placementId, placement.getState());
+            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
         }
-        if(placementState === PlacementState.READY) {
+        if(placement.getState() === PlacementState.READY) {
             this._nativeBridge.Listener.sendReadyEvent(placementId);
         }
     }
@@ -112,6 +116,11 @@ export class CampaignRefreshManager {
         for(const placementId in placements) {
             if(placements.hasOwnProperty(placementId)) {
                 this.setPlacementState(placementId, placementState);
+            }
+        }
+        for (const placementId in placements) {
+            if(placements.hasOwnProperty(placementId)) {
+                this.sendPlacementStateChanges(placementId);
             }
         }
     }
@@ -180,10 +189,12 @@ export class CampaignRefreshManager {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
+                this.sendPlacementStateChanges(placementId);
             });
         } else {
             this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
+            this.sendPlacementStateChanges(placementId);
         }
     }
 

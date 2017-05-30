@@ -1,3 +1,16 @@
+# Tue May 30 11:04:37 UTC 2017
+
+* Refresh screenWidth and screenHeight on access
+* Validate above values as integers instead of JS numbers
+
+# Tue May 23 08:56:18 UTC 2017
+
+* CampaignRefreshManager placement state race condition fix
+
+# Thu May 18 08:32:22 UTC 2017
+
+* Fix cache redirection support for more than one redirect
+
 # Tue May 16 10:49:04 UTC 2017
 
 * Fix negative targeting event topic name

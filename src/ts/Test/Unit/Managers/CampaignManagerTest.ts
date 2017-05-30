@@ -69,9 +69,7 @@ describe('CampaignManager', () => {
             assetCaching: 'disabled',
             placements: []
         });
-    });
 
-    beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
         warningSpy = sinon.spy();
@@ -119,7 +117,9 @@ describe('CampaignManager', () => {
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getScreenWidth: () => Promise.resolve(1234),
+                getScreenHeight: () => Promise.resolve(123)
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
@@ -614,69 +614,6 @@ describe('CampaignManager', () => {
                 assert.equal(warningSpy.callCount, 0);
             });
         });
-    });
-
-    beforeEach(() => {
-        clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
-        warningSpy = sinon.spy();
-        nativeBridge = <NativeBridge><any>{
-            Storage: {
-                get: function(storageType: number, key: string) {
-                    return Promise.resolve('123');
-                },
-                set: () => {
-                    return Promise.resolve();
-                },
-                write: () => {
-                    return Promise.resolve();
-                },
-                getKeys: sinon.stub().returns(Promise.resolve([]))
-            },
-            Request: {
-                onComplete: {
-                    subscribe: sinon.spy()
-                },
-                onFailed: {
-                    subscribe: sinon.spy()
-                }
-            },
-            Cache: {
-                setProgressInterval: sinon.spy(),
-                onDownloadStarted: new Observable0(),
-                onDownloadProgress: new Observable0(),
-                onDownloadEnd: new Observable0(),
-                onDownloadStopped: new Observable0(),
-                onDownloadError: new Observable0(),
-            },
-            Sdk: {
-                logWarning: warningSpy,
-                logInfo: sinon.spy()
-            },
-            Connectivity: {
-                onConnected: new Observable2()
-            },
-            Broadcast: {
-                onBroadcastAction: new Observable4()
-            },
-            Notification: {
-                onNotification: new Observable2()
-            },
-            DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
-            },
-            Lifecycle: {
-                onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1()
-            },
-            getPlatform: () => {
-                return Platform.TEST;
-            }
-        };
-        wakeUpManager = new WakeUpManager(nativeBridge);
-        request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = new DeviceInfo(nativeBridge);
     });
 
     it('should process custom tracking urls', () => {

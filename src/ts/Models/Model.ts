@@ -1,6 +1,7 @@
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-export type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'undefined' | 'null';
+
+export type SchemaType = 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object' | 'undefined' | 'null';
 
 export type ISchema<T extends object> = {
     [P in keyof T]: SchemaType[];
@@ -38,6 +39,8 @@ export abstract class Model<T extends object> {
             valueType = 'array';
         } else if (value === null) {
             valueType = 'null';
+        } else if(valueType === 'number' && Number.isInteger(value)) {
+            valueType = 'integer';
         }
 
         return valueType;
@@ -45,7 +48,8 @@ export abstract class Model<T extends object> {
 
     private checkValue(value: any, allowedTypes: SchemaType[]): boolean {
         for(const currentType of allowedTypes) {
-            if(this.getTypeOf(value) === currentType) {
+            const valueType = this.getTypeOf(value);
+            if(valueType === currentType || (currentType === 'number' && valueType === 'integer')) {
                 return true;
             }
         }
