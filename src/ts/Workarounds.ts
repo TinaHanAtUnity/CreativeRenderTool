@@ -14,6 +14,12 @@ if(!Array.prototype.forEach) {
     };
 }
 
+if(!Number.isInteger) {
+    Number.isInteger = function(value: any) {
+        return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+    };
+}
+
 if(!('classList' in document.documentElement) && Object.defineProperty && typeof HTMLElement !== 'undefined') {
     Object.defineProperty(HTMLElement.prototype, 'classList', {
         get: function(this: HTMLElement) {
