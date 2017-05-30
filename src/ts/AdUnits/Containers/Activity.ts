@@ -18,7 +18,6 @@ interface IDisplay {
     height: number;
 }
 
-
 export class Activity extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
