@@ -5,16 +5,19 @@ import { Asset } from 'Models/Assets/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
+    private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
 
-    constructor(cache: Cache, cacheMode: CacheMode) {
+    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
+        this._deviceInfo = deviceInfo;
         this._stopped = false;
     }
 
