@@ -78,6 +78,12 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+
+        this._nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'caching.pause.value').then(paused => {
+            this._paused = paused;
+        }).catch(() => {
+            // ignore errors, assume caching not paused
+        });
     }
 
     public cache(url: string): Promise<[string, string]> {
@@ -596,11 +602,20 @@ export class Cache {
     }
 
     private onStorageSet(eventType: string, data: string) {
+        let deleteValue: boolean = false;
+
         // note: these match Android and iOS storage event formats for 2.1 and earlier versions
-        if(data.indexOf('caching.pause.value=true') !== -1 || data.indexOf('"performance.caching.value":true') !== -1) {
+        if(data.indexOf('caching.pause.value=true') !== -1 || data.indexOf('"caching.pause":true') !== -1) {
             this.pause(true);
-        } else if(data.indexOf('caching.pause.value=false') !== -1 || data.indexOf('"performance.caching.value":false') !== -1) {
+            deleteValue = true;
+        } else if(data.indexOf('caching.pause.value=false') !== -1 || data.indexOf('"caching.pause":false') !== -1) {
             this.pause(false);
+            deleteValue = true;
+        }
+
+        if(deleteValue) {
+            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'caching.pause');
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
         }
     }
 }
