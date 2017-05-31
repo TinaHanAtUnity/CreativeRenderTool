@@ -19,7 +19,7 @@ export abstract class AdUnitContainer {
     public readonly onSystemPause = new Observable0(); // ad unit has been resigned from active (iOS only)
     public readonly onSystemInterrupt = new Observable0(); // ad unit has been interrupted and video has been paused (iOS only)
 
-    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void>;
+    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
     public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
     public abstract reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]>;

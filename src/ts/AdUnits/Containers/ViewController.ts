@@ -10,7 +10,6 @@ interface IIosOptions {
     supportedOrientationsPlist: UIInterfaceOrientationMask;
     shouldAutorotate: boolean;
     statusBarOrientation: number;
-    isTransparent: boolean;
 }
 
 export class ViewController extends AdUnitContainer {
@@ -39,7 +38,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, options: IIosOptions): Promise<void> {
         this._options = options;
         this._showing = true;
 
@@ -49,7 +48,6 @@ export class ViewController extends AdUnitContainer {
         }
 
         const orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
-        const isTransparent = options.isTransparent ? options.isTransparent : false;
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);

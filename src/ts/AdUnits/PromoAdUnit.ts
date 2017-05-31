@@ -10,7 +10,7 @@ export class PromoAdUnit extends AbstractAdUnit {
         super(nativeBridge, container, placement, campaign);
     }
     public show(): Promise<void> {
-        return this._container.open(this, false, false, ForceOrientation.NONE, true, {} );
+        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, {} );
     }
 
     public hide(): Promise<void> {

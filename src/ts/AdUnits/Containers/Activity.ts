@@ -46,7 +46,7 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
         this._androidOptions = options;
@@ -67,7 +67,7 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
