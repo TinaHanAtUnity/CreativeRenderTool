@@ -561,7 +561,9 @@ export class Cache {
     }
 
     private pause(paused: boolean): void {
-        if(paused === this._paused) return;
+        if(paused === this._paused) {
+            return;
+        }
         this._paused = paused;
 
         if(paused) {
