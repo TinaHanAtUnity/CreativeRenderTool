@@ -321,6 +321,10 @@ export class Cache {
         });
     }
 
+    public isPaused(): boolean {
+        return this._paused;
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
         this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
