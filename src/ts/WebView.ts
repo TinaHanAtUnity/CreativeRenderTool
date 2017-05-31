@@ -27,7 +27,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -219,8 +219,12 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options).then(adUnit => {
-            this._currentAdUnit = adUnit;
+        Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

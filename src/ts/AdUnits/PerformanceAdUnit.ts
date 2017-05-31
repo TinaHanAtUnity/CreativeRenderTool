@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { EndScreen } from 'Views/EndScreen';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
@@ -12,8 +12,8 @@ export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
-        super(nativeBridge, container, placement, campaign, video, overlay, deviceInfo, options);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
+        super(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options);
         this._endScreen = endScreen;
     }
 

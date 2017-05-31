@@ -29,8 +29,8 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _overlay: Overlay | undefined;
     private _deviceInfo: DeviceInfo;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
-        super(nativeBridge, container, placement, campaign);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
+        super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._video = video;
         this._active = false;
@@ -48,7 +48,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
-        return this._container.open(this, true, true, ForceOrientation.NONE, this._placement.disableBackButton(), this._options);
+        return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), this._options);
     }
 
     public hide(): Promise<void> {
@@ -135,43 +135,28 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private getValidVideoUrl(): Promise<string> {
         let streamingUrl: string = this.getVideo().getOriginalUrl();
 
-        return Promise.all([
-            this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
-            if(this._campaign instanceof PerformanceCampaign) {
-                const landscape = screenWidth >= screenHeight;
-                const portrait = screenHeight > screenWidth;
+        if(this._campaign instanceof PerformanceCampaign) {
+            const orientation = this.getForceOrientation()
 
-                const landscapeStreaming = this._campaign.getStreamingVideo();
-                const portraitStreaming = this._campaign.getStreamingPortraitVideo();
+            const landscapeStreaming = this._campaign.getStreamingVideo();
+            const portraitStreaming = this._campaign.getStreamingPortraitVideo();
 
-                if(landscape && landscapeStreaming) {
-                    streamingUrl = landscapeStreaming.getOriginalUrl();
-                } else if(portrait && portraitStreaming) {
-                    streamingUrl = portraitStreaming.getOriginalUrl();
-                } else {
-                    throw new WebViewError('Unable to fallback to an oriented streaming video');
-                }
+            if(orientation === ForceOrientation.LANDSCAPE && landscapeStreaming) {
+                streamingUrl = landscapeStreaming.getOriginalUrl();
+            } else if(orientation === ForceOrientation.PORTRAIT && portraitStreaming) {
+                streamingUrl = portraitStreaming.getOriginalUrl();
+            } else {
+                throw new WebViewError('Unable to fallback to an oriented streaming video');
             }
+        }
 
-            // check that if we think video has been cached, it is still available on device cache directory
-            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-                return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
-                    if(result.found) {
-                        return this.getVideo().getUrl();
-                    } else {
-                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
-                            url: this.getVideo().getUrl(),
-                            originalUrl: this.getVideo().getOriginalUrl(),
-                            campaignId: this._campaign.getId()
-                        }));
-
-                        // cached file not found (deleted by the system?), use streaming fallback
-                        return streamingUrl;
-                    }
-                }).catch(error => {
-                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
+        // check that if we think video has been cached, it is still available on device cache directory
+        if(this.getVideo().isCached() && this.getVideo().getFileId()) {
+            return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                if(result.found) {
+                    return this.getVideo().getUrl();
+                } else {
+                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
@@ -179,10 +164,19 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
                     // cached file not found (deleted by the system?), use streaming fallback
                     return streamingUrl;
-                });
-            } else {
-                return Promise.resolve(this.getVideo().getUrl());
-            }
-        });
+                }
+            }).catch(error => {
+                Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
+                    url: this.getVideo().getUrl(),
+                    originalUrl: this.getVideo().getOriginalUrl(),
+                    campaignId: this._campaign.getId()
+                }));
+
+                // cached file not found (deleted by the system?), use streaming fallback
+                return streamingUrl;
+            });
+        } else {
+            return Promise.resolve(this.getVideo().getUrl());
+        }
     }
 }
