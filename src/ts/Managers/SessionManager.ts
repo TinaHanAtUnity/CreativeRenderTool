@@ -91,7 +91,7 @@ export class SessionManagerEventMetadataCreator {
                 return [id, infoJson];
             });
         });
-}
+    }
 
 }
 

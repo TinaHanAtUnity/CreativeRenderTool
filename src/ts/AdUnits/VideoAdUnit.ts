@@ -42,7 +42,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._active = true;
+        this.setActive(true);
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
@@ -92,7 +92,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     }
 
     protected onShow() {
-        if(this.isShowing() && this._active) {
+        if(this.isShowing() && this.isActive()) {
             if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
                 if(this.getVideo().isCached()) {
                     this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
@@ -132,7 +132,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     // todo: this is first attempt to get rid of around 1% of failed starts
     // if this approach is successful, this should somehow be refactored as part of AssetManager to validate
     // other things too, like endscreen assets
-    protected getValidVideoUrl(): Promise<string> {
+    private getValidVideoUrl(): Promise<string> {
         let streamingUrl: string = this.getVideo().getOriginalUrl();
 
         return Promise.all([

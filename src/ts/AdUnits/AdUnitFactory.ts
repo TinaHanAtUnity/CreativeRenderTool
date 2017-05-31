@@ -29,7 +29,7 @@ import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
 import { Video } from 'Models/Assets/Video';
-import { WebViewError } from '../Errors/WebViewError';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class AdUnitFactory {
 
