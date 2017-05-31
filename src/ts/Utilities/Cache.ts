@@ -81,6 +81,8 @@ export class Cache {
 
         this._nativeBridge.Storage.get<boolean>(StorageType.PUBLIC, 'caching.pause.value').then(paused => {
             this._paused = paused;
+            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'caching.pause');
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
         }).catch(() => {
             // ignore errors, assume caching not paused
         });
@@ -601,16 +603,28 @@ export class Cache {
         }
     }
 
-    private onStorageSet(eventType: string, data: string) {
+    private onStorageSet(eventType: string, data: any) {
         let deleteValue: boolean = false;
 
         // note: these match Android and iOS storage event formats for 2.1 and earlier versions
-        if(data.indexOf('caching.pause.value=true') !== -1 || data.indexOf('"caching.pause":true') !== -1) {
-            this.pause(true);
-            deleteValue = true;
-        } else if(data.indexOf('caching.pause.value=false') !== -1 || data.indexOf('"caching.pause":false') !== -1) {
-            this.pause(false);
-            deleteValue = true;
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if(data.indexOf('caching.pause.value=true') !== -1) {
+                this.pause(true);
+                deleteValue = true;
+            } else if(data.indexOf('caching.pause.value=false') !== -1) {
+                this.pause(false);
+                deleteValue = true;
+            }
+        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            if(typeof data['caching.pause.value'] !== 'undefined') {
+                if(data['caching.pause.value'] === true) {
+                    this.pause(true);
+                    deleteValue = true;
+                } else {
+                    this.pause(false);
+                    deleteValue = true;
+                }
+            }
         }
 
         if(deleteValue) {
