@@ -54,7 +54,9 @@ export class SessionManagerEventMetadataCreator {
 
         const campaign = adUnit.getCampaign();
         if(campaign instanceof PerformanceCampaign) {
-            infoJson.cached = campaign.getVideo().isCached();
+            const landscapeVideo = campaign.getVideo();
+            const portraitVideo = campaign.getPortraitVideo();
+            infoJson.cached = (landscapeVideo && landscapeVideo.isCached()) || (portraitVideo && portraitVideo.isCached());
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
         }

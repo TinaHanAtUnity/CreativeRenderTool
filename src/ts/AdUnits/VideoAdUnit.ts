@@ -13,7 +13,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { WebViewError } from "Errors/WebViewError";
+import { WebViewError } from 'Errors/WebViewError';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -25,6 +25,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
     protected _options: any;
     private _video: Video;
+    private _active: boolean;
     private _overlay: Overlay | undefined;
     private _deviceInfo: DeviceInfo;
 
@@ -32,6 +33,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         super(nativeBridge, container, placement, campaign);
 
         this._video = video;
+        this._active = false;
         this._overlay = overlay;
         this._deviceInfo = deviceInfo;
         this._options = options;
@@ -40,7 +42,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._video.setActive(true);
+        this._active = true;
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
@@ -77,12 +79,20 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._video;
     }
 
+    public isActive() {
+        return this._active;
+    }
+
+    public setActive(value: boolean) {
+        this._active = value;
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
 
     protected onShow() {
-        if(this.isShowing() && this._video.isActive()) {
+        if(this.isShowing() && this._active) {
             if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
                 if(this.getVideo().isCached()) {
                     this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
@@ -105,7 +115,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     }
 
     protected onSystemInterrupt(): void {
-        if(this.isShowing() && this._video.isActive()) {
+        if(this.isShowing() && this.isActive()) {
             this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
             this._nativeBridge.VideoPlayer.play();
         }
@@ -123,19 +133,45 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     // if this approach is successful, this should somehow be refactored as part of AssetManager to validate
     // other things too, like endscreen assets
     protected getValidVideoUrl(): Promise<string> {
-        if(this._campaign instanceof PerformanceCampaign) {
-            return this.getOrientedVideoUrl();
-        }
+        let streamingUrl: string = this.getVideo().getOriginalUrl();
 
-        const streamingUrl: string = this.getVideo().getOriginalUrl();
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            if(this._campaign instanceof PerformanceCampaign) {
+                const landscape = screenWidth >= screenHeight;
+                const portrait = screenHeight > screenWidth;
 
-        // check that if we think video has been cached, it is still available on device cache directory
-        if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-            return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
-                if(result.found) {
-                    return this.getVideo().getUrl();
+                const landscapeStreaming = this._campaign.getStreamingVideo();
+                const portraitStreaming = this._campaign.getStreamingPortraitVideo();
+
+                if(landscape && landscapeStreaming) {
+                    streamingUrl = landscapeStreaming.getOriginalUrl();
+                } else if(portrait && portraitStreaming) {
+                    streamingUrl = portraitStreaming.getOriginalUrl();
                 } else {
-                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                    throw new WebViewError('Unable to fallback to an oriented streaming video');
+                }
+            }
+
+            // check that if we think video has been cached, it is still available on device cache directory
+            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
+                return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                    if(result.found) {
+                        return this.getVideo().getUrl();
+                    } else {
+                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                            url: this.getVideo().getUrl(),
+                            originalUrl: this.getVideo().getOriginalUrl(),
+                            campaignId: this._campaign.getId()
+                        }));
+
+                        // cached file not found (deleted by the system?), use streaming fallback
+                        return streamingUrl;
+                    }
+                }).catch(error => {
+                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
@@ -143,82 +179,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
                     // cached file not found (deleted by the system?), use streaming fallback
                     return streamingUrl;
-                }
-            }).catch(error => {
-                Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
-                    url: this.getVideo().getUrl(),
-                    originalUrl: this.getVideo().getOriginalUrl(),
-                    campaignId: this._campaign.getId()
-                }));
-
-                // cached file not found (deleted by the system?), use streaming fallback
-                return streamingUrl;
-            });
-        } else {
-            return Promise.resolve(this.getVideo().getUrl());
-        }
-    }
-
-    private getOrientedVideoUrl(): Promise<string> {
-        return Promise.all([
-            this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
-            const landscape = screenWidth >= screenHeight;
-            const portrait = screenHeight > screenWidth;
-
-            const landscapeVideo = this.getLandscapeVideoUrl();
-            const portraitVideo = this.getPortraitVideoUrl();
-
-            if(landscape) {
-                if(landscapeVideo) {
-                    return landscapeVideo;
-                }
-                if(portraitVideo) {
-                    return portraitVideo;
-                }
+                });
+            } else {
+                return Promise.resolve(this.getVideo().getUrl());
             }
-
-            if(portrait) {
-                if(portraitVideo) {
-                    return portraitVideo;
-                }
-                if(landscapeVideo) {
-                    return landscapeVideo;
-                }
-            }
-
-            throw new WebViewError('Unable to select an oriented video');
         });
-    }
-
-    private getLandscapeVideoUrl(): string | undefined {
-        const campaign: PerformanceCampaign = <PerformanceCampaign>this._campaign;
-        const video = campaign.getVideo();
-        const streaming = campaign.getStreamingVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video.getCachedUrl();
-            }
-            if(streaming) {
-                return streaming.getOriginalUrl();
-            }
-        }
-        return undefined;
-    }
-
-    private getPortraitVideoUrl(): string | undefined {
-        const campaign: PerformanceCampaign = <PerformanceCampaign>this._campaign;
-        const video = campaign.getPortraitVideo();
-        const streaming = campaign.getStreamingPortraitVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video.getCachedUrl();
-            }
-            if(streaming) {
-                return streaming.getOriginalUrl();
-            }
-        }
-        return undefined;
     }
 }

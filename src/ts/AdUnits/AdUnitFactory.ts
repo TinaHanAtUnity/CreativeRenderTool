@@ -28,10 +28,12 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
+import { Video } from 'Models/Assets/Video';
+import { WebViewError } from '../Errors/WebViewError';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): Promise<AbstractAdUnit> {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
@@ -44,40 +46,42 @@ export class AdUnitFactory {
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): Promise<AbstractAdUnit> {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
 
-        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options, endScreen);
+        return AdUnitFactory.getOrientedVideo(campaign, deviceInfo).then(video => {
+            const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
+            this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
 
-        const landscapeVideo = campaign.getVideo();
-        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
-        const portraitVideo = campaign.getPortraitVideo();
-        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
-        overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
+            const landscapeVideo = campaign.getVideo();
+            const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
+            const portraitVideo = campaign.getPortraitVideo();
+            const portraitVideoCached = portraitVideo && portraitVideo.isCached();
+            overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
-        this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
-        this.prepareVideoPlayer(nativeBridge, container, sessionManager, performanceAdUnit);
-        this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+            this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
+            this.prepareVideoPlayer(nativeBridge, container, sessionManager, performanceAdUnit);
+            this.prepareEndScreen(endScreen, nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
-        const onVideoErrorObserver = performanceAdUnit.onError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
+            const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
+            const onVideoErrorObserver = performanceAdUnit.onError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
 
-        performanceAdUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
-            performanceAdUnit.onError.unsubscribe(onVideoErrorObserver);
+            performanceAdUnit.onClose.subscribe(() => {
+                nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+                performanceAdUnit.onError.unsubscribe(onVideoErrorObserver);
+            });
+
+            performanceAdUnit.onClose.subscribe(() => {
+                performanceAdUnit.hide();
+            });
+
+            return performanceAdUnit;
         });
-
-        performanceAdUnit.onClose.subscribe(() => {
-            performanceAdUnit.hide();
-        });
-
-        return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): Promise<AbstractAdUnit> {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
         let vastAdUnit: VastAdUnit;
@@ -105,10 +109,10 @@ export class AdUnitFactory {
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
         });
 
-        return vastAdUnit;
+        return Promise.resolve(vastAdUnit);
     }
 
-    private static createMRAIDAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): Promise<AbstractAdUnit> {
         const mraid = new MRAID(nativeBridge, placement, campaign);
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
@@ -130,7 +134,7 @@ export class AdUnitFactory {
             mraidAdUnit.hide();
         });
 
-        return mraidAdUnit;
+        return Promise.resolve(mraidAdUnit);
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {
@@ -249,5 +253,66 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.Ios.onGenericError.unsubscribe(onGenericErrorObserver);
             nativeBridge.VideoPlayer.Ios.onPrepareError.unsubscribe(onVideoPrepareErrorObserver);
         });
+    }
+
+    private static getOrientedVideo(campaign: PerformanceCampaign, deviceInfo: DeviceInfo): Promise<Video> {
+        return Promise.all([
+            deviceInfo.getScreenWidth(),
+            deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const landscape = screenWidth >= screenHeight;
+            const portrait = screenHeight > screenWidth;
+
+            const landscapeVideo = AdUnitFactory.getLandscapeVideo(campaign);
+            const portraitVideo = AdUnitFactory.getPortraitVideo(campaign);
+
+            if(landscape) {
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+            }
+
+            if(portrait) {
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+            }
+
+            throw new WebViewError('Unable to select an oriented video');
+        });
+    }
+
+    private static getLandscapeVideo(campaign: PerformanceCampaign): Video | undefined {
+        const video = campaign.getVideo();
+        const streaming = campaign.getStreamingVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video;
+            }
+            if(streaming) {
+                return streaming;
+            }
+        }
+        return undefined;
+    }
+
+    private static getPortraitVideo(campaign: PerformanceCampaign): Video | undefined {
+        const video = campaign.getPortraitVideo();
+        const streaming = campaign.getStreamingPortraitVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video;
+            }
+            if(streaming) {
+                return streaming;
+            }
+        }
+        return undefined;
     }
 }

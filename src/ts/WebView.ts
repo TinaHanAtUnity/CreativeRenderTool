@@ -141,7 +141,7 @@ export class WebView {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
@@ -219,29 +219,31 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
-        this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
-        this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
-        this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
+        AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options).then(adUnit => {
+            this._currentAdUnit = adUnit;
+            this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
-            if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
-                const appSheetOptions = {
-                    id: parseInt(campaign.getAppStoreId(), 10)
-                };
-                this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
-                    const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.prepare(appSheetOptions);
+            if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                    const appSheetOptions = {
+                        id: parseInt(campaign.getAppStoreId(), 10)
+                    };
+                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
+                        });
+                        this._currentAdUnit.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                        });
                     });
-                    this._currentAdUnit.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                        this._nativeBridge.AppSheet.destroy(appSheetOptions);
-                    });
-                });
+                }
             }
-        }
 
-        this._currentAdUnit.show();
+            this._currentAdUnit.show();
+        });
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
