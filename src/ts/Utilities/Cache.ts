@@ -36,6 +36,7 @@ interface ICallbackObject {
     networkRetry: boolean;
     retryCount: number;
     networkRetryCount: number;
+    paused: boolean;
     resolve: Function;
     reject: Function;
     originalUrl?: string;
@@ -51,6 +52,7 @@ export class Cache {
     private _fileIds: { [key: string]: string } = {};
 
     private _currentUrl: string;
+    private _paused: boolean;
 
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
@@ -65,6 +67,8 @@ export class Cache {
             this._retryDelay = options.retryDelay;
         }
 
+        this._paused = false;
+
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
         this._nativeBridge.Cache.setProgressInterval(500);
@@ -73,6 +77,7 @@ export class Cache {
         this._nativeBridge.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
         this._nativeBridge.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
         this._nativeBridge.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
+        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     public cache(url: string): Promise<[string, string]> {
@@ -88,8 +93,10 @@ export class Cache {
             if(isCached) {
                 return Promise.resolve([CacheStatus.OK, fileId]);
             }
-            const promise = this.registerCallback(url, fileId);
-            this.downloadFile(url, fileId);
+            const promise = this.registerCallback(url, fileId, this._paused);
+            if(!this._paused) {
+                this.downloadFile(url, fileId);
+            }
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
             if(status === CacheStatus.OK) {
@@ -329,13 +336,14 @@ export class Cache {
         });
     }
 
-    private registerCallback(url: string, fileId: string, originalUrl?: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, paused: boolean, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
                 networkRetry: false,
                 retryCount: 0,
                 networkRetryCount: 0,
+                paused: paused,
                 resolve: resolve,
                 reject: reject,
                 originalUrl: originalUrl
@@ -431,7 +439,7 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, originalUrl);
+                    this.registerCallback(location, fileId, false, originalUrl);
                     this.downloadFile(location, fileId);
                     return;
                 }
@@ -463,7 +471,9 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, url, size, totalSize, duration, responseCode, headers));
-            this.fulfillCallback(url, CacheStatus.STOPPED);
+            if(!callback.paused) {
+                this.fulfillCallback(url, CacheStatus.STOPPED);
+            }
         }
     }
 
@@ -547,6 +557,48 @@ export class Cache {
                     this.downloadFile(url, callback.fileId);
                 }
             }
+        }
+    }
+
+    private pause(paused: boolean): void {
+        if(paused === this._paused) return;
+        this._paused = paused;
+
+        if(paused) {
+            let activeDownload: boolean = false;
+
+            for(const url in this._callbacks) {
+                if(this._callbacks.hasOwnProperty(url)) {
+                    const callback: ICallbackObject = this._callbacks[url];
+                    callback.paused = true;
+                    if(!callback.networkRetry) {
+                        activeDownload = true;
+                    }
+                }
+            }
+
+            if(activeDownload) {
+                this._nativeBridge.Cache.stop();
+            }
+        } else {
+            for(const url in this._callbacks) {
+                if (this._callbacks.hasOwnProperty(url)) {
+                    const callback: ICallbackObject = this._callbacks[url];
+                    if(callback.paused) {
+                        callback.paused = false;
+                        this.downloadFile(url, callback.fileId);
+                    }
+                }
+            }
+        }
+    }
+
+    private onStorageSet(eventType: string, data: string) {
+        // note: these match Android and iOS storage event formats for 2.1 and earlier versions
+        if(data.indexOf('caching.pause.value=true') !== -1 || data.indexOf('"performance.caching.value":true') !== -1) {
+            this.pause(true);
+        } else if(data.indexOf('caching.pause.value=false') !== -1 || data.indexOf('"performance.caching.value":false') !== -1) {
+            this.pause(false);
         }
     }
 }
