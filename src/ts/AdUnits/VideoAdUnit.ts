@@ -13,6 +13,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { WebViewError } from "Errors/WebViewError";
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -121,13 +122,12 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     // todo: this is first attempt to get rid of around 1% of failed starts
     // if this approach is successful, this should somehow be refactored as part of AssetManager to validate
     // other things too, like endscreen assets
-    private getValidVideoUrl(): Promise<string> {
-        let streamingUrl: string = this.getVideo().getOriginalUrl();
-
-        // todo: hack to get streaming video, needs proper refactoring when this is put in AssetManager
+    protected getValidVideoUrl(): Promise<string> {
         if(this._campaign instanceof PerformanceCampaign) {
-            streamingUrl = (<PerformanceCampaign>this._campaign).getStreamingVideo().getUrl();
+            return this.getOrientedVideoUrl();
         }
+
+        const streamingUrl: string = this.getVideo().getOriginalUrl();
 
         // check that if we think video has been cached, it is still available on device cache directory
         if(this.getVideo().isCached() && this.getVideo().getFileId()) {
@@ -157,5 +157,68 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         } else {
             return Promise.resolve(this.getVideo().getUrl());
         }
+    }
+
+    private getOrientedVideoUrl(): Promise<string> {
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const landscape = screenWidth >= screenHeight;
+            const portrait = screenHeight > screenWidth;
+
+            const landscapeVideo = this.getLandscapeVideoUrl();
+            const portraitVideo = this.getPortraitVideoUrl();
+
+            if(landscape) {
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+            }
+
+            if(portrait) {
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+            }
+
+            throw new WebViewError('Unable to select an oriented video');
+        });
+    }
+
+    private getLandscapeVideoUrl(): string | undefined {
+        const campaign: PerformanceCampaign = <PerformanceCampaign>this._campaign;
+        const video = campaign.getVideo();
+        const streaming = campaign.getStreamingVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video.getCachedUrl();
+            }
+            if(streaming) {
+                return streaming.getOriginalUrl();
+            }
+        }
+        return undefined;
+    }
+
+    private getPortraitVideoUrl(): string | undefined {
+        const campaign: PerformanceCampaign = <PerformanceCampaign>this._campaign;
+        const video = campaign.getPortraitVideo();
+        const streaming = campaign.getStreamingPortraitVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video.getCachedUrl();
+            }
+            if(streaming) {
+                return streaming.getOriginalUrl();
+            }
+        }
+        return undefined;
     }
 }

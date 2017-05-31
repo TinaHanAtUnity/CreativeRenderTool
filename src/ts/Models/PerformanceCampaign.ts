@@ -173,9 +173,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getRequiredAssets() {
-        return [
-            this.getVideo()
-        ];
+        return [];
     }
 
     public getOptionalAssets() {

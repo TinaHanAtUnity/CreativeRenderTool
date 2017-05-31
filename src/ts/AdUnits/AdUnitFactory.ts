@@ -51,7 +51,12 @@ export class AdUnitFactory {
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
-        overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+
+        const landscapeVideo = campaign.getVideo();
+        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
+        const portraitVideo = campaign.getPortraitVideo();
+        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
+        overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, performanceAdUnit);
