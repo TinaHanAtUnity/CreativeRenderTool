@@ -138,7 +138,7 @@ export class Cache {
         for(const url in this._callbacks) {
             if(this._callbacks.hasOwnProperty(url)) {
                 const callback: ICallbackObject = this._callbacks[url];
-                if(callback.networkRetry) {
+                if(callback.networkRetry || callback.paused) {
                     this.fulfillCallback(url, CacheStatus.STOPPED);
                 } else {
                     activeDownload = true;
