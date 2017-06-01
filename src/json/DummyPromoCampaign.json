@@ -1,7 +1,7 @@
 {
-    "id": "123abc",
-    "store" : "apple",
-    "appStoreId": "com.test",
-    "endScreenLandscape": "https://www.example.net/landscape.png",
-    "endScreenPortrait": "https://www.example.net/portrait.png"
+    "id": "000000000000000000000123",
+    "iapProductId": "com.example.iap.product1",
+    "buttonUrl": "http://example.com/button.png",
+    "landscapeUrl": "http://example.com/landscape.png",
+    "portraitUrl": "http://example.com/portrait.png"
 }
