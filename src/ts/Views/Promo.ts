@@ -22,6 +22,9 @@ export class Promo extends View {
 
         if(campaign) {
             this._templateData = {
+                'landscapeImage': campaign.getLandscape().getUrl(),
+                'portraitImage': campaign.getPortrait().getUrl(),
+                'buttonImage': campaign.getButton().getUrl()
             };
         }
 
