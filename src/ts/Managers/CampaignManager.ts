@@ -448,7 +448,9 @@ export class CampaignManager {
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    placementRequest[placement] = {};
+                    placementRequest[placement] = {
+                        adTypes: placements[placement].getAdTypes()
+                    };
                 }
             }
 
