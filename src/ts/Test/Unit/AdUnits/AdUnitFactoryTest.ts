@@ -102,6 +102,17 @@ describe('AdUnitFactoryTest', () => {
                 PromoAdUnit.show();
             });
         });
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                PromoAdUnit.setShowing(true);
+                PromoAdUnit.onClose.subscribe(() => {
+                    assert.equal(PromoAdUnit.isShowing(), false);
+                    done();
+                });
+
+                PromoAdUnit.hide();
+            });
+        });
     });
 
     describe('MRAID AdUnit', () => {
