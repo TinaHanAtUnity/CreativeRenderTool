@@ -141,10 +141,18 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             const landscapeStreaming = this._campaign.getStreamingVideo();
             const portraitStreaming = this._campaign.getStreamingPortraitVideo();
 
-            if(orientation === ForceOrientation.LANDSCAPE && landscapeStreaming) {
-                streamingUrl = landscapeStreaming.getOriginalUrl();
-            } else if(orientation === ForceOrientation.PORTRAIT && portraitStreaming) {
-                streamingUrl = portraitStreaming.getOriginalUrl();
+            if(orientation === ForceOrientation.LANDSCAPE) {
+                if(landscapeStreaming) {
+                    streamingUrl = landscapeStreaming.getOriginalUrl();
+                } else if(portraitStreaming) {
+                    streamingUrl = portraitStreaming.getOriginalUrl();
+                }
+            } else if(orientation === ForceOrientation.PORTRAIT) {
+                if(portraitStreaming) {
+                    streamingUrl = portraitStreaming.getOriginalUrl();
+                } else if(landscapeStreaming) {
+                    streamingUrl = landscapeStreaming.getOriginalUrl();
+                }
             } else {
                 throw new WebViewError('Unable to fallback to an oriented streaming video');
             }
