@@ -65,7 +65,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);

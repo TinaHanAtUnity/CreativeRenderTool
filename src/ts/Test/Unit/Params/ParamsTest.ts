@@ -202,7 +202,7 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 
