@@ -2,7 +2,7 @@
   "enabled": true,
   "country": "fi",
   "coppaCompliant": false,
-  "placementLevelControl": false,
+  "useAuction": false,
   "assetCaching": "forced",
   "placements": [
     {
