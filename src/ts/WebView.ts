@@ -401,6 +401,10 @@ export class WebView {
             if(TestEnvironment.get('autoCloseDelay')) {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
             }
+
+            if (TestEnvironment.get('forcedOrientation')) {
+                AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
+            }
             return;
         });
     }

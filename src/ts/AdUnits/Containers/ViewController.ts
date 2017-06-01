@@ -47,7 +47,12 @@ export class ViewController extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        const orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
+        let orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
+
+        const forcedOrientation = AdUnitContainer.getForcedOrientation();
+        if (forcedOrientation) {
+            orientation = forcedOrientation;
+        }
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
