@@ -35,7 +35,7 @@ export class TestFixtures {
 
     public static getPromoCampaign(): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(json, 'abc123', 123, json.appStoreId);
+        return new PromoCampaign(json.campaign, json.gamerId, json.abGroup);
     }
 
     public static getMRAIDCampaign(): MRAIDCampaign {

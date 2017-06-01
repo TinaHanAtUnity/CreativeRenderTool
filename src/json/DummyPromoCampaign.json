@@ -1,7 +1,12 @@
 {
-    "id": "000000000000000000000123",
-    "iapProductId": "com.example.iap.product1",
-    "buttonUrl": "http://example.com/button.png",
-    "landscapeUrl": "http://example.com/landscape.png",
-    "portraitUrl": "http://example.com/portrait.png"
+    "abGroup": 0,
+    "campaign": {
+        "id": "000000000000000000000123",
+        "iapProductId": "com.example.iap.product1",
+        "buttonUrl": "https://example.com/button.png",
+        "landscapeUrl": "https://example.com/landscape.png",
+        "portraitUrl": "https://example.com/portrait.png"
+    },
+    "gamerId": "583dfda0d933a3630a53249c",
+    "cacheTTL": 7200
 }

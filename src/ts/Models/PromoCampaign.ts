@@ -9,7 +9,7 @@ interface IPromoCampaign extends ICampaign {
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number, appStoreId: string) {
+    constructor(campaign: any, gamerId: string, abGroup: number) {
         super({
             ... Campaign.Schema,
             iapProductId: ['string'],
@@ -21,9 +21,9 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 
-        this.set('landscapeImage', new Image(campaign.endScreenLandscape));
-        this.set('portraitImage', new Image(campaign.endScreenPortrait));
-        this.set('buttonImage', new Image(campaign.buttonImage));
+        this.set('landscapeImage', new Image(campaign.landscapeUrl));
+        this.set('portraitImage', new Image(campaign.portraitUrl));
+        this.set('buttonImage', new Image(campaign.buttonUrl));
     }
 
     public getPortrait(): Image {
