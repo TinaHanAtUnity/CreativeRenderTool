@@ -51,6 +51,7 @@ export class ViewController extends AdUnitContainer {
 
         const forcedOrientation = AdUnitContainer.getForcedOrientation();
         if (forcedOrientation) {
+            allowRotation = false;
             orientation = forcedOrientation;
         }
 
