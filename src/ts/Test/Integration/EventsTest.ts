@@ -77,8 +77,8 @@ describe('EventsTest', () => {
         DeviceInfo.setOsVersion('6.0.1');
         DeviceInfo.setApiLevel(23);
         DeviceInfo.setRooted(false);
-        DeviceInfo.setScreenWidth(1080);
-        DeviceInfo.setScreenHeight(1776);
+        DeviceInfo.setScreenWidth(1776);
+        DeviceInfo.setScreenHeight(1080);
         DeviceInfo.setScreenDensity(480);
         DeviceInfo.setScreenLayout(268435794);
         DeviceInfo.setScreenBrightness(1);
@@ -144,8 +144,8 @@ describe('EventsTest', () => {
         DeviceInfo.setModel('iPhone7,2');
         DeviceInfo.setOsVersion('10.1.1');
         DeviceInfo.setRooted(false);
-        DeviceInfo.setScreenWidth(357);
-        DeviceInfo.setScreenHeight(647);
+        DeviceInfo.setScreenWidth(647);
+        DeviceInfo.setScreenHeight(357);
         DeviceInfo.setScreenScale(2);
         DeviceInfo.setScreenBrightness(1);
         DeviceInfo.setSystemLanguage('en_US');
