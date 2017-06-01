@@ -1,7 +1,8 @@
 {
     "abGroup": 0,
-    "campaign": {
+    "promo": {
         "id": "000000000000000000000123",
+        "appStoreId": "fooAppId",
         "iapProductId": "com.example.iap.product1",
         "buttonUrl": "https://example.com/button.png",
         "landscapeUrl": "https://example.com/landscape.png",

@@ -9,9 +9,9 @@ describe('PromoCampaign', () => {
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
             const json = JSON.parse(DummyPromo);
-            const campaign = new PromoCampaign(json.campaign, json.gamerId, json.abGroup);
+            const campaign = new PromoCampaign(json.promo, json.gamerId, json.abGroup);
 
-            assert.equal(campaign.getId(), json.campaign.id);
+            assert.equal(campaign.getId(), json.promo.id);
             assert.equal(campaign.getAbGroup(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
         });
