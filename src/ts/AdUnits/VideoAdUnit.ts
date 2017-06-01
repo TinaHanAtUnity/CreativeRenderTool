@@ -136,7 +136,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         let streamingUrl: string = this.getVideo().getOriginalUrl();
 
         if(this._campaign instanceof PerformanceCampaign) {
-            const orientation = this.getForceOrientation()
+            const orientation = this.getForceOrientation();
 
             const landscapeStreaming = this._campaign.getStreamingVideo();
             const portraitStreaming = this._campaign.getStreamingPortraitVideo();

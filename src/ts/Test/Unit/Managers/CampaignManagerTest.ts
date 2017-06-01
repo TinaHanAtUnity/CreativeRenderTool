@@ -139,7 +139,7 @@ describe('CampaignManager', () => {
             response: OnVastCampaignJson
         }));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
@@ -176,7 +176,7 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(1);
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
@@ -252,7 +252,7 @@ describe('CampaignManager', () => {
         }));
 
         vastParser.setMaxWrapperDepth(2);
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         campaignManager.onError.subscribe((error) => {
@@ -364,7 +364,7 @@ describe('CampaignManager', () => {
             response: nonWrappedVAST
         }));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         campaignManager.onError.subscribe((err: Error) => {
             assert.equal(err.message, 'VAST wrapper depth exceeded');
@@ -380,7 +380,7 @@ describe('CampaignManager', () => {
         const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredError: Error;
         campaignManager.onError.subscribe((error: Error) => {
@@ -402,7 +402,7 @@ describe('CampaignManager', () => {
         mockRequest.expects('post').returns(Promise.resolve(response));
         mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredError: WebViewError | Error;
         const verify = () => {
@@ -503,7 +503,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let noFillTriggered = false;
             let triggeredError: any;
@@ -555,7 +555,7 @@ describe('CampaignManager', () => {
         const mockRequest = sinon.mock(request);
         mockRequest.expects('post').returns(Promise.resolve(response));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
@@ -618,7 +618,7 @@ describe('CampaignManager', () => {
             response: CustomTrackingVastJson
         }));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
@@ -671,7 +671,7 @@ describe('CampaignManager', () => {
 
             const json = JSON.parse(DummyMRAIDCampaign);
             const asset = new HTML(json.mraid.inlinedURL);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -706,7 +706,7 @@ describe('CampaignManager', () => {
             }));
 
             const json = JSON.parse(DummyMRAIDNonInlined);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -744,7 +744,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
@@ -775,7 +775,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
 
