@@ -236,6 +236,7 @@ export class CampaignManager {
     private parsePerformanceCampaign(json: any): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
         if(json.promo && json.promo.iapProductId) {
+            json.promo.appStoreId = "iapPromo";
             const campaign = new PromoCampaign(json.promo, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             return this._assetManager.setup(campaign).then(() => this.onPromoCampaign.trigger(campaign));
         } else if(json.campaign && json.campaign.mraidUrl) {
