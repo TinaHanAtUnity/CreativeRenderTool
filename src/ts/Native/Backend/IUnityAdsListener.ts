@@ -10,5 +10,5 @@ export interface IUnityAdsListener {
     onUnityAdsError(error: UnityAdsError, message: string): void;
     onUnityAdsClick(placement: string): void;
     onUnityAdsPlacementStateChanged(placement: string, oldState: PlacementState, newState: PlacementState): void;
-
+    onUnityAdsInitiatePurchaseEvent(eventString: string): void;
 }

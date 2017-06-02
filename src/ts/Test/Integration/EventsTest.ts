@@ -64,6 +64,9 @@ describe('EventsTest', () => {
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
                 return;
+            },
+            onUnityAdsInitiatePurchaseEvent: (eventString: string) => {
+                return;
             }
         };
 
@@ -132,6 +135,9 @@ describe('EventsTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                return;
+            },
+            onUnityAdsInitiatePurchaseEvent: (eventString: string) => {
                 return;
             }
         };
