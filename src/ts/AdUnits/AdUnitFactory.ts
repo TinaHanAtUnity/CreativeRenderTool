@@ -43,7 +43,8 @@ export class AdUnitFactory {
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else if(campaign instanceof PromoCampaign) {
-            return this.createPromoAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);        } else {
+            return this.createPromoAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+        } else {
             throw new Error('Unknown campaign instance type');
         }
     }
