@@ -10,22 +10,24 @@ export type ISchema<T extends object> = {
 export abstract class Model<T extends object> {
     private _data: T;
     private readonly _schema: ISchema<T>;
+    private _name: string;
 
-    constructor(schema: ISchema<T>) {
+    constructor(name: string, schema: ISchema<T>) {
         this._data = <T>{};
         this._schema = schema;
+        this._name = name;
     }
 
     public abstract getDTO(): { [key: string]: any }
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
         if(!(key in this._schema)) {
-            this.handleError(new WebViewError('Key:' + key + ' not in schema', 'SchemaError'));
+            this.handleError(new WebViewError('model: ' + this._name + ' key:' + key + ' not in schema', 'SchemaError'));
         }
         if(this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
-            this.handleError(new WebViewError('Key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
+            this.handleError(new WebViewError('model: ' + this._name + ' key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
         }
     }
 

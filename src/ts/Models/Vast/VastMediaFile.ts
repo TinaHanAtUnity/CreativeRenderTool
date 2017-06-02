@@ -21,7 +21,7 @@ export class VastMediaFile extends Model<IVastMediaFile> {
                 minBitrate: number, maxBitrate: number, width: number, height: number);
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
                 minBitrate?: number, maxBitrate?: number, width?: number, height?: number) {
-        super({
+        super('VastMediaFile', {
             fileURL: ['string', 'null'],
             deliveryType: ['string'],
             mimeType: ['string', 'null'],

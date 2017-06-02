@@ -9,7 +9,7 @@ interface IMediationMetaData extends IMetaData {
 export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
 
     constructor() {
-        super({
+        super('MediationMetaData', {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined'],
