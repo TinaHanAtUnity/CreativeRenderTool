@@ -90,6 +90,10 @@ export class AnalyticsManager {
         }
     }
 
+    public getGameSessionId(): number {
+        return this._sessionId;
+    }
+
     private subscribeListeners(): void {
         this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
         this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());

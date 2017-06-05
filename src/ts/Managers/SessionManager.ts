@@ -29,16 +29,17 @@ export class SessionManagerEventMetadataCreator {
         this._metaDataManager = metaDataManager;
     }
 
-    public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         return this._eventManager.getUniqueEventId().then(id => {
-            return this.getInfoJson(adUnit, id, session, gamerSid, previousPlacementId);
+            return this.getInfoJson(adUnit, id, session, gameSession, gamerSid, previousPlacementId);
         });
     };
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'sessionId': currentSession.getId(),
+            'gameSessionId': gameSession,
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
             'placementId': adUnit.getPlacement().getId(),
@@ -111,6 +112,7 @@ export class SessionManager {
     private _eventMetadataCreator: SessionManagerEventMetadataCreator;
     private _metaDataManager: MetaDataManager;
 
+    private _gameSessionId: number;
     private _currentSession: Session;
 
     private _gamerServerId: string;
@@ -138,6 +140,14 @@ export class SessionManager {
 
     public setSession(session: Session) {
         this._currentSession = session;
+    }
+
+    public getGameSessionId(): number {
+        return this._gameSessionId;
+    }
+
+    public setGameSessionId(id: number) {
+        this._gameSessionId = id;
     }
 
     public getEventManager() {
@@ -175,7 +185,7 @@ export class SessionManager {
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
-            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
         });
     }
 
@@ -191,7 +201,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
@@ -206,7 +216,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
@@ -221,7 +231,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
@@ -257,7 +267,7 @@ export class SessionManager {
             HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
@@ -272,7 +282,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
@@ -287,7 +297,7 @@ export class SessionManager {
             this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public setGamerServerId(serverId: string): void {
