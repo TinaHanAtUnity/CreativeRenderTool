@@ -35,6 +35,7 @@ import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { StorageType } from 'Native/Api/Storage';
 
 export class WebView {
 
@@ -325,7 +326,16 @@ export class WebView {
      */
 
     private reinitialize() {
-        this._nativeBridge.Sdk.reinitialize();
+        // save caching pause state in case of reinit
+        if(this._cache.isPaused()) {
+            Promise.all([this._nativeBridge.Storage.set(StorageType.PUBLIC, 'caching.pause.value', true), this._nativeBridge.Storage.write(StorageType.PUBLIC)]).then(() => {
+                this._nativeBridge.Sdk.reinitialize();
+            }).catch(() => {
+                this._nativeBridge.Sdk.reinitialize();
+            });
+        } else {
+            this._nativeBridge.Sdk.reinitialize();
+        }
     }
 
     private getConfigJson(): Promise<INativeResponse> {

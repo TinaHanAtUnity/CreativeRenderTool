@@ -80,7 +80,8 @@ describe('CampaignManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
-                getKeys: sinon.stub().returns(Promise.resolve([]))
+                getKeys: sinon.stub().returns(Promise.resolve([])),
+                onSet: new Observable2()
             },
             Request: {
                 onComplete: {
