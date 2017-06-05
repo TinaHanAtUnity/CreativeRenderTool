@@ -128,6 +128,13 @@ export class CampaignManager {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
+        } else if('campaign' in json || 'vast' in json || 'mraid' in json) {
+            this._nativeBridge.Sdk.logError('Unity Ads server returned a campaign without gamerId, ignoring campaign');
+            const error: DiagnosticError = new DiagnosticError(new Error('Missing gamerId'), {
+                rawAdPlan: json
+            });
+            this.onError.trigger(error);
+            return Promise.resolve();
         }
 
         if('campaign' in json) {
