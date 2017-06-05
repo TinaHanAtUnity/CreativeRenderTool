@@ -10,7 +10,7 @@ interface IVast {
 export class Vast extends Model<IVast> {
 
     constructor(ads: VastAd[], errorURLTemplates: any[]) {
-        super({
+        super('Vast', {
             ads: ['array'],
             errorURLTemplates: ['array'],
             additionalTrackingEvents: ['object']

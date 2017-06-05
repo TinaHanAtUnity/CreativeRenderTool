@@ -23,7 +23,7 @@ interface IConfiguration {
 
 export class Configuration extends Model<IConfiguration> {
     constructor(configJson: any) {
-        super({
+        super('Configuration', {
             enabled: ['boolean'],
             country: ['string'],
             coppaCompliant: ['boolean'],
