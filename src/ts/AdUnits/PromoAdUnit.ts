@@ -18,16 +18,27 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._options = options;
     }
     public show(): Promise<void> {
+        this.setShowing(true);
+        this.onStart.trigger();
         this._promoView.show();
 
         return this._container.open(this, false, false, ForceOrientation.NONE, true, true, this._options);
     }
 
     public hide(): Promise<void> {
+        if(!this.isShowing()) {
+            return Promise.resolve();
+        }
+        this.setShowing(false);
+
         this._promoView.hide();
+        this._promoView.container().parentElement!.removeChild(this._promoView.container());
 
         this.unsetReferences();
-        return this._container.close();
+
+        return this._container.close().then(() => {
+            this.onClose.trigger();
+        });
     }
 
     public description(): string {
