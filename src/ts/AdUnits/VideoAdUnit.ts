@@ -159,12 +159,23 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         }
 
         // check that if we think video has been cached, it is still available on device cache directory
-        if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-            return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
-                if(result.found) {
-                    return this.getVideo().getUrl();
-                } else {
-                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+        return Promise.resolve().then(() => {
+            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
+                return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                    if(result.found) {
+                        return this.getVideo().getUrl();
+                    } else {
+                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                            url: this.getVideo().getUrl(),
+                            originalUrl: this.getVideo().getOriginalUrl(),
+                            campaignId: this._campaign.getId()
+                        }));
+
+                        // cached file not found (deleted by the system?), use streaming fallback
+                        return streamingUrl;
+                    }
+                }).catch(error => {
+                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
@@ -172,19 +183,21 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
                     // cached file not found (deleted by the system?), use streaming fallback
                     return streamingUrl;
+                });
+            } else {
+                return this.getVideo().getUrl();
+            }
+        }).then(finalVideoUrl => {
+            let videoOrientation = 'landscape';
+            if(this._campaign instanceof PerformanceCampaign) {
+                const portraitVideo = this._campaign.getPortraitVideo();
+                const portraitStreamingVideo = this._campaign.getStreamingPortraitVideo();
+                if((portraitVideo && finalVideoUrl === portraitVideo.getCachedUrl()) || (portraitStreamingVideo && finalVideoUrl === portraitStreamingVideo.getOriginalUrl())) {
+                    videoOrientation = 'portrait';
                 }
-            }).catch(error => {
-                Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
-                    url: this.getVideo().getUrl(),
-                    originalUrl: this.getVideo().getOriginalUrl(),
-                    campaignId: this._campaign.getId()
-                }));
-
-                // cached file not found (deleted by the system?), use streaming fallback
-                return streamingUrl;
-            });
-        } else {
-            return Promise.resolve(this.getVideo().getUrl());
-        }
+            }
+            this._nativeBridge.Sdk.logDebug('Choosing ' + videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
+            return finalVideoUrl;
+        });
     }
 }

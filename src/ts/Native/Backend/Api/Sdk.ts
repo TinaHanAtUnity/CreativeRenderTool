@@ -32,6 +32,12 @@ export class Sdk {
         // tslint:enable:no-console
     }
 
+    public static logDebug(message: string) {
+        // tslint:disable:no-console
+        console.log(message);
+        // tslint:enable:no-console
+    }
+
     public static setGameId(gameId: string) {
         Sdk._gameId = gameId;
     }
