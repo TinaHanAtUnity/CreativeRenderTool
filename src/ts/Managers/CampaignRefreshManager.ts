@@ -30,7 +30,7 @@ export class CampaignRefreshManager {
         this._refillTimestamp = 0;
         this._plcRefillTimestamp = 0;
 
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
             this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
             this._campaignManager.onPlcError.subscribe(error => this.onPlcError(error));
@@ -44,7 +44,7 @@ export class CampaignRefreshManager {
     }
 
     public getCampaign(placementId: string): Campaign {
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             return this._plcCampaigns[placementId];
         } else {
             return this._campaign;
@@ -61,7 +61,7 @@ export class CampaignRefreshManager {
     }
 
     public refresh(): Promise<void> {
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             if(this.shouldRefill(this._plcRefillTimestamp)) {
                 this.setPlacementStates(PlacementState.WAITING);
                 this._plcRefillTimestamp = 0;
@@ -127,7 +127,7 @@ export class CampaignRefreshManager {
 
     private invalidateCampaigns() {
         this._needsRefill = true;
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             this._plcCampaigns = {};
         } else {
             delete this._campaign;

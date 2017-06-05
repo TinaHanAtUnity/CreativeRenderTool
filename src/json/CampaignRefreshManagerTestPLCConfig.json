@@ -2,7 +2,7 @@
   "enabled": true,
   "country": "US",
   "coppaCompliant": false,
-  "placementLevelControl": true,
+  "useAuction": true,
   "assetCaching": "disabled",
   "abGroup": 3,
   "gamerId": "testGamerId",
