@@ -74,6 +74,7 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
+    private _previousPlacementId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -122,6 +123,14 @@ export class CampaignManager {
                 this.onError.trigger(error);
             }
         });
+    }
+
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
     }
 
     private parseCampaign(response: INativeResponse) {
@@ -444,6 +453,10 @@ export class CampaignManager {
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
+
+        if (this.getPreviousPlacementId()) {
+            body.previousPlacementId = this.getPreviousPlacementId();
+        }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
