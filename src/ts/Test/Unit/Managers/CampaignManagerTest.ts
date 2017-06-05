@@ -84,7 +84,8 @@ describe('CampaignManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
-                getKeys: sinon.stub().returns(Promise.resolve([]))
+                getKeys: sinon.stub().returns(Promise.resolve([])),
+                onSet: new Observable2()
             },
             Request: {
                 onComplete: {
@@ -796,4 +797,16 @@ describe('CampaignManager', () => {
         });
     });
 
+    it('test previous campaign', () => {
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        let previousCampaign = campaignManager.getPreviousPlacementId();
+
+        assert.equal(previousCampaign, undefined);
+
+        campaignManager.setPreviousPlacementId('defaultPlacement');
+        previousCampaign = campaignManager.getPreviousPlacementId();
+
+        assert.equal(previousCampaign, 'defaultPlacement');
+    });
 });

@@ -14,7 +14,7 @@ interface IVastCampaign extends ICampaign {
 
 export class VastCampaign extends Campaign<IVastCampaign> {
     constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
-        super({
+        super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
             video: ['object'],

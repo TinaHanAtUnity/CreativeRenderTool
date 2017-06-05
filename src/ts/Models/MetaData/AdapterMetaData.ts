@@ -7,7 +7,7 @@ interface IAdapterMetaData extends IMetaData {
 
 export class AdapterMetaData extends BaseMetaData<IAdapterMetaData> {
     constructor() {
-        super({
+        super('AdapterMetaData', {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined']

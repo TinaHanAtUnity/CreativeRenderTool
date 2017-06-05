@@ -36,6 +36,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { StorageType } from 'Native/Api/Storage';
 
 export class WebView {
 
@@ -250,6 +251,8 @@ export class WebView {
             }
         }
 
+        this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+        this._campaignManager.setPreviousPlacementId(placementId);
         this._currentAdUnit.show();
     }
 
@@ -332,7 +335,16 @@ export class WebView {
      */
 
     private reinitialize() {
-        this._nativeBridge.Sdk.reinitialize();
+        // save caching pause state in case of reinit
+        if(this._cache.isPaused()) {
+            Promise.all([this._nativeBridge.Storage.set(StorageType.PUBLIC, 'caching.pause.value', true), this._nativeBridge.Storage.write(StorageType.PUBLIC)]).then(() => {
+                this._nativeBridge.Sdk.reinitialize();
+            }).catch(() => {
+                this._nativeBridge.Sdk.reinitialize();
+            });
+        } else {
+            this._nativeBridge.Sdk.reinitialize();
+        }
     }
 
     private getConfigJson(): Promise<INativeResponse> {
@@ -399,6 +411,10 @@ export class WebView {
 
             if(TestEnvironment.get('autoCloseDelay')) {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
+            }
+
+            if (TestEnvironment.get('forcedOrientation')) {
+                AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
             return;
         });

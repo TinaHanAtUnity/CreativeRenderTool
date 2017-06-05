@@ -13,8 +13,8 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         keys: ['array'],
     };
 
-    constructor(schema: ISchema<T>) {
-        super(schema);
+    constructor(name: string, schema: ISchema<T>) {
+        super(name, schema);
     }
 
     public getCategory(): string {

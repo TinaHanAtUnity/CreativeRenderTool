@@ -7,8 +7,8 @@ export interface IVastCreative {
 }
 
 export abstract class VastCreative<T extends IVastCreative = IVastCreative> extends Model<T> {
-    constructor(schema: ISchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
-        super(schema);
+    constructor(name: string, schema: ISchema<T>, type: string, trackingEvents?: { [eventName: string]: string[] }) {
+        super(name, schema);
 
         this.set('type', type);
         this.set('trackingEvents', trackingEvents || {});
