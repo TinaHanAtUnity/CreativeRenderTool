@@ -13,8 +13,8 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         fileId: ['string', 'undefined']
     };
 
-    constructor(schema: ISchema<T>) {
-        super(schema);
+    constructor(name: string, schema: ISchema<T>) {
+        super(name, schema);
     }
 
     public getUrl(): string {
