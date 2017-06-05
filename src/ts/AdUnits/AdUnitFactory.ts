@@ -31,6 +31,7 @@ import { FinishState } from 'Constants/FinishState';
 import { PromoCampaign } from 'Models/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PromoEventHandlers } from 'EventHandlers/PromoEventHandlers';
 
 export class AdUnitFactory {
 
@@ -139,11 +140,11 @@ export class AdUnitFactory {
 
         promoView.render();
         document.body.appendChild(promoView.container());
-        promoView.onPromo.subscribe(() => {
-            // TODO
-        });
 
-        promoView.onClose.subscribe(() => {
+        promoView.onClose.subscribe(() => PromoEventHandlers.onClose(promoAdUnit));
+        promoView.onPromo.subscribe((productId) => PromoEventHandlers.onPromo(nativeBridge, productId));
+
+        promoAdUnit.onClose.subscribe(() => {
             promoAdUnit.setFinishState(FinishState.COMPLETED);
             promoAdUnit.hide();
         });

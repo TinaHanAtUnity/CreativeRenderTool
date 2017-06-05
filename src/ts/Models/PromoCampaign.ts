@@ -38,6 +38,10 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('buttonImage');
     }
 
+    public getIapProductId(): string {
+        return this.get('iapProductId');
+    }
+
     public getRequiredAssets() {
         return [
             this.getLandscape(),

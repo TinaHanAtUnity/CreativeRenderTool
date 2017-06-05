@@ -3,15 +3,16 @@ import PromoTemplate from 'html/Promo.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { PromoCampaign } from 'Models/PromoCampaign';
 
 export class Promo extends View {
 
-    public readonly onPromo = new Observable0();
+    public readonly onPromo = new Observable1<string>();
     public readonly onClose = new Observable0();
 
+    private _promoCampaign: PromoCampaign;
     private _localization: Localization;
 
     constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string) {
@@ -19,6 +20,7 @@ export class Promo extends View {
         this._localization = new Localization(language, 'promo');
 
         this._template = new Template(PromoTemplate, this._localization);
+        this._promoCampaign = campaign;
 
         if(campaign) {
             this._templateData = {
@@ -48,7 +50,7 @@ export class Promo extends View {
 
     private onPromoEvent(event: Event): void {
         event.preventDefault();
-        this.onPromo.trigger();
+        this.onPromo.trigger(this._promoCampaign.getIapProductId());
     }
 
     private onCloseEvent(event: Event): void {
