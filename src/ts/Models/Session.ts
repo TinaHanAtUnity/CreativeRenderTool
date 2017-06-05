@@ -21,7 +21,7 @@ export interface ISession {
 export class Session extends Model<ISession> {
 
     constructor(id: string) {
-        super({
+        super('Session', {
             id: ['string'],
             eventSent: ['object']
         });

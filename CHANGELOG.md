@@ -1,3 +1,11 @@
+# Fri Jun  2 09:10:17 UTC 2017
+
+* Support for auction v4, includes placement level ad types
+
+# Thu Jun  1 07:36:31 UTC 2017
+
+* Support cache pausing and unpausing with custom metadata flags
+
 # Tue May 30 11:04:37 UTC 2017
 
 * Refresh screenWidth and screenHeight on access

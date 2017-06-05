@@ -37,7 +37,7 @@ interface IPerformanceCampaign extends ICampaign {
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super({
+        super('PerformanceCampaign', {
             ... Campaign.Schema,
             appStoreId: ['string'],
             gameId: ['number'],

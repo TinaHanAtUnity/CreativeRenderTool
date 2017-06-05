@@ -12,7 +12,7 @@ export interface IVideo extends IAsset {
 
 export class Video extends Asset<IVideo> {
     constructor(url: string, size?: number) {
-        super({
+        super('Video', {
             ... Asset.Schema,
             size: ['number', 'undefined'],
             started: ['boolean'],

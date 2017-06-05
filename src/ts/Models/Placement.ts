@@ -1,4 +1,5 @@
 import { Model } from 'Models/Model';
+
 export enum PlacementState {
     READY,
     NOT_AVAILABLE,
@@ -19,6 +20,8 @@ interface IPlacement {
 
     muteVideo: boolean;
 
+    adTypes: string[] | undefined;
+
     state: PlacementState;
     previousState: PlacementState;
     placementStateChanged: boolean;
@@ -27,7 +30,7 @@ interface IPlacement {
 export class Placement extends Model<IPlacement> {
 
     constructor(data: any) {
-        super({
+        super('Placement', {
             id: ['string'],
             name: ['string'],
             default: ['boolean'],
@@ -35,6 +38,7 @@ export class Placement extends Model<IPlacement> {
             skipInSeconds: ['number'],
             disableBackButton: ['boolean'],
             muteVideo: ['boolean'],
+            adTypes: ['array', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean']
@@ -54,6 +58,8 @@ export class Placement extends Model<IPlacement> {
         this.set('disableBackButton', data.disableBackButton);
 
         this.set('muteVideo', data.muteVideo);
+
+        this.set('adTypes', data.adTypes);
 
         this.set('state', PlacementState.NOT_AVAILABLE);
     }
@@ -84,6 +90,10 @@ export class Placement extends Model<IPlacement> {
 
     public muteVideo(): boolean {
         return this.get('muteVideo');
+    }
+
+    public getAdTypes(): string[] | undefined {
+        return this.get('adTypes');
     }
 
     public getState(): PlacementState {
@@ -119,6 +129,7 @@ export class Placement extends Model<IPlacement> {
             'skipInSeconds': this.allowSkipInSeconds(),
             'disableBackButton': this.disableBackButton(),
             'muteVideo': this.muteVideo(),
+            'adTypes': this.getAdTypes(),
             'state': PlacementState[this.getState()].toLowerCase()
         };
     }

@@ -22,7 +22,7 @@ interface IClientInfo {
 export class ClientInfo extends Model<IClientInfo> {
 
     constructor(platform: Platform, data: any[]) {
-        super({
+        super('ClientInfo', {
             gameId: ['string'],
             testMode: ['boolean'],
             applicationName: ['string'],

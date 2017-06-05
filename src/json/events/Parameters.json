@@ -161,6 +161,13 @@
     "platforms": "all"
   },
   {
+    "key": "gameSessionId",
+    "type": "number",
+    "description": "Unique game session identifier. This identifier is shared with analytics events.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "language",
     "type": "string",
     "description": "Device language code (e.g. en_US or fr_CA)",

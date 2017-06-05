@@ -134,7 +134,7 @@ class TestCampaign extends Campaign {
     private _optional: Asset[];
 
     constructor(required: Asset[], optional: Asset[]) {
-        super(Campaign.Schema);
+        super('TestCampaign', Campaign.Schema);
         this._required = required;
         this._optional = optional;
     }
