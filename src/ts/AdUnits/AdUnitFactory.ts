@@ -142,7 +142,7 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onClose.subscribe(() => PromoEventHandlers.onClose(promoAdUnit));
-        promoView.onPromo.subscribe((productId) => PromoEventHandlers.onPromo(nativeBridge, productId));
+        promoView.onPromo.subscribe((productId) => PromoEventHandlers.onPromo(nativeBridge, promoAdUnit, productId));
 
         promoAdUnit.onClose.subscribe(() => {
             promoAdUnit.setFinishState(FinishState.COMPLETED);

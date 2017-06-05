@@ -33,12 +33,13 @@ export class PromoAdUnit extends AbstractAdUnit {
 
         this._promoView.hide();
         this._promoView.container().parentElement!.removeChild(this._promoView.container());
-
         this.unsetReferences();
 
-        return this._container.close().then(() => {
-            this.onClose.trigger();
-        });
+        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+
+        this.onFinish.trigger();
+        this.onClose.trigger();
+        return this._container.close();
     }
 
     public description(): string {
