@@ -7,7 +7,7 @@ interface IFrameworkMetaData extends IMetaData {
 
 export class FrameworkMetaData extends BaseMetaData<IFrameworkMetaData> {
     constructor() {
-        super({
+        super('FrameworkMetaData', {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined']

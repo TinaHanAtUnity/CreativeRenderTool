@@ -17,8 +17,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         timeout: ['number'],
         willExpireAt: ['number'],
     };
-    constructor(schema: ISchema<T>) {
-        super(schema);
+    constructor(name: string, schema: ISchema<T>) {
+        super(name, schema);
     }
 
     public getId(): string {

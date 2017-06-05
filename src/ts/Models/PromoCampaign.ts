@@ -10,7 +10,7 @@ interface IPromoCampaign extends ICampaign {
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super({
+        super('PromoCampaign', {
             ... Campaign.Schema,
             iapProductId: ['string'],
             landscapeImage: ['object'],

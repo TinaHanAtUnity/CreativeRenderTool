@@ -1,4 +1,5 @@
 import { Model } from 'Models/Model';
+
 export enum PlacementState {
     READY,
     NOT_AVAILABLE,
@@ -20,6 +21,8 @@ interface IPlacement {
     useDeviceOrientationForVideo: boolean;
     muteVideo: boolean;
 
+    adTypes: string[] | undefined;
+
     state: PlacementState;
     previousState: PlacementState;
     placementStateChanged: boolean;
@@ -28,7 +31,7 @@ interface IPlacement {
 export class Placement extends Model<IPlacement> {
 
     constructor(data: any) {
-        super({
+        super('Placement', {
             id: ['string'],
             name: ['string'],
             default: ['boolean'],
@@ -37,6 +40,7 @@ export class Placement extends Model<IPlacement> {
             disableBackButton: ['boolean'],
             useDeviceOrientationForVideo: ['boolean'],
             muteVideo: ['boolean'],
+            adTypes: ['array', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean']
@@ -57,6 +61,8 @@ export class Placement extends Model<IPlacement> {
 
         this.set('useDeviceOrientationForVideo', data.useDeviceOrientationForVideo);
         this.set('muteVideo', data.muteVideo);
+
+        this.set('adTypes', data.adTypes);
 
         this.set('state', PlacementState.NOT_AVAILABLE);
     }
@@ -93,6 +99,10 @@ export class Placement extends Model<IPlacement> {
         return this.get('muteVideo');
     }
 
+    public getAdTypes(): string[] | undefined {
+        return this.get('adTypes');
+    }
+
     public getState(): PlacementState {
         return this.get('state');
     }
@@ -127,6 +137,7 @@ export class Placement extends Model<IPlacement> {
             'disableBackButton': this.disableBackButton(),
             'useDeviceOrientationForVideo': this.useDeviceOrientationForVideo(),
             'muteVideo': this.muteVideo(),
+            'adTypes': this.getAdTypes(),
             'state': PlacementState[this.getState()].toLowerCase()
         };
     }

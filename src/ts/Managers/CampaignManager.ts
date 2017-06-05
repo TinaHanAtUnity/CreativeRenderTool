@@ -30,7 +30,7 @@ export class CampaignManager {
     }
 
     public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v3/games';
+        CampaignManager.AuctionBaseUrl = baseUrl + '/v4/games';
     }
 
     public static setAbGroup(abGroup: number) {
@@ -50,7 +50,7 @@ export class CampaignManager {
     }
 
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v3/games';
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -109,7 +109,7 @@ export class CampaignManager {
                 retryWithConnectionEvents: true
             });
         }).then(response => {
-            if(this._configuration.isPlacementLevelControl()) {
+            if(this._configuration.isAuction()) {
                 return this.parsePlcCampaigns(response);
             } else {
                 return this.parseCampaign(response);
@@ -118,7 +118,7 @@ export class CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            if(this._configuration.isPlacementLevelControl()) {
+            if(this._configuration.isAuction()) {
                 this.onPlcError.trigger(error);
             } else {
                 this.onError.trigger(error);
@@ -130,6 +130,13 @@ export class CampaignManager {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
+        } else if('campaign' in json || 'vast' in json || 'mraid' in json) {
+            this._nativeBridge.Sdk.logError('Unity Ads server returned a campaign without gamerId, ignoring campaign');
+            const error: DiagnosticError = new DiagnosticError(new Error('Missing gamerId'), {
+                rawAdPlan: json
+            });
+            this.onError.trigger(error);
+            return Promise.resolve();
         }
 
         if('campaign' in json) {
@@ -335,7 +342,7 @@ export class CampaignManager {
     private createRequestUrl(): Promise<string> {
         let url: string;
 
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             url = [
                 CampaignManager.AuctionBaseUrl,
                 this._clientInfo.getGameId(),
@@ -417,7 +424,7 @@ export class CampaignManager {
                 networkType: this.getParameter('networkType', networkType, 'number'),
             });
 
-            if(this._configuration.isPlacementLevelControl()) {
+            if(this._configuration.isAuction()) {
                 // todo: it's slightly wasteful to read gamerId from storage and then ignore the value
                 url = Url.addParameters(url, {
                     gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
@@ -450,13 +457,15 @@ export class CampaignManager {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
         }
 
-        if(this._configuration.isPlacementLevelControl()) {
+        if(this._configuration.isAuction()) {
             const placementRequest: any = {};
 
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    placementRequest[placement] = {};
+                    placementRequest[placement] = {
+                        adTypes: placements[placement].getAdTypes()
+                    };
                 }
             }
 

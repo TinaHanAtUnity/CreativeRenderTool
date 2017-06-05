@@ -16,7 +16,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
                 videoCustomClickURLTemplates?: string[], adParameters?: any) {
-        super({
+        super('VastCreativeLinear', {
             type: ['string'],
             trackingEvents: ['object'],
             duration: ['number'],
