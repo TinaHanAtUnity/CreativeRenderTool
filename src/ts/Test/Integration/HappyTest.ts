@@ -7,6 +7,9 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
+import { SessionManager } from 'Managers/SessionManager';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { ConfigManager } from 'Managers/ConfigManager';
 
 describe('IntegrationTest', () => {
 
@@ -65,7 +68,11 @@ describe('IntegrationTest', () => {
         DeviceInfo.setBatteryStatus('ok');
         DeviceInfo.setRingerMode(0);
 
-        UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -122,7 +129,11 @@ describe('IntegrationTest', () => {
         DeviceInfo.setSimulator(false);
         DeviceInfo.setStatusBarHeight(0);
 
-        UnityAds.initialize(Platform.IOS, '14850', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.IOS, '456', listener, true);
     });
 
 });

@@ -10,6 +10,9 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { SessionManager } from 'Managers/SessionManager';
 
 describe('EventsTest', () => {
 
@@ -100,7 +103,11 @@ describe('EventsTest', () => {
 
         AbstractAdUnit.setAutoClose(true);
 
-        UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.ANDROID, '667', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -168,7 +175,11 @@ describe('EventsTest', () => {
 
         AbstractAdUnit.setAutoClose(true);
 
-        UnityAds.initialize(Platform.IOS, '14850', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.IOS, '667', listener, true);
     });
 
 });
