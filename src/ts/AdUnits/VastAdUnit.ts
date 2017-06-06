@@ -8,14 +8,23 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { MOAT } from 'Views/MOAT';
+import { StreamType } from 'Constants/Android/StreamType';
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
+    private _moat?: MOAT;
+    private _volume: number;
+    private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _realDuration: number;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
         super(nativeBridge, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
+        deviceInfo.getDeviceVolume(StreamType.STREAM_MUSIC).then(volume => {
+            this._volume = volume;
+        });
     }
 
     public hide(): Promise<void> {
@@ -23,6 +32,10 @@ export class VastAdUnit extends VideoAdUnit {
         if (endScreen) {
             endScreen.hide();
             endScreen.remove();
+        }
+
+        if(this._moat) {
+            this._moat.container().parentElement!.removeChild(this._moat.container());
         }
 
         return super.hide();
@@ -34,6 +47,34 @@ export class VastAdUnit extends VideoAdUnit {
 
     public getVast(): Vast {
         return (<VastCampaign> this.getCampaign()).getVast();
+    }
+
+    public getMoat(): MOAT | undefined {
+        return this._moat;
+    }
+
+    public getEvents() {
+        return this._events;
+    }
+
+    public setEvents(events: Array<[number, string]>) {
+        this._events = events;
+    }
+
+    public getRealDuration() {
+        return this._realDuration;
+    }
+
+    public setRealDuration(duration: number) {
+        this._realDuration = duration;
+    }
+
+    public getVolume() {
+        return this._volume;
+    }
+
+    public setVolume(volume: number) {
+        this._volume = volume;
     }
 
     public getDuration(): number | null {
@@ -80,6 +121,12 @@ export class VastAdUnit extends VideoAdUnit {
         } else {
             return null;
         }
+    }
+
+    public initMoat() {
+        this._moat = new MOAT(this._nativeBridge);
+        this._moat.render();
+        document.body.appendChild(this._moat.container());
     }
 
     public sendVideoClickTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {

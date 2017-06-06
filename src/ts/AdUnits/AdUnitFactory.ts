@@ -28,7 +28,6 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
-import { MOAT } from 'Views/MOAT';
 import { StreamType } from 'Constants/Android/StreamType';
 
 export class AdUnitFactory {
@@ -77,10 +76,6 @@ export class AdUnitFactory {
     private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
-        const moat = new MOAT(nativeBridge);
-        moat.render();
-        document.body.appendChild(moat.container());
-
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
@@ -90,12 +85,15 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options);
         }
 
+        vastAdUnit.initMoat();
+
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, vastAdUnit);
 
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, duration));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoPlaying(sessionManager, vastAdUnit));
         const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));
@@ -105,7 +103,7 @@ export class AdUnitFactory {
 
         let onVolumeChangeObserver: any = undefined;
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
+            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_SYSTEM);
             onVolumeChangeObserver = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
@@ -113,6 +111,7 @@ export class AdUnitFactory {
         }
 
         vastAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             nativeBridge.VideoPlayer.onPause.unsubscribe(onPauseObserver);
@@ -128,7 +127,6 @@ export class AdUnitFactory {
                 }
             }
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
-            moat.container().parentElement!.removeChild(moat.container());
         });
 
         return vastAdUnit;

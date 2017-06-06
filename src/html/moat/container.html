@@ -41,7 +41,8 @@
         });
 
         window.addEventListener('message', function(event) {
-            if(moat && event.data.type && event.data.volume) {
+            if(moat && event && event.data && event.data.type && event.data.volume) {
+                console.log('type: ' + event.data.type + ' volume: ' + event.data.volume);
                 moat.dispatchEvent({
                     "type": event.data.type,
                     "adVolume": event.data.volume
