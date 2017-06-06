@@ -22,7 +22,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { SessionManager } from 'Managers/SessionManager';
-import { AbTestHelper } from "../Utilities/AbTestHelper";
+import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class CampaignManager {
 
