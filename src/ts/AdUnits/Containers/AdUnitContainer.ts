@@ -2,9 +2,9 @@ import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export enum ForceOrientation {
+    NONE,
     PORTRAIT,
-    LANDSCAPE,
-    NONE
+    LANDSCAPE
 }
 
 export const enum ViewConfiguration {
