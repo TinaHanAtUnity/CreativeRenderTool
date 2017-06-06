@@ -1,7 +1,6 @@
 import { AbstractAdUnit } from "AdUnits/AbstractAdUnit";
 import { NativeBridge } from "Native/NativeBridge";
 import { AdUnitContainer, ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
-import { SessionManager } from "Managers/SessionManager";
 import { Placement } from "Models/Placement";
 import { Campaign } from "Models/Campaign";
 import { Promo } from 'Views/Promo';
@@ -11,7 +10,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     private _promoView: Promo;
     private _options: any;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: Campaign, promo: Promo, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, promo: Promo, options: any) {
         super(nativeBridge, container, placement, campaign);
 
         this._promoView = promo;
@@ -22,7 +21,7 @@ export class PromoAdUnit extends AbstractAdUnit {
         this.onStart.trigger();
         this._promoView.show();
 
-        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, this._options);
+        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, false, this._options);
     }
 
     public hide(): Promise<void> {

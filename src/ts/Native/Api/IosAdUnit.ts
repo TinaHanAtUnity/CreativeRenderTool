@@ -32,8 +32,8 @@ export class IosAdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean, isTransparent: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate, isTransparent]);
+    public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean, isTransparent: boolean, withAnimation: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate, isTransparent, withAnimation]);
     }
 
     public close(): Promise<void> {

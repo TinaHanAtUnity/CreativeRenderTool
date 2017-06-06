@@ -38,7 +38,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, options: IIosOptions): Promise<void> {
         this._options = options;
         this._showing = true;
 
@@ -61,7 +61,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
 
-        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowRotation, isTransparent);
+        return this._nativeBridge.IosAdUnit.open(views, orientation, true, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {

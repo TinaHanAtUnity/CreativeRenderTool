@@ -2,7 +2,6 @@ import 'mocha';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandlers } from 'EventHandlers/PromoEventHandlers';
@@ -17,7 +16,6 @@ describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    const sessionManager = <SessionManager><any>{};
     let container: AdUnitContainer;
 
     beforeEach(() => {
@@ -33,7 +31,7 @@ describe('PromoEventHandlersTest', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
-            const promoAdUnit = new PromoAdUnit(nativeBridge, container, sessionManager, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
+            const promoAdUnit = new PromoAdUnit(nativeBridge, container, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
             sinon.stub(promoAdUnit, 'hide').returns(sinon.spy());
 
             PromoEventHandlers.onClose(promoAdUnit);
@@ -46,7 +44,7 @@ describe('PromoEventHandlersTest', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
-            const promoAdUnit = new PromoAdUnit(nativeBridge, container, sessionManager, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
+            const promoAdUnit = new PromoAdUnit(nativeBridge, container, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
             sinon.stub(promoAdUnit, 'hide').returns(sinon.spy());
 
             PromoEventHandlers.onClose(promoAdUnit);
@@ -57,7 +55,7 @@ describe('PromoEventHandlersTest', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
-            const promoAdUnit = new PromoAdUnit(nativeBridge, container, sessionManager, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
+            const promoAdUnit = new PromoAdUnit(nativeBridge, container, <Placement><any>{}, <PromoCampaign><any>{}, promoView, {});
             sinon.stub(promoAdUnit, 'hide').returns(sinon.spy());
             sinon.stub(nativeBridge.Listener, 'sendInitiatePurchaseEvent');
 

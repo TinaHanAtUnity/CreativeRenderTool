@@ -136,7 +136,7 @@ export class AdUnitFactory {
 
     private static createPromoAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PromoCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const promoView = new Promo(nativeBridge, campaign, deviceInfo.getLanguage());
-        const promoAdUnit = new PromoAdUnit(nativeBridge, container, sessionManager, placement, campaign, promoView, options);
+        const promoAdUnit = new PromoAdUnit(nativeBridge, container, placement, campaign, promoView, options);
 
         promoView.render();
         document.body.appendChild(promoView.container());
