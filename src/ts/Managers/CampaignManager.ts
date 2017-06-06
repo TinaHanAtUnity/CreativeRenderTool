@@ -429,6 +429,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this.getFullyCachedCampaigns());
 
         const body: any = {
             bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
@@ -458,10 +459,14 @@ export class CampaignManager {
             body.properties = this._configuration.getProperties();
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
             body.deviceFreeSpace = this.getParameter('deviceFreeSpace', freeSpace, 'number');
             body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
+
+            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
+                body.cachedCampaigns = fullyCachedCampaignIds;
+            }
 
             const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
@@ -519,6 +524,21 @@ export class CampaignManager {
 
                 HttpKafka.sendEvent('events.negtargeting.json', msg);
             }
+        });
+    }
+
+    private getFullyCachedCampaigns(): Promise<string[]> {
+        const campaignIds: string[] = [];
+        return this._nativeBridge.Storage.get<object>(StorageType.PRIVATE, 'cache.campaigns').then((campaigns) => {
+            for (const campaignId in campaigns) {
+                if (campaigns.hasOwnProperty(campaignId)) {
+                    campaignIds.push(campaignId);
+                    return campaignIds;
+                }
+            }
+            return Promise.resolve(campaignIds);
+        }).catch(() => {
+            return Promise.resolve(campaignIds);
         });
     }
 
