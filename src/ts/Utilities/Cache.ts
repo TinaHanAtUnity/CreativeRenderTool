@@ -21,6 +21,15 @@ export interface ICacheOptions {
     retryDelay: number;
 }
 
+export interface ICacheDiagnostics {
+    creativeType: string;
+    gamerId: string;
+    country: string;
+    sourceGameId: number;
+    targetGameId: number;
+    targetCampaignId: string;
+}
+
 export interface ICacheResponse {
     fullyDownloaded: boolean;
     url: string;
@@ -88,7 +97,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string): Promise<[string, string]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<[string, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;

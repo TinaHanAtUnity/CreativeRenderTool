@@ -17,6 +17,8 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         super(name, schema);
     }
 
+    public abstract getDescription(): string;
+
     public getUrl(): string {
         const cachedUrl = this.getCachedUrl();
         if (cachedUrl) {
