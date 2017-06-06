@@ -56,11 +56,12 @@ class TestStorageApi extends StorageApi {
     }
 
     public get<T>(type: StorageType, key: string): Promise<T> {
-        if(key && key.match(/^cache\./)) {
-            const id: string = key.substring(6);
+        if(key && key.match(/^cache\.files\./)) {
+            let id: string = key.substring(12);
+            id = id.split(".")[0];
 
             if(this._files[id]) {
-                return Promise.resolve(<any>JSON.stringify(this._files[id]));
+                return Promise.resolve(<any>this._files[id]);
             }
         }
 
@@ -68,8 +69,9 @@ class TestStorageApi extends StorageApi {
     }
 
     public delete(type: StorageType, key: string): Promise<void> {
-        if(key && key.match(/^cache\./)) {
-            const id: string = key.substring(6);
+        if(key && key.match(/^cache\.files\./)) {
+            let id: string = key.substring(12);
+            id = id.split(".")[0];
 
             if(this._files[id]) {
                 this._dirty = true;
@@ -87,7 +89,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public getKeys(type: StorageType, key: string, recursive: boolean): Promise<string[]> {
-        if(type === StorageType.PRIVATE && key === 'cache') {
+        if(type === StorageType.PRIVATE && key === 'cache.files') {
             const retArray: string[] = [];
 
             for(const i in this._files) {
@@ -107,6 +109,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public hasFileEntry(fileId: string) {
+        fileId = fileId.split(".")[0];
         if(this._files[fileId]) {
             return true;
         }
@@ -118,12 +121,9 @@ class TestStorageApi extends StorageApi {
         this._files[id] = {
             fullyDownloaded: fullyDownloaded,
             // values below this line are not read when cleaning cache so just using dummy values
-            url: '',
             size: 0,
             totalSize: 0,
-            duration: 0,
-            responseCode: 0,
-            headers: []
+            extension: 'mp4'
         };
     }
 }
@@ -141,6 +141,7 @@ class TestHelper {
 
     public addFile(id: string, size: number, fullyDownloaded: boolean, ageInDays: number) {
         this._cache.addFile(id, size, this._baseTimestamp - (ageInDays * 24 * 60 * 60 * 1000));
+        id = id.split(".")[0];
         this._storage.addFile(id, fullyDownloaded);
     }
 }
@@ -180,7 +181,7 @@ describe('CacheCleanTest', () => {
     });
 
     it('should delete old files', () => {
-        const fileId: string = 'test.mp4';
+        const fileId: string = 'test1.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         // add one file, 30 days old
@@ -219,8 +220,8 @@ describe('CacheCleanTest', () => {
     });
 
     it('should clean too large cache', () => {
-        const smallFileId: string = 'small';
-        const largeFileId: string = 'large';
+        const smallFileId: string = 'small.mp4';
+        const largeFileId: string = 'large.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         helper.addFile(smallFileId, 1234, true, 1); // small file, should be kept
@@ -273,7 +274,7 @@ describe('CacheCleanTest', () => {
     });
 
     it('should clean partially downloaded files', () => {
-        const fileId: string = 'test.mp4';
+        const fileId: string = 'test2.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         // add one partially downloaded file
