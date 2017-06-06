@@ -6,6 +6,11 @@ import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
 
+enum CacheType {
+    REQUIRED,
+    OPTIONAL
+}
+
 export class AssetManager {
 
     private _cache: Cache;
@@ -27,7 +32,7 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const requiredChain = this.cache(campaign.getRequiredAssets()).then(() => {
+        const requiredChain = this.cache(campaign.getRequiredAssets(), campaign, CacheType.REQUIRED).then(() => {
             return this.validateVideos(campaign.getRequiredAssets());
         });
 
@@ -36,16 +41,16 @@ export class AssetManager {
                 if(plc) {
                     // hack to avoid race conditions with plc when there are multiple different campaigns
                     // proper fix is to refactor AssetManager to trigger events instead of returning one promise
-                    return this.cache(campaign.getOptionalAssets()).then(() => {
+                    return this.cache(campaign.getOptionalAssets(), campaign, CacheType.OPTIONAL).then(() => {
                         return campaign;
                     });
                 } else {
-                    this.cache(campaign.getOptionalAssets());
+                    this.cache(campaign.getOptionalAssets(), campaign, CacheType.OPTIONAL);
                     return campaign;
                 }
             });
         } else {
-            requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
+            requiredChain.then(() => this.cache(campaign.getOptionalAssets(), campaign, CacheType.OPTIONAL));
         }
 
         return Promise.resolve(campaign);
@@ -60,7 +65,7 @@ export class AssetManager {
         this._cache.stop();
     }
 
-    private cache(assets: Asset[]): Promise<void> {
+    private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
         let chain = Promise.resolve();
         for(const asset of assets) {
             chain = chain.then(() => {
@@ -71,6 +76,13 @@ export class AssetManager {
                 return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
+                    return fileId;
+                }).then((fileId) => {
+                    if (cacheType === CacheType.REQUIRED) {
+                        return this._cache.writeCachedFileForCampaign(campaign.getId(), fileId).then(() => Promise.resolve());
+                    }
+
+                    return Promise.resolve();
                 });
             });
         }
