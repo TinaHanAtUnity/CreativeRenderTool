@@ -528,17 +528,10 @@ export class CampaignManager {
     }
 
     private getFullyCachedCampaigns(): Promise<string[]> {
-        const campaignIds: string[] = [];
-        return this._nativeBridge.Storage.get<object>(StorageType.PRIVATE, 'cache.campaigns').then((campaigns) => {
-            for (const campaignId in campaigns) {
-                if (campaigns.hasOwnProperty(campaignId)) {
-                    campaignIds.push(campaignId);
-                    return campaignIds;
-                }
-            }
-            return Promise.resolve(campaignIds);
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+           return campaignKeys;
         }).catch(() => {
-            return Promise.resolve(campaignIds);
+            return [];
         });
     }
 
