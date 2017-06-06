@@ -21,7 +21,8 @@ import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
-import {PromoCampaign} from "../Models/PromoCampaign";
+import { PromoCampaign } from 'Models/PromoCampaign';
+import { SessionManager } from 'Managers/SessionManager';
 
 export class CampaignManager {
 
@@ -70,17 +71,20 @@ export class CampaignManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
     private _assetManager: AssetManager;
+    private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
+    private _previousPlacementId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
+        this._sessionManager = sessionManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
@@ -124,6 +128,14 @@ export class CampaignManager {
                 this.onError.trigger(error);
             }
         });
+    }
+
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
     }
 
     private parseCampaign(response: INativeResponse) {
@@ -450,8 +462,13 @@ export class CampaignManager {
             bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
             coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
+            gameSessionId: this.getParameter('sessionId', this._sessionManager.getGameSessionId(), 'number'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
+
+        if (this.getPreviousPlacementId()) {
+            body.previousPlacementId = this.getPreviousPlacementId();
+        }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');

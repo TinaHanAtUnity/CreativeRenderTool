@@ -20,7 +20,6 @@ describe('PromoEventHandlersTest', () => {
     const sessionManager = <SessionManager><any>{};
     let container: AdUnitContainer;
 
-
     beforeEach(() => {
         nativeBridge = new NativeBridge({
             handleInvocation,

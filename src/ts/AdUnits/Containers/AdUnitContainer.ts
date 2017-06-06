@@ -14,6 +14,16 @@ export const enum ViewConfiguration {
 
 export abstract class AdUnitContainer {
 
+    public static setForcedOrientation(orientation: number) {
+        AdUnitContainer._forcedOrientation = orientation;
+    }
+
+    public static getForcedOrientation(): number | undefined {
+        return AdUnitContainer._forcedOrientation;
+    }
+
+    private static _forcedOrientation: number | undefined;
+
     public readonly onShow = new Observable0(); // ad unit becomes visible
     public readonly onSystemKill = new Observable0(); // ad unit killed by the system (Android only)
     public readonly onSystemPause = new Observable0(); // ad unit has been resigned from active (iOS only)

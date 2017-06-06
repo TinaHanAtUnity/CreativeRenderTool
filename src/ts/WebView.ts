@@ -35,6 +35,7 @@ import { MetaData } from 'Utilities/MetaData';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 
 export class WebView {
@@ -129,21 +130,29 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
 
             if(this._configuration.isAnalyticsEnabled()) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
-                this._analyticsManager.init();
-
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._wakeUpManager.setListenAndroidLifecycle(true);
                 }
-            }
 
-            return this._sessionManager.create();
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
+                return this._analyticsManager.init().then(() => {
+                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
+                    return this._sessionManager.create();
+                });
+            } else {
+                const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
+                return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
+                    analyticsStorage.setSessionId(gameSessionId);
+                    this._sessionManager.setGameSessionId(gameSessionId);
+                    return this._sessionManager.create();
+                });
+            }
         }).then(() => {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -242,6 +251,8 @@ export class WebView {
             }
         }
 
+        this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+        this._campaignManager.setPreviousPlacementId(placementId);
         this._currentAdUnit.show();
     }
 
@@ -400,6 +411,10 @@ export class WebView {
 
             if(TestEnvironment.get('autoCloseDelay')) {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
+            }
+
+            if (TestEnvironment.get('forcedOrientation')) {
+                AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
             return;
         });
