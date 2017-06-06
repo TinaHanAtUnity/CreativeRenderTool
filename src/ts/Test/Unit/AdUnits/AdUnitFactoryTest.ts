@@ -47,11 +47,11 @@ describe('AdUnitFactoryTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        container = new Activity(nativeBridge, deviceInfo);
         const eventManager = new EventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
-        deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), deviceInfo, eventManager, metaDataManager);
         sandbox.stub(sessionManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(sessionManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(sessionManager, 'sendThirdQuartile').returns(Promise.resolve());
