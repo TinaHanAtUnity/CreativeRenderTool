@@ -258,8 +258,8 @@ export class CampaignManager {
             const abGroup: number = CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup;
 
             if(AbTestHelper.isYodo1CachingAbTestActive(abGroup, this._clientInfo)) {
-                if(json.trailerDownloadable && json.trailerStreaming) {
-                    json.trailerDownloadable = json.trailerStreaming;
+                if(json.campaign && json.campaign.trailerDownloadable && json.campaign.trailerStreaming) {
+                    json.campaign.trailerDownloadable = json.campaign.trailerStreaming;
                 }
             }
 
