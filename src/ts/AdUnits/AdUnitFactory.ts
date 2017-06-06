@@ -28,6 +28,7 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
+import { MOAT } from 'Views/MOAT';
 
 export class AdUnitFactory {
 
@@ -75,6 +76,10 @@ export class AdUnitFactory {
     private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
+        const moat = new MOAT(nativeBridge);
+        moat.render();
+        document.body.appendChild(moat.container());
+
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
@@ -98,6 +103,7 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
+            moat.container().parentElement!.removeChild(moat.container());
         });
 
         return vastAdUnit;

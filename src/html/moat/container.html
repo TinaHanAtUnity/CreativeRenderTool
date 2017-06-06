@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <script>
+        /*Copyright (c) 2011-2016 Moat Inc. All Rights Reserved.*/
+        function initMoatTracking(c, d, e, k, l) {
+            var g = document.createElement("script"), a = [];
+            d = {
+                adData: {ids: d, duration: e, url: l}, dispatchEvent: function(b) {
+                    this.sendEvent ? (a && (a.push(b), b = a, a = !1), this.sendEvent(b)) : a.push(b)
+                }
+            };
+            e = "_moatApi" + Math.floor(1E8 * Math.random());
+            var f, h;
+            try {
+                f = c.ownerDocument, h = f.defaultView || f.parentWindow
+            } catch(b) {
+                f = document, h = window
+            }
+            h[e] = d;
+            g.type = "text/javascript";
+            c && c.insertBefore(g, c.childNodes[0] || null);
+            g.src = "https://z.moatads.com/" + k + "/moatvideo.js#" + e;
+            return d
+        }
+
+        var ids = {
+            "level1": "_ADVERTISER_",
+            "level2": "_CAMPAIGN_",
+            "level3": "_LINE_ITEM_",
+            "level4": "_CREATIVE_",
+            "slicer1": "_SITE_",
+            "slicer2": "_PLACEMENT_"
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dummyElement = document.createElement('div');
+            document.body.appendChild(dummyElement);
+
+            var moat = initMoatTracking(dummyElement, ids, 30, "unityinappvideo254672075459");
+            console.dir(moat);
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
