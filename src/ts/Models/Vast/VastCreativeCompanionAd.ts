@@ -12,7 +12,7 @@ interface IVastCreativeCompanionAd {
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
     constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
-        super({
+        super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
             height: ['number'],

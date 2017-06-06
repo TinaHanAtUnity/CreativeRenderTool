@@ -16,7 +16,7 @@ export class VastAd extends Model<IVastAd> {
 
     constructor();
     constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
-        super({
+        super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
             companionAds: ['array'],

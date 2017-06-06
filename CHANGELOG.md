@@ -1,3 +1,23 @@
+# Tue Jun  6 08:16:14 UTC 2017
+
+* Add gameSessionId and previousPlacementId parameters to ad requests, video events and click events
+* Option to force orientation with test metadata
+* Add names to all models to improve diagnostic errors
+* Set no fill when receiving a campaign without gamerId (does not apply to PLC campaigns)
+
+# Fri Jun  2 09:10:17 UTC 2017
+
+* Support for auction v4, includes placement level ad types
+
+# Thu Jun  1 07:36:31 UTC 2017
+
+* Support cache pausing and unpausing with custom metadata flags
+
+# Tue May 30 11:04:37 UTC 2017
+
+* Refresh screenWidth and screenHeight on access
+* Validate above values as integers instead of JS numbers
+
 # Tue May 23 08:56:18 UTC 2017
 
 * CampaignRefreshManager placement state race condition fix

@@ -11,7 +11,7 @@ interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
-    placementLevelControl: boolean;
+    useAuction: boolean;
     abGroup: number;
     gamerId: string;
     properties: string;
@@ -23,11 +23,11 @@ interface IConfiguration {
 
 export class Configuration extends Model<IConfiguration> {
     constructor(configJson: any) {
-        super({
+        super('Configuration', {
             enabled: ['boolean'],
             country: ['string'],
             coppaCompliant: ['boolean'],
-            placementLevelControl: ['boolean'],
+            useAuction: ['boolean'],
             abGroup: ['number'],
             gamerId: ['string'],
             properties: ['string'],
@@ -40,10 +40,10 @@ export class Configuration extends Model<IConfiguration> {
         this.set('enabled', configJson.enabled);
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
-        const placementLevelControl: boolean = configJson.placementLevelControl;
+        const useAuction: boolean = configJson.useAuction;
 
-        if(placementLevelControl) {
-            this.set('placementLevelControl', placementLevelControl);
+        if(useAuction) {
+            this.set('useAuction', useAuction);
             this.set('abGroup', configJson.abGroup);
             this.set('gamerId', configJson.gamerId);
             this.set('properties', configJson.properties);
@@ -94,8 +94,8 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('coppaCompliant');
     }
 
-    public isPlacementLevelControl(): boolean {
-        return this.get('placementLevelControl');
+    public isAuction(): boolean {
+        return this.get('useAuction');
     }
 
     public isAnalyticsEnabled(): boolean {
@@ -162,7 +162,7 @@ export class Configuration extends Model<IConfiguration> {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
-            'placementLevelControl': this.isPlacementLevelControl(),
+            'placementLevelControl': this.isAuction(),
             'abGroup': this.getAbGroup(),
             'gamerId': this.getGamerId(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),

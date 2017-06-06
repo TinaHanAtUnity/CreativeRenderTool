@@ -56,7 +56,7 @@ export class Activity extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        const orientation = this.getOrientation(allowRotation, forceOrientation, options);
+        let orientation = this.getOrientation(allowRotation, forceOrientation, options);
 
         let keyEvents: any[] = [];
         if(disableBackbutton) {
@@ -64,6 +64,11 @@ export class Activity extends AdUnitContainer {
         }
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
+
+        const forcedOrientation = AdUnitContainer.getForcedOrientation();
+        if (forcedOrientation) {
+            orientation = forcedOrientation;
+        }
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 

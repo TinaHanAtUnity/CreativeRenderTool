@@ -9,7 +9,7 @@ interface IPlayerMetaData extends IMetaData {
 export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
 
     constructor() {
-        super({
+        super('PlayerMetaData', {
             ... BaseMetaData.Schema,
             server_id: ['string'],
         });

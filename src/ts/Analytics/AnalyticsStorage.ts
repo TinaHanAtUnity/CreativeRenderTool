@@ -29,7 +29,13 @@ export class AnalyticsStorage {
 
     public getSessionId(reinit: boolean): Promise<number> {
         if(reinit) {
-            return this.getValue<number>('analytics.sessionid');
+            return this.getValue<number>('analytics.sessionid').then(sessionId => {
+                if(sessionId) {
+                    return sessionId;
+                } else {
+                    return this.getIntegerId();
+                }
+            });
         } else {
             return this.getIntegerId();
         }
@@ -66,6 +72,11 @@ export class AnalyticsStorage {
         this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'analytics.userid', userId);
         this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'analytics.sessionid', sessionId);
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
+    public setSessionId(sessionId: number): void {
+        // session id is only valid for native process lifetime so no write necessary
+        this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'analytics.sessionid', sessionId);
     }
 
     public setVersions(appVersion: string, osVersion: string): void {
