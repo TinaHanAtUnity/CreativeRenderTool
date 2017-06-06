@@ -29,6 +29,7 @@ import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
 import { MOAT } from 'Views/MOAT';
+import { StreamType } from 'Constants/Android/StreamType';
 
 export class AdUnitFactory {
 
@@ -96,12 +97,36 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, vastAdUnit);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
-        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(sessionManager, vastAdUnit));
+        const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoPlaying(sessionManager, vastAdUnit));
+        const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));
+        const onStopObserver = nativeBridge.VideoPlayer.onStop.subscribe(() => VastVideoEventHandlers.onVideoStopped(vastAdUnit));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VastVideoEventHandlers.onVideoProgress(vastAdUnit, position));
         const onVideoErrorObserver = vastAdUnit.onError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
+
+        let onVolumeChangeObserver: any = undefined;
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
+            onVolumeChangeObserver = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
+            onVolumeChangeObserver = nativeBridge.DeviceInfo.Ios.onVolumeChanged.subscribe((volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        }
 
         vastAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            nativeBridge.VideoPlayer.onPause.unsubscribe(onPauseObserver);
+            nativeBridge.VideoPlayer.onStop.unsubscribe(onStopObserver);
+            nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
+            if(onVolumeChangeObserver) {
+                if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
+                    nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
+                } else if(nativeBridge.getPlatform() === Platform.IOS) {
+                    nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
+                    nativeBridge.DeviceInfo.Ios.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
+                }
+            }
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
             moat.container().parentElement!.removeChild(moat.container());
         });
