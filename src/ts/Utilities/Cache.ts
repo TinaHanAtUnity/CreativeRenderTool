@@ -150,7 +150,7 @@ export class Cache {
     }
 
     public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigs()]).then(([keys, files, campaigns]): Promise<any> => {
+        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]): Promise<any> => {
             if(!files || !files.length) {
                 if(keys && keys.length > 0) {
                     return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache');
@@ -454,7 +454,7 @@ export class Cache {
         return this.getCacheKeysForKey('cache.files', false);
     }
 
-    private getCacheCampaigs(): Promise<object> {
+    private getCacheCampaigns(): Promise<object> {
         return this._nativeBridge.Storage.get<object>(StorageType.PRIVATE, 'cache.campaigns').then(campaigns => {
             return campaigns;
         }).catch(() => {
