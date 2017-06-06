@@ -23,6 +23,8 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { PromoCampaign } from 'Models/PromoCampaign';
 import { SessionManager } from 'Managers/SessionManager';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { MetaData } from 'Utilities/MetaData';
 
 export class CampaignManager {
 
@@ -232,6 +234,25 @@ export class CampaignManager {
                 return this._assetManager.setup(campaign, true).then(() => {
                     for(const placement of placements) {
                         this.onPlcCampaign.trigger(placement, campaign);
+                    }
+                });
+            }
+        } else if(contentType === 'purchasing/promo') {
+            const json = JsonParser.parse(content);
+            if (json && json.iapProductId) {
+                return PurchasingUtilities.refresh(new MetaData(this._nativeBridge)).then(values => {
+                    if(PurchasingUtilities.purchasesAvailable()) {
+                        const campaign = new PromoCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                        return this._assetManager.setup(campaign, true).then(() => {
+                            for (const placement of placements) {
+                                this.onPlcCampaign.trigger(placement, campaign);
+                            }
+                        });
+                    } else {
+                        for (const placement of placements) {
+                            this.onPlcNoFill.trigger(placement);
+                        }
+                        return Promise.resolve();
                     }
                 });
             }
