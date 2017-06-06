@@ -22,6 +22,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { SessionManager } from 'Managers/SessionManager';
+import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class CampaignManager {
 
@@ -254,7 +255,15 @@ export class CampaignManager {
             const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+            const abGroup: number = CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup;
+
+            if(AbTestHelper.isYodo1CachingAbTestActive(abGroup, this._clientInfo)) {
+                if(json.campaign && json.campaign.trailerDownloadable && json.campaign.trailerStreaming) {
+                    json.campaign.trailerDownloadable = json.campaign.trailerStreaming;
+                }
+            }
+
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, abGroup);
             this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
