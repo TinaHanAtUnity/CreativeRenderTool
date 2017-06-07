@@ -681,7 +681,7 @@ describe('CampaignManager', () => {
             response: OnProgrammaticVastPlcCampaignJson
         }));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionVideoJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
@@ -716,7 +716,7 @@ describe('CampaignManager', () => {
             response: mockResp
         }));
 
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         const campaignManager = new CampaignManager(nativeBridge, new Configuration(config), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: Campaign;
         let triggeredError: any;
