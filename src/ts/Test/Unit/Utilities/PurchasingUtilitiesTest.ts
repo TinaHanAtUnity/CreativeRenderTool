@@ -14,9 +14,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         sinon.stub(metaData, 'getKeys').returns(Promise.resolve(['catalog']));
         sinon.stub(metaData, 'get')
-            .withArgs('iap.catalog').returns(Promise.resolve([true, [
-                { "productId" : "free.sword", "localizedPriceString" : "$0.00", "localizedTitle" : "Sword of Minimal Value" },
-            { "productId" : "100.gold.coins", "localizedPriceString" : "$0.99", "localizedTitle" : "100 in-game Gold Coins" }]]));
+            .withArgs('iap.catalog').returns(Promise.resolve([true, "[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"com.example.iap.product1\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]"]));
     });
 
     it('should indicate that products are available', () => {
