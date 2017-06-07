@@ -21,6 +21,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 
+        this.set('iapProductId', campaign.iapProductId);
         this.set('landscapeImage', new Image(campaign.landscapeUrl));
         this.set('portraitImage', new Image(campaign.portraitUrl));
         this.set('buttonImage', new Image(campaign.buttonUrl));

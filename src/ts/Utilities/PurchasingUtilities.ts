@@ -1,12 +1,13 @@
 import { MetaData } from 'Utilities/MetaData';
-import { IProduct, PurchasingCatalog } from 'Models/PurchasingCatalog';
+import { PurchasingCatalog } from 'Models/PurchasingCatalog';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class PurchasingUtilities {
     public static refresh(metaData: MetaData): Promise<void> {
         return metaData.getKeys('iap').then(keys => {
-             return metaData.get<IProduct[]>('iap.catalog', false).then(([found, value]: [boolean, IProduct[]]) => {
+             return metaData.get<string>('iap.catalog', false).then(([found, value]: [boolean, string]) => {
                 if(found && value) {
-                    this._catalog = new PurchasingCatalog(value);
+                    this._catalog = new PurchasingCatalog(JsonParser.parse(value));
                 }
             });
         });
