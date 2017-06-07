@@ -222,6 +222,7 @@ export class WebView {
 
         this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
         this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+        this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
@@ -250,6 +251,12 @@ export class WebView {
         this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
         if(sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
+    }
+
+    private onAdUnitStartProcessed(): void {
+        if(!this._mustReinitialize) {
+            this._campaignRefreshManager.refresh();
         }
     }
 

@@ -87,7 +87,13 @@ export class VideoEventHandlers {
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getVideo().setStarted(true);
 
-            sessionManager.sendStart(adUnit);
+            sessionManager.sendStart(adUnit).then(() => {
+                if(adUnit.getVideo().isCached() && adUnit.getVideo().getPosition() + 5000 < adUnit.getVideo().getDuration()) {
+                    setTimeout(() => {
+                        adUnit.onStartProcessed.trigger();
+                    }, 5000);
+                }
+            });
 
             const overlay = adUnit.getOverlay();
             if(overlay) {

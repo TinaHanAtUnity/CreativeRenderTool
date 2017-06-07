@@ -27,6 +27,7 @@ export abstract class AbstractAdUnit {
     private static _autoCloseDelay: number = 0;
 
     public readonly onStart = new Observable0();
+    public readonly onStartProcessed = new Observable0();
     public readonly onFinish = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onError = new Observable0();
