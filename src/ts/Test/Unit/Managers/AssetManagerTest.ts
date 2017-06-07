@@ -13,7 +13,6 @@ import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { CacheError, IFileInfo, CacheEvent, CacheApi } from 'Native/Api/Cache';
 import { Request } from 'Utilities/Request';
 import { HTML } from 'Models/Assets/HTML';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 class TestCacheApi extends CacheApi {
 
@@ -170,8 +169,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not cache anything when cache mode is disabled', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.DISABLED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.DISABLED);
         const campaign = new TestCampaign([], []);
         const spy = sinon.spy(cache, 'cache');
         assetManager.setup(campaign);
@@ -179,8 +178,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should cache required assets', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.FORCED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new HTML('https://www.google.fi');
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');
@@ -191,8 +190,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should cache optional assets', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.FORCED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new HTML('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         const spy = sinon.spy(cache, 'cache');
@@ -205,8 +204,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not wait for optional assets when cache mode is allowed', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.ALLOWED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
         const asset = new HTML('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         return assetManager.setup(campaign).then(() => {
@@ -215,8 +214,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should swallow optional errors when cache mode is allowed', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request, {retries: 0, retryDelay: 1});
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.ALLOWED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request, {retries: 0, retryDelay: 1});
+        const assetManager = new AssetManager(cache, CacheMode.ALLOWED);
         const asset = new HTML('https://www.google.fi');
         const campaign = new TestCampaign([], [asset]);
         cacheApi.setInternet(false);
@@ -226,8 +225,8 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not swallow errors when cache mode is forced', () => {
-        const cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request, {retries: 0, retryDelay: 1});
-        const assetManager = new AssetManager(cache, TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.FORCED);
+        const cache = new Cache(nativeBridge, wakeUpManager, request, {retries: 0, retryDelay: 1});
+        const assetManager = new AssetManager(cache, CacheMode.FORCED);
         const asset = new HTML('https://www.google.fi');
         const campaign = new TestCampaign([asset], []);
         cacheApi.setInternet(false);

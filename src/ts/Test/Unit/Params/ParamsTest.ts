@@ -252,7 +252,7 @@ describe('Event parameters should match specifications', () => {
             const eventManager = new EventManager(nativeBridge, request);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            const assetManager = new AssetManager(new Cache(nativeBridge, deviceInfo, wakeUpManager, request), clientInfo, configuration, CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
@@ -274,7 +274,7 @@ describe('Event parameters should match specifications', () => {
             const eventManager = new EventManager(nativeBridge, request);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-            const assetManager = new AssetManager(new Cache(nativeBridge, deviceInfo, wakeUpManager, request), clientInfo, configuration, CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);

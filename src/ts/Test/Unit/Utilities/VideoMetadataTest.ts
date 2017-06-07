@@ -33,7 +33,7 @@ describe('VideoMetadataTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             wakeUpManager = new WakeUpManager(nativeBridge);
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
+            cache = new Cache(nativeBridge, wakeUpManager, request);
         });
 
         it('should validate valid video', () => {
@@ -66,7 +66,7 @@ describe('VideoMetadataTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
             wakeUpManager = new WakeUpManager(nativeBridge);
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request);
+            cache = new Cache(nativeBridge, wakeUpManager, request);
         });
 
         it('should validate valid video', () => {

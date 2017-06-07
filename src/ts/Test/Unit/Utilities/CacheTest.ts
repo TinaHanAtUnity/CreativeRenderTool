@@ -165,7 +165,7 @@ describe('CacheTest', () => {
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge);
         request = new Request(nativeBridge, wakeUpManager);
-        cacheManager = new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request, {retries: 3, retryDelay: 1});
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 

@@ -1,25 +1,20 @@
 import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
-import { CacheMode, Configuration } from 'Models/Configuration';
+import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { ClientInfo } from 'Models/ClientInfo';
 
 export class AssetManager {
 
     private _cache: Cache;
-    private _clientInfo: ClientInfo;
-    private _configuration: Configuration;
     private _cacheMode: CacheMode;
     private _stopped: boolean;
 
-    constructor(cache: Cache, clientInfo: ClientInfo, configuration: Configuration, cacheMode: CacheMode) {
+    constructor(cache: Cache, cacheMode: CacheMode) {
         this._cache = cache;
-        this._clientInfo = clientInfo;
-        this._configuration = configuration;
         this._cacheMode = cacheMode;
         this._stopped = false;
     }
@@ -132,8 +127,6 @@ export class AssetManager {
         return {
             creativeType: asset.getDescription(),
             gamerId: campaign.getGamerId(),
-            country: this._configuration.getCountry(),
-            sourceGameId: parseInt(this._clientInfo.getGameId(), 10),
             targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
             targetCampaignId: campaign.getId()
         };

@@ -115,8 +115,6 @@ export class TestFixtures {
         return {
             creativeType: 'TEST',
             gamerId: '1234abcd',
-            country: 'US',
-            sourceGameId: 1234,
             targetGameId: 5678,
             targetCampaignId: '123456abcdef'
         };

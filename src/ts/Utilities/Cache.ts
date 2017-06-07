@@ -10,7 +10,6 @@ import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { HttpKafka } from 'Utilities/HttpKafka';
-import { DeviceInfo } from 'Models/DeviceInfo';
 
 export enum CacheStatus {
     OK,
@@ -35,8 +34,6 @@ export interface ICacheOptions {
 export interface ICacheDiagnostics {
     creativeType: string;
     gamerId: string;
-    country: string;
-    sourceGameId: number;
     targetGameId: number;
     targetCampaignId: string;
 }
@@ -68,7 +65,6 @@ interface ICallbackObject {
 export class Cache {
 
     private _nativeBridge: NativeBridge;
-    private _deviceInfo: DeviceInfo;
     private _wakeUpManager: WakeUpManager;
     private _request: Request;
 
@@ -81,9 +77,8 @@ export class Cache {
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
-        this._deviceInfo = deviceInfo;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
 
@@ -681,21 +676,16 @@ export class Cache {
     }
 
     private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
-        this._deviceInfo.getNetworkType().then(networkType => {
-            const msg: any = {
-                eventTimestamp: Date.now(),
-                eventType: CacheDiagnosticEvent[event],
-                creativeType: callback.diagnostics.creativeType,
-                size: callback.contentLength,
-                connectionType: networkType,
-                downloadStartTimestamp: callback.startTimestamp,
-                gamerId: callback.diagnostics.gamerId,
-                country: callback.diagnostics.country,
-                sourceGameId: callback.diagnostics.sourceGameId,
-                targetGameId: callback.diagnostics.targetGameId,
-                targetCampaignId: callback.diagnostics.targetCampaignId
-            };
-            HttpKafka.sendEvent('events.creativedownload.json', msg);
-        });
+        const msg: any = {
+            eventTimestamp: Date.now(),
+            eventType: CacheDiagnosticEvent[event],
+            creativeType: callback.diagnostics.creativeType,
+            size: callback.contentLength,
+            downloadStartTimestamp: callback.startTimestamp,
+            gamerId: callback.diagnostics.gamerId,
+            targetGameId: callback.diagnostics.targetGameId,
+            targetCampaignId: callback.diagnostics.targetCampaignId
+        };
+        HttpKafka.sendEvent('events.creativedownload.json', msg);
     }
 }
