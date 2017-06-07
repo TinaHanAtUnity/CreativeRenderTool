@@ -19,7 +19,8 @@ describe('IosAdUnitTest', () => {
         supportedOrientations: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         supportedOrientationsPlist: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         shouldAutorotate: true,
-        statusBarOrientation: 1
+        statusBarOrientation: 1,
+        statusBarHidden: true
     };
 
     describe('should open ad unit', () => {
@@ -34,15 +35,24 @@ describe('IosAdUnitTest', () => {
         });
 
         it('with all options true', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, true, defaultOptions).then(() => {
+            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, ['videoplayer', 'webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE, true, true);
                 return;
             });
         });
 
         it('with all options false', () => {
-            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, false, true, true, defaultOptions).then(() => {
+            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, false, true, false, defaultOptions).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, false);
+                return;
+            });
+        });
+
+        it('with the status bar, transparent background and no animation', () => {
+            defaultOptions.statusBarHidden = false;
+
+            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, true, false, true, defaultOptions).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, false, false, true, false);
                 return;
             });
         });
