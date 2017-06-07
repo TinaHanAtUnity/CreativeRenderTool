@@ -742,16 +742,6 @@ describe('CampaignManager', () => {
         return verifyAuctionTriggeredCampaign(OnProgrammaticVastPlcCampaignJson, ConfigurationAuctionVideoJson, VastCampaign);
     });
 
-    // Complete this test with a sample Comet MRAID response
-    xit('should process correct Auction comet/campaign MRAID Campaign content type', () => {
-        return verifyAuctionTriggeredCampaign({}, {}, MRAIDCampaign);
-    });
-
-    // Complete this test with a sample Comet Performance response
-    xit('should process correct Auction comet/campaign Performance Campaign content type', () => {
-        return verifyAuctionTriggeredCampaign({}, {}, PerformanceCampaign);
-    });
-
     describe('on MRAID campaign', () => {
 
         it('should trigger onMRAIDCampaign after receiving a MRAID campaign inlined', () => {
