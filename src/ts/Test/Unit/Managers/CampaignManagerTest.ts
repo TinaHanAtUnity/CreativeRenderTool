@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
+import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -23,9 +24,11 @@ import { EventManager } from 'Managers/EventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
 
+import ConfigurationAuctionVideo from 'json/ConfigurationAuctionVideo.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
 import DummyMRAIDNonInlined from 'json/DummyMRAIDCampaignNonInlined.json';
 import OnVastCampaignJson from 'json/OnVastCampaign.json';
+import OnProgrammaticVastPlcCampaignJson from 'json/OnProgrammaticVastPlcCampaign.json';
 import InsideOutsideJson from 'json/InsideOutside.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
 import WrappedVastJson from 'json/WrappedVast.json';
@@ -59,6 +62,8 @@ describe('CampaignManager', () => {
     let metaDataManager: MetaDataManager;
     let eventManager: EventManager;
     let sessionManager: SessionManager;
+
+    const ConfigurationAuctionVideoJson = JSON.parse(ConfigurationAuctionVideo);
 
     beforeEach(() => {
         configuration = new Configuration({
@@ -105,7 +110,8 @@ describe('CampaignManager', () => {
             },
             Sdk: {
                 logWarning: warningSpy,
-                logInfo: sinon.spy()
+                logInfo: sinon.spy(),
+                logDebug: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
@@ -666,6 +672,73 @@ describe('CampaignManager', () => {
                 'http://customTrackingUrl/complete'
             ]);
         });
+    });
+
+    it('should process custom tracking urls for Auction programmatic/vast Campaign', () => {
+
+        const mockRequest = sinon.mock(request);
+        mockRequest.expects('post').returns(Promise.resolve({
+            response: OnProgrammaticVastPlcCampaignJson
+        }));
+
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionVideoJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        let triggeredCampaign: VastCampaign;
+        let triggeredError: any;
+        campaignManager.onPlcCampaign.subscribe((str: String, campaign: VastCampaign) => {
+            triggeredCampaign = campaign;
+        });
+        campaignManager.onPlcError.subscribe((error: any) => {
+            triggeredError = error;
+        });
+
+        // when the campaign manager requests the placement
+        return campaignManager.request().then(() => {
+            if(triggeredError) {
+                throw triggeredError;
+            }
+
+            // then the onVastCampaign observable is triggered with the correct campaign data
+            mockRequest.verify();
+            assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
+            assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+
+            assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D",
+                "https://www.dummy-url.com"
+            ]);
+        });
+    });
+
+    const verifyAuctionTriggeredCampaign = (mockResp: any, config: any, targetCampaign: any) => {
+        const mockRequest = sinon.mock(request);
+        mockRequest.expects('post').returns(Promise.resolve({
+            response: mockResp
+        }));
+
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        const campaignManager = new CampaignManager(nativeBridge, new Configuration(config), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        let triggeredCampaign: Campaign;
+        let triggeredError: any;
+        campaignManager.onPlcCampaign.subscribe((str: String, campaign: Campaign) => {
+            triggeredCampaign = campaign;
+        });
+        campaignManager.onPlcError.subscribe(error => {
+            triggeredError = error;
+        });
+
+        return campaignManager.request().then(() => {
+            if(triggeredError) {
+                throw triggeredError;
+            }
+
+            mockRequest.verify();
+            assert.isTrue(triggeredCampaign instanceof targetCampaign);
+        });
+    };
+
+    it('should process correct Auction programmatic/vast Campaign content type', () => {
+        return verifyAuctionTriggeredCampaign(OnProgrammaticVastPlcCampaignJson, ConfigurationAuctionVideoJson, VastCampaign);
     });
 
     describe('on MRAID campaign', () => {
