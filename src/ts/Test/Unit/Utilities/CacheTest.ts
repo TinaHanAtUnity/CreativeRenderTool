@@ -8,6 +8,7 @@ import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 class TestCacheApi extends CacheApi {
 
@@ -185,7 +186,7 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
+        return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics()).then(([fileId, fileUrl]) => {
             assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
             assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testUrl, cacheSpy.getCall(0).args[0], 'Cache one file download request url does not match');
@@ -203,15 +204,15 @@ describe('CacheTest', () => {
 
         const cacheSpy = sinon.spy(cacheApi, 'download');
 
-        return cacheManager.cache(testUrl1).then(([fileId, fileUrl]) => {
+        return cacheManager.cache(testUrl1, TestFixtures.getCacheDiagnostics()).then(([fileId, fileUrl]) => {
             assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
             assert.equal(fileId, '1647395140.jpg', 'Cache three files first fileId does not match');
             assert.equal(testFileUrl1, fileUrl, 'Cache three files first local file url does not match');
-        }).then(() => cacheManager.cache(testUrl2)).then(([fileId, fileUrl]) => {
+        }).then(() => cacheManager.cache(testUrl2, TestFixtures.getCacheDiagnostics())).then(([fileId, fileUrl]) => {
             assert.equal(testUrl2, cacheSpy.getCall(1).args[0], 'Cache three files second download request url does not match');
             assert.equal(fileId, '158720486.jpg', 'Cache three files second fileId does not match');
             assert.equal(testFileUrl2, fileUrl, 'Cache three files second local file url does not match');
-        }).then(() => cacheManager.cache(testUrl3)).then(([fileId, fileUrl]) => {
+        }).then(() => cacheManager.cache(testUrl3, TestFixtures.getCacheDiagnostics())).then(([fileId, fileUrl]) => {
             assert.equal(testUrl3, cacheSpy.getCall(2).args[0], 'Cache three files third download request url does not match');
             assert.equal(fileId, '929022075.jpg', 'Cache three files third fileId does not match');
             assert.equal(testFileUrl3, fileUrl, 'Cache three files third local file url does not match');
@@ -231,7 +232,7 @@ describe('CacheTest', () => {
             wakeUpManager.onNetworkConnected.trigger();
         }, 10);
 
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics()).then(fileUrl => {
             assert(networkTriggered, 'Cache one file with network failure: network was not triggered');
         });
     });
@@ -250,7 +251,7 @@ describe('CacheTest', () => {
         setTimeout(() => triggerNetwork(), 200);
         setTimeout(() => triggerNetwork(), 350);
 
-        return cacheManager.cache(testUrl).then(() => {
+        return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics()).then(() => {
             assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
         }).catch(error => {
             assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
@@ -264,7 +265,7 @@ describe('CacheTest', () => {
 
         setTimeout(() => cacheManager.stop(), 150);
 
-        return cacheManager.cache(testUrl).then(() => {
+        return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics()).then(() => {
             assert.fail('Caching should fail when stopped');
         }).catch(error => {
             assert.equal(error, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');
@@ -277,7 +278,7 @@ describe('CacheTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
+        return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics()).then(([fileId, fileUrl]) => {
             assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });

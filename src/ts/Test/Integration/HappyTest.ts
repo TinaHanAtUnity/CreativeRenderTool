@@ -62,7 +62,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setRingerMode(0);
 
         UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
@@ -117,7 +117,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
         DeviceInfo.setStatusBarHeight(0);

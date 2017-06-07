@@ -54,7 +54,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     private _nativeBridge: NativeBridge;
 
     constructor(nativeBridge: NativeBridge) {
-        super({
+        super('DeviceInfo', {
             androidId: ['string'],
             advertisingIdentifier: ['string', 'undefined', 'null'],
             limitAdTracking: ['boolean', 'undefined'],

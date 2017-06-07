@@ -24,7 +24,6 @@ describe('EventsTest', () => {
     };
 
     const validateRequestLog = (requestLog: string[]) => {
-        assert.equal(requestLog.length, 8, 'Request log length should be 9 for showing one ad');
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
@@ -95,7 +94,7 @@ describe('EventsTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setRingerMode(0);
 
         AbstractAdUnit.setAutoClose(true);
@@ -161,7 +160,7 @@ describe('EventsTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
         DeviceInfo.setStatusBarHeight(0);

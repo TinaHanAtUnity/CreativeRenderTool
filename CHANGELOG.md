@@ -1,3 +1,14 @@
+# Wed Jun  7 07:34:12 UTC 2017
+
+* Yodo1 A/B test with low quality videos on A/B groups 6 and 7, only for Yodo1 game IDs
+
+# Tue Jun  6 08:16:14 UTC 2017
+
+* Add gameSessionId and previousPlacementId parameters to ad requests, video events and click events
+* Option to force orientation with test metadata
+* Add names to all models to improve diagnostic errors
+* Set no fill when receiving a campaign without gamerId (does not apply to PLC campaigns)
+
 # Fri Jun  2 09:10:17 UTC 2017
 
 * Support for auction v4, includes placement level ad types
