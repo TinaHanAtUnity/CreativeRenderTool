@@ -89,9 +89,7 @@ export class VideoEventHandlers {
 
             sessionManager.sendStart(adUnit).then(() => {
                 if(adUnit.getVideo().isCached() && adUnit.getVideo().getPosition() + 5000 < adUnit.getVideo().getDuration()) {
-                    setTimeout(() => {
-                        adUnit.onStartProcessed.trigger();
-                    }, 5000);
+                    adUnit.setStartProcessedTreshold(adUnit.getVideo().getPosition() + 5000);
                 }
             });
 
@@ -130,6 +128,12 @@ export class VideoEventHandlers {
                 Diagnostics.trigger('video_player_too_large_progress', error);
 
                 return;
+            }
+
+            const startProcessedTreshold: number | undefined = adUnit.getStartProcessedTreshold();
+            if(!adUnit.isStartProcessed() && startProcessedTreshold && position > startProcessedTreshold) {
+                adUnit.setStartProcessed(true);
+                adUnit.onStartProcessed.trigger();
             }
 
             if(position === lastPosition) {

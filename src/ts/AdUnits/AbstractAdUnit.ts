@@ -40,6 +40,9 @@ export abstract class AbstractAdUnit {
     private _showing: boolean;
     private _finishState: FinishState;
 
+    private _startProcessed: boolean;
+    private _startProcessedTreshold: number | undefined;
+
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
         this._container = container;
@@ -48,6 +51,8 @@ export abstract class AbstractAdUnit {
 
         this._showing = false;
         this._finishState = FinishState.ERROR;
+
+        this._startProcessed = false;
     }
 
     public abstract show(): Promise<void>;
@@ -86,4 +91,19 @@ export abstract class AbstractAdUnit {
         }
     }
 
+    public isStartProcessed(): boolean {
+        return this._startProcessed;
+    }
+
+    public setStartProcessed(value: boolean): void {
+        this._startProcessed = value;
+    }
+
+    public getStartProcessedTreshold(): number | undefined {
+        return this._startProcessedTreshold;
+    }
+
+    public setStartProcessedTreshold(value: number): void {
+        this._startProcessedTreshold = value;
+    }
 }
