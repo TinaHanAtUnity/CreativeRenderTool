@@ -1,3 +1,7 @@
+# Wed Jun  7 07:34:12 UTC 2017
+
+* Yodo1 A/B test with low quality videos on A/B groups 6 and 7, only for Yodo1 game IDs
+
 # Tue Jun  6 08:16:14 UTC 2017
 
 * Add gameSessionId and previousPlacementId parameters to ad requests, video events and click events
