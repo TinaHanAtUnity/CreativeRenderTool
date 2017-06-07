@@ -196,7 +196,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                     videoOrientation = 'portrait';
                 }
             }
-            this._nativeBridge.Sdk.logDebug('Choosing ' + videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
+            this._nativeBridge.Sdk.logDebug('Choosing ' + videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()].toLowerCase());
             return finalVideoUrl;
         });
     }
