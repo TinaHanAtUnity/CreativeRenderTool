@@ -21,10 +21,24 @@ export class MOAT extends View {
         iframe.srcdoc = MOATContainer;
     }
 
+    public init(ids: { [key: string]: string }, duration: number, url: string) {
+        this._iframe.contentWindow.postMessage({
+            type: 'init',
+            data: {
+                ids,
+                duration,
+                url
+            }
+        }, '*');
+    }
+
     public triggerEvent(type: string, volume: number) {
         this._iframe.contentWindow.postMessage({
-            type: type,
-            volume: volume
+            type: 'event',
+            data: {
+                type,
+                volume
+            }
         }, '*');
     }
 

@@ -4,8 +4,18 @@ import { EventType } from 'Models/Session';
 
 export class VastVideoEventHandlers {
 
-    public static onVideoPrepared(adUnit: VastAdUnit, duration: number) {
+    public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number) {
         adUnit.setRealDuration(duration);
+        const ids = {
+            "level1": "_ADVERTISER_",
+            "level2": "_CAMPAIGN_",
+            "level3": "_LINE_ITEM_",
+            "level4": "_CREATIVE_"
+        };
+        const moat = adUnit.getMoat();
+        if(moat) {
+            moat.init(ids, duration, url);
+        }
     }
 
     public static onVideoPlaying(sessionManager: SessionManager, adUnit: VastAdUnit): void {

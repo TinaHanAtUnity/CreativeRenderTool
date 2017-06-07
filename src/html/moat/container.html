@@ -25,30 +25,35 @@
             return d
         }
 
-        var ids = {
-            "level1": "_ADVERTISER_",
-            "level2": "_CAMPAIGN_",
-            "level3": "_LINE_ITEM_",
-            "level4": "_CREATIVE_"
-        };
-
         var moat = undefined;
-
         document.addEventListener('DOMContentLoaded', function() {
-            var dummyElement = document.createElement('div');
-            document.body.appendChild(dummyElement);
-            moat = initMoatTracking(dummyElement, ids, 30, "unityinappvideo254672075459");
-        });
+            window.addEventListener('message', function(event) {
+                if(event && event.data && event.data.type && event.data.data) {
+                    switch(event.data.type) {
+                        case 'init':
+                            var dummyElement = document.createElement('div');
+                            document.body.appendChild(dummyElement);
+                            console.log('init: ' + event.data.data.ids + ' duration: ' + event.data.data.duration + ' url: ' + event.data.data.url);
+                            moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
+                            break;
 
-        window.addEventListener('message', function(event) {
-            if(moat && event && event.data && event.data.type && 'volume' in event.data) {
-                console.log('type: ' + event.data.type + ' volume: ' + event.data.volume);
-                moat.dispatchEvent({
-                    "type": event.data.type,
-                    "adVolume": event.data.volume
-                });
-            }
-        }, false);
+                        case 'event':
+                            console.log('type: ' + event.data.data.type + ' volume: ' + event.data.data.volume);
+                            if(moat) {
+                                moat.dispatchEvent({
+                                    "type": event.data.data.type,
+                                    "adVolume": event.data.data.volume
+                                });
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }, false);
+
+        });
     </script>
 </head>
 <body>
