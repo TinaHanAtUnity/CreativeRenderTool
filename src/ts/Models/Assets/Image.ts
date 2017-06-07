@@ -6,4 +6,8 @@ export class Image extends Asset<IAsset> {
 
         this.set('url', url);
     }
+
+    public getDescription(): string {
+        return 'IMAGE';
+    }
 }

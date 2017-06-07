@@ -36,6 +36,10 @@ export class Video extends Asset<IVideo> {
         this.set('active', true);
     }
 
+    public getDescription(): string {
+        return 'VIDEO';
+    }
+
     public getSize() {
         return this.get('size');
     }
