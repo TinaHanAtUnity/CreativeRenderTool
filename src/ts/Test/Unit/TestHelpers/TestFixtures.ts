@@ -11,6 +11,7 @@ import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
+import { ICacheDiagnostics } from 'Utilities/Cache';
 
 export class TestFixtures {
 
@@ -108,5 +109,16 @@ export class TestFixtures {
             gamerId: 'abc123',
             abGroup: 0
         });
+    }
+
+    public static getCacheDiagnostics(): ICacheDiagnostics {
+        return {
+            creativeType: 'TEST',
+            gamerId: '1234abcd',
+            country: 'US',
+            sourceGameId: 1234,
+            targetGameId: 5678,
+            targetCampaignId: '123456abcdef'
+        };
     }
 }

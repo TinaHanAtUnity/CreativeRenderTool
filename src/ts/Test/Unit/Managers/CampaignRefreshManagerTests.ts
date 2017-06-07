@@ -122,7 +122,7 @@ describe('CampaignRefreshManager', () => {
         eventManager = new EventManager(nativeBridge, request);
         deviceInfo = new DeviceInfo(nativeBridge);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
-        assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+        assetManager = new AssetManager(new Cache(nativeBridge, TestFixtures.getDeviceInfo(), wakeUpManager, request), TestFixtures.getClientInfo(), TestFixtures.getConfiguration(), CacheMode.DISABLED);
         campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         container = new TestContainer();
     });

@@ -133,7 +133,7 @@ export class AssetManager {
             creativeType: asset.getDescription(),
             gamerId: campaign.getGamerId(),
             country: this._configuration.getCountry(),
-            sourceGameId: parseInt(this._clientInfo.getGameId()),
+            sourceGameId: parseInt(this._clientInfo.getGameId(), 10),
             targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
             targetCampaignId: campaign.getId()
         };
