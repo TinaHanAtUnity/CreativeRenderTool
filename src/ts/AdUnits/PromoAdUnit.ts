@@ -4,11 +4,15 @@ import { AdUnitContainer, ForceOrientation } from "AdUnits/Containers/AdUnitCont
 import { Placement } from "Models/Placement";
 import { Campaign } from "Models/Campaign";
 import { Promo } from 'Views/Promo';
+import { IObserver0 } from 'Utilities/IObserver';
+import { FinishState } from 'Constants/FinishState';
 
 export class PromoAdUnit extends AbstractAdUnit {
 
     private _promoView: Promo;
     private _options: any;
+
+    private _onSystemKillObserver: IObserver0;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, promo: Promo, options: any) {
         super(nativeBridge, container, placement, campaign);
@@ -21,7 +25,9 @@ export class PromoAdUnit extends AbstractAdUnit {
         this.onStart.trigger();
         this._promoView.show();
 
-        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, false, this._options);
+        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+
+        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, false, true, this._options);
     }
 
     public hide(): Promise<void> {
@@ -29,6 +35,8 @@ export class PromoAdUnit extends AbstractAdUnit {
             return Promise.resolve();
         }
         this.setShowing(false);
+
+        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         this._promoView.hide();
         this._promoView.container().parentElement!.removeChild(this._promoView.container());
@@ -47,5 +55,12 @@ export class PromoAdUnit extends AbstractAdUnit {
 
     private unsetReferences() {
         delete this._promoView;
+    }
+
+    private onSystemKill() {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
     }
 }
