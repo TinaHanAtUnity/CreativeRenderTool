@@ -152,8 +152,18 @@ export class Cache {
     public cleanCache(): Promise<any[]> {
         return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]): Promise<any> => {
             if(!files || !files.length) {
-                if(keys && keys.length > 0) {
-                    return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache');
+                let campaignCount = 0;
+                if (campaigns) {
+                    for (const campaign in campaigns) {
+                        if (campaigns.hasOwnProperty(campaign)) {
+                            campaignCount++;
+                        }
+                    }
+                }
+                if((keys && keys.length > 0) || campaignCount > 0) {
+                    return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache').then(() => {
+                        return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+                    });
                 } else {
                     return Promise.resolve();
                 }
@@ -239,12 +249,9 @@ export class Cache {
 
                 for (const campaignId in campaigns) {
                     if (campaigns.hasOwnProperty(campaignId)) {
-                        this._nativeBridge.Sdk.logInfo('Checking campaign: ' + campaignId);
                         for (const currentFileId in campaigns[campaignId]) {
                             if (campaigns[campaignId].hasOwnProperty(currentFileId)) {
-                                this._nativeBridge.Sdk.logInfo('Checking campaign: ' + campaignId + ' with file: ' + currentFileId + ' with files: ' + cacheFilesLeftIds);
                                 if (cacheFilesLeftIds.indexOf(currentFileId) === -1) {
-                                    this._nativeBridge.Sdk.logInfo('Removing campaign: ' + campaignId + ' has lost one of its required assets');
                                     promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId));
                                     campaignsDirty = true;
                                     break;
