@@ -4,50 +4,36 @@ import { JsonParser } from 'Utilities/JsonParser';
 
 export class PurchasingUtilities {
     public static refresh(metaData: MetaData): Promise<void> {
-        return metaData.getKeys('iap').then(keys => {
-             return metaData.get<string>('iap.catalog', false).then(([found, value]: [boolean, string]) => {
-                if(found && value) {
-                    this._catalog = new PurchasingCatalog(JsonParser.parse(value));
-                }
-            });
+        return metaData.get<string>('iap.catalog', false).then(([found, value]: [boolean, string]) => {
+            if(found && value) {
+                this._catalog = new PurchasingCatalog(JsonParser.parse(value));
+            }
         });
     }
 
     public static productAvailable(productId: string): boolean {
-        if(this._catalog.getProducts().length !== 0) {
-            for(const product of this._catalog.getProducts()) {
-                if(product.getId() === productId) {
-                    return true;
-                }
-            }
+        if(this.purchasesAvailable()) {
+            return this._catalog.getProducts().has(productId);
         }
         return false;
     }
 
     public static productPrice(productId: string): string {
-        if(this._catalog.getProducts().length !== 0) {
-            for(const product of this._catalog.getProducts()) {
-                if(product.getId() === productId) {
-                    return product.getPrice();
-                }
-            }
+        if(this.productAvailable(productId)) {
+            return this._catalog.getProducts().get(productId)!.getPrice();
         }
-        return "";
+        throw new Error('Attempting to get price of invalid product: ' + productId);
     }
 
     public static productDescription(productId: string): string {
-        if(this._catalog.getProducts().length !== 0) {
-            for(const product of this._catalog.getProducts()) {
-                if(product.getId() === productId) {
-                    return product.getDescription();
-                }
-            }
+        if(this.productAvailable(productId)) {
+            return this._catalog.getProducts().get(productId)!.getDescription();
         }
-        return "";
+        throw new Error('Attempting to get description of invalid product: ' + productId);
     }
 
     public static purchasesAvailable(): boolean {
-        return this._catalog.getProducts().length !== 0;
+        return this._catalog.getProducts() !== undefined;
     }
 
     private static _catalog: PurchasingCatalog;

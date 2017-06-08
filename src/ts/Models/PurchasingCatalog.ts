@@ -41,23 +41,24 @@ export class Product extends Model<IProduct> {
 }
 
 interface IPurchasingCatalog {
-    products: Product[];
+    products: Map<string, Product>;
 }
 
 export class PurchasingCatalog extends Model<IPurchasingCatalog> {
-    constructor(data: IProduct[]) {
+    constructor(data: any[]) {
         super('PurchasingCatalog', {
-            products: ['array']
+            products: ['object']
         });
 
-        const products: Product[] = [];
-        for (const product of data) {
-            products.push(new Product(product));
+        const products: Map<string, Product> = new Map();
+        for (const productData of data) {
+            const product = new Product(productData);
+            products.set(product.getId(), product);
         }
         this.set('products', products);
     }
 
-    public getProducts(): Product[] {
+    public getProducts(): Map<string, Product> {
         return this.get('products');
     }
 
