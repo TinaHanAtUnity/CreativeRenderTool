@@ -578,7 +578,7 @@ export class CampaignManager {
 
     private getFullyCachedCampaigns(): Promise<string[]> {
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-           return campaignKeys;
+            return campaignKeys;
         }).catch(() => {
             return [];
         });
