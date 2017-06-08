@@ -10,7 +10,7 @@ interface IMRAIDCampaign extends ICampaign {
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }) {
-        super({
+        super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
             resource: ['string', 'undefined'],

@@ -31,7 +31,7 @@ interface IPlacement {
 export class Placement extends Model<IPlacement> {
 
     constructor(data: any) {
-        super({
+        super('Placement', {
             id: ['string'],
             name: ['string'],
             default: ['boolean'],

@@ -21,6 +21,8 @@ import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { SessionManager } from 'Managers/SessionManager';
+import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class CampaignManager {
 
@@ -68,17 +70,20 @@ export class CampaignManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
     private _assetManager: AssetManager;
+    private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _requesting: boolean;
+    private _previousPlacementId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
+        this._sessionManager = sessionManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
@@ -124,10 +129,25 @@ export class CampaignManager {
         });
     }
 
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
+    }
+
     private parseCampaign(response: INativeResponse) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
+        } else if('campaign' in json || 'vast' in json || 'mraid' in json) {
+            this._nativeBridge.Sdk.logError('Unity Ads server returned a campaign without gamerId, ignoring campaign');
+            const error: DiagnosticError = new DiagnosticError(new Error('Missing gamerId'), {
+                rawAdPlan: json
+            });
+            this.onError.trigger(error);
+            return Promise.resolve();
         }
 
         if('campaign' in json) {
@@ -176,7 +196,7 @@ export class CampaignManager {
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content);
+                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls);
                     });
                 }
             }
@@ -189,32 +209,44 @@ export class CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placements: string[], contentType: string, content: string): Promise<void> {
+    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
         this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
-        if(contentType === 'comet/campaign') {
-            const json = JsonParser.parse(content);
-            if(json && json.mraidUrl) {
-                const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                return this._assetManager.setup(campaign, true).then(() => {
-                    for(const placement of placements) {
-                        this.onPlcCampaign.trigger(placement, campaign);
-                    }
+        switch (contentType) {
+            case 'comet/campaign':
+                const json = JsonParser.parse(content);
+                if(json && json.mraidUrl) {
+                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
+                    return this._assetManager.setup(campaign, true).then(() => {
+                        for(const placement of placements) {
+                            this.onPlcCampaign.trigger(placement, campaign);
+                        }
+                    });
+                } else {
+                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                    this.sendNegativeTargetingEvent(campaign, gamerId);
+                    return this._assetManager.setup(campaign, true).then(() => {
+                        for(const placement of placements) {
+                            this.onPlcCampaign.trigger(placement, campaign);
+                        }
+                    });
+                }
+
+            case 'programmatic/vast':
+                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
+                    return this._assetManager.setup(vastCampaign, true).then(() => {
+                        for(const placement of placements) {
+                            this.onPlcCampaign.trigger(placement, vastCampaign);
+                        }
+                    });
                 });
-            } else {
-                const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                this.sendNegativeTargetingEvent(campaign, gamerId);
-                return this._assetManager.setup(campaign, true).then(() => {
-                    for(const placement of placements) {
-                        this.onPlcCampaign.trigger(placement, campaign);
-                    }
-                });
-            }
+
+            default:
+                return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
         }
 
-        return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
     }
 
     private handlePlcNoFill(placement: string): Promise<void> {
@@ -235,7 +267,15 @@ export class CampaignManager {
             const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
+            const abGroup: number = CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup;
+
+            if(AbTestHelper.isYodo1CachingAbTestActive(abGroup, this._clientInfo)) {
+                if(json.campaign && json.campaign.trailerDownloadable && json.campaign.trailerStreaming) {
+                    json.campaign.trailerDownloadable = json.campaign.trailerStreaming;
+                }
+            }
+
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, abGroup);
             this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
@@ -246,7 +286,15 @@ export class CampaignManager {
             return this.handleNoFill();
         }
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
-        const decodedVast = decodeURIComponent(json.vast.data).trim();
+        return this.parseVastCampaignHelper(json.vast.data, json.gamerId, json.abGroup, json.vast.tracking, json.cacheTTL).then(campaign => {
+            return this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
+        }).catch((error) => {
+            this.onError.trigger(error);
+        });
+    }
+
+    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
+        const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             let campaignId: string;
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -256,10 +304,9 @@ export class CampaignManager {
             } else {
                 campaignId = 'UNKNOWN';
             }
-            const campaign = new VastCampaign(vast, campaignId, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.cacheTTL, json.vast.tracking);
+            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls);
             if(campaign.getVast().getImpressionUrls().length === 0) {
-                this.onError.trigger(new Error('Campaign does not have an impression url'));
-                return;
+                return Promise.reject(new Error('Campaign does not have an impression url'));
             }
             // todo throw an Error if required events are missing. (what are the required events?)
             if(campaign.getVast().getErrorURLTemplates().length === 0) {
@@ -268,22 +315,19 @@ export class CampaignManager {
             if(!campaign.getVideo().getUrl()) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign does not have a video url'),
-                    {rootWrapperVast: json.vast}
+                    {rootWrapperVast: content}
                 );
                 this.onError.trigger(videoUrlError);
-                return;
+                return Promise.reject(videoUrlError);
             }
             if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign video url needs to be https for iOS'),
-                    {rootWrapperVast: json.vast}
+                    {rootWrapperVast: content}
                 );
-                this.onError.trigger(videoUrlError);
-                return;
+                return Promise.reject(videoUrlError);
             }
-            return this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
-        }).catch((error) => {
-            this.onError.trigger(error);
+            return Promise.resolve(campaign);
         });
     }
 
@@ -436,8 +480,13 @@ export class CampaignManager {
             bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
             coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
             language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
+            gameSessionId: this.getParameter('sessionId', this._sessionManager.getGameSessionId(), 'number'),
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
+
+        if (this.getPreviousPlacementId()) {
+            body.previousPlacementId = this.getPreviousPlacementId();
+        }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');

@@ -13,7 +13,7 @@ export interface IVideo extends IAsset {
 
 export class Video extends Asset<IVideo> {
     constructor(url: string, size?: number) {
-        super({
+        super('Video', {
             ... Asset.Schema,
             size: ['number', 'undefined'],
             started: ['boolean'],
@@ -34,6 +34,10 @@ export class Video extends Asset<IVideo> {
         this.set('positionRepeats', 0);
         this.set('quartile', 0);
         this.set('active', true);
+    }
+
+    public getDescription(): string {
+        return 'VIDEO';
     }
 
     public getSize() {

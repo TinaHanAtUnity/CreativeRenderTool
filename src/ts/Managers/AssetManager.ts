@@ -1,10 +1,11 @@
-import { Cache } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 enum CacheType {
     REQUIRED,
@@ -73,7 +74,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
+                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -132,5 +133,14 @@ export class AssetManager {
             required: required,
             id: campaign.getId()
         });
+    }
+
+    private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
+        return {
+            creativeType: asset.getDescription(),
+            gamerId: campaign.getGamerId(),
+            targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
+            targetCampaignId: campaign.getId()
+        };
     }
 }

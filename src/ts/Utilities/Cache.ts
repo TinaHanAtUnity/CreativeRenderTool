@@ -8,6 +8,7 @@ import { Request } from 'Utilities/Request';
 import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export enum CacheStatus {
     OK,
@@ -15,9 +16,25 @@ export enum CacheStatus {
     FAILED
 }
 
+enum CacheDiagnosticEvent {
+    STARTED,
+    RESUMED,
+    STOPPED,
+    FINISHED,
+    REDIRECTED,
+    ERROR
+}
+
 export interface ICacheOptions {
     retries: number;
     retryDelay: number;
+}
+
+export interface ICacheDiagnostics {
+    creativeType: string;
+    gamerId: string;
+    targetGameId: number;
+    targetCampaignId: string;
 }
 
 export interface ICacheResponse {
@@ -33,6 +50,9 @@ interface ICallbackObject {
     retryCount: number;
     networkRetryCount: number;
     paused: boolean;
+    startTimestamp: number;
+    contentLength: number;
+    diagnostics: ICacheDiagnostics;
     resolve: Function;
     reject: Function;
     originalUrl?: string;
@@ -84,7 +104,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string): Promise<[string, string]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<[string, string]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -97,7 +117,7 @@ export class Cache {
             if(isCached) {
                 return Promise.resolve([CacheStatus.OK, fileId]);
             }
-            const promise = this.registerCallback(url, fileId, this._paused);
+            const promise = this.registerCallback(url, fileId, this._paused, diagnostics);
             if(!this._paused) {
                 this.downloadFile(url, fileId);
             }
@@ -388,7 +408,7 @@ export class Cache {
         });
     }
 
-    private registerCallback(url: string, fileId: string, paused: boolean, originalUrl?: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, paused: boolean, diagnostics: ICacheDiagnostics, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
@@ -396,6 +416,9 @@ export class Cache {
                 retryCount: 0,
                 networkRetryCount: 0,
                 paused: paused,
+                startTimestamp: 0,
+                contentLength: 0,
+                diagnostics: diagnostics,
                 resolve: resolve,
                 reject: reject,
                 originalUrl: originalUrl
@@ -484,9 +507,16 @@ export class Cache {
     }
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: Array<[string, string]>): void {
+        const callback = this._callbacks[url];
+
+        callback.startTimestamp = Date.now();
+        callback.contentLength = totalSize;
+
         if(size === 0) {
-            const callback = this._callbacks[url];
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
+            this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
+        } else {
+            this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
         }
     }
 
@@ -499,9 +529,11 @@ export class Cache {
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, size, totalSize, this.getFileIdExtension(callback.fileId)));
+                this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, callback);
                 this.fulfillCallback(url, CacheStatus.OK);
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
+                this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
                 this.deleteCacheResponse(callback.fileId);
                 if(size > 0) {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
@@ -514,14 +546,17 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, false, originalUrl);
+                    this.registerCallback(location, fileId, false, callback.diagnostics, originalUrl);
                     this.downloadFile(location, fileId);
                     return;
                 }
             } else if(responseCode === 416) {
+                this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
                 this.handleRequestRangeError(callback, url);
                 return;
             }
+
+            this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
 
             const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
                 url: url,
@@ -546,6 +581,7 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
+            this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback);
             if(!callback.paused) {
                 this.fulfillCallback(url, CacheStatus.STOPPED);
             }
@@ -555,6 +591,8 @@ export class Cache {
     private onDownloadError(error: string, url: string, message: string): void {
         const callback = this._callbacks[url];
         if(callback) {
+            this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
+
             switch (error) {
                 case CacheError[CacheError.NETWORK_ERROR]:
                     this.handleRetry(callback, url, error);
@@ -698,5 +736,19 @@ export class Cache {
             this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'caching.pause');
             this._nativeBridge.Storage.write(StorageType.PUBLIC);
         }
+    }
+
+    private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
+        const msg: any = {
+            eventTimestamp: Date.now(),
+            eventType: CacheDiagnosticEvent[event],
+            creativeType: callback.diagnostics.creativeType,
+            size: callback.contentLength,
+            downloadStartTimestamp: callback.startTimestamp,
+            gamerId: callback.diagnostics.gamerId,
+            targetGameId: callback.diagnostics.targetGameId,
+            targetCampaignId: callback.diagnostics.targetCampaignId
+        };
+        HttpKafka.sendEvent('events.creativedownload.json', msg);
     }
 }
