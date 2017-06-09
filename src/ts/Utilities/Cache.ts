@@ -77,6 +77,8 @@ export class Cache {
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
 
+    private _sendDiagnosticEvents = false;
+
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
@@ -343,6 +345,10 @@ export class Cache {
 
     public isPaused(): boolean {
         return this._paused;
+    }
+
+    public setDiagnostics(value: boolean) {
+        this._sendDiagnosticEvents = value;
     }
 
     private downloadFile(url: string, fileId: string): void {
@@ -676,16 +682,18 @@ export class Cache {
     }
 
     private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
-        const msg: any = {
-            eventTimestamp: Date.now(),
-            eventType: CacheDiagnosticEvent[event],
-            creativeType: callback.diagnostics.creativeType,
-            size: callback.contentLength,
-            downloadStartTimestamp: callback.startTimestamp,
-            gamerId: callback.diagnostics.gamerId,
-            targetGameId: callback.diagnostics.targetGameId,
-            targetCampaignId: callback.diagnostics.targetCampaignId
-        };
-        HttpKafka.sendEvent('events.creativedownload.json', msg);
+        if(this._sendDiagnosticEvents) {
+            const msg: any = {
+                eventTimestamp: Date.now(),
+                eventType: CacheDiagnosticEvent[event],
+                creativeType: callback.diagnostics.creativeType,
+                size: callback.contentLength,
+                downloadStartTimestamp: callback.startTimestamp,
+                gamerId: callback.diagnostics.gamerId,
+                targetGameId: callback.diagnostics.targetGameId,
+                targetCampaignId: callback.diagnostics.targetCampaignId
+            };
+            HttpKafka.sendEvent('events.creativedownload.json', msg);
+        }
     }
 }
