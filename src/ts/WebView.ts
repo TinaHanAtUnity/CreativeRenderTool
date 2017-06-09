@@ -148,6 +148,10 @@ export class WebView {
                 });
             }
         }).then(() => {
+            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
+                this._cache.setDiagnostics(true);
+            }
+
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
