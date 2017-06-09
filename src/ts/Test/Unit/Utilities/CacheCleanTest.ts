@@ -6,7 +6,7 @@ import { CacheApi, IFileInfo, CacheError } from 'Native/Api/Cache';
 import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Cache, ICacheResponse } from 'Utilities/Cache';
+import { Cache } from 'Utilities/Cache';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { FakeSdkApi } from '../TestHelpers/FakeSdkApi';
@@ -45,15 +45,12 @@ class TestCacheApi extends CacheApi {
 }
 
 class TestStorageApi extends StorageApi {
-    private _files: { [id: string]: ICacheResponse };
-    private _campaigns: {[id: string]: any};
+    private _contents: any;
     private _dirty: boolean;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
 
-        this._files = {};
-        this._campaigns = {};
         this._dirty = false;
     }
 
@@ -62,18 +59,20 @@ class TestStorageApi extends StorageApi {
             let id: string = key.substring(12);
             id = id.split(".")[0];
 
-            if(this._files[id]) {
-                return Promise.resolve(<any>this._files[id]);
+            if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[id]) {
+                return Promise.resolve(<any>this._contents.cache.files[id]);
             }
         }
         if (key && key.match(/^cache\.campaigns\./)) {
             const id: string = key.substring(16);
-            if (this._campaigns[id]) {
-                return Promise.resolve(<any>this._campaigns[id]);
+            if(this._contents && this._contents.cache && this._contents.cache.campaigns && this._contents.cache.campaigns[id]) {
+                return Promise.resolve(<any>this._contents.cache.campaigns[id]);
             }
         }
         if (key && key.match(/^cache\.campaigns/)) {
-            return Promise.resolve(<any>this._campaigns);
+            if(this._contents && this._contents.cache && this._contents.cache.campaigns) {
+                return Promise.resolve(<any>this._contents.cache.campaigns);
+            }
         }
 
         return Promise.reject(StorageError[StorageError.COULDNT_GET_VALUE]);
@@ -81,12 +80,11 @@ class TestStorageApi extends StorageApi {
 
     public delete(type: StorageType, key: string): Promise<void> {
         if(key && key.match(/^cache\.files\./)) {
-            let id: string = key.substring(12);
-            id = id.split(".")[0];
+            const id: string = key.substring(12);
 
-            if(this._files[id]) {
+            if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[id]) {
                 this._dirty = true;
-                delete this._files[id];
+                delete this._contents.cache.files[id];
                 return Promise.resolve();
             }
         }
@@ -94,17 +92,16 @@ class TestStorageApi extends StorageApi {
         if (key && key.match(/^cache\.campaigns\./)) {
             const id: string = key.substring(16);
 
-            if (this._campaigns[id]) {
+            if (this._contents && this._contents.cache && this._contents.cache.campaigns && this._contents.cache.campaigns[id]) {
                 this._dirty = true;
-                delete this._campaigns[id];
+                delete this._contents.cache.campaigns[id];
                 return Promise.resolve();
             }
         }
 
         if (key && key.match(/cache/)) {
             this._dirty = true;
-            this._campaigns = {};
-            this._files = {};
+            delete this._contents.cache;
             return Promise.resolve();
         }
 
@@ -120,9 +117,11 @@ class TestStorageApi extends StorageApi {
         if(type === StorageType.PRIVATE && key === 'cache.files') {
             const retArray: string[] = [];
 
-            for(const i in this._files) {
-                if(this._files.hasOwnProperty(i)) {
-                    retArray.push(i);
+            if(this._contents && this._contents.cache && this._contents.cache.files) {
+                for(const i in this._contents.cache.files) {
+                    if(this._contents.cache.files.hasOwnProperty(i)) {
+                        retArray.push(i);
+                    }
                 }
             }
 
@@ -131,9 +130,24 @@ class TestStorageApi extends StorageApi {
         if (type === StorageType.PRIVATE && key === 'cache.campaigns') {
             const retArray: string[] = [];
 
-            for(const i in this._campaigns) {
-                if(this._campaigns.hasOwnProperty(i)) {
-                    retArray.push(i);
+            if(this._contents && this._contents.cache && this._contents.cache.campaigns) {
+                for(const i in this._contents.cache.campaigns) {
+                    if(this._contents.cache.campaigns.hasOwnProperty(i)) {
+                        retArray.push(i);
+                    }
+                }
+            }
+
+            return Promise.resolve(retArray);
+        }
+        if (type === StorageType.PRIVATE && key === 'cache') {
+            const retArray: string[] = [];
+
+            if (this._contents && this._contents.cache) {
+                for(const i in this._contents.cache) {
+                    if (this._contents.cache.hasOwnProperty(i)) {
+                        retArray.push(i);
+                    }
                 }
             }
 
@@ -149,7 +163,7 @@ class TestStorageApi extends StorageApi {
 
     public hasFileEntry(fileId: string): boolean {
         fileId = fileId.split(".")[0];
-        if(this._files[fileId]) {
+        if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId]) {
             return true;
         }
 
@@ -157,34 +171,15 @@ class TestStorageApi extends StorageApi {
     }
 
     public hasCampaignEntry(id: string): boolean {
-        if(this._campaigns[id]) {
+        if(this._contents && this._contents.cache && this._contents.cache.campaigns && this._contents.cache.campaigns[id]) {
             return true;
         }
 
         return false;
     }
 
-    public addFile(id: string, fullyDownloaded: boolean) {
-        this._files[id] = {
-            fullyDownloaded: fullyDownloaded,
-            // values below this line are not read when cleaning cache so just using dummy values
-            size: 0,
-            totalSize: 0,
-            extension: 'mp4'
-        };
-    }
-
-    public addCampaign(id: string, files: string[]) {
-        const filesObject = {};
-        for(const file of files) {
-            if(file) {
-                const fileHash = file.split(".")[0];
-                const fileExtension = file.split(".")[1];
-                filesObject[fileHash] = fileExtension;
-            }
-        }
-
-        this._campaigns[id] = filesObject;
+    public setStorageContents(contents: any): void {
+        this._contents = contents;
     }
 }
 
@@ -199,10 +194,8 @@ class TestHelper {
         this._baseTimestamp = new Date().getTime();
     }
 
-    public addFile(id: string, size: number, fullyDownloaded: boolean, ageInDays: number) {
+    public addFile(id: string, size: number, ageInDays: number) {
         this._cache.addFile(id, size, this._baseTimestamp - (ageInDays * 24 * 60 * 60 * 1000));
-        id = id.split(".")[0];
-        this._storage.addFile(id, fullyDownloaded);
     }
 }
 
@@ -231,7 +224,19 @@ describe('CacheCleanTest', () => {
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         // add one file, 2 days old
-        helper.addFile(fileId, 1000000, true, 2);
+        helper.addFile(fileId, 1000000, 2);
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    test: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    }
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 0, 'Cache cleanup tried to delete files when none should have been deleted');
@@ -245,7 +250,19 @@ describe('CacheCleanTest', () => {
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         // add one file, 30 days old
-        helper.addFile(fileId, 1000000, true, 30);
+        helper.addFile(fileId, 1000000, 30);
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    test: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    }
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
@@ -262,10 +279,41 @@ describe('CacheCleanTest', () => {
         const oldFileId2: string = 'old2.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
-        helper.addFile(newFileId, 1000000, true, 1); // 1 day old, should be kept
-        helper.addFile(newFileId2, 1000000, true, 2); // 2 days old, should be kept
-        helper.addFile(oldFileId, 1000000, true, 31); // 31 days old, should be deleted
-        helper.addFile(oldFileId2, 1000000, true, 32); // 32 days old, should be deleted
+        helper.addFile(newFileId, 1000000, 1); // 1 day old, should be kept
+        helper.addFile(newFileId2, 1000000, 2); // 2 days old, should be kept
+        helper.addFile(oldFileId, 1000000, 31); // 31 days old, should be deleted
+        helper.addFile(oldFileId2, 1000000, 32); // 32 days old, should be deleted
+
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    new: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    },
+                    new2: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    },
+                    old: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    },
+                    old2: {
+                        fullyDownloaded: true,
+                        size: 1000000,
+                        totalSize: 1000000,
+                        extension: 'mp4'
+                    }
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 2, 'Cache cleanup should have deleted two files');
@@ -284,8 +332,27 @@ describe('CacheCleanTest', () => {
         const largeFileId: string = 'large.mp4';
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
-        helper.addFile(smallFileId, 1234, true, 1); // small file, should be kept
-        helper.addFile(largeFileId, 123456789, true, 2); // large file over 50 megabytes, should be deleted
+        helper.addFile(smallFileId, 1234, 1); // small file, should be kept
+        helper.addFile(largeFileId, 123456789, 2); // large file over 50 megabytes, should be deleted
+
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    small: {
+                        fullyDownloaded: true,
+                        size: 1234,
+                        totalSize: 1234,
+                        extension: 'mp4'
+                    },
+                    large: {
+                        fullyDownloaded: true,
+                        size: 123456789,
+                        totalSize: 123456789,
+                        extension: 'mp4'
+                    },
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
@@ -322,7 +389,18 @@ describe('CacheCleanTest', () => {
         const storageSpy = sinon.stub(storageApi, 'delete').returns(Promise.resolve());
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
-        storageApi.addFile('foo', true);
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    foo: {
+                        fullyDownloaded: true,
+                        size: 12345,
+                        totalSize: 12345,
+                        extension: 'mp4'
+                    }
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Cache cleanup did not invoke storage delete once');
@@ -338,7 +416,19 @@ describe('CacheCleanTest', () => {
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
         // add one partially downloaded file
-        helper.addFile(fileId, 1000000, false, 1);
+        helper.addFile(fileId, 1000000, 1);
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                    test2: {
+                        fullyDownloaded: false,
+                        size: 12345,
+                        totalSize: 12345,
+                        extension: 'mp4'
+                    }
+                }
+            }
+        });
 
         return cache.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
@@ -349,47 +439,154 @@ describe('CacheCleanTest', () => {
     });
 
     it('should delete campaign with files in cache but without required files in cache', () => {
-        const campaignId = "123456";
-        const cacheSpy = sinon.spy(storageApi, 'delete');
-        helper.addFile("test1.mp4", 123456, true, 2);
-        helper.addFile("test2.mp4", 123456, true, 2);
-        storageApi.addCampaign(campaignId, ["test3.mp4", "test4.mp4"]);
+        const campaignId = '123456';
+        const storageSpy = sinon.spy(storageApi, 'delete');
+        helper.addFile('test1.mp4', 123456, 2);
+        helper.addFile('test2.mp4', 123456, 2);
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                },
+                campaigns: {
+                    '123456': {
+                        test3: {
+                            extension: 'mp4'
+                        },
+                        test4: {
+                            extension: 'mp4'
+                        }
+                    }
+                }
+            }
+        });
 
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
         return cache.cleanCache().then(() => {
-            assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
-            assert.equal(cacheSpy.getCall(0).args[1], 'cache.campaigns.' + campaignId, 'Cache cleanup deleted a wrong campaign');
+            assert.equal(storageSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache.campaigns.' + campaignId, 'Cache cleanup deleted a wrong campaign');
             assert.isFalse(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did not remove storage entry for deleted campaign');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
         });
     });
 
-    it('should delete campaign without files in cache but without required files in cache', () => {
-        const campaignId = "123456";
-        const cacheSpy = sinon.spy(storageApi, 'delete');
-        storageApi.addCampaign(campaignId, ["test3.mp4", "test4.mp4"]);
-
+    it('should delete campaign without files on disk and without required files in cache', () => {
+        const campaignId = '123456';
+        const storageSpy = sinon.spy(storageApi, 'delete');
+        storageApi.setStorageContents({
+            cache: {
+                files: {
+                },
+                campaigns: {
+                    '123456': {
+                        test1: {
+                            extension: 'mp4'
+                        },
+                        test2: {
+                            extension: 'mp4'
+                        }
+                    }
+                }
+            }
+        });
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
         return cache.cleanCache().then(() => {
-            assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
-            assert.equal(cacheSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
+            assert.equal(storageSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
             assert.isFalse(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did not remove storage entry for deleted campaign');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
         });
     });
 
     it('should keep campaign with files still in cache', () => {
-        const campaignId = "123456";
-        const cacheSpy = sinon.spy(storageApi, 'delete');
-        helper.addFile("test1.mp4", 123456, true, 2);
-        helper.addFile("test2.mp4", 123456, true, 2);
-        storageApi.addCampaign(campaignId, ["test1.mp4", "test2.mp4"]);
+        const campaignId = '123456';
+        const storageSpy = sinon.spy(storageApi, 'delete');
+        helper.addFile('test1.mp4', 123456, 2);
+        helper.addFile('test2.mp4', 123456, 2);
+        storageApi.setStorageContents({
+           cache: {
+               files: {
+                   test1: {
+                       fullyDownloaded: true,
+                       size: 123456,
+                       totalSize: 123456,
+                       extension: 'mp4'
+                   },
+                   test2: {
+                       fullyDownloaded: true,
+                       size: 123456,
+                       totalSize: 123456,
+                       extension: 'mp4'
+                   }
+               },
+               campaigns: {
+                   '123456': {
+                       test1: {
+                           extension: 'mp4'
+                       },
+                       test2: {
+                           extension: 'mp4'
+                       }
+                   }
+
+               }
+           }
+        });
 
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
         return cache.cleanCache().then(() => {
-            assert.equal(cacheSpy.callCount, 0, 'Cache cleanup shouldn\'t have deleted campaign');
+            assert.equal(storageSpy.callCount, 0, 'Cache cleanup shouldn\'t have deleted campaign');
             assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did remove storage entry for campaign');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
         });
     });
+
+    it('should delete the whole cache bookkeeping when there is files on disk but format is old', () => {
+        const storageSpy = sinon.spy(storageApi, 'delete');
+        const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
+
+        helper.addFile('test1.mp4', 123456, 2);
+        helper.addFile('test2.mp4', 123456, 2);
+
+        storageApi.setStorageContents({
+            cache: {
+                test1: {
+                    mp4: '{fullyDownloaded: true}'
+                },
+                test2: {
+                    mp4: '{fullyDownloaded: true}'
+                }
+            }
+        });
+
+        return cache.cleanCache().then(() => {
+            assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
+            assert.equal(cacheSpy.callCount, 2, 'Should have deleted two files from cache');
+            assert.equal(cacheSpy.getCall(0).args[0], 'test1.mp4', 'Fist file deleted should be \'test1\'');
+            assert.equal(cacheSpy.getCall(1).args[0], 'test2.mp4', 'Fist file deleted should be \'test2\'');
+            assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
+        });
+    });
+
+    it('should delete the whole cache bookkeeping when there is no files on disk and format is old', () => {
+        const storageSpy = sinon.spy(storageApi, 'delete');
+
+        storageApi.setStorageContents({
+            cache: {
+                test1: {
+                    mp4: '{fullyDownloaded: true}'
+                },
+                test2: {
+                    mp4: '{fullyDownloaded: true}'
+                }
+            }
+        });
+
+        return cache.cleanCache().then(() => {
+            assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
+            assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
+        });
+    });
+
 });
