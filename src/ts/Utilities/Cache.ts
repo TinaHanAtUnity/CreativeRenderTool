@@ -73,6 +73,8 @@ export class Cache {
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
 
+    private _sendDiagnosticEvents = false;
+
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
@@ -385,6 +387,10 @@ export class Cache {
         ]);
     }
 
+    public setDiagnostics(value: boolean) {
+        this._sendDiagnosticEvents = value;
+    }
+
     private deleteCacheBookKeepingData(): Promise<void> {
         return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache').then(() => {
             return this._nativeBridge.Storage.write(StorageType.PRIVATE);
@@ -395,10 +401,10 @@ export class Cache {
 
     private checkAndCleanOldCacheFormat(): Promise<void> {
         return this.getCacheKeys().then((cacheKeys) => {
-            if(cacheKeys.length > 2) {
+            if (cacheKeys.length > 2) {
                 return this.deleteCacheBookKeepingData();
             }
-            for(const cacheKey of cacheKeys) {
+            for (const cacheKey of cacheKeys) {
                 if (cacheKey && cacheKey !== 'files' && cacheKey !== 'campaigns') {
                     return this.deleteCacheBookKeepingData();
                 }
@@ -767,16 +773,18 @@ export class Cache {
     }
 
     private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
-        const msg: any = {
-            eventTimestamp: Date.now(),
-            eventType: CacheDiagnosticEvent[event],
-            creativeType: callback.diagnostics.creativeType,
-            size: callback.contentLength,
-            downloadStartTimestamp: callback.startTimestamp,
-            gamerId: callback.diagnostics.gamerId,
-            targetGameId: callback.diagnostics.targetGameId,
-            targetCampaignId: callback.diagnostics.targetCampaignId
-        };
-        HttpKafka.sendEvent('events.creativedownload.json', msg);
+        if(this._sendDiagnosticEvents) {
+            const msg: any = {
+                eventTimestamp: Date.now(),
+                eventType: CacheDiagnosticEvent[event],
+                creativeType: callback.diagnostics.creativeType,
+                size: callback.contentLength,
+                downloadStartTimestamp: callback.startTimestamp,
+                gamerId: callback.diagnostics.gamerId,
+                targetGameId: callback.diagnostics.targetGameId,
+                targetCampaignId: callback.diagnostics.targetCampaignId
+            };
+            HttpKafka.sendEvent('events.creativedownload.json', msg);
+        }
     }
 }
