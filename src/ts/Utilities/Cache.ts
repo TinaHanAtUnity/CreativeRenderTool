@@ -181,13 +181,14 @@ export class Cache {
                     }
                 }
                 if((keys && keys.length > 0) || campaignCount > 0) {
-                    return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache').then(() => {
-                        return this._nativeBridge.Storage.write(StorageType.PRIVATE);
-                    });
+                    return this.deleteCacheBookKeepingData();
                 } else {
-                    return Promise.resolve();
+                    return this.checkAndCleanOldCacheFormat();
                 }
             }
+
+            const promises: Array<Promise<any>> = [];
+            promises.push(this.checkAndCleanOldCacheFormat());
 
             // clean files older than three weeks and limit cache size to 50 megabytes
             const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
@@ -221,7 +222,6 @@ export class Cache {
                 this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
             }
 
-            const promises: Array<Promise<any>> = [];
             let dirty: boolean = false;
 
             deleteFiles.map(file => {
@@ -267,11 +267,11 @@ export class Cache {
                 });
                 let campaignsDirty = false;
 
-                for (const campaignId in campaigns) {
-                    if (campaigns.hasOwnProperty(campaignId)) {
-                        for (const currentFileId in campaigns[campaignId]) {
-                            if (campaigns[campaignId].hasOwnProperty(currentFileId)) {
-                                if (cacheFilesLeftIds.indexOf(currentFileId) === -1) {
+                for(const campaignId in campaigns) {
+                    if(campaigns.hasOwnProperty(campaignId)) {
+                        for(const currentFileId in campaigns[campaignId]) {
+                            if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
+                                if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
                                     promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId));
                                     campaignsDirty = true;
                                     break;
@@ -385,6 +385,30 @@ export class Cache {
         ]);
     }
 
+    private deleteCacheBookKeepingData(): Promise<void> {
+        return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache').then(() => {
+            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        }).catch(() => {
+            return Promise.resolve();
+        });
+    }
+
+    private checkAndCleanOldCacheFormat(): Promise<void> {
+        return this.getCacheKeys().then((cacheKeys) => {
+            if(cacheKeys.length > 2) {
+                return this.deleteCacheBookKeepingData();
+            }
+            for(const cacheKey of cacheKeys) {
+                if (cacheKey && cacheKey !== 'files' && cacheKey !== 'campaigns') {
+                    return this.deleteCacheBookKeepingData();
+                }
+            }
+            return Promise.resolve();
+        }).catch(() => {
+            return Promise.resolve();
+        });
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
         this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
@@ -478,6 +502,10 @@ export class Cache {
         }).catch(() => {
             return [];
         });
+    }
+
+    private getCacheKeys(): Promise<string[]> {
+        return this.getCacheKeysForKey('cache', false);
     }
 
     private getCacheFilesKeys(): Promise<string[]> {
