@@ -25,7 +25,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -203,7 +203,7 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 
@@ -252,7 +252,7 @@ describe('Event parameters should match specifications', () => {
             const eventManager = new EventManager(nativeBridge, request);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
@@ -274,7 +274,7 @@ describe('Event parameters should match specifications', () => {
             const eventManager = new EventManager(nativeBridge, request);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
