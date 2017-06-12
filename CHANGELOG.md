@@ -1,3 +1,8 @@
+# Mon Jun 12 08:30:19 UTC 2017
+
+* Start sending cache diagnostics to ads.sdk2.events.creativedownload.json for 1 user out of 10000
+* Fix a race condition with operative event retries that might have sent them twice during 20 second race window (ABT-129)
+
 # Wed Jun  7 07:34:12 UTC 2017
 
 * Yodo1 A/B test with low quality videos on A/B groups 6 and 7, only for Yodo1 game IDs
