@@ -8,7 +8,6 @@ export interface IVideo extends IAsset {
     position: number;
     positionRepeats: number;
     quartile: number;
-    active: boolean;
 }
 
 export class Video extends Asset<IVideo> {
@@ -21,8 +20,7 @@ export class Video extends Asset<IVideo> {
             duration: ['number'],
             position: ['number'],
             positionRepeats: ['number'],
-            quartile: ['number'],
-            active: ['boolean']
+            quartile: ['number']
         });
 
         this.set('url', url);
@@ -33,7 +31,10 @@ export class Video extends Asset<IVideo> {
         this.set('position', 0);
         this.set('positionRepeats', 0);
         this.set('quartile', 0);
-        this.set('active', true);
+    }
+
+    public getDescription(): string {
+        return 'VIDEO';
     }
 
     public getSize() {
@@ -92,14 +93,6 @@ export class Video extends Asset<IVideo> {
         this.set('quartile', quartile);
     }
 
-    public isActive() {
-        return this.get('active');
-    }
-
-    public setActive(active: boolean) {
-        this.set('active', active);
-    }
-
     public getDTO(): { [key: string]: any } {
         return {
             'asset': super.getDTO(),
@@ -109,8 +102,7 @@ export class Video extends Asset<IVideo> {
             'duration': this.getDuration(),
             'position': this.getPosition(),
             'positionRepeats': this.getPositionRepeats(),
-            'quartile': this.getQuartile(),
-            'active': this.isActive()
+            'quartile': this.getQuartile()
         };
     }
 }

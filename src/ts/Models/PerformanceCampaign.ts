@@ -21,11 +21,14 @@ interface IPerformanceCampaign extends ICampaign {
     landscapeImage: Image;
     portraitImage: Image;
 
-    video: Video;
-    streamingVideo: Video;
+    video?: Video;
+    streamingVideo?: Video;
 
-    clickAttributionUrl: string | undefined;
-    clickAttributionUrlFollowsRedirects: boolean | undefined;
+    videoPortrait?: Video;
+    streamingPortraitVideo?: Video;
+
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
 
     bypassAppSheet: boolean;
 
@@ -44,8 +47,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             ratingCount: ['number'],
             landscapeImage: ['object'],
             portraitImage: ['object'],
-            video: ['object'],
-            streamingVideo: ['object'],
+            video: ['object', 'undefined'],
+            streamingVideo: ['object', 'undefined'],
+            videoPortrait: ['object', 'undefined'],
+            streamingPortraitVideo: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             bypassAppSheet: ['boolean'],
@@ -68,8 +73,15 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         this.set('landscapeImage', new Image(campaign.endScreenLandscape));
         this.set('portraitImage', new Image(campaign.endScreenPortrait));
 
-        this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
-        this.set('streamingVideo', new Video(campaign.trailerStreaming));
+        if(campaign.trailerDownloadable && campaign.trailerDownloadableSize && campaign.trailerStreaming) {
+            this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
+            this.set('streamingVideo', new Video(campaign.trailerStreaming));
+        }
+
+        if(campaign.trailerPortraitDownloadable && campaign.trailerPortraitDownloadableSize && campaign.trailerPortraitStreaming) {
+            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, campaign.trailerPortraitDownloadableSize));
+            this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming));
+        }
 
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
@@ -128,12 +140,20 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('landscapeImage');
     }
 
-    public getVideo(): Video {
+    public getVideo(): Video | undefined {
         return this.get('video');
     }
 
-    public getStreamingVideo(): Video {
+    public getStreamingVideo(): Video | undefined {
         return this.get('streamingVideo');
+    }
+
+    public getPortraitVideo(): Video | undefined {
+        return this.get('videoPortrait');
+    }
+
+    public getStreamingPortraitVideo(): Video | undefined {
+        return this.get('streamingPortraitVideo');
     }
 
     public getClickAttributionUrl(): string | undefined {
@@ -153,9 +173,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getRequiredAssets() {
-        return [
-            this.getVideo()
-        ];
+        return [];
     }
 
     public getOptionalAssets() {

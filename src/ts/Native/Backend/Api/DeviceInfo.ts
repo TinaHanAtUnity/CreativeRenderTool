@@ -102,7 +102,7 @@ export class DeviceInfo {
         DeviceInfo._batteryLevel = value;
     }
 
-    public static setBatteryStatus(value: string) {
+    public static setBatteryStatus(value: number) {
         DeviceInfo._batteryStatus = value;
     }
 
@@ -290,7 +290,7 @@ export class DeviceInfo {
     private static _screenBrightness: number;
     private static _freeSpace: number;
     private static _batteryLevel: number;
-    private static _batteryStatus: string;
+    private static _batteryStatus: number;
     private static _freeMemory: number;
     private static _ringerMode: number;
     private static _userInterfaceIdiom: number;

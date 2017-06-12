@@ -77,7 +77,7 @@ export class VideoPlayer {
                 } else {
                     Backend.sendEvent('VIDEOPLAYER', 'PROGRESS', currentTime);
                 }
-            }, 250);
+            }, 10);
         }
     }
 
