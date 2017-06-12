@@ -14,7 +14,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { StoreName } from "Models/PerformanceCampaign";
@@ -22,6 +22,7 @@ import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EndScreenTestPerformanceCampaign1 from 'json/EndScreenTestPerformanceCampaign1.json';
+import { Video } from 'Models/Assets/Video';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -64,8 +65,8 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
-                new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -77,8 +78,8 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
                 const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -99,8 +100,8 @@ describe('EndScreenEventHandlersTest', () => {
 
             it('with response that does not contain location, it should not launch intent', () => {
                 const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
@@ -174,8 +175,8 @@ describe('EndScreenEventHandlersTest', () => {
             const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
             campaignObj.store = 'apple';
             campaignObj.appStoreId = '11111';
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
-                new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -190,8 +191,8 @@ describe('EndScreenEventHandlersTest', () => {
             it('with response that contains location, it should open url scheme', () => {
                 const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
                 campaignObj.store = 'apple';
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
