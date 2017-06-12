@@ -2,12 +2,12 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export class TestAdUnit extends AbstractAdUnit {
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
-        super(nativeBridge, container, placement, campaign);
+        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
     }
 
     public show(): Promise<void> {
