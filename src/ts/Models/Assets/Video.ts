@@ -33,6 +33,10 @@ export class Video extends Asset<IVideo> {
         this.set('quartile', 0);
     }
 
+    public getDescription(): string {
+        return 'VIDEO';
+    }
+
     public getSize() {
         return this.get('size');
     }

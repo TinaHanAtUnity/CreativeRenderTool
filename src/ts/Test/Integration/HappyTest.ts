@@ -65,7 +65,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setRingerMode(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
@@ -124,7 +124,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
         DeviceInfo.setStatusBarHeight(0);

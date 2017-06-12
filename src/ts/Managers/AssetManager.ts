@@ -1,4 +1,4 @@
-import { Cache } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
@@ -33,7 +33,7 @@ export class AssetManager {
         }
 
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
-            const requiredChain = this.cache(requiredAssets).then(() => {
+            const requiredChain = this.cache(requiredAssets, campaign).then(() => {
                 return this.validateVideos(requiredAssets);
             });
 
@@ -42,16 +42,16 @@ export class AssetManager {
                     if(plc) {
                         // hack to avoid race conditions with plc when there are multiple different campaigns
                         // proper fix is to refactor AssetManager to trigger events instead of returning one promise
-                        return this.cache(optionalAssets).then(() => {
+                        return this.cache(optionalAssets, campaign).then(() => {
                             return campaign;
                         });
                     } else {
-                        this.cache(optionalAssets);
+                        this.cache(optionalAssets, campaign);
                         return campaign;
                     }
                 });
             } else {
-                requiredChain.then(() => this.cache(optionalAssets));
+                requiredChain.then(() => this.cache(optionalAssets, campaign));
             }
 
             return Promise.resolve(campaign);
@@ -83,7 +83,7 @@ export class AssetManager {
         this._cache.stop();
     }
 
-    private cache(assets: Asset[]): Promise<void> {
+    private cache(assets: Asset[], campaign: Campaign): Promise<void> {
         let chain = Promise.resolve();
         for(const asset of assets) {
             chain = chain.then(() => {
@@ -91,7 +91,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
+                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                 });
@@ -176,5 +176,14 @@ export class AssetManager {
 
             throw new WebViewError('Unable to select oriented video for caching');
         });
+    }
+
+    private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
+        return {
+            creativeType: asset.getDescription(),
+            gamerId: campaign.getGamerId(),
+            targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
+            targetCampaignId: campaign.getId()
+        };
     }
 }
