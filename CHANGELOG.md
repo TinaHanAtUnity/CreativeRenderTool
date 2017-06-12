@@ -2,6 +2,7 @@
 
 * Start sending cache diagnostics to ads.sdk2.events.creativedownload.json for 1 user out of 10000
 * Fix a race condition with operative event retries that might have sent them twice during 20 second race window (ABT-129)
+* Programmatic VAST support for auction
 
 # Wed Jun  7 07:34:12 UTC 2017
 
