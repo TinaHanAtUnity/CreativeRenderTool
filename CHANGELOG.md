@@ -1,3 +1,8 @@
+# Tue Jun 13 10:28:55 UTC 2017
+
+* Support for oriented performance campaigns
+* Remove Yodo1 A/B test
+
 # Mon Jun 12 08:30:19 UTC 2017
 
 * Start sending cache diagnostics to ads.sdk2.events.creativedownload.json for 1 user out of 10000
