@@ -18,7 +18,6 @@ interface IPlacement {
 
     disableBackButton: boolean;
 
-    useDeviceOrientationForVideo: boolean;
     muteVideo: boolean;
 
     adTypes: string[] | undefined;
@@ -38,7 +37,6 @@ export class Placement extends Model<IPlacement> {
             allowSkip: ['boolean'],
             skipInSeconds: ['number'],
             disableBackButton: ['boolean'],
-            useDeviceOrientationForVideo: ['boolean'],
             muteVideo: ['boolean'],
             adTypes: ['array', 'undefined'],
             state: ['number'],
@@ -59,7 +57,6 @@ export class Placement extends Model<IPlacement> {
 
         this.set('disableBackButton', data.disableBackButton);
 
-        this.set('useDeviceOrientationForVideo', data.useDeviceOrientationForVideo);
         this.set('muteVideo', data.muteVideo);
 
         this.set('adTypes', data.adTypes);
@@ -89,10 +86,6 @@ export class Placement extends Model<IPlacement> {
 
     public disableBackButton(): boolean {
         return this.get('disableBackButton');
-    }
-
-    public useDeviceOrientationForVideo(): boolean {
-        return this.get('useDeviceOrientationForVideo');
     }
 
     public muteVideo(): boolean {
@@ -135,7 +128,6 @@ export class Placement extends Model<IPlacement> {
             'allowSkip': this.allowSkip(),
             'skipInSeconds': this.allowSkipInSeconds(),
             'disableBackButton': this.disableBackButton(),
-            'useDeviceOrientationForVideo': this.useDeviceOrientationForVideo(),
             'muteVideo': this.muteVideo(),
             'adTypes': this.getAdTypes(),
             'state': PlacementState[this.getState()].toLowerCase()

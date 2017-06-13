@@ -56,7 +56,12 @@ export class Activity extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        let orientation = this.getOrientation(allowRotation, forceOrientation, options);
+        const forcedOrientation = AdUnitContainer.getForcedOrientation();
+        if (forcedOrientation) {
+            this._lockedOrientation = forcedOrientation;
+        } else {
+            this._lockedOrientation = forceOrientation;
+        }
 
         let keyEvents: any[] = [];
         if(disableBackbutton) {
@@ -65,14 +70,9 @@ export class Activity extends AdUnitContainer {
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
-        const forcedOrientation = AdUnitContainer.getForcedOrientation();
-        if (forcedOrientation) {
-            orientation = forcedOrientation;
-        }
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + ForceOrientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
-
-        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
+        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {

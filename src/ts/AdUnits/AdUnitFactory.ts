@@ -21,7 +21,7 @@ import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverla
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
@@ -32,17 +32,19 @@ import { PromoCampaign } from 'Models/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandlers } from 'EventHandlers/PromoEventHandlers';
+import { Video } from 'Models/Assets/Video';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
+            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof MRAIDCampaign) {
-            return this.createMRAIDAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, options);
+            return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
-            return this.createPerformanceAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+            return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else if(campaign instanceof PromoCampaign) {
             return this.createPromoAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else {
@@ -50,14 +52,20 @@ export class AdUnitFactory {
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
 
-        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options, endScreen);
+        const video = this.getOrientedVideo(campaign, forceOrientation);
+        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
-        overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+
+        const landscapeVideo = campaign.getVideo();
+        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
+        const portraitVideo = campaign.getPortraitVideo();
+        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
+        overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, performanceAdUnit);
@@ -78,7 +86,7 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
         let vastAdUnit: VastAdUnit;
@@ -109,7 +117,7 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static createMRAIDAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
         const mraid = new MRAID(nativeBridge, placement, campaign);
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
@@ -268,5 +276,58 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.Ios.onGenericError.unsubscribe(onGenericErrorObserver);
             nativeBridge.VideoPlayer.Ios.onPrepareError.unsubscribe(onVideoPrepareErrorObserver);
         });
+    }
+
+    private static getOrientedVideo(campaign: PerformanceCampaign, forceOrientation: ForceOrientation): Video {
+        const landscapeVideo = AdUnitFactory.getLandscapeVideo(campaign);
+        const portraitVideo = AdUnitFactory.getPortraitVideo(campaign);
+
+        if(forceOrientation === ForceOrientation.LANDSCAPE) {
+            if(landscapeVideo) {
+                return landscapeVideo;
+            }
+            if(portraitVideo) {
+                return portraitVideo;
+            }
+        }
+
+        if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if(portraitVideo) {
+                return portraitVideo;
+            }
+            if(landscapeVideo) {
+                return landscapeVideo;
+            }
+        }
+
+        throw new WebViewError('Unable to select an oriented video');
+    }
+
+    private static getLandscapeVideo(campaign: PerformanceCampaign): Video | undefined {
+        const video = campaign.getVideo();
+        const streaming = campaign.getStreamingVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video;
+            }
+            if(streaming) {
+                return streaming;
+            }
+        }
+        return undefined;
+    }
+
+    private static getPortraitVideo(campaign: PerformanceCampaign): Video | undefined {
+        const video = campaign.getPortraitVideo();
+        const streaming = campaign.getStreamingPortraitVideo();
+        if(video) {
+            if(video.isCached()) {
+                return video;
+            }
+            if(streaming) {
+                return streaming;
+            }
+        }
+        return undefined;
     }
 }

@@ -15,7 +15,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     private _onSystemKillObserver: IObserver0;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign, promo: Promo, options: any) {
-        super(nativeBridge, container, placement, campaign);
+        super(nativeBridge, ForceOrientation.PORTRAIT, container, placement, campaign);
 
         this._promoView = promo;
         this._options = options;

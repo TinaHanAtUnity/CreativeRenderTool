@@ -1,20 +1,25 @@
-import { Cache } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
+    private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
 
-    constructor(cache: Cache, cacheMode: CacheMode) {
+    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
+        this._deviceInfo = deviceInfo;
         this._stopped = false;
     }
 
@@ -27,28 +32,46 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const requiredChain = this.cache(campaign.getRequiredAssets()).then(() => {
-            return this.validateVideos(campaign.getRequiredAssets());
-        });
-
-        if(this._cacheMode === CacheMode.FORCED || plc) {
-            return requiredChain.then(() => {
-                if(plc) {
-                    // hack to avoid race conditions with plc when there are multiple different campaigns
-                    // proper fix is to refactor AssetManager to trigger events instead of returning one promise
-                    return this.cache(campaign.getOptionalAssets()).then(() => {
-                        return campaign;
-                    });
-                } else {
-                    this.cache(campaign.getOptionalAssets());
-                    return campaign;
-                }
+        return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
+            const requiredChain = this.cache(requiredAssets, campaign).then(() => {
+                return this.validateVideos(requiredAssets);
             });
-        } else {
-            requiredChain.then(() => this.cache(campaign.getOptionalAssets()));
+
+            if(this._cacheMode === CacheMode.FORCED || plc) {
+                return requiredChain.then(() => {
+                    if(plc) {
+                        // hack to avoid race conditions with plc when there are multiple different campaigns
+                        // proper fix is to refactor AssetManager to trigger events instead of returning one promise
+                        return this.cache(optionalAssets, campaign).then(() => {
+                            return campaign;
+                        });
+                    } else {
+                        this.cache(optionalAssets, campaign);
+                        return campaign;
+                    }
+                });
+            } else {
+                requiredChain.then(() => this.cache(optionalAssets, campaign));
+            }
+
+            return Promise.resolve(campaign);
+        });
+    }
+
+    public selectAssets(campaign: Campaign): Promise<[Asset[], Asset[]]> {
+        const requiredAssets = campaign.getRequiredAssets();
+        const optionalAssets = campaign.getOptionalAssets();
+
+        if(campaign instanceof PerformanceCampaign) {
+            return this.getOrientedVideo(campaign).then(video => {
+                return [[video], optionalAssets];
+            });
         }
 
-        return Promise.resolve(campaign);
+        return Promise.resolve([
+            requiredAssets,
+            optionalAssets
+        ]);
     }
 
     public enableCaching(): void {
@@ -60,7 +83,7 @@ export class AssetManager {
         this._cache.stop();
     }
 
-    private cache(assets: Asset[]): Promise<void> {
+    private cache(assets: Asset[], campaign: Campaign): Promise<void> {
         let chain = Promise.resolve();
         for(const asset of assets) {
             chain = chain.then(() => {
@@ -68,7 +91,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl()).then(([fileId, fileUrl]) => {
+                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                 });
@@ -120,5 +143,47 @@ export class AssetManager {
             required: required,
             id: campaign.getId()
         });
+    }
+
+    private getOrientedVideo(campaign: PerformanceCampaign): Promise<Video> {
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const landscape = screenWidth >= screenHeight;
+            const portrait = screenHeight > screenWidth;
+
+            const landscapeVideo = campaign.getVideo();
+            const portraitVideo = campaign.getPortraitVideo();
+
+            if(landscape) {
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+            }
+
+            if(portrait) {
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+            }
+
+            throw new WebViewError('Unable to select oriented video for caching');
+        });
+    }
+
+    private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
+        return {
+            creativeType: asset.getDescription(),
+            gamerId: campaign.getGamerId(),
+            targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
+            targetCampaignId: campaign.getId()
+        };
     }
 }

@@ -47,15 +47,6 @@ describe('IosAdUnitTest', () => {
                 return;
             });
         });
-
-        it('with the status bar, transparent background and no animation', () => {
-            defaultOptions.statusBarHidden = false;
-
-            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, true, false, true, defaultOptions).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, false, false, true, false);
-                return;
-            });
-        });
     });
 
     it('should close ad unit', () => {

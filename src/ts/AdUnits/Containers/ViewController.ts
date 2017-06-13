@@ -48,25 +48,26 @@ export class ViewController extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        let orientation = this.getOrientation(options.supportedOrientations, allowRotation, forceOrientation);
-
         const forcedOrientation = AdUnitContainer.getForcedOrientation();
         if (forcedOrientation) {
             allowRotation = false;
-            orientation = forcedOrientation;
+            this._lockedOrientation = forcedOrientation;
+        } else {
+            this._lockedOrientation = forceOrientation;
         }
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, []);
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + orientation);
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + ForceOrientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
         if (allowStatusBar) {
             hideStatusBar = options.statusBarHidden;
         }
-        return this._nativeBridge.IosAdUnit.open(views, orientation, hideStatusBar, allowRotation, isTransparent, withAnimation);
+
+        return this._nativeBridge.IosAdUnit.open(views, this.getOrientation(options.supportedOrientations, allowRotation, this._lockedOrientation), true, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
