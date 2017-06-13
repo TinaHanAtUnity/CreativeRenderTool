@@ -21,7 +21,7 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { SessionManager } from 'Managers/SessionManager';
 
-export class CampaignManager {
+export abstract class CampaignManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
         CampaignManager.CampaignBaseUrl = baseUrl + '/games';
@@ -54,12 +54,6 @@ export class CampaignManager {
     private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
-
-   // public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
-   // public readonly onVastCampaign = new Observable1<VastCampaign>();
-   // public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
-   // public readonly onNoFill = new Observable0();
-   // public readonly onError = new Observable1<WebViewError>();
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
@@ -94,7 +88,7 @@ export class CampaignManager {
     public request(): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
-            return Promise.resolve(undefined);
+            return Promise.resolve();
         }
 
         this._assetManager.enableCaching();
