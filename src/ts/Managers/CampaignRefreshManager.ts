@@ -8,7 +8,7 @@ import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
-export class CampaignRefreshManager {
+export abstract class CampaignRefreshManager {
     private static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
@@ -31,15 +31,15 @@ export class CampaignRefreshManager {
         this._plcRefillTimestamp = 0;
 
         if(this._configuration.isAuction()) {
-            this._campaignManager.onPlcCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
-            this._campaignManager.onPlcNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
-            this._campaignManager.onPlcError.subscribe(error => this.onPlcError(error));
+            this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onPlcCampaign(placementId, campaign));
+            this._campaignManager.onNoFill.subscribe(placementId => this.onPlcNoFill(placementId));
+            this._campaignManager.onError.subscribe(error => this.onPlcError(error));
         } else {
-            this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onNoFill.subscribe(() => this.onNoFill());
-            this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
+            // this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
+            // this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
+            // this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
+            // this._campaignManager.onNoFill.subscribe(() => this.onNoFill());
+            // this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
         }
     }
 
@@ -133,7 +133,7 @@ export class CampaignRefreshManager {
             delete this._campaign;
         }
     }
-
+/*
     private onCampaign(campaign: Campaign) {
         this._campaign = campaign;
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
@@ -160,7 +160,7 @@ export class CampaignRefreshManager {
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger('campaign_request_failed', error);
         this.onNoFill();
-    }
+    }*/
 
     private onCampaignExpired(campaign: Campaign): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');

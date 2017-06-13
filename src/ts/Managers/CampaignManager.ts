@@ -1,4 +1,4 @@
-import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable1, Observable2 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -8,10 +8,8 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
@@ -49,33 +47,34 @@ export class CampaignManager {
         CampaignManager.CampaignResponse = campaignResponse;
     }
 
+    protected static CampaignResponse: string | undefined;
+
+    protected static AbGroup: number | undefined;
     private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
-    private static AbGroup: number | undefined;
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
-    private static CampaignResponse: string | undefined;
 
-    public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
-    public readonly onVastCampaign = new Observable1<VastCampaign>();
-    public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
-    public readonly onNoFill = new Observable0();
+   // public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
+   // public readonly onVastCampaign = new Observable1<VastCampaign>();
+   // public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
+   // public readonly onNoFill = new Observable0();
+   // public readonly onError = new Observable1<WebViewError>();
+
+    public readonly onCampaign = new Observable2<string, Campaign>();
+    public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable1<WebViewError>();
 
-    public readonly onPlcCampaign = new Observable2<string, Campaign>();
-    public readonly onPlcNoFill = new Observable1<string>();
-    public readonly onPlcError = new Observable1<WebViewError>();
-
-    private _nativeBridge: NativeBridge;
-    private _configuration: Configuration;
-    private _assetManager: AssetManager;
+    protected _nativeBridge: NativeBridge;
+    protected _requesting: boolean;
+    protected _assetManager: AssetManager;
+    protected _configuration: Configuration;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
-    private _requesting: boolean;
     private _previousPlacementId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
@@ -92,10 +91,10 @@ export class CampaignManager {
         this._requesting = false;
     }
 
-    public request(): Promise<void> {
+    public request(): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
-            return Promise.resolve();
+            return Promise.resolve(undefined);
         }
 
         this._assetManager.enableCaching();
@@ -110,7 +109,9 @@ export class CampaignManager {
                 followRedirects: false,
                 retryWithConnectionEvents: true
             });
-        }).then(response => {
+        });
+        /*
+        .then(response => {
             if(this._configuration.isAuction()) {
                 return this.parsePlcCampaigns(response);
             } else {
@@ -125,7 +126,7 @@ export class CampaignManager {
             } else {
                 this.onError.trigger(error);
             }
-        });
+        });*/
     }
 
     public setPreviousPlacementId(id: string | undefined) {
@@ -136,155 +137,35 @@ export class CampaignManager {
         return this._previousPlacementId;
     }
 
-    private parseCampaign(response: INativeResponse) {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-        if(json.gamerId) {
-            this.storeGamerId(json.gamerId);
-        } else if('campaign' in json || 'vast' in json || 'mraid' in json) {
-            this._nativeBridge.Sdk.logError('Unity Ads server returned a campaign without gamerId, ignoring campaign');
-            const error: DiagnosticError = new DiagnosticError(new Error('Missing gamerId'), {
-                rawAdPlan: json
-            });
-            this.onError.trigger(error);
-            return Promise.resolve();
-        }
-
-        if('campaign' in json) {
-            return this.parsePerformanceCampaign(json);
-        } else if('vast' in json) {
-            return this.parseVastCampaign(json);
-        } else if('mraid' in json) {
-            return this.parseMraidCampaign(json);
-        } else {
-            return this.handleNoFill();
-        }
+    protected storeGamerId(gamerId: string): Promise<void[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
     }
 
-    private parsePlcCampaigns(response: INativeResponse) {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+    protected sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return;
+        }
 
-        if('placements' in json) {
-            const fill: { [mediaId: string]: string[] } = {};
-            const noFill: string[] = [];
+        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
+            if(installed) {
+                const msg: any = {
+                    ts: Date.now(),
+                    gamerId: gamerId,
+                    campaignId: campaign.getId(),
+                    targetBundleId: campaign.getAppStoreId(),
+                    targetGameId: campaign.getGameId(),
+                    coppa: this._configuration.isCoppaCompliant()
+                };
 
-            const placements = this._configuration.getPlacements();
-            for(const placement in placements) {
-                if(placements.hasOwnProperty(placement)) {
-                    const mediaId: string = json.placements[placement];
-
-                    if(mediaId) {
-                        if(fill[mediaId]) {
-                            fill[mediaId].push(placement);
-                        } else {
-                            fill[mediaId] = [placement];
-                        }
-                    } else {
-                        noFill.push(placement);
-                    }
-                }
+                HttpKafka.sendEvent('events.negtargeting.json', msg);
             }
-
-            let chain = Promise.resolve();
-
-            for(const placement of noFill) {
-                chain = chain.then(() => {
-                    return this.handlePlcNoFill(placement);
-                });
-            }
-
-            for(const mediaId in fill) {
-                if(fill.hasOwnProperty(mediaId)) {
-                    chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls);
-                    });
-                }
-            }
-
-            return chain.catch(error => {
-                return this.handlePlcError(error);
-            });
-        } else {
-            return this.handlePlcError(new Error('No placements found'));
-        }
-    }
-
-    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }): Promise<void> {
-        const abGroup: number = this._configuration.getAbGroup();
-        const gamerId: string = this._configuration.getGamerId();
-
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
-        switch (contentType) {
-            case 'comet/campaign':
-                const json = JsonParser.parse(content);
-                if(json && json.mraidUrl) {
-                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, campaign);
-                        }
-                    });
-                } else {
-                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                    this.sendNegativeTargetingEvent(campaign, gamerId);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, campaign);
-                        }
-                    });
-                }
-
-            case 'programmatic/vast':
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
-                    return this._assetManager.setup(vastCampaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, vastCampaign);
-                        }
-                    });
-                });
-
-            default:
-                return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
-        }
-
-    }
-
-    private handlePlcNoFill(placement: string): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        this.onPlcNoFill.trigger(placement);
-        return Promise.resolve();
-    }
-
-    private handlePlcError(error: any): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onPlcError.trigger(error);
-        return Promise.resolve();
-    }
-
-    private parsePerformanceCampaign(json: any): Promise<void> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
-        if(json.campaign && json.campaign.mraidUrl) {
-            const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
-            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
-        } else {
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-            this.sendNegativeTargetingEvent(campaign, json.gamerId);
-            return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
-        }
-    }
-
-    private parseVastCampaign(json: any): Promise<void> {
-        if(json.vast === null) {
-            return this.handleNoFill();
-        }
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned VAST advertisement for AB Group ' + json.abGroup);
-        return this.parseVastCampaignHelper(json.vast.data, json.gamerId, json.abGroup, json.vast.tracking, json.cacheTTL).then(campaign => {
-            return this._assetManager.setup(campaign).then(() => this.onVastCampaign.trigger(campaign));
-        }).catch((error) => {
-            this.onError.trigger(error);
         });
     }
 
-    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
+    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             let campaignId: string;
@@ -320,43 +201,6 @@ export class CampaignManager {
             }
             return Promise.resolve(campaign);
         });
-    }
-
-    private parseMraidCampaign(json: any): Promise<void> {
-        let campaignId: string;
-
-        if(json.mraid === null) {
-            return this.handleNoFill();
-        }
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            campaignId = '00005472656d6f7220694f53';
-        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            campaignId = '005472656d6f7220416e6472';
-        } else {
-            campaignId = 'UNKNOWN';
-        }
-
-        json.mraid.id = campaignId;
-
-        if(json.mraid.inlinedURL || json.mraid.markup) {
-            const campaign = new MRAIDCampaign(json.mraid, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.mraid.inlinedURL, json.mraid.markup, json.mraid.tracking);
-            return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
-        } else {
-            const MRAIDUrlError = new DiagnosticError(
-                new Error('MRAID Campaign missing markup'),
-                {mraid: json.mraid}
-            );
-            this.onError.trigger(MRAIDUrlError);
-            return Promise.resolve();
-        }
-    }
-
-    private handleNoFill(): Promise<void> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
-        this.onNoFill.trigger();
-        return Promise.resolve();
     }
 
     private createRequestUrl(): Promise<string> {
@@ -531,34 +375,6 @@ export class CampaignManager {
             return gamerId;
         }).catch(error => {
             return undefined;
-        });
-    }
-
-    private storeGamerId(gamerId: string): Promise<void[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
-    }
-
-    private sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return;
-        }
-
-        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
-            if(installed) {
-                const msg: any = {
-                    ts: Date.now(),
-                    gamerId: gamerId,
-                    campaignId: campaign.getId(),
-                    targetBundleId: campaign.getAppStoreId(),
-                    targetGameId: campaign.getGameId(),
-                    coppa: this._configuration.isCoppaCompliant()
-                };
-
-                HttpKafka.sendEvent('events.negtargeting.json', msg);
-            }
         });
     }
 
