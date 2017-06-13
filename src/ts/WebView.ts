@@ -270,8 +270,12 @@ export class WebView {
     }
 
     private onAdUnitStartProcessed(): void {
-        if(!this._mustReinitialize) {
-            this._campaignRefreshManager.refresh();
+        if(this._currentAdUnit && (this._currentAdUnit.getCampaign().getAbGroup() === 6 || this._currentAdUnit.getCampaign().getAbGroup() === 7)) {
+            setTimeout(() => {
+                if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
+                    this._campaignRefreshManager.refresh();
+                }
+            }, 5000);
         }
     }
 

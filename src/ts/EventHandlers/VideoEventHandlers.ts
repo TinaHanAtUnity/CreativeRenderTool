@@ -86,12 +86,7 @@ export class VideoEventHandlers {
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getVideo().setStarted(true);
-
-            sessionManager.sendStart(adUnit).then(() => {
-                if(adUnit.getVideo().isCached() && adUnit.getVideo().getPosition() + 5000 < adUnit.getVideo().getDuration()) {
-                    adUnit.setStartProcessedTreshold(adUnit.getVideo().getPosition() + 5000);
-                }
-            });
+            sessionManager.sendStart(adUnit);
 
             const overlay = adUnit.getOverlay();
             if(overlay) {
@@ -128,12 +123,6 @@ export class VideoEventHandlers {
                 Diagnostics.trigger('video_player_too_large_progress', error);
 
                 return;
-            }
-
-            const startProcessedTreshold: number | undefined = adUnit.getStartProcessedTreshold();
-            if(!adUnit.isStartProcessed() && startProcessedTreshold && position > startProcessedTreshold) {
-                adUnit.setStartProcessed(true);
-                adUnit.onStartProcessed.trigger();
             }
 
             if(position === lastPosition) {

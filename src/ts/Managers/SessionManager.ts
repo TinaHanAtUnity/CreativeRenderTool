@@ -184,6 +184,9 @@ export class SessionManager {
             return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId());
         }).then(([id, infoJson]) => {
             return this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
+        }).then(() => {
+            adUnit.onStartProcessed.trigger();
+            return;
         });
     }
 
