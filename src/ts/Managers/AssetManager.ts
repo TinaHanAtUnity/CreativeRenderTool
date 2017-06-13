@@ -152,8 +152,11 @@ export class AssetManager {
     private reportInvalidUrl(campaign: Campaign, asset: Asset, required: boolean): void {
         Diagnostics.trigger('invalid_asset_url', {
             url: asset.getUrl(),
+            assetType: asset.getDescription(),
+            assetDTO: asset.getDTO(),
             required: required,
-            id: campaign.getId()
+            id: campaign.getId(),
+            campaignDTO: campaign.getDTO()
         });
     }
 
