@@ -102,7 +102,7 @@ export class AssetManager {
                     return fileId;
                 }).then((fileId) => {
                     if (cacheType === CacheType.REQUIRED) {
-                        return this._cache.writeCachedFileForCampaign(campaign.getId(), fileId).then(() => Promise.resolve());
+                        return this._cache.writeCachedFileForCampaign(campaign.getId(), fileId);
                     }
 
                     return Promise.resolve();

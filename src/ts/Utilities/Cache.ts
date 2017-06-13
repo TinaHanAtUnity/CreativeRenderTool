@@ -44,6 +44,14 @@ export interface ICacheResponse {
     extension: string;
 }
 
+export interface ICacheCampaignResponse {
+    extension: string;
+}
+
+export interface ICacheCampaignsResponse {
+    [id: string]: ICacheCampaignResponse;
+}
+
 interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
@@ -380,11 +388,12 @@ export class Cache {
         return this._paused;
     }
 
-    public writeCachedFileForCampaign(campaignId: string, fileId: string): Promise<void[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + "." + this.getFileIdHash(fileId), {extension: this.getFileIdExtension(fileId)}),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
+    public writeCachedFileForCampaign(campaignId: string, fileId: string): Promise<void> {
+        return this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + "." + this.getFileIdHash(fileId), {extension: this.getFileIdExtension(fileId)}).then(() => {
+            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        }).catch(() => {
+            return Promise.resolve();
+        });
     }
 
     public setDiagnostics(value: boolean) {
@@ -487,9 +496,7 @@ export class Cache {
     }
 
     private getCacheResponse(fileId: string): Promise<ICacheResponse> {
-        return this._nativeBridge.Storage.get<object>(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(fileId)).then(rawStoredCacheResponse => {
-            return <ICacheResponse>rawStoredCacheResponse;
-        });
+        return this._nativeBridge.Storage.get<ICacheResponse>(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(fileId));
     }
 
     private writeCacheResponse(fileId: string, cacheResponse: ICacheResponse): void {
@@ -519,7 +526,7 @@ export class Cache {
     }
 
     private getCacheCampaigns(): Promise<object> {
-        return this._nativeBridge.Storage.get<object>(StorageType.PRIVATE, 'cache.campaigns').then(campaigns => {
+        return this._nativeBridge.Storage.get<ICacheCampaignsResponse>(StorageType.PRIVATE, 'cache.campaigns').then(campaigns => {
             return campaigns;
         }).catch(() => {
             return {};
