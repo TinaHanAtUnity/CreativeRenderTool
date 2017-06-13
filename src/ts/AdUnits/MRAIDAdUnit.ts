@@ -83,13 +83,14 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         }
 
         this.onFinish.trigger();
-        this.onClose.trigger();
         this._mraid.container().parentElement!.removeChild(this._mraid.container());
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
-        return this._container.close();
+        return this._container.close().then(() => {
+            this.onClose.trigger();
+        });
     }
 
     public isCached(): boolean {
