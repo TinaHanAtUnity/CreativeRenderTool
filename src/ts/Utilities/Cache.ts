@@ -61,8 +61,8 @@ interface ICallbackObject {
     startTimestamp: number;
     contentLength: number;
     diagnostics: ICacheDiagnostics;
-    resolve: Function;
-    reject: Function;
+    resolve: (value?: T | PromiseLike<T>) => void;
+    reject: (reason?: any) => void;
     originalUrl?: string;
 }
 

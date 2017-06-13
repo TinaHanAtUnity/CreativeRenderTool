@@ -104,9 +104,9 @@ class SpecVerifier {
 
     private assertUnspecifiedParams(): void {
         if(this._queryParams) {
-            for(let i: number = 0; i < this._queryParams.length; i++) {
-                const paramName: string = this._queryParams[i].split('=')[0];
-                const paramValue: any = this._queryParams[i].split('=')[1];
+            for(const queryParam of this._queryParams) {
+                const paramName: string = queryParam.split('=')[0];
+                const paramValue: any = queryParam.split('=')[1];
 
                 assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
@@ -133,8 +133,8 @@ class SpecVerifier {
                     if(this._spec[param].queryString) {
                         let found: boolean = false;
 
-                        for(let i: number = 0; i < this._queryParams.length; i++) {
-                            const paramName: string = this._queryParams[i].split('=')[0];
+                        for(const queryParam of this._queryParams) {
+                            const paramName: string = queryParam.split('=')[0];
                             if(paramName === param) {
                                 found = true;
                             }

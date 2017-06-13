@@ -23,7 +23,9 @@ export class Sdk {
     }
 
     public static logError(message: string) {
+        // tslint:disable:no-console
         console.error(message);
+        // tslint:enable:no-console
     }
 
     public static logInfo(message: string) {

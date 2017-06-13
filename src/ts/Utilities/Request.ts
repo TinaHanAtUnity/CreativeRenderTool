@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { Platform } from 'Constants/Platform';
+import { CallbackContainer } from './CallbackContainer';
 
 const enum RequestStatus {
     COMPLETE,
@@ -58,7 +59,7 @@ export class Request {
     private static _readTimeout = 30000;
 
     private static _callbackId: number = 1;
-    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
+    private static _callbacks: { [key: number]: { [key: number]: CallbackContainer } } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
 
     private static getDefaultRequestOptions(): IRequestOptions {
@@ -143,10 +144,7 @@ export class Request {
 
     private registerCallback(id: number): Promise<INativeResponse> {
         return new Promise<INativeResponse>((resolve, reject) => {
-            const callbackObject: { [key: number]: Function } = {};
-            callbackObject[RequestStatus.COMPLETE] = resolve;
-            callbackObject[RequestStatus.FAILED] = reject;
-            Request._callbacks[id] = callbackObject;
+            Request._callbacks[id] = new CallbackContainer(resolve, reject);
         });
     }
 

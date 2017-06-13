@@ -8,7 +8,7 @@ export class Url {
             newUrl += '?';
         }
 
-        const pairs: Object[] = [];
+        const pairs: object[] = [];
         for(const key in parameters) {
             if(parameters.hasOwnProperty(key)) {
                 const value: string = parameters[key];
@@ -25,8 +25,8 @@ export class Url {
     public static getQueryParameter(locationString: string, parameter: string): string | null {
         const queryString: string[] = locationString.split('?')[1].split('&');
 
-        for(let i: number = 0; i < queryString.length; i++) {
-            const queryParam = queryString[i].split('=');
+        for(const entryPair of queryString) {
+            const queryParam = entryPair.split('=');
             if(queryParam[0] === parameter) {
                 return queryParam[1];
             }

@@ -27,9 +27,7 @@ export enum CallbackStatus {
     ERROR
 }
 
-export interface INativeCallback {
-    (status: CallbackStatus, ...parameters: any[]): void;
-}
+export type INativeCallback = (status: CallbackStatus, ...parameters: any[]) => void;
 
 export class NativeBridge implements INativeBridge {
 
@@ -107,7 +105,7 @@ export class NativeBridge implements INativeBridge {
         this.UrlScheme = new UrlSchemeApi(this);
     }
 
-    public registerCallback(resolve: Function, reject: Function): number {
+    public registerCallback(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
         const id: number = this._callbackId++;
         this._callbackTable[id] = new CallbackContainer(resolve, reject);
         return id;

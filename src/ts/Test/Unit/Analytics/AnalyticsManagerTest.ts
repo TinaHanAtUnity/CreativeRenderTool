@@ -39,9 +39,9 @@ class FakeStorageApi extends StorageApi {
 }
 
 class FakeRequestApi extends RequestApi {
-    private _postCallback: Function;
+    private _postCallback: (url: string, body: string) => void;
 
-    constructor(nativeBridge: NativeBridge, postCallback: Function) {
+    constructor(nativeBridge: NativeBridge, postCallback: (url: string, body: string) => void) {
         super(nativeBridge);
 
         this._postCallback = postCallback;

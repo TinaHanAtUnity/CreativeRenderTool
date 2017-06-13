@@ -692,7 +692,7 @@ describe('CampaignManager', () => {
         const campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionVideoJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: VastCampaign;
         let triggeredError: any;
-        campaignManager.onPlcCampaign.subscribe((str: String, campaign: VastCampaign) => {
+        campaignManager.onPlcCampaign.subscribe((str: string, campaign: VastCampaign) => {
             triggeredCampaign = campaign;
         });
         campaignManager.onPlcError.subscribe((error: any) => {
@@ -727,7 +727,7 @@ describe('CampaignManager', () => {
         const campaignManager = new CampaignManager(nativeBridge, new Configuration(config), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let triggeredCampaign: Campaign;
         let triggeredError: any;
-        campaignManager.onPlcCampaign.subscribe((str: String, campaign: Campaign) => {
+        campaignManager.onPlcCampaign.subscribe((str: string, campaign: Campaign) => {
             triggeredCampaign = campaign;
         });
         campaignManager.onPlcError.subscribe(error => {

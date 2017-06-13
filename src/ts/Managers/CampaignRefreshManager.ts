@@ -22,7 +22,7 @@ export class CampaignRefreshManager {
     private _plcRefillTimestamp: number;
     private _needsRefill = true;
 
-    constructor (nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;

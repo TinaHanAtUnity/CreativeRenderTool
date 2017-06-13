@@ -1,4 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
+import { CallbackContainer } from './CallbackContainer';
 
 const enum RequestStatus {
     COMPLETE,
@@ -8,7 +9,7 @@ const enum RequestStatus {
 export class Resolve {
 
     private static _callbackId = 1;
-    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
+    private static _callbacks: { [key: number]: { [key: number]: CallbackContainer } } = {};
 
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = Resolve._callbacks[id];
@@ -43,10 +44,7 @@ export class Resolve {
 
     private registerCallback(id: number): Promise<[string, string, string]> {
         return new Promise<[string, string, string]>((resolve, reject) => {
-            const callbackObject: { [key: number]: Function } = {};
-            callbackObject[RequestStatus.COMPLETE] = resolve;
-            callbackObject[RequestStatus.FAILED] = reject;
-            Resolve._callbacks[id] = callbackObject;
+            Resolve._callbacks[id] = new CallbackContainer(resolve, reject);
         });
     }
 

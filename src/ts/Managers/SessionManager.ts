@@ -33,7 +33,7 @@ export class SessionManagerEventMetadataCreator {
         return this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id, session, gameSession, gamerSid, previousPlacementId);
         });
-    };
+    }
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {

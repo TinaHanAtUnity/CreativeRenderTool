@@ -37,8 +37,7 @@ export class View {
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
                 const elements: NodeList = this._container.querySelectorAll(binding.selector);
-                for(let i: number = 0; i < elements.length; ++i) {
-                    const element: Node = elements[i];
+                for(const element of elements) {
                     View.addEventListener(binding, <HTMLElement>element, attachTap);
                 }
             } else {

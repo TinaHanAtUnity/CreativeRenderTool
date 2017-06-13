@@ -127,7 +127,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         if(overlay) {
             overlay.container().parentElement!.removeChild(overlay.container());
         }
-    };
+    }
 
     // todo: this is first attempt to get rid of around 1% of failed starts
     // if this approach is successful, this should somehow be refactored as part of AssetManager to validate

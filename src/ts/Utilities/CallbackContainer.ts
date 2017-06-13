@@ -1,10 +1,11 @@
 export class CallbackContainer {
 
-    public resolve: Function;
-    public reject: Function;
+    public readonly resolve: (value?: T | PromiseLike<T>) => void;
+    public readonly reject: (reason?: any) => void;
 
-    constructor(resolve: Function, reject: Function) {
+    constructor(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) {
         this.resolve = resolve;
         this.reject = reject;
     }
+
 }
