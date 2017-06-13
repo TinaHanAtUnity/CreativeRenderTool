@@ -21,7 +21,7 @@ import { Session } from 'Models/Session';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
@@ -71,10 +71,10 @@ describe('VideoEventHandlersTest', () => {
 
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         video = new Video('');
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
             getStreamingVideo: () => video
-        }, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+        }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('with onVideoPlay', () => {
@@ -88,10 +88,10 @@ describe('VideoEventHandlersTest', () => {
     describe('with video start', () => {
         beforeEach(() => {
             video = new Video('');
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
                 getVideo: () => video,
                 getStreamingVideo: () => video
-            }, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+            }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
             sessionManager.setSession(new Session('123'));
         });
 
@@ -182,7 +182,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set video to inactive', () => {
             VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
 
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
@@ -377,7 +377,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set video to inactive and video to finish state to error', () => {
             VideoEventHandlers.onPrepareError(nativeBridge, performanceAdUnit, 'http://test.video.url');
 
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
@@ -408,7 +408,7 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setStarted(true);
             VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, performanceAdUnit, 1, 0, 'http://test.video.url');
 
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
@@ -423,7 +423,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set video to inactive and video to finish state to error, video not started', () => {
             VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, performanceAdUnit, 1, 0, 'http://test.video.url');
 
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();

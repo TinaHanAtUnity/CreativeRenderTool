@@ -22,7 +22,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAID, options: any) {
-        super(nativeBridge, container, placement, campaign);
+        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();

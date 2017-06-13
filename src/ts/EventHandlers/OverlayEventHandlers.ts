@@ -9,7 +9,7 @@ export class OverlayEventHandlers {
 
     public static onSkip(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit): void {
         nativeBridge.VideoPlayer.pause();
-        adUnit.getVideo().setActive(false);
+        adUnit.setActive(false);
         adUnit.setFinishState(FinishState.SKIPPED);
         sessionManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
 

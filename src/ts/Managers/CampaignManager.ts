@@ -22,7 +22,6 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { SessionManager } from 'Managers/SessionManager';
-import { AbTestHelper } from 'Utilities/AbTestHelper';
 
 export class CampaignManager {
 
@@ -267,15 +266,7 @@ export class CampaignManager {
             const campaign = new MRAIDCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.campaign.mraidUrl);
             return this._assetManager.setup(campaign).then(() => this.onMRAIDCampaign.trigger(campaign));
         } else {
-            const abGroup: number = CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup;
-
-            if(AbTestHelper.isYodo1CachingAbTestActive(abGroup, this._clientInfo)) {
-                if(json.campaign && json.campaign.trailerDownloadable && json.campaign.trailerStreaming) {
-                    json.campaign.trailerDownloadable = json.campaign.trailerStreaming;
-                }
-            }
-
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, abGroup);
+            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
             this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => this.onPerformanceCampaign.trigger(campaign));
         }
@@ -473,6 +464,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this.getFullyCachedCampaigns());
 
         const body: any = {
             bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
@@ -507,10 +499,14 @@ export class CampaignManager {
             body.properties = this._configuration.getProperties();
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
             body.deviceFreeSpace = this.getParameter('deviceFreeSpace', freeSpace, 'number');
             body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
+
+            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
+                body.cachedCampaigns = fullyCachedCampaignIds;
+            }
 
             const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
@@ -568,6 +564,14 @@ export class CampaignManager {
 
                 HttpKafka.sendEvent('events.negtargeting.json', msg);
             }
+        });
+    }
+
+    private getFullyCachedCampaigns(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
         });
     }
 
