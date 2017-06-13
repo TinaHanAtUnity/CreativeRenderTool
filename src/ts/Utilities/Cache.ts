@@ -197,107 +197,106 @@ export class Cache {
                 }
             }
 
-            const promises: Array<Promise<any>> = [];
-            promises.push(this.checkAndCleanOldCacheFormat());
+            return this.checkAndCleanOldCacheFormat().then(() => {
+                // clean files older than three weeks and limit cache size to 50 megabytes
+                const promises: Array<Promise<any>> = [];
+                const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
+                const sizeThreshold: number = 50 * 1024 * 1024;
 
-            // clean files older than three weeks and limit cache size to 50 megabytes
-            const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
-            const sizeThreshold: number = 50 * 1024 * 1024;
+                const keepFiles: string[] = [];
+                const deleteFiles: string[] = [];
+                let totalSize: number = 0;
+                let deleteSize: number = 0;
+                let keepSize: number = 0;
 
-            const keepFiles: string[] = [];
-            const deleteFiles: string[] = [];
-            let totalSize: number = 0;
-            let deleteSize: number = 0;
-            let keepSize: number = 0;
+                // sort files from newest to oldest
+                files.sort((n1: IFileInfo, n2: IFileInfo) => {
+                    return n2.mtime - n1.mtime;
+                });
 
-            // sort files from newest to oldest
-            files.sort((n1: IFileInfo, n2: IFileInfo) => {
-                return n2.mtime - n1.mtime;
-            });
-
-            for(const file of files) {
-                totalSize += file.size;
-                if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
-                    deleteFiles.push(file.id);
-                    deleteSize += file.size;
-                } else {
-                    keepFiles.push(file.id);
-                    keepSize += file.size;
-                }
-            }
-
-            if(deleteFiles.length > 0) {
-                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
-            } else {
-                this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
-            }
-
-            let dirty: boolean = false;
-
-            deleteFiles.map(file => {
-                if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
-                    promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)));
-                    dirty = true;
-                }
-                promises.push(this._nativeBridge.Cache.deleteFile(file));
-            });
-
-            if(dirty) {
-                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
-            }
-
-            // check consistency of kept files so that bookkeeping and files on device match
-            keepFiles.map(file => {
-                promises.push(this.getCacheResponse(file).then(response => {
-                    if(response.fullyDownloaded === true) {
-                        // file and bookkeeping ok
-                        return Promise.all([]);
+                for(const file of files) {
+                    totalSize += file.size;
+                    if(file.mtime < timeThreshold || totalSize > sizeThreshold) {
+                        deleteFiles.push(file.id);
+                        deleteSize += file.size;
                     } else {
-                        // file not fully downloaded, deleting it
+                        keepFiles.push(file.id);
+                        keepSize += file.size;
+                    }
+                }
+
+                if(deleteFiles.length > 0) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                }
+
+                let dirty: boolean = false;
+
+                deleteFiles.map(file => {
+                    if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
+                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)));
+                        dirty = true;
+                    }
+                    promises.push(this._nativeBridge.Cache.deleteFile(file));
+                });
+
+                if(dirty) {
+                    promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+                }
+
+                // check consistency of kept files so that bookkeeping and files on device match
+                keepFiles.map(file => {
+                    promises.push(this.getCacheResponse(file).then(response => {
+                        if(response.fullyDownloaded === true) {
+                            // file and bookkeeping ok
+                            return Promise.all([]);
+                        } else {
+                            // file not fully downloaded, deleting it
+                            return Promise.all([
+                                this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
+                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)),
+                                this._nativeBridge.Storage.write(StorageType.PRIVATE),
+                                this._nativeBridge.Cache.deleteFile(file)
+                            ]);
+                        }
+                    }).catch(() => {
+                        // entry not found in bookkeeping so delete file
                         return Promise.all([
-                            this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
-                            this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)),
-                            this._nativeBridge.Storage.write(StorageType.PRIVATE),
+                            this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting desynced download ' + file),
                             this._nativeBridge.Cache.deleteFile(file)
                         ]);
-                    }
-                }).catch(() => {
-                    // entry not found in bookkeeping so delete file
-                    return Promise.all([
-                        this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting desynced download ' + file),
-                        this._nativeBridge.Cache.deleteFile(file)
-                    ]);
-                }));
-            });
-
-            return this._nativeBridge.Cache.getFiles().then((cacheFilesLeft) => {
-                const cacheFilesLeftIds: string[] = [];
-                cacheFilesLeft.map(currentFile => {
-                   cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));
+                    }));
                 });
-                let campaignsDirty = false;
 
-                for(const campaignId in campaigns) {
-                    if(campaigns.hasOwnProperty(campaignId)) {
-                        for(const currentFileId in campaigns[campaignId]) {
-                            if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
-                                if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
-                                    promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId));
-                                    campaignsDirty = true;
-                                    break;
+                return this._nativeBridge.Cache.getFiles().then((cacheFilesLeft) => {
+                    const cacheFilesLeftIds: string[] = [];
+                    cacheFilesLeft.map(currentFile => {
+                        cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));
+                    });
+                    let campaignsDirty = false;
+
+                    for(const campaignId in campaigns) {
+                        if(campaigns.hasOwnProperty(campaignId)) {
+                            for(const currentFileId in campaigns[campaignId]) {
+                                if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
+                                    if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
+                                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId));
+                                        campaignsDirty = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if (campaignsDirty) {
-                    promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
-                }
-            }).then(() => {
-                return Promise.all(promises);
+                    if (campaignsDirty) {
+                        promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+                    }
+                }).then(() => {
+                    return Promise.all(promises);
+                });
             });
-
         });
     }
 
