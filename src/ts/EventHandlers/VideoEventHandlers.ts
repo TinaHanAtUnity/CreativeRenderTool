@@ -74,6 +74,7 @@ export class VideoEventHandlers {
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getVideo().setStarted(true);
+
             sessionManager.sendStart(adUnit);
 
             const overlay = adUnit.getOverlay();
