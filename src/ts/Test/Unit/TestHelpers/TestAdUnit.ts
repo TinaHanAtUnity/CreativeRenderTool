@@ -25,4 +25,8 @@ export class TestAdUnit extends AbstractAdUnit {
     public description(): string {
         return 'test';
     }
+
+    public isCached(): boolean {
+        return false;
+    }
 }

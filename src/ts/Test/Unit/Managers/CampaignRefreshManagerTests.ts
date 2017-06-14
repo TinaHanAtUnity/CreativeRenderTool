@@ -724,4 +724,7 @@ export class TestAdUnit extends AbstractAdUnit {
     public isShowing() {
         return true;
     }
+    public isCached() {
+        return false;
+    }
 }

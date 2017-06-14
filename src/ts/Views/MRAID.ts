@@ -18,6 +18,7 @@ export interface IOrientationProperties {
 export class MRAID extends View {
 
     public readonly onClick = new Observable0();
+    public readonly onReward = new Observable0();
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
@@ -38,6 +39,7 @@ export class MRAID extends View {
 
     private _canClose = false;
     private _canSkip = false;
+    private _didReward = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -115,9 +117,14 @@ export class MRAID extends View {
         } else {
             let closeRemaining = closeLength;
             const updateInterval = setInterval(() => {
+                const progress = (closeLength - closeRemaining) / closeLength;
+                if(progress >= 0.75 && !this._didReward) {
+                    this.onReward.trigger();
+                    this._didReward = true;
+                }
                 if(closeRemaining > 0) {
                     closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
+                    this.updateProgressCircle(this._closeElement, progress);
                 }
                 if (closeRemaining <= 0) {
                     clearInterval(updateInterval);
