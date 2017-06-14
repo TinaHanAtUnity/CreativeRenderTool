@@ -104,7 +104,6 @@ export class WebView {
                 // don't fail init due to cache cleaning issues, instead just log and report diagnostics
                 this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
                 Diagnostics.trigger('cleaning_cache_failed', error);
-                return Promise.resolve();
             });
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
