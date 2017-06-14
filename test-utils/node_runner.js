@@ -3,13 +3,14 @@ const path = require('path');
 const Mocha = require('mocha');
 const System = require('systemjs');
 const Istanbul = require('istanbul');
-const jsdom = require('jsdom').jsdom;
+const { JSDOM } = require('jsdom');
 const DOMParser = require('xmldom').DOMParser;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const LocalStorage = require('node-localstorage').LocalStorage;
 const exec = require('child_process').exec;
 
-global.document = jsdom('');
+const { document } = new JSDOM('').window;
+global.document = document;
 global.window = document.defaultView;
 global.DOMParser = DOMParser;
 global.XMLHttpRequest = XMLHttpRequest;
