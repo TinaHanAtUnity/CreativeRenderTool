@@ -1,3 +1,7 @@
+# Wed Jun 14 14:16:35 UTC 2017
+
+* Catch all errors from cache cleaning to avoid init failures
+
 # Wed Jun 14 13:22:49 UTC 2017
 
 * Redeployment of previous deploy after revert
