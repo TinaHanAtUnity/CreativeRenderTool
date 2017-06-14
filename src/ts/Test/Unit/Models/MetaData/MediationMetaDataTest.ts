@@ -123,11 +123,13 @@ describe('MediationMetaDataTest', () => {
                             mediationVersion: 'test_version',
                             mediationOrdinal: 42
                         }, 'MediationMetaData.getDTO() produced invalid output');
+                    } else {
+                        throw new Error('MediationMetaData is not defined');
                     }
-                    throw new Error('MediationMetaData is not defined');
                 });
+            } else {
+                throw new Error('MediationMetaData is not defined');
             }
-            throw new Error('MediationMetaData is not defined');
         });
     });
 
@@ -158,9 +160,10 @@ describe('MediationMetaDataTest', () => {
             if(metaData) {
                 assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                 assert.isUndefined(metaData.getVersion(), 'MediationMetaData.getVersion() did not pass through correctly');
-                assert.isNaN(metaData.getOrdinal(), 'MediationMetaData.getOrdinal() did not pass through correctly');
+                assert.isUndefined(metaData.getOrdinal(), 'MediationMetaData.getOrdinal() did not pass through correctly');
+            } else {
+                throw new Error('MediationMetaData is not defined');
             }
-            throw new Error('MediationMetaData is not defined');
         });
     });
 

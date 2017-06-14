@@ -85,8 +85,9 @@ describe('PlayerMetaDataTest', () => {
                 return metaDataManager.fetch(PlayerMetaData).then(exists => {
                     assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');
                 });
+            } else {
+                throw new Error('PlayerMetaData is not defined');
             }
-            throw new Error('PlayerMetaData is not defined');
         });
     });
 

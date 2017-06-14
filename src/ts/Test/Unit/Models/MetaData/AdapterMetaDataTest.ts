@@ -88,8 +88,9 @@ describe('AdapterMetaDataTest', () => {
                     adapterName: 'test_name',
                     adapterVersion: 'test_version'
                 }, 'AdapterMetaData.getDTO() produced invalid output');
+            } else {
+                throw new Error('AdapterMetaData is not defined');
             }
-            throw new Error('AdapterMetaData is not defined');
         });
     });
 
@@ -119,8 +120,9 @@ describe('AdapterMetaDataTest', () => {
             if(metaData) {
                 assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
                 assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
+            } else {
+                throw new Error('AdapterMetaData is not defined');
             }
-            throw new Error('AdapterMetaData is not defined');
         });
     });
 });
