@@ -59,7 +59,7 @@ export class Request {
     private static _readTimeout = 30000;
 
     private static _callbackId: number = 1;
-    private static _callbacks: { [key: number]: { [key: number]: CallbackContainer } } = {};
+    private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
 
     private static getDefaultRequestOptions(): IRequestOptions {
@@ -168,7 +168,11 @@ export class Request {
     private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
         const callbackObject = Request._callbacks[id];
         if(callbackObject) {
-            callbackObject[status](...parameters);
+            if(status === RequestStatus.COMPLETE) {
+                callbackObject.resolve(...parameters);
+            } else {
+                callbackObject.reject(...parameters);
+            }
             delete Request._callbacks[id];
             delete Request._requests[id];
         }

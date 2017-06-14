@@ -1,4 +1,4 @@
-export class CallbackContainer {
+export class CallbackContainer<T> {
 
     public readonly resolve: (value?: T | PromiseLike<T>) => void;
     public readonly reject: (reason?: any) => void;

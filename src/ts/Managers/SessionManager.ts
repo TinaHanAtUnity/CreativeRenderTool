@@ -73,31 +73,27 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        const promises: Array<Promise<any>> = [];
-        promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this._deviceInfo.getConnectionType());
-
-        return Promise.all(promises).then(([networkType, connectionType]) => {
+        return Promise.all([
+            this._deviceInfo.getNetworkType(),
+            this._deviceInfo.getConnectionType(),
+            this._metaDataManager.fetch(MediationMetaData),
+            this._metaDataManager.fetch(FrameworkMetaData)
+        ]).then(([networkType, connectionType, mediation, framework]: [number, string, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
 
-            const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
-            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
-                if(mediation) {
-                    infoJson.mediationName = mediation.getName();
-                    infoJson.mediationVersion = mediation.getVersion();
-                    infoJson.mediationOrdinal = mediation.getOrdinal();
-                }
+            if(mediation) {
+                infoJson.mediationName = mediation.getName();
+                infoJson.mediationVersion = mediation.getVersion();
+                infoJson.mediationOrdinal = mediation.getOrdinal();
+            }
 
-                if(framework) {
-                    infoJson.frameworkName = framework.getName();
-                    infoJson.frameworkVersion = framework.getVersion();
-                }
+            if(framework) {
+                infoJson.frameworkName = framework.getName();
+                infoJson.frameworkVersion = framework.getVersion();
+            }
 
-                return [id, infoJson];
-            });
+            return <[string, any]>[id, infoJson];
         });
     }
 

@@ -64,7 +64,7 @@ export class NativeBridge implements INativeBridge {
     public UrlScheme: UrlSchemeApi;
 
     private _callbackId: number = 1;
-    private _callbackTable: {[key: number]: CallbackContainer} = {};
+    private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
 
     private _platform: Platform;
     private _apiLevel: number;
@@ -105,7 +105,7 @@ export class NativeBridge implements INativeBridge {
         this.UrlScheme = new UrlSchemeApi(this);
     }
 
-    public registerCallback(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
+    public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
         const id: number = this._callbackId++;
         this._callbackTable[id] = new CallbackContainer(resolve, reject);
         return id;
@@ -116,7 +116,7 @@ export class NativeBridge implements INativeBridge {
             if(!this._autoBatch) {
                 this._autoBatch = new BatchInvocation(this);
             }
-            const promise = this._autoBatch.queue(className, methodName, parameters);
+            const promise = this._autoBatch.queue<T>(className, methodName, parameters);
             if(!this._autoBatchTimer) {
                 this._autoBatchTimer = setTimeout(() => {
                     this.invokeBatch(this._autoBatch);
@@ -127,17 +127,10 @@ export class NativeBridge implements INativeBridge {
             return promise;
         } else {
             const batch = new BatchInvocation(this);
-            const promise = batch.queue(className, methodName, parameters);
+            const promise = batch.queue<T>(className, methodName, parameters);
             this.invokeBatch(batch);
             return promise;
         }
-    }
-
-    public rawInvoke(fullClassName: string, methodName: string, parameters?: any[]): Promise<any[]> {
-        const batch: BatchInvocation = new BatchInvocation(this);
-        const promise = batch.rawQueue(fullClassName, methodName, parameters);
-        this.invokeBatch(batch);
-        return promise;
     }
 
     public handleCallback(results: any[][]): void {
@@ -145,7 +138,7 @@ export class NativeBridge implements INativeBridge {
             const id: number = parseInt(result.shift(), 10);
             const status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
-            const callbackObject: CallbackContainer = this._callbackTable[id];
+            const callbackObject = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }

@@ -25,7 +25,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
         get: function(this: HTMLElement) {
             const self = this;
 
-            function update(fn: () => any) {
+            function update(fn: (classes: string[], index: number, value?: string) => any) {
                 return function(value: string) {
                     const classes = self.className.split(/\s+/);
                     const index = classes.indexOf(value);

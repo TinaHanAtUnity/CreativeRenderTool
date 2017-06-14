@@ -81,13 +81,15 @@ describe('AdapterMetaDataTest', () => {
 
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(AdapterMetaData).then(metaData => {
-            assert.isDefined(metaData, 'AdapterMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
-            assert.deepEqual(metaData.getDTO(), {
-                adapterName: 'test_name',
-                adapterVersion: 'test_version'
-            }, 'AdapterMetaData.getDTO() produced invalid output');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
+                assert.deepEqual(metaData.getDTO(), {
+                    adapterName: 'test_name',
+                    adapterVersion: 'test_version'
+                }, 'AdapterMetaData.getDTO() produced invalid output');
+            }
+            throw new Error('AdapterMetaData is not defined');
         });
     });
 
@@ -114,9 +116,11 @@ describe('AdapterMetaDataTest', () => {
 
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(AdapterMetaData).then(metaData => {
-            assert.isDefined(metaData, 'AdapterMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
+            }
+            throw new Error('AdapterMetaData is not defined');
         });
     });
 });

@@ -37,9 +37,12 @@ export class View {
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
                 const elements: NodeList = this._container.querySelectorAll(binding.selector);
-                for(const element of elements) {
+                // tslint:disable:prefer-for-of
+                for(let i = 0; i < elements.length; ++i) {
+                    const element = elements[i];
                     View.addEventListener(binding, <HTMLElement>element, attachTap);
                 }
+                // tslint:enable:prefer-for-of
             } else {
                 View.addEventListener(binding, this._container, attachTap);
             }

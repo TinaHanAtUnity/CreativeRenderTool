@@ -81,13 +81,15 @@ describe('FrameworkMetaDataTest', () => {
 
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
-            assert.isDefined(metaData, 'FrameworkMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
-            assert.deepEqual(metaData.getDTO(), {
-                frameworkName: 'test_name',
-                frameworkVersion: 'test_version'
-            }, 'FrameworkMetaData.getDTO() produced invalid output');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
+                assert.deepEqual(metaData.getDTO(), {
+                    frameworkName: 'test_name',
+                    frameworkVersion: 'test_version'
+                }, 'FrameworkMetaData.getDTO() produced invalid output');
+            }
+            throw new Error('FrameworkMetaData is not defined');
         });
     });
 
@@ -114,9 +116,11 @@ describe('FrameworkMetaDataTest', () => {
 
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
-            assert.isDefined(metaData, 'FrameworkMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
+            }
+            throw new Error('FrameworkMetaData is not defined');
         });
     });
 });

@@ -61,7 +61,7 @@ interface ICallbackObject {
     startTimestamp: number;
     contentLength: number;
     diagnostics: ICacheDiagnostics;
-    resolve: (value?: T | PromiseLike<T>) => void;
+    resolve: (value?: [CacheStatus, string]) => void;
     reject: (reason?: any) => void;
     originalUrl?: string;
 }
@@ -114,7 +114,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<[string, string]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<string[]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -180,7 +180,7 @@ export class Cache {
     }
 
     public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]): Promise<any> => {
+        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
             if(!files || !files.length) {
                 let campaignCount = 0;
                 if (campaigns) {

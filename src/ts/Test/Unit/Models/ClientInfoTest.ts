@@ -65,6 +65,7 @@ describe('ClientInfoTest', () => {
 
         assert.throw(() => {
             const clientInfoTest = new ClientInfo(Platform.TEST, data);
+            assert.equal(clientInfoTest.getGameId(), 'abc1111');
         }, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
     });
 });

@@ -1,20 +1,15 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { CallbackContainer } from './CallbackContainer';
 
-const enum RequestStatus {
-    COMPLETE,
-    FAILED
-}
-
 export class Resolve {
 
     private static _callbackId = 1;
-    private static _callbacks: { [key: number]: { [key: number]: CallbackContainer } } = {};
+    private static _callbacks: { [key: number]: CallbackContainer<[string, string, string]> } = {};
 
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
-            callbackObject[RequestStatus.COMPLETE]([host, ip]);
+            callbackObject.resolve([host, ip]);
             delete Resolve._callbacks[id];
         }
     }
@@ -22,7 +17,7 @@ export class Resolve {
     private static onResolveFailed(id: string, host: string, error: string, message: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
-            callbackObject[RequestStatus.FAILED]([error, message]);
+            callbackObject.reject([error, message]);
             delete Resolve._callbacks[id];
         }
     }

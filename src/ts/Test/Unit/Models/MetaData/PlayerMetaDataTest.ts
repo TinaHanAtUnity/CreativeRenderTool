@@ -77,14 +77,16 @@ describe('PlayerMetaDataTest', () => {
 
         const metaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(PlayerMetaData, false).then(metaData => {
-            assert.isDefined(metaData, 'PlayerMetaData is not defined');
-            assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
-            assert.deepEqual(metaData.getDTO(), {
-                sid: 'test_sid',
-            }, 'PlayerMetaData.getDTO() produced invalid output');
-            return metaDataManager.fetch(PlayerMetaData).then(exists => {
-                assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');
-            });
+            if(metaData) {
+                assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
+                assert.deepEqual(metaData.getDTO(), {
+                    sid: 'test_sid',
+                }, 'PlayerMetaData.getDTO() produced invalid output');
+                return metaDataManager.fetch(PlayerMetaData).then(exists => {
+                    assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');
+                });
+            }
+            throw new Error('PlayerMetaData is not defined');
         });
     });
 

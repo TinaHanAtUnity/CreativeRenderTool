@@ -8,7 +8,7 @@ export class Url {
             newUrl += '?';
         }
 
-        const pairs: object[] = [];
+        const pairs: string[] = [];
         for(const key in parameters) {
             if(parameters.hasOwnProperty(key)) {
                 const value: string = parameters[key];
