@@ -1,3 +1,9 @@
+# Wed Jun 14 13:22:49 UTC 2017
+
+* Redeployment of previous deploy after revert
+* Add more information to cache_desync_failure and cache_desync_fixed diagnostics
+* Add hack for iOS older than 2.1.0 to avoid most cache desync issues
+
 # Wed Jun 14 08:23:35 UTC 2017
 
 * Send an array of cached campaigns in device cache in cachedCampaigns array in ad requests
