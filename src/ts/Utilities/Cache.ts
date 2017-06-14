@@ -678,13 +678,25 @@ export class Cache {
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
                 Diagnostics.trigger('cache_desync_fixed', {
-                    url: url
+                    url: url,
+                    responseCode: response.responseCode,
+                    fileFound: fileInfo.found,
+                    fileSize: fileInfo.size,
+                    contentLength: parseInt(contentLength, 10)
                 });
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, fileInfo.size, fileInfo.size, this.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
+                let parsedContentLength = undefined;
+                if (contentLength) {
+                    parsedContentLength = parseInt(contentLength, 10);
+                }
                 Diagnostics.trigger('cache_desync_failure', {
-                    url: url
+                    url: url,
+                    responseCode: response.responseCode,
+                    fileFound: fileInfo.found,
+                    fileSize: fileInfo.size,
+                    contentLength: parsedContentLength
                 });
                 this.deleteCacheResponse(callback.fileId);
                 if(fileInfo.found) {
@@ -692,9 +704,10 @@ export class Cache {
                 }
                 this.fulfillCallback(url, CacheStatus.FAILED);
             }
-        }).catch(() => {
+        }).catch((error) => {
             Diagnostics.trigger('cache_desync_failure', {
-                url: url
+                url: url,
+                error: error,
             });
             this.deleteCacheResponse(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
