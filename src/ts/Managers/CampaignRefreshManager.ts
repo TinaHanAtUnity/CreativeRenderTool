@@ -129,6 +129,7 @@ export class CampaignRefreshManager {
     private onCampaignExpired(): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
+        this.invalidateCampaigns(false);
         return this._campaignManager.request();
     }
 
@@ -143,14 +144,7 @@ export class CampaignRefreshManager {
             placement.setCurrentCampaign(campaign);
         }
 
-        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
-            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this.handlePlacementState(placementId, PlacementState.READY);
-            });
-        } else {
-            this.handlePlacementState(placementId, PlacementState.READY);
-        }
+        this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
@@ -175,7 +169,7 @@ export class CampaignRefreshManager {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger('plc_request_failed', error);
+        Diagnostics.trigger('campaign_request_failed', error);
         this.setPlacementStates(PlacementState.NO_FILL);
     }
 
