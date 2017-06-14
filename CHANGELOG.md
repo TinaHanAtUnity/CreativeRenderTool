@@ -1,3 +1,9 @@
+# Wed Jun 14 08:23:35 UTC 2017
+
+* Send an array of cached campaigns in device cache in cachedCampaigns array in ad requests
+* Send third quartile event after 3/4 of playback on MRAID playable ads
+* Test for refreshing ads five seconds after start event instead of when going to endscreen in A/B groups 6 and 7
+
 # Tue Jun 13 10:28:55 UTC 2017
 
 * Support for oriented performance campaigns
