@@ -6,6 +6,7 @@ import { Template } from 'Utilities/Template';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { PromoCampaign } from 'Models/PromoCampaign';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class Promo extends View {
 
@@ -26,7 +27,8 @@ export class Promo extends View {
             this._templateData = {
                 'landscapeImage': campaign.getLandscape().getUrl(),
                 'portraitImage': campaign.getPortrait().getUrl(),
-                'buttonImage': campaign.getButton().getUrl()
+                'buttonImage': campaign.getButton().getUrl(),
+                'localizedPrice': PurchasingUtilities.productPrice(campaign.getIapProductId())
             };
         }
 
