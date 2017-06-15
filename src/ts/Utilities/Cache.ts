@@ -237,9 +237,9 @@ export class Cache {
                     if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
                         promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
                             Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                error: error,
-                                key: 'cache.files.' + this.getFileIdHash(file),
-                                errorType: 'deleteFiles'
+                                cleanCacheError: error,
+                                cleanCacheKey: 'cache.files.' + this.getFileIdHash(file),
+                                cleanCacheErrorType: 'deleteFiles'
                             });
                         }));
                         dirty = true;
@@ -263,9 +263,9 @@ export class Cache {
                                 this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
                                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
                                     Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                        error: error,
-                                        key: 'cache.files.' + this.getFileIdHash(file),
-                                        errorType: 'keepFiles'
+                                        cleanCacheError: error,
+                                        cleanCacheKey: 'cache.files.' + this.getFileIdHash(file),
+                                        cleanCacheErrorType: 'keepFiles'
                                     });
                                 }),
                                 this._nativeBridge.Storage.write(StorageType.PRIVATE),
@@ -295,9 +295,9 @@ export class Cache {
                                     if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
                                         promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId).catch((error) => {
                                             Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                                error: error,
-                                                key: 'cache.campaigns.' + campaignId,
-                                                errorType: 'deleteUncachedCampaign'
+                                                cleanCacheError: error,
+                                                cleanCacheKey: 'cache.campaigns.' + campaignId,
+                                                cleanCacheErrorType: 'deleteUncachedCampaign'
                                             });
                                         }));
                                         campaignsDirty = true;
