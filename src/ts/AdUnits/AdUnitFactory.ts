@@ -127,7 +127,7 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
             if(onVolumeChangeObserver) {
                 if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
+                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_SYSTEM);
                     nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
                 } else if(nativeBridge.getPlatform() === Platform.IOS) {
                     nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();

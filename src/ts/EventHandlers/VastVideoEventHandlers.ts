@@ -90,7 +90,7 @@ export class VastVideoEventHandlers {
     public static onVolumeChange(adUnit: VastAdUnit, volume: number, maxVolume: number) {
         const moat = adUnit.getMoat();
         if(moat) {
-            adUnit.setVolume(volume);
+            adUnit.setVolume(volume / maxVolume);
             moat.triggerEvent('AdVolumeChange', adUnit.getVolume());
         }
     }

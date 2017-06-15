@@ -10,6 +10,7 @@ import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { MOAT } from 'Views/MOAT';
 import { StreamType } from 'Constants/Android/StreamType';
+import { Platform } from 'Constants/Platform';
 
 export class VastAdUnit extends VideoAdUnit {
 
@@ -22,9 +23,22 @@ export class VastAdUnit extends VideoAdUnit {
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
-        deviceInfo.getDeviceVolume(StreamType.STREAM_MUSIC).then(volume => {
-            this._volume = volume;
-        });
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            Promise.all([
+                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_SYSTEM),
+                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_SYSTEM)
+            ]).then(([volume, maxVolume]) => {
+                this.setVolume(volume / maxVolume);
+            });
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            Promise.all([
+                nativeBridge.DeviceInfo.Ios.getDeviceVolume(),
+                nativeBridge.DeviceInfo.Ios.getDeviceMaxVolume()
+            ]).then(([volume, maxVolume]) => {
+                this.setVolume(volume / maxVolume);
+            });
+        }
     }
 
     public hide(): Promise<void> {
