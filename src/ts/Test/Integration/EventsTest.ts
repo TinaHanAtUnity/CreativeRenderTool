@@ -10,6 +10,9 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { SessionManager } from 'Managers/SessionManager';
 
 describe('EventsTest', () => {
 
@@ -24,7 +27,6 @@ describe('EventsTest', () => {
     };
 
     const validateRequestLog = (requestLog: string[]) => {
-        assert.equal(requestLog.length, 8, 'Request log length should be 9 for showing one ad');
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
@@ -77,8 +79,8 @@ describe('EventsTest', () => {
         DeviceInfo.setOsVersion('6.0.1');
         DeviceInfo.setApiLevel(23);
         DeviceInfo.setRooted(false);
-        DeviceInfo.setScreenWidth(1080);
-        DeviceInfo.setScreenHeight(1776);
+        DeviceInfo.setScreenWidth(1776);
+        DeviceInfo.setScreenHeight(1080);
         DeviceInfo.setScreenDensity(480);
         DeviceInfo.setScreenLayout(268435794);
         DeviceInfo.setScreenBrightness(1);
@@ -95,12 +97,16 @@ describe('EventsTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setRingerMode(0);
 
         AbstractAdUnit.setAutoClose(true);
 
-        UnityAds.initialize(Platform.ANDROID, '14851', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.ANDROID, '667', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -144,8 +150,8 @@ describe('EventsTest', () => {
         DeviceInfo.setModel('iPhone7,2');
         DeviceInfo.setOsVersion('10.1.1');
         DeviceInfo.setRooted(false);
-        DeviceInfo.setScreenWidth(357);
-        DeviceInfo.setScreenHeight(647);
+        DeviceInfo.setScreenWidth(647);
+        DeviceInfo.setScreenHeight(357);
         DeviceInfo.setScreenScale(2);
         DeviceInfo.setScreenBrightness(1);
         DeviceInfo.setSystemLanguage('en_US');
@@ -161,14 +167,18 @@ describe('EventsTest', () => {
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
         DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus('ok');
+        DeviceInfo.setBatteryStatus(1);
         DeviceInfo.setUserInterfaceIdiom(0);
         DeviceInfo.setSimulator(false);
         DeviceInfo.setStatusBarHeight(0);
 
         AbstractAdUnit.setAutoClose(true);
 
-        UnityAds.initialize(Platform.IOS, '14850', listener, true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+
+        UnityAds.initialize(Platform.IOS, '667', listener, true);
     });
 
 });

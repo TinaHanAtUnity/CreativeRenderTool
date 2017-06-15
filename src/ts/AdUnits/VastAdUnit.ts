@@ -4,7 +4,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -20,7 +20,7 @@ export class VastAdUnit extends VideoAdUnit {
     private _realDuration: number;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
+        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
         deviceInfo.getDeviceVolume(StreamType.STREAM_MUSIC).then(volume => {
             this._volume = volume;

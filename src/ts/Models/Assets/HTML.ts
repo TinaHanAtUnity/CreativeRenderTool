@@ -6,4 +6,8 @@ export class HTML extends Asset<IAsset> {
 
         this.set('url', url);
     }
+
+    public getDescription(): string {
+        return 'MRAID';
+    }
 }

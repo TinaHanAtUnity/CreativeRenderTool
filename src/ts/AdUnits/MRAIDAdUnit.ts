@@ -8,6 +8,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { MRAID, IOrientationProperties } from 'Views/MRAID';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
+import { HTML } from 'Models/Assets/HTML';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -21,7 +22,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAID, options: any) {
-        super(nativeBridge, container, placement, campaign);
+        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();
@@ -82,13 +83,23 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         }
 
         this.onFinish.trigger();
-        this.onClose.trigger();
         this._mraid.container().parentElement!.removeChild(this._mraid.container());
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
-        return this._container.close();
+        return this._container.close().then(() => {
+            this.onClose.trigger();
+        });
+    }
+
+    public isCached(): boolean {
+        const asset: HTML | undefined = (<MRAIDCampaign>this.getCampaign()).getResourceUrl();
+        if(asset) {
+            return asset.isCached();
+        }
+
+        return false;
     }
 
     public description(): string {

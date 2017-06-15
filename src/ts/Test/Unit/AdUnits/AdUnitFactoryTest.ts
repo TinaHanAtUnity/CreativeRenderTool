@@ -11,7 +11,6 @@ import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { SessionManager } from 'Managers/SessionManager';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
@@ -20,7 +19,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
@@ -33,7 +32,6 @@ describe('AdUnitFactoryTest', () => {
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
-    let deviceInfo: DeviceInfo;
     let sessionManager: SessionManager;
     let config: Configuration;
     let metaDataManager: MetaDataManager;
@@ -47,11 +45,11 @@ describe('AdUnitFactoryTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        container = new Activity(nativeBridge, deviceInfo);
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        sandbox.stub(container, 'close').returns(Promise.resolve());
         const eventManager = new EventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), deviceInfo, eventManager, metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(Platform.ANDROID), eventManager, metaDataManager);
         sandbox.stub(sessionManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(sessionManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(sessionManager, 'sendThirdQuartile').returns(Promise.resolve());
@@ -65,7 +63,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -78,7 +76,7 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, {});
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), vastCampaign, config, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -109,7 +107,7 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, {});
         });
 
         describe('on hide', () => {

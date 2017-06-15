@@ -56,7 +56,15 @@ export class SessionManagerEventMetadataCreator {
 
         const campaign = adUnit.getCampaign();
         if(campaign instanceof PerformanceCampaign) {
-            infoJson.cached = campaign.getVideo().isCached();
+            const landscapeVideo = campaign.getVideo();
+            const portraitVideo = campaign.getPortraitVideo();
+            if(landscapeVideo && landscapeVideo.isCached()) {
+                infoJson.cached = true;
+            } else if(portraitVideo && portraitVideo.isCached()) {
+                infoJson.cached = true;
+            } else {
+                infoJson.cached = false;
+            }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
         }
@@ -91,7 +99,7 @@ export class SessionManagerEventMetadataCreator {
                 return [id, infoJson];
             });
         });
-}
+    }
 
 }
 
@@ -169,14 +177,10 @@ export class SessionManager {
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(this._currentSession) {
             if(this._currentSession.getEventSent(EventType.START)) {
-                return Promise.resolve(void(0));
+                return Promise.resolve();
             }
             this._currentSession.setEventSent(EventType.START);
         }
-
-        const fulfilled = ([id, infoJson]: [string, any]) => {
-            this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
-        };
 
         return this._metaDataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
@@ -185,7 +189,12 @@ export class SessionManager {
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
-            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId());
+        }).then(([id, infoJson]) => {
+            return this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
+        }).then(() => {
+            adUnit.onStartProcessed.trigger();
+            return;
         });
     }
 

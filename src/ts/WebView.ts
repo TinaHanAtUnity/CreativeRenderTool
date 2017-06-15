@@ -27,7 +27,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -70,6 +70,12 @@ export class WebView {
 
     private _metadataManager: MetaDataManager;
 
+    // constant value that determines the delay for refreshing ads after backend has processed a start event
+    // set to five seconds because backend should usually process start event in less than one second but
+    // we want to be safe in case of error situations on the backend and mistimings on the device
+    // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
+    private _startRefreshMagicConstant: number = 5000;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -94,7 +100,11 @@ export class WebView {
 
             return this._deviceInfo.fetch();
         }).then(() => {
-            return this._cache.cleanCache();
+            return this._cache.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -148,10 +158,14 @@ export class WebView {
                 });
             }
         }).then(() => {
+            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
+                this._cache.setDiagnostics(true);
+            }
+
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode());
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
@@ -229,31 +243,38 @@ export class WebView {
             this._assetManager.stopCaching();
         }
 
-        this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
-        this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
-        this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
-        this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
+        Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
+            this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
+            this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
-            if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
-                const appSheetOptions = {
-                    id: parseInt(campaign.getAppStoreId(), 10)
-                };
-                this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
-                    const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.prepare(appSheetOptions);
+            if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                    const appSheetOptions = {
+                        id: parseInt(campaign.getAppStoreId(), 10)
+                    };
+                    this._nativeBridge.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this._nativeBridge.AppSheet.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.prepare(appSheetOptions);
+                        });
+                        this._currentAdUnit.onClose.subscribe(() => {
+                            this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                        });
                     });
-                    this._currentAdUnit.onClose.subscribe(() => {
-                        this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                        this._nativeBridge.AppSheet.destroy(appSheetOptions);
-                    });
-                });
+                }
             }
-        }
 
-        this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
-        this._campaignManager.setPreviousPlacementId(placementId);
-        this._currentAdUnit.show();
+            this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+            this._campaignManager.setPreviousPlacementId(placementId);
+            this._currentAdUnit.show();
+        });
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
@@ -261,6 +282,16 @@ export class WebView {
         this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
         if(sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
+    }
+
+    private onAdUnitStartProcessed(): void {
+        if(this._currentAdUnit && (this._currentAdUnit.getCampaign().getAbGroup() === 6 || this._currentAdUnit.getCampaign().getAbGroup() === 7)) {
+            setTimeout(() => {
+                if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
+                    this._campaignRefreshManager.refresh();
+                }
+            }, this._startRefreshMagicConstant);
         }
     }
 

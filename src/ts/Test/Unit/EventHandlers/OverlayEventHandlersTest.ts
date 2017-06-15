@@ -16,7 +16,7 @@ import { Double } from 'Utilities/Double';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
@@ -47,11 +47,11 @@ describe('OverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVast: sinon.spy(),
                 getVideo: () => video,
                 getStreamingVideo: () => video
-        }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+        }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('When calling onSkip', () => {
@@ -69,7 +69,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should set video inactive', () => {
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
         });
 
         it('should set finish state', () => {
