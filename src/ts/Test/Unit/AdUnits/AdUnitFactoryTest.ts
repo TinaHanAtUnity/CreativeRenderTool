@@ -29,6 +29,7 @@ import { FinishState } from 'Constants/FinishState';
 import ConfigurationJson from 'json/Configuration.json';
 import { PromoCampaign } from 'Models/PromoCampaign';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -91,6 +92,8 @@ describe('AdUnitFactoryTest', () => {
         let PromoAdUnit: PromoAdUnit;
         let campaign: PromoCampaign;
         beforeEach(() => {
+            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
+
             campaign = TestFixtures.getPromoCampaign();
             PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
         });
