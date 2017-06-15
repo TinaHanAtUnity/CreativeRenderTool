@@ -133,7 +133,7 @@ build-test: clean build-dir build-css build-static build-ts
 
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
-		node_modules/es6-promise/dist/es6-promise.js \
+		node_modules/es6-promise/dist/es6-promise.auto.js \
 		node_modules/systemjs/dist/system.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
