@@ -235,7 +235,13 @@ export class Cache {
 
                 deleteFiles.map(file => {
                     if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
-                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)));
+                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
+                            Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
+                                error: error,
+                                key: 'cache.files.' + this.getFileIdHash(file),
+                                errorType: 'deleteFiles'
+                            });
+                        }));
                         dirty = true;
                     }
                     promises.push(this._nativeBridge.Cache.deleteFile(file));
@@ -255,7 +261,13 @@ export class Cache {
                             // file not fully downloaded, deleting it
                             return Promise.all([
                                 this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
-                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)),
+                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
+                                    Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
+                                        error: error,
+                                        key: 'cache.files.' + this.getFileIdHash(file),
+                                        errorType: 'keepFiles'
+                                    });
+                                }),
                                 this._nativeBridge.Storage.write(StorageType.PRIVATE),
                                 this._nativeBridge.Cache.deleteFile(file)
                             ]);
@@ -281,7 +293,13 @@ export class Cache {
                             for(const currentFileId in campaigns[campaignId]) {
                                 if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
                                     if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
-                                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId));
+                                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId).catch((error) => {
+                                            Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
+                                                error: error,
+                                                key: 'cache.campaigns.' + campaignId,
+                                                errorType: 'deleteUncachedCampaign'
+                                            });
+                                        }));
                                         campaignsDirty = true;
                                         break;
                                     }
