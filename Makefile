@@ -9,7 +9,7 @@ ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
-ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.js
+ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
 SYSTEM_JS = node_modules/systemjs/dist/system.src.js
 
 # Sources
