@@ -33,8 +33,8 @@ export class PurchasingUtilities {
     }
 
     public static purchasesAvailable(): boolean {
-        return this._catalog.getProducts() !== undefined;
+        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getProducts().size !== 0);
     }
 
-    private static _catalog: PurchasingCatalog;
+    private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
 }
