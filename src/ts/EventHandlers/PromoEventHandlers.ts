@@ -8,8 +8,8 @@ export class PromoEventHandlers {
     }
 
     public static onPromo(nativeBridge: NativeBridge, adUnit: PromoAdUnit, iapProductId: string): void {
-        nativeBridge.Listener.sendInitiatePurchaseEvent(iapProductId);
         adUnit.hide();
+        nativeBridge.Listener.sendInitiatePurchaseEvent(iapProductId);
     }
 
 }
