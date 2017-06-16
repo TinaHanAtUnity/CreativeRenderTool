@@ -248,25 +248,25 @@ export class CampaignManager {
                     });
                 });
 
-        case 'purchasing/promo':
-            const promoJson = JsonParser.parse(content);
-            if (promoJson && promoJson.iapProductId) {
-                return PurchasingUtilities.refresh(new MetaData(this._nativeBridge)).then(values => {
-                    if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
-                        const campaign = new PromoCampaign(promoJson, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                        return this._assetManager.setup(campaign, true).then(() => {
+            case 'purchasing/promo':
+                const promoJson = JsonParser.parse(content);
+                if (promoJson && promoJson.iapProductId) {
+                    return PurchasingUtilities.refresh(new MetaData(this._nativeBridge)).then(values => {
+                        if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
+                            const campaign = new PromoCampaign(promoJson, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                            return this._assetManager.setup(campaign, true).then(() => {
+                                for (const placement of placements) {
+                                    this.onPlcCampaign.trigger(placement, campaign);
+                                }
+                            });
+                        } else {
                             for (const placement of placements) {
-                                this.onPlcCampaign.trigger(placement, campaign);
+                                this.onPlcNoFill.trigger(placement);
                             }
-                        });
-                    } else {
-                        for (const placement of placements) {
-                            this.onPlcNoFill.trigger(placement);
+                            return Promise.resolve();
                         }
-                        return Promise.resolve();
-                    }
-                });
-            }
+                    });
+                }
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
         }
