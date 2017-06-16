@@ -62,7 +62,6 @@ export class CampaignManager {
     public readonly onPerformanceCampaign = new Observable1<PerformanceCampaign>();
     public readonly onVastCampaign = new Observable1<VastCampaign>();
     public readonly onMRAIDCampaign = new Observable1<MRAIDCampaign>();
-    public readonly onPromoCampaign = new Observable1<PromoCampaign>();
     public readonly onNoFill = new Observable0();
     public readonly onError = new Observable1<WebViewError>();
 

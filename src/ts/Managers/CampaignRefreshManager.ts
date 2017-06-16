@@ -38,10 +38,6 @@ export class CampaignRefreshManager {
             this._campaignManager.onPerformanceCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onVastCampaign.subscribe(campaign => this.onCampaign(campaign));
             this._campaignManager.onMRAIDCampaign.subscribe(campaign => this.onCampaign(campaign));
-            this._campaignManager.onPromoCampaign.subscribe(campaign => {
-                this._nativeBridge.Sdk.logInfo('got promo campaign');
-                this.onCampaign(campaign);
-            });
             this._campaignManager.onNoFill.subscribe(() => this.onNoFill());
             this._campaignManager.onError.subscribe(error => this.onCampaignError(error));
         }
