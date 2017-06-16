@@ -281,17 +281,17 @@ export class Cache {
                     }));
                 });
 
-                return this._nativeBridge.Cache.getFiles().then((cacheFilesLeft) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));
                     });
                     let campaignsDirty = false;
 
-                    for(const campaignId in campaigns) {
-                        if(campaigns.hasOwnProperty(campaignId)) {
-                            for(const currentFileId in campaigns[campaignId]) {
-                                if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
+                    for(const campaignId in campaignsLeft) {
+                        if(campaignsLeft.hasOwnProperty(campaignId)) {
+                            for(const currentFileId in campaignsLeft[campaignId]) {
+                                if(campaignsLeft[campaignId].hasOwnProperty(currentFileId)) {
                                     if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
                                         promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId).catch((error) => {
                                             Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
