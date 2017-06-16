@@ -252,7 +252,7 @@ export class CampaignManager {
             const promoJson = JsonParser.parse(content);
             if (promoJson && promoJson.iapProductId) {
                 return PurchasingUtilities.refresh(new MetaData(this._nativeBridge)).then(values => {
-                    if (PurchasingUtilities.purchasesAvailable()) {
+                    if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
                         const campaign = new PromoCampaign(promoJson, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                         return this._assetManager.setup(campaign, true).then(() => {
                             for (const placement of placements) {
