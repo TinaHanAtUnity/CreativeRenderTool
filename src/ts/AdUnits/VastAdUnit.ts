@@ -17,6 +17,7 @@ export class VastAdUnit extends VideoAdUnit {
     private _endScreen: VastEndScreen | null;
     private _moat?: MOAT;
     private _volume: number;
+    private _muted: boolean = false;
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _realDuration: number;
 
@@ -84,11 +85,22 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     public getVolume() {
+        if(this._muted) {
+            return 0;
+        }
         return this._volume;
     }
 
     public setVolume(volume: number) {
         this._volume = volume;
+    }
+
+    public setMuted(muted: boolean) {
+        this._muted = muted;
+    }
+
+    public getMuted() {
+        return this._muted;
     }
 
     public getDuration(): number | null {
