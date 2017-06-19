@@ -697,7 +697,7 @@ export class Cache {
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, fileInfo.size, fileInfo.size, this.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
-                let parsedContentLength = undefined;
+                let parsedContentLength;
                 if (contentLength) {
                     parsedContentLength = parseInt(contentLength, 10);
                 }
