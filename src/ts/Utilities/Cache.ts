@@ -235,7 +235,7 @@ export class Cache {
 
                 deleteFiles.map(file => {
                     if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
-                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch();
+                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch());
                         dirty = true;
                     }
                     promises.push(this._nativeBridge.Cache.deleteFile(file));
