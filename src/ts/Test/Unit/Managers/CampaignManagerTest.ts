@@ -49,6 +49,7 @@ import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
+import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -89,7 +90,13 @@ describe('CampaignManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
-                getKeys: sinon.stub().returns(Promise.resolve([])),
+                // getKeys: sinon.stub().returns(Promise.resolve(getKeysContents)),
+                getKeys: sinon.stub().callsFake((type: StorageType, key: string, recursive: boolean) => {
+                    if (key && key === 'cache.campaigns') {
+                        return Promise.resolve(['12345', '67890']);
+                    }
+                    return Promise.resolve([]);
+                }),
                 onSet: new Observable2()
             },
             Request: {
@@ -881,5 +888,23 @@ describe('CampaignManager', () => {
         previousCampaign = campaignManager.getPreviousPlacementId();
 
         assert.equal(previousCampaign, 'defaultPlacement');
+    });
+
+    it('should have cachedCampaigns in request body', () => {
+        let requestData: string = "{}";
+        sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+            requestData = data;
+            return Promise.resolve();
+        });
+
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+
+        return campaignManager.request().then(() => {
+            const requestBody = JSON.parse(requestData);
+            assert.equal(2, requestBody.cachedCampaigns.length, 'Cached campaigns should contain 2 entries');
+            assert.equal('12345', requestBody.cachedCampaigns[0], 'Cached campaigns first entry not what was expected');
+            assert.equal('67890', requestBody.cachedCampaigns[1], 'Cached campaigns second entry not whas was expected');
+        });
     });
 });
