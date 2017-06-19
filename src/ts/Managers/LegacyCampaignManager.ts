@@ -14,8 +14,16 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
+import { StorageType } from 'Native/Api/Storage';
+import { Url } from 'Utilities/Url';
 
 export class LegacyCampaignManager extends CampaignManager {
+    public static setTestBaseUrl(baseUrl: string): void {
+        LegacyCampaignManager.CampaignBaseUrl = baseUrl + '/games';
+    }
+
+    private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         super(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
     }
@@ -31,6 +39,33 @@ export class LegacyCampaignManager extends CampaignManager {
         }).catch((error) => {
             this._requesting = false;
             this.onError.trigger(error);
+        });
+    }
+
+    protected getBaseUrl(): string {
+        return [
+            LegacyCampaignManager.CampaignBaseUrl,
+            this._clientInfo.getGameId(),
+            'fill'
+        ].join('/');
+    }
+
+    protected createRequestUrl(): Promise<string> {
+        return Promise.all([super.createRequestUrl(), this.fetchGamerId()]).then(([url, gamerId]) => {
+            if(gamerId) {
+                url = Url.addParameters(url, {
+                    gamerId: this.getParameter('gamerId', gamerId, 'string')
+                });
+            }
+            return url;
+        });
+    }
+
+    private fetchGamerId(): Promise<string> {
+        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+            return gamerId;
+        }).catch(error => {
+            return undefined;
         });
     }
 
