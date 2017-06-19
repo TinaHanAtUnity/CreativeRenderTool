@@ -286,7 +286,7 @@ export class WebView {
     }
 
     private onAdUnitStartProcessed(): void {
-        if(this._currentAdUnit && (this._currentAdUnit.getCampaign().getAbGroup() === 6 || this._currentAdUnit.getCampaign().getAbGroup() === 7)) {
+        if(this._currentAdUnit) {
             setTimeout(() => {
                 if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
                     this._campaignRefreshManager.refresh();
