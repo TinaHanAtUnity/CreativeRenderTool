@@ -101,7 +101,11 @@ export class WebView {
 
             return this._deviceInfo.fetch();
         }).then(() => {
-            return this._cache.cleanCache();
+            return this._cache.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -287,7 +291,7 @@ export class WebView {
     }
 
     private onAdUnitStartProcessed(): void {
-        if(this._currentAdUnit && (this._currentAdUnit.getCampaign().getAbGroup() === 6 || this._currentAdUnit.getCampaign().getAbGroup() === 7)) {
+        if(this._currentAdUnit) {
             setTimeout(() => {
                 if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
                     this._campaignRefreshManager.refresh();
