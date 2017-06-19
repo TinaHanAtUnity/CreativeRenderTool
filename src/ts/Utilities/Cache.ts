@@ -273,7 +273,7 @@ export class Cache {
                     }));
                 });
 
-                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], object]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));

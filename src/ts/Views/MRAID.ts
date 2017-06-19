@@ -9,7 +9,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
-import { WebViewError } from '../Errors/WebViewError';
+import { WebViewError } from 'Errors/WebViewError';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { Platform } from 'Constants/Platform';
-import { CallbackContainer } from './CallbackContainer';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
 
 const enum RequestStatus {
     COMPLETE,
