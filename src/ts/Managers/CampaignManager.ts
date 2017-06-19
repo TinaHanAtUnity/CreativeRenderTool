@@ -23,14 +23,6 @@ import { SessionManager } from 'Managers/SessionManager';
 
 export abstract class CampaignManager {
 
-    public static setTestBaseUrl(baseUrl: string): void {
-        CampaignManager.CampaignBaseUrl = baseUrl + '/games';
-    }
-
-    public static setAuctionBaseUrl(baseUrl: string): void {
-        CampaignManager.AuctionBaseUrl = baseUrl + '/v4/games';
-    }
-
     public static setAbGroup(abGroup: number) {
         CampaignManager.AbGroup = abGroup;
     }
@@ -50,8 +42,6 @@ export abstract class CampaignManager {
     protected static CampaignResponse: string | undefined;
 
     protected static AbGroup: number | undefined;
-    private static CampaignBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
-    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
 
@@ -63,10 +53,10 @@ export abstract class CampaignManager {
     protected _requesting: boolean;
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
+    protected _clientInfo: ClientInfo;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
-    private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
@@ -95,7 +85,7 @@ export abstract class CampaignManager {
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(), JSON.stringify(this.createRequestBody())]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             return this._request.post(requestUrl, requestBody, [], {
                 retries: 2,
@@ -113,6 +103,8 @@ export abstract class CampaignManager {
     public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
     }
+
+    protected abstract getBaseUrl(): string;
 
     protected storeGamerId(gamerId: string): Promise<void[]> {
         return Promise.all([
@@ -140,6 +132,39 @@ export abstract class CampaignManager {
                 HttpKafka.sendEvent('events.negtargeting.json', msg);
             }
         });
+    }
+
+    protected getParameter(field: string, value: any, expectedType: string) {
+        if(value === undefined) {
+            return undefined;
+        }
+
+        if(typeof value === expectedType) {
+            return value;
+        } else {
+            Diagnostics.trigger('internal_type_error', {
+                context: 'campaign_request',
+                field: field,
+                value: JSON.stringify(value),
+                expectedType: expectedType,
+                observedType: typeof value
+            });
+
+            if(expectedType === 'string') {
+                return '';
+            }
+
+            if(expectedType === 'number') {
+                return 0;
+            }
+
+            if(expectedType === 'boolean') {
+                return false;
+            }
+
+            // we only use string, number and boolean so this code is not reachable
+            return value;
+        }
     }
 
     protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
@@ -180,22 +205,8 @@ export abstract class CampaignManager {
         });
     }
 
-    private createRequestUrl(): Promise<string> {
-        let url: string;
-
-        if(this._configuration.isAuction()) {
-            url = [
-                CampaignManager.AuctionBaseUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
-        } else {
-            url = [
-                CampaignManager.CampaignBaseUrl,
-                this._clientInfo.getGameId(),
-                'fill'
-            ].join('/');
-        }
+    protected createRequestUrl(): Promise<string> {
+        let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
@@ -255,9 +266,8 @@ export abstract class CampaignManager {
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this.fetchGamerId());
 
-        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType, gamerId]) => {
+        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
             url = Url.addParameters(url, {
                 screenWidth: this.getParameter('screenWidth', screenWidth, 'number'),
                 screenHeight: this.getParameter('screenHeight', screenHeight, 'number'),
@@ -265,22 +275,11 @@ export abstract class CampaignManager {
                 networkType: this.getParameter('networkType', networkType, 'number'),
             });
 
-            if(this._configuration.isAuction()) {
-                // todo: it's slightly wasteful to read gamerId from storage and then ignore the value
-                url = Url.addParameters(url, {
-                    gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
-                });
-            } else if(gamerId) {
-                url = Url.addParameters(url, {
-                    gamerId: this.getParameter('gamerId', gamerId, 'string')
-                });
-            }
-
             return url;
         });
     }
 
-    private createRequestBody(): Promise<string> {
+    protected createRequestBody(): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -302,22 +301,6 @@ export abstract class CampaignManager {
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
-        }
-
-        if(this._configuration.isAuction()) {
-            const placementRequest: any = {};
-
-            const placements = this._configuration.getPlacements();
-            for(const placement in placements) {
-                if(placements.hasOwnProperty(placement)) {
-                    placementRequest[placement] = {
-                        adTypes: placements[placement].getAdTypes()
-                    };
-                }
-            }
-
-            body.placements = placementRequest;
-            body.properties = this._configuration.getProperties();
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
@@ -347,16 +330,8 @@ export abstract class CampaignManager {
                     body.frameworkVersion = this.getParameter('frameworkVersion', framework.getVersion(), 'string');
                 }
 
-                return JSON.stringify(body);
+                return body;
             });
-        });
-    }
-
-    private fetchGamerId(): Promise<string> {
-        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
-            return gamerId;
-        }).catch(error => {
-            return undefined;
         });
     }
 
@@ -366,38 +341,5 @@ export abstract class CampaignManager {
         }).catch(() => {
             return [];
         });
-    }
-
-    private getParameter(field: string, value: any, expectedType: string) {
-        if(value === undefined) {
-            return undefined;
-        }
-
-        if(typeof value === expectedType) {
-            return value;
-        } else {
-            Diagnostics.trigger('internal_type_error', {
-                context: 'campaign_request',
-                field: field,
-                value: JSON.stringify(value),
-                expectedType: expectedType,
-                observedType: typeof value
-            });
-
-            if(expectedType === 'string') {
-                return '';
-            }
-
-            if(expectedType === 'number') {
-                return 0;
-            }
-
-            if(expectedType === 'boolean') {
-                return false;
-            }
-
-            // we only use string, number and boolean so this code is not reachable
-            return value;
-        }
     }
 }
