@@ -255,13 +255,7 @@ export class Cache {
                             // file not fully downloaded, deleting it
                             return Promise.all([
                                 this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
-                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
-                                    Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                        cleanCacheError: error,
-                                        cleanCacheKey: 'cache.files.' + this.getFileIdHash(file),
-                                        cleanCacheErrorType: 'keepFiles'
-                                    });
-                                }),
+                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch(),
                                 this._nativeBridge.Storage.write(StorageType.PRIVATE),
                                 this._nativeBridge.Cache.deleteFile(file)
                             ]);
