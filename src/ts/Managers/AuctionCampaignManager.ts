@@ -11,8 +11,16 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Url } from 'Utilities/Url';
 
 export class AuctionCampaignManager extends CampaignManager {
+
+    public static setAuctionBaseUrl(baseUrl: string): void {
+        AuctionCampaignManager.AuctionBaseUrl = baseUrl + '/v4/games';
+    }
+
+    private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         super(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
     }
@@ -28,6 +36,44 @@ export class AuctionCampaignManager extends CampaignManager {
         }).catch((error) => {
             this._requesting = false;
             this.onError.trigger(error);
+        });
+    }
+
+    protected getBaseUrl(): string {
+        return [
+            AuctionCampaignManager.AuctionBaseUrl,
+            this._clientInfo.getGameId(),
+            'requests'
+        ].join('/');
+    }
+
+    protected createRequestUrl(): Promise<string> {
+        return super.createRequestUrl().then((url) => {
+            url = Url.addParameters(url, {
+                gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
+            });
+
+            return url;
+        });
+    }
+
+    protected createRequestBody(): Promise<any> {
+        return super.createRequestBody().then((body) => {
+            const placementRequest: any = {};
+
+            const placements = this._configuration.getPlacements();
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
+                    placementRequest[placement] = {
+                        adTypes: placements[placement].getAdTypes()
+                    };
+                }
+            }
+
+            body.placements = placementRequest;
+            body.properties = this._configuration.getProperties();
+
+            return body;
         });
     }
 
