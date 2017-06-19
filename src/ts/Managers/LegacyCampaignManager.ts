@@ -31,12 +31,6 @@ export class LegacyCampaignManager extends CampaignManager {
         }).catch((error) => {
             this._requesting = false;
             this.onError.trigger(error);
-            /*
-            if(this._configuration.isAuction()) {
-                this.onPlcError.trigger(error);
-            } else {*/
-                // super.onError.trigger(error);
-            // }
         });
     }
 
@@ -129,23 +123,12 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private handleNoFill(): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show');
-
-        for(const placementId in this._configuration.getPlacements()) {
-            if(this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                this.onNoFill.trigger(placementId);
-            }
-        }
-
+        this.onNoFill.trigger('');
         return Promise.resolve();
     }
 
     private handleFill(campaign: Campaign): Promise<void> {
-        for(const placementId in this._configuration.getPlacements()) {
-            if(this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                this.onCampaign.trigger(placementId, campaign);
-            }
-        }
-
+        this.onCampaign.trigger('', campaign);
         return Promise.resolve();
     }
 }
