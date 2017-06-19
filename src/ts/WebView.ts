@@ -411,7 +411,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                CampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                LegacyCampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
@@ -420,7 +420,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('auctionUrl')) {
-                CampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
+                AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {
