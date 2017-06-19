@@ -1,3 +1,8 @@
+# Mon Jun 19 12:02:30 UTC 2017
+
+* Fix cache bookkeeping errors
+* Enable earlier ad requests for all users
+
 # Wed Jun 14 14:16:35 UTC 2017
 
 * Catch all errors from cache cleaning to avoid init failures
