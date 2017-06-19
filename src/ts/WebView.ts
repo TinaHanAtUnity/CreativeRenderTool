@@ -70,6 +70,12 @@ export class WebView {
 
     private _metadataManager: MetaDataManager;
 
+    // constant value that determines the delay for refreshing ads after backend has processed a start event
+    // set to five seconds because backend should usually process start event in less than one second but
+    // we want to be safe in case of error situations on the backend and mistimings on the device
+    // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
+    private _startRefreshMagicConstant: number = 5000;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -94,7 +100,11 @@ export class WebView {
 
             return this._deviceInfo.fetch();
         }).then(() => {
-            return this._cache.cleanCache();
+            return this._cache.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -240,6 +250,7 @@ export class WebView {
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
@@ -271,6 +282,16 @@ export class WebView {
         this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
         if(sendFinish) {
             this._nativeBridge.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
+    }
+
+    private onAdUnitStartProcessed(): void {
+        if(this._currentAdUnit) {
+            setTimeout(() => {
+                if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
+                    this._campaignRefreshManager.refresh();
+                }
+            }, this._startRefreshMagicConstant);
         }
     }
 
