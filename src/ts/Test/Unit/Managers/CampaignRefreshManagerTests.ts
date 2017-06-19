@@ -143,8 +143,7 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
-                campaignManager.onCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
@@ -167,8 +166,7 @@ describe('CampaignRefreshManager', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const vast = new Vast([new VastAd()], ['ErrorUrl']);
                 sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-                campaignManager.onCampaign.trigger('rewardedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
-                campaignManager.onCampaign.trigger('incentivizedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
@@ -192,8 +190,7 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const mraid = new MRAIDCampaign(campaignObject, 'TestGamerId', 12345);
-                campaignManager.onCampaign.trigger('rewardedVideo', mraid);
-                campaignManager.onCampaign.trigger('incentivizedVideo', mraid);
+                campaignManager.onCampaign.trigger('', mraid);
                 return Promise.resolve();
             });
 
@@ -217,8 +214,7 @@ describe('CampaignRefreshManager', () => {
             const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
-                campaignManager.onCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 campaignObject = campaignObject2;
                 return Promise.resolve();
             });
@@ -253,8 +249,7 @@ describe('CampaignRefreshManager', () => {
 
         it('placement states should end up with NO_FILL', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onNoFill.trigger('rewardedVideo');
-                campaignManager.onNoFill.trigger('incentivizedVideo');
+                campaignManager.onNoFill.trigger('');
                 return Promise.resolve();
             });
 
@@ -280,8 +275,7 @@ describe('CampaignRefreshManager', () => {
             const campaign2 = new PerformanceCampaign(campaignObject2, 'TestGamerId', 12345);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', campaign);
-                campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 campaign = campaign2;
                 return Promise.resolve();
             });
@@ -318,8 +312,7 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', campaign);
-                campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 return Promise.resolve();
             });
 
@@ -352,8 +345,7 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', campaign);
-                campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 campaign = campaign2;
                 return Promise.resolve();
             });
@@ -655,19 +647,19 @@ describe('CampaignRefreshManager', () => {
                         assert.equal(tmpCampaign2.getId(), 'TestCampaignId2');
                     }
 
-                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.WAITING, '-1');
-                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING, '-2');
+                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.WAITING);
+                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
                     currentAdUnit.onClose.trigger();
 
-                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY, '-3');
-                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING, '-4');
+                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
+                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
                     campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
                     currentAdUnit.onClose.trigger();
 
-                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY, '-5');
-                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY, '-6');
+                    assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
+                    assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
                 });
             });
         });
