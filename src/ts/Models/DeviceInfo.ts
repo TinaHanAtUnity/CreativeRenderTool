@@ -23,7 +23,7 @@ interface IDeviceInfo {
     screenHeight: number;
     screenScale: number;
     userInterfaceIdiom: UIUserInterfaceIdiom;
-    networkOperator: string | null;
+    networkOperator: number | null;
     networkOperatorName: string | null;
     timeZone: string;
     headset: boolean;
@@ -191,7 +191,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         });
     }
 
-    public getNetworkOperator(): Promise<string | null> {
+    public getNetworkOperator(): Promise<number | null> {
         if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => {
                 this.set('networkOperator', networkOperator);
