@@ -236,11 +236,7 @@ export class Cache {
                 deleteFiles.map(file => {
                     if(keys.indexOf(this.getFileIdHash(file)) !== -1) {
                         promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
-                            Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                cleanCacheError: error,
-                                cleanCacheKey: 'cache.files.' + this.getFileIdHash(file),
-                                cleanCacheErrorType: 'deleteFiles'
-                            });
+                            this._nativeBridge.Sdk.logDebug('Error while removing file storage entry');
                         }));
                         dirty = true;
                     }
@@ -262,11 +258,7 @@ export class Cache {
                             return Promise.all([
                                 this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
                                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + this.getFileIdHash(file)).catch((error) => {
-                                    Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
-                                        cleanCacheError: error,
-                                        cleanCacheKey: 'cache.files.' + this.getFileIdHash(file),
-                                        cleanCacheErrorType: 'keepFiles'
-                                    });
+                                    this._nativeBridge.Sdk.logDebug('Error while removing file storage entry for partially downloaded file');
                                 }),
                                 this._nativeBridge.Storage.write(StorageType.PRIVATE),
                                 this._nativeBridge.Cache.deleteFile(file)
@@ -281,17 +273,17 @@ export class Cache {
                     }));
                 });
 
-                return this._nativeBridge.Cache.getFiles().then((cacheFilesLeft) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));
                     });
                     let campaignsDirty = false;
 
-                    for(const campaignId in campaigns) {
-                        if(campaigns.hasOwnProperty(campaignId)) {
-                            for(const currentFileId in campaigns[campaignId]) {
-                                if(campaigns[campaignId].hasOwnProperty(currentFileId)) {
+                    for(const campaignId in campaignsLeft) {
+                        if(campaignsLeft.hasOwnProperty(campaignId)) {
+                            for(const currentFileId in campaignsLeft[campaignId]) {
+                                if(campaignsLeft[campaignId].hasOwnProperty(currentFileId)) {
                                     if(cacheFilesLeftIds.indexOf(currentFileId) === -1) {
                                         promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaigns.' + campaignId).catch((error) => {
                                             Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
