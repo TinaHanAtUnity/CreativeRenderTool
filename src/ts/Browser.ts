@@ -45,7 +45,7 @@ const setClientInfo = () => {
 const setAndroidDeviceInfo = () => {
     const fields = [
         ['AdvertisingTrackingId'],
-        ['LimitAdTrackingFlag'],
+        ['LimitAdTrackingFlag', true],
         ['AndroidId'],
         ['Manufacturer'],
         ['Model'],
@@ -75,14 +75,14 @@ const setAndroidDeviceInfo = () => {
     ];
     fields.forEach(([field, flag]: [string, boolean]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-        DeviceInfo['set' + field](flag ? element.checked : element.value);
+        DeviceInfo['set' + field](flag ? element.checked : /^\d+$/.test(element.value) ? parseInt(element.value, 10) : element.value);
     });
 };
 
 const setIosDeviceInfo = () => {
     const fields = [
         ['AdvertisingTrackingId'],
-        ['LimitAdTrackingFlag'],
+        ['LimitAdTrackingFlag', true],
         ['Manufacturer'],
         ['Model'],
         ['OsVersion'],
@@ -110,7 +110,7 @@ const setIosDeviceInfo = () => {
     ];
     fields.forEach(([field, flag]: [string, boolean]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-        DeviceInfo['set' + field](flag ? element.checked : element.value);
+        DeviceInfo['set' + field](flag ? element.checked : /^\d+$/.test(element.value) ? parseInt(element.value, 10) : element.value);
     });
 };
 
