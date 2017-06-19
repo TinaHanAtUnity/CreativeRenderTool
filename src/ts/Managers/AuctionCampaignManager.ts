@@ -28,12 +28,6 @@ export class AuctionCampaignManager extends CampaignManager {
         }).catch((error) => {
             this._requesting = false;
             this.onError.trigger(error);
-            /*
-             if(this._configuration.isAuction()) {
-             this.onPlcError.trigger(error);
-             } else {*/
-            // super.onError.trigger(error);
-            // }
         });
     }
 
