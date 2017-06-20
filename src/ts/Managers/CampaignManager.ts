@@ -21,7 +21,10 @@ import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { PromoCampaign } from 'Models/PromoCampaign';
 import { SessionManager } from 'Managers/SessionManager';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { MetaData } from 'Utilities/MetaData';
 
 export class CampaignManager {
 
@@ -242,6 +245,25 @@ export class CampaignManager {
                     });
                 });
 
+            case 'purchasing/promo':
+                const promoJson = JsonParser.parse(content);
+                if (promoJson && promoJson.iapProductId) {
+                    return PurchasingUtilities.refresh(new MetaData(this._nativeBridge)).then(values => {
+                        if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
+                            const campaign = new PromoCampaign(promoJson, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                            return this._assetManager.setup(campaign, true).then(() => {
+                                for (const placement of placements) {
+                                    this.onPlcCampaign.trigger(placement, campaign);
+                                }
+                            });
+                        } else {
+                            for (const placement of placements) {
+                                this.onPlcNoFill.trigger(placement);
+                            }
+                            return Promise.resolve();
+                        }
+                    });
+                }
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
         }

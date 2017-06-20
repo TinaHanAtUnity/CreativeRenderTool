@@ -28,6 +28,10 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAID } from 'Views/MRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
+import { PromoCampaign } from 'Models/PromoCampaign';
+import { Promo } from 'Views/Promo';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PromoEventHandlers } from 'EventHandlers/PromoEventHandlers';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 
@@ -41,6 +45,8 @@ export class AdUnitFactory {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+        } else if(campaign instanceof PromoCampaign) {
+            return this.createPromoAdUnit(nativeBridge, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -137,6 +143,24 @@ export class AdUnitFactory {
         });
 
         return mraidAdUnit;
+    }
+
+    private static createPromoAdUnit(nativeBridge: NativeBridge, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PromoCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+        const promoView = new Promo(nativeBridge, campaign, deviceInfo.getLanguage());
+        const promoAdUnit = new PromoAdUnit(nativeBridge, container, placement, campaign, promoView, options);
+
+        promoView.render();
+        document.body.appendChild(promoView.container());
+
+        promoView.onClose.subscribe(() => PromoEventHandlers.onClose(promoAdUnit));
+        promoView.onPromo.subscribe((productId) => PromoEventHandlers.onPromo(nativeBridge, promoAdUnit, productId));
+
+        promoAdUnit.onClose.subscribe(() => {
+            promoAdUnit.setFinishState(FinishState.COMPLETED);
+            promoAdUnit.hide();
+        });
+
+        return promoAdUnit;
     }
 
     private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit) {

@@ -1,0 +1,13 @@
+{
+    "abGroup": 0,
+    "promo": {
+        "id": "000000000000000000000123",
+        "appStoreId": "fooAppId",
+        "iapProductId": "com.example.iap.product1",
+        "buttonUrl": "https://example.com/button.png",
+        "landscapeUrl": "https://example.com/landscape.png",
+        "portraitUrl": "https://example.com/portrait.png"
+    },
+    "gamerId": "583dfda0d933a3630a53249c",
+    "cacheTTL": 7200
+}

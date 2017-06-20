@@ -36,6 +36,9 @@ describe('IntegrationTest', () => {
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
                 return;
+            },
+            onUnityAdsInitiatePurchaseEvent: (eventString: string) => {
+                return;
             }
         };
 
@@ -97,6 +100,9 @@ describe('IntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+                return;
+            },
+            onUnityAdsInitiatePurchaseEvent: (eventString: string) => {
                 return;
             }
         };
