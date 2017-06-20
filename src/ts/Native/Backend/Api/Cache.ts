@@ -51,6 +51,17 @@ export class Cache {
         throw CacheError.FILE_NOT_FOUND;
     }
 
+    public static getFileContent(fileId: string, encoding: string) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                resolve(xhr.responseText);
+            }, false);
+            xhr.open('GET', decodeURIComponent(Cache._fileIdMap[fileId]));
+            xhr.send();
+        });
+    }
+
     public static getVideoInfo(fileId: string) {
         return [640, 360, 10000];
     }
