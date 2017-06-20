@@ -6,6 +6,8 @@ import { Campaign } from "Models/Campaign";
 import { Promo } from 'Views/Promo';
 import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
+import { PromoCampaign } from 'Models/PromoCampaign';
+import { Image } from 'Models/Assets/Image';
 
 export class PromoAdUnit extends AbstractAdUnit {
 
@@ -47,6 +49,14 @@ export class PromoAdUnit extends AbstractAdUnit {
         this.onFinish.trigger();
         this.onClose.trigger();
         return this._container.close();
+    }
+
+    public isCached(): boolean {
+        const asset: Image | undefined = (<PromoCampaign>this.getCampaign()).getLandscape();
+        if(asset) {
+            return asset.isCached();
+        }
+        return false;
     }
 
     public description(): string {
