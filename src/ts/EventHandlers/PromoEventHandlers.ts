@@ -9,7 +9,9 @@ export class PromoEventHandlers {
 
     public static onPromo(nativeBridge: NativeBridge, adUnit: PromoAdUnit, iapProductId: string): void {
         adUnit.hide();
-        nativeBridge.Listener.sendInitiatePurchaseEvent(iapProductId);
+        const iapPayload = <any>{};
+        iapPayload.productId = iapProductId;
+        nativeBridge.Listener.sendInitiatePurchaseEvent(iapPayload);
     }
 
 }
