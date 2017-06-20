@@ -12,6 +12,7 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Url } from 'Utilities/Url';
+import { Campaign } from 'Models/Campaign';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -135,34 +136,42 @@ export class AuctionCampaignManager extends CampaignManager {
                 const json = JsonParser.parse(content);
                 if(json && json.mraidUrl) {
                     const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onCampaign.trigger(placement, campaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, campaign);
                 } else {
                     const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                     this.sendNegativeTargetingEvent(campaign, gamerId);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onCampaign.trigger(placement, campaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, campaign);
                 }
 
             case 'programmatic/vast':
                 return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
-                    return this._assetManager.setup(vastCampaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onCampaign.trigger(placement, vastCampaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
+
+            case 'programmatic/mraid-url':
+                const jsonMraidUrl = JsonParser.parse(content);
+                jsonMraidUrl.id = this.getProgrammaticCampaignId();
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls);
+                return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
+
+            case 'programmatic/mraid':
+                const jsonMraid = JsonParser.parse(content);
+                jsonMraid.id = this.getProgrammaticCampaignId();
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls);
+                return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
         }
 
+    }
+
+    private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
+        return this._assetManager.setup(campaign, true).then(() => {
+            for(const placement of placements) {
+                this.onCampaign.trigger(placement, campaign);
+            }
+        });
     }
 
     private handlePlcNoFill(placement: string): Promise<void> {
