@@ -53,7 +53,7 @@ export class FakeDeviceInfo extends DeviceInfo {
         return Promise.resolve(this._fakeDevice.networkType);
     }
 
-    public getNetworkOperator(): Promise<number> {
+    public getNetworkOperator(): Promise<string> {
         return Promise.resolve(this._fakeDevice.networkOperator);
     }
 

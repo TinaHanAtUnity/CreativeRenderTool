@@ -54,20 +54,18 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkType');
     }
 
-    public getNetworkOperator(): Promise<number> {
+    public getNetworkOperator(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkOperator').then(result => {
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator').then(result => {
                 if(typeof result === 'string') {
-                    return parseInt(result, 10);
-                } else if(typeof result === 'number') {
                     return result;
                 } else {
-                    return undefined;
+                    return '';
                 }
             });
         } else {
-            return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkOperator');
+            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator');
         }
     }
 

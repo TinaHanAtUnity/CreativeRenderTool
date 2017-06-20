@@ -60,7 +60,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setFreeSpace(10159440);
         DeviceInfo.setConnectionType('wifi');
         DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator(24412);
+        DeviceInfo.setNetworkOperator('24412');
         DeviceInfo.setNetworkOperatorName('DNA');
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);
@@ -119,7 +119,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setFreeSpace(10159440);
         DeviceInfo.setConnectionType('wifi');
         DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator(24412);
+        DeviceInfo.setNetworkOperator('24412');
         DeviceInfo.setNetworkOperatorName('DNA');
         DeviceInfo.setHeadset(false);
         DeviceInfo.setDeviceVolume(1);

@@ -122,7 +122,7 @@ describe('DeviceInfoTest Android', () => {
                 getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve(123123)),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
 
                 Android: {
                     getAndroidId: sinon.stub().returns(Promise.resolve('17')),
@@ -149,7 +149,7 @@ describe('DeviceInfoTest Android', () => {
             assert.equal(dto.screenLayout, 1);
             assert.equal(dto.freeSpaceInternal, 16);
             assert.equal(dto.networkOperatorName, 'operatorName');
-            assert.equal(dto.networkOperator, 123123);
+            assert.equal(dto.networkOperator, 'operator');
             assert.equal(dto.ringerMode, 2);
             assert.equal(dto.deviceVolume, 0.5);
             assert.equal(dto.totalSpaceExternal, 2048);
@@ -181,7 +181,7 @@ describe('DeviceInfoTest Android', () => {
                 getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve(123123)),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
 
                 Android: {
                     getAndroidId: sinon.stub().returns(Promise.resolve('17')),
@@ -235,7 +235,7 @@ describe('DeviceInfoTest iOS', () => {
                 getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve(123123)),
+                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
 
                 Ios: {
                     getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
@@ -259,7 +259,7 @@ describe('DeviceInfoTest iOS', () => {
             assert.equal(dto.simulator, true);
             assert.equal(dto.freeSpaceInternal, 16);
             assert.equal(dto.networkOperatorName, 'operatorName');
-            assert.equal(dto.networkOperator, 123123);
+            assert.equal(dto.networkOperator, 'operator');
             assert.equal(dto.deviceVolume, 0.5);
             assert.equal(dto.totalSpaceInternal, 1024);
         });
