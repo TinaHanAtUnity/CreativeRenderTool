@@ -161,11 +161,11 @@ export abstract class CampaignManager {
         }
     }
 
-    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
+    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
-            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls);
+            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 return Promise.reject(new Error('Campaign does not have an impression url'));
             }

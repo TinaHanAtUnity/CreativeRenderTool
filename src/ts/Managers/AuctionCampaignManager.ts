@@ -22,6 +22,7 @@ export class AuctionCampaignManager extends CampaignManager {
     }
 
     private static AuctionBaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+    private static CorrelationId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         super(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
@@ -83,6 +84,9 @@ export class AuctionCampaignManager extends CampaignManager {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
+            if ('correlationId' in json) {
+                AuctionCampaignManager.CorrelationId = json.correlationId;
+            }
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
 
@@ -114,7 +118,7 @@ export class AuctionCampaignManager extends CampaignManager {
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls);
+                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId);
                     });
                 }
             }
@@ -127,7 +131,7 @@ export class AuctionCampaignManager extends CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }): Promise<void> {
+    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
@@ -145,20 +149,20 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
 
             case 'programmatic/vast':
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
+                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, undefined, adType, creativeId, seatId, AuctionCampaignManager.CorrelationId).then((vastCampaign) => {
                     return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
 
             case 'programmatic/mraid-url':
                 const jsonMraidUrl = JsonParser.parse(content);
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls);
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, AuctionCampaignManager.CorrelationId);
                 return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
                 const jsonMraid = JsonParser.parse(content);
                 jsonMraid.id = this.getProgrammaticCampaignId();
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls, adType, creativeId, seatId, AuctionCampaignManager.CorrelationId);
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             default:
