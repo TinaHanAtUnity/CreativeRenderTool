@@ -59,48 +59,6 @@ export class MRAID extends View {
         ];
     }
 
-    public render() {
-        super.render();
-
-        console.time('Load playable');
-
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
-
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-
-        // this._loadingScreen.style.position = 'absolute';
-        this._loadingScreen.style.width = '100vw';
-        this._loadingScreen.style.height = '100vh';
-        this._loadingScreen.style.backgroundColor = 'yellow';
-        
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(Math.abs(<number>window.orientation) === 90) {
-                iframe.width = screen.height;
-                iframe.height = screen.width;
-            } else {
-                iframe.width = screen.width;
-                iframe.height = screen.height;
-            }
-        } else {
-            iframe.height = window.innerHeight;
-            iframe.width = window.innerWidth;
-        }
-
-        this.createMRAID().then(mraid => {
-
-            iframe.onload = () => {
-                console.timeEnd('Load playable');
-            }
-
-            iframe.srcdoc = mraid;
-        });
-
-        this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        window.addEventListener('message', this._messageListener, false);
-    }
-
     public show(): void {
         super.show();
 
@@ -185,6 +143,47 @@ export class MRAID extends View {
         } else {
             window.addEventListener('resize', this._resizeHandler, false);
         }
+    }
+
+    public render() {
+        super.render();
+
+        // console.time('Load playable');
+
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+
+        // this._loadingScreen.style.position = 'absolute';
+        this._loadingScreen.style.width = '100vw';
+        this._loadingScreen.style.height = '100vh';
+        this._loadingScreen.style.backgroundColor = 'yellow';
+
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            if (Math.abs(<number>window.orientation) === 90) {
+                iframe.width = screen.height;
+                iframe.height = screen.width;
+            } else {
+                iframe.width = screen.width;
+                iframe.height = screen.height;
+            }
+        } else {
+            iframe.height = window.innerHeight;
+            iframe.width = window.innerWidth;
+        }
+
+        this.createMRAID().then(mraid => {
+
+            iframe.onload = () => {
+                // console.timeEnd('Load playable');
+            };
+
+            iframe.srcdoc = mraid;
+        });
+
+        this._messageListener = (event: MessageEvent) => this.onMessage(event);
+        window.addEventListener('message', this._messageListener, false);
     }
 
     public hide() {
