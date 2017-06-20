@@ -108,6 +108,11 @@ if(coverageDir) {
     };
 }
 
+process.on('unhandledRejection', error => {
+    console.error(error);
+    process.exit(1);
+});
+
 const sourcePaths = getSourcePaths('src/ts');
 const testPaths = getTestPaths('src/ts/Test', testFilter);
 
