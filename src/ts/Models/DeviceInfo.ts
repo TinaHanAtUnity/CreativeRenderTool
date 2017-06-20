@@ -70,7 +70,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
             screenHeight: ['integer'],
             screenScale: ['number'],
             userInterfaceIdiom: ['number'],
-            networkOperator: ['integer', 'null'],
+            networkOperator: ['string', 'null'],
             networkOperatorName: ['string', 'null'],
             timeZone: ['string'],
             headset: ['boolean'],
