@@ -11,7 +11,7 @@ export class PromoEventHandlers {
         adUnit.hide();
         const iapPayload = <any>{};
         iapPayload.productId = iapProductId;
-        nativeBridge.Listener.sendInitiatePurchaseEvent(iapPayload);
+        nativeBridge.Listener.sendInitiatePurchaseEvent(JSON.stringify(iapPayload));
     }
 
 }

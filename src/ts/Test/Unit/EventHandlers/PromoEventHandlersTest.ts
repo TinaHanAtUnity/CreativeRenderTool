@@ -62,7 +62,7 @@ describe('PromoEventHandlersTest', () => {
             PromoEventHandlers.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid');
             const eventPayload = <any>{};
             eventPayload.productId = 'com.unit.test.iapproductid';
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendInitiatePurchaseEvent, eventPayload);
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendInitiatePurchaseEvent, JSON.stringify(eventPayload));
         });
     });
 });
