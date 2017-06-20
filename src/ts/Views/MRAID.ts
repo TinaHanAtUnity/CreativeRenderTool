@@ -29,6 +29,7 @@ export class MRAID extends View {
     private _campaign: MRAIDCampaign;
 
     private _closeElement: HTMLElement;
+    private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
     private _loaded = false;
 
@@ -61,9 +62,18 @@ export class MRAID extends View {
     public render() {
         super.render();
 
+        console.time('Load playable');
+
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+
+        // this._loadingScreen.style.position = 'absolute';
+        this._loadingScreen.style.width = '100vw';
+        this._loadingScreen.style.height = '100vh';
+        this._loadingScreen.style.backgroundColor = 'yellow';
+        
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             if(Math.abs(<number>window.orientation) === 90) {
@@ -79,6 +89,11 @@ export class MRAID extends View {
         }
 
         this.createMRAID().then(mraid => {
+
+            iframe.onload = () => {
+                console.timeEnd('Load playable');
+            }
+
             iframe.srcdoc = mraid;
         });
 
