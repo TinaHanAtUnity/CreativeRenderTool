@@ -130,6 +130,9 @@ export class AdUnitFactory {
             sessionManager.sendClick(mraidAdUnit);
             mraidAdUnit.sendClick();
         });
+        mraid.onReward.subscribe(() => {
+            sessionManager.sendThirdQuartile(mraidAdUnit);
+        });
         mraid.onSkip.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
             mraidAdUnit.hide();

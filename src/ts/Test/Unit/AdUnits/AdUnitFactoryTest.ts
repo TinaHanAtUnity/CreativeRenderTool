@@ -51,6 +51,7 @@ describe('AdUnitFactoryTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge);
         const request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        sandbox.stub(container, 'close').returns(Promise.resolve());
         const eventManager = new EventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
