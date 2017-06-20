@@ -51,7 +51,7 @@ describe('PromoEventHandlersTest', () => {
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
-        it('should call native listener with the iapProductId', () => {
+        it('should call native listener with json containing iapProductId as productId', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
@@ -60,7 +60,9 @@ describe('PromoEventHandlersTest', () => {
             sinon.stub(nativeBridge.Listener, 'sendInitiatePurchaseEvent');
 
             PromoEventHandlers.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid');
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendInitiatePurchaseEvent, 'com.unit.test.iapproductid');
+            const eventPayload = <any>{};
+            eventPayload.productId = 'com.unit.test.iapproductid';
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendInitiatePurchaseEvent, eventPayload);
         });
     });
 });
