@@ -1,3 +1,29 @@
+# Mon Jun 19 12:02:30 UTC 2017
+
+* Fix cache bookkeeping errors
+* Enable earlier ad requests for all users
+
+# Wed Jun 14 14:16:35 UTC 2017
+
+* Catch all errors from cache cleaning to avoid init failures
+
+# Wed Jun 14 13:22:49 UTC 2017
+
+* Redeployment of previous deploy after revert
+* Add more information to cache_desync_failure and cache_desync_fixed diagnostics
+* Add hack for iOS older than 2.1.0 to avoid most cache desync issues
+
+# Wed Jun 14 08:23:35 UTC 2017
+
+* Send an array of cached campaigns in device cache in cachedCampaigns array in ad requests
+* Send third quartile event after 3/4 of playback on MRAID playable ads
+* Test for refreshing ads five seconds after start event instead of when going to endscreen in A/B groups 6 and 7
+
+# Tue Jun 13 10:28:55 UTC 2017
+
+* Support for oriented performance campaigns
+* Remove Yodo1 A/B test
+
 # Mon Jun 12 08:30:19 UTC 2017
 
 * Start sending cache diagnostics to ads.sdk2.events.creativedownload.json for 1 user out of 10000

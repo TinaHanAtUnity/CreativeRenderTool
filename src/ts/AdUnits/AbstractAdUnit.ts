@@ -27,6 +27,7 @@ export abstract class AbstractAdUnit {
     private static _autoCloseDelay: number = 0;
 
     public readonly onStart = new Observable0();
+    public readonly onStartProcessed = new Observable0();
     public readonly onFinish = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onError = new Observable0();
@@ -56,6 +57,8 @@ export abstract class AbstractAdUnit {
     public abstract hide(): Promise<void>;
 
     public abstract description(): string;
+
+    public abstract isCached(): boolean;
 
     public isShowing() {
         return this._showing;
@@ -90,5 +93,4 @@ export abstract class AbstractAdUnit {
             this._finishState = finishState;
         }
     }
-
 }

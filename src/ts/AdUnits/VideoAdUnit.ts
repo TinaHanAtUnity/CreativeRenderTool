@@ -67,6 +67,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         });
     }
 
+    public isCached(): boolean {
+        return this._video.isCached();
+    }
+
     public getOverlay(): Overlay | undefined {
         return this._overlay;
     }
