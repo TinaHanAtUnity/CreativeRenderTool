@@ -108,8 +108,9 @@ if(coverageDir) {
     };
 }
 
-process.on('unhandledRejection', error => {
+process.on('unhandledRejection', (error, promise) => {
     console.error(error);
+    console.error(promise);
     process.exit(1);
 });
 

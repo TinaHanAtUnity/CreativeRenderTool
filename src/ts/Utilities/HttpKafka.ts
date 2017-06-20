@@ -27,6 +27,10 @@ export class HttpKafka {
             'msg': data
         });
 
+        if(!HttpKafka._request) {
+            throw new Error('Request instance missing from HttpKafka');
+        }
+
         return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
             messages.unshift(commonObject);
 

@@ -121,7 +121,7 @@ describe('AnalyticsManagerTest', () => {
                 done();
             });
 
-            this.nativeBridge.Storage.onSet.trigger(StorageEvent.SET, 'price=1, currency=USD');
+            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], 'price=1, currency=USD');
         });
     });
 });
