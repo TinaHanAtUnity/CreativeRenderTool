@@ -199,6 +199,14 @@ export class Vast extends Model<IVast> {
         };
     }
 
+    public getCompanionCreativeViewTrackingUrls(): string[] {
+        const ad = this.getAd();
+        if (ad) {
+            return ad.getCompanionCreativeViewTrackingUrls();
+        }
+        return [];
+    }
+
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
         const minHeight = 320;
         const minWidth = 480;
@@ -221,13 +229,4 @@ export class Vast extends Model<IVast> {
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
     }
-
-    public getCompanionCreativeViewTrackingUrls(): string[] {
-        const ad = this.getAd();
-        if (ad) {
-            return ad.getCompanionCreativeViewTrackingUrls();
-        }
-        return [];
-    }
-
 }

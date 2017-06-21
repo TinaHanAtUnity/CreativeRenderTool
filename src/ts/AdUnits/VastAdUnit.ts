@@ -96,6 +96,13 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
+    public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
+        const urls = this.getVast().getCompanionCreativeViewTrackingUrls();
+        for (const url of urls) {
+            this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+        }
+    }
+
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
@@ -118,12 +125,5 @@ export class VastAdUnit extends VideoAdUnit {
     private isValidURL(url: string | null): boolean {
         const reg = new RegExp('^(https?)://.+$');
         return !!url && reg.test(url);
-    }
-
-    public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
-        const urls = this.getVast().getCompanionCreativeViewTrackingUrls();
-        for (const url of urls) {
-            this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
-        }
     }
 }
