@@ -150,6 +150,12 @@
       "requred": "yes",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "videoOrientation",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }

@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -67,6 +68,10 @@ export class SessionManagerEventMetadataCreator {
             }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
+        }
+
+        if(adUnit instanceof PerformanceAdUnit) {
+            infoJson.videoOrientation = adUnit.getVideoOrientation();
         }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
