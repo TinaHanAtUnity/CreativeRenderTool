@@ -198,9 +198,17 @@ export class CampaignRefreshManager {
             messageType = 'plc_request_failed';
         }
 
-        this._nativeBridge.Sdk.logError(JSON.stringify(error));
         Diagnostics.trigger(messageType, error);
-        this.setPlacementStates(PlacementState.NO_FILL);
+        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this.setPlacementStates(PlacementState.NO_FILL);
+            });
+        } else {
+            this.setPlacementStates(PlacementState.NO_FILL);
+        }
     }
 
     private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined) {
