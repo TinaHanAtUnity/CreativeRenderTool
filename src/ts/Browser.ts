@@ -24,93 +24,96 @@ const resizeHandler = (event?: Event) => {
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 
+const toInt = (element: HTMLInputElement): number => parseInt(element.value, 10);
+const toBoolean = (element: HTMLInputElement): boolean => element.checked;
+
 const setClientInfo = () => {
     const fields = [
         ['appName', 'setAppName'],
         ['appVersion', 'setAppVersion'],
         ['sdkVersion', 'setSdkVersion'],
         ['sdkVersionName', 'setSdkVersionName'],
-        ['debuggable', 'setDebuggable', true],
+        ['debuggable', 'setDebuggable', toBoolean],
         ['configUrl', 'setConfigUrl'],
         ['webViewUrl', 'setWebViewUrl'],
         ['webViewHash', 'setWebViewHash'],
         ['webViewVersion', 'setWebViewVersion']
     ];
-    fields.forEach(([field, setter, flag]: [string, string, boolean]) => {
+    fields.forEach(([field, setter, parser]: [string, string, (element: HTMLInputElement) => any]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById(field);
-        Sdk[setter](flag ? element.checked : element.value);
+        Sdk[setter](parser ? parser(element) : element.value);
     });
 };
 
 const setAndroidDeviceInfo = () => {
     const fields = [
         ['AdvertisingTrackingId'],
-        ['LimitAdTrackingFlag'],
+        ['LimitAdTrackingFlag', toBoolean],
         ['AndroidId'],
         ['Manufacturer'],
         ['Model'],
         ['OsVersion'],
-        ['ApiLevel'],
-        ['Rooted', true],
-        ['ScreenWidth'],
-        ['ScreenHeight'],
-        ['ScreenDensity'],
-        ['ScreenLayout'],
-        ['ScreenBrightness'],
+        ['ApiLevel', toInt],
+        ['Rooted', toBoolean],
+        ['ScreenWidth', toInt],
+        ['ScreenHeight', toInt],
+        ['ScreenDensity', toInt],
+        ['ScreenLayout', toInt],
+        ['ScreenBrightness', toInt],
         ['SystemLanguage'],
         ['TimeZone'],
-        ['TotalSpace'],
-        ['FreeSpace'],
-        ['TotalMemory'],
-        ['FreeMemory'],
+        ['TotalSpace', toInt],
+        ['FreeSpace', toInt],
+        ['TotalMemory', toInt],
+        ['FreeMemory', toInt],
         ['ConnectionType'],
-        ['NetworkType'],
+        ['NetworkType', toInt],
         ['NetworkOperator'],
         ['NetworkOperatorName'],
-        ['Headset', true],
-        ['DeviceVolume'],
-        ['BatteryLevel'],
-        ['BatteryStatus'],
-        ['RingerMode']
+        ['Headset', toBoolean],
+        ['DeviceVolume', toInt],
+        ['BatteryLevel', toInt],
+        ['BatteryStatus', toInt],
+        ['RingerMode', toInt]
     ];
-    fields.forEach(([field, flag]: [string, boolean]) => {
+    fields.forEach(([field, parser]: [string, (element: HTMLInputElement) => any]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-        DeviceInfo['set' + field](flag ? element.checked : element.value);
+        DeviceInfo['set' + field](parser ? parser(element) : element.value);
     });
 };
 
 const setIosDeviceInfo = () => {
     const fields = [
         ['AdvertisingTrackingId'],
-        ['LimitAdTrackingFlag'],
+        ['LimitAdTrackingFlag', toBoolean],
         ['Manufacturer'],
         ['Model'],
         ['OsVersion'],
-        ['Rooted', true],
-        ['ScreenWidth'],
-        ['ScreenHeight'],
-        ['ScreenScale'],
-        ['ScreenBrightness'],
+        ['Rooted', toBoolean],
+        ['ScreenWidth', toInt],
+        ['ScreenHeight', toInt],
+        ['ScreenScale', toInt],
+        ['ScreenBrightness', toInt],
         ['SystemLanguage'],
         ['TimeZone'],
-        ['TotalSpace'],
-        ['FreeSpace'],
-        ['TotalMemory'],
-        ['FreeMemory'],
+        ['TotalSpace', toInt],
+        ['FreeSpace', toInt],
+        ['TotalMemory', toInt],
+        ['FreeMemory', toInt],
         ['ConnectionType'],
-        ['NetworkType'],
+        ['NetworkType', toInt],
         ['NetworkOperator'],
         ['NetworkOperatorName'],
-        ['Headset', true],
-        ['DeviceVolume'],
-        ['BatteryLevel'],
-        ['BatteryStatus'],
-        ['UserInterfaceIdiom'],
-        ['Simulator', true]
+        ['Headset', toBoolean],
+        ['DeviceVolume', toInt],
+        ['BatteryLevel', toInt],
+        ['BatteryStatus', toInt],
+        ['UserInterfaceIdiom', toInt],
+        ['Simulator', toBoolean]
     ];
-    fields.forEach(([field, flag]: [string, boolean]) => {
+    fields.forEach(([field, parser]: [string, (element: HTMLInputElement) => any]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-        DeviceInfo['set' + field](flag ? element.checked : element.value);
+        DeviceInfo['set' + field](parser ? parser(element) : element.value);
     });
 };
 

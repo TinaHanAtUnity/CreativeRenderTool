@@ -221,28 +221,16 @@ export class CampaignManager {
                 const json = JsonParser.parse(content);
                 if(json && json.mraidUrl) {
                     const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, campaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, campaign);
                 } else {
                     const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                     this.sendNegativeTargetingEvent(campaign, gamerId);
-                    return this._assetManager.setup(campaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, campaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, campaign);
                 }
 
             case 'programmatic/vast':
                 return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
-                    return this._assetManager.setup(vastCampaign, true).then(() => {
-                        for(const placement of placements) {
-                            this.onPlcCampaign.trigger(placement, vastCampaign);
-                        }
-                    });
+                    return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
 
             case 'purchasing/promo':
@@ -264,10 +252,42 @@ export class CampaignManager {
                         }
                     });
                 }
+
+            case 'programmatic/mraid-url':
+                const jsonMraidUrl = JsonParser.parse(content);
+                jsonMraidUrl.id = this.getProgrammaticCampaignId();
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls);
+                return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
+
+            case 'programmatic/mraid':
+                const jsonMraid = JsonParser.parse(content);
+                jsonMraid.id = this.getProgrammaticCampaignId();
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls);
+                return this.setupPlcCampaignAssets(placements, mraidCampaign);
+
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
         }
 
+    }
+
+    private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
+        return this._assetManager.setup(campaign, true).then(() => {
+            for(const placement of placements) {
+                this.onPlcCampaign.trigger(placement, campaign);
+            }
+        });
+    }
+
+    private getProgrammaticCampaignId(): string {
+        switch (this._nativeBridge.getPlatform()) {
+            case Platform.IOS:
+                return '00005472656d6f7220694f53';
+            case Platform.ANDROID:
+                return '005472656d6f7220416e6472';
+            default:
+                return 'UNKNOWN';
+        }
     }
 
     private handlePlcNoFill(placement: string): Promise<void> {
@@ -309,14 +329,7 @@ export class CampaignManager {
     private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-            let campaignId: string;
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                campaignId = '00005472656d6f7220694f53';
-            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                campaignId = '005472656d6f7220416e6472';
-            } else {
-                campaignId = 'UNKNOWN';
-            }
+            const campaignId = this.getProgrammaticCampaignId();
             const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 return Promise.reject(new Error('Campaign does not have an impression url'));
@@ -345,22 +358,12 @@ export class CampaignManager {
     }
 
     private parseMraidCampaign(json: any): Promise<void> {
-        let campaignId: string;
-
         if(json.mraid === null) {
             return this.handleNoFill();
         }
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned game advertisement for AB Group ' + json.abGroup);
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            campaignId = '00005472656d6f7220694f53';
-        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            campaignId = '005472656d6f7220416e6472';
-        } else {
-            campaignId = 'UNKNOWN';
-        }
-
-        json.mraid.id = campaignId;
+        json.mraid.id = this.getProgrammaticCampaignId();
 
         if(json.mraid.inlinedURL || json.mraid.markup) {
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup, json.mraid.inlinedURL, json.mraid.markup, json.mraid.tracking);
