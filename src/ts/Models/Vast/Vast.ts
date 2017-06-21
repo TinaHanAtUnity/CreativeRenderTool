@@ -222,4 +222,12 @@ export class Vast extends Model<IVast> {
         return MIMEType === playableMIMEType;
     }
 
+    public getCompanionCreativeViewTrackingUrls(): string[] {
+        const ad = this.getAd();
+        if (ad) {
+            return ad.getCompanionCreativeViewTrackingUrls();
+        }
+        return [];
+    }
+
 }

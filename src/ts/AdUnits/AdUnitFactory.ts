@@ -188,6 +188,7 @@ export class AdUnitFactory {
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
+        endScreen.onShow.subscribe(() => VastEndScreenEventHandlers.onShow(sessionManager, adUnit));
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
@@ -241,7 +242,6 @@ export class AdUnitFactory {
     private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
                 if(!container.isPaused()) {

@@ -120,4 +120,10 @@ export class VastAdUnit extends VideoAdUnit {
         return !!url && reg.test(url);
     }
 
+    public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
+        const urls = this.getVast().getCompanionCreativeViewTrackingUrls();
+        for (const url of urls) {
+            this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+        }
+    }
 }

@@ -293,12 +293,37 @@ export class VastParser {
             const staticResourceURL = this.parseNodeText(staticResourceElement);
             const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement);
 
-            const companionAd = new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate);
+            const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
+
+            const companionAd = new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
 
             return companionAd;
         } else {
             return null;
         }
+    }
+
+    private getTrackingEventsFromElement(el: Node): { [eventType: string]: string[] } {
+        const events: { [eventType: string]: string[] } = {};
+
+        const trackingEventsElements = this.childsByName(el, 'TrackingEvents');
+        for(const trackingEventsElement of trackingEventsElements) {
+            const trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
+            for(const trackingElement of trackingElements) {
+                const eventName = trackingElement.getAttribute('event');
+                const trackingURLTemplate = this.parseNodeText(trackingElement);
+                if ((eventName != null) && (trackingURLTemplate != null)) {
+                    if (events[eventName] !== undefined) {
+                        events[eventName].push(trackingURLTemplate);
+                    } else {
+                        events[eventName] = [trackingURLTemplate];
+                    }
+                }
+            }
+        }
+
+
+        return events;
     }
 
     private parseDuration(durationString: string): number {
