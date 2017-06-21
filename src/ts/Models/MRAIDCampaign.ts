@@ -1,11 +1,17 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
+import { Image } from 'Models/Assets/Image';
 
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
     additionalTrackingEvents: { [eventName: string]: string[] };
+
+    gameName: string;
+    gameIcon: Image;
+    rating: number;
+    ratingCount: number;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -15,7 +21,11 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             resourceAsset: ['object', 'undefined'],
             resource: ['string', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            additionalTrackingEvents: ['object', 'undefined']
+            additionalTrackingEvents: ['object', 'undefined'],
+            gameName: ['string'],
+            gameIcon: ['object'],
+            rating: ['number'],
+            ratingCount: ['number']
         });
 
         this.set('id', campaign.id);
@@ -26,6 +36,12 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('resource', resource);
         this.set('dynamicMarkup', campaign.dynamicMarkup);
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
+
+        this.set('gameName', campaign.gameName);
+        this.set('gameIcon', new Image(campaign.gameIcon));
+
+        this.set('rating', campaign.rating);
+        this.set('ratingCount', campaign.ratingCount);
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -44,13 +60,31 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('resource');
     }
 
+    public getGameName(): string {
+        return this.get('gameName');
+    }
+
+    public getGameIcon(): Image {
+        return this.get('gameIcon');
+    }
+
+    public getRating(): number{
+        return this.get('rating');
+    }
+
+    public getRatingCount(): number {
+        return this.get('ratingCount');
+    }
+
     public getRequiredAssets() {
         const resourceUrl =  this.getResourceUrl();
         return resourceUrl ? [resourceUrl] : [];
     }
 
     public getOptionalAssets() {
-        return [];
+        return [
+            this.getGameIcon()
+        ];
     }
 
     public getDynamicMarkup(): string | undefined {
