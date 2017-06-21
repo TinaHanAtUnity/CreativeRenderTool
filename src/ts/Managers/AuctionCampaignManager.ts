@@ -13,6 +13,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -31,7 +32,7 @@ export class AuctionCampaignManager extends CampaignManager {
             if(response) {
                 return this.parsePlcCampaigns(response);
             }
-            return Promise.resolve();
+            throw new WebViewError('Empty campaign response', 'CampaignRequestError');
         }).then(() => {
             this._requesting = false;
         }).catch((error) => {

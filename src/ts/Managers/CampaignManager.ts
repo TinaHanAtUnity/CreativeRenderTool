@@ -107,13 +107,6 @@ export abstract class CampaignManager {
 
     protected abstract getBaseUrl(): string;
 
-    protected storeGamerId(gamerId: string): Promise<void[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
-    }
-
     protected sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return;

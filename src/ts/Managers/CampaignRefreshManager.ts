@@ -192,8 +192,14 @@ export class CampaignRefreshManager {
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
+
+        let messageType = 'campaign_request_failed';
+        if (this._configuration.isAuction()) {
+            messageType = 'plc_request_failed';
+        }
+
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
-        Diagnostics.trigger('campaign_request_failed', error);
+        Diagnostics.trigger(messageType, error);
         this.setPlacementStates(PlacementState.NO_FILL);
     }
 

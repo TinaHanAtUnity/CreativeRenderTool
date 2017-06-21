@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { Campaign } from 'Models/Campaign';
 import { StorageType } from 'Native/Api/Storage';
 import { Url } from 'Utilities/Url';
+import { WebViewError } from 'Errors/WebViewError';
 
 export class LegacyCampaignManager extends CampaignManager {
     public static setTestBaseUrl(baseUrl: string): void {
@@ -33,7 +34,7 @@ export class LegacyCampaignManager extends CampaignManager {
             if(response) {
                 return this.parseCampaign(response);
             }
-            return Promise.resolve();
+            throw new WebViewError('Empty campaign response', 'CampaignRequestError');
         }).then(() => {
             this._requesting = false;
         }).catch((error) => {
@@ -59,6 +60,13 @@ export class LegacyCampaignManager extends CampaignManager {
             }
             return url;
         });
+    }
+
+    private storeGamerId(gamerId: string): Promise<void[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
     }
 
     private fetchGamerId(): Promise<string> {
