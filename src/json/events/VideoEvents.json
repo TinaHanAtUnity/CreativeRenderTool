@@ -156,6 +156,12 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "cachedOrientation",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }

@@ -61,6 +61,7 @@
 | timeZone | string | Current timezone | SDK | all |
 | webviewUa | string | WebView user agent string | SDK | all |
 | videoOrientation | string | Chosen video orientation | SDK | all |
+| cachedOrientation | string | Cached video orientation | SDK | all |
 
 
 
@@ -160,6 +161,7 @@
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
+| cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 
 
 

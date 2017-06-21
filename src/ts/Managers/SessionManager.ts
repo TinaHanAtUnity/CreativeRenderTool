@@ -61,8 +61,10 @@ export class SessionManagerEventMetadataCreator {
             const portraitVideo = campaign.getPortraitVideo();
             if(landscapeVideo && landscapeVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'landscape';
             } else if(portraitVideo && portraitVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'portrait';
             } else {
                 infoJson.cached = false;
             }

@@ -348,5 +348,12 @@
     "description": "Chosen video orientation",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "cachedOrientation",
+    "type": "string",
+    "description": "Cached video orientation",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
