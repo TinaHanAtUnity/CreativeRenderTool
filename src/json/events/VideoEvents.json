@@ -138,6 +138,18 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "screenWidth",
+      "requred": "yes",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "screenHeight",
+      "requred": "yes",
+      "queryString": false,
+      "body": true
     }
   ]
 }

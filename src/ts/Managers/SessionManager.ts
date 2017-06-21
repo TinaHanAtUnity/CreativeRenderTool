@@ -76,10 +76,14 @@ export class SessionManagerEventMetadataCreator {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
+        promises.push(this._deviceInfo.getScreenWidth());
+        promises.push(this._deviceInfo.getScreenHeight());
 
-        return Promise.all(promises).then(([networkType, connectionType]) => {
+        return Promise.all(promises).then(([networkType, connectionType, screenWidth, screenHeight]) => {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
+            infoJson.screenWidth = screenWidth;
+            infoJson.screenHeight = screenHeight;
 
             const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
