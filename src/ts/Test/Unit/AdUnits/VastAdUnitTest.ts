@@ -272,6 +272,18 @@ describe('VastAdUnit', () => {
             assert.equal(endScreen, vastEndScreen);
         });
 
+        it('it should fire companion tracking events', () => {
+            const url = 'http://www.adcaponemediation.com/companion';
+            const mockEventManager = sinon.mock(eventManager);
+            sinon.stub(vast, 'getCompanionCreativeViewTrackingUrls').returns([url]);
+
+            mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', url);
+
+            vastAdUnit.sendCompanionTrackingEvent(eventManager, '123', 1234);
+
+            mockEventManager.verify();
+        });
+
         it('should hide and then remove endscreen on hide', () => {
             vastAdUnit.hide();
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
