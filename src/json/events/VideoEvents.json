@@ -141,13 +141,13 @@
     },
     {
       "parameter": "screenWidth",
-      "requred": "yes",
+      "required": "yes",
       "queryString": false,
       "body": true
     },
     {
       "parameter": "screenHeight",
-      "requred": "yes",
+      "required": "yes",
       "queryString": false,
       "body": true
     },

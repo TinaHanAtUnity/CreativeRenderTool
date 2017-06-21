@@ -32,6 +32,7 @@
 <tr><td>force_country</td><td>string</td><td>Force country targeting for internal testing purposes</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameId</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>gamerId</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
+<tr><td>gameSessionId</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>number</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
@@ -57,6 +58,7 @@
 <tr><td>test</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
 <tr><td>timeZone</td><td>string</td><td>Current timezone</td><td>SDK</td><td>all</td></tr>
 <tr><td>webviewUa</td><td>string</td><td>WebView user agent string</td><td>SDK</td><td>all</td></tr>
+<tr><td>videoOrientation</td><td>string</td><td>Chosen video orientation</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -107,6 +109,7 @@
 <tr><td>networkOperator</td><td>no</td><td>False</td><td>True</td><td>string</td><td>MCC + MNC codes</td><td>SDK</td><td>all</td></tr>
 <tr><td>coppa</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>True for COPPA compliant (games targeted for children)</td><td>Server</td><td>all</td></tr>
 <tr><td>networkOperatorName</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Cell network operator name</td><td>SDK</td><td>all</td></tr>
+<tr><td>gameSessionId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>mediationName</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Mediation provider name</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationVersion</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Mediation SDK version</td><td>Mediation</td><td>all</td></tr>
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
@@ -119,6 +122,7 @@
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
 <tr><td>sessionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
+<tr><td>gameSessionId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gamerId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>campaignId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal campaign identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>placementId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal placement identifier</td><td>Admin</td><td>all</td></tr>
@@ -139,12 +143,16 @@
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
 <tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenWidth</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Screen width in pixels</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenHeight</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Screen height in pixels</td><td>SDK</td><td>all</td></tr>
+<tr><td>videoOrientation</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Chosen video orientation</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>redirect</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Legacy parameter, always false</td><td>SDK</td><td>all</td></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
 <tr><td>sessionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
+<tr><td>gameSessionId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gamerId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>campaignId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal campaign identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>placementId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal placement identifier</td><td>Admin</td><td>all</td></tr>
@@ -165,4 +173,6 @@
 <tr><td>mediationOrdinal</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5</td><td>Mediation</td><td>all</td></tr>
 <tr><td>frameworkName</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Game framework, both Asset Store package and engine integration set this to "Unity"</td><td>SDK</td><td>all</td></tr>
 <tr><td>frameworkVersion</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenWidth</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Screen width in pixels</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenHeight</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Screen height in pixels</td><td>SDK</td><td>all</td></tr>
  </table></body></html>

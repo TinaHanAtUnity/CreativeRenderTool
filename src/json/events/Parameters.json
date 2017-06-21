@@ -341,5 +341,12 @@
     "description": "WebView user agent string",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "videoOrientation",
+    "type": "string",
+    "description": "Chosen video orientation",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
