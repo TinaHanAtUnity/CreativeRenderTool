@@ -280,7 +280,7 @@ describe('VastAdUnit', () => {
             const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
                 'creativeView': [url]
             });
-            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
+            sandbox.stub(vast, 'getLandscapeOrientedCompanionAd').returns(companion);
 
             const mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
