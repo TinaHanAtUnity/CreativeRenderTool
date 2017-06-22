@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Vast } from 'Models/Vast/Vast';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
@@ -97,9 +98,20 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
-        const urls = this.getVast().getCompanionCreativeViewTrackingUrls();
-        for (const url of urls) {
-            this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+        const companion = this.getCompanionForOrientation();
+        if (companion) {
+            const urls = companion.getEventTrackingUrls('creativeView');
+            for (const url of urls) {
+                this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+            }
+        }
+    }
+
+    private getCompanionForOrientation(): VastCreativeCompanionAd | null {
+        if (this._forceOrientation === ForceOrientation.LANDSCAPE) {
+            return this.getVast().getLandscapeOrientedCompanionAd();
+        } else {
+            return this.getVast().getPortraitOrientedCompanionAd();
         }
     }
 

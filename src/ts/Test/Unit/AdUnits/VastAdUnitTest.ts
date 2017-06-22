@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { Overlay } from 'Views/Overlay';
@@ -273,11 +274,16 @@ describe('VastAdUnit', () => {
         });
 
         it('it should fire companion tracking events', () => {
-            const url = 'http://www.adcaponemediation.com/companion';
-            const mockEventManager = sinon.mock(eventManager);
-            sinon.stub(vast, 'getCompanionCreativeViewTrackingUrls').returns([url]);
+            const width = 320;
+            const height = 480;
+            const url = 'http://example.com/companionCreativeView';
+            const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
+                'creativeView': [url]
+            });
+            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
 
-            mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', url);
+            const mockEventManager = sinon.mock(eventManager);
+            mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
 
             vastAdUnit.sendCompanionTrackingEvent(eventManager, '123', 1234);
 

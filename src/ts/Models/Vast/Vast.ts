@@ -1,4 +1,5 @@
 import { VastAd } from 'Models/Vast/VastAd';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd'
 import { Model } from 'Models/Model';
 
 interface IVast {
@@ -130,7 +131,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getCompanionLandscapeUrl(): string | null {
+    public getLandscapeOrientedCompanionAd(): VastCreativeCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -138,7 +139,32 @@ export class Vast extends Model<IVast> {
             if (companionAds) {
                 for(const companionAd of companionAds) {
                     if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
-                        return companionAd.getStaticResourceURL();
+                        return companionAd;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public getCompanionLandscapeUrl(): string | null {
+        const companion = this.getLandscapeOrientedCompanionAd();
+        if (companion) {
+            return companion.getStaticResourceURL();
+        }
+        return null;
+    }
+
+    public getPortraitOrientedCompanionAd(): VastCreativeCompanionAd | null {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for(const companionAd of companionAds) {
+                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                        return companionAd;
                     }
                 }
             }
@@ -148,19 +174,10 @@ export class Vast extends Model<IVast> {
     }
 
     public getCompanionPortraitUrl(): string | null {
-        const ad = this.getAd();
-        if (ad) {
-            const companionAds = ad.getCompanionAds();
-
-            if (companionAds) {
-                for(const companionAd of companionAds) {
-                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
-                        return companionAd.getStaticResourceURL();
-                    }
-                }
-            }
+        const companion = this.getPortraitOrientedCompanionAd();
+        if (companion) {
+            return companion.getStaticResourceURL();
         }
-
         return null;
     }
 
