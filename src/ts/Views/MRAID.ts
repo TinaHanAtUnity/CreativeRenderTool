@@ -23,7 +23,7 @@ export class MRAID extends View {
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
 
-    private readonly onLoaded = new Observable0();
+    // private readonly onLoaded = new Observable0();
 
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
@@ -31,12 +31,16 @@ export class MRAID extends View {
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _loaded = false;
+    // private _loaded = false;
+    private _iFrameLoaded = false;
 
     private _messageListener: any;
     private _resizeHandler: any;
     private _resizeDelayer: any;
     private _resizeTimeout: any;
+    private _loadingScreenTimeout: any;
+    private _prepareTimeout: any;
+
 
     private _canClose = false;
     private _canSkip = false;
@@ -108,17 +112,30 @@ export class MRAID extends View {
             }, 1000);
         }
 
-        if(this._loaded) {
-            this._iframe.contentWindow.postMessage('viewable', '*');
-        } else {
-            const observer = this.onLoaded.subscribe(() => {
-                this._iframe.contentWindow.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
-                this.onLoaded.unsubscribe(observer);
-            });
-        }
+
+        this._loadingScreenTimeout = setTimeout(() => {
+            if(this._iFrameLoaded) {
+                this.showPlayable();
+            } else {
+                this._prepareTimeout = setTimeout(() => {
+                    // TODO: show close button, send diagnostics
+                }, 5000);
+            }
+            this._loadingScreenTimeout = undefined;
+        }, 2000);
+
+
+        // if(this._loaded) {
+        //     this._iframe.contentWindow.postMessage('viewable', '*');
+        // } else {
+        //     const observer = this.onLoaded.subscribe(() => {
+        //         this._iframe.contentWindow.postMessage({
+        //             type: 'viewable',
+        //             value: true
+        //         }, '*');
+        //         this.onLoaded.unsubscribe(observer);
+        //     });
+        // }
 
         this._resizeDelayer = (event: Event) => {
             this._resizeTimeout = setTimeout(() => {
@@ -175,11 +192,10 @@ export class MRAID extends View {
 
         this.createMRAID().then(mraid => {
 
-            iframe.onload = () => {
-                // console.timeEnd('Load playable');
-            };
-
+            iframe.onload = () => this.onIframeLoaded();
+            this._iframe.style.display = 'none';
             iframe.srcdoc = mraid;
+
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -216,6 +232,25 @@ export class MRAID extends View {
 
             return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
         });
+    }
+
+    private onIframeLoaded() {
+        // console.timeEnd('Load playable');
+        if(!this._loadingScreenTimeout) {
+            clearTimeout(this._prepareTimeout);
+            this._prepareTimeout = undefined;
+
+            this.showPlayable();
+        }
+        this._iFrameLoaded = true;
+    }
+
+    private showPlayable() {
+        this._iframe.style.display = 'block';
+        this._iframe.contentWindow.postMessage({
+            type: 'viewable',
+            value: true
+        }, '*');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -256,8 +291,9 @@ export class MRAID extends View {
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':
-                this._loaded = true;
-                this.onLoaded.trigger();
+                // console.log('onMessage loaded');
+                // this._loaded = true;
+                // this.onLoaded.trigger();
                 break;
 
             case 'open':
