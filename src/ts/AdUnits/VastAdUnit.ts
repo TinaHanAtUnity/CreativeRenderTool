@@ -9,6 +9,7 @@ import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitCont
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Orientation, DeviceOrientation } from 'Utilities/Orientation';
 
 export class VastAdUnit extends VideoAdUnit {
 
@@ -108,7 +109,14 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     private getCompanionForOrientation(): VastCreativeCompanionAd | null {
+        let orientation = DeviceOrientation.getDeviceOrientation();
         if (this._forceOrientation === ForceOrientation.LANDSCAPE) {
+            orientation = Orientation.LANDSCAPE;
+        } else if (this._forceOrientation === ForceOrientation.PORTRAIT) {
+            orientation = Orientation.PORTRAIT;
+        }
+
+        if (orientation === Orientation.LANDSCAPE) {
             return this.getVast().getLandscapeOrientedCompanionAd();
         } else {
             return this.getVast().getPortraitOrientedCompanionAd();
