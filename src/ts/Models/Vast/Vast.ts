@@ -1,5 +1,5 @@
 import { VastAd } from 'Models/Vast/VastAd';
-import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd'
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { Model } from 'Models/Model';
 
 interface IVast {
