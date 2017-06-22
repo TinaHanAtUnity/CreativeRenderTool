@@ -56,7 +56,9 @@ export class AssetManager {
                     }
                 });
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL));
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                    // allow optional assets to fail caching when not in CacheMode.FORCED
+                });
             }
 
             return Promise.resolve(campaign);
