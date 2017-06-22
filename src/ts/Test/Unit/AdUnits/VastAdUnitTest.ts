@@ -14,7 +14,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 
@@ -55,7 +54,7 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         eventManager = new EventManager(nativeBridge, request);
-        vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     afterEach(() => sandbox.restore);
@@ -145,7 +144,7 @@ describe('VastAdUnit', () => {
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
         });
 
         it('should return correct http:// url', () => {
@@ -252,7 +251,7 @@ describe('VastAdUnit', () => {
                 hide: sinon.spy(),
                 remove: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
         });
 
         it('should return correct companion click through url', () => {

@@ -12,7 +12,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 
 import { Placement } from 'Models/Placement';
@@ -71,7 +71,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         sessionManager.setSession(new Session('123'));
 
-        testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     describe('When calling onSkip', () => {
@@ -89,7 +89,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = <VastEndScreen><any> {
                     show: sinon.spy()
                 };
-                const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+                const vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
                 VastOverlayEventHandlers.onSkip(vastAdUnit);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
@@ -127,7 +127,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         beforeEach(() => {
             video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
+            vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
             }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
