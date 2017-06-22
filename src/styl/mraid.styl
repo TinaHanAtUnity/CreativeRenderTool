@@ -74,3 +74,104 @@
     -webkit-animation-fill-mode: forwards;
     -webkit-animation-timing-function: linear;
     -webkit-animation-duration: 0.01s;
+
+  .loading-screen
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height 100vh;
+    background-color: white;
+    z-index: 100;
+    opacity: 1;
+    //text-align center;
+    //line-height: 100vh;
+
+    &.hidden
+      -webkit-transition: opacity 1000ms ease-out;
+      opacity 0;
+      pointer-events none;
+
+    .container
+      //background-color: #ffd5d6;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      position: absolute;
+
+      > div
+        align-self: center;
+        margin: 10px;
+
+    .user-text
+      font-size: 13.5pt;
+      color: #1f1e1e;
+
+    progress-bar-width = 80%;
+    filling-bar-width = progress-bar-width * 0.125
+
+    .progress-bar
+      height: 2pt;
+      width: progress-bar-width;
+      background-color: #e6e6e6;
+      overflow: hidden;
+
+      .filling
+        background-color: #167dfb;
+        height: 5pt;
+        width: filling-bar-width;
+        display: block
+        position: relative;
+        left: 0;
+        animation: progress-bar-dynamic 2.5s linear infinite;
+
+
+    @import "game-shared.styl";
+
+    //@keyframes progress-bar-dynamic {
+    //   0% {
+    //     left: 0;
+    //   }
+    //
+    //   25%, 75%{
+    //     left: 50% - filling-bar-width * 0.5;
+    //   }
+    //
+    //  50% {
+    //    left: 100% - filling-bar-width;
+    //  }
+    //}
+
+    @keyframes progress-bar-dynamic {
+      0% {
+        left: 0;
+      }
+      15% {
+        left: 10%;
+        width: progress-bar-width * 0.25;
+      }
+
+      20% {
+        width: progress-bar-width * 0.5;
+      }
+
+      50%{
+        width: progress-bar-width * 0.3;
+        left: 50%;
+      }
+
+      75% {
+        width: progress-bar-width * 0.25;
+        left: 60%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+

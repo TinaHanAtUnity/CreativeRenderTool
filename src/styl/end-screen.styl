@@ -1,4 +1,7 @@
 #end-screen
+
+  @import "game-shared.styl";
+
   .campaign-container
     width: 100%
     height: 100%
@@ -56,24 +59,15 @@
 
   .game-icon
     float: left
-    background-color: #FFF
-    background-size: cover
-    width: 75px
-    height: 75px
-    border-radius: 18pt
-    margin-bottom: 20px
 
   .name-container
     padding-left: 10px
     padding-right: 10px
     padding-top: 8px
-    font-size: 17pt
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    color: #1f1e1e
 
   .store-container
     margin-left: 10px
@@ -85,26 +79,6 @@
     -webkit-box-pack: center
     -webkit-justify-content: center
 
-  .game-rating
-    display: inline-block
-    position: relative
-    font-size: 20px
-    letter-spacing: 5px
-    color: #e6e6e6
-
-  .game-rating-mask
-    color: #ff8e00
-    position: absolute
-    left: 0
-    width: 0%
-    height: 100%
-    overflow: hidden
-    font-size: inherit
-
-  .game-rating-count
-    font-size: 17px
-    color: #7c7c7c
-
   .download-container
     text-align: center
     clear: both
@@ -115,17 +89,6 @@
     background: #167dfb
     left: 0px
     right: 0px
-
-  .unityads-logo
-    background-image: url('../img/unityads.png')
-    background-position: center
-    background-size: cover
-    position: absolute
-    bottom: 10px
-    left: 50%
-    height: 16px
-    width: 68px
-    -webkit-transform: translate(-50%, 0)
 
   .privacy-button
     position: absolute
@@ -207,12 +170,11 @@ body.portrait
     .game-background-landscape
       display: none
 
-
 // Device specific
 body.iphone
 body.ipad
 body.android
-  // 320 x 426 - Samsung Galaxy Y
+// 320 x 426 - Samsung Galaxy Y
   @media screen and (max-height: 320px) and (max-width: 427px), screen and (max-height: 427px) and (max-width: 320px)
     #end-screen
       .game-icon
@@ -221,7 +183,7 @@ body.android
         border-radius: 12pt
 
       .name-container
-          font-size: 15pt
+        font-size: 15pt
 
       .btn-download
         padding: 5px 5px 5px 5px
@@ -230,16 +192,14 @@ body.android
     &.landscape
       #end-screen
         .name-container
-            font-size: 13pt
+          font-size: 13pt
 
         .game-rating
           font-size: 17px
 
         .btn-download
           font-size: 9pt
-          padding: 5px 5px 5px 5px
-
-  // 320 x 568 - iPhone 5
+          padding: 5px 5px 5px 5px // 320 x 568 - iPhone 5
   @media screen and (min-height: 568px) and (min-width: 320px), screen and (min-height: 320px) and (min-width: 568px)
     #end-screen
       .store-container
@@ -251,9 +211,7 @@ body.android
     &.landscape
       #end-screen
         .btn-download
-          font-size: 14pt
-
-  // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
+          font-size: 14pt // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
   @media screen and (min-height: 360px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 360px)
     #end-screen
       .btn-close-region
@@ -279,17 +237,13 @@ body.android
           padding-top: 115px
 
         .btn-download
-          padding: 10px 10px 10px 10px
-
-  // 384 x 360 - LG Optimus G
+          padding: 10px 10px 10px 10px // 384 x 360 - LG Optimus G
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
     &.landscape
       #end-screen
         .btn-download
           padding: 15px 10px 15px 10px;
-          font-size: 16pt;
-
-  // 424 x 753 - LG Optimus 4X HD
+          font-size: 16pt; // 424 x 753 - LG Optimus 4X HD
   @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px)
     #end-screen
       .name-container
@@ -321,9 +275,7 @@ body.android
 
         .btn-download
           font-size: 19pt
-          line-height: 19pt
-
-  // 540 x 960 - Motorola Droid 3
+          line-height: 19pt // 540 x 960 - Motorola Droid 3
   @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px)
     #end-screen
       .btn-close-region
@@ -368,9 +320,7 @@ body.android
         .btn-download
           padding: 25px 20px 25px 20px
           font-size: 21pt
-          line-height: 21pt
-
-  // 960 x 600 - Google Nexus 7
+          line-height: 21pt // 960 x 600 - Google Nexus 7
   @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px)
     #end-screen
       .name-container
@@ -378,9 +328,7 @@ body.android
 
       .unityads-logo
         width: 153px
-        height: 36px
-
-  // 1024 x 600 - Samsung Galaxy Tab 7"
+        height: 36px // 1024 x 600 - Samsung Galaxy Tab 7"
   @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px)
     #end-screen
       .name-container
@@ -397,9 +345,7 @@ body.android
         .btn-download
           padding: 30px 20px 30px 20px
           font-size: 24pt
-          line-height: 24pt
-
-  // 1024 x 768 - iPad
+          line-height: 24pt // 1024 x 768 - iPad
   @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px)
     #end-screen
       font-weight: lighter
@@ -426,9 +372,7 @@ body.android
 
         .game-rating
           font-size: 45px
-          letter-spacing: 5px
-
-  // 800 x 1280 - Samsung Galaxy Tab 10
+          letter-spacing: 5px // 800 x 1280 - Samsung Galaxy Tab 10
   @media screen and (min-height: 800px) and (min-width: 1280px), screen and (min-height: 1280px) and (min-width: 800px)
     #end-screen
       font-weight: lighter
