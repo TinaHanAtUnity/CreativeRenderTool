@@ -274,8 +274,12 @@ describe('VastAdUnit', () => {
 
         it('should hide and then remove endscreen on hide', () => {
             vastAdUnit.hide();
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
         });
     });
 });

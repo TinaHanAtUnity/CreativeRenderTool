@@ -26,6 +26,9 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 
 import ConfigurationJson from 'json/Configuration.json';
+import { PromoCampaign } from 'Models/PromoCampaign';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -80,6 +83,36 @@ describe('AdUnitFactoryTest', () => {
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
+        });
+    });
+
+    describe('Promo AdUnit', () => {
+        let PromoAdUnit: PromoAdUnit;
+        let campaign: PromoCampaign;
+        beforeEach(() => {
+            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
+
+            campaign = TestFixtures.getPromoCampaign();
+            PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+        });
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                PromoAdUnit.onStart.subscribe(() => {
+                    done();
+                });
+                PromoAdUnit.show();
+            });
+        });
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                PromoAdUnit.setShowing(true);
+                PromoAdUnit.onClose.subscribe(() => {
+                    assert.equal(PromoAdUnit.isShowing(), false);
+                    done();
+                });
+
+                PromoAdUnit.hide();
+            });
         });
     });
 

@@ -161,7 +161,7 @@ export abstract class CampaignManager {
         }
     }
 
-    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number ): Promise<VastCampaign> {
+    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
@@ -193,7 +193,7 @@ export abstract class CampaignManager {
     }
 
     protected getProgrammaticCampaignId(): string {
-        switch (this._nativeBridge.getPlatform()) {
+        switch(this._nativeBridge.getPlatform()) {
             case Platform.IOS:
                 return '00005472656d6f7220694f53';
             case Platform.ANDROID:
@@ -293,7 +293,7 @@ export abstract class CampaignManager {
             timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
         };
 
-        if (this.getPreviousPlacementId()) {
+        if(this.getPreviousPlacementId()) {
             body.previousPlacementId = this.getPreviousPlacementId();
         }
 
@@ -306,7 +306,7 @@ export abstract class CampaignManager {
             body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
             body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
 
-            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
+            if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
             }
 

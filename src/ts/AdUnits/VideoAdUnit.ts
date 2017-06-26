@@ -49,7 +49,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
 
-        return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), this._options);
+        return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
