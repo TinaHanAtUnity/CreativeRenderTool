@@ -10,9 +10,9 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
-import { CampaignManager } from 'Managers/CampaignManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 
 describe('EventsTest', () => {
 
@@ -106,7 +106,7 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, '667', listener, true);
@@ -181,7 +181,7 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '667', listener, true);
