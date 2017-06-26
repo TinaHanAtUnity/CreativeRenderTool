@@ -43,17 +43,21 @@ export class VastAdUnit extends VideoAdUnit {
     }
 
     public hide(): Promise<void> {
-        const endScreen = this.getEndScreen();
-        if (endScreen) {
-            endScreen.hide();
-            endScreen.remove();
-        }
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, 500);
+        }).then(() => {
+            const endScreen = this.getEndScreen();
+            if (endScreen) {
+                endScreen.hide();
+                endScreen.remove();
+            }
 
-        if(this._moat) {
-            this._moat.container().parentElement!.removeChild(this._moat.container());
-        }
+            if(this._moat) {
+                this._moat.container().parentElement!.removeChild(this._moat.container());
+            }
 
-        return super.hide();
+            return super.hide();
+        });
     }
 
     public description(): string {
