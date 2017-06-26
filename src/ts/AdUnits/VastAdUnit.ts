@@ -27,8 +27,8 @@ export class VastAdUnit extends VideoAdUnit {
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             Promise.all([
-                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_SYSTEM),
-                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_SYSTEM)
+                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_MUSIC),
+                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });

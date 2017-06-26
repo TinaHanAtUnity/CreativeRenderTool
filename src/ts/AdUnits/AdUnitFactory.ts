@@ -117,7 +117,7 @@ export class AdUnitFactory {
 
         let onVolumeChangeObserver: any = undefined;
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_SYSTEM);
+            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
             onVolumeChangeObserver = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
@@ -133,7 +133,7 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
             if(onVolumeChangeObserver) {
                 if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_SYSTEM);
+                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
                     nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
                 } else if(nativeBridge.getPlatform() === Platform.IOS) {
                     nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
