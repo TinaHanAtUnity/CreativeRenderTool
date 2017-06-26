@@ -91,15 +91,15 @@
       pointer-events: none
 
     .container
-      display: flex
-      flex-direction: column
-      justify-content: center
-
       display: -webkit-box
+      display: flex
+
       -webkit-box-orient: vertical
       -webkit-box-direction: normal
       -webkit-box-pack: center
 
+      flex-direction: column
+      justify-content: center
       top: 0
       bottom: 0
       left: 0
@@ -136,20 +136,20 @@
         position: relative
         left: 0
 
+        -webkit-transform: translate3d(0, 0, 0)
         transform: translate3d(0, 0, 0)
+
+        -webkit-backface-visibility: hidden;
         backface-visibility: hidden
 
-        -webkit-transform: translate3d(0, 0, 0)
-        -webkit-backface-visibility: hidden;
-
-        animation: progress-bar-dynamic 1s cubic-bezier(0, 0.125, 0, 1) infinite
         -webkit-animation: progress-bar-dynamic 1s cubic-bezier(0, 0.125, 0, 1) infinite
+        animation: progress-bar-dynamic 1s cubic-bezier(0, 0.125, 0, 1) infinite
 
 
     @import "game-shared.styl"
 
 
-    @keyframes progress-bar-dynamic {
+    @-webkit-keyframes progress-bar-dynamic {
       0% {
         left: filling-bar-width * -1
       }
@@ -188,7 +188,7 @@
 
     }
 
-    @-webkit-keyframes progress-bar-dynamic {
+    @keyframes progress-bar-dynamic {
       0% {
         left: filling-bar-width * -1
       }
