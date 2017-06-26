@@ -9,6 +9,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
+import { Localization } from 'Utilities/Localization';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -27,6 +28,7 @@ export class MRAID extends View {
 
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
+    private _localization: Localization;
 
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
@@ -46,13 +48,24 @@ export class MRAID extends View {
     private _canSkip = false;
     private _didReward = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'mraid');
 
         this._placement = placement;
         this._campaign = campaign;
+        this._localization = new Localization(language, 'endscreen');
 
         this._template = new Template(MRAIDTemplate);
+
+        if(campaign) {
+            const adjustedRating: number = campaign.getRating() * 20;
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount())
+            };
+        }
 
         this._bindings = [
             {
@@ -172,11 +185,6 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        // this._loadingScreen.style.position = 'absolute';
-        this._loadingScreen.style.width = '100vw';
-        this._loadingScreen.style.height = '100vh';
-        this._loadingScreen.style.backgroundColor = 'yellow';
-
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             if (Math.abs(<number>window.orientation) === 90) {
                 iframe.width = screen.height;
@@ -247,6 +255,7 @@ export class MRAID extends View {
 
     private showPlayable() {
         this._iframe.style.display = 'block';
+        this._loadingScreen.style.display = 'none';
         this._iframe.contentWindow.postMessage({
             type: 'viewable',
             value: true

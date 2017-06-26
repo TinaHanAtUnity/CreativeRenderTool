@@ -112,7 +112,7 @@ export class AdUnitFactory {
     }
 
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
-        const mraid = new MRAID(nativeBridge, placement, campaign);
+        const mraid = new MRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
         mraid.render();
