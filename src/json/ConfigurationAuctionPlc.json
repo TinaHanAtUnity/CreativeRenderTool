@@ -1,0 +1,50 @@
+{
+  "enabled": true,
+  "coppaCompliant": false,
+  "assetCaching": "forced",
+  "placements": [
+    {
+      "id": "premium",
+      "name": "Premium placement",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false
+    },
+    {
+      "id": "video",
+      "name": "Video",
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    },
+    {
+      "id": "mraid",
+      "name": "Mraid",
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    },
+    {
+      "id": "defaultVideoAndPictureZone",
+      "name": "Rewarded Video",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false
+    }
+  ],
+  "useAuction": true,
+  "country": "FI",
+  "gamerId": "57a35671bb58271e002d93c9",
+  "abGroup": 13,
+  "properties": "abcdefgh12345678"
+}

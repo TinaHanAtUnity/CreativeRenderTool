@@ -26,6 +26,10 @@ export class Sdk {
         console.error(message);
     }
 
+    public static logWarning(message: string) {
+        console.warn(message);
+    }
+
     public static logInfo(message: string) {
         // tslint:disable:no-console
         console.info(message);

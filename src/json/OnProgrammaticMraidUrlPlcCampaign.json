@@ -1,0 +1,17 @@
+{
+  "correlationId": "zGg2TfRsBNbqlc7AVdhLAw",
+  "placements": {
+    "mraid": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85"
+  },
+  "media": {
+    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
+      "contentType": "programmatic/mraid-url",
+      "content": "{\"dynamicMarkup\":\"var markup = 'dynamic';\",\"markup\":\"\",\"inlinedUrl\":\"https://img.serveroute.com/mini_8ball_fast/inlined.html\"}",
+      "trackingUrls": {
+        "impression": [
+          "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"
+        ]
+      }
+    }
+  }
+}

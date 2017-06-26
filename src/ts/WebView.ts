@@ -3,7 +3,6 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { Campaign } from 'Models/Campaign';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -37,6 +36,8 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
+import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 
 export class WebView {
 
@@ -166,7 +167,11 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
+            if(this._configuration.isAuction()) {
+                this._campaignManager = new AuctionCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
+            } else {
+                this._campaignManager = new LegacyCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
+            }
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -214,7 +219,7 @@ export class WebView {
             return;
         }
 
-        const campaign: Campaign = this._campaignRefreshManager.getCampaign(placementId);
+        const campaign = this._campaignRefreshManager.getCampaign(placementId);
 
         if(!campaign) {
             this.showError(true, placementId, 'Campaign not found');
@@ -286,7 +291,7 @@ export class WebView {
     }
 
     private onAdUnitStartProcessed(): void {
-        if(this._currentAdUnit && (this._currentAdUnit.getCampaign().getAbGroup() === 6 || this._currentAdUnit.getCampaign().getAbGroup() === 7)) {
+        if(this._currentAdUnit) {
             setTimeout(() => {
                 if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
                     this._campaignRefreshManager.refresh();
@@ -406,7 +411,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                CampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                LegacyCampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
@@ -415,7 +420,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('auctionUrl')) {
-                CampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
+                AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {

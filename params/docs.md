@@ -34,6 +34,7 @@
 | force_country | string | Force country targeting for internal testing purposes | SDK | all |
 | gameId | string | Source game identifier | App | all |
 | gamerId | string | Internal gamer identifier | Server | all |
+| gameSessionId | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | language | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | boolean | boolean if user has limited tracking or not | SDK | all |
 | mediationOrdinal | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
@@ -59,6 +60,8 @@
 | test | boolean | Test mode | App | all |
 | timeZone | string | Current timezone | SDK | all |
 | webviewUa | string | WebView user agent string | SDK | all |
+| videoOrientation | string | Chosen video orientation | SDK | all |
+| cachedOrientation | string | Cached video orientation | SDK | all |
 
 
 
@@ -117,6 +120,7 @@
 | networkOperator | no | False | True | string | MCC + MNC codes | SDK | all |
 | coppa | all | False | True | boolean | True for COPPA compliant (games targeted for children) | Server | all |
 | networkOperatorName | no | False | True | string | Cell network operator name | SDK | all |
+| gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | mediationName | no | False | True | string | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | string | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
@@ -133,6 +137,7 @@
 |---|---|---|---|---|---|---|---|
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
 | sessionId | all | False | True | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
+| gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |
 | placementId | all | False | True | string | Internal placement identifier | Admin | all |
@@ -153,6 +158,10 @@
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
+| screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
+| screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
+| videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
+| cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 
 
 
@@ -163,6 +172,7 @@
 | redirect | all | True | False | boolean | Legacy parameter, always false | SDK | all |
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
 | sessionId | all | False | True | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
+| gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |
 | placementId | all | False | True | string | Internal placement identifier | Admin | all |
@@ -183,4 +193,6 @@
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
+| screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
+| screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
 
