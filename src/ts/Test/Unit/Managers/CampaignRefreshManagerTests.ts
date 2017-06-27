@@ -32,6 +32,8 @@ import CampaignRefreshManagerTestCampaign2 from 'json/CampaignRefreshManagerTest
 import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
 import CampaignRefreshManagerTestPLCConfig from 'json/CampaignRefreshManagerTestPLCConfig.json';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -123,13 +125,13 @@ describe('CampaignRefreshManager', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         container = new TestContainer();
     });
 
     describe('Non-PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestConfig));
+            campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
         });
 
@@ -141,14 +143,20 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPerformanceCampaign.trigger(new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof PerformanceCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const campaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, campaign);
+                if (campaign) {
+                    assert.equal(campaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
             });
@@ -158,14 +166,20 @@ describe('CampaignRefreshManager', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const vast = new Vast([new VastAd()], ['ErrorUrl']);
                 sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-                campaignManager.onVastCampaign.trigger(new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof VastCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const campaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, campaign);
+                if (campaign) {
+                    assert.equal(campaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
             });
@@ -176,14 +190,20 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 const mraid = new MRAIDCampaign(campaignObject, 'TestGamerId', 12345);
-                campaignManager.onMRAIDCampaign.trigger(mraid);
+                campaignManager.onCampaign.trigger('', mraid);
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof MRAIDCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const campaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, campaign);
+                if (campaign) {
+                    assert.equal(campaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
             });
@@ -194,21 +214,33 @@ describe('CampaignRefreshManager', () => {
             const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPerformanceCampaign.trigger(new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 campaignObject = campaignObject2;
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const campaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, campaign);
+                if (campaign) {
+                    assert.equal(campaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
 
                 return campaignRefreshManager.refresh().then(() => {
                     assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                    assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId2');
-                    assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                    const campaign2 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, campaign2);
+                    if (campaign2) {
+                        assert.notEqual(campaign2.getId(), 'TestCampaignId2');
+                        assert.equal(campaign2.getId(), 'TestCampaignId');
+                    }
+
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
                 });
@@ -217,7 +249,7 @@ describe('CampaignRefreshManager', () => {
 
         it('placement states should end up with NO_FILL', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onNoFill.trigger();
+                campaignManager.onNoFill.trigger('');
                 return Promise.resolve();
             });
 
@@ -243,20 +275,30 @@ describe('CampaignRefreshManager', () => {
             const campaign2 = new PerformanceCampaign(campaignObject2, 'TestGamerId', 12345);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPerformanceCampaign.trigger(campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 campaign = campaign2;
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
 
                 return campaignRefreshManager.refresh().then(() => {
                     assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                    assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId2');
+
+                    const tmpCampaign2 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, tmpCampaign2);
+                    if (tmpCampaign2) {
+                        assert.equal(tmpCampaign2.getId(), 'TestCampaignId2');
+                    }
+
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
                 });
@@ -270,13 +312,19 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPerformanceCampaign.trigger(campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
 
@@ -297,14 +345,20 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPerformanceCampaign.trigger(campaign);
+                campaignManager.onCampaign.trigger('', campaign);
                 campaign = campaign2;
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
 
@@ -316,7 +370,13 @@ describe('CampaignRefreshManager', () => {
 
                 return campaignRefreshManager.refresh().then(() => {
                     assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                    assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId2');
+
+                    const tmpCampaign2 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, tmpCampaign2);
+                    if (tmpCampaign2) {
+                        assert.equal(tmpCampaign2.getId(), 'TestCampaignId2');
+                    }
+
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.WAITING);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
@@ -351,6 +411,7 @@ describe('CampaignRefreshManager', () => {
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestPLCConfig));
+            campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
         });
 
@@ -362,18 +423,24 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof PerformanceCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 assert.notEqual(campaignRefreshManager.getCampaign('incentivizedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('incentivizedVideo') instanceof PerformanceCampaign);
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
@@ -386,18 +453,24 @@ describe('CampaignRefreshManager', () => {
             sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('rewardedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof VastCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcCampaign.trigger('incentivizedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('incentivizedVideo', new VastCampaign(vast, 'TestCampaignId', 'TestGamerId', 12345));
 
                 assert.notEqual(campaignRefreshManager.getCampaign('incentivizedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('incentivizedVideo') instanceof VastCampaign);
@@ -411,18 +484,24 @@ describe('CampaignRefreshManager', () => {
             const mraid = new MRAIDCampaign(campaignObject, 'TestGamerId', 12345);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', mraid);
+                campaignManager.onCampaign.trigger('rewardedVideo', mraid);
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof MRAIDCampaign);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcCampaign.trigger('incentivizedVideo', mraid);
+                campaignManager.onCampaign.trigger('incentivizedVideo', mraid);
                 assert.notEqual(campaignRefreshManager.getCampaign('incentivizedVideo'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('incentivizedVideo') instanceof MRAIDCampaign);
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
@@ -435,21 +514,34 @@ describe('CampaignRefreshManager', () => {
             const campaignObject2: any = JSON.parse(CampaignRefreshManagerTestCampaign2);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 campaignObject = campaignObject2;
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
                 return campaignRefreshManager.refresh().then(() => {
-                    assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                    assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId2');
-                    assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+                    const tmpCampaign2 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, tmpCampaign2);
+                    if (tmpCampaign2) {
+                        assert.notEqual(tmpCampaign2.getId(), 'TestCampaignId2');
+                    }
+
+                    const tmpCampaign3 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, tmpCampaign3);
+                    if (tmpCampaign3) {
+                        assert.equal(tmpCampaign3.getId(), 'TestCampaignId');
+                    }
+
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
                 });
@@ -460,8 +552,8 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
-                campaignManager.onPlcNoFill.trigger('rewardedVideo');
+                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onNoFill.trigger('rewardedVideo');
                 return Promise.resolve();
             });
 
@@ -473,7 +565,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcNoFill.trigger('incentivizedVideo');
+                campaignManager.onNoFill.trigger('incentivizedVideo');
 
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.NO_FILL);
             });
@@ -486,17 +578,21 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
 
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
@@ -518,18 +614,22 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onPlcCampaign.trigger('rewardedVideo', campaign);
+                campaignManager.onCampaign.trigger('rewardedVideo', campaign);
                 campaign = campaign2;
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId');
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                }
+
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                campaignManager.onPlcCampaign.trigger('incentivizedVideo', campaign);
+                campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
 
                 assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
@@ -541,8 +641,12 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(campaignRefreshManager.getCampaign('incentivizedVideo'), undefined);
 
                 return campaignRefreshManager.refresh().then(() => {
-                    assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                    assert.equal(campaignRefreshManager.getCampaign('rewardedVideo').getId(), 'TestCampaignId2');
+                    const tmpCampaign2 = campaignRefreshManager.getCampaign('rewardedVideo');
+                    assert.notEqual(undefined, tmpCampaign2);
+                    if (tmpCampaign2) {
+                        assert.equal(tmpCampaign2.getId(), 'TestCampaignId2');
+                    }
+
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.WAITING);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
@@ -551,7 +655,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
                     assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
 
-                    campaignManager.onPlcCampaign.trigger('incentivizedVideo', campaign);
+                    campaignManager.onCampaign.trigger('incentivizedVideo', campaign);
                     currentAdUnit.onClose.trigger();
 
                     assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
@@ -565,7 +669,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onPlcError.trigger(error);
+                campaignManager.onError.trigger(error);
                 return Promise.resolve();
             });
 
