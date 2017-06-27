@@ -28,6 +28,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _active: boolean;
     private _overlay: Overlay | undefined;
     private _deviceInfo: DeviceInfo;
+    private _videoOrientation: 'landscape' | 'portrait' | undefined;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
@@ -89,6 +90,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
     public setActive(value: boolean) {
         this._active = value;
+    }
+
+    public getVideoOrientation(): 'landscape' | 'portrait' | undefined {
+        return this._videoOrientation;
     }
 
     protected unsetReferences() {
@@ -192,15 +197,15 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                 return this.getVideo().getUrl();
             }
         }).then(finalVideoUrl => {
-            let videoOrientation = 'landscape';
+            this._videoOrientation = 'landscape';
             if(this._campaign instanceof PerformanceCampaign) {
                 const portraitVideo = this._campaign.getPortraitVideo();
                 const portraitStreamingVideo = this._campaign.getStreamingPortraitVideo();
                 if((portraitVideo && finalVideoUrl === portraitVideo.getCachedUrl()) || (portraitStreamingVideo && finalVideoUrl === portraitStreamingVideo.getOriginalUrl())) {
-                    videoOrientation = 'portrait';
+                    this._videoOrientation = 'portrait';
                 }
             }
-            this._nativeBridge.Sdk.logDebug('Choosing ' + videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()].toLowerCase());
+            this._nativeBridge.Sdk.logDebug('Choosing ' + this._videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()].toLowerCase());
             return finalVideoUrl;
         });
     }

@@ -28,6 +28,12 @@ export class Sdk {
         // tslint:enable:no-console
     }
 
+    public static logWarning(message: string) {
+        // tslint:disable:no-console
+        console.warn(message);
+        // tslint:enable:no-console
+    }
+
     public static logInfo(message: string) {
         // tslint:disable:no-console
         console.info(message);

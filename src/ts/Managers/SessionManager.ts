@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -60,13 +61,19 @@ export class SessionManagerEventMetadataCreator {
             const portraitVideo = campaign.getPortraitVideo();
             if(landscapeVideo && landscapeVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'landscape';
             } else if(portraitVideo && portraitVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'portrait';
             } else {
                 infoJson.cached = false;
             }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
+        }
+
+        if(adUnit instanceof PerformanceAdUnit) {
+            infoJson.videoOrientation = adUnit.getVideoOrientation();
         }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -76,11 +83,15 @@ export class SessionManagerEventMetadataCreator {
         return Promise.all([
             this._deviceInfo.getNetworkType(),
             this._deviceInfo.getConnectionType(),
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
             this._metaDataManager.fetch(MediationMetaData),
             this._metaDataManager.fetch(FrameworkMetaData)
-        ]).then(([networkType, connectionType, mediation, framework]: [number, string, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
+        ]).then(([networkType, connectionType, screenWidth, screenHeight, mediation, framework]: [number, string, number, number, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
+            infoJson.screenWidth = screenWidth;
+            infoJson.screenHeight = screenHeight;
 
             if(mediation) {
                 infoJson.mediationName = mediation.getName();

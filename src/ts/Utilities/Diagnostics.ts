@@ -9,9 +9,11 @@ export class Diagnostics {
                 value: error
             };
         }
-        return HttpKafka.sendEvent('diagnostics', {
-            type: type,
-            error: error
-        });
+
+        const kafkaObject: any = {};
+        kafkaObject.type = type;
+        kafkaObject[type] = error;
+
+        return HttpKafka.sendEvent('diagnostics', kafkaObject);
     }
 }
