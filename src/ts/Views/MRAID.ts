@@ -80,51 +80,6 @@ export class MRAID extends View {
         super.show();
 
         const iframe: any = this._iframe;
-        const closeLength = 30;
-
-        if(this._placement.allowSkip()) {
-            const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = closeLength;
-            let skipRemaining = skipLength;
-            const updateInterval = setInterval(() => {
-                if(closeRemaining > 0) {
-                    closeRemaining--;
-                }
-                if(skipRemaining > 0) {
-                    skipRemaining--;
-                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
-                }
-                if(skipRemaining <= 0) {
-                    this._canSkip = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-                if (closeRemaining <= 0) {
-                    clearInterval(updateInterval);
-                    this._canClose = true;
-                }
-            }, 1000);
-        } else {
-            let closeRemaining = closeLength;
-            const updateInterval = setInterval(() => {
-                const progress = (closeLength - closeRemaining) / closeLength;
-                if(progress >= 0.75 && !this._didReward) {
-                    this.onReward.trigger();
-                    this._didReward = true;
-                }
-                if(closeRemaining > 0) {
-                    closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, progress);
-                }
-                if (closeRemaining <= 0) {
-                    clearInterval(updateInterval);
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-            }, 1000);
-        }
-
 
         this._loadingScreenTimeout = setTimeout(() => {
             if(this._iFrameLoaded) {
@@ -132,6 +87,10 @@ export class MRAID extends View {
             } else {
                 this._prepareTimeout = setTimeout(() => {
                     // TODO: show close button, send diagnostics
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this._closeElement.style.display = 'block';
+                    this.updateProgressCircle(this._closeElement, 1);
                 }, 5000);
             }
             this._loadingScreenTimeout = undefined;
@@ -254,6 +213,52 @@ export class MRAID extends View {
     }
 
     private showPlayable() {
+        const closeLength = 30;
+
+        if(this._placement.allowSkip()) {
+            const skipLength = this._placement.allowSkipInSeconds();
+            let closeRemaining = closeLength;
+            let skipRemaining = skipLength;
+            const updateInterval = setInterval(() => {
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                }
+                if(skipRemaining > 0) {
+                    skipRemaining--;
+                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
+                }
+                if(skipRemaining <= 0) {
+                    this._canSkip = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
+                }
+            }, 1000);
+        } else {
+            let closeRemaining = closeLength;
+            const updateInterval = setInterval(() => {
+                const progress = (closeLength - closeRemaining) / closeLength;
+                if(progress >= 0.75 && !this._didReward) {
+                    this.onReward.trigger();
+                    this._didReward = true;
+                }
+                if(closeRemaining > 0) {
+                    closeRemaining--;
+                    this.updateProgressCircle(this._closeElement, progress);
+                }
+                if (closeRemaining <= 0) {
+                    clearInterval(updateInterval);
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+            }, 1000);
+        }
+        this._closeElement.style.display = 'block';
+
         this._iframe.style.display = 'block';
         this._loadingScreen.style.display = 'none';
         this._iframe.contentWindow.postMessage({
