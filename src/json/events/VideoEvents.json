@@ -162,6 +162,12 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "previousPlacementId",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }
