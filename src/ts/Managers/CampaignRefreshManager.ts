@@ -241,6 +241,7 @@ export class CampaignRefreshManager {
 
     private handleQuickRefillAbTest() {
         if(CampaignRefreshManager.QuickRefillAbGroup && CampaignRefreshManager.QuickRefillAbGroup === 7) {
+            this._nativeBridge.Sdk.logDebug('Unity Ads quick refresh mode active, refreshing after five minutes');
             this._refillTimestamp = Date.now() + 300000; // five minutes from now
             setTimeout(() => {
                 this.refresh();
