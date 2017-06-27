@@ -1,3 +1,15 @@
+# Tue Jun 27 10:35:11 UTC 2017
+
+* Refactored campaign managers to separate classes
+* Removed negative targeting events
+* Add JS workarounds for hybrid test runner
+
+# Wed Jun 21 13:37:03 UTC 2017
+
+* Programmatic MRAID support for Auction
+* Namespaced diagnostics messages
+* Various new parameters to operative events related to oriented videos
+
 # Mon Jun 19 12:02:30 UTC 2017
 
 * Fix cache bookkeeping errors

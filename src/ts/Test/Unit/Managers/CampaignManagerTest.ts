@@ -10,7 +10,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { CampaignManager } from 'Managers/CampaignManager';
 import { VastParser } from 'Utilities/VastParser';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
@@ -23,6 +22,8 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { EventManager } from 'Managers/EventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -56,6 +57,7 @@ import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
 import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
 import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
 import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
+import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -71,14 +73,7 @@ describe('CampaignManager', () => {
     let sessionManager: SessionManager;
 
     beforeEach(() => {
-        configuration = new Configuration({
-            enabled: true,
-            country: 'US',
-            coppaCompliant: false,
-            placementLevelControl: false,
-            assetCaching: 'disabled',
-            placements: []
-        });
+        configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestConfig));
 
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
@@ -94,7 +89,6 @@ describe('CampaignManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
-                // getKeys: sinon.stub().returns(Promise.resolve(getKeysContents)),
                 getKeys: sinon.stub().callsFake((type: StorageType, key: string, recursive: boolean) => {
                     if (key && key === 'cache.campaigns') {
                         return Promise.resolve(['12345', '67890']);
@@ -191,7 +185,7 @@ describe('CampaignManager', () => {
     });
 
     describe('on VAST campaign', () => {
-        it('should trigger onVastCampaign after requesting a valid vast placement', () => {
+        it('should trigger onCampaign after requesting a valid vast placement', () => {
 
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
@@ -200,10 +194,10 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
-            campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -237,60 +231,62 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(1);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
-            campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
-                triggeredCampaign = campaign;
-                // then the onVastCampaign observable is triggered with the correct campaign data
-                mockRequest.verify();
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
+                if (!triggeredCampaign && campaign) {
+                    triggeredCampaign = campaign;
+                    // then the onVastCampaign observable is triggered with the correct campaign data
+                    mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getAbGroup(), 3);
-                assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-                assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
-                assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
-                    'http://myErrorURL/error',
-                    'http://myErrorURL/wrapper/error'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getImpressionUrls(), [
-                    'http://myTrackingURL/impression',
-                    'http://myTrackingURL/wrapper/impression'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('creativeView'), [
-                    'http://myTrackingURL/creativeView',
-                    'http://myTrackingURL/wrapper/creativeView'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
-                    'http://myTrackingURL/start',
-                    'http://myTrackingURL/wrapper/start'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
-                    'http://myTrackingURL/firstQuartile',
-                    'http://myTrackingURL/wrapper/firstQuartile'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
-                    'http://myTrackingURL/midpoint',
-                    'http://myTrackingURL/wrapper/midpoint'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
-                    'http://myTrackingURL/thirdQuartile',
-                    'http://myTrackingURL/wrapper/thirdQuartile'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
-                    'http://myTrackingURL/complete',
-                    'http://myTrackingURL/wrapper/complete'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('mute'), [
-                    'http://myTrackingURL/wrapper/mute'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
-                    'http://myTrackingURL/wrapper/unmute'
-                ]);
-                assert.deepEqual(triggeredCampaign.getVast().getVideoClickTrackingURLs(), [
-                    'http://myTrackingURL/click'
-                ]);
-                assert.equal(triggeredCampaign.getVast().getVideoClickThroughURL(), 'http://www.tremormedia.com');
-                assert.equal(triggeredCampaign.getVast().getDuration(), 30);
-                done();
+                    assert.equal(triggeredCampaign.getAbGroup(), 3);
+                    assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+                    assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
+                    assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
+                        'http://myErrorURL/error',
+                        'http://myErrorURL/wrapper/error'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getImpressionUrls(), [
+                        'http://myTrackingURL/impression',
+                        'http://myTrackingURL/wrapper/impression'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('creativeView'), [
+                        'http://myTrackingURL/creativeView',
+                        'http://myTrackingURL/wrapper/creativeView'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                        'http://myTrackingURL/start',
+                        'http://myTrackingURL/wrapper/start'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                        'http://myTrackingURL/firstQuartile',
+                        'http://myTrackingURL/wrapper/firstQuartile'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                        'http://myTrackingURL/midpoint',
+                        'http://myTrackingURL/wrapper/midpoint'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                        'http://myTrackingURL/thirdQuartile',
+                        'http://myTrackingURL/wrapper/thirdQuartile'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                        'http://myTrackingURL/complete',
+                        'http://myTrackingURL/wrapper/complete'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('mute'), [
+                        'http://myTrackingURL/wrapper/mute'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
+                        'http://myTrackingURL/wrapper/unmute'
+                    ]);
+                    assert.deepEqual(triggeredCampaign.getVast().getVideoClickTrackingURLs(), [
+                        'http://myTrackingURL/click'
+                    ]);
+                    assert.equal(triggeredCampaign.getVast().getVideoClickThroughURL(), 'http://www.tremormedia.com');
+                    assert.equal(triggeredCampaign.getVast().getDuration(), 30);
+                    done();
+                }
             });
 
             // when the campaign manager requests the placement
@@ -313,12 +309,12 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(2);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
                 assert.equal(1, 2, error.message);
             });
-            campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 triggeredCampaign = campaign;
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
@@ -425,7 +421,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             campaignManager.onError.subscribe((err: Error) => {
                 assert.equal(err.message, 'VAST wrapper depth exceeded');
                 done();
@@ -441,7 +437,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: Error;
             campaignManager.onError.subscribe((error: Error) => {
                 triggeredError = error;
@@ -449,7 +445,6 @@ describe('CampaignManager', () => {
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
-
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
                 assert.equal(triggeredError.message, expectedErrorMessage);
@@ -463,7 +458,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: WebViewError | Error;
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
@@ -564,7 +559,7 @@ describe('CampaignManager', () => {
                 mockRequest.expects('post').returns(Promise.resolve(response));
 
                 const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
                 let noFillTriggered = false;
                 let triggeredError: any;
                 campaignManager.onNoFill.subscribe(() => {
@@ -607,7 +602,6 @@ describe('CampaignManager', () => {
                 // because the video url would have been in the wrapped xml
                 return verifyErrorForResponse(response, 'VAST wrapper depth exceeded');
             });
-
         });
 
         const verifyCampaignForResponse = (response: {response: any}) => {
@@ -616,10 +610,10 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
-            campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -679,10 +673,10 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
-            campaignManager.onVastCampaign.subscribe((campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -732,10 +726,10 @@ describe('CampaignManager', () => {
             const json = JSON.parse(DummyMRAIDCampaign);
             const asset = new HTML(json.mraid.inlinedURL);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
-            campaignManager.onMRAIDCampaign.subscribe((campaign: MRAIDCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -767,10 +761,10 @@ describe('CampaignManager', () => {
 
             const json = JSON.parse(DummyMRAIDNonInlined);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
-            campaignManager.onMRAIDCampaign.subscribe((campaign: MRAIDCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -804,11 +798,15 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
+            let doneCalled = false;
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
-                done();
+                if (!doneCalled) {
+                    doneCalled = true;
+                    done();
+                }
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -836,7 +834,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
 
             campaignManager.onError.subscribe(error => {
@@ -861,13 +859,13 @@ describe('CampaignManager', () => {
 
         beforeEach(() => {
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-            campaignManager.onPlcCampaign.subscribe((placement: String, campaign: Campaign) => {
+            campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
                 triggeredCampaign = campaign;
                 triggeredPlacement = placement;
             });
-            campaignManager.onPlcError.subscribe((error: any) => {
+            campaignManager.onError.subscribe((error: any) => {
                 triggeredError = error;
             });
             mockRequest = sinon.mock(request);
@@ -983,13 +981,13 @@ describe('CampaignManager', () => {
                     return Platform.ANDROID;
                 };
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-                campaignManager.onPlcCampaign.subscribe((placement: String, campaign: Campaign) => {
+                campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });
-                campaignManager.onPlcError.subscribe((error: any) => {
+                campaignManager.onError.subscribe((error: any) => {
                     triggeredError = error;
                 });
 
@@ -1012,13 +1010,13 @@ describe('CampaignManager', () => {
                     return Platform.IOS;
                 };
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-                campaignManager.onPlcCampaign.subscribe((placement: String, campaign: Campaign) => {
+                campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });
-                campaignManager.onPlcError.subscribe((error: any) => {
+                campaignManager.onError.subscribe((error: any) => {
                     triggeredError = error;
                 });
 
@@ -1040,7 +1038,7 @@ describe('CampaignManager', () => {
 
     it('test previous campaign', () => {
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let previousCampaign = campaignManager.getPreviousPlacementId();
 
         assert.equal(previousCampaign, undefined);
@@ -1059,7 +1057,7 @@ describe('CampaignManager', () => {
         });
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
         return campaignManager.request().then(() => {
             const requestBody = JSON.parse(requestData);
