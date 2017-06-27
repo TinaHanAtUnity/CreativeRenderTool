@@ -24,8 +24,6 @@ export class MRAID extends View {
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
 
-    // private readonly onLoaded = new Observable0();
-
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
     private _localization: Localization;
@@ -33,7 +31,6 @@ export class MRAID extends View {
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    // private _loaded = false;
     private _iFrameLoaded = false;
 
     private _messageListener: any;
@@ -42,7 +39,6 @@ export class MRAID extends View {
     private _resizeTimeout: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-
 
     private _canClose = false;
     private _canSkip = false;
@@ -105,19 +101,6 @@ export class MRAID extends View {
             }
             this._loadingScreenTimeout = undefined;
         }, 2000);
-
-
-        // if(this._loaded) {
-        //     this._iframe.contentWindow.postMessage('viewable', '*');
-        // } else {
-        //     const observer = this.onLoaded.subscribe(() => {
-        //         this._iframe.contentWindow.postMessage({
-        //             type: 'viewable',
-        //             value: true
-        //         }, '*');
-        //         this.onLoaded.unsubscribe(observer);
-        //     });
-        // }
 
         this._resizeDelayer = (event: Event) => {
             this._resizeTimeout = setTimeout(() => {
@@ -322,12 +305,6 @@ export class MRAID extends View {
 
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
-            case 'loaded':
-                // console.log('onMessage loaded');
-                // this._loaded = true;
-                // this.onLoaded.trigger();
-                break;
-
             case 'open':
                 this.onClick.trigger();
                 if(this._nativeBridge.getPlatform() === Platform.IOS) {
