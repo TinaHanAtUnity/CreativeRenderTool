@@ -9,6 +9,8 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export class CampaignRefreshManager {
+    public static QuickRefillAbGroup: number;
+
     private static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
@@ -179,9 +181,11 @@ export class CampaignRefreshManager {
                 const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                     this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     this.setPlacementStates(PlacementState.NO_FILL);
+                    this.handleQuickRefillAbTest();
                 });
             } else {
                 this.setPlacementStates(PlacementState.NO_FILL);
+                this.handleQuickRefillAbTest();
             }
         }
     }
@@ -205,9 +209,11 @@ export class CampaignRefreshManager {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL);
+                this.handleQuickRefillAbTest();
             });
         } else {
             this.setPlacementStates(PlacementState.NO_FILL);
+            this.handleQuickRefillAbTest();
         }
     }
 
@@ -230,6 +236,15 @@ export class CampaignRefreshManager {
             this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
             this.sendPlacementStateChanges(placementId);
+        }
+    }
+
+    private handleQuickRefillAbTest() {
+        if(CampaignRefreshManager.QuickRefillAbGroup && CampaignRefreshManager.QuickRefillAbGroup === 7) {
+            this._refillTimestamp = Date.now() + 300000; // five minutes from now
+            setTimeout(() => {
+                this.refresh();
+            }, 300000 + (Math.random() * 60000)); // five minutes + up to one minute of random delay
         }
     }
 }
