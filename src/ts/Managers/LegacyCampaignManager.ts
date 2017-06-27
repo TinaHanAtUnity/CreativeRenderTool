@@ -110,7 +110,6 @@ export class LegacyCampaignManager extends CampaignManager {
             });
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-            this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => {
                 return this.handleFill(campaign);
             });

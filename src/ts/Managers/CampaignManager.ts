@@ -10,7 +10,6 @@ import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -18,7 +17,6 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
-import { HttpKafka } from 'Utilities/HttpKafka';
 import { SessionManager } from 'Managers/SessionManager';
 
 export abstract class CampaignManager {
@@ -106,27 +104,6 @@ export abstract class CampaignManager {
     }
 
     protected abstract getBaseUrl(): string;
-
-    protected sendNegativeTargetingEvent(campaign: PerformanceCampaign, gamerId: string) {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return;
-        }
-
-        this._nativeBridge.DeviceInfo.Android.isAppInstalled(campaign.getAppStoreId()).then(installed => {
-            if(installed) {
-                const msg: any = {
-                    ts: Date.now(),
-                    gamerId: gamerId,
-                    campaignId: campaign.getId(),
-                    targetBundleId: campaign.getAppStoreId(),
-                    targetGameId: campaign.getGameId(),
-                    coppa: this._configuration.isCoppaCompliant()
-                };
-
-                HttpKafka.sendEvent('events.negtargeting.json', msg);
-            }
-        });
-    }
 
     protected getParameter(field: string, value: any, expectedType: string) {
         if(value === undefined) {
