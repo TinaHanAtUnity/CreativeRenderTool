@@ -1,4 +1,9 @@
 #mraid
+
+  @import "game-shared.styl";
+  progress-bar-width = 60%
+  filling-bar-width = progress-bar-width * 0.3
+
   #mraid-iframe
     position: absolute
     top: 0
@@ -116,11 +121,9 @@
         text-align: center
 
     .user-text
-      font-size: 13.5pt
+      font-size: 12.5pt
+      font-weight: 300
       color: #1f1e1e
-
-    progress-bar-width = 80%
-    filling-bar-width = progress-bar-width * 0.3
 
     .progress-bar
       height: 3pt
@@ -144,9 +147,6 @@
 
         -webkit-animation: progress-bar-dynamic 1s cubic-bezier(0, 0.125, 0, 1) infinite
         animation: progress-bar-dynamic 1s cubic-bezier(0, 0.125, 0, 1) infinite
-
-
-    @import "game-shared.styl"
 
 
     @-webkit-keyframes progress-bar-dynamic {
@@ -227,47 +227,46 @@
 
     }
 
+  @media screen and (min-height: 568px)
+    .loading-screen
+      .game-icon
+        height: 96px
+        width: 96px
 
+  @media screen and (max-height: 240px)
+    .loading-screen
+      .container > div
+        margin: 3px
 
-    //@keyframes progress-bar-dynamic {
-    //   0% {
-    //     left: 0
-    //   }
-    //
-    //   25%, 75%{
-    //     left: 50% - filling-bar-width * 0.5
-    //   }
-    //
-    //  50% {
-    //    left: 100% - filling-bar-width
-    //  }
-    //}
+      .name-container
+        font-size: 12pt
 
-    //@keyframes progress-bar-dynamic {
-    //  0% {
-    //    left: 0
-    //  }
-    //  15% {
-    //    left: 10%
-    //    width: progress-bar-width * 0.25
-    //  }
-    //
-    //  20% {
-    //    width: progress-bar-width * 0.5
-    //  }
-    //
-    //  50%{
-    //    width: progress-bar-width * 0.3
-    //    left: 50%
-    //  }
-    //
-    //  75% {
-    //    width: progress-bar-width * 0.25
-    //    left: 60%
-    //  }
-    //
-    //  100% {
-    //    left: 100%
-    //  }
-    //}
+      .game-rating
+        font-size: 10pt
+
+      .user-text
+        font-size: 10.5pt
+
+  // iPad
+  @media screen and (min-height: 768px) and (min-width: 1024px),  screen and (min-height: 1024px) and (min-width: 768px)
+    .loading-screen
+      .user-text
+        font-size: 18.5pt
+      .game-icon
+        height: 150px
+        width: 150px
+
+      .progress-bar
+        width: progress-bar-width * 0.8
+
+      .game-rating
+        font-size: 20pt
+
+      .name-container
+        font-size: 30pt
+
+      .unityads-logo
+        height: 32px
+        width: 136px
+        bottom: 20px
 
