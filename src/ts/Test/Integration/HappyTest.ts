@@ -8,8 +8,8 @@ import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
-import { CampaignManager } from 'Managers/CampaignManager';
 import { ConfigManager } from 'Managers/ConfigManager';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 
 describe('IntegrationTest', () => {
 
@@ -69,7 +69,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setRingerMode(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, '456', listener, true);
@@ -130,7 +130,7 @@ describe('IntegrationTest', () => {
         DeviceInfo.setStatusBarHeight(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '456', listener, true);

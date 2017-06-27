@@ -1,4 +1,5 @@
 import { Model } from 'Models/Model';
+import { Campaign } from 'Models/Campaign';
 
 export enum PlacementState {
     READY,
@@ -25,6 +26,7 @@ interface IPlacement {
     state: PlacementState;
     previousState: PlacementState;
     placementStateChanged: boolean;
+    currentCampaign: Campaign | undefined;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -41,7 +43,8 @@ export class Placement extends Model<IPlacement> {
             adTypes: ['array', 'undefined'],
             state: ['number'],
             previousState: ['number'],
-            placementStateChanged: ['boolean']
+            placementStateChanged: ['boolean'],
+            currentCampaign: ['object', 'undefined']
         });
 
         this.set('id', data.id);
@@ -118,6 +121,14 @@ export class Placement extends Model<IPlacement> {
 
     public getPreviousState(): number {
         return this.get('previousState');
+    }
+
+    public getCurrentCampaign(): Campaign | undefined {
+        return this.get('currentCampaign');
+    }
+
+    public setCurrentCampaign(campaign: Campaign | undefined): void {
+        this.set('currentCampaign', campaign);
     }
 
     public getDTO(): { [key: string]: any } {

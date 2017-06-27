@@ -12,6 +12,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -60,13 +61,19 @@ export class SessionManagerEventMetadataCreator {
             const portraitVideo = campaign.getPortraitVideo();
             if(landscapeVideo && landscapeVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'landscape';
             } else if(portraitVideo && portraitVideo.isCached()) {
                 infoJson.cached = true;
+                infoJson.cachedOrientation = 'portrait';
             } else {
                 infoJson.cached = false;
             }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
+        }
+
+        if(adUnit instanceof PerformanceAdUnit) {
+            infoJson.videoOrientation = adUnit.getVideoOrientation();
         }
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -76,10 +83,14 @@ export class SessionManagerEventMetadataCreator {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getNetworkType());
         promises.push(this._deviceInfo.getConnectionType());
+        promises.push(this._deviceInfo.getScreenWidth());
+        promises.push(this._deviceInfo.getScreenHeight());
 
-        return Promise.all(promises).then(([networkType, connectionType]) => {
+        return Promise.all(promises).then(([networkType, connectionType, screenWidth, screenHeight]) => {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
+            infoJson.screenWidth = screenWidth;
+            infoJson.screenHeight = screenHeight;
 
             const metaDataPromises: Array<Promise<any>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
