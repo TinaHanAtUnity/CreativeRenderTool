@@ -87,6 +87,10 @@ export class MRAID extends View {
             } else {
                 this._prepareTimeout = setTimeout(() => {
                     // TODO: show close button, send diagnostics
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this._closeElement.style.display = 'block';
+                    this.updateProgressCircle(this._closeElement, 1);
                 }, 5000);
             }
             this._loadingScreenTimeout = undefined;
