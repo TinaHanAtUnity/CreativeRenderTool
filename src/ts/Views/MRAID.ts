@@ -168,10 +168,8 @@ export class MRAID extends View {
         }
 
         this.createMRAID().then(mraid => {
-
             iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
-
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -266,13 +264,25 @@ export class MRAID extends View {
                 }
             }, 1000);
         }
-        this._closeElement.style.display = 'block';
 
-        // this._loadingScreen.style.display = 'none';
-        this._iframe.contentWindow.postMessage({
-            type: 'viewable',
-            value: true
-        }, '*');
+        this._loadingScreen.classList.add('hidden');
+
+        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+            if (this._loadingScreen.style.display === 'none') {
+                return;
+            }
+
+            this._loadingScreen.addEventListener(e, () => {
+                this._closeElement.style.display = 'block';
+
+                this._iframe.contentWindow.postMessage({
+                    type: 'viewable',
+                    value: true
+                }, '*');
+
+                this._loadingScreen.style.display = 'none';
+            }, false);
+        });
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
