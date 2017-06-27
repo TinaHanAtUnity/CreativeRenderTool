@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
+import { Asset } from 'Models/Assets/Asset';
 
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
@@ -8,10 +9,10 @@ interface IMRAIDCampaign extends ICampaign {
     dynamicMarkup: string | undefined;
     additionalTrackingEvents: { [eventName: string]: string[] };
 
-    gameName: string;
-    gameIcon: Image;
-    rating: number;
-    ratingCount: number;
+    gameName: string | undefined;
+    gameIcon: Image | undefined;
+    rating: number | undefined;
+    ratingCount: number | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -22,10 +23,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             resource: ['string', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             additionalTrackingEvents: ['object', 'undefined'],
-            gameName: ['string'],
-            gameIcon: ['object'],
-            rating: ['number'],
-            ratingCount: ['number']
+            gameName: ['string', 'undefined'],
+            gameIcon: ['object', 'undefined'],
+            rating: ['number', 'undefined'],
+            ratingCount: ['number', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -38,8 +39,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
 
         this.set('gameName', campaign.gameName);
-        this.set('gameIcon', new Image(campaign.gameIcon));
 
+        if(campaign.gameIcon) {
+            this.set('gameIcon', new Image(campaign.gameIcon));
+        }
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
     }
@@ -60,19 +63,19 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('resource');
     }
 
-    public getGameName(): string {
+    public getGameName(): string | undefined {
         return this.get('gameName');
     }
 
-    public getGameIcon(): Image {
+    public getGameIcon(): Image | undefined {
         return this.get('gameIcon');
     }
 
-    public getRating(): number{
+    public getRating(): number | undefined {
         return this.get('rating');
     }
 
-    public getRatingCount(): number {
+    public getRatingCount(): number | undefined {
         return this.get('ratingCount');
     }
 
@@ -81,10 +84,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return resourceUrl ? [resourceUrl] : [];
     }
 
-    public getOptionalAssets() {
-        return [
-            this.getGameIcon()
-        ];
+    public getOptionalAssets(): Asset[] {
+        const gameIcon = this.getGameIcon();
+
+        if(!gameIcon) {
+            return [];
+        } else {
+            return [
+                gameIcon
+            ];
+        }
     }
 
     public getDynamicMarkup(): string | undefined {

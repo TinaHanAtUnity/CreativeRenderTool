@@ -58,13 +58,23 @@ export class MRAID extends View {
         this._template = new Template(MRAIDTemplate);
 
         if(campaign) {
-            const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon().getUrl(),
-                'rating': adjustedRating.toString(),
-                'ratingCount': this._localization.abbreviate(campaign.getRatingCount())
             };
+            const gameIcon = campaign.getGameIcon();
+            if(gameIcon) {
+                this._templateData.gameIcon = gameIcon.getUrl();
+            }
+            const rating = campaign.getRating();
+            if(rating) {
+                const adjustedRating: number = rating * 20;
+                this._templateData.rating = adjustedRating.toString();
+            }
+            const ratingCount = campaign.getRatingCount();
+            if(ratingCount) {
+                this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
+            }
+
         }
 
         this._bindings = [
@@ -160,7 +170,6 @@ export class MRAID extends View {
         this.createMRAID().then(mraid => {
 
             iframe.onload = () => this.onIframeLoaded();
-            this._iframe.style.display = 'none';
             iframe.srcdoc = mraid;
 
         });
@@ -259,8 +268,7 @@ export class MRAID extends View {
         }
         this._closeElement.style.display = 'block';
 
-        this._iframe.style.display = 'block';
-        this._loadingScreen.style.display = 'none';
+        // this._loadingScreen.style.display = 'none';
         this._iframe.contentWindow.postMessage({
             type: 'viewable',
             value: true
