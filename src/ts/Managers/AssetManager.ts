@@ -51,7 +51,9 @@ export class AssetManager {
                             return campaign;
                         });
                     } else {
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL);
+                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                            // allow optional assets to fail caching when not in CacheMode.FORCED
+                        });
                         return campaign;
                     }
                 });

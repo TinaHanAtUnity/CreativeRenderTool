@@ -26,6 +26,10 @@ describe('DiagnosticsTest', () => {
         }, Platform.TEST, false);
     });
 
+    after(() => {
+        HttpKafka.setRequest(undefined);
+    });
+
     it('should not allow primitives as root values', () => {
         const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());

@@ -4,7 +4,7 @@ import { INativeResponse, Request } from 'Utilities/Request';
 import { Configuration } from 'Models/Configuration';
 
 export class HttpKafka {
-    public static setRequest(request: Request) {
+    public static setRequest(request?: Request) {
         HttpKafka._request = request;
     }
 
@@ -27,15 +27,16 @@ export class HttpKafka {
             'msg': data
         });
 
-        if(!HttpKafka._request) {
-            throw new Error('Request instance missing from HttpKafka');
-        }
-
         return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
             messages.unshift(commonObject);
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-            return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+            if(HttpKafka._request) {
+                return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+            } else {
+                console.dir(data);
+                return Promise.resolve(<INativeResponse>{});
+            }
         });
     }
 
@@ -44,7 +45,7 @@ export class HttpKafka {
     }
 
     private static KafkaBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
-    private static _request: Request;
+    private static _request: Request | undefined;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
     private static _configuration: Configuration | undefined;

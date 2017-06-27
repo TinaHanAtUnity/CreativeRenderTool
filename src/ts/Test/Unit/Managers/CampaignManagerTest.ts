@@ -26,7 +26,6 @@ import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
-import { HttpKafka } from 'Utilities/HttpKafka';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
@@ -181,7 +180,6 @@ describe('CampaignManager', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
-        HttpKafka.setRequest(request);
     });
 
     describe('on VAST campaign', () => {
@@ -873,7 +871,6 @@ describe('CampaignManager', () => {
 
         describe('performance campaign', () => {
             it('should process correct Auction comet/performance Campaign content type', () => {
-                mockRequest.expects('post').returns(Promise.resolve());
                 mockRequest.expects('post').returns(Promise.resolve({
                     response: OnCometVideoPlcCampaignJson
                 }));
