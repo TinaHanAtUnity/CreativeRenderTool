@@ -140,7 +140,6 @@ export class AuctionCampaignManager extends CampaignManager {
                     return this.setupPlcCampaignAssets(placements, campaign);
                 } else {
                     const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                    this.sendNegativeTargetingEvent(campaign, gamerId);
                     return this.setupPlcCampaignAssets(placements, campaign);
                 }
 
