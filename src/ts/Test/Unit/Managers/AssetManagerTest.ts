@@ -178,8 +178,9 @@ describe('AssetManagerTest', () => {
         const assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo);
         const campaign = new TestCampaign([], []);
         const spy = sinon.spy(cache, 'cache');
-        assetManager.setup(campaign);
-        assert(!spy.calledOnce, 'Cache was called when cache mode was disabled');
+        return assetManager.setup(campaign).then(() => {
+            assert(!spy.calledOnce, 'Cache was called when cache mode was disabled');
+        });
     });
 
     it('should cache required assets', () => {

@@ -35,6 +35,8 @@ export class AnalyticsStorage {
                 } else {
                     return this.getIntegerId();
                 }
+            }).catch(() => {
+                return this.getIntegerId();
             });
         } else {
             return this.getIntegerId();

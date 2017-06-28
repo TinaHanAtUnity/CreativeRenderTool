@@ -232,7 +232,7 @@ test-unit:
 	@echo Running unit tests
 	@echo
 
-	TEST_FILTER=Unit node test-utils/node_runner.js
+	TEST_FILTER=Unit node --trace-warnings test-utils/node_runner.js
 
 test-integration: MODULE = system
 test-integration: TARGET = es5
