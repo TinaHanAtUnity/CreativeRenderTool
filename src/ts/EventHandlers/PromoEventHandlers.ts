@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { PromoAdUnit}  from 'AdUnits/PromoAdUnit';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 
 export class PromoEventHandlers {
 

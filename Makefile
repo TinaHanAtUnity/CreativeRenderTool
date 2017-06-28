@@ -9,7 +9,7 @@ ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
-ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.js
+ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
 SYSTEM_JS = node_modules/systemjs/dist/system.src.js
 
 # Sources
@@ -133,7 +133,7 @@ build-test: clean build-dir build-css build-static build-ts
 
 	mkdir -p $(BUILD_DIR)/vendor
 	cp \
-		node_modules/es6-promise/dist/es6-promise.js \
+		node_modules/es6-promise/dist/es6-promise.auto.js \
 		node_modules/systemjs/dist/system.js \
 		node_modules/mocha/mocha.js \
 		node_modules/chai/chai.js \
@@ -232,7 +232,7 @@ test-unit:
 	@echo Running unit tests
 	@echo
 
-	TEST_FILTER=Unit node test-utils/node_runner.js
+	TEST_FILTER=Unit node --trace-warnings test-utils/node_runner.js
 
 test-integration: MODULE = system
 test-integration: TARGET = es5

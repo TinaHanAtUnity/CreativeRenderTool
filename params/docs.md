@@ -62,6 +62,8 @@
 | webviewUa | string | WebView user agent string | SDK | all |
 | videoOrientation | string | Chosen video orientation | SDK | all |
 | cachedOrientation | string | Cached video orientation | SDK | all |
+| cachedCampaigns | object | Campaign ID's which are fully cached on the device | SDK | all |
+| previousPlacementId | string | Previously shown placementId | SDK | all |
 
 
 
@@ -129,6 +131,8 @@
 | forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
 | forceCampaignId | no | True | False | string | Force campaign ID for internal testing purposes | SDK | all |
 | force_country | no | True | False | string | Force country targeting for internal testing purposes | SDK | all |
+| cachedCampaigns | no | False | True | object | Campaign ID's which are fully cached on the device | SDK | all |
+| previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 
 
 
@@ -162,6 +166,7 @@
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
+| previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 
 
 

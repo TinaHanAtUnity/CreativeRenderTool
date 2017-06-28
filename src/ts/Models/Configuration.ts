@@ -153,7 +153,7 @@ export class Configuration extends Model<IConfiguration> {
             }
         }
 
-        let defaultPlacementId: string | undefined = undefined;
+        let defaultPlacementId: string | undefined;
         const defaultPlacement = this.getDefaultPlacement();
         if (defaultPlacement) {
             defaultPlacementId = defaultPlacement.getId();

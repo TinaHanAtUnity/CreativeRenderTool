@@ -114,7 +114,7 @@ export class AuctionCampaignManager extends CampaignManager {
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls);
+                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId);
                     });
                 }
             }
@@ -127,7 +127,7 @@ export class AuctionCampaignManager extends CampaignManager {
         }
     }
 
-    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }): Promise<void> {
+    private handlePlcCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
@@ -140,25 +140,24 @@ export class AuctionCampaignManager extends CampaignManager {
                     return this.setupPlcCampaignAssets(placements, campaign);
                 } else {
                     const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                    this.sendNegativeTargetingEvent(campaign, gamerId);
                     return this.setupPlcCampaignAssets(placements, campaign);
                 }
 
             case 'programmatic/vast':
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls).then((vastCampaign) => {
+                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, undefined, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
                     return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
 
             case 'programmatic/mraid-url':
                 const jsonMraidUrl = JsonParser.parse(content);
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls);
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
                 const jsonMraid = JsonParser.parse(content);
                 jsonMraid.id = this.getProgrammaticCampaignId();
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             default:

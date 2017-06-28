@@ -15,7 +15,7 @@ class TestStorageApi extends StorageApi {
         this._storage = data;
     }
 
-    public get(storageType: StorageType, key: string): Promise<string | number> {
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
         try {
             switch(key) {
                 case 'mediation.name.value':
@@ -84,14 +84,17 @@ describe('MediationMetaDataTest', () => {
 
         const metaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
-            assert.isDefined(metaData, 'MediationMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-            assert.deepEqual(metaData.getDTO(), {
-                mediationName: 'test_name',
-                mediationVersion: 'test_version',
-                mediationOrdinal: undefined
-            }, 'MediationMetaData.getDTO() produced invalid output');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+                assert.deepEqual(metaData.getDTO(), {
+                    mediationName: 'test_name',
+                    mediationVersion: 'test_version',
+                    mediationOrdinal: undefined
+                }, 'MediationMetaData.getDTO() produced invalid output');
+            } else {
+                throw new Error('MediationMetaData is not defined');
+            }
         });
     });
 
@@ -106,23 +109,29 @@ describe('MediationMetaDataTest', () => {
 
         const metaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
-            assert.isDefined(metaData, 'MediationMetaData is defined');
-            assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-            assert.equal(metaData.getOrdinal(), undefined, 'MediationMetaData.getOrdinal() did not pass through correctly');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+                assert.equal(metaData.getOrdinal(), undefined, 'MediationMetaData.getOrdinal() did not pass through correctly');
 
-            return metaDataManager.fetch(MediationMetaData, true, ['ordinal']).then(metaData2 => {
-                assert.equal(metaData, metaData2, 'MediationMetaData was redefined');
-                assert.isDefined(metaData2, 'MediationMetaData is not defined');
-                assert.equal(metaData2.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
-                assert.equal(metaData2.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-                assert.equal(metaData2.getOrdinal(), 42, 'MediationMetaData.getOrdinal() did not pass through correctly');
-                assert.deepEqual(metaData2.getDTO(), {
-                    mediationName: 'test_name',
-                    mediationVersion: 'test_version',
-                    mediationOrdinal: 42
-                }, 'MediationMetaData.getDTO() produced invalid output');
-            });
+                return metaDataManager.fetch(MediationMetaData, true, ['ordinal']).then(metaData2 => {
+                    assert.equal(metaData, metaData2, 'MediationMetaData was redefined');
+                    if(metaData2) {
+                        assert.equal(metaData2.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
+                        assert.equal(metaData2.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+                        assert.equal(metaData2.getOrdinal(), 42, 'MediationMetaData.getOrdinal() did not pass through correctly');
+                        assert.deepEqual(metaData2.getDTO(), {
+                            mediationName: 'test_name',
+                            mediationVersion: 'test_version',
+                            mediationOrdinal: 42
+                        }, 'MediationMetaData.getDTO() produced invalid output');
+                    } else {
+                        throw new Error('MediationMetaData is not defined');
+                    }
+                });
+            } else {
+                throw new Error('MediationMetaData is not defined');
+            }
         });
     });
 
@@ -150,10 +159,13 @@ describe('MediationMetaDataTest', () => {
 
         const metaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(MediationMetaData).then(metaData => {
-            assert.isDefined(metaData, 'MediationMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
-            assert.isUndefined(metaData.getVersion(), 'MediationMetaData.getVersion() did not pass through correctly');
-            assert.isNaN(metaData.getOrdinal(), 'MediationMetaData.getOrdinal() did not pass through correctly');
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
+                assert.isUndefined(metaData.getVersion(), 'MediationMetaData.getVersion() did not pass through correctly');
+                assert.isUndefined(metaData.getOrdinal(), 'MediationMetaData.getOrdinal() did not pass through correctly');
+            } else {
+                throw new Error('MediationMetaData is not defined');
+            }
         });
     });
 

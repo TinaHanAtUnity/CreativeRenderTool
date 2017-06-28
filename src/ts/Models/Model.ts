@@ -18,7 +18,7 @@ export abstract class Model<T extends object> {
         this._name = name;
     }
 
-    public abstract getDTO(): { [key: string]: any }
+    public abstract getDTO(): { [key: string]: any };
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
         if(!(key in this._schema)) {

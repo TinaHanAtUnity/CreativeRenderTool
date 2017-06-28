@@ -39,9 +39,9 @@ class FakeStorageApi extends StorageApi {
 }
 
 class FakeRequestApi extends RequestApi {
-    private _postCallback: Function;
+    private _postCallback: (url: string, body: string) => void;
 
-    constructor(nativeBridge: NativeBridge, postCallback: Function) {
+    constructor(nativeBridge: NativeBridge, postCallback: (url: string, body: string) => void) {
         super(nativeBridge);
 
         this._postCallback = postCallback;
@@ -121,18 +121,18 @@ describe('AnalyticsManagerTest', () => {
         storage.setValue('iap.purchases', [transaction]);
 
         analyticsManager.init().then(() => {
-            let eventNumber = 0;
+            let count = 0;
             nativeBridge.Request = new FakeRequestApi(nativeBridge, (url: string, body: string) => {
-                eventNumber++;
-                if (eventNumber === 2) {
-                    try {
-                        assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
-                        done();
-                    } catch (e) {
-                        done(e);
-                    }
+                if(count === 0) {
+                    assert.equal(TestHelper.getEventType(body), 'analytics.deviceInfo.v1');
+                } else if(count === 1) {
+                    assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
+                    done();
                 }
+                ++count;
             });
+
+            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], [{price: 1, currency: 'USD'}]);
         });
     });
 

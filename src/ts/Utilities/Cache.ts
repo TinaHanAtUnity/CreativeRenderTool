@@ -61,8 +61,8 @@ interface ICallbackObject {
     startTimestamp: number;
     contentLength: number;
     diagnostics: ICacheDiagnostics;
-    resolve: Function;
-    reject: Function;
+    resolve: (value?: [CacheStatus, string]) => void;
+    reject: (reason?: any) => void;
     originalUrl?: string;
 }
 
@@ -114,7 +114,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<[string, string]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<string[]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -180,7 +180,7 @@ export class Cache {
     }
 
     public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]): Promise<any> => {
+        return Promise.all([this.getCacheFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
             if(!files || !files.length) {
                 let campaignCount = 0;
                 if (campaigns) {
@@ -273,7 +273,7 @@ export class Cache {
                     }));
                 });
 
-                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], object]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));
@@ -697,7 +697,7 @@ export class Cache {
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, fileInfo.size, fileInfo.size, this.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
-                let parsedContentLength = undefined;
+                let parsedContentLength;
                 if (contentLength) {
                     parsedContentLength = parseInt(contentLength, 10);
                 }
