@@ -15,7 +15,7 @@ class TestStorageApi extends StorageApi {
         this._storage = data;
     }
 
-    public get(storageType: StorageType, key: string): Promise<string | number> {
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
         try {
             switch(key) {
                 case 'framework.name.value':
