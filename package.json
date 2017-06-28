@@ -16,7 +16,7 @@
     "systemjs-plugin-text": "0.0.11",
     "tslint": "5.4.3",
     "tslint-microsoft-contrib": "5.0.0",
-    "typescript": "rc"
+    "typescript": "2.4.1"
   },
   "devDependencies": {
     "@types/chai": "4.0.1",
