@@ -7,7 +7,7 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { INativeResponse } from '../Utilities/Request';
+import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
     public static QuickRefillAbGroup: number;
