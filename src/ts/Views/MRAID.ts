@@ -210,6 +210,7 @@ export class MRAID extends View {
 
             this.showPlayable();
         }
+
         this._iFrameLoaded = true;
     }
 
@@ -359,23 +360,25 @@ export class MRAID extends View {
 
     private fetchMRAID(): Promise<string> {
         const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
-            const fileId = resourceUrl.getFileId();
-            if(fileId) {
-                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
-            } else {
+        if (resourceUrl) {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 return new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
                     }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
+                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
                     xhr.send();
                 });
+            } else {
+                const fileId = resourceUrl.getFileId();
+                if (fileId) {
+                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                }
             }
-        } else {
-            return Promise.resolve(this._campaign.getResource());
         }
+
+        return Promise.resolve(this._campaign.getResource());
     }
 
 }
