@@ -167,7 +167,7 @@ export class AuctionCampaignManager extends CampaignManager {
     }
 
     private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
-        return this._assetManager.setup(campaign, true).then(() => {
+        return this._assetManager.setup(campaign).then(() => {
             for(const placement of placements) {
                 this.onCampaign.trigger(placement, campaign);
             }
