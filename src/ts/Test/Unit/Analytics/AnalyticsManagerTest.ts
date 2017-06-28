@@ -116,12 +116,18 @@ describe('AnalyticsManagerTest', () => {
         storage.setValue('iap.purchases', [transaction]);
 
         analyticsManager.init().then(() => {
+            let count = 0;
             nativeBridge.Request = new FakeRequestApi(nativeBridge, (url: string, body: string) => {
-                assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
-                done();
+                if(count === 0) {
+                    assert.equal(TestHelper.getEventType(body), 'analytics.deviceInfo.v1');
+                } else if(count === 1) {
+                    assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
+                    done();
+                }
+                ++count;
             });
 
-            this.nativeBridge.Storage.onSet.trigger(StorageEvent.SET, 'price=1, currency=USD');
+            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], 'price=1, currency=USD');
         });
     });
 });

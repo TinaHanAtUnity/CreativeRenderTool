@@ -66,7 +66,7 @@ describe('AnalyticsStorageTest', () => {
             const analyticsId: number = 119295447155507; // first 12 hex digits converted to decimal
 
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve(nativeId));
-            sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PRIVATE, 'analytics.sessionid').returns(Promise.reject(['COULDNT_GET_VALUE', 'analytics.sessionid']));
+            sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PRIVATE, 'analytics.sessionid').callsFake(() => Promise.reject(['COULDNT_GET_VALUE', 'analytics.sessionid']));
 
             return analyticsStorage.getSessionId(false).then(id => {
                 assert.equal(id, analyticsId, 'created session id does not match');

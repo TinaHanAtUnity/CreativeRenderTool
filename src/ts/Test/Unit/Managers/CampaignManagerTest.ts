@@ -24,8 +24,8 @@ import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
 import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
-import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
