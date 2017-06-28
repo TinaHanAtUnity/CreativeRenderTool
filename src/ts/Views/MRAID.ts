@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -92,11 +93,15 @@ export class MRAID extends View {
                 this.showPlayable();
             } else {
                 this._prepareTimeout = setTimeout(() => {
-                    // TODO: show close button, send diagnostics
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this._closeElement.style.display = 'block';
                     this.updateProgressCircle(this._closeElement, 1);
+
+                    Diagnostics.trigger('playable_prepare_timeout', {
+                        'url': this._campaign.getResource()
+                    });
+
                 }, 5000);
             }
             this._loadingScreenTimeout = undefined;
