@@ -32,7 +32,7 @@ export class MRAID extends View {
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _iFrameLoaded = false;
+    private _iframeLoaded = false;
 
     private _messageListener: any;
     private _resizeHandler: any;
@@ -89,7 +89,7 @@ export class MRAID extends View {
         const iframe: any = this._iframe;
 
         this._loadingScreenTimeout = setTimeout(() => {
-            if(this._iFrameLoaded) {
+            if(this._iframeLoaded) {
                 this.showPlayable();
             } else {
                 this._prepareTimeout = setTimeout(() => {
@@ -205,14 +205,14 @@ export class MRAID extends View {
     }
 
     private onIframeLoaded() {
+        this._iframeLoaded = true;
+
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
 
             this.showPlayable();
         }
-
-        this._iFrameLoaded = true;
     }
 
     private showPlayable() {
