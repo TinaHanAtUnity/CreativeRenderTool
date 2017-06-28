@@ -9,7 +9,7 @@ interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }) {
+    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -26,6 +26,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('resource', resource);
         this.set('dynamicMarkup', campaign.dynamicMarkup);
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
+        this.set('adType', adType || undefined);
+        this.set('correlationId', correlationId || undefined);
+        this.set('creativeId', creativeId || undefined);
+        this.set('seatId', seatId || undefined);
     }
 
     public getResourceUrl(): HTML | undefined {

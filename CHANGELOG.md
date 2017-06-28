@@ -1,3 +1,7 @@
+# Wed Jun 28 08:35:39 UTC 2017
+
+* Start quick no fill refresh A/B test on group 7
+
 # Tue Jun 27 10:35:11 UTC 2017
 
 * Refactored campaign managers to separate classes
