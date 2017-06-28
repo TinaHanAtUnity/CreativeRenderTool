@@ -91,15 +91,3 @@ Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-syst
 #### Running deployment tests
 
 Follow the link for desired platform -> Build with Parameters -> Build. This job will start system test jobs, that run tests on real device in Testdroid cloud. The job iterates over all webview git branches with prefix 'origin/staging/', so staging branches must be deployed in order to run tests. Each found staging branch will result in a job under 'Results' link above.
-
-## Releasing
-
-Before releasing, update dependencies to latest versions in `package.json`, then regenerate `npm-shrinkwrap.json` with `npm shrinkwrap` and then manually remove `fsevents` dependency from the `npm-shrinkwrap.json` file (`fsevents` breaks build on Linux machines. See [this](https://github.com/npm/npm/issues/2679#issuecomment-150084700))
-
-### Release checklist
-
-- Create `staging/*` branches for all release branches and resolve any conflicts
-- Ask QA to run tests
-- If all looks good, update `LKG_*` tags
-- Merge staging branches through PRs to production branches
-- Update CHANGELOG.md in master branch
