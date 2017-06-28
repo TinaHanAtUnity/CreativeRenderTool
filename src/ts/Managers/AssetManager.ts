@@ -51,19 +51,23 @@ export class AssetManager {
                             return campaign;
                         });
                     } else {
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL);
+                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                            // allow optional assets to fail caching when in CacheMode.FORCED
+                        });
                         return campaign;
                     }
                 });
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL));
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                    // allow optional assets to fail caching when not in CacheMode.FORCED
+                });
             }
 
             return Promise.resolve(campaign);
         });
     }
 
-    public selectAssets(campaign: Campaign): Promise<[Asset[], Asset[]]> {
+    public selectAssets(campaign: Campaign): Promise<Asset[][]> {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 

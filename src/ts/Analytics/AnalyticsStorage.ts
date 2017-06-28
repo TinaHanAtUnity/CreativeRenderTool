@@ -35,17 +35,19 @@ export class AnalyticsStorage {
                 } else {
                     return this.getIntegerId();
                 }
+            }).catch(() => {
+                return this.getIntegerId();
             });
         } else {
             return this.getIntegerId();
         }
     }
 
-    public getAppVersion(): Promise<string> {
+    public getAppVersion(): Promise<string | undefined> {
         return this.getValue<string>('analytics.appversion');
     }
 
-    public getOsVersion(): Promise<string> {
+    public getOsVersion(): Promise<string | undefined> {
         return this.getValue<string>('analytics.osversion');
     }
 

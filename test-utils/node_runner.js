@@ -3,13 +3,14 @@ const path = require('path');
 const Mocha = require('mocha');
 const System = require('systemjs');
 const Istanbul = require('istanbul');
-const jsdom = require('jsdom').jsdom;
+const { JSDOM } = require('jsdom');
 const DOMParser = require('xmldom').DOMParser;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const LocalStorage = require('node-localstorage').LocalStorage;
 const exec = require('child_process').exec;
 
-global.document = jsdom('');
+const { document } = new JSDOM('').window;
+global.document = document;
 global.window = document.defaultView;
 global.DOMParser = DOMParser;
 global.XMLHttpRequest = XMLHttpRequest;
@@ -53,7 +54,7 @@ System.config({
         'sinon': './node_modules/sinon/pkg/sinon.js',
         'chai': './node_modules/chai/chai.js',
         'text': './node_modules/systemjs-plugin-text/text.js',
-        'es6-promise': './node_modules/es6-promise/dist/es6-promise.js'
+        'es6-promise': './node_modules/es6-promise/dist/es6-promise.auto.js'
     },
     meta: {
         'mocha': {
@@ -107,6 +108,11 @@ if(coverageDir) {
         });
     };
 }
+
+process.on('unhandledRejection', (error, promise) => {
+    console.error(error);
+    process.exit(1);
+});
 
 const sourcePaths = getSourcePaths('src/ts');
 const testPaths = getTestPaths('src/ts/Test', testFilter);

@@ -175,7 +175,6 @@ describe('VideoEventHandlersTest', () => {
             prom = Promise.resolve(false);
 
             sinon.spy(nativeBridge, 'invoke');
-            sinon.spy(nativeBridge, 'rawInvoke');
             sinon.spy(sessionManager, 'sendView');
         });
 
