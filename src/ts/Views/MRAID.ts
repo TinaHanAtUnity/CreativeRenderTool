@@ -98,8 +98,9 @@ export class MRAID extends View {
                     this._closeElement.style.display = 'block';
                     this.updateProgressCircle(this._closeElement, 1);
 
+                    const resourceUrl = this._campaign.getResourceUrl();
                     Diagnostics.trigger('playable_prepare_timeout', {
-                        'url': this._campaign.getResource()
+                        'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
                     });
 
                     this._prepareTimeout = undefined;
