@@ -92,6 +92,8 @@ describe('MediationMetaDataTest', () => {
                     mediationVersion: 'test_version',
                     mediationOrdinal: undefined
                 }, 'MediationMetaData.getDTO() produced invalid output');
+            } else {
+                throw new Error('MediationMetaData is not defined');
             }
         });
     });
