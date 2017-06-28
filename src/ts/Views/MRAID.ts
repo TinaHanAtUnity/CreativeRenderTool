@@ -102,6 +102,7 @@ export class MRAID extends View {
                         'url': this._campaign.getResource()
                     });
 
+                    this._prepareTimeout = undefined;
                 }, 5000);
             }
             this._loadingScreenTimeout = undefined;
@@ -134,8 +135,6 @@ export class MRAID extends View {
 
     public render() {
         super.render();
-
-        // console.time('Load playable');
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
@@ -182,6 +181,14 @@ export class MRAID extends View {
             clearTimeout(this._resizeTimeout);
             this._resizeHandler = undefined;
         }
+        if(this._loadingScreenTimeout) {
+            clearTimeout(this._loadingScreenTimeout);
+            this._loadingScreenTimeout = undefined;
+        }
+        if(this._prepareTimeout) {
+            clearTimeout(this._prepareTimeout);
+            this._prepareTimeout = undefined;
+        }
         super.hide();
     }
 
@@ -197,7 +204,6 @@ export class MRAID extends View {
     }
 
     private onIframeLoaded() {
-        // console.timeEnd('Load playable');
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
