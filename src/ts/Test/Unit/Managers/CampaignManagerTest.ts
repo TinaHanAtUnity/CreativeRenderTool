@@ -924,6 +924,10 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
+                    assert.equal(triggeredCampaign.getCreativeId(), 'vast-sample-creative-id');
+                    assert.equal(triggeredCampaign.getSeatId(), '900');
+                    assert.equal(triggeredCampaign.getCorrelationId(), 'zzzz');
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                     assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls('start'), [
                         "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D",
@@ -947,6 +951,10 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAdType(), 'mraid-url-sample-ad-type');
+                    assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
+                    assert.equal(triggeredCampaign.getSeatId(), '901');
+                    assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html'));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
@@ -968,6 +976,10 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAdType(), 'mraid-sample-ad-type');
+                    assert.equal(triggeredCampaign.getCreativeId(), 'mraid-sample-creative-id');
+                    assert.equal(triggeredCampaign.getSeatId(), '902');
+                    assert.equal(triggeredCampaign.getCorrelationId(), 'zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResource(), '<div>markup</div>');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
                 });

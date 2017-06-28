@@ -7,6 +7,10 @@ export interface ICampaign {
     abGroup: number;
     timeout: number;
     willExpireAt: number;
+    adType: string | undefined;
+    correlationId: string | undefined;
+    creativeId: string | undefined;
+    seatId: number | undefined;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -16,7 +20,12 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         abGroup: ['number'],
         timeout: ['number'],
         willExpireAt: ['number'],
+        adType: ['string', 'undefined'],
+        correlationId: ['string', 'undefined'],
+        creativeId: ['string', 'undefined'],
+        seatId: ['number', 'undefined'],
     };
+
     constructor(name: string, schema: ISchema<T>) {
         super(name, schema);
     }
@@ -35,6 +44,22 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getTimeout(): number | undefined {
         return this.get('timeout');
+    }
+
+    public getAdType(): string | undefined {
+        return this.get('adType');
+    }
+
+    public getCorrelationId(): string | undefined {
+        return this.get('correlationId');
+    }
+
+    public getCreativeId(): string | undefined {
+        return this.get('creativeId');
+    }
+
+    public getSeatId(): number | undefined {
+        return this.get('seatId');
     }
 
     public isExpired(): boolean {
