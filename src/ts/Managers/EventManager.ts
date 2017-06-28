@@ -35,7 +35,7 @@ export class EventManager {
         this._request = request;
     }
 
-    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<void> {
+    public operativeEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
@@ -129,7 +129,7 @@ export class EventManager {
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
-    private resendEvent(sessionId: string, eventId: string): Promise<void[]> {
+    private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
         return this.getStoredOperativeEvent(sessionId, eventId).then(([url, data]) => {
             this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
             return this._request.post(url, data);
@@ -143,10 +143,10 @@ export class EventManager {
         });
     }
 
-    private getStoredOperativeEvent(sessionId: string, eventId: string): Promise<[string, string]> {
+    private getStoredOperativeEvent(sessionId: string, eventId: string): Promise<string[]> {
         return Promise.all([
-            this._nativeBridge.Storage.get(StorageType.PRIVATE, EventManager.getUrlKey(sessionId, eventId)),
-            this._nativeBridge.Storage.get(StorageType.PRIVATE, EventManager.getDataKey(sessionId, eventId))
+            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, EventManager.getUrlKey(sessionId, eventId)),
+            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, EventManager.getDataKey(sessionId, eventId))
         ]);
     }
 

@@ -53,7 +53,7 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     protected createRequestUrl(): Promise<string> {
-        return Promise.all([super.createRequestUrl(), this.fetchGamerId()]).then(([url, gamerId]) => {
+        return Promise.all([super.createRequestUrl(), this.fetchGamerId()]).then(([url, gamerId]: [string, string | undefined]) => {
             if(gamerId) {
                 url = Url.addParameters(url, {
                     gamerId: this.getParameter('gamerId', gamerId, 'string')
@@ -70,7 +70,7 @@ export class LegacyCampaignManager extends CampaignManager {
         ]);
     }
 
-    private fetchGamerId(): Promise<string> {
+    private fetchGamerId(): Promise<string | undefined> {
         return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {

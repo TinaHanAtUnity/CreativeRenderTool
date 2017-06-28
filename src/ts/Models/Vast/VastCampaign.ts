@@ -24,13 +24,13 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         });
 
         const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset = undefined;
+        let portraitAsset;
         if(portraitUrl) {
             portraitAsset = new Image(portraitUrl);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset = undefined;
+        let landscapeAsset;
         if(landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl);
         }

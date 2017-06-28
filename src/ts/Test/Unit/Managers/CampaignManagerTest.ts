@@ -663,7 +663,6 @@ describe('CampaignManager', () => {
         });
 
         it('should process custom tracking urls', () => {
-
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
@@ -851,7 +850,7 @@ describe('CampaignManager', () => {
         let campaignManager: any;
         let triggeredCampaign: Campaign;
         let triggeredError: any;
-        let triggeredPlacement: String;
+        let triggeredPlacement: string;
         let mockRequest: any;
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
@@ -859,7 +858,7 @@ describe('CampaignManager', () => {
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-            campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
+            campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                 triggeredCampaign = campaign;
                 triggeredPlacement = placement;
             });
@@ -926,7 +925,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'vast-sample-creative-id');
-                    assert.equal(triggeredCampaign.getSeatId(), '900');
+                    assert.equal(triggeredCampaign.getSeatId(), 900);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zzzz');
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                     assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls('start'), [
@@ -953,7 +952,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-url-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
-                    assert.equal(triggeredCampaign.getSeatId(), '901');
+                    assert.equal(triggeredCampaign.getSeatId(), 901);
                     assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html'));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
@@ -978,7 +977,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getAbGroup(), 13);
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-sample-creative-id');
-                    assert.equal(triggeredCampaign.getSeatId(), '902');
+                    assert.equal(triggeredCampaign.getSeatId(), 902);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResource(), '<div>markup</div>');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
@@ -992,7 +991,7 @@ describe('CampaignManager', () => {
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
                 campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-                campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
+                campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });
@@ -1021,7 +1020,7 @@ describe('CampaignManager', () => {
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
                 campaignManager = new AuctionCampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
-                campaignManager.onCampaign.subscribe((placement: String, campaign: Campaign) => {
+                campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });

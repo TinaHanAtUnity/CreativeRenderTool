@@ -7,6 +7,7 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
     public static QuickRefillAbGroup: number;
@@ -22,7 +23,7 @@ export class CampaignRefreshManager {
     private _refillTimestamp: number;
     private _needsRefill = true;
 
-    constructor (nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
@@ -52,7 +53,7 @@ export class CampaignRefreshManager {
         });
     }
 
-    public refresh(): Promise<void> {
+    public refresh(): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
@@ -129,7 +130,7 @@ export class CampaignRefreshManager {
         return false;
     }
 
-    private onCampaignExpired(): Promise<void> {
+    private onCampaignExpired(): Promise<INativeResponse | void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
         this.invalidateCampaigns(false);

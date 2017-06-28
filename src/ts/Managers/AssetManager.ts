@@ -67,7 +67,7 @@ export class AssetManager {
         });
     }
 
-    public selectAssets(campaign: Campaign): Promise<[Asset[], Asset[]]> {
+    public selectAssets(campaign: Campaign): Promise<Asset[][]> {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 

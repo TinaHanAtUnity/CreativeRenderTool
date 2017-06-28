@@ -43,11 +43,11 @@ export class AnalyticsStorage {
         }
     }
 
-    public getAppVersion(): Promise<string> {
+    public getAppVersion(): Promise<string | undefined> {
         return this.getValue<string>('analytics.appversion');
     }
 
-    public getOsVersion(): Promise<string> {
+    public getOsVersion(): Promise<string | undefined> {
         return this.getValue<string>('analytics.osversion');
     }
 

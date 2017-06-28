@@ -16,14 +16,14 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
 
-    public get(storageType: StorageType, key: string): Promise<string | number> {
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
         try {
             switch(key) {
                 case 'adapter.name.value':
-                    return Promise.resolve('adapter_name');
+                    return Promise.resolve(<any>'adapter_name');
 
                 case 'adapter.version.value':
-                    return Promise.resolve('adapter_version');
+                    return Promise.resolve(<any>'adapter_version');
 
                 default:
                     throw new Error('Unknown key "' + key + '"');
