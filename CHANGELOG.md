@@ -1,3 +1,7 @@
+# Thu Jun 29 12:47:41 UTC 2017
+
+* Reduce quick no fill refresh test initial delay to one minute
+
 # Thu Jun 29 09:09:31 UTC 2017
 
 * Add values sent via operative events for brand auction
