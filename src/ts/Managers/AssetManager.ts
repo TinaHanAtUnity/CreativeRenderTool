@@ -88,10 +88,12 @@ export class AssetManager {
     }
 
     public enableCaching(): void {
+        // todo: should queue state be reset here?
         this._stopped = false;
     }
 
     public stopCaching(): void {
+        // todo: clean queue here
         this._stopped = true;
         this._cache.stop();
     }
