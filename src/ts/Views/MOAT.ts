@@ -22,6 +22,7 @@ export class MOAT extends View {
     }
 
     public init(ids: { [key: string]: string }, duration: number, url: string) {
+        this._nativeBridge.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
         this._iframe.contentWindow.postMessage({
             type: 'init',
             data: {
@@ -33,6 +34,7 @@ export class MOAT extends View {
     }
 
     public triggerEvent(type: string, volume: number) {
+        this._nativeBridge.Sdk.logDebug('Calling MOAT video event "' + type + '" with volume: ' + volume);
         this._iframe.contentWindow.postMessage({
             type: 'event',
             data: {

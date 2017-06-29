@@ -33,12 +33,10 @@
                         case 'init':
                             var dummyElement = document.createElement('div');
                             document.body.appendChild(dummyElement);
-                            console.log('init: ' + event.data.data.ids + ' duration: ' + event.data.data.duration + ' url: ' + event.data.data.url);
                             moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
                             break;
 
                         case 'event':
-                            console.log('type: ' + event.data.data.type + ' volume: ' + event.data.data.volume);
                             if(moat) {
                                 moat.dispatchEvent({
                                     "type": event.data.data.type,
