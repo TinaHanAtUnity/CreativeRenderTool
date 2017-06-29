@@ -14,18 +14,29 @@ enum CacheType {
     OPTIONAL
 }
 
+interface IQueueObject {
+    url: string;
+    diagnostics: ICacheDiagnostics;
+    cacheType: CacheType;
+    resolve: (value: string[]) => void;
+    reject: (reason?: any) => void;
+}
+
 export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
+    private _caching: boolean;
+    private _queue: IQueueObject[];
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
+        this._queue = [];
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -92,7 +103,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
+                const promise = this.queue(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -103,9 +114,43 @@ export class AssetManager {
 
                     return Promise.resolve();
                 });
+                this.executeQueue();
+                return promise;
             });
         }
         return chain;
+    }
+
+    private queue(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
+        return new Promise<string[]>((resolve,reject) => {
+            const queueObject: IQueueObject = {
+                url: url,
+                diagnostics: diagnostics,
+                cacheType: cacheType,
+                resolve: resolve,
+                reject: reject
+            };
+            this._queue.push(queueObject);
+        });
+    }
+
+    private executeQueue(): void {
+        if(!this._caching && this._queue.length > 0) {
+            // todo: fetch the asset first from required assets, then from optional assets
+            const currentAsset: IQueueObject | undefined = this._queue.shift();
+            if(currentAsset) {
+                this._caching = true;
+                this._cache.cache(currentAsset.url, currentAsset.diagnostics).then(([fileId, fileUrl]) => {
+                    currentAsset.resolve([fileId, fileUrl]);
+                    this._caching = false;
+                    this.executeQueue();
+                }).catch(error => {
+                    currentAsset.reject(error);
+                    this._caching = false;
+                    this.executeQueue();
+                });
+            }
+        }
     }
 
     private validateAssets(campaign: Campaign): boolean {

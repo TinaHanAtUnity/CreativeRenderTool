@@ -103,21 +103,25 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
             }
 
-            let chain = Promise.resolve();
+            let chain: Promise<void[]> = Promise.all([]);
 
+            const noFillPromises: Array<Promise<void>> = [];
             for(const placement of noFill) {
-                chain = chain.then(() => {
-                    return this.handlePlcNoFill(placement);
-                });
+                noFillPromises.push(this.handlePlcNoFill(placement));
             }
+            chain = chain.then(() => {
+                return Promise.all(noFillPromises);
+            });
 
+            const campaignPromises: Array<Promise<void>> = [];
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId);
-                    });
+                    campaignPromises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
                 }
             }
+            chain = chain.then(() => {
+                return Promise.all(campaignPromises);
+            });
 
             return chain.catch(error => {
                 return this.handlePlcError(error);
