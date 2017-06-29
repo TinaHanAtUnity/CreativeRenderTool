@@ -11,7 +11,7 @@ import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
     public static QuickRefillAbGroup: number;
-    private static QuickRefillDelay: number = 300000; // five minutes
+    private static QuickRefillDelay: number = 60000; // one minute
 
     private static NoFillDelay = 3600;
 
@@ -248,12 +248,12 @@ export class CampaignRefreshManager {
             this._refillTimestamp = Date.now() + CampaignRefreshManager.QuickRefillDelay;
             setTimeout(() => {
                 this.refresh();
-            }, CampaignRefreshManager.QuickRefillDelay + (Math.random() * 60000)); // five minutes (initially) + up to one minute of random delay
+            }, CampaignRefreshManager.QuickRefillDelay + (Math.random() * 5000)); // one minute (initially) + up to five seconds of random delay
             CampaignRefreshManager.QuickRefillDelay = CampaignRefreshManager.QuickRefillDelay * 2;
         }
     }
 
     private resetQuickRefillAbTest() {
-        CampaignRefreshManager.QuickRefillDelay = 300000;
+        CampaignRefreshManager.QuickRefillDelay = 60000;
     }
 }
