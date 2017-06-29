@@ -17,7 +17,6 @@ enum CacheType {
 interface IQueueObject {
     url: string;
     diagnostics: ICacheDiagnostics;
-    cacheType: CacheType;
     resolve: (value: string[]) => void;
     reject: (reason?: any) => void;
 }
@@ -29,14 +28,16 @@ export class AssetManager {
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
-    private _queue: IQueueObject[];
+    private _requiredQueue: IQueueObject[];
+    private _optionalQueue: IQueueObject[];
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
-        this._queue = [];
+        this._requiredQueue = [];
+        this._optionalQueue = [];
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -126,28 +127,38 @@ export class AssetManager {
             const queueObject: IQueueObject = {
                 url: url,
                 diagnostics: diagnostics,
-                cacheType: cacheType,
                 resolve: resolve,
                 reject: reject
             };
-            this._queue.push(queueObject);
+            if(cacheType === CacheType.REQUIRED) {
+                this._requiredQueue.push(queueObject);
+            } else {
+                this._optionalQueue.push(queueObject);
+            }
         });
     }
 
     private executeQueue(): void {
-        if(!this._caching && this._queue.length > 0) {
-            // todo: fetch the asset first from required assets, then from optional assets
-            const currentAsset: IQueueObject | undefined = this._queue.shift();
+        if(!this._caching) {
+            let currentAsset: IQueueObject | undefined = this._requiredQueue.shift();
+            if(!currentAsset) {
+                currentAsset = this._optionalQueue.shift();
+            }
+
             if(currentAsset) {
                 this._caching = true;
                 this._cache.cache(currentAsset.url, currentAsset.diagnostics).then(([fileId, fileUrl]) => {
-                    currentAsset.resolve([fileId, fileUrl]);
-                    this._caching = false;
-                    this.executeQueue();
+                    if(currentAsset) { // todo: why does the compiler require this?
+                        currentAsset.resolve([fileId, fileUrl]);
+                        this._caching = false;
+                        this.executeQueue();
+                    }
                 }).catch(error => {
-                    currentAsset.reject(error);
-                    this._caching = false;
-                    this.executeQueue();
+                    if(currentAsset) { // todo: why does the compiler require this?
+                        currentAsset.reject(error);
+                        this._caching = false;
+                        this.executeQueue();
+                    }
                 });
             }
         }
