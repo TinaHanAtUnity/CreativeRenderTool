@@ -1,3 +1,11 @@
+# Thu Jun 29 09:09:31 UTC 2017
+
+* Add values sent via operative events for brand auction
+* Update to TypeScript 2.4
+* Update dependencies
+* Document previousPlacementId and cachedCampaigns
+* Fix unhandled promise rejections
+
 # Wed Jun 28 08:35:39 UTC 2017
 
 * Start quick no fill refresh A/B test on group 7
