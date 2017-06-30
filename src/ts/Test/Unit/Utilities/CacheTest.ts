@@ -241,7 +241,7 @@ describe('CacheTest', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
-        const triggerNetwork: Function = () => {
+        const triggerNetwork = () => {
             networkTriggers++;
             wakeUpManager.onNetworkConnected.trigger();
         };

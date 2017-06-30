@@ -1,3 +1,25 @@
+# Thu Jun 29 12:47:41 UTC 2017
+
+* Reduce quick no fill refresh test initial delay to one minute
+
+# Thu Jun 29 09:09:31 UTC 2017
+
+* Add values sent via operative events for brand auction
+* Update to TypeScript 2.4
+* Update dependencies
+* Document previousPlacementId and cachedCampaigns
+* Fix unhandled promise rejections
+
+# Wed Jun 28 08:35:39 UTC 2017
+
+* Start quick no fill refresh A/B test on group 7
+
+# Tue Jun 27 10:35:11 UTC 2017
+
+* Refactored campaign managers to separate classes
+* Removed negative targeting events
+* Add JS workarounds for hybrid test runner
+
 # Wed Jun 21 13:37:03 UTC 2017
 
 * Programmatic MRAID support for Auction

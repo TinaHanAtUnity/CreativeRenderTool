@@ -13,7 +13,7 @@ interface IVastCampaign extends ICampaign {
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any) {
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
@@ -24,13 +24,13 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         });
 
         const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset = undefined;
+        let portraitAsset;
         if(portraitUrl) {
             portraitAsset = new Image(portraitUrl);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset = undefined;
+        let landscapeAsset;
         if(landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl);
         }
@@ -45,6 +45,10 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('timeout', cacheTTL || 3600);
+        this.set('adType', adType || undefined);
+        this.set('correlationId', correlationId || undefined);
+        this.set('creativeId', creativeId || undefined);
+        this.set('seatId', seatId || undefined);
 
         this.processCustomTracking(tracking);
     }

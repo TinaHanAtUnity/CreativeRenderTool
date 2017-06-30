@@ -355,5 +355,19 @@
     "description": "Cached video orientation",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "cachedCampaigns",
+    "type": "object",
+    "description": "Campaign ID's which are fully cached on the device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "previousPlacementId",
+    "type": "string",
+    "description": "Previously shown placementId",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

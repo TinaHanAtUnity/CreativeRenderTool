@@ -1,19 +1,15 @@
 import { NativeBridge } from 'Native/NativeBridge';
-
-const enum RequestStatus {
-    COMPLETE,
-    FAILED
-}
+import { CallbackContainer } from './CallbackContainer';
 
 export class Resolve {
 
     private static _callbackId = 1;
-    private static _callbacks: { [key: number]: { [key: number]: Function } } = {};
+    private static _callbacks: { [key: number]: CallbackContainer<[string, string, string]> } = {};
 
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
-            callbackObject[RequestStatus.COMPLETE]([host, ip]);
+            callbackObject.resolve([host, ip]);
             delete Resolve._callbacks[id];
         }
     }
@@ -21,7 +17,7 @@ export class Resolve {
     private static onResolveFailed(id: string, host: string, error: string, message: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
-            callbackObject[RequestStatus.FAILED]([error, message]);
+            callbackObject.reject([error, message]);
             delete Resolve._callbacks[id];
         }
     }
@@ -43,10 +39,7 @@ export class Resolve {
 
     private registerCallback(id: number): Promise<[string, string, string]> {
         return new Promise<[string, string, string]>((resolve, reject) => {
-            const callbackObject: { [key: number]: Function } = {};
-            callbackObject[RequestStatus.COMPLETE] = resolve;
-            callbackObject[RequestStatus.FAILED] = reject;
-            Resolve._callbacks[id] = callbackObject;
+            Resolve._callbacks[id] = new CallbackContainer(resolve, reject);
         });
     }
 

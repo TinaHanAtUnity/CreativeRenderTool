@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { VastAdUnit}  from 'AdUnits/VastAdUnit';
+import { VastAdUnit} from 'AdUnits/VastAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 

@@ -7,8 +7,12 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
+    public static QuickRefillAbGroup: number;
+    private static QuickRefillDelay: number = 60000; // one minute
+
     private static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
@@ -19,7 +23,7 @@ export class CampaignRefreshManager {
     private _refillTimestamp: number;
     private _needsRefill = true;
 
-    constructor (nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
@@ -49,7 +53,7 @@ export class CampaignRefreshManager {
         });
     }
 
-    public refresh(): Promise<void> {
+    public refresh(): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING);
             this._refillTimestamp = 0;
@@ -126,7 +130,7 @@ export class CampaignRefreshManager {
         return false;
     }
 
-    private onCampaignExpired(): Promise<void> {
+    private onCampaignExpired(): Promise<INativeResponse | void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL);
         this.invalidateCampaigns(false);
@@ -141,6 +145,7 @@ export class CampaignRefreshManager {
             this.handlePlacementState(placementId, PlacementState.READY);
         } else {
             // TODO: remove this whole else -block when we get rid of LegacyCampaignManager
+            this.resetQuickRefillAbTest();
             if(this._configuration.getPlacements()) {
                 for(placementId in this._configuration.getPlacements()) {
                     if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
@@ -179,9 +184,11 @@ export class CampaignRefreshManager {
                 const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                     this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                     this.setPlacementStates(PlacementState.NO_FILL);
+                    this.handleQuickRefillAbTest();
                 });
             } else {
                 this.setPlacementStates(PlacementState.NO_FILL);
+                this.handleQuickRefillAbTest();
             }
         }
     }
@@ -205,9 +212,11 @@ export class CampaignRefreshManager {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL);
+                this.handleQuickRefillAbTest();
             });
         } else {
             this.setPlacementStates(PlacementState.NO_FILL);
+            this.handleQuickRefillAbTest();
         }
     }
 
@@ -231,5 +240,20 @@ export class CampaignRefreshManager {
             this.setPlacementState(placementId, placementState);
             this.sendPlacementStateChanges(placementId);
         }
+    }
+
+    private handleQuickRefillAbTest() {
+        if(CampaignRefreshManager.QuickRefillAbGroup && CampaignRefreshManager.QuickRefillAbGroup === 7) {
+            this._nativeBridge.Sdk.logDebug('Unity Ads quick refresh mode active, refreshing after ' + (CampaignRefreshManager.QuickRefillDelay / 60000) + ' minutes');
+            this._refillTimestamp = Date.now() + CampaignRefreshManager.QuickRefillDelay;
+            setTimeout(() => {
+                this.refresh();
+            }, CampaignRefreshManager.QuickRefillDelay + (Math.random() * 5000)); // one minute (initially) + up to five seconds of random delay
+            CampaignRefreshManager.QuickRefillDelay = CampaignRefreshManager.QuickRefillDelay * 2;
+        }
+    }
+
+    private resetQuickRefillAbTest() {
+        CampaignRefreshManager.QuickRefillDelay = 60000;
     }
 }
