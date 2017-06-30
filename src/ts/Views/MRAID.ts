@@ -264,8 +264,6 @@ export class MRAID extends View {
             }, 1000);
         }
 
-        this._loadingScreen.classList.add('hidden');
-
         ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
             if (this._loadingScreen.style.display === 'none') {
                 return;
@@ -282,6 +280,8 @@ export class MRAID extends View {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
+
+        this._loadingScreen.classList.add('hidden');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {

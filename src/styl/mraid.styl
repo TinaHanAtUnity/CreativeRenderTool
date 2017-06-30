@@ -1,6 +1,9 @@
 #mraid
 
   @import "game-shared.styl";
+
+  hiding-delay = 1.5s;
+
   progress-bar-width = 60%
   filling-bar-width = progress-bar-width * 0.3
 
@@ -94,6 +97,10 @@
     &.hidden
       -webkit-transition: opacity 1000ms ease-out;
       transition: opacity 1000ms ease-out
+
+      -webkit-transition-delay: hiding-delay
+      transition-delay: hiding-delay
+
       opacity: 0
       pointer-events: none
 
