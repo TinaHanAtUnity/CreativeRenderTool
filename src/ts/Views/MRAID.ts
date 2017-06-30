@@ -36,9 +36,6 @@ export class MRAID extends View {
     private _iframeLoaded = false;
 
     private _messageListener: any;
-    private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
 
@@ -87,8 +84,6 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
-        const iframe: any = this._iframe;
-
         this._loadingScreenTimeout = setTimeout(() => {
             if(this._iframeLoaded) {
                 this.showPlayable();
@@ -109,30 +104,6 @@ export class MRAID extends View {
             }
             this._loadingScreenTimeout = undefined;
         }, 2000);
-
-        this._resizeDelayer = (event: Event) => {
-            this._resizeTimeout = setTimeout(() => {
-                this._resizeHandler(event);
-            }, 200);
-        };
-
-        this._resizeHandler = (event: Event) => {
-            iframe.width = window.innerWidth;
-            iframe.height = window.innerHeight;
-            if(this._iframe.contentWindow) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'resize',
-                    width: window.innerWidth,
-                    height: window.innerHeight
-                }, '*');
-            }
-        };
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            window.addEventListener('resize', this._resizeDelayer, false);
-        } else {
-            window.addEventListener('resize', this._resizeHandler, false);
-        }
     }
 
     public render() {
@@ -142,19 +113,6 @@ export class MRAID extends View {
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            if (Math.abs(<number>window.orientation) === 90) {
-                iframe.width = screen.height;
-                iframe.height = screen.width;
-            } else {
-                iframe.width = screen.width;
-                iframe.height = screen.height;
-            }
-        } else {
-            iframe.height = window.innerHeight;
-            iframe.width = window.innerWidth;
-        }
 
         this.createMRAID().then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
@@ -174,19 +132,12 @@ export class MRAID extends View {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
         }
-        if(this._resizeHandler) {
-            window.removeEventListener('resize', this._resizeHandler, false);
-            this._resizeHandler = undefined;
-        }
-        if(this._resizeDelayer) {
-            window.removeEventListener('resize', this._resizeDelayer, false);
-            clearTimeout(this._resizeTimeout);
-            this._resizeHandler = undefined;
-        }
+
         if(this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
         }
+
         if(this._prepareTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
