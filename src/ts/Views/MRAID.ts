@@ -9,6 +9,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
+import { WebViewError } from 'Errors/WebViewError';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
@@ -195,12 +196,14 @@ export class MRAID extends View {
 
     public createMRAID(): Promise<string> {
         return this.fetchMRAID().then(mraid => {
-            const markup = this._campaign.getDynamicMarkup();
-            if(markup) {
-                mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+            if(mraid) {
+                const markup = this._campaign.getDynamicMarkup();
+                if(markup) {
+                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+                }
+                return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
             }
-
-            return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
+            throw new WebViewError('Unable to fetch MRAID');
         });
     }
 
@@ -359,7 +362,7 @@ export class MRAID extends View {
         }
     }
 
-    private fetchMRAID(): Promise<string> {
+    private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
         if (resourceUrl) {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -378,7 +381,6 @@ export class MRAID extends View {
                 }
             }
         }
-
         return Promise.resolve(this._campaign.getResource());
     }
 

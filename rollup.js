@@ -1,14 +1,15 @@
-import includePaths from 'rollup-plugin-includepaths';
+import include from 'rollup-plugin-includepaths';
 import string from 'rollup-plugin-string';
-import nodeResolve from 'rollup-plugin-node-resolve';
+import resolve from 'rollup-plugin-node-resolve';
 import html from 'rollup-plugin-html';
+import alias from 'rollup-plugin-alias';
 
 export default {
     entry: 'build/release/js/Device.js',
     format: 'iife',
     dest: 'build/release/bundle.js',
     plugins: [
-        includePaths({
+        include({
             paths: [
                 'build/release/js',
                 'build/release'
@@ -28,7 +29,10 @@ export default {
                 '**/*.json'
             ]
         }),
-        nodeResolve()
+        alias({
+            'es6-promise': 'node_modules/es6-promise/dist/es6-promise.auto.js'
+        }),
+        resolve()
     ],
     context: 'window'
 };

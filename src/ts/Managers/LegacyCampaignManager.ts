@@ -17,6 +17,7 @@ import { Campaign } from 'Models/Campaign';
 import { StorageType } from 'Native/Api/Storage';
 import { Url } from 'Utilities/Url';
 import { WebViewError } from 'Errors/WebViewError';
+import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 
 export class LegacyCampaignManager extends CampaignManager {
     public static setTestBaseUrl(baseUrl: string): void {
@@ -52,7 +53,7 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     protected createRequestUrl(): Promise<string> {
-        return Promise.all([super.createRequestUrl(), this.fetchGamerId()]).then(([url, gamerId]) => {
+        return Promise.all([super.createRequestUrl(), this.fetchGamerId()]).then(([url, gamerId]: [string, string | undefined]) => {
             if(gamerId) {
                 url = Url.addParameters(url, {
                     gamerId: this.getParameter('gamerId', gamerId, 'string')
@@ -69,7 +70,7 @@ export class LegacyCampaignManager extends CampaignManager {
         ]);
     }
 
-    private fetchGamerId(): Promise<string> {
+    private fetchGamerId(): Promise<string | undefined> {
         return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {
@@ -79,6 +80,12 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private parseCampaign(response: INativeResponse): Promise<void> {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+
+        // note: very hackish way of setting A/B group for a test but practically the only easy way to handle everything including all error paths
+        if(json.abGroup) {
+            CampaignRefreshManager.QuickRefillAbGroup = json.abGroup;
+        }
+
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
         } else if('campaign' in json || 'vast' in json || 'mraid' in json) {
@@ -110,7 +117,6 @@ export class LegacyCampaignManager extends CampaignManager {
             });
         } else {
             const campaign = new PerformanceCampaign(json.campaign, json.gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : json.abGroup);
-            this.sendNegativeTargetingEvent(campaign, json.gamerId);
             return this._assetManager.setup(campaign).then(() => {
                 return this.handleFill(campaign);
             });
