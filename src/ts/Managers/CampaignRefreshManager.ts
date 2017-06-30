@@ -249,7 +249,7 @@ export class CampaignRefreshManager {
             setTimeout(() => {
                 this.refresh();
             }, CampaignRefreshManager.QuickRefillDelay + (Math.random() * 5000)); // one minute (initially) + up to five seconds of random delay
-            CampaignRefreshManager.QuickRefillDelay = CampaignRefreshManager.QuickRefillDelay * 2;
+            CampaignRefreshManager.QuickRefillDelay = CampaignRefreshManager.QuickRefillDelay + 60000;
         }
     }
 
