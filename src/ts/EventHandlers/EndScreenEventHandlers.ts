@@ -86,7 +86,6 @@ export class EndScreenEventHandlers {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        event: event,
                         sessionId: sessionManager.getSession().getId(),
                         url: campaign.getClickAttributionUrl(),
                         response: (<RequestError>error).nativeResponse

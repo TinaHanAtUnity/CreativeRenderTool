@@ -67,7 +67,8 @@ export class AuctionCampaignManager extends CampaignManager {
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
                     placementRequest[placement] = {
-                        adTypes: placements[placement].getAdTypes()
+                        adTypes: placements[placement].getAdTypes(),
+                        allowSkip: placements[placement].allowSkip()
                     };
                 }
             }
