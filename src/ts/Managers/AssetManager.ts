@@ -1,4 +1,4 @@
-import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics, CacheStatus } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
@@ -88,14 +88,26 @@ export class AssetManager {
     }
 
     public enableCaching(): void {
-        // todo: should queue state be reset here?
         this._stopped = false;
     }
 
     public stopCaching(): void {
-        // todo: clean queue here
         this._stopped = true;
         this._cache.stop();
+
+        while(this._requiredQueue.length) {
+            const object: IQueueObject | undefined = this._requiredQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
+
+        while(this._optionalQueue.length) {
+            const object: IQueueObject | undefined = this._optionalQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
     }
 
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
@@ -148,19 +160,16 @@ export class AssetManager {
             }
 
             if(currentAsset) {
+                const asset: IQueueObject = currentAsset;
                 this._caching = true;
-                this._cache.cache(currentAsset.url, currentAsset.diagnostics).then(([fileId, fileUrl]) => {
-                    if(currentAsset) { // todo: why does the compiler require this?
-                        currentAsset.resolve([fileId, fileUrl]);
-                        this._caching = false;
-                        this.executeQueue();
-                    }
+                this._cache.cache(asset.url, asset.diagnostics).then(([fileId, fileUrl]) => {
+                    asset.resolve([fileId, fileUrl]);
+                    this._caching = false;
+                    this.executeQueue();
                 }).catch(error => {
-                    if(currentAsset) { // todo: why does the compiler require this?
-                        currentAsset.reject(error);
-                        this._caching = false;
-                        this.executeQueue();
-                    }
+                    asset.reject(error);
+                    this._caching = false;
+                    this.executeQueue();
                 });
             }
         }
