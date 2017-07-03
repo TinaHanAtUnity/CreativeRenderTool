@@ -9,6 +9,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { Configuration } from 'Models/Configuration';
 
 export class VideoEventHandlers {
 
@@ -71,7 +72,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getVideo().setStarted(true);
 
@@ -107,7 +108,7 @@ export class VideoEventHandlers {
                 const error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
                     position: position,
                     lastPosition: lastPosition,
-                    duration: adUnit.getVideo().getDuration()
+                    duration: adUnit.getVideo().getDuration(),
                 });
                 Diagnostics.trigger('video_player_too_large_progress', error);
 
@@ -126,7 +127,10 @@ export class VideoEventHandlers {
                     const error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
                         repeats: repeats,
                         position: position,
-                        duration: adUnit.getVideo().getDuration()
+                        duration: adUnit.getVideo().getDuration(),
+                        originalUrl: adUnit.getVideo().getOriginalUrl(),
+                        cached: adUnit.getVideo().isCached(),
+                        cacheMode: configuration.getCacheMode()
                     });
                     Diagnostics.trigger('video_player_stuck', error);
 
