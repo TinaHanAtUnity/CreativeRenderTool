@@ -104,27 +104,20 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
             }
 
-            let chain: Promise<void[]> = Promise.all([]);
+            const promises: Array<Promise<void>> = [];
 
-            const noFillPromises: Array<Promise<void>> = [];
             for(const placement of noFill) {
-                noFillPromises.push(this.handlePlcNoFill(placement));
+                promises.push(this.handlePlcNoFill(placement));
             }
-            chain = chain.then(() => {
-                return Promise.all(noFillPromises);
-            });
 
-            const campaignPromises: Array<Promise<void>> = [];
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    campaignPromises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
+                    promises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
                 }
             }
-            chain = chain.then(() => {
-                return Promise.all(campaignPromises);
-            });
 
-            return chain.catch(error => {
+            return Promise.all(promises).catch(error => {
+                // todo: catch errors by placement
                 return this.handlePlcError(error);
             });
         } else {
