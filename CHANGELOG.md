@@ -1,3 +1,8 @@
+# Mon Jul  3 12:48:21 UTC 2017
+
+* Revert test in group 7 back to exponential increase of refresh interval
+* Fix strange reference to event global in end screen event handler
+
 # Mon Jul  3 09:30:10 UTC 2017
 
 * Try linear increasing of refresh interval in group 7
