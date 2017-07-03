@@ -1,3 +1,9 @@
+# Mon Jul  3 09:30:10 UTC 2017
+
+* Try linear increasing of refresh interval in group 7
+* Start A/B test with 1 second refresh after start in A/B group 6
+* Add allowSkip parameter to auction ad requests
+
 # Thu Jun 29 12:47:41 UTC 2017
 
 * Reduce quick no fill refresh test initial delay to one minute
