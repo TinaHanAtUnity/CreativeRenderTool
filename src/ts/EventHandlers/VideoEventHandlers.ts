@@ -128,6 +128,7 @@ export class VideoEventHandlers {
                         repeats: repeats,
                         position: position,
                         duration: adUnit.getVideo().getDuration(),
+                        url: adUnit.getVideo().getUrl(),
                         originalUrl: adUnit.getVideo().getOriginalUrl(),
                         cached: adUnit.getVideo().isCached(),
                         cacheMode: configuration.getCacheMode()
