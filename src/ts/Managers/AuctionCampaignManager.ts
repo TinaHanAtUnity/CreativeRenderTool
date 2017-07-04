@@ -104,23 +104,20 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
             }
 
-            let chain = Promise.resolve();
+            const promises: Array<Promise<void>> = [];
 
             for(const placement of noFill) {
-                chain = chain.then(() => {
-                    return this.handlePlcNoFill(placement);
-                });
+                promises.push(this.handlePlcNoFill(placement));
             }
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId);
-                    });
+                    promises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
                 }
             }
 
-            return chain.catch(error => {
+            return Promise.all(promises).catch(error => {
+                // todo: catch errors by placement
                 return this.handlePlcError(error);
             });
         } else {
@@ -168,7 +165,7 @@ export class AuctionCampaignManager extends CampaignManager {
     }
 
     private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
-        return this._assetManager.setup(campaign, true).then(() => {
+        return this._assetManager.setup(campaign).then(() => {
             for(const placement of placements) {
                 this.onCampaign.trigger(placement, campaign);
             }
