@@ -131,7 +131,9 @@ export class ClientInfo extends Model<IClientInfo> {
             'configUrl': this.getConfigUrl(),
             'webviewUrl': this.getWebviewUrl(),
             'webviewHash': this.getWebviewHash(),
-            'webviewVersion': this.getWebviewVersion()
+            'webviewVersion': this.getWebviewVersion(),
+            'initTimestamp': this.getInitTimestamp(),
+            'reinitialized': this.isReinitialized()
         };
     }
 }

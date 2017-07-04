@@ -1,4 +1,4 @@
-import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics, CacheStatus } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
@@ -14,21 +14,33 @@ enum CacheType {
     OPTIONAL
 }
 
+interface IQueueObject {
+    url: string;
+    diagnostics: ICacheDiagnostics;
+    resolve: (value: string[]) => void;
+    reject: (reason?: any) => void;
+}
+
 export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
+    private _caching: boolean;
+    private _requiredQueue: IQueueObject[];
+    private _optionalQueue: IQueueObject[];
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
+        this._requiredQueue = [];
+        this._optionalQueue = [];
     }
 
-    public setup(campaign: Campaign, plc?: boolean): Promise<Campaign> {
+    public setup(campaign: Campaign): Promise<Campaign> {
         if(!this.validateAssets(campaign)) {
             throw new Error('Invalid required assets in campaign ' + campaign.getId());
         }
@@ -42,20 +54,12 @@ export class AssetManager {
                 return this.validateVideos(requiredAssets);
             });
 
-            if(this._cacheMode === CacheMode.FORCED || plc) {
+            if(this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    if(plc) {
-                        // hack to avoid race conditions with plc when there are multiple different campaigns
-                        // proper fix is to refactor AssetManager to trigger events instead of returning one promise
-                        return this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                            return campaign;
-                        });
-                    } else {
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
-                            // allow optional assets to fail caching when in CacheMode.FORCED
-                        });
-                        return campaign;
-                    }
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                        // allow optional assets to fail caching when in CacheMode.FORCED
+                    });
+                    return campaign;
                 });
             } else {
                 requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
@@ -90,6 +94,20 @@ export class AssetManager {
     public stopCaching(): void {
         this._stopped = true;
         this._cache.stop();
+
+        while(this._requiredQueue.length) {
+            const object: IQueueObject | undefined = this._requiredQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
+
+        while(this._optionalQueue.length) {
+            const object: IQueueObject | undefined = this._optionalQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
     }
 
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
@@ -100,7 +118,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
+                const promise = this.queue(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -111,9 +129,50 @@ export class AssetManager {
 
                     return Promise.resolve();
                 });
+                this.executeQueue();
+                return promise;
             });
         }
         return chain;
+    }
+
+    private queue(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
+        return new Promise<string[]>((resolve,reject) => {
+            const queueObject: IQueueObject = {
+                url: url,
+                diagnostics: diagnostics,
+                resolve: resolve,
+                reject: reject
+            };
+            if(cacheType === CacheType.REQUIRED) {
+                this._requiredQueue.push(queueObject);
+            } else {
+                this._optionalQueue.push(queueObject);
+            }
+        });
+    }
+
+    private executeQueue(): void {
+        if(!this._caching) {
+            let currentAsset: IQueueObject | undefined = this._requiredQueue.shift();
+            if(!currentAsset) {
+                currentAsset = this._optionalQueue.shift();
+            }
+
+            if(currentAsset) {
+                const asset: IQueueObject = currentAsset;
+                this._caching = true;
+                this._cache.cache(asset.url, asset.diagnostics).then(([fileId, fileUrl]) => {
+                    asset.resolve([fileId, fileUrl]);
+                    this._caching = false;
+                    this.executeQueue();
+                }).catch(error => {
+                    asset.reject(error);
+                    this._caching = false;
+                    this.executeQueue();
+                });
+            }
+        }
     }
 
     private validateAssets(campaign: Campaign): boolean {
