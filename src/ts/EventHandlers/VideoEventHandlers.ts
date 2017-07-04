@@ -108,7 +108,7 @@ export class VideoEventHandlers {
                 const error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
                     position: position,
                     lastPosition: lastPosition,
-                    duration: adUnit.getVideo().getDuration(),
+                    duration: adUnit.getVideo().getDuration()
                 });
                 Diagnostics.trigger('video_player_too_large_progress', error);
 
