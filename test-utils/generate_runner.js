@@ -14,11 +14,11 @@ let getPaths = (root) => {
     return paths;
 };
 
-let testList = JSON.stringify(getPaths('src/ts/Test'));
+let testList = getPaths('src/ts/Test');
 console.log(testList);
 
 let runnerPath = process.env.BUILD_DIR + '/runner.js';
 
 let options = {encoding: 'utf-8'};
 let runnerTemplate = fs.readFileSync(runnerPath, options);
-fs.writeFileSync(runnerPath, runnerTemplate.replace('{TEST_LIST}', testList), options);
+fs.writeFileSync(runnerPath, runnerTemplate.replace('{TEST_LIST}', JSON.stringify(['Workarounds'].concat(testList))), options);
