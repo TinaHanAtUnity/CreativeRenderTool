@@ -9,7 +9,22 @@ import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitCont
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { Orientation, DeviceOrientation } from 'Utilities/Orientation';
+
+enum Orientation {
+    LANDSCAPE,
+    PORTRAIT
+}
+
+class DeviceOrientation {
+    public static getDeviceOrientation(): Orientation {
+        let height = window.innerHeight;
+        if (height <= 0) {
+            height = 1;
+        }
+        const aspectRatio = window.innerWidth / height;
+        return aspectRatio >= 1.0 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+    }
+}
 
 export class VastAdUnit extends VideoAdUnit {
 
