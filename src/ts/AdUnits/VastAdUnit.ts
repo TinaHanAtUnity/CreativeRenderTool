@@ -30,8 +30,8 @@ export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
+        super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
     }
 
