@@ -60,17 +60,17 @@ export class ParamsTestData {
         const params: IRawEventParameter[] = parsedSpec.parameters;
         const types = {};
 
-        for(let i: number = 0; i < parsedParams.length; i++) {
-            types[parsedParams[i].key] = parsedParams[i].type;
+        for(const parsedParam of parsedParams) {
+            types[parsedParam.key] = parsedParam.type;
         }
 
-        for(let i: number = 0; i < params.length; i++) {
-            spec[params[i].parameter] = {
-                parameter: params[i].parameter,
-                required: params[i].required,
-                queryString: params[i].queryString,
-                body: params[i].body,
-                type: types[params[i].parameter]
+        for(const param of params) {
+            spec[param.parameter] = {
+                parameter: param.parameter,
+                required: param.required,
+                queryString: param.queryString,
+                body: param.body,
+                type: types[param.parameter]
             };
         }
 

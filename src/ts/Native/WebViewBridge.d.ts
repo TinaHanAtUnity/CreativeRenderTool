@@ -4,7 +4,7 @@ interface IWebViewBridge {
 }
 
 interface IMessageHandler {
-    postMessage: Function;
+    postMessage: (message: any) => void;
 }
 
 interface IMessageHandlers {

@@ -3,7 +3,7 @@ import 'es6-promise';
 /* tslint:disable:no-unused-expression */
 
 if(!Array.prototype.forEach) {
-    Array.prototype.forEach = <any>function(this: any, callback: Function, thisArg: any) {
+    Array.prototype.forEach = <any>function(this: any, callback: () => any, thisArg: any) {
         if(typeof(callback) !== 'function') {
             throw new TypeError(callback + ' is not a function!');
         }
@@ -25,7 +25,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
         get: function(this: HTMLElement) {
             const self = this;
 
-            function update(fn: Function) {
+            function update(fn: (classes: string[], index: number, value?: string) => any) {
                 return function(value: string) {
                     const classes = self.className.split(/\s+/);
                     const index = classes.indexOf(value);

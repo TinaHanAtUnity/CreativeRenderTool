@@ -14,14 +14,12 @@ export class VastParser {
 
     private static createDOMParser() {
         return new DOMParser();
-    };
+    }
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
     private _rootWrapperVast: any;
 
-    constructor();
-    constructor(domParser: DOMParser);
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParser.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || VastParser.createDOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
@@ -124,7 +122,7 @@ export class VastParser {
                 }
             }
         }
-    };
+    }
 
     private parseNodeText(node: any): string {
         let parsedText = node && (node.textContent || node.text);

@@ -185,31 +185,31 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getDTO(): { [key: string]: any } {
-        let gameIcon: any = undefined;
+        let gameIcon: any;
         const gameIconObject = this.getGameIcon();
         if (gameIconObject) {
             gameIcon = gameIconObject.getDTO();
         }
 
-        let landscapeImage: any = undefined;
+        let landscapeImage: any;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
             landscapeImage = landscapeImageObject.getDTO();
         }
 
-        let portraitImage: any = undefined;
+        let portraitImage: any;
         const portraitImageObject = this.getPortrait();
         if (portraitImageObject) {
             portraitImage = portraitImageObject.getDTO();
         }
 
-        let video: any = undefined;
+        let video: any;
         const videoObject = this.getVideo();
         if (videoObject) {
             video = videoObject.getDTO();
         }
 
-        let streamingVideo: any = undefined;
+        let streamingVideo: any;
         const streamingVideoObject = this.getStreamingVideo();
         if (streamingVideoObject) {
             streamingVideo = streamingVideoObject.getDTO();

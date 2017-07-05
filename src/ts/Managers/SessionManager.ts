@@ -34,7 +34,7 @@ export class SessionManagerEventMetadataCreator {
         return this._eventManager.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id, session, gameSession, gamerSid, previousPlacementId);
         });
-    };
+    }
 
     private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
@@ -43,6 +43,10 @@ export class SessionManagerEventMetadataCreator {
             'gameSessionId': gameSession,
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
+            'adType': adUnit.getCampaign().getAdType(),
+            'correlationId': adUnit.getCampaign().getCorrelationId(),
+            'creativeId': adUnit.getCampaign().getCreativeId(),
+            'seatId': adUnit.getCampaign().getSeatId(),
             'placementId': adUnit.getPlacement().getId(),
             'apiLevel': this._deviceInfo.getApiLevel(),
             'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
@@ -52,7 +56,8 @@ export class SessionManagerEventMetadataCreator {
             'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel(),
             'sdkVersion': this._clientInfo.getSdkVersion(),
-            'previousPlacementId': previousPlacementId
+            'previousPlacementId': previousPlacementId,
+            'bundleId': this._clientInfo.getApplicationName()
         };
 
         const campaign = adUnit.getCampaign();
@@ -80,35 +85,31 @@ export class SessionManagerEventMetadataCreator {
             infoJson.webviewUa = navigator.userAgent;
         }
 
-        const promises: Array<Promise<any>> = [];
-        promises.push(this._deviceInfo.getNetworkType());
-        promises.push(this._deviceInfo.getConnectionType());
-        promises.push(this._deviceInfo.getScreenWidth());
-        promises.push(this._deviceInfo.getScreenHeight());
-
-        return Promise.all(promises).then(([networkType, connectionType, screenWidth, screenHeight]) => {
+        return Promise.all([
+            this._deviceInfo.getNetworkType(),
+            this._deviceInfo.getConnectionType(),
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._metaDataManager.fetch(MediationMetaData),
+            this._metaDataManager.fetch(FrameworkMetaData)
+        ]).then(([networkType, connectionType, screenWidth, screenHeight, mediation, framework]: [number, string, number, number, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
             infoJson.networkType = networkType;
             infoJson.connectionType = connectionType;
             infoJson.screenWidth = screenWidth;
             infoJson.screenHeight = screenHeight;
 
-            const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
-            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
-                if(mediation) {
-                    infoJson.mediationName = mediation.getName();
-                    infoJson.mediationVersion = mediation.getVersion();
-                    infoJson.mediationOrdinal = mediation.getOrdinal();
-                }
+            if(mediation) {
+                infoJson.mediationName = mediation.getName();
+                infoJson.mediationVersion = mediation.getVersion();
+                infoJson.mediationOrdinal = mediation.getOrdinal();
+            }
 
-                if(framework) {
-                    infoJson.frameworkName = framework.getName();
-                    infoJson.frameworkVersion = framework.getVersion();
-                }
+            if(framework) {
+                infoJson.frameworkName = framework.getName();
+                infoJson.frameworkVersion = framework.getVersion();
+            }
 
-                return [id, infoJson];
-            });
+            return <[string, any]>[id, infoJson];
         });
     }
 

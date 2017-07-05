@@ -85,7 +85,7 @@ export class WebView {
         }
     }
 
-    public initialize(): Promise<void> {
+    public initialize(): Promise<void | any[]> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge);
@@ -292,11 +292,17 @@ export class WebView {
 
     private onAdUnitStartProcessed(): void {
         if(this._currentAdUnit) {
+            // A/B test for 2 second refresh after start
+            let magicConstant: number = this._startRefreshMagicConstant;
+            if(this._currentAdUnit.getCampaign().getAbGroup() === 6) {
+                magicConstant = 2000;
+            }
+
             setTimeout(() => {
                 if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
                     this._campaignRefreshManager.refresh();
                 }
-            }, this._startRefreshMagicConstant);
+            }, magicConstant);
         }
     }
 

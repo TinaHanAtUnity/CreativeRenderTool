@@ -265,7 +265,6 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
-
             });
 
             it('should open app sheet', () => {
@@ -273,10 +272,9 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(nativeBridge.AppSheet, 'present').returns(resolved);
                 sinon.spy(nativeBridge.AppSheet, 'destroy');
 
-                resolved.then(() => {
+                return new Promise((resolve, reject) => setTimeout(resolve, 500)).then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AppSheet.present, {id: 11111});
                     sinon.assert.called(<sinon.SinonSpy>nativeBridge.AppSheet.destroy);
-
                 });
             });
 

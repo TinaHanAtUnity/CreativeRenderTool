@@ -216,6 +216,18 @@
       "required": "no",
       "queryString": true,
       "body": false
+    },
+    {
+      "parameter": "cachedCampaigns",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "previousPlacementId",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }

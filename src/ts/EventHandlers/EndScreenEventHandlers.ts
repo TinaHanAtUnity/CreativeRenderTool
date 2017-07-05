@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit} from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -86,7 +86,6 @@ export class EndScreenEventHandlers {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        event: event,
                         sessionId: sessionManager.getSession().getId(),
                         url: campaign.getClickAttributionUrl(),
                         response: (<RequestError>error).nativeResponse
@@ -122,7 +121,7 @@ export class EndScreenEventHandlers {
         }
     }
 
-    private static openAppStore (nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
+    private static openAppStore(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
         const platform = nativeBridge.getPlatform();
 
         if(platform === Platform.ANDROID) {

@@ -1,3 +1,36 @@
+# Wed Jul  5 09:48:21 UTC 2017
+
+* Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
+* Add new fields to video_player_stuck diagnostics
+* Add new 2.1.0 client object fields to diagnostic messages
+
+# Mon Jul  3 12:48:21 UTC 2017
+
+* Revert test in group 7 back to exponential increase of refresh interval
+* Fix strange reference to event global in end screen event handler
+
+# Mon Jul  3 09:30:10 UTC 2017
+
+* Try linear increasing of refresh interval in group 7
+* Start A/B test with 1 second refresh after start in A/B group 6
+* Add allowSkip parameter to auction ad requests
+
+# Thu Jun 29 12:47:41 UTC 2017
+
+* Reduce quick no fill refresh test initial delay to one minute
+
+# Thu Jun 29 09:09:31 UTC 2017
+
+* Add values sent via operative events for brand auction
+* Update to TypeScript 2.4
+* Update dependencies
+* Document previousPlacementId and cachedCampaigns
+* Fix unhandled promise rejections
+
+# Wed Jun 28 08:35:39 UTC 2017
+
+* Start quick no fill refresh A/B test on group 7
+
 # Tue Jun 27 10:35:11 UTC 2017
 
 * Refactored campaign managers to separate classes

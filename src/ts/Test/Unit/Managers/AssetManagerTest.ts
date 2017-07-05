@@ -178,8 +178,9 @@ describe('AssetManagerTest', () => {
         const assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo);
         const campaign = new TestCampaign([], []);
         const spy = sinon.spy(cache, 'cache');
-        assetManager.setup(campaign);
-        assert(!spy.calledOnce, 'Cache was called when cache mode was disabled');
+        return assetManager.setup(campaign).then(() => {
+            assert(!spy.calledOnce, 'Cache was called when cache mode was disabled');
+        });
     });
 
     it('should cache required assets', () => {
@@ -242,4 +243,30 @@ describe('AssetManagerTest', () => {
         });
     });
 
+    it('should cache two campaigns', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi');
+        const asset2 = new HTML('https:/www.google.fi/2');
+        const campaign = new TestCampaign([asset], []);
+        const campaign2 = new TestCampaign([asset2], []);
+        return Promise.all([assetManager.setup(campaign),assetManager.setup(campaign2)]).then(() => {
+            assert(asset.isCached(), 'First asset was not cached');
+            assert(asset2.isCached(), 'Second asset was not cached');
+        });
+    });
+
+    it('should stop caching', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi');
+        const campaign = new TestCampaign([asset], []);
+        const promise = assetManager.setup(campaign);
+        assetManager.stopCaching();
+        return promise.then(() => {
+            throw new Error('Should not resolve');
+        }).catch(error => {
+            assert.isFalse(asset.isCached(), 'Asset was cached when caching was stopped');
+        });
+    });
 });
