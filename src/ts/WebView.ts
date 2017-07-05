@@ -292,10 +292,10 @@ export class WebView {
 
     private onAdUnitStartProcessed(): void {
         if(this._currentAdUnit) {
-            // A/B test for 1 second refresh after start
+            // A/B test for 2 second refresh after start
             let magicConstant: number = this._startRefreshMagicConstant;
             if(this._currentAdUnit.getCampaign().getAbGroup() === 6) {
-                magicConstant = 1000;
+                magicConstant = 2000;
             }
 
             setTimeout(() => {
