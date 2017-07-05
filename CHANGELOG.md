@@ -1,3 +1,9 @@
+# Wed Jul  5 09:48:21 UTC 2017
+
+* Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
+* Add new fields to video_player_stuck diagnostics
+* Add new 2.1.0 client object fields to diagnostic messages
+
 # Mon Jul  3 12:48:21 UTC 2017
 
 * Revert test in group 7 back to exponential increase of refresh interval
