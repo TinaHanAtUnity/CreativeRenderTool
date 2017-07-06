@@ -1,41 +1,80 @@
-import { Asset } from 'Models/Asset';
+import { Asset } from 'Models/Assets/Asset';
+import { ISchema, Model } from 'Models/Model';
 
-export abstract class Campaign {
+export interface ICampaign {
+    id: string;
+    gamerId: string;
+    abGroup: number;
+    timeout: number;
+    willExpireAt: number;
+    adType: string | undefined;
+    correlationId: string | undefined;
+    creativeId: string | undefined;
+    seatId: number | undefined;
+}
 
-    private _id: string;
-    private _gamerId: string;
-    private _abGroup: number;
-    private _timeout: number;
-    private _willExpireAt: number;
+export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
+    public static Schema: ISchema<ICampaign> = {
+        id: ['string'],
+        gamerId: ['string'],
+        abGroup: ['number'],
+        timeout: ['number'],
+        willExpireAt: ['number'],
+        adType: ['string', 'undefined'],
+        correlationId: ['string', 'undefined'],
+        creativeId: ['string', 'undefined'],
+        seatId: ['number', 'undefined'],
+    };
 
-    constructor(id: string, gamerId: string, abGroup: number, timeout?: number, store?: string) {
-        this._id = id;
-        this._gamerId = gamerId;
-        this._abGroup = abGroup;
-        this._timeout = typeof timeout !== 'undefined' ? timeout : 0;
-        if(timeout) {
-            this._willExpireAt = Date.now() + timeout * 1000;
-        }
+    constructor(name: string, schema: ISchema<T>) {
+        super(name, schema);
     }
 
     public getId(): string {
-        return this._id;
+        return this.get('id');
     }
 
     public getGamerId(): string {
-        return this._gamerId;
+        return this.get('gamerId');
     }
 
     public getAbGroup(): number {
-        return this._abGroup;
+        return this.get('abGroup');
     }
 
-    public getTimeout(): number {
-        return this._timeout;
+    public getTimeout(): number | undefined {
+        return this.get('timeout');
     }
 
-    public isExpired() {
-        return this._willExpireAt && Date.now() > this._willExpireAt;
+    public getAdType(): string | undefined {
+        return this.get('adType');
+    }
+
+    public getCorrelationId(): string | undefined {
+        return this.get('correlationId');
+    }
+
+    public getCreativeId(): string | undefined {
+        return this.get('creativeId');
+    }
+
+    public getSeatId(): number | undefined {
+        return this.get('seatId');
+    }
+
+    public isExpired(): boolean {
+        const willExpireAt = this.get('willExpireAt');
+        return willExpireAt !== undefined && Date.now() > willExpireAt;
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this.getId(),
+            'gamerId': this.getGamerId(),
+            'abGroup': this.getAbGroup(),
+            'timeout': this.getTimeout(),
+            'willExpireAt': this.get('willExpireAt')
+        };
     }
 
     public abstract getRequiredAssets(): Asset[];

@@ -9,6 +9,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
+import { WebViewError } from 'Errors/WebViewError';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -18,6 +19,7 @@ export interface IOrientationProperties {
 export class MRAID extends View {
 
     public readonly onClick = new Observable0();
+    public readonly onReward = new Observable0();
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
@@ -38,6 +40,7 @@ export class MRAID extends View {
 
     private _canClose = false;
     private _canSkip = false;
+    private _didReward = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -115,9 +118,14 @@ export class MRAID extends View {
         } else {
             let closeRemaining = closeLength;
             const updateInterval = setInterval(() => {
+                const progress = (closeLength - closeRemaining) / closeLength;
+                if(progress >= 0.75 && !this._didReward) {
+                    this.onReward.trigger();
+                    this._didReward = true;
+                }
                 if(closeRemaining > 0) {
                     closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, (closeLength - closeRemaining) / closeLength);
+                    this.updateProgressCircle(this._closeElement, progress);
                 }
                 if (closeRemaining <= 0) {
                     clearInterval(updateInterval);
@@ -184,6 +192,20 @@ export class MRAID extends View {
             this._resizeHandler = undefined;
         }
         super.hide();
+    }
+
+    public createMRAID(): Promise<string> {
+        return this.fetchMRAID().then(mraid => {
+            if(mraid) {
+                const markup = this._campaign.getDynamicMarkup();
+                if(markup) {
+                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+                }
+
+                return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
+            }
+            throw new WebViewError('Unable to fetch MRAID');
+        });
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -269,13 +291,7 @@ export class MRAID extends View {
         }
     }
 
-    private createMRAID(): Promise<string> {
-        return this.fetchMRAID().then(mraid => {
-            return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
-        });
-    }
-
-    private fetchMRAID(): Promise<string> {
+    private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
             const fileId = resourceUrl.getFileId();
@@ -287,7 +303,7 @@ export class MRAID extends View {
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
                     }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
+                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
                     xhr.send();
                 });
             }

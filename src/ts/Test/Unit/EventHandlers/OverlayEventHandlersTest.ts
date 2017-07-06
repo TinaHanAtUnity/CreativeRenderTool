@@ -16,10 +16,11 @@ import { Double } from 'Utilities/Double';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -30,6 +31,7 @@ describe('OverlayEventHandlersTest', () => {
     let sessionManager: SessionManager;
     let endScreen: EndScreen;
     let video: Video;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -41,14 +43,15 @@ describe('OverlayEventHandlersTest', () => {
             hide: sinon.spy(),
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        metaDataManager = new MetaDataManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVast: sinon.spy(),
                 getVideo: () => video,
                 getStreamingVideo: () => video
-        }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+        }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
     describe('When calling onSkip', () => {
@@ -56,6 +59,7 @@ describe('OverlayEventHandlersTest', () => {
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.spy(sessionManager, 'sendSkip');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
+            sinon.spy(container, 'reconfigure');
 
             OverlayEventHandlers.onSkip(nativeBridge, sessionManager, performanceAdUnit);
         });
@@ -65,7 +69,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should set video inactive', () => {
-            assert.isFalse(performanceAdUnit.getVideo().isActive());
+            assert.isFalse(performanceAdUnit.isActive());
         });
 
         it('should set finish state', () => {
@@ -76,8 +80,8 @@ describe('OverlayEventHandlersTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
         });
 
-        it('should set views through AdUnit API', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.AndroidAdUnit.setViews, ['webview']);
+        it('should call reconfigure', () => {
+            sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
         });
 
         it('should hide overlay', () => {

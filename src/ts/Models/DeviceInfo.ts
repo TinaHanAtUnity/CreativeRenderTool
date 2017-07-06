@@ -7,85 +7,125 @@ import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 
-export class DeviceInfo extends Model {
+interface IDeviceInfo {
+    androidId: string;
+    advertisingIdentifier: string | undefined | null;
+    limitAdTracking: boolean | undefined;
+    apiLevel: number;
+    osVersion: string;
+    manufacturer: string;
+    model: string;
+    connectionType: string;
+    networkType: number;
+    screenLayout: number;
+    screenDensity: number;
+    screenWidth: number;
+    screenHeight: number;
+    screenScale: number;
+    userInterfaceIdiom: UIUserInterfaceIdiom;
+    networkOperator: string | null;
+    networkOperatorName: string | null;
+    timeZone: string;
+    headset: boolean;
+    ringerMode: RingerMode;
+    language: string;
+    volume: number;
+    screenBrightness: number;
+    freeExternalSpace: number;
+    totalExternalSpace: number;
+    freeInternalSpace: number;
+    totalInternalSpace: number;
+    batteryLevel: number;
+    batteryStatus: BatteryStatus;
+    freeMemory: number;
+    totalMemory: number;
+    rooted: boolean;
+    simulator: boolean;
+    isGoogleStoreInstalled: boolean;
+    isXiaomiStoreInstalled: boolean;
+    statusBarHeight: number;
+}
+
+export class DeviceInfo extends Model<IDeviceInfo> {
 
     public static GooglePlayPackageName = 'com.android.vending';
     public static XiaomiPackageName = 'com.xiaomi.gamecenter';
 
-    private _androidId: string;
-    private _advertisingIdentifier: string;
-    private _limitAdTracking: boolean;
-    private _apiLevel: number;
-    private _osVersion: string;
-    private _manufacturer: string;
-    private _model: string;
-    private _connectionType: string;
-    private _networkType: number;
-    private _screenLayout: number;
-    private _screenDensity: number;
-    private _screenWidth: number;
-    private _screenHeight: number;
-    private _screenScale: number;
-    private _userInterfaceIdiom: UIUserInterfaceIdiom;
-    private _networkOperator: string;
-    private _networkOperatorName: string;
-    private _timeZone: string;
-    private _headset: boolean;
-    private _ringerMode: RingerMode;
-    private _language: string;
-    private _volume: number;
-    private _screenBrightness: number;
-    private _freeExternalSpace: number;
-    private _totalExternalSpace: number;
-    private _freeInternalSpace: number;
-    private _totalInternalSpace: number;
-    private _batteryLevel: number;
-    private _batteryStatus: BatteryStatus;
-    private _freeMemory: number;
-    private _totalMemory: number;
-    private _rooted: boolean;
-    private _simulator: boolean;
-    private _isGoogleStoreInstalled: boolean;
-    private _isXiaomiStoreInstalled: boolean;
-    private _statusBarHeight: number;
-
     private _nativeBridge: NativeBridge;
 
     constructor(nativeBridge: NativeBridge) {
-        super();
+        super('DeviceInfo', {
+            androidId: ['string'],
+            advertisingIdentifier: ['string', 'undefined', 'null'],
+            limitAdTracking: ['boolean', 'undefined'],
+            apiLevel: ['number'],
+            osVersion: ['string'],
+            manufacturer: ['string'],
+            model: ['string'],
+            connectionType: ['string'],
+            networkType: ['number'],
+            screenLayout: ['number'],
+            screenDensity: ['number'],
+            screenWidth: ['integer'],
+            screenHeight: ['integer'],
+            screenScale: ['number'],
+            userInterfaceIdiom: ['number'],
+            networkOperator: ['string', 'null'],
+            networkOperatorName: ['string', 'null'],
+            timeZone: ['string'],
+            headset: ['boolean'],
+            ringerMode: ['number'],
+            language: ['string'],
+            volume: ['number'],
+            screenBrightness: ['number'],
+            freeExternalSpace: ['number'],
+            totalExternalSpace: ['number'],
+            freeInternalSpace: ['number'],
+            totalInternalSpace: ['number'],
+            batteryLevel: ['number'],
+            batteryStatus: ['number'],
+            freeMemory: ['number'],
+            totalMemory: ['number'],
+            rooted: ['boolean'],
+            simulator: ['boolean'],
+            isGoogleStoreInstalled: ['boolean'],
+            isXiaomiStoreInstalled: ['boolean'],
+            statusBarHeight: ['number']
+        });
+
         this._nativeBridge = nativeBridge;
     }
 
     public fetch(): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
 
-        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this._advertisingIdentifier = advertisingIdentifier).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this._limitAdTracking = limitAdTracking).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this._osVersion = osVersion).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this._model = model).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this._screenWidth = screenWidth).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this._screenHeight = screenHeight).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this._language = language).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this._rooted = rooted).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this._timeZone = timeZone).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this._totalMemory = totalMemory).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this.set('osVersion', osVersion)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this.set('model', model)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this.set('screenWidth', screenWidth)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this.set('screenHeight', screenHeight)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this.set('language', language)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this.set('rooted', rooted)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this._userInterfaceIdiom = userInterfaceIdiom).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this._screenScale = screenScale).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this._simulator = simulator).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this._totalInternalSpace = totalSpace).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getStatusBarHeight().then(statusBarHeight => this._statusBarHeight = statusBarHeight).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this.set('simulator', simulator)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this.set('totalInternalSpace', totalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Ios.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this._androidId = androidId).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this._apiLevel = apiLevel).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this._totalInternalSpace = totalInternalSpace).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this._totalExternalSpace = totalExternalSpace).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this._manufacturer = manufacturer).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this._screenDensity = screenDensity).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this._screenLayout = screenLayout).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this._isGoogleStoreInstalled = isGoogleInstalled).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this._isXiaomiStoreInstalled = isXiaomiInstalled).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getAndroidId().then(androidId => this.set('androidId', androidId)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApiLevel().then(apiLevel => this.set('apiLevel', apiLevel)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this.set('totalInternalSpace', totalInternalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this.set('totalExternalSpace', totalExternalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getManufacturer().then(manufacturer => this.set('manufacturer', manufacturer)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(DeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
         }
 
         return Promise.all(promises);
@@ -96,292 +136,331 @@ export class DeviceInfo extends Model {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             storeString = "apple";
         } else {
-            if (this._isGoogleStoreInstalled) {
+            if (this.isGoogleStoreInstalled()) {
                 storeString = "google";
             }
-            if (this._isXiaomiStoreInstalled) {
+            if (this.isXiaomiStoreInstalled()) {
                 storeString = "xiaomi";
             }
-            if (this._isXiaomiStoreInstalled && this._isGoogleStoreInstalled) {
+            if (this.isXiaomiStoreInstalled() && this.isGoogleStoreInstalled()) {
                 storeString = "xiaomi,google";
             }
-            if (!this._isXiaomiStoreInstalled && !this._isGoogleStoreInstalled) {
+            if (!this.isXiaomiStoreInstalled() && !this.isGoogleStoreInstalled()) {
                 storeString = "none";
             }
         }
         return storeString;
     }
 
+    public isGoogleStoreInstalled(): boolean {
+        return this.get('isGoogleStoreInstalled');
+    }
+
+    public isXiaomiStoreInstalled(): boolean {
+        return this.get('isXiaomiStoreInstalled');
+    }
+
     public getAndroidId(): string {
-        return this._androidId;
+        return this.get('androidId');
     }
 
-    public getAdvertisingIdentifier(): string {
-        return this._advertisingIdentifier;
+    public getAdvertisingIdentifier(): string | undefined | null {
+        return this.get('advertisingIdentifier');
     }
 
-    public getLimitAdTracking(): boolean {
-        return this._limitAdTracking;
+    public getLimitAdTracking(): boolean | undefined {
+        return this.get('limitAdTracking');
     }
 
     public getApiLevel(): number {
-        return this._apiLevel;
+        return this.get('apiLevel');
     }
 
     public getManufacturer(): string {
-        return this._manufacturer;
+        return this.get('manufacturer');
     }
 
     public getModel(): string {
-        return this._model;
+        return this.get('model');
     }
 
     public getNetworkType(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getNetworkType().then(networkType => {
-            this._networkType = networkType;
-            return this._networkType;
+            this.set('networkType', networkType);
+            return this.get('networkType');
         });
     }
 
-    public getNetworkOperator(): Promise<string> {
+    public getNetworkOperator(): Promise<string | null> {
         if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => {
-                this._networkOperator = networkOperator;
-                return this._networkOperator;
+                this.set('networkOperator', networkOperator);
+                return this.get('networkOperator');
             });
         } else {
-            return Promise.resolve(this._networkOperator);
+            return Promise.resolve(this.get('networkOperator'));
         }
     }
 
-    public getNetworkOperatorName(): Promise<string> {
+    public getNetworkOperatorName(): Promise<string | null> {
         if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
-                this._networkOperatorName = networkOperatorName;
-                return this._networkOperatorName;
+                this.set('networkOperatorName', networkOperatorName);
+                return this.get('networkOperatorName');
             });
         } else {
-            return Promise.resolve(this._networkOperatorName);
+            return Promise.resolve(this.get('networkOperatorName'));
         }
     }
 
     public getOsVersion(): string {
-        return this._osVersion;
+        return this.get('osVersion');
     }
 
     public getScreenLayout(): number {
-        return this._screenLayout;
+        return this.get('screenLayout');
     }
 
     public getScreenDensity(): number {
-        return this._screenDensity;
+        return this.get('screenDensity');
     }
 
-    public getScreenWidth(): number {
-        return this._screenWidth;
+    public getScreenWidth(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => {
+            this.set('screenWidth', screenWidth);
+            return screenWidth;
+        });
     }
 
-    public getScreenHeight(): number {
-        return this._screenHeight;
+    public getScreenHeight(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => {
+            this.set('screenHeight', screenHeight);
+            return screenHeight;
+        });
     }
 
     public getScreenScale(): number {
-        return this._screenScale;
+        return this.get('screenScale');
     }
 
     public getUserInterfaceIdiom(): UIUserInterfaceIdiom {
-        return this._userInterfaceIdiom;
+        return this.get('userInterfaceIdiom');
     }
 
     public isRooted(): boolean {
-        return this._rooted;
+        return this.get('rooted');
     }
 
     public getConnectionType(): Promise<string> {
         return this._nativeBridge.DeviceInfo.getConnectionType().then(connectionType => {
-            this._connectionType = connectionType;
-            return this._connectionType;
+            this.set('connectionType', connectionType);
+            return this.get('connectionType');
         });
     }
 
     public getTimeZone(): string {
-        return this._timeZone;
+        return this.get('timeZone');
     }
 
     public getFreeSpace(): Promise<number> {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.DeviceInfo.Ios.getFreeSpace().then(freeInternalSpace => {
-                this._freeInternalSpace = freeInternalSpace;
-                return this._freeInternalSpace;
+                this.set('freeInternalSpace', freeInternalSpace);
+                return this.get('freeInternalSpace');
             });
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
-                this._freeInternalSpace = freeInternalSpace;
-                return this._freeInternalSpace;
+                this.set('freeInternalSpace', freeInternalSpace);
+                return this.get('freeInternalSpace');
             });
         } else {
-            return Promise.resolve(this._freeInternalSpace);
+            return Promise.resolve(this.get('freeInternalSpace'));
         }
     }
 
     public getFreeSpaceExternal(): Promise<number> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
-                this._freeExternalSpace = freeSpace;
-                return this._freeExternalSpace;
+                this.set('freeExternalSpace', freeSpace);
+                return this.get('freeExternalSpace');
             });
         } else {
-            return Promise.resolve(this._freeExternalSpace);
+            return Promise.resolve(this.get('freeExternalSpace'));
         }
     }
 
     public getTotalSpace(): number {
-        return this._totalInternalSpace;
+        return this.get('totalInternalSpace');
     }
 
     public getTotalSpaceExternal(): number {
-        return this._totalExternalSpace;
+        return this.get('totalExternalSpace');
     }
 
     public getLanguage(): string {
-        return this._language;
+        return this.get('language');
     }
 
     public isSimulator(): boolean {
-        return this._simulator;
+        return this.get('simulator');
     }
 
     public getHeadset(): Promise<boolean> {
         return this._nativeBridge.DeviceInfo.getHeadset().then(headset => {
-            this._headset = headset;
-            return this._headset;
+            this.set('headset', headset);
+            return this.get('headset');
         });
     }
 
     public getRingerMode(): Promise<RingerMode> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getRingerMode().then(ringerMode => {
-                this._ringerMode = ringerMode;
-                return this._ringerMode;
+                this.set('ringerMode', ringerMode);
+                return this.get('ringerMode');
             });
         } else {
-            return Promise.resolve(this._ringerMode);
+            return Promise.resolve(this.get('ringerMode'));
         }
     }
 
     public getDeviceVolume(): Promise<number> {
         if (this._nativeBridge.getPlatform()  === Platform.IOS) {
             return this._nativeBridge.DeviceInfo.Ios.getDeviceVolume().then(volume => {
-                this._volume = volume;
-                return this._volume;
+                this.set('volume', volume);
+                return this.get('volume');
             });
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => {
-                this._volume = volume;
-                return this._volume;
+                this.set('volume', volume);
+                return this.get('volume');
             });
         } else {
-            return Promise.resolve(this._volume);
+            return Promise.resolve(this.get('volume'));
         }
     }
 
     public getScreenBrightness(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getScreenBrightness().then(brightness => {
-            this._screenBrightness = brightness;
-            return this._screenBrightness;
+            this.set('screenBrightness', brightness);
+            return this.get('screenBrightness');
         });
     }
 
     public getBatteryLevel(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getBatteryLevel().then(level => {
-            this._batteryLevel = level;
-            return this._batteryLevel;
+            this.set('batteryLevel', level);
+            return this.get('batteryLevel');
         });
     }
 
     public getBatteryStatus(): Promise<BatteryStatus> {
         return this._nativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => {
-            this._batteryStatus = batteryStatus;
-            return this._batteryStatus;
+            this.set('batteryStatus', batteryStatus);
+            return this.get('batteryStatus');
         });
     }
 
     public getFreeMemory(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => {
-            this._freeMemory = freeMemory;
-            return this._freeMemory;
+            this.set('freeMemory', freeMemory);
+            return this.get('freeMemory');
         });
     }
 
     public getTotalMemory(): number {
-        return this._totalMemory;
+        return this.get('totalMemory');
     }
 
     public getStatusBarHeight(): number {
-        return this._statusBarHeight;
+        return this.get('statusBarHeight');
     }
 
     public getDTO(): Promise<any> {
-        const promises: Array<Promise<any>> = [];
-        promises.push(this.getConnectionType().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkType().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getHeadset().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getFreeSpace().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this.getFreeMemory().catch(err => this.handleDeviceInfoError(err)));
-
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this.getRingerMode().catch(err => this.handleDeviceInfoError(err)));
-        }
-
-        return Promise.all(promises).then(values => {
+        return Promise.all<any>([
+            this.getConnectionType().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkType().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)),
+            this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)),
+            this.getHeadset().catch(err => this.handleDeviceInfoError(err)),
+            this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenWidth().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenHeight().catch(err => this.handleDeviceInfoError(err)),
+            this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)),
+            this.getFreeSpace().catch(err => this.handleDeviceInfoError(err)),
+            this.getBatteryLevel().catch(err => this.handleDeviceInfoError(err)),
+            this.getBatteryStatus().catch(err => this.handleDeviceInfoError(err)),
+            this.getFreeMemory().catch(err => this.handleDeviceInfoError(err))
+        ]).then(([
+            connectionType,
+            networkType,
+            networkOperator,
+            networkOperatorName,
+            headset,
+            deviceVolume,
+            screenWidth,
+            screenHeight,
+            screenBrightness,
+            freeSpace,
+            batteryLevel,
+            batteryStatus,
+            freeMemory
+        ]) => {
             const dto: any = {
-                'apiLevel': this._apiLevel,
-                'osVersion': this._osVersion,
-                'deviceMake': this._manufacturer,
-                'deviceModel': this._model,
-                'connectionType': this._connectionType,
-                'networkType': this._networkType,
-                'screenLayout': this._screenLayout,
-                'screenDensity': this._screenDensity,
-                'screenWidth': this._screenWidth,
-                'screenHeight': this._screenHeight,
-                'screenScale': this._screenScale,
-                'userInterfaceIdiom': this._userInterfaceIdiom,
-                'networkOperator': this._networkOperator,
-                'networkOperatorName': this._networkOperatorName,
-                'timeZone': this._timeZone,
-                'headset': this._headset,
-                'ringerMode': this._ringerMode,
-                'language': this._language,
-                'deviceVolume': this._volume,
-                'screenBrightness': this._screenBrightness,
-                'freeSpaceInternal': this._freeInternalSpace,
-                'totalSpaceInternal': this._totalInternalSpace,
-                'freeSpaceExternal': this._freeExternalSpace,
-                'totalSpaceExternal': this._totalExternalSpace,
-                'batteryLevel': this._batteryLevel,
-                'batteryStatus': this._batteryStatus,
-                'freeMemory': this._freeMemory,
-                'totalMemory': this._totalMemory,
-                'rooted': this._rooted,
-                'simulator': this._simulator,
+                'apiLevel': this.getApiLevel(),
+                'osVersion': this.getOsVersion(),
+                'deviceMake': this.getManufacturer(),
+                'deviceModel': this.getModel(),
+                'connectionType': connectionType,
+                'networkType': networkType,
+                'screenLayout': this.getScreenLayout(),
+                'screenDensity': this.getScreenDensity(),
+                'screenWidth': screenWidth,
+                'screenHeight': screenHeight,
+                'screenScale': this.getScreenScale(),
+                'userInterfaceIdiom': this.getUserInterfaceIdiom(),
+                'networkOperator': networkOperator,
+                'networkOperatorName': networkOperatorName,
+                'timeZone': this.getTimeZone(),
+                'headset': headset,
+                'language': this.getLanguage(),
+                'deviceVolume': deviceVolume,
+                'screenBrightness': screenBrightness,
+                'freeSpaceInternal': freeSpace,
+                'totalSpaceInternal': this.getTotalSpace(),
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
+                'batteryLevel': batteryLevel,
+                'batteryStatus': batteryStatus,
+                'freeMemory': freeMemory,
+                'totalMemory': this.getTotalMemory(),
+                'rooted': this.isRooted(),
+                'simulator': this.isSimulator(),
             };
 
-            if(this.getAdvertisingIdentifier()) {
-                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
-                dto.limitAdTracking = this.getLimitAdTracking();
-            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                dto.androidId = this.getAndroidId();
-            }
+            const sendDto = () => {
+                if(this.getAdvertisingIdentifier()) {
+                    dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+                    dto.limitAdTracking = this.getLimitAdTracking();
+                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    dto.androidId = this.getAndroidId();
+                }
+                return dto;
+            };
 
-            return dto;
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                return Promise.all([
+                    this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
+                    this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+                ]).then(([
+                    freeSpaceExternal,
+                    ringerMode
+                ]) => {
+                    dto.freeSpaceExternal = freeSpaceExternal;
+                    dto.ringerMode = ringerMode;
+                    return sendDto();
+                });
+            } else {
+                return sendDto();
+            }
         });
     }
 

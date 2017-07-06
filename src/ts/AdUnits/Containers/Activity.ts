@@ -45,7 +45,12 @@ export class Activity extends AdUnitContainer {
             views = ['videoplayer', 'webview'];
         }
 
-        const orientation = this.getOrientation(allowRotation, forceOrientation);
+        const forcedOrientation = AdUnitContainer.getForcedOrientation();
+        if (forcedOrientation) {
+            this._lockedOrientation = forcedOrientation;
+        } else {
+            this._lockedOrientation = forceOrientation;
+        }
 
         let keyEvents: any[] = [];
         if(disableBackbutton) {
@@ -54,9 +59,9 @@ export class Activity extends AdUnitContainer {
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + orientation + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + ForceOrientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, orientation, keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, this.getOrientation(allowRotation, this._lockedOrientation), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
     }
 
     public close(): Promise<void> {
@@ -70,28 +75,26 @@ export class Activity extends AdUnitContainer {
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
-        const width = this._deviceInfo.getScreenWidth();
-        const height = this._deviceInfo.getScreenHeight();
 
-        switch (configuration) {
-            case ViewConfiguration.ENDSCREEN:
-                promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
-                break;
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            switch (configuration) {
+                case ViewConfiguration.ENDSCREEN:
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                    break;
 
-            case ViewConfiguration.SPLIT_VIDEO_ENDSCREEN:
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT));
-                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, width, height / 2));
-                break;
-
-            case ViewConfiguration.LANDSCAPE_VIDEO:
-                promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
-                promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, this._deviceInfo.getScreenHeight(), this._deviceInfo.getScreenWidth()));
-                break;
-            default:
-                break;
-        }
-        return Promise.all(promises);
+                case ViewConfiguration.LANDSCAPE_VIDEO:
+                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
+                    break;
+                default:
+                    break;
+            }
+            return Promise.all(promises);
+        });
     }
 
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {

@@ -7,8 +7,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import DummyCampaign from 'json/DummyCampaign.json';
+import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
+import { ICacheDiagnostics } from 'Utilities/Cache';
 
 export class TestFixtures {
 
@@ -29,6 +32,11 @@ export class TestFixtures {
         return new PerformanceCampaign(JSON.parse(DummyCampaign), 'abc123', 123);
     }
 
+    public static getMRAIDCampaign(): MRAIDCampaign {
+        const json = JSON.parse(DummyMRAIDCampaign);
+        return new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>', json.mraid.tracking);
+    }
+
     public static getClientInfo(platform?: Platform): ClientInfo {
         if(typeof platform === 'undefined') {
             platform = Platform.ANDROID;
@@ -44,7 +52,10 @@ export class TestFixtures {
             true,
             'http://example.com/config.json',
             'http://example.com/index.html',
-            null
+            null,
+            '2.0.0-webview',
+            123456,
+            false
         ]);
     }
 
@@ -98,5 +109,14 @@ export class TestFixtures {
             gamerId: 'abc123',
             abGroup: 0
         });
+    }
+
+    public static getCacheDiagnostics(): ICacheDiagnostics {
+        return {
+            creativeType: 'TEST',
+            gamerId: '1234abcd',
+            targetGameId: 5678,
+            targetCampaignId: '123456abcdef'
+        };
     }
 }

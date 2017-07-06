@@ -1,6 +1,6 @@
-import { Campaign } from 'Models/Campaign';
-import { Asset } from 'Models/Asset';
-import { Video } from 'Models/Video';
+import { Campaign, ICampaign } from 'Models/Campaign';
+import { Video } from 'Models/Assets/Video';
+import { Image } from 'Models/Assets/Image';
 
 export enum StoreName {
     APPLE,
@@ -8,65 +8,96 @@ export enum StoreName {
     XIAOMI
 }
 
-export class PerformanceCampaign extends Campaign {
+interface IPerformanceCampaign extends ICampaign {
+    appStoreId: string;
 
-    private _appStoreId: string;
-    private _appStoreCountry: string;
+    gameId: number;
+    gameName: string;
+    gameIcon: Image;
 
-    private _gameId: number;
-    private _gameName: string;
-    private _gameIcon: Asset;
+    rating: number;
+    ratingCount: number;
 
-    private _rating: number;
-    private _ratingCount: number;
+    landscapeImage: Image;
+    portraitImage: Image;
 
-    private _landscapeImage: Asset;
-    private _portraitImage: Asset;
+    video?: Video;
+    streamingVideo?: Video;
 
-    private _video: Video;
-    private _streamingVideo: Video;
+    videoPortrait?: Video;
+    streamingPortraitVideo?: Video;
 
-    private _clickAttributionUrl: string;
-    private _clickAttributionUrlFollowsRedirects: boolean;
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
 
-    private _bypassAppSheet: boolean;
+    bypassAppSheet: boolean;
 
-    private _store: StoreName;
+    store: StoreName;
+}
 
+export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     constructor(campaign: any, gamerId: string, abGroup: number) {
-        super(campaign.id, gamerId, abGroup);
+        super('PerformanceCampaign', {
+            ... Campaign.Schema,
+            appStoreId: ['string'],
+            gameId: ['number'],
+            gameName: ['string'],
+            gameIcon: ['object'],
+            rating: ['number'],
+            ratingCount: ['number'],
+            landscapeImage: ['object'],
+            portraitImage: ['object'],
+            video: ['object', 'undefined'],
+            streamingVideo: ['object', 'undefined'],
+            videoPortrait: ['object', 'undefined'],
+            streamingPortraitVideo: ['object', 'undefined'],
+            clickAttributionUrl: ['string', 'undefined'],
+            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            bypassAppSheet: ['boolean'],
+            store: ['number']
+        });
 
-        this._appStoreId = campaign.appStoreId;
-        this._appStoreCountry = campaign.appStoreCountry;
+        this.set('id', campaign.id);
+        this.set('gamerId', gamerId);
+        this.set('abGroup', abGroup);
 
-        this._gameId = campaign.gameId;
-        this._gameName = campaign.gameName;
-        this._gameIcon = new Asset(campaign.gameIcon);
+        this.set('appStoreId', campaign.appStoreId);
 
-        this._rating = campaign.rating;
-        this._ratingCount = campaign.ratingCount;
+        this.set('gameId', campaign.gameId);
+        this.set('gameName', campaign.gameName);
+        this.set('gameIcon', new Image(campaign.gameIcon));
 
-        this._landscapeImage = new Asset(campaign.endScreenLandscape);
-        this._portraitImage = new Asset(campaign.endScreenPortrait);
+        this.set('rating', campaign.rating);
+        this.set('ratingCount', campaign.ratingCount);
 
-        this._video = new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize);
-        this._streamingVideo = new Video(campaign.trailerStreaming);
+        this.set('landscapeImage', new Image(campaign.endScreenLandscape));
+        this.set('portraitImage', new Image(campaign.endScreenPortrait));
 
-        this._clickAttributionUrl = campaign.clickAttributionUrl;
-        this._clickAttributionUrlFollowsRedirects = campaign.clickAttributionUrlFollowsRedirects;
+        if(campaign.trailerDownloadable && campaign.trailerDownloadableSize && campaign.trailerStreaming) {
+            this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
+            this.set('streamingVideo', new Video(campaign.trailerStreaming));
+        }
 
-        this._bypassAppSheet = campaign.bypassAppSheet;
+        if(campaign.trailerPortraitDownloadable && campaign.trailerPortraitDownloadableSize && campaign.trailerPortraitStreaming) {
+            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, campaign.trailerPortraitDownloadableSize));
+            this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming));
+        }
+
+        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
+        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
+
+        this.set('bypassAppSheet', campaign.bypassAppSheet);
 
         const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
         switch(campaignStore) {
             case 'apple':
-                this._store = StoreName.APPLE;
+                this.set('store', StoreName.APPLE);
                 break;
             case 'google':
-                this._store = StoreName.GOOGLE;
+                this.set('store', StoreName.GOOGLE);
                 break;
             case 'xiaomi':
-                this._store = StoreName.XIAOMI;
+                this.set('store', StoreName.XIAOMI);
                 break;
             default:
                 throw new Error('Unknown store value "' + campaign.store + '"');
@@ -74,63 +105,67 @@ export class PerformanceCampaign extends Campaign {
     }
 
     public getStore(): StoreName {
-        return this._store;
+        return this.get('store');
     }
 
     public getAppStoreId(): string {
-        return this._appStoreId;
-    }
-
-    public getAppStoreCountry(): string {
-        return this._appStoreCountry;
+        return this.get('appStoreId');
     }
 
     public getGameId(): number {
-        return this._gameId;
+        return this.get('gameId');
     }
 
     public getGameName(): string {
-        return this._gameName;
+        return this.get('gameName');
     }
 
-    public getGameIcon(): Asset {
-        return this._gameIcon;
+    public getGameIcon(): Image {
+        return this.get('gameIcon');
     }
 
-    public getRating() {
-        return this._rating;
+    public getRating(): number {
+        return this.get('rating');
     }
 
-    public getRatingCount() {
-        return this._ratingCount;
+    public getRatingCount(): number {
+        return this.get('ratingCount');
     }
 
-    public getPortrait(): Asset {
-        return this._portraitImage;
+    public getPortrait(): Image {
+        return this.get('portraitImage');
     }
 
-    public getLandscape(): Asset {
-        return this._landscapeImage;
+    public getLandscape(): Image {
+        return this.get('landscapeImage');
     }
 
-    public getVideo(): Video {
-        return this._video;
+    public getVideo(): Video | undefined {
+        return this.get('video');
     }
 
-    public getStreamingVideo(): Video {
-        return this._streamingVideo;
+    public getStreamingVideo(): Video | undefined {
+        return this.get('streamingVideo');
     }
 
-    public getClickAttributionUrl(): string {
-        return this._clickAttributionUrl;
+    public getPortraitVideo(): Video | undefined {
+        return this.get('videoPortrait');
     }
 
-    public getClickAttributionUrlFollowsRedirects(): boolean {
-        return this._clickAttributionUrlFollowsRedirects;
+    public getStreamingPortraitVideo(): Video | undefined {
+        return this.get('streamingPortraitVideo');
+    }
+
+    public getClickAttributionUrl(): string | undefined {
+        return this.get('clickAttributionUrl');
+    }
+
+    public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
+        return this.get('clickAttributionUrlFollowsRedirects');
     }
 
     public getBypassAppSheet(): boolean {
-        return this._bypassAppSheet;
+        return this.get('bypassAppSheet');
     }
 
     public getTimeoutInSeconds(): number {
@@ -138,9 +173,7 @@ export class PerformanceCampaign extends Campaign {
     }
 
     public getRequiredAssets() {
-        return [
-            this.getVideo()
-        ];
+        return [];
     }
 
     public getOptionalAssets() {
@@ -149,5 +182,55 @@ export class PerformanceCampaign extends Campaign {
             this.getPortrait(),
             this.getLandscape()
         ];
+    }
+
+    public getDTO(): { [key: string]: any } {
+        let gameIcon: any;
+        const gameIconObject = this.getGameIcon();
+        if (gameIconObject) {
+            gameIcon = gameIconObject.getDTO();
+        }
+
+        let landscapeImage: any;
+        const landscapeImageObject = this.getLandscape();
+        if (landscapeImageObject) {
+            landscapeImage = landscapeImageObject.getDTO();
+        }
+
+        let portraitImage: any;
+        const portraitImageObject = this.getPortrait();
+        if (portraitImageObject) {
+            portraitImage = portraitImageObject.getDTO();
+        }
+
+        let video: any;
+        const videoObject = this.getVideo();
+        if (videoObject) {
+            video = videoObject.getDTO();
+        }
+
+        let streamingVideo: any;
+        const streamingVideoObject = this.getStreamingVideo();
+        if (streamingVideoObject) {
+            streamingVideo = streamingVideoObject.getDTO();
+        }
+
+        return {
+            'campaign': super.getDTO(),
+            'appStoreId': this.getAppStoreId(),
+            'gameId': this.getGameId(),
+            'gameName': this.getGameName(),
+            'gameIcon': gameIcon,
+            'rating': this.getRating(),
+            'ratingCount': this.getRatingCount(),
+            'landscapeImage': landscapeImage,
+            'portraitImage': portraitImage,
+            'video': video,
+            'streamingVideo': streamingVideo,
+            'clickAttributionUrl': this.getClickAttributionUrl(),
+            'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
+            'bypassAppSheet': this.getBypassAppSheet(),
+            'store': StoreName[this.getStore()].toLowerCase()
+        };
     }
 }

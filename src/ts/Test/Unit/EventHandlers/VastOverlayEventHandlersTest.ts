@@ -20,9 +20,10 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Session } from 'Models/Session';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -30,6 +31,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let overlay: Overlay;
+    let metaDataManager: MetaDataManager;
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -42,6 +44,8 @@ describe('VastOverlayEventHandlersTest', () => {
             handleInvocation,
             handleCallback
         });
+
+        metaDataManager = new MetaDataManager(nativeBridge);
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
@@ -64,7 +68,7 @@ describe('VastOverlayEventHandlersTest', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
 
         clientInfo = TestFixtures.getClientInfo();
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))));
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
         sessionManager.setSession(new Session('123'));
 
         testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
@@ -93,7 +97,7 @@ describe('VastOverlayEventHandlersTest', () => {
     });
 
     describe('When calling onMute', () => {
-        const testMuteEvent = function (muted: boolean) {
+        const testMuteEvent = function(muted: boolean) {
             const eventName = muted ? 'mute' : 'unmute';
             const mockEventManager = sinon.mock(sessionManager.getEventManager());
             mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '123', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=testPlacement`);

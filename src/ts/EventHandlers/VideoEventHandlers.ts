@@ -7,10 +7,9 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { Configuration } from 'Models/Configuration';
 
 export class VideoEventHandlers {
 
@@ -22,18 +21,8 @@ export class VideoEventHandlers {
 
         if(duration > 40000) {
             const campaign = adUnit.getCampaign();
-            let url: string;
-            let originalUrl: string;
-            if(campaign instanceof PerformanceCampaign) {
-                url = (<PerformanceCampaign>campaign).getVideo().getUrl();
-                originalUrl = (<PerformanceCampaign>campaign).getVideo().getOriginalUrl();
-            } else if(campaign instanceof VastCampaign) {
-                url = (<VastCampaign>campaign).getVideo().getUrl();
-                originalUrl = (<VastCampaign>campaign).getVideo().getOriginalUrl();
-            } else {
-                throw new Error('Unknown campaign type');
-            }
-
+            const url = adUnit.getVideo().getUrl();
+            const originalUrl = adUnit.getVideo().getOriginalUrl();
             const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
                 duration: duration,
                 campaignId: campaign.getId(),
@@ -83,7 +72,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getVideo().setStarted(true);
 
@@ -138,7 +127,11 @@ export class VideoEventHandlers {
                     const error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
                         repeats: repeats,
                         position: position,
-                        duration: adUnit.getVideo().getDuration()
+                        duration: adUnit.getVideo().getDuration(),
+                        url: adUnit.getVideo().getUrl(),
+                        originalUrl: adUnit.getVideo().getOriginalUrl(),
+                        cached: adUnit.getVideo().isCached(),
+                        cacheMode: configuration.getCacheMode()
                     });
                     Diagnostics.trigger('video_player_stuck', error);
 
@@ -180,7 +173,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoCompleted(sessionManager: SessionManager, adUnit: VideoAdUnit): void {
-        adUnit.getVideo().setActive(false);
+        adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         sessionManager.sendView(adUnit);
 
@@ -282,7 +275,7 @@ export class VideoEventHandlers {
 
     private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         videoAdUnit.getVideo().setErrorStatus(true);
-        videoAdUnit.getVideo().setActive(false);
+        videoAdUnit.setActive(false);
         videoAdUnit.setFinishState(FinishState.ERROR);
 
         this.updateViewsOnVideoError(videoAdUnit);

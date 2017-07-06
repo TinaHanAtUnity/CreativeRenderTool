@@ -12,7 +12,7 @@
       "check-type"
     ],
     "trailing-comma": false,
-    "max-line-length": false,
+    "max-line-length": [false],
     "no-bitwise": false,
     "object-literal-sort-keys": false,
     "one-variable-per-declaration": false,
@@ -20,8 +20,9 @@
     "ordered-imports": false,
     "only-arrow-functions": false,
     "arrow-parens": false,
-    "max-classes-per-file": false,
+    "max-classes-per-file": [false],
     "object-literal-key-quotes": false,
-    "object-literal-shorthand": false
+    "object-literal-shorthand": false,
+    "no-angle-bracket-type-assertion": false
   }
 }

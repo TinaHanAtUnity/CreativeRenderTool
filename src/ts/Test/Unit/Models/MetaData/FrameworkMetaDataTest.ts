@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 
 class TestStorageApi extends StorageApi {
 
@@ -14,7 +15,7 @@ class TestStorageApi extends StorageApi {
         this._storage = data;
     }
 
-    public get(storageType: StorageType, key: string): Promise<string | number> {
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
         try {
             switch(key) {
                 case 'framework.name.value':
@@ -64,7 +65,8 @@ describe('FrameworkMetaDataTest', () => {
     });
 
     it('should return undefined when data doesnt exist', () => {
-        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
             assert.isUndefined(metaData, 'Returned FrameworkMetaData even when it doesnt exist');
         });
     });
@@ -77,18 +79,22 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
-            assert.isDefined(metaData, 'FrameworkMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
-            assert.deepEqual(metaData.getDTO(), {
-                frameworkName: 'test_name',
-                frameworkVersion: 'test_version'
-            }, 'FrameworkMetaData.getDTO() produced invalid output');
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), 'test_version', 'FrameworkMetaData.getVersion() did not pass through correctly');
+                assert.deepEqual(metaData.getDTO(), {
+                    frameworkName: 'test_name',
+                    frameworkVersion: 'test_version'
+                }, 'FrameworkMetaData.getDTO() produced invalid output');
+            } else {
+                throw new Error('FrameworkMetaData is not defined');
+            }
         });
     });
 
-    it('should fetch correctly when data is undefined', () => {
+    it('should not fetch when data is undefined', () => {
         storageApi.setStorage({
             framework: {
                 name: undefined,
@@ -96,10 +102,9 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
-            assert.isDefined(metaData, 'FrameworkMetaData is not defined');
-            assert.equal(metaData.getName(), undefined, 'FrameworkMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
+            assert.isUndefined(metaData, 'FrameworkMetaData is defined');
         });
     });
 
@@ -110,11 +115,14 @@ describe('FrameworkMetaDataTest', () => {
             }
         });
 
-        return MetaDataManager.fetchFrameworkMetaData(nativeBridge, false).then(metaData => {
-            assert.isDefined(metaData, 'FrameworkMetaData is not defined');
-            assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
-            assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        return metaDataManager.fetch(FrameworkMetaData).then(metaData => {
+            if(metaData) {
+                assert.equal(metaData.getName(), 'test_name', 'FrameworkMetaData.getName() did not pass through correctly');
+                assert.equal(metaData.getVersion(), undefined, 'FrameworkMetaData.getVersion() did not pass through correctly');
+            } else {
+                throw new Error('FrameworkMetaData is not defined');
+            }
         });
     });
-
 });

@@ -1,76 +1,105 @@
-import { VastCreative } from 'Models/Vast/VastCreative';
+import { IVastCreative, VastCreative } from 'Models/Vast/VastCreative';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
-export class VastCreativeLinear extends VastCreative {
+interface IVastCreativeLinear extends IVastCreative {
+    duration: number;
+    skipDelay: number | null;
+    mediaFiles: VastMediaFile[];
+    videoClickThroughURLTemplate: string | null;
+    videoClickTrackingURLTemplates: string[];
+    videoCustomClickURLTemplates: string[];
+    adParameters: object | null;
+}
 
-    private _duration: number;
-    private _skipDelay: number | null;
-    private _mediaFiles: VastMediaFile[];
-    private _videoClickThroughURLTemplate: string | null;
-    private _videoClickTrackingURLTemplates: string[];
-    private _videoCustomClickURLTemplates: string[];
-    private _adParameters: any;
-
+export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor();
     constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
                 videoCustomClickURLTemplates?: string[], adParameters?: any) {
-        super('linear');
-        this._duration = duration || 0;
-        this._skipDelay = skipDelay || null;
-        this._mediaFiles = mediaFiles || [];
-        this._videoClickThroughURLTemplate = videoClickThroughURLTemplate || null;
-        this._videoClickTrackingURLTemplates = videoClickTrackingURLTemplates || [];
-        this._videoCustomClickURLTemplates = videoCustomClickURLTemplates || [];
-        this._adParameters = adParameters || null;
+        super('VastCreativeLinear', {
+            type: ['string'],
+            trackingEvents: ['object'],
+            duration: ['number'],
+            skipDelay: ['number', 'null'],
+            mediaFiles: ['array'],
+            videoClickThroughURLTemplate: ['string', 'null'],
+            videoClickTrackingURLTemplates: ['array'],
+            videoCustomClickURLTemplates: ['array'],
+            adParameters: ['object', 'null']
+        }, 'linear');
+
+        this.set('duration', duration || 0);
+        this.set('skipDelay', skipDelay || null);
+        this.set('mediaFiles', mediaFiles || []);
+        this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate || null);
+        this.set('videoClickTrackingURLTemplates', videoClickTrackingURLTemplates || []);
+        this.set('videoCustomClickURLTemplates', videoCustomClickURLTemplates || []);
+        this.set('adParameters', adParameters || null);
     }
 
     public getDuration(): number {
-        return this._duration;
+        return this.get('duration');
     }
 
     public setDuration(duration: number) {
-        this._duration = duration;
+        this.set('duration', duration);
     }
 
     public getSkipDelay(): number | null {
-        return this._skipDelay;
+        return this.get('skipDelay');
     }
 
     public setSkipDelay(skipDelay: number | null) {
-        this._skipDelay = skipDelay;
+        this.set('skipDelay', skipDelay);
     }
 
     public getMediaFiles(): VastMediaFile[] {
-        return this._mediaFiles;
+        return this.get('mediaFiles');
     }
 
     public addMediaFile(mediaFile: VastMediaFile) {
-        this._mediaFiles.push(mediaFile);
+        this.get('mediaFiles').push(mediaFile);
     }
 
     public getVideoClickThroughURLTemplate(): string | null {
-        return this._videoClickThroughURLTemplate;
+        return this.get('videoClickThroughURLTemplate');
     }
 
     public setVideoClickThroughURLTemplate(videoClickThroughURLTemplate: string) {
-        this._videoClickThroughURLTemplate = videoClickThroughURLTemplate;
+        this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate || null);
     }
 
     public getVideoClickTrackingURLTemplates(): string[] {
-        return this._videoClickTrackingURLTemplates;
+        return this.get('videoClickTrackingURLTemplates');
     }
 
     public addVideoClickTrackingURLTemplate(trackingURLTemplate: string) {
-        this._videoClickTrackingURLTemplates.push(trackingURLTemplate);
+        this.get('videoClickTrackingURLTemplates').push(trackingURLTemplate);
     }
 
     public getVideoCustomClickURLTemplates(): string[] {
-        return this._videoCustomClickURLTemplates;
+        return this.get('videoCustomClickURLTemplates');
     }
 
-    public getAdParameters(): any {
-        return this._adParameters;
+    public getAdParameters(): {} | null {
+        return this.get('adParameters');
     }
 
+    public getDTO(): { [key: string]: any } {
+        const mediaFiles = [];
+        for (const mediaFile of this.getMediaFiles()) {
+            mediaFiles.push(mediaFile.getDTO());
+        }
+
+        return {
+            'vastCreative': super.getDTO(),
+            'duration': this.getDuration(),
+            'skipDelay': this.getSkipDelay(),
+            'mediaFiles': mediaFiles,
+            'videoClickThroughURLTemplate': this.getVideoClickThroughURLTemplate(),
+            'videoClickTrackingURLTemplates': this.getVideoClickTrackingURLTemplates(),
+            'videoCustomClickURLTemplates': this.getVideoCustomClickURLTemplates(),
+            'adParameters': this.getAdParameters()
+        };
+    }
 }

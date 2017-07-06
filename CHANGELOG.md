@@ -1,3 +1,151 @@
+# Thu Jul  6 07:20:34 UTC 2017
+
+* Add bundleId to video events
+* Increase test delay to two seconds in A/B group 6
+
+# Wed Jul  5 09:48:21 UTC 2017
+
+* Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
+* Add new fields to video_player_stuck diagnostics
+* Add new 2.1.0 client object fields to diagnostic messages
+
+# Mon Jul  3 12:48:21 UTC 2017
+
+* Revert test in group 7 back to exponential increase of refresh interval
+* Fix strange reference to event global in end screen event handler
+
+# Mon Jul  3 09:30:10 UTC 2017
+
+* Try linear increasing of refresh interval in group 7
+* Start A/B test with 1 second refresh after start in A/B group 6
+* Add allowSkip parameter to auction ad requests
+
+# Thu Jun 29 12:47:41 UTC 2017
+
+* Reduce quick no fill refresh test initial delay to one minute
+
+# Thu Jun 29 09:09:31 UTC 2017
+
+* Add values sent via operative events for brand auction
+* Update to TypeScript 2.4
+* Update dependencies
+* Document previousPlacementId and cachedCampaigns
+* Fix unhandled promise rejections
+
+# Wed Jun 28 08:35:39 UTC 2017
+
+* Start quick no fill refresh A/B test on group 7
+
+# Tue Jun 27 10:35:11 UTC 2017
+
+* Refactored campaign managers to separate classes
+* Removed negative targeting events
+* Add JS workarounds for hybrid test runner
+
+# Wed Jun 21 13:37:03 UTC 2017
+
+* Programmatic MRAID support for Auction
+* Namespaced diagnostics messages
+* Various new parameters to operative events related to oriented videos
+
+# Mon Jun 19 12:02:30 UTC 2017
+
+* Fix cache bookkeeping errors
+* Enable earlier ad requests for all users
+
+# Wed Jun 14 14:16:35 UTC 2017
+
+* Catch all errors from cache cleaning to avoid init failures
+
+# Wed Jun 14 13:22:49 UTC 2017
+
+* Redeployment of previous deploy after revert
+* Add more information to cache_desync_failure and cache_desync_fixed diagnostics
+* Add hack for iOS older than 2.1.0 to avoid most cache desync issues
+
+# Wed Jun 14 08:23:35 UTC 2017
+
+* Send an array of cached campaigns in device cache in cachedCampaigns array in ad requests
+* Send third quartile event after 3/4 of playback on MRAID playable ads
+* Test for refreshing ads five seconds after start event instead of when going to endscreen in A/B groups 6 and 7
+
+# Tue Jun 13 10:28:55 UTC 2017
+
+* Support for oriented performance campaigns
+* Remove Yodo1 A/B test
+
+# Mon Jun 12 08:30:19 UTC 2017
+
+* Start sending cache diagnostics to ads.sdk2.events.creativedownload.json for 1 user out of 10000
+* Fix a race condition with operative event retries that might have sent them twice during 20 second race window (ABT-129)
+* Programmatic VAST support for auction
+
+# Wed Jun  7 07:34:12 UTC 2017
+
+* Yodo1 A/B test with low quality videos on A/B groups 6 and 7, only for Yodo1 game IDs
+
+# Tue Jun  6 08:16:14 UTC 2017
+
+* Add gameSessionId and previousPlacementId parameters to ad requests, video events and click events
+* Option to force orientation with test metadata
+* Add names to all models to improve diagnostic errors
+* Set no fill when receiving a campaign without gamerId (does not apply to PLC campaigns)
+
+# Fri Jun  2 09:10:17 UTC 2017
+
+* Support for auction v4, includes placement level ad types
+
+# Thu Jun  1 07:36:31 UTC 2017
+
+* Support cache pausing and unpausing with custom metadata flags
+
+# Tue May 30 11:04:37 UTC 2017
+
+* Refresh screenWidth and screenHeight on access
+* Validate above values as integers instead of JS numbers
+
+# Tue May 23 08:56:18 UTC 2017
+
+* CampaignRefreshManager placement state race condition fix
+
+# Thu May 18 08:32:22 UTC 2017
+
+* Fix cache redirection support for more than one redirect
+
+# Tue May 16 10:49:04 UTC 2017
+
+* Fix negative targeting event topic name
+
+# Tue May 16 08:10:53 UTC 2017
+
+* Prevent a single ad unit from sending multiple click and click attribution events
+* Start sending negative targeting events to Kafka if an advertised game is already installed on the device
+
+# Fri May 12 12:04:09 UTC 2017
+
+* Fix a racing condition when caching PLC ad plan with two or more campaigns
+* Remove unused code for split screen portrait videos
+
+# Fri May 12 09:02:18 UTC 2017
+
+* Fix type error with VAST id
+* Allow networkOperator and networkOperatorName to be null
+* Report campaign_request_failed and plc_request_failed diagnostic events separately
+
+# Wed May 10 14:43:26 UTC 2017
+
+* Programmatic MRAID support for CrossInstall
+
+# Wed May 10 12:05:57 UTC 2017
+
+* Typed models
+
+# Tue May  9 09:26:30 UTC 2017
+
+* Support auction v3, send properties parameter in ad requests
+* Support TypeScript 2.3
+* First version of analytics events from Unity Ads SDK, not enabled by default
+
 # Wed May  3 11:10:45 UTC 2017
 
 * Read metadata only after ad unit has been opened to make opening ad unit faster

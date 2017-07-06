@@ -16,10 +16,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<Configuration> {
-        return Promise.all<FrameworkMetaData, AdapterMetaData, string>([
-            MetaDataManager.fetchFrameworkMetaData(nativeBridge),
-            MetaDataManager.fetchAdapterMetaData(nativeBridge),
+    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager): Promise<Configuration> {
+        return Promise.all([
+            metaDataManager.fetch(FrameworkMetaData),
+            metaDataManager.fetch(AdapterMetaData),
             ConfigManager.fetchGamerId(nativeBridge)
         ]).then(([framework, adapter, gamerId]) => {
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
@@ -33,7 +33,7 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-                    if(config.isPlacementLevelControl()) {
+                    if(config.isAuction()) {
                         nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                         if(config.getGamerId()) {
                             ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
@@ -77,7 +77,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework: FrameworkMetaData, adapter: AdapterMetaData, gamerId: string): string {
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -126,7 +126,7 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string> {
+    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string | undefined> {
         return nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
             return gamerId;
         }).catch(error => {

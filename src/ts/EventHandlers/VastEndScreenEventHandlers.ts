@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { VastAdUnit}  from 'AdUnits/VastAdUnit';
+import { VastAdUnit} from 'AdUnits/VastAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 
@@ -26,7 +26,7 @@ export class VastEndScreenEventHandlers {
     }
 
     public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
-        if (keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideo().isActive()) {
+        if (keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isActive()) {
             adUnit.hide();
         }
     }

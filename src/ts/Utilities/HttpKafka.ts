@@ -4,7 +4,7 @@ import { INativeResponse, Request } from 'Utilities/Request';
 import { Configuration } from 'Models/Configuration';
 
 export class HttpKafka {
-    public static setRequest(request: Request) {
+    public static setRequest(request?: Request) {
         HttpKafka._request = request;
     }
 
@@ -31,7 +31,14 @@ export class HttpKafka {
             messages.unshift(commonObject);
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-            return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+            if(HttpKafka._request) {
+                return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+            } else {
+                // tslint:disable:no-console
+                console.dir(data);
+                // tslint:enable:no-console
+                return Promise.resolve(<INativeResponse>{});
+            }
         });
     }
 
@@ -40,10 +47,11 @@ export class HttpKafka {
     }
 
     private static KafkaBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
-    private static _request: Request;
+    private static _request: Request | undefined;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
     private static _configuration: Configuration | undefined;
+    private static _deviceInfoUpdating: boolean = false;
 
     private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
         const common: any = {
@@ -54,11 +62,14 @@ export class HttpKafka {
             }
         };
 
-        if (deviceInfo) {
+        if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
+            HttpKafka._deviceInfoUpdating = true;
             return deviceInfo.getDTO().then(deviceInfoDTO => {
+                HttpKafka._deviceInfoUpdating = false;
                 common.common.device = deviceInfoDTO;
                 return common;
             }).catch(err => {
+                HttpKafka._deviceInfoUpdating = false;
                 return common;
             });
         } else {

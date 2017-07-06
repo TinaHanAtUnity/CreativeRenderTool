@@ -73,12 +73,12 @@ export class FakeDeviceInfo extends DeviceInfo {
         return this._fakeDevice.screenDensity;
     }
 
-    public getScreenWidth(): number {
-        return this._fakeDevice.screenWidth;
+    public getScreenWidth(): Promise<number> {
+        return Promise.resolve(this._fakeDevice.screenWidth);
     }
 
-    public getScreenHeight(): number {
-        return this._fakeDevice.screenHeight;
+    public getScreenHeight(): Promise<number> {
+        return Promise.resolve(this._fakeDevice.screenHeight);
     }
 
     public getScreenScale(): number {

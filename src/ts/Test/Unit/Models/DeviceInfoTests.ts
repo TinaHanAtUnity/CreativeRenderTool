@@ -7,6 +7,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { WebViewError } from 'Errors/WebViewError';
 
 describe('DeviceInfoTest', () => {
 
@@ -30,7 +31,7 @@ describe('DeviceInfoTest', () => {
                 getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
                 isRooted: sinon.stub().returns(Promise.resolve(true)),
                 getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getHeadset: sinon.stub().returns(Promise.resolve(true)),
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
@@ -42,6 +43,33 @@ describe('DeviceInfoTest', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
         return deviceInfo.fetch();
 
+    });
+
+    it('should not let floating values as screenWidth or screenHeight', (done) => {
+        nativeBridge = <NativeBridge><any>{
+            getPlatform: () => {
+                return Platform.TEST;
+            },
+            DeviceInfo: {
+                getScreenHeight: sinon.stub().returns(Promise.resolve(1200.123)),
+                getScreenWidth: sinon.stub().returns(Promise.resolve(800.123)),
+            }
+        };
+
+        deviceInfo = new DeviceInfo(nativeBridge);
+
+        Promise.all([
+            deviceInfo.getScreenWidth(),
+            deviceInfo.getScreenHeight()
+        ]).then(() => {
+            assert.fail('should not pass');
+        }).catch(err => {
+            if(err instanceof WebViewError) {
+                done();
+            } else {
+                done(err);
+            }
+        });
     });
 
     it('Get DeviceInfo DTO', () => {
@@ -87,7 +115,7 @@ describe('DeviceInfoTest Android', () => {
                 getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
                 isRooted: sinon.stub().returns(Promise.resolve(true)),
                 getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getHeadset: sinon.stub().returns(Promise.resolve(true)),
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
@@ -146,7 +174,7 @@ describe('DeviceInfoTest Android', () => {
                 getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
                 isRooted: sinon.stub().returns(Promise.resolve(true)),
                 getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getHeadset: sinon.stub().returns(Promise.resolve(true)),
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
@@ -200,7 +228,7 @@ describe('DeviceInfoTest iOS', () => {
                 getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
                 isRooted: sinon.stub().returns(Promise.resolve(true)),
                 getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getHeadset: sinon.stub().returns(Promise.resolve(true)),
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
@@ -265,7 +293,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 // reject promise
                 isRooted: sinon.stub().returns(Promise.reject(new Error('testError'))),
                 getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve('1024')),
+                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getHeadset: sinon.stub().returns(Promise.resolve(true)),
                 getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
                 getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),

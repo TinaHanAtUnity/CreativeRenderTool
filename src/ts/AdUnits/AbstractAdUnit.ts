@@ -2,7 +2,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 
 export abstract class AbstractAdUnit {
@@ -27,11 +27,13 @@ export abstract class AbstractAdUnit {
     private static _autoCloseDelay: number = 0;
 
     public readonly onStart = new Observable0();
+    public readonly onStartProcessed = new Observable0();
     public readonly onFinish = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onError = new Observable0();
 
     protected readonly _nativeBridge: NativeBridge;
+    protected readonly _forceOrientation: ForceOrientation;
     protected readonly _container: AdUnitContainer;
     protected readonly _placement: Placement;
     protected readonly _campaign: Campaign;
@@ -39,8 +41,9 @@ export abstract class AbstractAdUnit {
     private _showing: boolean;
     private _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
+        this._forceOrientation = forceOrientation;
         this._container = container;
         this._placement = placement;
         this._campaign = campaign;
@@ -55,6 +58,8 @@ export abstract class AbstractAdUnit {
 
     public abstract description(): string;
 
+    public abstract isCached(): boolean;
+
     public isShowing() {
         return this._showing;
     }
@@ -65,6 +70,10 @@ export abstract class AbstractAdUnit {
 
     public getContainer(): AdUnitContainer {
         return this._container;
+    }
+
+    public getForceOrientation(): ForceOrientation {
+        return this._forceOrientation;
     }
 
     public getPlacement(): Placement {
@@ -84,5 +93,4 @@ export abstract class AbstractAdUnit {
             this._finishState = finishState;
         }
     }
-
 }

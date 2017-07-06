@@ -1,19 +1,28 @@
 import { VastAd } from 'Models/Vast/VastAd';
+import { Model } from 'Models/Model';
 
-export class Vast {
+interface IVast {
+    ads: VastAd[];
+    errorURLTemplates: string[];
+    additionalTrackingEvents: { [eventName: string]: string[] };
+}
 
-    private _ads: VastAd[];
-    private _errorURLTemplates: string[];
-    private _additionalTrackingEvents: { [eventName: string]: string[] };
+export class Vast extends Model<IVast> {
 
     constructor(ads: VastAd[], errorURLTemplates: any[]) {
-        this._ads = ads;
-        this._errorURLTemplates = errorURLTemplates;
-        this._additionalTrackingEvents = {};
+        super('Vast', {
+            ads: ['array'],
+            errorURLTemplates: ['array'],
+            additionalTrackingEvents: ['object']
+        });
+
+        this.set('ads', ads);
+        this.set('errorURLTemplates', errorURLTemplates);
+        this.set('additionalTrackingEvents', {});
     }
 
     public getAds(): VastAd[] {
-        return this._ads;
+        return this.get('ads');
     }
 
     public getErrorURLTemplates(): string[] {
@@ -21,16 +30,18 @@ export class Vast {
         if (ad) {
             const adErrorUrls = ad.getErrorURLTemplates();
             if (adErrorUrls instanceof Array) {
-                return adErrorUrls.concat(this._errorURLTemplates || []);
+                return adErrorUrls.concat(this.get('errorURLTemplates') || []);
             }
         }
-        return this._errorURLTemplates;
+
+        return this.get('errorURLTemplates');
     }
 
     public getAd(): VastAd | null {
         if (this.getAds() && this.getAds().length > 0) {
             return this.getAds()[0];
         }
+
         return null;
     }
 
@@ -65,8 +76,8 @@ export class Vast {
         if (ad) {
             const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
             let additionalTrackingEventUrls: string[] = [];
-            if (this._additionalTrackingEvents) {
-                additionalTrackingEventUrls = this._additionalTrackingEvents[eventName] || [];
+            if (this.get('additionalTrackingEvents')) {
+                additionalTrackingEventUrls = this.get('additionalTrackingEvents')[eventName] || [];
             }
             if (adTrackingEventUrls instanceof Array) {
                 return adTrackingEventUrls.concat(additionalTrackingEventUrls);
@@ -78,13 +89,13 @@ export class Vast {
     }
 
     public addTrackingEventUrl(eventName: string, url: string) {
-        if (!this._additionalTrackingEvents) {
-            this._additionalTrackingEvents = {};
+        if (!this.get('additionalTrackingEvents')) {
+            this.set('additionalTrackingEvents', {});
         }
-        if (!this._additionalTrackingEvents[eventName]) {
-            this._additionalTrackingEvents[eventName] = [];
+        if (!this.get('additionalTrackingEvents')[eventName]) {
+            this.get('additionalTrackingEvents')[eventName] = [];
         }
-        this._additionalTrackingEvents[eventName].push(url);
+        this.get('additionalTrackingEvents')[eventName].push(url);
     }
 
     public getDuration(): number | null {
@@ -175,6 +186,19 @@ export class Vast {
         return null;
     }
 
+    public getDTO(): { [key: string]: any } {
+        const ads = [];
+        for (const ad of this.get('ads')) {
+            ads.push(ad.getDTO());
+        }
+
+        return {
+            'ads': ads,
+            'errorURLTemplates': this.get('errorURLTemplates'),
+            'additionalTrackingEvents': this.get('additionalTrackingEvents')
+        };
+    }
+
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
         const minHeight = 320;
         const minWidth = 480;
@@ -197,4 +221,5 @@ export class Vast {
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
     }
+
 }

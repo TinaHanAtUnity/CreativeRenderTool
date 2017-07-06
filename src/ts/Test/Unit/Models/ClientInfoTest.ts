@@ -17,14 +17,16 @@ describe('ClientInfoTest', () => {
             true,
             'com.unity3d.ads.test',
             '1.0.0-test',
-            '2000',
+            2000,
             '2.0.0-sdk-test',
             true,
             'http://test.com/config.json',
             'http://test.com/index.html',
             '54321',
             '2.0.0-webview-test',
-            null
+            0,
+            false,
+            {'asd': 'asd'}
         ];
 
         clientInfo = new ClientInfo(Platform.TEST, data);
@@ -61,9 +63,9 @@ describe('ClientInfoTest', () => {
             null
         ];
 
-        // tslint:disable:no-unused-new
-        const clientInfoConstructor = () => { new ClientInfo(Platform.TEST, data); };
-        assert.throw(clientInfoConstructor, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
-        // tslint:enable:no-unused-new
+        assert.throw(() => {
+            const clientInfoTest = new ClientInfo(Platform.TEST, data);
+            assert.equal(clientInfoTest.getGameId(), 'abc1111');
+        }, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
     });
 });

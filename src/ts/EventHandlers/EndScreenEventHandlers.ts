@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
-import { AbstractAdUnit}  from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit} from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -12,6 +12,7 @@ import { StoreName } from 'Models/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { EventType } from 'Models/Session';
 
 export class EndScreenEventHandlers {
 
@@ -50,11 +51,20 @@ export class EndScreenEventHandlers {
     }
 
     public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
+        const currentSession = sessionManager.getSession();
+        if(currentSession) {
+            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
+                return;
+            }
+            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
+        }
+
         const eventManager = sessionManager.getEventManager();
         const platform = nativeBridge.getPlatform();
+        const clickAttributionUrl = campaign.getClickAttributionUrl();
 
-        if(campaign.getClickAttributionUrlFollowsRedirects()) {
-            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), true).then(response => {
+        if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
+            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -76,7 +86,6 @@ export class EndScreenEventHandlers {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        event: event,
                         sessionId: sessionManager.getSession().getId(),
                         url: campaign.getClickAttributionUrl(),
                         response: (<RequestError>error).nativeResponse
@@ -85,7 +94,9 @@ export class EndScreenEventHandlers {
                 Diagnostics.trigger('click_attribution_failed', error);
             });
         } else {
-            eventManager.clickAttributionEvent(campaign.getClickAttributionUrl(), false);
+            if (clickAttributionUrl) {
+                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+            }
         }
     }
 
@@ -105,12 +116,12 @@ export class EndScreenEventHandlers {
     }
 
     public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
-        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.getVideo().isActive()) {
+        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isActive()) {
             adUnit.hide();
         }
     }
 
-    private static openAppStore (nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
+    private static openAppStore(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
         const platform = nativeBridge.getPlatform();
 
         if(platform === Platform.ANDROID) {

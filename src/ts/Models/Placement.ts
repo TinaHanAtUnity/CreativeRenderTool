@@ -1,3 +1,6 @@
+import { Model } from 'Models/Model';
+import { Campaign } from 'Models/Campaign';
+
 export enum PlacementState {
     READY,
     NOT_AVAILABLE,
@@ -6,75 +9,139 @@ export enum PlacementState {
     NO_FILL
 }
 
-export class Placement {
+interface IPlacement {
+    id: string;
+    name: string;
+    default: boolean;
 
-    private _id: string;
-    private _name: string;
-    private _default: boolean;
+    allowSkip: boolean;
+    skipInSeconds: number;
 
-    private _allowSkip: boolean;
-    private _skipInSeconds: number;
+    disableBackButton: boolean;
 
-    private _disableBackButton: boolean;
+    muteVideo: boolean;
 
-    private _useDeviceOrientationForVideo: boolean;
-    private _muteVideo: boolean;
+    adTypes: string[] | undefined;
 
-    private _state: PlacementState;
+    state: PlacementState;
+    previousState: PlacementState;
+    placementStateChanged: boolean;
+    currentCampaign: Campaign | undefined;
+}
+
+export class Placement extends Model<IPlacement> {
 
     constructor(data: any) {
-        this._id = data.id;
-        this._name = data.name;
-        this._default = data.default;
+        super('Placement', {
+            id: ['string'],
+            name: ['string'],
+            default: ['boolean'],
+            allowSkip: ['boolean'],
+            skipInSeconds: ['number'],
+            disableBackButton: ['boolean'],
+            muteVideo: ['boolean'],
+            adTypes: ['array', 'undefined'],
+            state: ['number'],
+            previousState: ['number'],
+            placementStateChanged: ['boolean'],
+            currentCampaign: ['object', 'undefined']
+        });
 
-        this._allowSkip = data.allowSkip;
-        this._skipInSeconds = data.skipInSeconds;
+        this.set('id', data.id);
+        this.set('name', data.name);
+        this.set('default', data.default);
 
-        this._disableBackButton = data.disableBackButton;
+        const allowSkip: boolean = data.allowSkip;
+        this.set('allowSkip', allowSkip);
 
-        this._useDeviceOrientationForVideo = data.useDeviceOrientationForVideo;
-        this._muteVideo = data.muteVideo;
+        if (allowSkip) {
+            this.set('skipInSeconds', data.skipInSeconds);
+        }
 
-        this._state = PlacementState.NOT_AVAILABLE;
+        this.set('disableBackButton', data.disableBackButton);
+
+        this.set('muteVideo', data.muteVideo);
+
+        this.set('adTypes', data.adTypes);
+
+        this.set('state', PlacementState.NOT_AVAILABLE);
     }
 
     public getId(): string {
-        return this._id;
+        return this.get('id');
     }
 
     public getName(): string {
-        return this._name;
+        return this.get('name');
     }
 
     public isDefault(): boolean {
-        return this._default;
+        return this.get('default');
     }
 
     public allowSkip(): boolean {
-        return this._allowSkip;
+        return this.get('allowSkip');
     }
 
     public allowSkipInSeconds(): number {
-        return this._skipInSeconds;
+        return this.get('skipInSeconds');
     }
 
     public disableBackButton(): boolean {
-        return this._disableBackButton;
-    }
-
-    public useDeviceOrientationForVideo(): boolean {
-        return this._useDeviceOrientationForVideo;
+        return this.get('disableBackButton');
     }
 
     public muteVideo(): boolean {
-        return this._muteVideo;
+        return this.get('muteVideo');
+    }
+
+    public getAdTypes(): string[] | undefined {
+        return this.get('adTypes');
     }
 
     public getState(): PlacementState {
-        return this._state;
+        return this.get('state');
     }
 
     public setState(state: PlacementState): void {
-        this._state = state;
+        if (this.getState() !== state) {
+            this.set('previousState', this.getState());
+            this.setPlacementStateChanged(true);
+        }
+        this.set('state', state);
+    }
+
+    public getPlacementStateChanged(): boolean {
+        return this.get('placementStateChanged');
+    }
+
+    public setPlacementStateChanged(changed: boolean) {
+        this.set('placementStateChanged', changed);
+    }
+
+    public getPreviousState(): number {
+        return this.get('previousState');
+    }
+
+    public getCurrentCampaign(): Campaign | undefined {
+        return this.get('currentCampaign');
+    }
+
+    public setCurrentCampaign(campaign: Campaign | undefined): void {
+        this.set('currentCampaign', campaign);
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this.getId(),
+            'name': this.getName(),
+            'default': this.isDefault(),
+            'allowSkip': this.allowSkip(),
+            'skipInSeconds': this.allowSkipInSeconds(),
+            'disableBackButton': this.disableBackButton(),
+            'muteVideo': this.muteVideo(),
+            'adTypes': this.getAdTypes(),
+            'state': PlacementState[this.getState()].toLowerCase()
+        };
     }
  }

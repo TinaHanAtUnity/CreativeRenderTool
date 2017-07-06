@@ -2,7 +2,6 @@
     "id": "123abc",
     "store" : "apple",
     "appStoreId": "com.test",
-    "appStoreCountry": "us",
     "gameId": 1234,
     "gameName": "Test game",
     "gameIcon": "https://www.example.net/icon.png",

@@ -25,9 +25,11 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
+import { ClientInfo } from 'Models/ClientInfo';
+import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -59,7 +61,7 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
-            this.onComplete.trigger(id, url, '{"assetCaching": "forced", "placements": []}', 200, []);
+            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "placements": []}', 200, []);
         }, 1);
         return Promise.resolve(id);
     }
@@ -103,9 +105,9 @@ class SpecVerifier {
 
     private assertUnspecifiedParams(): void {
         if(this._queryParams) {
-            for(let i: number = 0; i < this._queryParams.length; i++) {
-                const paramName: string = this._queryParams[i].split('=')[0];
-                const paramValue: any = this._queryParams[i].split('=')[1];
+            for(const queryParam of this._queryParams) {
+                const paramName: string = queryParam.split('=')[0];
+                const paramValue: any = queryParam.split('=')[1];
 
                 assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
@@ -132,8 +134,8 @@ class SpecVerifier {
                     if(this._spec[param].queryString) {
                         let found: boolean = false;
 
-                        for(let i: number = 0; i < this._queryParams.length; i++) {
-                            const paramName: string = this._queryParams[i].split('=')[0];
+                        for(const queryParam of this._queryParams) {
+                            const paramName: string = queryParam.split('=')[0];
                             if(paramName === param) {
                                 found = true;
                             }
@@ -185,13 +187,14 @@ class TestHelper {
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
         const eventManager: EventManager = new EventManager(nativeBridge, request);
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager);
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
         sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
-        const config: Configuration = new Configuration({'assetCaching': 'forced', 'placements': []});
+        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
         let container: AdUnitContainer;
@@ -201,21 +204,18 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
     }
 }
 
 describe('Event parameters should match specifications', () => {
-    beforeEach(() => {
-        MetaDataManager.clearCaches();
-    });
-
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
@@ -225,9 +225,10 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS)).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
@@ -245,11 +246,17 @@ describe('Event parameters should match specifications', () => {
 
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), TestFixtures.getVastParser());
+            const eventManager = new EventManager(nativeBridge, request);
+            const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+            const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            sessionManager.setGameSessionId(1234);
+            const campaignManager: CampaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -261,11 +268,17 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
+            const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), TestFixtures.getVastParser());
+            const eventManager = new EventManager(nativeBridge, request);
+            const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
+            const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            sessionManager.setGameSessionId(1234);
+            const campaignManager: CampaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -282,6 +295,7 @@ describe('Event parameters should match specifications', () => {
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            sessionManager.setGameSessionId(1234);
             const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             return sessionManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
@@ -297,6 +311,7 @@ describe('Event parameters should match specifications', () => {
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            sessionManager.setGameSessionId(1234);
             const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             return sessionManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
@@ -321,6 +336,7 @@ describe('Event parameters should match specifications', () => {
                 request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
+                sessionManager.setGameSessionId(1234);
                 adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             });
 
@@ -381,6 +397,7 @@ describe('Event parameters should match specifications', () => {
                 request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
+                sessionManager.setGameSessionId(1234);
                 adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
             });
 

@@ -12,7 +12,9 @@ export class Sdk {
             Sdk._configUrl,
             Sdk._webViewUrl,
             Sdk._webViewHash,
-            Sdk._webViewVersion
+            Sdk._webViewVersion,
+            Sdk._initTimeStamp,
+            Sdk._reinitialized
         ];
     }
 
@@ -21,12 +23,26 @@ export class Sdk {
     }
 
     public static logError(message: string) {
+        // tslint:disable:no-console
         console.error(message);
+        // tslint:enable:no-console
+    }
+
+    public static logWarning(message: string) {
+        // tslint:disable:no-console
+        console.warn(message);
+        // tslint:enable:no-console
     }
 
     public static logInfo(message: string) {
         // tslint:disable:no-console
         console.info(message);
+        // tslint:enable:no-console
+    }
+
+    public static logDebug(message: string) {
+        // tslint:disable:no-console
+        console.log(message);
         // tslint:enable:no-console
     }
 
@@ -66,12 +82,20 @@ export class Sdk {
         Sdk._webViewUrl = webViewUrl;
     }
 
-    public static setWebViewHash(webViewHash: string) {
+    public static setWebViewHash(webViewHash: string | null) {
         Sdk._webViewHash = webViewHash;
     }
 
     public static setWebViewVersion(webViewVersion: string) {
         Sdk._webViewVersion = webViewVersion;
+    }
+
+    public static setInitTimeStamp(initTimeStamp: number) {
+        Sdk._initTimeStamp = initTimeStamp;
+    }
+
+    public static setReinitialized(reinitialized: boolean) {
+        Sdk._reinitialized = reinitialized;
     }
 
     private static _gameId: string;
@@ -83,7 +107,8 @@ export class Sdk {
     private static _debuggable: boolean;
     private static _configUrl: string;
     private static _webViewUrl: string;
-    private static _webViewHash: string;
+    private static _webViewHash: string | null;
     private static _webViewVersion: string;
-
+    private static _initTimeStamp: number;
+    private static _reinitialized: boolean;
 }

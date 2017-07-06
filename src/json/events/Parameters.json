@@ -161,6 +161,13 @@
     "platforms": "all"
   },
   {
+    "key": "gameSessionId",
+    "type": "number",
+    "description": "Unique game session identifier. This identifier is shared with analytics events.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "language",
     "type": "string",
     "description": "Device language code (e.g. en_US or fr_CA)",
@@ -332,6 +339,34 @@
     "key": "webviewUa",
     "type": "string",
     "description": "WebView user agent string",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "videoOrientation",
+    "type": "string",
+    "description": "Chosen video orientation",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cachedOrientation",
+    "type": "string",
+    "description": "Cached video orientation",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cachedCampaigns",
+    "type": "object",
+    "description": "Campaign ID's which are fully cached on the device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "previousPlacementId",
+    "type": "string",
+    "description": "Previously shown placementId",
     "provider": "SDK",
     "platforms": "all"
   }

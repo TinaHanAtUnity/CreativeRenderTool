@@ -19,6 +19,7 @@ import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -38,6 +39,46 @@ describe('VastVideoEventHandlers tests', () => {
     let eventManager: EventManager;
     let sessionManager: SessionManager;
     let testAdUnit: VastAdUnit;
+    let metaDataManager: MetaDataManager;
+
+    beforeEach(() => {
+        nativeBridge = new NativeBridge({
+            handleInvocation,
+            handleCallback
+        });
+
+        metaDataManager = new MetaDataManager(nativeBridge);
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = EventTestVast;
+        const vast = vastParser.parseVast(vastXml);
+        campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+
+        overlay = new Overlay(nativeBridge, false, 'en');
+
+        placement = new Placement({
+            id: '123',
+            name: 'test',
+            default: true,
+            allowSkip: true,
+            skipInSeconds: 5,
+            disableBackButton: true,
+            useDeviceOrientationForVideo: false,
+            muteVideo: false
+        });
+
+        deviceInfo = new DeviceInfo(nativeBridge);
+
+        clientInfo = TestFixtures.getClientInfo();
+        wakeUpManager = new WakeUpManager(nativeBridge);
+        request = new Request(nativeBridge, wakeUpManager);
+        eventManager = new EventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager, undefined);
+        sessionManager.setSession(new Session('123'));
+        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        sinon.spy(testAdUnit, 'hide');
+    });
 
     it('sends start events from VAST', () => {
         // given a VAST placement
@@ -131,43 +172,4 @@ describe('VastVideoEventHandlers tests', () => {
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
     });
-
-    beforeEach(() => {
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
-
-        const vastParser = TestFixtures.getVastParser();
-        const vastXml = EventTestVast;
-        const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
-
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-
-        overlay = new Overlay(nativeBridge, false, 'en');
-
-        placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            muteVideo: false
-        });
-
-        deviceInfo = new DeviceInfo(nativeBridge);
-
-        clientInfo = TestFixtures.getClientInfo();
-        wakeUpManager = new WakeUpManager(nativeBridge);
-        request = new Request(nativeBridge, wakeUpManager);
-        eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, undefined);
-        sessionManager.setSession(new Session('123'));
-        testAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
-        sinon.spy(testAdUnit, 'hide');
-    });
-
 });

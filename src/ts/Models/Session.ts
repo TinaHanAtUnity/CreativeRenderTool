@@ -1,22 +1,59 @@
-export class Session {
-    public startSent: boolean = false;
-    public firstQuartileSent: boolean = false;
-    public midpointSent: boolean = false;
-    public thirdQuartileSent: boolean = false;
-    public viewSent: boolean = false;
-    public skipSent: boolean = false;
+import { Model } from 'Models/Model';
 
-    public impressionSent: boolean = false;
-    public vastCompleteSent: boolean = false;
+export enum EventType {
+    START,
+    FIRST_QUARTILE,
+    MIDPOINT,
+    THIRD_QUARTILE,
+    VIEW,
+    SKIP,
+    CLICK,
+    CLICK_ATTRIBUTION,
+    IMPRESSION,
+    VAST_COMPLETE
+}
 
-    private _id: string;
+export interface ISession {
+    id: string;
+    eventSent: { [key: number]: boolean };
+}
+
+export class Session extends Model<ISession> {
 
     constructor(id: string) {
-        this._id = id;
+        super('Session', {
+            id: ['string'],
+            eventSent: ['object']
+        });
+
+        this.set('id', id);
+        this.set('eventSent', {});
     }
 
     public getId(): string {
-        return this._id;
+        return this.get('id');
     }
 
+    public getEventSent(eventType: EventType) {
+        const eventSent = this.get('eventSent');
+        if(!(eventType in eventSent)) {
+            return false;
+        }
+        return eventSent[eventType];
+    }
+
+    public setEventSent(eventType: EventType) {
+        const eventSent = this.get('eventSent');
+        if(!(eventType in eventSent)) {
+            eventSent[eventType] = true;
+        }
+        this.set('eventSent', eventSent);
+    }
+
+    public getDTO(): { [key: string]: any } {
+        return {
+            'id': this.getId(),
+            'eventSent': this.get('eventSent')
+        };
+    }
 }

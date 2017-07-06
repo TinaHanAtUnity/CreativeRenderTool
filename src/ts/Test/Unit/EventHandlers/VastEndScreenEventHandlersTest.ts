@@ -13,7 +13,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { Video } from 'Models/Video';
+import { Video } from 'Models/Assets/Video';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
