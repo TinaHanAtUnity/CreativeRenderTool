@@ -819,7 +819,7 @@ export class Cache {
         const deltaPosition: number = position - this._currentDownloadPosition;
         const deltaTime: number = Date.now() - this._lastProgressEvent;
 
-        if(position > 0 && deltaPosition > 51200) { // sample size must be at least 50 kilobytes
+        if(position > 0 && deltaPosition > 153600) { // sample size must be at least 150 kilobytes
             // speed in kilobytes per second (same as bytes per millisecond)
             const speed: number = deltaPosition / deltaTime;
 

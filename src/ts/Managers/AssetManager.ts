@@ -14,7 +14,14 @@ enum CacheType {
     OPTIONAL
 }
 
-interface IQueueObject {
+interface ICampaignQueueObject {
+    campaign: Campaign;
+    ready: boolean;
+    resolve: (campaign: Campaign) => void;
+    reject: (reason?: any) => void;
+}
+
+interface IAssetQueueObject {
     url: string;
     diagnostics: ICacheDiagnostics;
     resolve: (value: string[]) => void;
@@ -28,16 +35,25 @@ export class AssetManager {
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
-    private _requiredQueue: IQueueObject[];
-    private _optionalQueue: IQueueObject[];
+    private _fastConnectionDetected: boolean;
+    private _campaignQueue: ICampaignQueueObject[];
+    private _requiredQueue: IAssetQueueObject[];
+    private _optionalQueue: IAssetQueueObject[];
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
+        this._caching = false;
+        this._fastConnectionDetected = false;
+        this._campaignQueue = [];
         this._requiredQueue = [];
         this._optionalQueue = [];
+
+        if(cacheMode === CacheMode.ADAPTIVE) {
+            this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
+        }
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -61,6 +77,32 @@ export class AssetManager {
                     });
                     return campaign;
                 });
+            } else if(this._cacheMode === CacheMode.ADAPTIVE) {
+                if(this._fastConnectionDetected) {
+                    // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
+                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                        // allow optional assets to fail
+                    });
+                    return Promise.resolve(campaign);
+                } else {
+                    requiredChain.then(() => {
+                        // todo: somehow set the thing ready here
+                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                            // allow optional assets to fail caching when in CacheMode.FORCED
+                        });
+                        return campaign;
+                    });
+
+                    return new Promise<Campaign>((resolve,reject) => {
+                        const queueObject: ICampaignQueueObject = {
+                            campaign: campaign,
+                            ready: false,
+                            resolve: resolve,
+                            reject: reject
+                        };
+                        this._campaignQueue.push(queueObject);
+                    });
+                }
             } else {
                 requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
@@ -93,17 +135,18 @@ export class AssetManager {
 
     public stopCaching(): void {
         this._stopped = true;
+        this._fastConnectionDetected = false;
         this._cache.stop();
 
         while(this._requiredQueue.length) {
-            const object: IQueueObject | undefined = this._requiredQueue.shift();
+            const object: IAssetQueueObject | undefined = this._requiredQueue.shift();
             if(object) {
                 object.reject(CacheStatus.STOPPED);
             }
         }
 
         while(this._optionalQueue.length) {
-            const object: IQueueObject | undefined = this._optionalQueue.shift();
+            const object: IAssetQueueObject | undefined = this._optionalQueue.shift();
             if(object) {
                 object.reject(CacheStatus.STOPPED);
             }
@@ -118,7 +161,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                const promise = this.queue(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
+                const promise = this.queueAsset(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -129,16 +172,16 @@ export class AssetManager {
 
                     return Promise.resolve();
                 });
-                this.executeQueue();
+                this.executeAssetQueue();
                 return promise;
             });
         }
         return chain;
     }
 
-    private queue(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
+    private queueAsset(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
         return new Promise<string[]>((resolve,reject) => {
-            const queueObject: IQueueObject = {
+            const queueObject: IAssetQueueObject = {
                 url: url,
                 diagnostics: diagnostics,
                 resolve: resolve,
@@ -152,24 +195,24 @@ export class AssetManager {
         });
     }
 
-    private executeQueue(): void {
+    private executeAssetQueue(): void {
         if(!this._caching) {
-            let currentAsset: IQueueObject | undefined = this._requiredQueue.shift();
+            let currentAsset: IAssetQueueObject | undefined = this._requiredQueue.shift();
             if(!currentAsset) {
                 currentAsset = this._optionalQueue.shift();
             }
 
             if(currentAsset) {
-                const asset: IQueueObject = currentAsset;
+                const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
                 this._cache.cache(asset.url, asset.diagnostics).then(([fileId, fileUrl]) => {
                     asset.resolve([fileId, fileUrl]);
                     this._caching = false;
-                    this.executeQueue();
+                    this.executeAssetQueue();
                 }).catch(error => {
                     asset.reject(error);
                     this._caching = false;
-                    this.executeQueue();
+                    this.executeAssetQueue();
                 });
             }
         }
@@ -254,6 +297,10 @@ export class AssetManager {
 
             throw new WebViewError('Unable to select oriented video for caching');
         });
+    }
+
+    private onFastConnectionDetected(): void {
+        this._fastConnectionDetected = true;
     }
 
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
