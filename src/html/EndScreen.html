@@ -10,15 +10,22 @@
         <div class="name-container"><%= data.gameName %></div>
       </div>
       <div class="store-container">
-        <span class="game-rating">
-          <span class="game-rating-mask" style="width: <%= data.rating %>%">
-          <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+
+        <% if(!!data.rating) { %>
+          <span class="game-rating">
+            <span class="game-rating-mask" style="width: <%= data.rating %>%">
+              <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+            </span>
+            <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
           </span>
-          <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
-        </span>
-        <span class="game-rating-count">
-          (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
-        </span>
+        <% } %>
+
+        <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
+          <span class="game-rating-count">
+            (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+          </span>
+        <% } %>
+
       </div>
       <div class="download-container">
         <a class="btn-download">
