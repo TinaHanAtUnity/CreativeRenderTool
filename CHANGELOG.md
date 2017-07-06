@@ -1,3 +1,8 @@
+# Thu Jul  6 07:20:34 UTC 2017
+
+* Add bundleId to video events
+* Increase test delay to two seconds in A/B group 6
+
 # Wed Jul  5 09:48:21 UTC 2017
 
 * Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
