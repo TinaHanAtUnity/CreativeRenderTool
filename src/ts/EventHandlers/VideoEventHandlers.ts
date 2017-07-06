@@ -149,7 +149,7 @@ export class VideoEventHandlers {
                                             width: width,
                                             height: height,
                                             duration: duration
-                                        }
+                                        };
                                         error.videoInfo = videoInfo;
                                         return error;
                                     });
@@ -187,7 +187,7 @@ export class VideoEventHandlers {
                                             width: width,
                                             height: height,
                                             duration: duration
-                                        }
+                                        };
                                         error.videoInfo = videoInfo;
                                         return error;
                                     });
