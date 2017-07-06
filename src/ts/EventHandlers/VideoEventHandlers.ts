@@ -200,6 +200,8 @@ export class VideoEventHandlers {
                         }).catch(() => {
                             Diagnostics.trigger('video_player_stuck', error);
                         });
+                    } else {
+                        Diagnostics.trigger('video_player_stuck', error);
                     }
 
                     return;
