@@ -20,7 +20,7 @@
           </span>
         <% } %>
 
-        <% if (!!data.ratingCount) { %>
+        <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
           <span class="game-rating-count">
             (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
           </span>
