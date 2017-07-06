@@ -93,6 +93,7 @@ export class EventManager {
                 key: sessionTimestampKey,
                 timestamp: timestamp
             }));
+            return Promise.resolve([]);
         });
     }
 
@@ -112,9 +113,8 @@ export class EventManager {
                 });
             });
             return Promise.all(promises).catch(error => {
-                Diagnostics.trigger('sending_stored_events_failed', new DiagnosticError(error), {
-                    // todo: more diagnostics needed?
-                });
+                Diagnostics.trigger('sending_stored_events_failed', error);
+                return Promise.resolve([]);
             });
         });
     }
