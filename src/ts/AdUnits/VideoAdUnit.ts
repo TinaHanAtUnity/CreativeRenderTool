@@ -140,7 +140,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     }
 
     protected onLowMemoryWarning(): void {
-        this._lowMemory = true;
+        if(this.isShowing()) {
+            this._lowMemory = true;
+        }
     }
 
     protected hideChildren() {
