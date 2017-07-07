@@ -52,7 +52,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
-        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.susbcribe(() => this.onLowMemoryWarning());
+        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
         return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), this._options);
     }
