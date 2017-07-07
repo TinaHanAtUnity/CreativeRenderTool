@@ -22,6 +22,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     protected _onShowObserver: any;
     protected _onSystemKillObserver: any;
     protected _onSystemInterruptObserver: any;
+    protected _onLowMemoryWarningObserver: any;
 
     protected _options: any;
     private _video: Video;
@@ -29,6 +30,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _overlay: Overlay | undefined;
     private _deviceInfo: DeviceInfo;
     private _videoOrientation: 'landscape' | 'portrait' | undefined;
+    private _lowMemory: boolean;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
@@ -38,6 +40,8 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._overlay = overlay;
         this._deviceInfo = deviceInfo;
         this._options = options;
+
+        this._lowMemory = false;
     }
 
     public show(): Promise<void> {
@@ -48,6 +52,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
+        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.susbcribe(() => this.onLowMemoryWarning());
 
         return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), this._options);
     }
@@ -96,6 +101,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._videoOrientation;
     }
 
+    public isLowMemory(): boolean {
+        return this._lowMemory;
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
@@ -128,6 +137,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
             this._nativeBridge.VideoPlayer.play();
         }
+    }
+
+    protected onLowMemoryWarning(): void {
+        this._lowMemory = true;
     }
 
     protected hideChildren() {
