@@ -28,6 +28,7 @@ export abstract class AdUnitContainer {
     public readonly onSystemKill = new Observable0(); // ad unit killed by the system (Android only)
     public readonly onSystemPause = new Observable0(); // ad unit has been resigned from active (iOS only)
     public readonly onSystemInterrupt = new Observable0(); // ad unit has been interrupted and video has been paused (iOS only)
+    public readonly onLowMemoryWarning = new Observable0(); // ad unit has received low memory warning (iOS only)
 
     protected _lockedOrientation: ForceOrientation;
 

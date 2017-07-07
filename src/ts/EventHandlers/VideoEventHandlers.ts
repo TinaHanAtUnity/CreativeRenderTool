@@ -133,7 +133,8 @@ export class VideoEventHandlers {
                         url: adUnit.getVideo().getUrl(),
                         originalUrl: adUnit.getVideo().getOriginalUrl(),
                         cached: adUnit.getVideo().isCached(),
-                        cacheMode: configuration.getCacheMode()
+                        cacheMode: configuration.getCacheMode(),
+                        lowMemory: adUnit.isLowMemory()
                     };
 
                     const fileId = adUnit.getVideo().getFileId();
