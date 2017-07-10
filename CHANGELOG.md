@@ -1,3 +1,8 @@
+# Mon Jul 10 06:56:26 UTC 2017
+
+* Catch a few different init errors instead of failing entire init
+* Add low memory warning detection to video_player_stuck diagnostic events
+
 # Thu Jul  6 14:00:44 UTC 2017
 
 * Endscreen ratings fix
