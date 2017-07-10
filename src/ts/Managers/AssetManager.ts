@@ -36,9 +36,10 @@ export class AssetManager {
     private _stopped: boolean;
     private _caching: boolean;
     private _fastConnectionDetected: boolean;
-    private _campaignQueue: ICampaignQueueObject[];
     private _requiredQueue: IAssetQueueObject[];
     private _optionalQueue: IAssetQueueObject[];
+    private _campaignQueue: { [id: number]: ICampaignQueueObject };
+    private _campaignId: number;
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
@@ -47,9 +48,10 @@ export class AssetManager {
         this._stopped = false;
         this._caching = false;
         this._fastConnectionDetected = false;
-        this._campaignQueue = [];
         this._requiredQueue = [];
         this._optionalQueue = [];
+        this._campaignQueue = {};
+        this._campaignId = 0;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
@@ -85,23 +87,38 @@ export class AssetManager {
                     });
                     return Promise.resolve(campaign);
                 } else {
+                    const id: number = this._campaignId;
+                    const promise = this.registerCampaign(campaign, id);
+                    this._campaignId++;
+
                     requiredChain.then(() => {
-                        // todo: somehow set the thing ready here
+                        const campaignObject = this._campaignQueue[id];
+
+                        if(campaignObject) {
+                            if(!campaignObject.ready) {
+                                campaignObject.resolve(campaign);
+                            }
+
+                            delete this._campaignQueue[id];
+                        }
+
                         this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
                             // allow optional assets to fail caching when in CacheMode.FORCED
                         });
                         return campaign;
+                    }).catch(error => {
+                        const campaignObject = this._campaignQueue[id];
+
+                        if(campaignObject) {
+                            if(!campaignObject.ready) {
+                                campaignObject.reject(error);
+                            }
+
+                            delete this._campaignQueue[id];
+                        }
                     });
 
-                    return new Promise<Campaign>((resolve,reject) => {
-                        const queueObject: ICampaignQueueObject = {
-                            campaign: campaign,
-                            ready: false,
-                            resolve: resolve,
-                            reject: reject
-                        };
-                        this._campaignQueue.push(queueObject);
-                    });
+                    return promise;
                 }
             } else {
                 requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
@@ -301,6 +318,28 @@ export class AssetManager {
 
     private onFastConnectionDetected(): void {
         this._fastConnectionDetected = true;
+
+        for(const id in this._campaignQueue) {
+            if(this._campaignQueue.hasOwnProperty(id)) {
+                const campaignObject = this._campaignQueue[id];
+                if(!campaignObject.ready) {
+                    campaignObject.ready = true;
+                    campaignObject.resolve(campaignObject.campaign);
+                }
+            }
+        }
+    }
+
+    private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {
+        return new Promise<Campaign>((resolve,reject) => {
+            const queueObject: ICampaignQueueObject = {
+                campaign: campaign,
+                ready: false,
+                resolve: resolve,
+                reject: reject
+            };
+            this._campaignQueue[id] = queueObject;
+        });
     }
 
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {

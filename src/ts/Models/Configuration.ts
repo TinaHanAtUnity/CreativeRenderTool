@@ -72,7 +72,6 @@ export class Configuration extends Model<IConfiguration> {
             default:
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
-        this.set('cacheMode', CacheMode.ADAPTIVE);
 
         const placements = configJson.placements;
 
