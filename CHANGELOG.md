@@ -1,3 +1,18 @@
+# Mon Jul 10 06:56:26 UTC 2017
+
+* Catch a few different init errors instead of failing entire init
+* Add low memory warning detection to video_player_stuck diagnostic events
+
+# Thu Jul  6 14:00:44 UTC 2017
+
+* Endscreen ratings fix
+* Improve video_player_stuck diagnostics
+
+# Thu Jul  6 07:20:34 UTC 2017
+
+* Add bundleId to video events
+* Increase test delay to two seconds in A/B group 6
+
 # Wed Jul  5 09:48:21 UTC 2017
 
 * Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously

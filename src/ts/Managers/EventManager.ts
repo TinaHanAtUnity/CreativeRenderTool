@@ -4,6 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class EventManager {
 
@@ -81,10 +82,19 @@ export class EventManager {
     }
 
     public startNewSession(sessionId: string): Promise<void[]> {
+        const sessionTimestampKey = EventManager.getSessionTimestampKey(sessionId);
+        const timestamp = Date.now();
+
         return Promise.all([
-            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, EventManager.getSessionTimestampKey(sessionId), Date.now()),
+            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, sessionTimestampKey, timestamp),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
+        ]).catch(error => {
+            Diagnostics.trigger('session_start_failed', new DiagnosticError(error, {
+                key: sessionTimestampKey,
+                timestamp: timestamp
+            }));
+            return Promise.resolve([]);
+        });
     }
 
     public sendUnsentSessions(): Promise<any[]> {
@@ -102,7 +112,10 @@ export class EventManager {
                     }
                 });
             });
-            return Promise.all(promises);
+            return Promise.all(promises).catch(error => {
+                Diagnostics.trigger('sending_stored_events_failed', error);
+                return Promise.resolve([]);
+            });
         });
     }
 

@@ -10,6 +10,8 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Configuration } from 'Models/Configuration';
+import { Platform } from 'Constants/Platform';
+import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 
 export class VideoEventHandlers {
 
@@ -124,16 +126,84 @@ export class VideoEventHandlers {
                     nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
                     this.handleVideoError(nativeBridge, adUnit);
 
-                    const error: DiagnosticError = new DiagnosticError(new Error('Video player stuck'), {
+                    const error: any = {
                         repeats: repeats,
                         position: position,
                         duration: adUnit.getVideo().getDuration(),
                         url: adUnit.getVideo().getUrl(),
                         originalUrl: adUnit.getVideo().getOriginalUrl(),
                         cached: adUnit.getVideo().isCached(),
-                        cacheMode: configuration.getCacheMode()
-                    });
-                    Diagnostics.trigger('video_player_stuck', error);
+                        cacheMode: configuration.getCacheMode(),
+                        lowMemory: adUnit.isLowMemory()
+                    };
+
+                    const fileId = adUnit.getVideo().getFileId();
+
+                    if(fileId) {
+                        nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
+                            error.fileInfo = fileInfo;
+
+                            if(fileInfo.found) {
+                                if(nativeBridge.getPlatform() === Platform.IOS) {
+                                    return nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
+                                        const videoInfo: any = {
+                                            width: width,
+                                            height: height,
+                                            duration: duration
+                                        };
+                                        error.videoInfo = videoInfo;
+                                        return error;
+                                    });
+                                } else {
+                                    const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
+                                    return nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+                                        let width: number = 0;
+                                        let height: number = 0;
+                                        let duration: number = 0;
+
+                                        for (const entry of results) {
+                                            const key = entry[0];
+                                            const value = entry[1];
+
+                                            switch (key) {
+                                                case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                                                    width = value;
+                                                    break;
+
+                                                case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                                                    height = value;
+                                                    break;
+
+                                                case VideoMetadata.METADATA_KEY_DURATION:
+                                                    duration = value;
+                                                    break;
+
+                                                default:
+                                                    // unknown key, ignore
+                                                    break;
+                                            }
+                                        }
+
+                                        const videoInfo: any = {
+                                            width: width,
+                                            height: height,
+                                            duration: duration
+                                        };
+                                        error.videoInfo = videoInfo;
+                                        return error;
+                                    });
+                                }
+                            } else {
+                                return error;
+                            }
+                        }).then((videoError) => {
+                            Diagnostics.trigger('video_player_stuck', videoError);
+                        }).catch(() => {
+                            Diagnostics.trigger('video_player_stuck', error);
+                        });
+                    } else {
+                        Diagnostics.trigger('video_player_stuck', error);
+                    }
 
                     return;
                 } else {
