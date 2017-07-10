@@ -140,6 +140,11 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
+            if (!this._configuration.isEnabled()) {
+                const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
+                Diagnostics.trigger('disabled_game', error);
+            }
+
             if(this._configuration.isAnalyticsEnabled()) {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._wakeUpManager.setListenAndroidLifecycle(true);
