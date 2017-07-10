@@ -141,7 +141,8 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
 
             if (!this._configuration.isEnabled()) {
-                throw new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
+                const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
+                Diagnostics.trigger('disabled_game', error);
             }
 
             if(this._configuration.isAnalyticsEnabled()) {
