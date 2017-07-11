@@ -883,7 +883,7 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof PerformanceCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                 });
             });
 
@@ -901,7 +901,7 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html'));
                 });
             });
@@ -922,7 +922,7 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'vast-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 900);
@@ -949,7 +949,7 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-url-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 901);
@@ -974,7 +974,7 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), 13);
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 902);
