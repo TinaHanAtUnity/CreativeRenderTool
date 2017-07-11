@@ -16,7 +16,7 @@ enum CacheType {
 
 interface ICampaignQueueObject {
     campaign: Campaign;
-    ready: boolean;
+    resolved: boolean;
     resolve: (campaign: Campaign) => void;
     reject: (reason?: any) => void;
 }
@@ -39,7 +39,7 @@ export class AssetManager {
     private _requiredQueue: IAssetQueueObject[];
     private _optionalQueue: IAssetQueueObject[];
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
-    private _campaignId: number;
+    private _queueId: number;
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
@@ -51,7 +51,7 @@ export class AssetManager {
         this._requiredQueue = [];
         this._optionalQueue = [];
         this._campaignQueue = {};
-        this._campaignId = 0;
+        this._queueId = 0;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
@@ -87,15 +87,16 @@ export class AssetManager {
                     });
                     return Promise.resolve(campaign);
                 } else {
-                    const id: number = this._campaignId;
+                    const id: number = this._queueId;
                     const promise = this.registerCampaign(campaign, id);
-                    this._campaignId++;
+                    this._queueId++;
 
                     requiredChain.then(() => {
                         const campaignObject = this._campaignQueue[id];
 
                         if(campaignObject) {
-                            if(!campaignObject.ready) {
+                            if(!campaignObject.resolved) {
+                                campaignObject.resolved = true;
                                 campaignObject.resolve(campaign);
                             }
 
@@ -110,7 +111,8 @@ export class AssetManager {
                         const campaignObject = this._campaignQueue[id];
 
                         if(campaignObject) {
-                            if(!campaignObject.ready) {
+                            if(!campaignObject.resolved) {
+                                campaignObject.resolved = true;
                                 campaignObject.reject(error);
                             }
 
@@ -322,8 +324,8 @@ export class AssetManager {
         for(const id in this._campaignQueue) {
             if(this._campaignQueue.hasOwnProperty(id)) {
                 const campaignObject = this._campaignQueue[id];
-                if(!campaignObject.ready) {
-                    campaignObject.ready = true;
+                if(!campaignObject.resolved) {
+                    campaignObject.resolved = true;
                     campaignObject.resolve(campaignObject.campaign);
                 }
             }
@@ -334,7 +336,7 @@ export class AssetManager {
         return new Promise<Campaign>((resolve,reject) => {
             const queueObject: ICampaignQueueObject = {
                 campaign: campaign,
-                ready: false,
+                resolved: false,
                 resolve: resolve,
                 reject: reject
             };
