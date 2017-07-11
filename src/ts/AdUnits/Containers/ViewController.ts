@@ -155,7 +155,7 @@ export class ViewController extends AdUnitContainer {
 
             case ViewController._appDidBecomeActive:
                 this._paused = false;
-                this.onSystemInterrupt.trigger();
+                this.onSystemInterrupt.trigger(false);
                 break;
 
             case ViewController._audioSessionInterrupt:
@@ -163,13 +163,15 @@ export class ViewController extends AdUnitContainer {
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
-                        this.onSystemInterrupt.trigger();
+                        this.onSystemInterrupt.trigger(false);
                     }
+                } else if(interruptData.AVAudioSessionInterruptionTypeKey === 1) {
+                    this.onSystemInterrupt.trigger(true);
                 }
                 break;
 
             case ViewController._audioSessionRouteChange:
-                this.onSystemInterrupt.trigger();
+                this.onSystemInterrupt.trigger(false);
                 break;
 
             default:
