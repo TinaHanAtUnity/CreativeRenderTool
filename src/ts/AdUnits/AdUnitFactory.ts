@@ -86,10 +86,10 @@ export class AdUnitFactory {
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
-            vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
         } else {
-            vastAdUnit = new VastAdUnit(nativeBridge, container, placement, campaign, overlay, deviceInfo, options);
+            vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
@@ -187,6 +187,7 @@ export class AdUnitFactory {
         endScreen.hide();
         document.body.appendChild(endScreen.container());
         endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
+        endScreen.onShow.subscribe(() => VastEndScreenEventHandlers.onShow(sessionManager, adUnit));
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
@@ -240,7 +241,6 @@ export class AdUnitFactory {
     private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
             if(likelyToKeepUp === true) {
                 if(!container.isPaused()) {
