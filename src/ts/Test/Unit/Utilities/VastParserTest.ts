@@ -237,6 +237,11 @@ describe('VastParser', () => {
             const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickthrough);
             assert.equal(vast.getCompanionPortraitUrl(), null);
         });
+
+        it('should have the correct companion tracking urls', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            assert.deepEqual(vast.getCompanionCreativeViewTrackingUrls(), ['https://test.com/clicktracking', 'https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_uuid=83d5ca41-447b-4650-a4a1-745fa218e1e1&mt_cmid=1&mt_aid=123&event=companionImpression&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111']);
+        });
     });
 
     beforeEach(() => {

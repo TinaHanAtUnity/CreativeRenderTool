@@ -14,6 +14,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
+import { CacheStatus } from 'Utilities/Cache';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -117,6 +118,11 @@ export class AuctionCampaignManager extends CampaignManager {
             }
 
             return Promise.all(promises).catch(error => {
+                // stopping campaign parsing and caching due to showing an ad unit is ok
+                if(error === CacheStatus.STOPPED) {
+                    return Promise.resolve();
+                }
+
                 // todo: catch errors by placement
                 return this.handlePlcError(error);
             });
