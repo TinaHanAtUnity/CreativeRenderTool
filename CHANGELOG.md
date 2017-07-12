@@ -1,3 +1,9 @@
+# Wed Jul 12 09:10:06 UTC 2017
+
+* VAST companion tracking
+* Stop sending errors for properly stopped caching
+* Send diagnostic error if game is not enabled in config response
+
 # Mon Jul 10 06:56:26 UTC 2017
 
 * Catch a few different init errors instead of failing entire init
