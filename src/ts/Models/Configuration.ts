@@ -4,7 +4,8 @@ import { Model } from 'Models/Model';
 export enum CacheMode {
     FORCED,
     ALLOWED,
-    DISABLED
+    DISABLED,
+    ADAPTIVE
 }
 
 interface IConfiguration {
@@ -62,6 +63,10 @@ export class Configuration extends Model<IConfiguration> {
 
             case 'disabled':
                 this.set('cacheMode', CacheMode.DISABLED);
+                break;
+
+            case 'adaptive':
+                this.set('cacheMode', CacheMode.ADAPTIVE);
                 break;
 
             default:
