@@ -26,6 +26,7 @@ export class ViewController extends AdUnitContainer {
     private _options: IIosOptions;
 
     private _onViewControllerDidAppearObserver: any;
+    private _onMemoryWarningObserver: any;
     private _onNotificationObserver: any;
 
     constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
@@ -35,6 +36,7 @@ export class ViewController extends AdUnitContainer {
         this._deviceInfo = deviceInfo;
 
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+        this._onMemoryWarningObserver = this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
@@ -133,6 +135,10 @@ export class ViewController extends AdUnitContainer {
 
     private onViewDidAppear(): void {
         this.onShow.trigger();
+    }
+
+    private onMemoryWarning(): void {
+        this.onLowMemoryWarning.trigger();
     }
 
     private onNotification(event: string, parameters: any): void {

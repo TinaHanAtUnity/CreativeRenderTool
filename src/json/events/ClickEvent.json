@@ -162,6 +162,12 @@
       "required": "yes",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "bundleId",
+      "required": "yes",
+      "queryString": false,
+      "body": true
     }
   ]
 }

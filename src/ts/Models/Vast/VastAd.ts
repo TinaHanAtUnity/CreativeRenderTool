@@ -155,4 +155,19 @@ export class VastAd extends Model<IVastAd> {
             'companionAds': companionAds
         };
     }
+
+    public getCompanionCreativeViewTrackingUrls(): string[] {
+        return this.getCompanionEventTrackingUrls('creativeView');
+    }
+
+    private getCompanionEventTrackingUrls(eventType: string): string[] {
+        let urls: string[] = [];
+        const companions = this.getCompanionAds();
+
+        for (const companion of companions) {
+            urls = urls.concat(companion.getEventTrackingUrls(eventType));
+        }
+
+        return urls;
+    }
 }

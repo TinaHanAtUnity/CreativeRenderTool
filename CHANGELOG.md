@@ -1,3 +1,35 @@
+# Mon Jul 10 06:56:26 UTC 2017
+
+* Catch a few different init errors instead of failing entire init
+* Add low memory warning detection to video_player_stuck diagnostic events
+
+# Thu Jul  6 14:00:44 UTC 2017
+
+* Endscreen ratings fix
+* Improve video_player_stuck diagnostics
+
+# Thu Jul  6 07:20:34 UTC 2017
+
+* Add bundleId to video events
+* Increase test delay to two seconds in A/B group 6
+
+# Wed Jul  5 09:48:21 UTC 2017
+
+* Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
+* Add new fields to video_player_stuck diagnostics
+* Add new 2.1.0 client object fields to diagnostic messages
+
+# Mon Jul  3 12:48:21 UTC 2017
+
+* Revert test in group 7 back to exponential increase of refresh interval
+* Fix strange reference to event global in end screen event handler
+
+# Mon Jul  3 09:30:10 UTC 2017
+
+* Try linear increasing of refresh interval in group 7
+* Start A/B test with 1 second refresh after start in A/B group 6
+* Add allowSkip parameter to auction ad requests
+
 # Thu Jun 29 12:47:41 UTC 2017
 
 * Reduce quick no fill refresh test initial delay to one minute

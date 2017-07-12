@@ -96,7 +96,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video started', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             assert.isTrue(performanceAdUnit.getVideo().hasStarted());
         });
@@ -104,7 +104,7 @@ describe('VideoEventHandlersTest', () => {
         it('should send start event to backend', () => {
             sinon.spy(sessionManager, 'sendStart');
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
         });
@@ -112,7 +112,7 @@ describe('VideoEventHandlersTest', () => {
         it('should invoke onUnityAdsStart callback ', () => {
             sinon.stub(nativeBridge.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, TestFixtures.getPlacement().getId());
         });
@@ -124,14 +124,14 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 5, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition, 5);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, -5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, -5, TestFixtures.getConfiguration());
 
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, -5);
@@ -142,7 +142,7 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(4000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 6000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 6000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendFirstQuartile, performanceAdUnit);
         });
@@ -152,7 +152,7 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(9000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 11000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 11000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendMidpoint, performanceAdUnit);
         });
@@ -162,7 +162,7 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(14000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 16000);
+            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 16000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, performanceAdUnit);
         });
@@ -280,7 +280,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Programmatic Ad');
@@ -301,7 +301,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
@@ -313,7 +313,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
@@ -331,7 +331,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
@@ -343,7 +343,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
-            const vastAdUnit = new VastAdUnit(nativeBridge, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);

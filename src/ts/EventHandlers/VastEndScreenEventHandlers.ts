@@ -30,4 +30,8 @@ export class VastEndScreenEventHandlers {
             adUnit.hide();
         }
     }
+
+    public static onShow(sessionManager: SessionManager, adUnit: VastAdUnit): void {
+        adUnit.sendCompanionTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+    }
 }

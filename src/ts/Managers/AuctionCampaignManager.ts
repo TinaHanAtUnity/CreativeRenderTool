@@ -14,6 +14,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
+import { CacheStatus } from 'Utilities/Cache';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -67,7 +68,8 @@ export class AuctionCampaignManager extends CampaignManager {
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
                     placementRequest[placement] = {
-                        adTypes: placements[placement].getAdTypes()
+                        adTypes: placements[placement].getAdTypes(),
+                        allowSkip: placements[placement].allowSkip()
                     };
                 }
             }
@@ -103,23 +105,25 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
             }
 
-            let chain = Promise.resolve();
+            const promises: Array<Promise<void>> = [];
 
             for(const placement of noFill) {
-                chain = chain.then(() => {
-                    return this.handlePlcNoFill(placement);
-                });
+                promises.push(this.handlePlcNoFill(placement));
             }
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    chain = chain.then(() => {
-                        return this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId);
-                    });
+                    promises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
                 }
             }
 
-            return chain.catch(error => {
+            return Promise.all(promises).catch(error => {
+                // stopping campaign parsing and caching due to showing an ad unit is ok
+                if(error === CacheStatus.STOPPED) {
+                    return Promise.resolve();
+                }
+
+                // todo: catch errors by placement
                 return this.handlePlcError(error);
             });
         } else {
@@ -167,7 +171,7 @@ export class AuctionCampaignManager extends CampaignManager {
     }
 
     private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
-        return this._assetManager.setup(campaign, true).then(() => {
+        return this._assetManager.setup(campaign).then(() => {
             for(const placement of placements) {
                 this.onCampaign.trigger(placement, campaign);
             }

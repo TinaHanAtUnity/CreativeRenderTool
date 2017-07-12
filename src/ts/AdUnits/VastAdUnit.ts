@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Vast } from 'Models/Vast/Vast';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { EventManager } from 'Managers/EventManager';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
@@ -9,12 +10,28 @@ import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
+enum Orientation {
+    LANDSCAPE,
+    PORTRAIT
+}
+
+class DeviceOrientation {
+    public static getDeviceOrientation(): Orientation {
+        let height = window.innerHeight;
+        if (height <= 0) {
+            height = 1;
+        }
+        const aspectRatio = window.innerWidth / height;
+        return aspectRatio >= 1.0 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+    }
+}
+
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
+        super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
     }
 
@@ -96,6 +113,31 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
+    public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
+        const companion = this.getCompanionForOrientation();
+        if (companion) {
+            const urls = companion.getEventTrackingUrls('creativeView');
+            for (const url of urls) {
+                this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+            }
+        }
+    }
+
+    private getCompanionForOrientation(): VastCreativeCompanionAd | null {
+        let orientation = DeviceOrientation.getDeviceOrientation();
+        if (this._forceOrientation === ForceOrientation.LANDSCAPE) {
+            orientation = Orientation.LANDSCAPE;
+        } else if (this._forceOrientation === ForceOrientation.PORTRAIT) {
+            orientation = Orientation.PORTRAIT;
+        }
+
+        if (orientation === Orientation.LANDSCAPE) {
+            return this.getVast().getLandscapeOrientedCompanionAd();
+        } else {
+            return this.getVast().getPortraitOrientedCompanionAd();
+        }
+    }
+
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
@@ -119,5 +161,4 @@ export class VastAdUnit extends VideoAdUnit {
         const reg = new RegExp('^(https?)://.+$');
         return !!url && reg.test(url);
     }
-
 }
