@@ -1,3 +1,7 @@
+# Wed Jul 12 12:43:02 UTC 2017
+
+* Test adaptive caching on A/B group 13
+
 # Wed Jul 12 09:10:06 UTC 2017
 
 * VAST companion tracking
