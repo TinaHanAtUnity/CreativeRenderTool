@@ -116,7 +116,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         if(clickAttributionUrl) {
             this._sessionManager.getEventManager().clickAttributionEvent(clickAttributionUrl, false);
             if((<MRAIDCampaign>this.getCampaign()).getClickAttributionUrlFollowsRedirects()) {
-                Diagnostics.trigger('mraid_click_attribution_misconfigured', {
+                Diagnostics.trigger('mraid_click_attribution_url_follows_redirects', {
                     url: clickAttributionUrl,
                     followsRedirects: true
                 });
