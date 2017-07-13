@@ -123,6 +123,7 @@ export class AdUnitFactory {
             sessionManager.sendView(mraidAdUnit);
             sessionManager.sendClick(mraidAdUnit);
             mraidAdUnit.sendClick();
+            mraidAdUnit.sendClickAttribution();
         });
         mraid.onReward.subscribe(() => {
             sessionManager.sendThirdQuartile(mraidAdUnit);

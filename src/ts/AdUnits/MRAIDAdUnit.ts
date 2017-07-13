@@ -9,6 +9,7 @@ import { MRAID, IOrientationProperties } from 'Views/MRAID';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -108,6 +109,19 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     public sendClick(): void {
         this.sendTrackingEvent('click');
+    }
+
+    public sendClickAttribution(): void {
+        const clickAttributionUrl = (<MRAIDCampaign>this.getCampaign()).getClickAttributionUrl();
+        if(clickAttributionUrl) {
+            this._sessionManager.getEventManager().clickAttributionEvent(clickAttributionUrl, false);
+            if((<MRAIDCampaign>this.getCampaign()).getClickAttributionUrlFollowsRedirects()) {
+                Diagnostics.trigger('mraid_click_attribution_url_follows_redirects', {
+                    url: clickAttributionUrl,
+                    followsRedirects: true
+                });
+            }
+        }
     }
 
     private onShow() {
