@@ -59,7 +59,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, []);
+        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + ForceOrientation[this._lockedOrientation]);
 
@@ -171,7 +171,11 @@ export class ViewController extends AdUnitContainer {
                 break;
 
             case ViewController._audioSessionRouteChange:
-                this.onSystemInterrupt.trigger(false);
+                const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
+                if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
+                    this.onSystemInterrupt.trigger(false);
+                }
+
                 break;
 
             default:
