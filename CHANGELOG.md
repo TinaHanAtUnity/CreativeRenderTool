@@ -1,3 +1,7 @@
+# Thu Jul 13 10:52:37 UTC 2017
+
+* CPI MRAID click attribution url was not fired (ABT-255)
+
 # Wed Jul 12 12:43:02 UTC 2017
 
 * Test adaptive caching on A/B group 13
