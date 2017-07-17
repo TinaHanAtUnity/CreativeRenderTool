@@ -1,4 +1,4 @@
-# Thu Jul 13 10:52:37 UTC 2017
+# Fri Jul 14 08:59:40 UTC 2017
 
 * CPI MRAID click attribution url was not fired (ABT-255)
 
