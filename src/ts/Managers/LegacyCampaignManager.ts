@@ -17,7 +17,6 @@ import { Campaign } from 'Models/Campaign';
 import { StorageType } from 'Native/Api/Storage';
 import { Url } from 'Utilities/Url';
 import { WebViewError } from 'Errors/WebViewError';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 
 export class LegacyCampaignManager extends CampaignManager {
     public static setTestBaseUrl(baseUrl: string): void {
@@ -80,11 +79,6 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private parseCampaign(response: INativeResponse): Promise<void> {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-
-        // note: very hackish way of setting A/B group for a test but practically the only easy way to handle everything including all error paths
-        if(json.abGroup) {
-            CampaignRefreshManager.QuickRefillAbGroup = json.abGroup;
-        }
 
         if(json.gamerId) {
             this.storeGamerId(json.gamerId);
