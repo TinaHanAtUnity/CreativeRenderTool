@@ -18,7 +18,7 @@ export interface IOrientationProperties {
 
 export class MRAID extends View {
 
-    public readonly onClick = new Observable0();
+    public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
@@ -251,15 +251,7 @@ export class MRAID extends View {
                 break;
 
             case 'open':
-                this.onClick.trigger();
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(encodeURI(event.data.url));
-                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': encodeURI(event.data.url) // todo: these come from 3rd party sources, should be validated before general MRAID support
-                    });
-                }
+                this.onClick.trigger(encodeURI(event.data.url));
                 break;
 
             case 'close':
