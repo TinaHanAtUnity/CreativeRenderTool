@@ -1,3 +1,7 @@
+# Tue Jul 18 10:07:39 UTC 2017
+
+* Remove A/B tests for groups 6, 7 (refresh intervals) & 13 (adaptive caching)
+
 # Fri Jul 14 08:59:40 UTC 2017
 
 * CPI MRAID click attribution url was not fired (ABT-255)
