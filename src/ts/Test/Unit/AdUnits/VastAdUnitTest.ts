@@ -274,7 +274,6 @@ describe('VastAdUnit', () => {
             assert.equal(endScreen, vastEndScreen);
         });
 
-        // todo: temporarily disabled because somehow this test fails on Android hybrid tests and I was not able to figure out why, maybe something to do with orientations?
         it('it should fire companion tracking events', () => {
             const width = 320;
             const height = 480;
