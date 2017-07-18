@@ -301,17 +301,11 @@ export class WebView {
 
     private onAdUnitStartProcessed(): void {
         if(this._currentAdUnit) {
-            // A/B test for 2 second refresh after start
-            let magicConstant: number = this._startRefreshMagicConstant;
-            if(this._currentAdUnit.getCampaign().getAbGroup() === 6) {
-                magicConstant = 2000;
-            }
-
             setTimeout(() => {
                 if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
                     this._campaignRefreshManager.refresh();
                 }
-            }, magicConstant);
+            }, this._startRefreshMagicConstant);
         }
     }
 
