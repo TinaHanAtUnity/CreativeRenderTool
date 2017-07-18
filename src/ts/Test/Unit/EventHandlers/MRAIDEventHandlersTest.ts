@@ -117,7 +117,7 @@ describe('MRAIDEventHandlersTest', () => {
                         'action': 'android.intent.action.VIEW',
                         'uri': 'market://foobar.com'
                     });
-                });§
+                });
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
