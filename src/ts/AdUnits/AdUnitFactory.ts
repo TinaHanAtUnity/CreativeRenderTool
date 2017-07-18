@@ -30,6 +30,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
+import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
 
 export class AdUnitFactory {
 
@@ -117,14 +118,9 @@ export class AdUnitFactory {
 
         mraid.render();
         document.body.appendChild(mraid.container());
-        mraid.onClick.subscribe(() => {
-            nativeBridge.Listener.sendClickEvent(placement.getId());
-            sessionManager.sendThirdQuartile(mraidAdUnit);
-            sessionManager.sendView(mraidAdUnit);
-            sessionManager.sendClick(mraidAdUnit);
-            mraidAdUnit.sendClick();
-            mraidAdUnit.sendClickAttribution();
-        });
+
+        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, sessionManager, url));
+
         mraid.onReward.subscribe(() => {
             sessionManager.sendThirdQuartile(mraidAdUnit);
         });
