@@ -2,11 +2,12 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { SessionManager } from 'Managers/SessionManager';
 import { EventType } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from "../Constants/Platform";
-import { RequestError } from "../Errors/RequestError";
-import { Diagnostics } from "Utilities/Diagnostics";
-import { DiagnosticError } from "../Errors/DiagnosticError";
-import { MRAIDCampaign } from "../Models/MRAIDCampaign";
+import { Platform } from 'Constants/Platform';
+import { RequestError } from 'Errors/RequestError';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { Request } from 'Utilities/Request';
 
 export class MRAIDEventHandlers {
 
@@ -19,13 +20,17 @@ export class MRAIDEventHandlers {
 
         const campaign = <MRAIDCampaign>adUnit.getCampaign();
 
-
-        if(campaign.getClickAttributionUrl())
-        const currentSession = sessionManager.getSession();
-        adUnit.sendClickAttribution();
+        if(campaign.getClickAttributionUrl()) {
+            this.handleClickAttribution(nativeBridge, sessionManager, campaign);
+            if(!campaign.getClickAttributionUrlFollowsRedirects()) {
+                MRAIDEventHandlers.openUrl(nativeBridge, url);
+            }
+        } else {
+            MRAIDEventHandlers.openUrl(nativeBridge, url);
+        }
     }
 
-    public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
+    private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
         const currentSession = sessionManager.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
@@ -35,23 +40,15 @@ export class MRAIDEventHandlers {
         }
 
         const eventManager = sessionManager.getEventManager();
-        const platform = nativeBridge.getPlatform();
         const clickAttributionUrl = campaign.getClickAttributionUrl();
 
         if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
-                    if(platform === Platform.ANDROID) {
-                        nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
-                        });
-                    } else if(platform === Platform.IOS) {
-                        nativeBridge.UrlScheme.open(location);
-                    }
+                    this.openUrl(nativeBridge, location);
                 } else {
-                    Diagnostics.trigger('click_attribution_misconfigured', {
+                    Diagnostics.trigger('mraid_click_attribution_misconfigured', {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
@@ -66,12 +63,23 @@ export class MRAIDEventHandlers {
                         response: (<RequestError>error).nativeResponse
                     });
                 }
-                Diagnostics.trigger('click_attribution_failed', error);
+                Diagnostics.trigger('mraid_click_attribution_failed', error);
             });
         } else {
             if (clickAttributionUrl) {
                 eventManager.clickAttributionEvent(clickAttributionUrl, false);
             }
+        }
+    }
+
+    private static openUrl(nativeBridge: NativeBridge, url: string) {
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.UrlScheme.open(url);
+        } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
+            });
         }
     }
 }
