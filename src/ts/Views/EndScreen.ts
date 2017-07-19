@@ -33,7 +33,7 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
-        if(campaign) {
+        if (campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
@@ -87,6 +87,11 @@ export class EndScreen extends View {
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
+        // TODO: not optimal way to tell the animation to start only when endcard is visible
+        // should be good enough for a/b testing
+        // maybe set it only if a/b testing campaign is on
+        this._container.classList.add('active-animation');
+
         if(AbstractAdUnit.getAutoClose()) {
            setTimeout(() => {
                this.onClose.trigger();
@@ -97,7 +102,7 @@ export class EndScreen extends View {
     public hide(): void {
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
@@ -107,6 +112,19 @@ export class EndScreen extends View {
     private getEndscreenAlt(campaign: PerformanceCampaign) {
         if (this._isMasterClassCampaign) {
             return 'masterclass';
+        }
+
+        /*
+        * Pseudo code
+        * TODO: Support proper a/b functionality
+        * */
+
+        if ('pulse-animation') {
+            return 'pulse-animation';
+        }
+
+        if ('thirsty-button') {
+            return 'thirsty-button';
         }
 
         return undefined;
