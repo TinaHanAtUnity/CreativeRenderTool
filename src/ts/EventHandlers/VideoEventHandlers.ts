@@ -20,7 +20,7 @@ export class VideoEventHandlers {
             const prepareNotCalledError: any = {
                 originalUrl: adUnit.getVideo().getOriginalUrl(),
                 campaignId: adUnit.getCampaign().getId(),
-                url: url,
+                url: adUnit.getVideo().getUrl(),
                 duration: duration
             };
             Diagnostics.trigger('video_player_prepare_not_called', prepareNotCalledError);
