@@ -1,39 +1,46 @@
-<div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>"><a class="btn-close"><span class="icon-close"></span></a></div>
+<div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>"><a class="btn-close"><span
+        class="icon-close"></span></a></div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
-  <div class="game-background game-background-landscape" style="background-image: url(<%= data.endScreenLandscape %>)"></div>
-  <div class="game-background game-background-portrait" style="background-image: url(<%= data.endScreenPortrait %>)"></div>
-  <div class="end-screen-info-background">
-    <div class="end-screen-stripe"></div>
-    <div class="end-screen-info">
-      <div class="game-info">
-        <div class="game-icon" style="background-image: url(<%= data.gameIcon %>)"></div>
-        <div class="name-container"><%= data.gameName %></div>
-      </div>
-      <div class="store-container">
+    <div class="game-background game-background-landscape"
+         style="background-image: url(<%= data.endScreenLandscape %>)"></div>
+    <div class="game-background game-background-portrait"
+         style="background-image: url(<%= data.endScreenPortrait %>)"></div>
+    <div class="end-screen-info-background">
+        <div class="end-screen-stripe"></div>
+        <div class="end-screen-info">
+            <div class="game-info">
+                <div class="game-icon" style="background-image: url(<%= data.gameIcon %>)"></div>
+                <div class="name-container"><%= data.gameName %></div>
+            </div>
+            <div class="store-container">
 
-        <% if(!!data.rating) { %>
-          <span class="game-rating">
+                <% if(!!data.rating) { %>
+                <span class="game-rating">
             <span class="game-rating-mask" style="width: <%= data.rating %>%">
               <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
             </span>
             <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
           </span>
-        <% } %>
+                <% } %>
 
-        <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
-          <span class="game-rating-count">
+                <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
+                <span class="game-rating-count">
             (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
           </span>
-        <% } %>
-
-      </div>
-      <div class="download-container">
-        <a class="btn-download">
-          <span class="download-text"><%= data.t("Download For Free") %></span>
-        </a>
-      </div>
+                <% } %>
+            </div>
+            <div class="download-container btn-download">
+                <!--<a class="btn-download">-->
+                <span class="download-text"><%= data.t("Download For Free") %></span>
+                <!--</a>-->
+                <% for (var i = 0; i < 100; i++) { %>
+                    <span class="bubble"
+                          style="left:<%= ((Math.random() * 100) + 1) %>%; top:<%= ((Math.random() * 100) + 1) %>%; transform: scale(<%= Math.random() %>); animation-duration: <%=(Math.random() * 25 + 1)%>s";
+                    ></span>
+                <% } %>
+            </div>
+        </div>
+        <div class="privacy-button"><span class="icon-info"></span></div>
+        <div class="unityads-logo"></div>
     </div>
-    <div class="privacy-button"><span class="icon-info"></span></div>
-    <div class="unityads-logo"></div>
-  </div>
 </div>
