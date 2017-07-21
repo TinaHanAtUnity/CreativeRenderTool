@@ -17,13 +17,7 @@ export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
         if(!adUnit.isPrepareCalled()) {
-            const prepareNotCalledError: any = {
-                originalUrl: adUnit.getVideo().getOriginalUrl(),
-                campaignId: adUnit.getCampaign().getId(),
-                url: adUnit.getVideo().getUrl(),
-                duration: duration
-            };
-            Diagnostics.trigger('video_player_prepare_not_called', prepareNotCalledError);
+            Diagnostics.trigger('video_player_prepare_not_called', 'Prepare not called by videoAdUnit');
         }
 
         if(adUnit.getVideo().getErrorStatus() || !adUnit.isPrepareCalled()) {
