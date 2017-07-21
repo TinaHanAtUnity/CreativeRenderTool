@@ -75,6 +75,7 @@ describe('VideoEventHandlersTest', () => {
             getVideo: () => video,
             getStreamingVideo: () => video
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+        sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
     });
 
     describe('with onVideoPlay', () => {
@@ -281,6 +282,7 @@ describe('VideoEventHandlersTest', () => {
             const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Programmatic Ad');
@@ -302,7 +304,7 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
-
+            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
@@ -314,7 +316,7 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
-
+            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
@@ -332,7 +334,7 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
-
+            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
@@ -344,7 +346,7 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), vastCampaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
-
+            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10);
 
