@@ -132,6 +132,7 @@ export class Activity extends AdUnitContainer {
     }
 
     private onPause(finishing: boolean, activityId: number): void {
+        this.onAndroidPause.trigger();
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
