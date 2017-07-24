@@ -33,6 +33,18 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
+        const buildCss = (): string => {
+            const left = Math.random() * 90;
+            const top = Math.random() * 90 + 10;
+            const size = Math.random() * 50 + 5;
+            const blur = Math.random() * size / 10;
+            const duration = size / 3.25;
+
+            // return `left: ${left}%; top: ${top}%; -webkit-transform: scale(${scaleFactor}); transform: scale(${scaleFactor});-webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
+            // return `left: ${left}%; top: ${top}%; -webkit-transform: scale(${scaleFactor}); transform: scale(${scaleFactor});-webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;`;
+            return `left: ${left}%; top: ${top}%; -webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
+        };
+
         if (campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
@@ -43,7 +55,8 @@ export class EndScreen extends View {
                 'endScreenPortrait': campaign.getLandscape().getUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
+                'endscreenAlt': this.getEndscreenAlt(campaign),
+                'buildCSS': buildCss
             };
         }
 
@@ -118,13 +131,12 @@ export class EndScreen extends View {
         * Pseudo code
         * TODO: Support proper a/b functionality
         * */
+        if ('thirsty-button') {
+            return 'thirsty-button';
+        }
 
         if ('pulse-animation') {
             return 'pulse-animation';
-        }
-
-        if ('thirsty-button') {
-            return 'thirsty-button';
         }
 
         return undefined;

@@ -1,98 +1,39 @@
 .bubble {
   background: #fff;
-  width: 50px;
-  height: 50px;
   position: absolute;
-  display: block;
-  //left: 110px;
-  //bottom: 110px;
-  border-radius: 100px;
-  background: -webkit-gradient(radial, center center, 0, center center, 100, from(rgba(75, 190, 200, .2)), to(rgba(255, 255, 255, .7)));
-  background: gradient(center 45deg, circle closest-corner, rgba(75, 190, 200, 0), rgba(75, 190, 200, .1), rgba(75, 190, 200, .3), rgba(255, 255, 255, .7));
-  animation: animateBubble 21s linear infinite, sideWays 2s ease-in-out infinite alternate;
+  display: none;
+  border-radius: 50%;
+  background: -webkit-gradient(radial, center center, 0, center center, 100, from(rgba(75, 190, 200, .2)), to(rgba(255, 255, 255, .5)));
+  background: gradient(center 45deg, circle closest-corner, rgba(75, 190, 200, 0), rgba(75, 190, 200, .1), rgba(75, 190, 200, .3), rgba(255, 255, 255, .5));
+  -webkit-transform: translatez(0);
+  transform: translatez(0);
+  -webkit-animation: animateBubble 21s linear infinite;
+  animation: animateBubble 21s linear infinite;
 
 }
 
+
 @keyframes animateBubble {
   0% {
-    top:110%;
+    -webkit-transform: translateY(200%);
+    transform: translateY(200%);
   }
   100% {
-    top:-100%;
+    -webkit-transform: translateY(-500%);
+    transform: translateY(-500%);
   }
 }
 
 @keyframes sideWays {
   0% {
-    margin-left: -25px;
+     -webkit-transform: translateX(-100%); /* Safari */
+    transform: translateX(-100%);
   }
+
   100% {
-    margin-left: 25px;
+     -webkit-transform: translateX(100%); /* Safari */
+    transform: translateX(100%);
   }
-}
-
-.bubble:nth-child(1) {
-  animation: animateBubble 25s linear infinite, sideWays 15s ease-in-out infinite alternate;
-  transform: scale(0.5);
-  left: 30%;
-  top: 10%;
-}
-
-.bubble:nth-child(2) {
-  animation: animateBubble 15s linear infinite, sideWays 12s linear infinite alternate;
-  transform: scale(1);
-  left: 80%;
-  top: 50%;
-}
-
-.bubble:nth-child(3) {
-  transform: scale(0.25);
-  left: 40%;
-  top: 30%;
-  animation: animateBubble 12s linear infinite, sideWays 10s ease infinite alternate;
-}
-
-.bubble:nth-child(4) {
-  animation: animateBubble 10s linear infinite, sideWays 5s ease-in-out infinite alternate;
-  transform: scale(0.46);
-  left: 55%;
-  top: 0%;
-}
-
-.bubble:nth-child(5) {
-  animation: animateBubble 10s linear infinite, sideWays 3s ease-in-out infinite alternate;
-  transform: scale(0.76);
-  left: 32%;
-  top: -20%;
-}
-
-.bubble:nth-child(6) {
-  animation: animateBubble 17s linear infinite, sideWays 9s ease-in-out infinite alternate;
-  transform: scale(0.29);
-  left: 69%;
-  top: 70%;
-}
-
-.bubble:nth-child(7) {
-  animation: animateBubble 22s linear infinite, sideWays 5s ease-in-out infinite alternate;
-  transform: scale(0.33);
-  left: 46%;
-  top: -75%;
-}
-
-
-.bubble:nth-child(8) {
-  animation: animateBubble 5s linear infinite, sideWays 35s ease-in-out infinite alternate;
-  transform: scale(0.4);
-  left: 15%;
-  top: -75%;
-}
-
-.bubble:nth-child(8) {
-  animation: animateBubble 6.5s linear infinite, sideWays 2.5s ease-in-out infinite alternate;
-  transform: scale(0.6);
-  left: 75%;
-  top: -33%;
 }
 
 #end-screen
@@ -101,6 +42,9 @@
   &.active-animation > .campaign-container.pulse-animation .btn-download
       -webkit-animation: pulse 7.5s 1s infinite;
       animation: pulse 7.5s 1s infinite
+
+  &.active-animation .bubble
+    display: block;
 
   .campaign-container
     width: 100%
@@ -116,12 +60,15 @@
       transform: scale(0.75);
 
     &.thirsty-button .btn-download
+      will-change: top, margin-left;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
 
       overflow: hidden;
       position: relative;
 
-      -webkit-box-shadow: -2px 5px 2px 2px rgba(12, 70, 140, 0.75);
-      box-shadow: -2px 5px 2px 2px rgba(12, 70, 140, 0.75);
+      -webkit-box-shadow: -2px 5px 2px 2px rgba(12, 70, 140, 0.75), inset 0 0 5px 1px rgba(255,234,234, 0.8);
+      box-shadow: -2px 5px 2px 2px rgba(12, 70, 140, 0.75), inset 0 0 5px 1px rgba(255,234,234, 0.8);
 
   .btn-close-region
     position: absolute
@@ -299,7 +246,6 @@ body.landscape
       margin: auto
 
     .name-container
-      font-size: 18pt
       padding-top: 95px
       font-size: 20pt
       text-overflow: ellipsis;
