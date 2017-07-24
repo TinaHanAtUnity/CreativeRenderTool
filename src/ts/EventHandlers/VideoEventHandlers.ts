@@ -8,7 +8,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
-import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
@@ -16,10 +16,16 @@ import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
-        if(adUnit.getVideo().getErrorStatus()) {
+        if(!adUnit.isPrepareCalled()) {
+            Diagnostics.trigger('video_player_prepare_not_called', 'Prepare not called by videoAdUnit');
+        }
+
+        if(adUnit.getVideo().getErrorStatus() || !adUnit.isPrepareCalled()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
         }
+
+        adUnit.setPrepareCalled(false);
 
         if(duration > 40000) {
             const campaign = adUnit.getCampaign();
@@ -327,6 +333,12 @@ export class VideoEventHandlers {
         Diagnostics.trigger('video_player_illegal_state_error', {
             'position': videoAdUnit.getVideo().getPosition()
         });
+    }
+
+    public static onIosVideoLikelyToKeepUp(nativeBridge: NativeBridge, adUnit: VideoAdUnit, container: AdUnitContainer, likelyToKeepUp: boolean): void {
+        if(!container.isPaused() && adUnit.getVideo().hasStarted() && likelyToKeepUp) {
+            nativeBridge.VideoPlayer.play();
+        }
     }
 
     protected static afterVideoCompleted(adUnit: VideoAdUnit) {
