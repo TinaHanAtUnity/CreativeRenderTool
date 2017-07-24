@@ -1,50 +1,23 @@
 .bubble {
-  background: #fff;
   position: absolute;
-  display: none;
+  background: #fff;
   border-radius: 50%;
   background: -webkit-gradient(radial, center center, 0, center center, 100, from(rgba(75, 190, 200, .2)), to(rgba(255, 255, 255, .5)));
   background: gradient(center 45deg, circle closest-corner, rgba(75, 190, 200, 0), rgba(75, 190, 200, .1), rgba(75, 190, 200, .3), rgba(255, 255, 255, .5));
   -webkit-transform: translatez(0);
   transform: translatez(0);
-  -webkit-animation: animateBubble 21s linear infinite;
-  animation: animateBubble 21s linear infinite;
-
-}
-
-
-@keyframes animateBubble {
-  0% {
-    -webkit-transform: translateY(200%);
-    transform: translateY(200%);
-  }
-  100% {
-    -webkit-transform: translateY(-500%);
-    transform: translateY(-500%);
-  }
-}
-
-@keyframes sideWays {
-  0% {
-     -webkit-transform: translateX(-100%); /* Safari */
-    transform: translateX(-100%);
-  }
-
-  100% {
-     -webkit-transform: translateX(100%); /* Safari */
-    transform: translateX(100%);
-  }
 }
 
 #end-screen
   // This is done, so animation runs only after endcard is visible
-  // see EndScreen.ts:90
+  // see EndScreen.ts:90. It improves fps alot between screen transitions
   &.active-animation > .campaign-container.pulse-animation .btn-download
       -webkit-animation: pulse 7.5s 1s infinite;
       animation: pulse 7.5s 1s infinite
 
   &.active-animation .bubble
-    display: block;
+    -webkit-animation: animateBubble 0s linear infinite;
+    animation: animateBubble 0s linear infinite;
 
   .campaign-container
     width: 100%
