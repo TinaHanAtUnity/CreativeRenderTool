@@ -208,6 +208,15 @@ export class MRAID extends View {
         });
     }
 
+    public setViewableState(viewable: boolean) {
+        if(this._loaded) {
+            this._iframe.contentWindow.postMessage({
+                type: 'viewable',
+                value: viewable
+            }, '*');
+        }
+    }
+
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
