@@ -1,3 +1,9 @@
+# Tue Jul 25 06:44:19 UTC 2017
+
+* Trigger mraid viewableChange event on system pause and resume
+* Follow redirects if clickAttributionUrlFollowsRedirects is true on MRAID campaigns
+* Fix some video_player_stuck errors
+
 # Tue Jul 18 10:07:39 UTC 2017
 
 * Remove A/B tests for groups 6, 7 (refresh intervals) & 13 (adaptive caching)
