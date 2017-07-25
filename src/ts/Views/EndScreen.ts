@@ -35,13 +35,11 @@ export class EndScreen extends View {
 
         const buildCss = (): string => {
             const left = Math.random() * 90;
-            const top = Math.random() * 90 + 10;
+            const top = Math.random() * 110 + 10;
             const size = Math.random() * 50 + 5;
-            const blur = Math.random() * size / 10;
+            const blur = Math.random() * size / 20;
             const duration = size / 3.25;
 
-            // return `left: ${left}%; top: ${top}%; -webkit-transform: scale(${scaleFactor}); transform: scale(${scaleFactor});-webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
-            // return `left: ${left}%; top: ${top}%; -webkit-transform: scale(${scaleFactor}); transform: scale(${scaleFactor});-webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;`;
             return `left: ${left}%; top: ${top}%; -webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
         };
 

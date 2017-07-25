@@ -6,6 +6,22 @@
   background: gradient(center 45deg, circle closest-corner, rgba(75, 190, 200, 0), rgba(75, 190, 200, .1), rgba(75, 190, 200, .3), rgba(255, 255, 255, .5));
   -webkit-transform: translatez(0);
   transform: translatez(0);
+  mix-blend-mode: overlay;
+}
+
+
+.flash {
+  height: 100%;
+  width: 30%;
+  display: inline;
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  -webkit-transform: translatez(0);
+  transform: translatez(0);
+  background: -webkit-linear-gradient(45deg, rgba(215, 223, 229, 0.1) 4%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(45deg, rgba(215, 223, 229, 0.1) 4%, rgba(255, 255, 255, 0.2) 100%);
+  mix-blend-mode: overlay;
 }
 
 #end-screen
@@ -18,6 +34,10 @@
   &.active-animation .bubble
     -webkit-animation: animateBubble 0s linear infinite;
     animation: animateBubble 0s linear infinite;
+
+  &.active-animation .flash
+    -webkit-animation: flash 5s ease-out infinite;
+    animation: flash 5s ease-out infinite;
 
   .campaign-container
     width: 100%
@@ -36,6 +56,8 @@
       will-change: top, margin-left;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 800;
 
       overflow: hidden;
       position: relative;

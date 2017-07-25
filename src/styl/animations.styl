@@ -112,3 +112,36 @@
   }
 }
 
+@-webkit-keyframes flash {
+  80% {
+    opacity: 0;
+    -webkit-transform: translate(-110%) skewX(45deg);
+    transform: translate(-110%) skewX(45deg);
+  }
+
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(200%) skewX(45deg);
+    transform: translate(200%) skewX(45deg);
+  }
+}
+
+@keyframes flash {
+  80% {
+    opacity: 0;
+    -webkit-transform: translate(-110%) skewX(45deg);
+    transform: translate(-110%) skewX(45deg);
+  }
+
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(200%) skewX(45deg);
+    transform: translate(200%) skewX(45deg);
+  }
+}
