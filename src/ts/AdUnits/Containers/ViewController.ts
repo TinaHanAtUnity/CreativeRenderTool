@@ -150,7 +150,7 @@ export class ViewController extends AdUnitContainer {
         switch(event) {
             case ViewController._appWillResignActive:
                 this._paused = true;
-                this.onSystemPause.trigger();
+                this.onSystemInterrupt.trigger(true);
                 break;
 
             case ViewController._appDidBecomeActive:
