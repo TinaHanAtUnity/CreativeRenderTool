@@ -9,7 +9,6 @@
   mix-blend-mode: overlay;
 }
 
-
 .flash {
   height: 100%;
   width: 30%;
@@ -22,6 +21,9 @@
   background: -webkit-linear-gradient(45deg, rgba(215, 223, 229, 0.1) 4%, rgba(255, 255, 255, 0.2) 100%);
   background: linear-gradient(45deg, rgba(215, 223, 229, 0.1) 4%, rgba(255, 255, 255, 0.2) 100%);
   mix-blend-mode: overlay;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 #end-screen
@@ -53,7 +55,7 @@
       transform: scale(0.75);
 
     &.thirsty-button .btn-download
-      will-change: top, margin-left;
+      will-change: transform;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
       -webkit-font-smoothing: antialiased;
