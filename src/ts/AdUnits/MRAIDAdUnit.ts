@@ -117,19 +117,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this.sendTrackingEvent('click');
     }
 
-    public sendClickAttribution(): void {
-        const clickAttributionUrl = (<MRAIDCampaign>this.getCampaign()).getClickAttributionUrl();
-        if(clickAttributionUrl) {
-            this._sessionManager.getEventManager().clickAttributionEvent(clickAttributionUrl, false);
-            if((<MRAIDCampaign>this.getCampaign()).getClickAttributionUrlFollowsRedirects()) {
-                Diagnostics.trigger('mraid_click_attribution_url_follows_redirects', {
-                    url: clickAttributionUrl,
-                    followsRedirects: true
-                });
-            }
-        }
-    }
-
     private onShow() {
         this._mraid.setViewableState(true);
 
