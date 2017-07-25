@@ -9,7 +9,6 @@ import { MRAID, IOrientationProperties } from 'Views/MRAID';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
