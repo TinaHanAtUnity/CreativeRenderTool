@@ -16,6 +16,16 @@ export interface IOrientationProperties {
     forceOrientation: ForceOrientation;
 }
 
+class Dimensions {
+    public width: number;
+    public height: number;
+
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+    }
+}
+
 export class MRAID extends View {
 
     public readonly onClick = new Observable1<string>();
@@ -66,18 +76,8 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(Math.abs(<number>window.orientation) === 90) {
-                iframe.width = screen.height;
-                iframe.height = screen.width;
-            } else {
-                iframe.width = screen.width;
-                iframe.height = screen.height;
-            }
-        } else {
-            iframe.height = window.innerHeight;
-            iframe.width = window.innerWidth;
-        }
+        const dimensions = this.getWindowDimensions();
+        this.updateIFrameDimensions(this._iframe, dimensions);
 
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
@@ -90,7 +90,6 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
-        const iframe: any = this._iframe;
         const closeLength = 30;
 
         if(this._placement.allowSkip()) {
@@ -149,21 +148,12 @@ export class MRAID extends View {
         }
 
         this._resizeDelayer = (event: Event) => {
-            this._resizeTimeout = setTimeout(() => {
-                this._resizeHandler(event);
-            }, 200);
+            this._resizeHandler(event);
         };
 
         this._resizeHandler = (event: Event) => {
-            iframe.width = window.innerWidth;
-            iframe.height = window.innerHeight;
-            if(this._iframe.contentWindow) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'resize',
-                    width: window.innerWidth,
-                    height: window.innerHeight
-                }, '*');
-            }
+            const dimensions = this.getWindowDimensions();
+            this.updateIFrameDimensions(this._iframe, dimensions);
         };
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -213,6 +203,19 @@ export class MRAID extends View {
             this._iframe.contentWindow.postMessage({
                 type: 'viewable',
                 value: viewable
+            }, '*');
+        }
+    }
+
+    private updateIFrameDimensions(iframe: HTMLIFrameElement, dimensions: Dimensions) {
+        iframe.width = dimensions.width.toString();
+        iframe.height = dimensions.height.toString();
+
+        if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'resize',
+                width: dimensions.width,
+                height: dimensions.height
             }, '*');
         }
     }
@@ -313,4 +316,20 @@ export class MRAID extends View {
         }
     }
 
+    private getWindowDimensions(): Dimensions {
+        let width, height;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            if(Math.abs(<number>window.orientation) === 90) {
+                width = screen.height;
+                height = screen.width;
+            } else {
+                width = screen.width;
+                height = screen.height;
+            }
+        } else {
+            width = window.innerWidth;
+            height = window.innerHeight;
+        }
+        return new Dimensions(width, height);
+    }
 }
