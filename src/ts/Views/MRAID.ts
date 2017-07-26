@@ -76,8 +76,7 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        const dimensions = this.getWindowDimensions();
-        this.updateIFrameDimensions(this._iframe, dimensions);
+        this.updateIFrameDimensions();
 
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
@@ -152,8 +151,7 @@ export class MRAID extends View {
         };
 
         this._resizeHandler = (event: Event) => {
-            const dimensions = this.getWindowDimensions();
-            this.updateIFrameDimensions(this._iframe, dimensions);
+            this.updateIFrameDimensions();
         };
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -207,12 +205,13 @@ export class MRAID extends View {
         }
     }
 
-    private updateIFrameDimensions(iframe: HTMLIFrameElement, dimensions: Dimensions) {
-        iframe.width = dimensions.width.toString();
-        iframe.height = dimensions.height.toString();
+    private updateIFrameDimensions() {
+        const dimensions = this.getWindowDimensions();
+        this._iframe.width = dimensions.width.toString();
+        this._iframe.height = dimensions.height.toString();
 
-        if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage({
+        if (this._iframe.contentWindow) {
+            this._iframe.contentWindow.postMessage({
                 type: 'resize',
                 width: dimensions.width,
                 height: dimensions.height
