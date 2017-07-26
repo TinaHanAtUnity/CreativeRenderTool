@@ -45,8 +45,6 @@ export class MRAID extends View {
 
     private _messageListener: any;
     private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -146,19 +144,10 @@ export class MRAID extends View {
             });
         }
 
-        this._resizeDelayer = (event: Event) => {
-            this._resizeHandler(event);
-        };
-
         this._resizeHandler = (event: Event) => {
             this.updateIFrameDimensions();
         };
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            window.addEventListener('resize', this._resizeDelayer, false);
-        } else {
-            window.addEventListener('resize', this._resizeHandler, false);
-        }
+        window.addEventListener('resize', this._resizeHandler, false);
     }
 
     public hide() {
@@ -172,11 +161,6 @@ export class MRAID extends View {
         }
         if(this._resizeHandler) {
             window.removeEventListener('resize', this._resizeHandler, false);
-            this._resizeHandler = undefined;
-        }
-        if(this._resizeDelayer) {
-            window.removeEventListener('resize', this._resizeDelayer, false);
-            clearTimeout(this._resizeTimeout);
             this._resizeHandler = undefined;
         }
         super.hide();
