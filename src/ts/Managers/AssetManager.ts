@@ -262,9 +262,6 @@ export class AssetManager {
             if(asset instanceof Video) {
                 promises.push(this._cache.isVideoValid(asset).then(valid => {
                     if(!valid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: asset.getOriginalUrl()
-                        });
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }
                 }));
