@@ -21,6 +21,8 @@ export class EndScreen extends View {
     private _localization: Localization;
     private _isMasterClassCampaign = false;
 
+    private downloadButton: HTMLElement;
+
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
@@ -62,7 +64,7 @@ export class EndScreen extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: '.game-background, .game-icon'
             },
             {
                 event: 'click',
@@ -73,6 +75,16 @@ export class EndScreen extends View {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'touchstart',
+                listener: (event: Event) => this.onTouchStart(event),
+                selector: '.btn-download, .download-text'
+            },
+            {
+                event: 'touchend',
+                listener: (event: Event) => this.onDownloadEvent(event),
+                selector: '.btn-download, .download-text'
             }
         ];
     }
@@ -84,6 +96,8 @@ export class EndScreen extends View {
             const downloadText: HTMLElement = <HTMLElement>this._container.querySelector('.download-text');
             downloadText.innerHTML = 'Find Out More';
         }
+
+        this.downloadButton = <HTMLElement>this._container.querySelector('.btn-download');
     }
 
     public show(): void {
@@ -142,6 +156,8 @@ export class EndScreen extends View {
 
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
+        this.downloadButton.classList.remove('active');
         this.onDownload.trigger();
     }
 
@@ -167,4 +183,8 @@ export class EndScreen extends View {
         });
     }
 
+    private onTouchStart(event: Event) {
+        event.preventDefault();
+        this.downloadButton.classList.add('active');
+    }
 }
