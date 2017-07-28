@@ -35,15 +35,23 @@ export class EndScreen extends View {
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
-        const buildCss = (): string => {
-            const left = Math.random() * 90;
-            const top = Math.random() * 110 + 10;
-            const size = Math.random() * 50 + 5;
-            const blur = Math.random() * size / 20;
-            const duration = size / 3.25;
-
-            return `left: ${left}%; top: ${top}%; -webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
-        };
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDownloadEvent(event),
+                selector: '.game-background, .btn-download, .game-icon'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.btn-close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
+            }
+        ];
 
         if (campaign) {
             const adjustedRating: number = campaign.getRating() * 20;
@@ -55,38 +63,35 @@ export class EndScreen extends View {
                 'endScreenPortrait': campaign.getLandscape().getUrl(),
                 'rating': adjustedRating.toString(),
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-                'endscreenAlt': this.getEndscreenAlt(campaign),
-                'buildCSS': buildCss
+                'endscreenAlt': this.getEndscreenAlt(campaign)
             };
-        }
 
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .game-icon'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'touchstart',
-                listener: (event: Event) => this.onTouchStart(event),
-                selector: '.btn-download, .download-text'
-            },
-            {
-                event: 'touchend',
-                listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.btn-download, .download-text'
+            if (this._templateData.endscreenAlt === 'thirsty-button') {
+                this._bindings[0].selector = '.game-background, .game-icon';
+                this._bindings = this._bindings.concat([
+                    {
+                        event: 'touchstart',
+                        listener: (event: Event) => this.onTouchStart(event),
+                        selector: '.btn-download'
+                    },
+                    {
+                        event: 'touchend',
+                        listener: (event: Event) => this.onDownloadEvent(event),
+                        selector: '.btn-download'
+                    }
+                ]);
+
+                this._templateData.buildCSS = (): string => {
+                    const left = Math.random() * 90;
+                    const top = Math.random() * 110 + 10;
+                    const size = Math.random() * 50 + 5;
+                    const blur = Math.random() * size / 20;
+                    const duration = size / 3.25;
+
+                    return `left: ${left}%; top: ${top}%; -webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
+                };
             }
-        ];
+        }
     }
 
     public render(): void {
@@ -139,15 +144,13 @@ export class EndScreen extends View {
             return 'masterclass';
         }
 
-        /*
-        * Pseudo code
-        * TODO: Support proper a/b functionality
-        * */
-        if ('thirsty-button') {
+        const abGroup = campaign.getAbGroup();
+
+        if (abGroup === 10 || abGroup === 11) {
             return 'thirsty-button';
         }
 
-        if ('pulse-animation') {
+        if (abGroup === 8 || abGroup === 9) {
             return 'pulse-animation';
         }
 

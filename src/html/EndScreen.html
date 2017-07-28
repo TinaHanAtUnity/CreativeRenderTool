@@ -29,17 +29,23 @@
           </span>
                 <% } %>
             </div>
-            <div class="download-container btn-download">
-                <!--<a class="btn-download">-->
-                <span class="flash"></span>
-                <span class="download-text"><%= data.t("Download For Free") %></span>
-                <!--</a>-->
-                <% for (var i = 0; i < 25; i++) { %>
-                    <span class="bubble"
-                          style="<%= data.buildCSS() %>"
-                    ></span>
-                <% } %>
-            </div>
+
+            <% if (!!data.buildCSS) { %>
+                <div class="download-container btn-download">
+                    <span class="flash"></span>
+                    <span class="download-text"><%= data.t("Download For Free") %></span>
+                    <% for (var i = 0; i < 25; i++) { %>
+                        <span class="bubble" style="<%= data.buildCSS() %>"></span>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="download-container">
+                    <a class="btn-download">
+                        <span class="download-text"><%= data.t("Download For Free") %></span>
+                    </a>
+                </div>
+            <% } %>
+
         </div>
         <div class="privacy-button"><span class="icon-info"></span></div>
         <div class="unityads-logo"></div>
