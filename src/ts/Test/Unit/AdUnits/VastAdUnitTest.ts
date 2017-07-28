@@ -274,8 +274,7 @@ describe('VastAdUnit', () => {
             assert.equal(endScreen, vastEndScreen);
         });
 
-        // todo: temporarily disabled because somehow this test fails on Android hybrid tests and I was not able to figure out why, maybe something to do with orientations?
-        xit('it should fire companion tracking events', () => {
+        it('it should fire companion tracking events', () => {
             const width = 320;
             const height = 480;
             const url = 'http://example.com/companionCreativeView';
@@ -283,12 +282,11 @@ describe('VastAdUnit', () => {
                 'creativeView': [url]
             });
             sandbox.stub(vast, 'getLandscapeOrientedCompanionAd').returns(companion);
+            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
 
             const mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
-
             vastAdUnit.sendCompanionTrackingEvent(eventManager, '123', 1234);
-
             mockEventManager.verify();
         });
 
