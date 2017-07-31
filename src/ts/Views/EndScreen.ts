@@ -117,9 +117,7 @@ export class EndScreen extends View {
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
-        // TODO: not optimal way to tell the animation to start only when endcard is visible
-        // should be good enough for a/b testing
-        // maybe set it only if a/b testing campaign is on
+        // Requires for a/b testing animations
         this._container.classList.add('active-animation');
 
         if(AbstractAdUnit.getAutoClose()) {
