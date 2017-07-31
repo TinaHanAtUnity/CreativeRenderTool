@@ -1,3 +1,11 @@
+#end-screen
+  &.active-animation .btn-download
+    -webkit-transform: translatez(0);
+    transform: translatez(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+
 @-webkit-keyframes pulse {
   0% {
     -webkit-box-shadow: 0 0 rgba(22, 125, 251, 0);
