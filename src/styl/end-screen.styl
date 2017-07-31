@@ -1,5 +1,5 @@
 #end-screen
-  .bubble {
+  .bubble
     position: absolute;
     background: #fff;
     border-radius: 50%;
@@ -8,9 +8,8 @@
     -webkit-transform: translatez(0);
     transform: translatez(0);
     mix-blend-mode: overlay;
-  }
 
-  .flash {
+  .flash
     height: 100%;
     width: 30%;
     display: inline;
@@ -25,7 +24,6 @@
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     will-change: transform, opacity;
-  }
 
   // This is done, so animation runs only after endcard is visible
   // see EndScreen.ts:90. It improves fps alot between screen transitions
@@ -54,11 +52,11 @@
     height: 100%
 
     &.pulse-animation .btn-download
-      will-change: transform
+      will-change: transform;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      position relative
-      top 0.5rem
+      position: relative;
+      top: 0.5rem;
       -webkit-transform: scale(0.75);
       transform: scale(0.75);
 
