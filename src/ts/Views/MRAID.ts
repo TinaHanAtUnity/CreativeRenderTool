@@ -16,16 +16,6 @@ export interface IOrientationProperties {
     forceOrientation: ForceOrientation;
 }
 
-class Dimensions {
-    public width: number;
-    public height: number;
-
-    constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
-    }
-}
-
 export class MRAID extends View {
 
     public readonly onClick = new Observable1<string>();
@@ -44,7 +34,6 @@ export class MRAID extends View {
     private _loaded = false;
 
     private _messageListener: any;
-    private _resizeHandler: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -73,8 +62,6 @@ export class MRAID extends View {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-
-        this.updateIFrameDimensions();
 
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
@@ -143,11 +130,6 @@ export class MRAID extends View {
                 this.onLoaded.unsubscribe(observer);
             });
         }
-
-        this._resizeHandler = (event: Event) => {
-            this.updateIFrameDimensions();
-        };
-        window.addEventListener('resize', this._resizeHandler, false);
     }
 
     public hide() {
@@ -158,10 +140,6 @@ export class MRAID extends View {
         if(this._messageListener) {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
-        }
-        if(this._resizeHandler) {
-            window.removeEventListener('resize', this._resizeHandler, false);
-            this._resizeHandler = undefined;
         }
         super.hide();
     }
@@ -185,20 +163,6 @@ export class MRAID extends View {
             this._iframe.contentWindow.postMessage({
                 type: 'viewable',
                 value: viewable
-            }, '*');
-        }
-    }
-
-    private updateIFrameDimensions() {
-        const dimensions = this.getWindowDimensions();
-        this._iframe.width = dimensions.width.toString();
-        this._iframe.height = dimensions.height.toString();
-
-        if (this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage({
-                type: 'resize',
-                width: dimensions.width,
-                height: dimensions.height
             }, '*');
         }
     }
@@ -297,22 +261,5 @@ export class MRAID extends View {
         } else {
             return Promise.resolve(this._campaign.getResource());
         }
-    }
-
-    private getWindowDimensions(): Dimensions {
-        let width, height;
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(Math.abs(<number>window.orientation) === 90) {
-                width = screen.height;
-                height = screen.width;
-            } else {
-                width = screen.width;
-                height = screen.height;
-            }
-        } else {
-            width = window.innerWidth;
-            height = window.innerHeight;
-        }
-        return new Dimensions(width, height);
     }
 }
