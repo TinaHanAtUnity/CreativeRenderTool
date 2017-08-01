@@ -125,6 +125,14 @@ export class AuctionCampaignManager extends CampaignManager {
                     campaigns: campaigns,
                     rawResponse: response.response
                 });
+            } else {
+                if(campaigns === 1 && noFill.length > 0) {
+                    Diagnostics.trigger('fill_nofill_plc_mix', {
+                        campaigns: campaigns,
+                        noFillPlacements: noFill.length,
+                        rawResponse: response.response
+                    });
+                }
             }
 
             return Promise.all(promises).catch(error => {
