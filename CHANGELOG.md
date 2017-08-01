@@ -1,3 +1,27 @@
+# Tue Jul 25 06:44:19 UTC 2017
+
+* Trigger mraid viewableChange event on system pause and resume
+* Follow redirects if clickAttributionUrlFollowsRedirects is true on MRAID campaigns
+* Fix some video_player_stuck errors
+
+# Tue Jul 18 10:07:39 UTC 2017
+
+* Remove A/B tests for groups 6, 7 (refresh intervals) & 13 (adaptive caching)
+
+# Fri Jul 14 08:59:40 UTC 2017
+
+* CPI MRAID click attribution url was not fired (ABT-255)
+
+# Wed Jul 12 12:43:02 UTC 2017
+
+* Test adaptive caching on A/B group 13
+
+# Wed Jul 12 09:10:06 UTC 2017
+
+* VAST companion tracking
+* Stop sending errors for properly stopped caching
+* Send diagnostic error if game is not enabled in config response
+
 # Mon Jul 10 06:56:26 UTC 2017
 
 * Catch a few different init errors instead of failing entire init

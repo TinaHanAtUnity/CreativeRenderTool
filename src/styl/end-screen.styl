@@ -87,8 +87,8 @@
     color: #ffffff
     display: block
     background: #167dfb
-    left: 0px
-    right: 0px
+    left: 0
+    right: 0
 
   .privacy-button
     position: absolute
@@ -99,8 +99,8 @@
     font-size: 22px
 
   .btn-download
-    margin: 0 15px 0 15px
-    padding: 10px 10px 10px 10px
+    margin: 0 15px
+    padding: 10px
     border-radius: 10px
     font-size: 18pt
     line-height: 24pt
@@ -185,7 +185,7 @@ body.android
         font-size: 15pt
 
       .btn-download
-        padding: 5px 5px 5px 5px
+        padding: 5px
         font-size: 16pt
 
     &.landscape
@@ -205,7 +205,7 @@ body.android
         margin-top: 10px
 
       .btn-download
-        padding: 15px 10px 15px 10px
+        padding: 15px 10px
 
     &.landscape
       #end-screen
@@ -236,13 +236,17 @@ body.android
           padding-top: 115px
 
         .btn-download
-          padding: 10px 10px 10px 10px // 384 x 360 - LG Optimus G
+          padding: 10px
+
+  // 384 x 360 - LG Optimus G
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
     &.landscape
       #end-screen
         .btn-download
-          padding: 15px 10px 15px 10px;
-          font-size: 16pt; // 424 x 753 - LG Optimus 4X HD
+          padding: 15px 10px
+          font-size: 16pt;
+
+  // 424 x 753 - LG Optimus 4X HD
   @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px)
     #end-screen
       .name-container
@@ -259,7 +263,7 @@ body.android
         font-size: 24px
 
       .btn-download
-        padding: 25px 20px 25px 20px
+        padding: 25px 20px
         font-size: 22pt
         line-height: 22pt
 
@@ -274,7 +278,9 @@ body.android
 
         .btn-download
           font-size: 19pt
-          line-height: 19pt // 540 x 960 - Motorola Droid 3
+          line-height: 19pt
+
+  // 540 x 960 - Motorola Droid 3
   @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px)
     #end-screen
       .btn-close-region
@@ -319,7 +325,9 @@ body.android
         .btn-download
           padding: 25px 20px 25px 20px
           font-size: 21pt
-          line-height: 21pt // 960 x 600 - Google Nexus 7
+          line-height: 21pt
+
+  // 960 x 600 - Google Nexus 7
   @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px)
     #end-screen
       .name-container
@@ -327,7 +335,9 @@ body.android
 
       .unityads-logo
         width: 153px
-        height: 36px // 1024 x 600 - Samsung Galaxy Tab 7"
+        height: 36px
+
+  // 1024 x 600 - Samsung Galaxy Tab 7"
   @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px)
     #end-screen
       .name-container
@@ -344,7 +354,9 @@ body.android
         .btn-download
           padding: 30px 20px 30px 20px
           font-size: 24pt
-          line-height: 24pt // 1024 x 768 - iPad
+          line-height: 24pt
+
+  // 1024 x 768 - iPad
   @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px)
     #end-screen
       font-weight: lighter
@@ -371,7 +383,9 @@ body.android
 
         .game-rating
           font-size: 45px
-          letter-spacing: 5px // 800 x 1280 - Samsung Galaxy Tab 10
+          letter-spacing: 5px
+
+  // 800 x 1280 - Samsung Galaxy Tab 10
   @media screen and (min-height: 800px) and (min-width: 1280px), screen and (min-height: 1280px) and (min-width: 800px)
     #end-screen
       font-weight: lighter
@@ -397,7 +411,7 @@ body.android
         font-size: 45px
 
       .btn-download
-        padding: 45px 25px 45px 25px
+        padding: 45px 25px
         font-size: 35pt
         line-height: 35pt
 
@@ -408,6 +422,6 @@ body.android
           padding-top: 200px
 
         .btn-download
-          padding: 40px 20px 40px 20px
+          padding: 40px 20px
           font-size: 30pt
           line-height: 30pt

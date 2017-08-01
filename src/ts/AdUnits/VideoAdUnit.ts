@@ -31,6 +31,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _deviceInfo: DeviceInfo;
     private _videoOrientation: 'landscape' | 'portrait' | undefined;
     private _lowMemory: boolean;
+    private _prepareCalled: boolean;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
@@ -40,6 +41,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._overlay = overlay;
         this._deviceInfo = deviceInfo;
         this._options = options;
+        this._prepareCalled = false;
 
         this._lowMemory = false;
     }
@@ -51,7 +53,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
+        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
         return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), this._options);
@@ -71,6 +73,14 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
+    }
+
+    public isPrepareCalled(): boolean {
+        return this._prepareCalled;
+    }
+
+    public setPrepareCalled(prepareCalled: boolean): void {
+        this._prepareCalled = prepareCalled;
     }
 
     public isCached(): boolean {
@@ -120,6 +130,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             }
 
             this.getValidVideoUrl().then(url => {
+                this.setPrepareCalled(true);
                 this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
             });
         }
@@ -132,10 +143,15 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         }
     }
 
-    protected onSystemInterrupt(): void {
+    protected onSystemInterrupt(interruptStarted: boolean): void {
         if(this.isShowing() && this.isActive()) {
-            this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
-            this._nativeBridge.VideoPlayer.play();
+            if(interruptStarted) {
+                this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
+                this._nativeBridge.VideoPlayer.pause();
+            } else {
+                this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+                this._nativeBridge.VideoPlayer.play();
+            }
         }
     }
 

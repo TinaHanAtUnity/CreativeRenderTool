@@ -9,6 +9,7 @@ import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { Observable0 } from 'Utilities/Observable';
 
 export enum CacheStatus {
     OK,
@@ -67,6 +68,7 @@ interface ICallbackObject {
 }
 
 export class Cache {
+    public onFastConnectionDetected: Observable0 = new Observable0();
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -80,6 +82,10 @@ export class Cache {
 
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
+
+    private _currentDownloadPosition: number = -1;
+    private _lastProgressEvent: number;
+    private _fastConnectionDetected: boolean = false;
 
     private _sendDiagnosticEvents = false;
 
@@ -97,7 +103,7 @@ export class Cache {
 
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
-        this._nativeBridge.Cache.setProgressInterval(500);
+        this._nativeBridge.Cache.setProgressInterval(250);
         this._nativeBridge.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
         this._nativeBridge.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
         this._nativeBridge.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
@@ -351,8 +357,21 @@ export class Cache {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
-                    return (width > 0 && height > 0 && duration > 0);
+                    const isValid = (width > 0 && height > 0 && duration > 0);
+                    if(!isValid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: video.getOriginalUrl(),
+                            width: width,
+                            height: height,
+                            duration: duration
+                        });
+                    }
+                    return isValid;
                 }).catch(error => {
+                    Diagnostics.trigger('video_validation_failed', {
+                        url: video.getOriginalUrl(),
+                        error: error
+                    });
                     return false;
                 });
             } else {
@@ -385,8 +404,21 @@ export class Cache {
                         }
                     }
 
-                    return (width > 0 && height > 0 && duration > 0);
+                    const isValid = (width > 0 && height > 0 && duration > 0);
+                    if(!isValid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: video.getOriginalUrl(),
+                            width: width,
+                            height: height,
+                            duration: duration
+                        });
+                    }
+                    return isValid;
                 }).catch(error => {
+                    Diagnostics.trigger('video_validation_failed', {
+                        url: video.getOriginalUrl(),
+                        error: error
+                    });
                     return false;
                 });
             }
@@ -557,6 +589,8 @@ export class Cache {
     }
 
     private onDownloadStarted(url: string, size: number, totalSize: number, responseCode: number, headers: Array<[string, string]>): void {
+        this.updateProgress(0, false);
+
         const callback = this._callbacks[url];
 
         callback.startTimestamp = Date.now();
@@ -571,10 +605,14 @@ export class Cache {
     }
 
     private onDownloadProgress(url: string, size: number, totalSize: number): void {
+        this.updateProgress(size, false);
+
         this._nativeBridge.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): void {
+        this.updateProgress(size, true);
+
         const callback = this._callbacks[url];
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
@@ -628,6 +666,8 @@ export class Cache {
     }
 
     private onDownloadStopped(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: Array<[string, string]>): void {
+        this.updateProgress(size, true);
+
         const callback = this._callbacks[url];
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
@@ -798,6 +838,30 @@ export class Cache {
         if(deleteValue) {
             this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'caching.pause');
             this._nativeBridge.Storage.write(StorageType.PUBLIC);
+        }
+    }
+
+    private updateProgress(position: number, finished: boolean) {
+        const deltaPosition: number = position - this._currentDownloadPosition;
+        const deltaTime: number = Date.now() - this._lastProgressEvent;
+
+        if(position > 0 && deltaPosition > 153600) { // sample size must be at least 150 kilobytes
+            // speed in kilobytes per second (same as bytes per millisecond)
+            const speed: number = deltaPosition / deltaTime;
+
+            // if speed is over 1 megabytes per second (8mbps), the connection is fast enough for streaming
+            if(speed > 1024 && !this._fastConnectionDetected) {
+                this._fastConnectionDetected = true;
+                this.onFastConnectionDetected.trigger();
+            }
+        }
+
+        if(finished) {
+            this._currentDownloadPosition = 0;
+            this._fastConnectionDetected = false;
+        } else {
+            this._currentDownloadPosition = position;
+            this._lastProgressEvent = Date.now();
         }
     }
 

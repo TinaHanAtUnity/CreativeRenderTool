@@ -282,12 +282,11 @@ describe('VastAdUnit', () => {
                 'creativeView': [url]
             });
             sandbox.stub(vast, 'getLandscapeOrientedCompanionAd').returns(companion);
+            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
 
             const mockEventManager = sinon.mock(eventManager);
             mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
-
             vastAdUnit.sendCompanionTrackingEvent(eventManager, '123', 1234);
-
             mockEventManager.verify();
         });
 

@@ -59,7 +59,7 @@ export class ViewController extends AdUnitContainer {
 
         this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, []);
+        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + ForceOrientation[this._lockedOrientation]);
 
@@ -150,12 +150,12 @@ export class ViewController extends AdUnitContainer {
         switch(event) {
             case ViewController._appWillResignActive:
                 this._paused = true;
-                this.onSystemPause.trigger();
+                this.onSystemInterrupt.trigger(true);
                 break;
 
             case ViewController._appDidBecomeActive:
                 this._paused = false;
-                this.onSystemInterrupt.trigger();
+                this.onSystemInterrupt.trigger(false);
                 break;
 
             case ViewController._audioSessionInterrupt:
@@ -163,13 +163,19 @@ export class ViewController extends AdUnitContainer {
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
-                        this.onSystemInterrupt.trigger();
+                        this.onSystemInterrupt.trigger(false);
                     }
+                } else if(interruptData.AVAudioSessionInterruptionTypeKey === 1) {
+                    this.onSystemInterrupt.trigger(true);
                 }
                 break;
 
             case ViewController._audioSessionRouteChange:
-                this.onSystemInterrupt.trigger();
+                const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
+                if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
+                    this.onSystemInterrupt.trigger(false);
+                }
+
                 break;
 
             default:

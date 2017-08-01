@@ -9,6 +9,9 @@ interface IMRAIDCampaign extends ICampaign {
     dynamicMarkup: string | undefined;
     additionalTrackingEvents: { [eventName: string]: string[] };
 
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
+
     gameName: string | undefined;
     gameIcon: Image | undefined;
     rating: number | undefined;
@@ -23,6 +26,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             resource: ['string', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             additionalTrackingEvents: ['object', 'undefined'],
+            clickAttributionUrl: ['string', 'undefined'],
+            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
@@ -38,6 +43,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('dynamicMarkup', campaign.dynamicMarkup);
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
 
+        this.set('adType', adType || undefined);
+        this.set('correlationId', correlationId || undefined);
+        this.set('creativeId', creativeId || undefined);
+        this.set('seatId', seatId || undefined);
+
+        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
+        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
+
         this.set('gameName', campaign.gameName);
 
         if(campaign.gameIcon) {
@@ -45,11 +58,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         }
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
-
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('seatId', seatId || undefined);
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -107,6 +115,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getTrackingEventUrls(): { [eventName: string]: string[] } {
         return this.get('additionalTrackingEvents');
+    }
+
+    public getClickAttributionUrl(): string | undefined {
+        return this.get('clickAttributionUrl');
+    }
+
+    public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
+        return this.get('clickAttributionUrlFollowsRedirects');
     }
 
     public getDTO(): { [key: string]: any } {

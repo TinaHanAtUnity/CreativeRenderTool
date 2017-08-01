@@ -30,6 +30,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
+import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
 
 export class AdUnitFactory {
 
@@ -117,13 +118,9 @@ export class AdUnitFactory {
 
         mraid.render();
         document.body.appendChild(mraid.container());
-        mraid.onClick.subscribe(() => {
-            nativeBridge.Listener.sendClickEvent(placement.getId());
-            sessionManager.sendThirdQuartile(mraidAdUnit);
-            sessionManager.sendView(mraidAdUnit);
-            sessionManager.sendClick(mraidAdUnit);
-            mraidAdUnit.sendClick();
-        });
+
+        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, sessionManager, url));
+
         mraid.onReward.subscribe(() => {
             sessionManager.sendThirdQuartile(mraidAdUnit);
         });
@@ -241,13 +238,7 @@ export class AdUnitFactory {
     private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
-        const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => {
-            if(likelyToKeepUp === true) {
-                if(!container.isPaused()) {
-                    nativeBridge.VideoPlayer.play();
-                }
-            }
-        });
+        const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => VideoEventHandlers.onIosVideoLikelyToKeepUp(nativeBridge, videoAdUnit, container, likelyToKeepUp));
 
         videoAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.unsubscribe(onLikelyToKeepUpObserver);
