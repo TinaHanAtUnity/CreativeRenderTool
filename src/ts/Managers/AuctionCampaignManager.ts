@@ -150,7 +150,6 @@ export class AuctionCampaignManager extends CampaignManager {
         switch (contentType) {
             case 'comet/campaign':
                 const json = JsonParser.parse(content);
-                json.mraidUrl = 'https://unityads-cdn-origin.s3.amazonaws.com/playables/production/android/roll-the-ball/index.html';
                 if(json && json.mraidUrl) {
                     const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
                     return this.setupPlcCampaignAssets(placements, campaign);
