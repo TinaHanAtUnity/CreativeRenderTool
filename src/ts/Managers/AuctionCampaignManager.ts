@@ -15,6 +15,7 @@ import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { CacheStatus } from 'Utilities/Cache';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -111,10 +112,19 @@ export class AuctionCampaignManager extends CampaignManager {
                 promises.push(this.handlePlcNoFill(placement));
             }
 
+            let campaigns: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
+                    campaigns++;
                     promises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
                 }
+            }
+
+            if(campaigns > 1) {
+                Diagnostics.trigger('multiple_plc_campaigns', {
+                    campaigns: campaigns,
+                    rawResponse: response.response
+                });
             }
 
             return Promise.all(promises).catch(error => {
