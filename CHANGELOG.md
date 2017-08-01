@@ -1,3 +1,10 @@
+# Tue Aug  1 13:08:27 UTC 2017
+
+* Endscreen download button A/B test in groups 8, 9, 10 and 11
+* Fix for some iOS video_player_stuck cases
+* Improved video_validation_failed diagnostics
+* Send multiple_plc_campaigns whenever SDK receives different kinds of fill to different placements
+
 # Tue Jul 25 06:44:19 UTC 2017
 
 * Trigger mraid viewableChange event on system pause and resume
