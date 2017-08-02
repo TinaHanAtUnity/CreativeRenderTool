@@ -10,9 +10,20 @@ const LocalStorage = require('node-localstorage').LocalStorage;
 const exec = require('child_process').exec;
 
 const { document } = new JSDOM('').window;
+
+class CustomDOMParser {
+    parseFromString(markup, type) {
+        if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
+            return new JSDOM(markup).window.document;
+		} else {
+			return DOMParser.prototype.parseFromString.apply(new DOMParser(), arguments);
+		}
+    };
+}
+
 global.document = document;
 global.window = document.defaultView;
-global.DOMParser = DOMParser;
+global.DOMParser = CustomDOMParser;
 global.XMLHttpRequest = XMLHttpRequest;
 global.window.localStorage = new LocalStorage('./localStorage');
 global.window.sessionStorage = new LocalStorage('./sessionStorage');

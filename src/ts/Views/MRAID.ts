@@ -197,12 +197,14 @@ export class MRAID extends View {
     public createMRAID(): Promise<string> {
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
+                mraid = decodeURIComponent(mraid);
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
+                mraid = this.replaceMraidSources(mraid);
 
-                return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
+                return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
         });
@@ -215,6 +217,15 @@ export class MRAID extends View {
                 value: viewable
             }, '*');
         }
+    }
+
+    private replaceMraidSources(mraid: string): string {
+        const dom = new DOMParser().parseFromString(mraid, "text/html");
+        const src = dom.documentElement.querySelector('script[src="mraid.js"]');
+        if (src && src.parentNode) {
+            src.parentNode.removeChild(src);
+        }
+        return dom.documentElement.outerHTML;
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {

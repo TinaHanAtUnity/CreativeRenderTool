@@ -34,7 +34,7 @@ describe('MRAID', () => {
     });
 
     it('should render', (done) => {
-        const campaign = new MRAIDCampaign({id: '123abc'}, '123456', 1, undefined, `<script src="mraid.js"></script><div>Hello</div>`);
+        const campaign = new MRAIDCampaign({id: '123abc'}, '123456', 1, undefined, `<div><script src="mraid.js"></script><div>Hello</div></div>`);
         const mraid = new MRAID(nativeBridge, placement, campaign);
 
         mraid.render();
@@ -56,7 +56,7 @@ describe('MRAID', () => {
     });
 
     it('should replace placeholder with dynamic markup injected', () => {
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, '123456', 1, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`);
+        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, '123456', 1, undefined, `<div><script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div></div>`);
         const mraid = new MRAID(nativeBridge, placement, campaign);
         return mraid.createMRAID().then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
