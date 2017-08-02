@@ -46,6 +46,7 @@ export abstract class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable1<WebViewError>();
+    public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
