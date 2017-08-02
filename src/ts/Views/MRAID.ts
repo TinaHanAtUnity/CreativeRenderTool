@@ -83,27 +83,35 @@ export class MRAID extends View {
 
     public show(): void {
         super.show();
+        if(this._campaign.getAbGroup() === 5) {
+            this._loadingScreen.style.display = 'block';
+            this._loadingScreenTimeout = setTimeout(() => {
+                if(this._iframeLoaded) {
+                    this.showPlayable();
+                } else {
+                    this._prepareTimeout = setTimeout(() => {
+                        this._canClose = true;
+                        this._closeElement.style.opacity = '1';
+                        this._closeElement.style.display = 'block';
+                        this.updateProgressCircle(this._closeElement, 1);
 
-        this._loadingScreenTimeout = setTimeout(() => {
+                        const resourceUrl = this._campaign.getResourceUrl();
+                        Diagnostics.trigger('playable_prepare_timeout', {
+                            'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
+                        });
+
+                        this._prepareTimeout = undefined;
+                    }, 5000);
+                }
+                this._loadingScreenTimeout = undefined;
+            }, 1500);
+        } else {
             if(this._iframeLoaded) {
                 this.showPlayable();
             } else {
-                this._prepareTimeout = setTimeout(() => {
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this._closeElement.style.display = 'block';
-                    this.updateProgressCircle(this._closeElement, 1);
-
-                    const resourceUrl = this._campaign.getResourceUrl();
-                    Diagnostics.trigger('playable_prepare_timeout', {
-                        'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
-                    });
-
-                    this._prepareTimeout = undefined;
-                }, 5000);
+                // onIframeLoaded function handles load events
             }
-            this._loadingScreenTimeout = undefined;
-        }, 2000);
+        }
     }
 
     public render() {
@@ -159,7 +167,7 @@ export class MRAID extends View {
     }
 
     public setViewableState(viewable: boolean) {
-        if(this._iframeLoaded) {
+        if(this._iframeLoaded && !this._loadingScreenTimeout) {
             this._iframe.contentWindow.postMessage({
                 type: 'viewable',
                 value: viewable
@@ -224,24 +232,33 @@ export class MRAID extends View {
             }, 1000);
         }
 
-        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-            if (this._loadingScreen.style.display === 'none') {
-                return;
-            }
+        if(this._campaign.getAbGroup() === 5) {
+            ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+                if(this._loadingScreen.style.display === 'none') {
+                    return;
+                }
 
-            this._loadingScreen.addEventListener(e, () => {
-                this._closeElement.style.display = 'block';
+                this._loadingScreen.addEventListener(e, () => {
+                    this._closeElement.style.display = 'block';
 
-                this._iframe.contentWindow.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
+                    this._iframe.contentWindow.postMessage({
+                        type: 'viewable',
+                        value: true
+                    }, '*');
 
-                this._loadingScreen.style.display = 'none';
-            }, false);
-        });
+                    this._loadingScreen.style.display = 'none';
+                }, false);
+            });
 
-        this._loadingScreen.classList.add('hidden');
+            this._loadingScreen.classList.add('hidden');
+        } else {
+            this._closeElement.style.display = 'block';
+            this._iframe.contentWindow.postMessage({
+                type: 'viewable',
+                value: true
+            }, '*');
+        }
+
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
