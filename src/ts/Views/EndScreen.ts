@@ -21,6 +21,8 @@ export class EndScreen extends View {
     private _localization: Localization;
     private _isMasterClassCampaign = false;
 
+    private downloadButton: HTMLElement;
+
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
@@ -32,20 +34,6 @@ export class EndScreen extends View {
         }
 
         this._template = new Template(EndScreenTemplate, this._localization);
-
-        if(campaign) {
-            const adjustedRating: number = campaign.getRating() * 20;
-            this._templateData = {
-                'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon().getUrl(),
-                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-                'endScreenLandscape': campaign.getPortrait().getUrl(),
-                'endScreenPortrait': campaign.getLandscape().getUrl(),
-                'rating': adjustedRating.toString(),
-                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
-            };
-        }
 
         this._bindings = [
             {
@@ -64,6 +52,46 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+
+        if (campaign) {
+            const adjustedRating: number = campaign.getRating() * 20;
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortrait().getUrl(),
+                'endScreenPortrait': campaign.getLandscape().getUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
+                'endscreenAlt': this.getEndscreenAlt(campaign)
+            };
+
+            if (this._templateData.endscreenAlt === 'thirsty-button') {
+                this._bindings[0].selector = '.game-background, .game-icon';
+                this._bindings = this._bindings.concat([
+                    {
+                        event: 'touchstart',
+                        listener: (event: Event) => this.onTouchStart(event),
+                        selector: '.btn-download'
+                    },
+                    {
+                        event: 'touchend',
+                        listener: (event: Event) => this.onDownloadEvent(event),
+                        selector: '.btn-download'
+                    }
+                ]);
+
+                this._templateData.buildCSS = (): string => {
+                    const left = Math.random() * 90;
+                    const top = Math.random() * 110 + 10;
+                    const size = Math.random() * 50 + 5;
+                    const blur = Math.random() * size / 20;
+                    const duration = size / 3.25;
+
+                    return `left: ${left}%; top: ${top}%; -webkit-animation-duration: ${duration}s;animation-duration: ${duration}s;-webkit-filter: blur(${blur}px);filter: blur(${blur}px); height: ${size}px; width: ${size}px`;
+                };
+            }
+        }
     }
 
     public render(): void {
@@ -73,6 +101,8 @@ export class EndScreen extends View {
             const downloadText: HTMLElement = <HTMLElement>this._container.querySelector('.download-text');
             downloadText.innerHTML = 'Find Out More';
         }
+
+        this.downloadButton = <HTMLElement>this._container.querySelector('.btn-download');
     }
 
     public show(): void {
@@ -87,6 +117,9 @@ export class EndScreen extends View {
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
+        // Requires for a/b testing animations
+        this._container.classList.add('active-animation');
+
         if(AbstractAdUnit.getAutoClose()) {
            setTimeout(() => {
                this.onClose.trigger();
@@ -97,7 +130,7 @@ export class EndScreen extends View {
     public hide(): void {
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
@@ -109,11 +142,23 @@ export class EndScreen extends View {
             return 'masterclass';
         }
 
+        const abGroup = campaign.getAbGroup();
+
+        if (abGroup === 10 || abGroup === 11) {
+            return 'thirsty-button';
+        }
+
+        if (abGroup === 8 || abGroup === 9) {
+            return 'pulse-animation';
+        }
+
         return undefined;
     }
 
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
+        this.downloadButton.classList.remove('active');
         this.onDownload.trigger();
     }
 
@@ -139,4 +184,8 @@ export class EndScreen extends View {
         });
     }
 
+    private onTouchStart(event: Event) {
+        event.preventDefault();
+        this.downloadButton.classList.add('active');
+    }
 }

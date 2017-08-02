@@ -27,7 +27,6 @@ export abstract class AdUnitContainer {
     public readonly onShow = new Observable0(); // ad unit becomes visible
     public readonly onSystemKill = new Observable0(); // ad unit killed by the system (Android only)
     public readonly onAndroidPause = new Observable0(); // ad unit paused (Android only)
-    public readonly onSystemPause = new Observable0(); // ad unit has been resigned from active (iOS only)
     public readonly onSystemInterrupt = new Observable1<boolean>(); // ad unit has been interrupted and video has been paused (iOS only)
     public readonly onLowMemoryWarning = new Observable0(); // ad unit has received low memory warning (iOS only)
 
