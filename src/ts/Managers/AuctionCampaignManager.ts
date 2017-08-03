@@ -15,6 +15,7 @@ import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { CacheStatus } from 'Utilities/Cache';
+import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -110,7 +111,7 @@ export class AuctionCampaignManager extends CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handlePlcNoFill(placement));
-                refreshDelay = 3600;
+                refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
             for(const mediaId in fill) {
@@ -120,7 +121,7 @@ export class AuctionCampaignManager extends CampaignManager {
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > refreshDelay) {
+                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
