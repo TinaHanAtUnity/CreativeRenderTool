@@ -10,7 +10,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
-    private static NoFillDelay = 3600;
+    public static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -30,6 +30,7 @@ export class CampaignRefreshManager {
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe(error => this.onError(error));
+        this._campaignManager.onAdPlanReceived.subscribe(refreshDelay => this.onAdPlanReceived(refreshDelay));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -135,9 +136,7 @@ export class CampaignRefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
-        if (this._configuration.isAuction()) {
-            // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
-            this._refillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
+        if(this._configuration.isAuction()) {
             this.setCampaignForPlacement(placementId, campaign);
             this.handlePlacementState(placementId, PlacementState.READY);
         } else {
@@ -209,6 +208,13 @@ export class CampaignRefreshManager {
             });
         } else {
             this.setPlacementStates(PlacementState.NO_FILL);
+        }
+    }
+
+    private onAdPlanReceived(refreshDelay: number) {
+        if(refreshDelay > 0) {
+            this._refillTimestamp = Date.now() + refreshDelay * 1000;
+            this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + refreshDelay + ' seconds');
         }
     }
 

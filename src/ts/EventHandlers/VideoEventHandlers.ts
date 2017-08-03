@@ -12,6 +12,7 @@ import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitCon
 import { Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class VideoEventHandlers {
 
@@ -142,6 +143,11 @@ export class VideoEventHandlers {
                         cacheMode: configuration.getCacheMode(),
                         lowMemory: adUnit.isLowMemory()
                     };
+
+                    if(nativeBridge.getPlatform() === Platform.IOS && adUnit.getContainer() instanceof ViewController) {
+                        const container = <ViewController>adUnit.getContainer();
+                        error.events = container.getDiagnosticsEvents();
+                    }
 
                     const fileId = adUnit.getVideo().getFileId();
 
