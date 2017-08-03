@@ -1,3 +1,8 @@
+# Thu Aug  3 16:05:47 UTC 2017
+
+* Fix VAST campaign expiration
+* Fix a race condition with iOS video preparing and system events
+
 # Thu Aug  3 09:26:02 UTC 2017
 
 * Modify auction ad plan expiration to match old yield ad plan expiration
