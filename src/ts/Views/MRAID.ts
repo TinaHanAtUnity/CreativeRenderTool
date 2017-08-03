@@ -197,7 +197,6 @@ export class MRAID extends View {
     public createMRAID(): Promise<string> {
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
-                mraid = decodeURIComponent(mraid);
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
