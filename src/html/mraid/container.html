@@ -66,6 +66,13 @@
                     }
                 }, false);
 
+                window.addEventListener('resize', function(e) {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    trigger('sizeChange', [width, height]);
+                });
+
+
                 window.addEventListener('DOMContentLoaded', function() {
                     window.parent.postMessage({
                         type: 'loaded'
