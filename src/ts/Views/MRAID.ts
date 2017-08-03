@@ -90,29 +90,9 @@ export class MRAID extends View {
     public show(): void {
         super.show();
         if(this._loadingScreenAbTest) {
-            this._loadingScreen.style.display = 'block';
-            this._loadingScreenTimeout = setTimeout(() => {
-                if(this._iframeLoaded) {
-                    this.showPlayable();
-                } else {
-                    this._prepareTimeout = setTimeout(() => {
-                        this._canClose = true;
-                        this._closeElement.style.opacity = '1';
-                        this._closeElement.style.display = 'block';
-                        this.updateProgressCircle(this._closeElement, 1);
-
-                        const resourceUrl = this._campaign.getResourceUrl();
-                        Diagnostics.trigger('playable_prepare_timeout', {
-                            'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
-                        });
-
-                        this._prepareTimeout = undefined;
-                    }, 5000);
-                }
-                this._loadingScreenTimeout = undefined;
-            }, 1500);
+            this.showLoadingScreen();
         } else {
-            // if not loaded, onIframeLoaded function shows the playable on the loaded event
+            // if not loaded, onIframeLoaded function shows the playable on the onload event
             if(this._iframeLoaded) {
                 this.showPlayable();
             }
@@ -189,6 +169,31 @@ export class MRAID extends View {
 
             this.showPlayable();
         }
+    }
+
+    private showLoadingScreen() {
+        this._loadingScreen.style.display = 'block';
+        this._loadingScreenTimeout = setTimeout(() => {
+            if(this._iframeLoaded) {
+                this.showPlayable();
+            } else {
+                // start the prepare timeout and wait for the onload event
+                this._prepareTimeout = setTimeout(() => {
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this._closeElement.style.display = 'block';
+                    this.updateProgressCircle(this._closeElement, 1);
+
+                    const resourceUrl = this._campaign.getResourceUrl();
+                    Diagnostics.trigger('playable_prepare_timeout', {
+                        'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
+                    });
+
+                    this._prepareTimeout = undefined;
+                }, 5000);
+            }
+            this._loadingScreenTimeout = undefined;
+        }, 1500);
     }
 
     private showPlayable() {
