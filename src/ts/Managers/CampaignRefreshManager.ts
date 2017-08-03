@@ -10,7 +10,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
-    private static NoFillDelay = 3600;
+    public static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
