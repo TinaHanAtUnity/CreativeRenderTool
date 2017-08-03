@@ -43,6 +43,8 @@ export class MRAID extends View {
     private _canSkip = false;
     private _didReward = false;
 
+    private _loadingScreenAbTest = false;
+
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'mraid');
 
@@ -69,7 +71,6 @@ export class MRAID extends View {
             if(ratingCount) {
                 this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
             }
-
         }
 
         this._bindings = [
@@ -79,11 +80,16 @@ export class MRAID extends View {
                 selector: '.close-region'
             }
         ];
+
+        const resourceUrl = this._campaign.getResourceUrl();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/roll-the-ball/) && campaign.getAbGroup() === 5) {
+            this._loadingScreenAbTest = true;
+        }
     }
 
     public show(): void {
         super.show();
-        if(this._campaign.getAbGroup() === 5) {
+        if(this._loadingScreenAbTest) {
             this._loadingScreen.style.display = 'block';
             this._loadingScreenTimeout = setTimeout(() => {
                 if(this._iframeLoaded) {
@@ -106,10 +112,9 @@ export class MRAID extends View {
                 this._loadingScreenTimeout = undefined;
             }, 1500);
         } else {
+            // if not loaded, onIframeLoaded function shows the playable on the loaded event
             if(this._iframeLoaded) {
                 this.showPlayable();
-            } else {
-                // onIframeLoaded function handles load events
             }
         }
     }
@@ -232,7 +237,7 @@ export class MRAID extends View {
             }, 1000);
         }
 
-        if(this._campaign.getAbGroup() === 5) {
+        if(this._loadingScreenAbTest) {
             ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
                 if(this._loadingScreen.style.display === 'none') {
                     return;
