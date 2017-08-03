@@ -27,6 +27,7 @@ export class VideoEventHandlers {
         }
 
         adUnit.setPrepareCalled(false);
+        adUnit.setVideoReady(true);
 
         if(duration > 40000) {
             const campaign = adUnit.getCampaign();

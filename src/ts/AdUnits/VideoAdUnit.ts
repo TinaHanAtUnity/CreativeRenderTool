@@ -32,11 +32,13 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _videoOrientation: 'landscape' | 'portrait' | undefined;
     private _lowMemory: boolean;
     private _prepareCalled: boolean;
+    private _videoReady: boolean;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._video = video;
+        this._videoReady = false;
         this._active = false;
         this._overlay = overlay;
         this._deviceInfo = deviceInfo;
@@ -73,6 +75,14 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
+    }
+
+    public isVideoReady(): boolean {
+        return this._videoReady;
+    }
+
+    public setVideoReady(ready: boolean): void {
+        this._videoReady = ready;
     }
 
     public isPrepareCalled(): boolean {
@@ -148,7 +158,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             if(interruptStarted) {
                 this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
                 this._nativeBridge.VideoPlayer.pause();
-            } else {
+            } else if (!interruptStarted && this.isVideoReady()) {
                 this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }
