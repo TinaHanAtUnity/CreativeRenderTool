@@ -318,9 +318,12 @@ export class AdUnitFactory {
         view.render();
         document.body.appendChild(view.container());
 
-        view.onClose.subscribe(() => {
-            view.hide();
-        });
+        const onClose = () => {
+            programmaticAdUnit.hide();
+        };
+
+        view.onClose.subscribe(onClose);
+        view.onSkip.subscribe(onClose);
 
         return programmaticAdUnit;
     }

@@ -35,6 +35,9 @@ export class ProgrammaticImageAdUnit extends AbstractAdUnit {
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
+        // Display ads are always completed.
+        this.setFinishState(FinishState.COMPLETED);
+
         return this._container.open(this, false, true, this._forceOrientation, true, this._options);
     }
 
@@ -48,14 +51,6 @@ export class ProgrammaticImageAdUnit extends AbstractAdUnit {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         this._view.hide();
-
-        const finishState = this.getFinishState();
-        if(finishState === FinishState.COMPLETED) {
-            this._sessionManager.sendThirdQuartile(this);
-            this._sessionManager.sendView(this);
-        } else if(finishState === FinishState.SKIPPED) {
-            this._sessionManager.sendSkip(this);
-        }
 
         this.onFinish.trigger();
         this._view.container().parentElement!.removeChild(this._view.container());
