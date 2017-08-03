@@ -15,9 +15,9 @@ class CustomDOMParser {
     parseFromString(markup, type) {
         if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
             return new JSDOM(markup).window.document;
-		} else {
-			return DOMParser.prototype.parseFromString.apply(new DOMParser(), arguments);
-		}
+        } else {
+            return DOMParser.prototype.parseFromString.apply(new DOMParser(), arguments);
+        }
     };
 }
 
