@@ -67,7 +67,6 @@
                 }, false);
 
                 window.addEventListener('resize', function(e) {
-                    console.log(`width=${window.innerWidth},height=${window.innerHeight}`);
                     width = window.innerWidth;
                     height = window.innerHeight;
                     trigger('sizeChange', [width, height]);
