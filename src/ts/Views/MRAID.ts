@@ -220,7 +220,7 @@ export class MRAID extends View {
 
     private replaceMraidSources(mraid: string): string {
         const dom = new DOMParser().parseFromString(mraid, "text/html");
-        const src = dom.documentElement.querySelector('script[src="mraid.js"]');
+        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
         if (src && src.parentNode) {
             src.parentNode.removeChild(src);
         }
