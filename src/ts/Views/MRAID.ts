@@ -87,18 +87,6 @@ export class MRAID extends View {
         }
     }
 
-    public show(): void {
-        super.show();
-        if(this._loadingScreenAbTest) {
-            this.showLoadingScreen();
-        } else {
-            // if not loaded, onIframeLoaded function shows the playable on the onload event
-            if(this._iframeLoaded) {
-                this.showPlayable();
-            }
-        }
-    }
-
     public render() {
         super.render();
 
@@ -114,6 +102,18 @@ export class MRAID extends View {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
+    }
+
+    public show(): void {
+        super.show();
+        if(this._loadingScreenAbTest) {
+            this.showLoadingScreen();
+        } else {
+            // if not loaded, onIframeLoaded function shows the playable on the onload event
+            if(this._iframeLoaded) {
+                this.showPlayable();
+            }
+        }
     }
 
     public hide() {
