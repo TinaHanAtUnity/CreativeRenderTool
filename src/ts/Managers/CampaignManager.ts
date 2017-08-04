@@ -45,7 +45,7 @@ export abstract class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable1<WebViewError>();
+    public readonly onError = new Observable2<WebViewError, string[]>();
     public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
@@ -156,7 +156,6 @@ export abstract class CampaignManager {
                     new Error('Campaign does not have a video url'),
                     {rootWrapperVast: content}
                 );
-                this.onError.trigger(videoUrlError);
                 return Promise.reject(videoUrlError);
             }
             if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {

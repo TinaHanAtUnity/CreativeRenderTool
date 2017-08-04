@@ -39,7 +39,7 @@ export class AuctionCampaignManager extends CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            this.onError.trigger(error);
+            return this.handlePlcError(error, this._configuration.getPlacementIds());
         });
     }
 
@@ -116,7 +116,21 @@ export class AuctionCampaignManager extends CampaignManager {
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    promises.push(this.handlePlcCampaign(fill[mediaId], json.media[mediaId].contentType, json.media[mediaId].content, json.media[mediaId].trackingUrls, json.media[mediaId].cacheTTL, json.media[mediaId].adType, json.media[mediaId].creativeId, json.media[mediaId].seatId, json.correlationId));
+                    promises.push(this.handlePlcCampaign(fill[mediaId],
+                        json.media[mediaId].contentType,
+                        json.media[mediaId].content,
+                        json.media[mediaId].trackingUrls,
+                        json.media[mediaId].cacheTTL,
+                        json.media[mediaId].adType,
+                        json.media[mediaId].creativeId,
+                        json.media[mediaId].seatId,
+                        json.correlationId).catch(error => {
+                            if(error === CacheStatus.STOPPED) {
+                                return Promise.resolve();
+                            }
+
+                            return this.handlePlcError(error, fill[mediaId]);
+                    }));
 
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
                     const contentType = json.media[mediaId].contentType;
@@ -130,16 +144,10 @@ export class AuctionCampaignManager extends CampaignManager {
             this.onAdPlanReceived.trigger(refreshDelay);
 
             return Promise.all(promises).catch(error => {
-                // stopping campaign parsing and caching due to showing an ad unit is ok
-                if(error === CacheStatus.STOPPED) {
-                    return Promise.resolve();
-                }
-
-                // todo: catch errors by placement
-                return this.handlePlcError(error);
+                return this.handlePlcError(error, this._configuration.getPlacementIds());
             });
         } else {
-            return this.handlePlcError(new Error('No placements found'));
+            return this.handlePlcError(new Error('No placements found'), this._configuration.getPlacementIds());
         }
     }
 
@@ -180,7 +188,7 @@ export class AuctionCampaignManager extends CampaignManager {
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             default:
-                return this.handlePlcError(new Error('Unsupported content-type: ' + contentType));
+                return this.handlePlcError(new Error('Unsupported content-type: ' + contentType), placements);
         }
 
     }
@@ -199,8 +207,9 @@ export class AuctionCampaignManager extends CampaignManager {
         return Promise.resolve();
     }
 
-    private handlePlcError(error: any): Promise<void> {
+    private handlePlcError(error: any, placementIds: string[]): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error);
+        this.onError.trigger(error, placementIds);
+
         return Promise.resolve();
     }}
