@@ -62,4 +62,15 @@ describe('MRAID', () => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
         });
     });
+
+    it('should remove the mraid.js placeholder when it has a query parameter', () => {
+        const markup = '<script src="mraid.js?foo=bar&baz=blah><div>Hello, world!</div>';
+        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, '123456', 1, undefined, markup);
+        const mraid = new MRAID(nativeBridge, placement, campaign);
+        return mraid.createMRAID().then((src) => {
+            const dom = new DOMParser().parseFromString(src, 'text/html');
+            assert.isNotNull(dom);
+            assert.isNull(dom.querySelector('script[src^="mraid.js"]'));
+        });
+    });
 });

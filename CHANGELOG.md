@@ -1,3 +1,14 @@
+# Thu Aug  3 16:05:47 UTC 2017
+
+* Fix VAST campaign expiration
+* Fix a race condition with iOS video preparing and system events
+
+# Thu Aug  3 09:26:02 UTC 2017
+
+* Modify auction ad plan expiration to match old yield ad plan expiration
+* Add logging of system events to iOS video_player_stuck diagnostics
+* Remove multiple_plc_campaigns diagnostic message
+
 # Tue Aug  1 13:08:27 UTC 2017
 
 * Endscreen download button A/B test in groups 8, 9, 10 and 11
