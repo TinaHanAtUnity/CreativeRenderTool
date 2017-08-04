@@ -175,7 +175,8 @@ export class AuctionCampaignManager extends CampaignManager {
                 // todo: handle ad plan expiration with cacheTTL or something similar
                 const jsonMraid = JsonParser.parse(content);
                 jsonMraid.id = this.getProgrammaticCampaignId();
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, jsonMraid.markup, trackingUrls, adType, creativeId, seatId, correlationId);
+                const markup = decodeURIComponent(jsonMraid.markup);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             default:
