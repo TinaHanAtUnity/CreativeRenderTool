@@ -23,6 +23,12 @@ export class MOAT extends View {
 
     public init(ids: { [key: string]: string }, duration: number, url: string) {
         this._nativeBridge.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
+        this._iframe.contentWindow.postMessage('viewable', '*');
+        this._iframe.contentWindow.postMessage({
+            type: 'resize',
+            width: window.innerWidth,
+            height: window.innerHeight
+        }, '*');
         this._iframe.contentWindow.postMessage({
             type: 'init',
             data: {
