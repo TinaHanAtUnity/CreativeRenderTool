@@ -82,7 +82,8 @@ export class MRAID extends View {
         ];
 
         const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/roll-the-ball/) && campaign.getAbGroup() === 5) {
+        const abGroup = campaign.getAbGroup();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/roll-the-ball/) && (abGroup === 8 || abGroup === 9)) {
             this._loadingScreenAbTest = true;
         }
     }
