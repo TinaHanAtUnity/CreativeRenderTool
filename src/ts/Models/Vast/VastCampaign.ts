@@ -45,6 +45,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('timeout', cacheTTL || 3600);
+        this.set('willExpireAt', Date.now() + this.get('timeout') * 1000);
         this.set('adType', adType || undefined);
         this.set('correlationId', correlationId || undefined);
         this.set('creativeId', creativeId || undefined);
