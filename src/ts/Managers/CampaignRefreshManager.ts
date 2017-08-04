@@ -3,7 +3,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { Placement, PlacementState } from 'Models/Placement';
+import { PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
