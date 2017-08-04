@@ -74,10 +74,14 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideo().getPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(adUnit.getVideo().getPosition()).then(() => {
-                    nativeBridge.VideoPlayer.play();
+                    if(!adUnit.getContainer().isPaused()) {
+                        nativeBridge.VideoPlayer.play();
+                    }
                 });
             } else {
-                nativeBridge.VideoPlayer.play();
+                if(!adUnit.getContainer().isPaused()) {
+                    nativeBridge.VideoPlayer.play();
+                }
             }
         });
     }
