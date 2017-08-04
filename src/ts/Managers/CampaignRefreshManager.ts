@@ -93,25 +93,18 @@ export class CampaignRefreshManager {
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
-        const placements: { [id: string]: Placement } = this._configuration.getPlacements();
         for(const placementId of placementIds) {
-            if(placements.hasOwnProperty(placementId)) {
-                this.setPlacementState(placementId, placementState);
-            }
+            this.setPlacementState(placementId, placementState);
         }
         for (const placementId of placementIds) {
-            if(placements.hasOwnProperty(placementId)) {
-                this.sendPlacementStateChanges(placementId);
-            }
+            this.sendPlacementStateChanges(placementId);
         }
     }
 
     private invalidateCampaigns(needsRefill: boolean, placementIds: string[]): void {
         this._needsRefill = needsRefill;
         for(const placementId of placementIds) {
-            if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
-            }
+            this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
         }
     }
 

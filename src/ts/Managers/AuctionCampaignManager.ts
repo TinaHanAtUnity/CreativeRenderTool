@@ -144,12 +144,6 @@ export class AuctionCampaignManager extends CampaignManager {
             this.onAdPlanReceived.trigger(refreshDelay);
 
             return Promise.all(promises).catch(error => {
-                // stopping campaign parsing and caching due to showing an ad unit is ok
-                // if(error === CacheStatus.STOPPED) {
-                //    return Promise.resolve();
-                // }
-
-                // todo: catch errors by placement
                 return this.handlePlcError(error, this._configuration.getPlacementIds());
             });
         } else {
