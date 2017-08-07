@@ -32,6 +32,5 @@ describe('Overlay', () => {
         assert.isNotNull(overlay.container().querySelector('.circle-left'));
         assert.isNotNull(overlay.container().querySelector('.circle-right'));
         assert.isNotNull(overlay.container().querySelector('.progress-wrapper'));
-        assert.isNotNull(overlay.container().querySelector('.full-screen-button'));
     });
 });

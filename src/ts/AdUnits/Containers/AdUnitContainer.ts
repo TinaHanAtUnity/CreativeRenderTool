@@ -26,11 +26,13 @@ export abstract class AdUnitContainer {
 
     public readonly onShow = new Observable0(); // ad unit becomes visible
     public readonly onSystemKill = new Observable0(); // ad unit killed by the system (Android only)
-    public readonly onSystemPause = new Observable0(); // ad unit has been resigned from active (iOS only)
+    public readonly onAndroidPause = new Observable0(); // ad unit paused (Android only)
     public readonly onSystemInterrupt = new Observable1<boolean>(); // ad unit has been interrupted and video has been paused (iOS only)
     public readonly onLowMemoryWarning = new Observable0(); // ad unit has received low memory warning (iOS only)
 
     protected _lockedOrientation: ForceOrientation;
+
+    private _diagnosticsEvents: any[] = [];
 
     public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
@@ -42,4 +44,15 @@ export abstract class AdUnitContainer {
         return this._lockedOrientation;
     }
 
+    public getDiagnosticsEvents(): any[] {
+        return this._diagnosticsEvents;
+    }
+
+    public addDiagnosticsEvent(event: any): void {
+        this._diagnosticsEvents.push(event);
+    }
+
+    public resetDiagnosticsEvents(): void {
+        this._diagnosticsEvents = [];
+    }
 }

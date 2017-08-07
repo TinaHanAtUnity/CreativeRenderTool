@@ -39,7 +39,7 @@ export class LegacyCampaignManager extends CampaignManager {
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
-            this.onError.trigger(error);
+            return this.handleError(error);
         });
     }
 
@@ -87,7 +87,7 @@ export class LegacyCampaignManager extends CampaignManager {
             const error: DiagnosticError = new DiagnosticError(new Error('Missing gamerId'), {
                 rawAdPlan: json
             });
-            this.onError.trigger(error);
+            this.handleError(error);
             return Promise.resolve();
         }
 
@@ -127,7 +127,7 @@ export class LegacyCampaignManager extends CampaignManager {
                 return this.handleFill(campaign);
             });
         }).catch((error) => {
-            this.onError.trigger(error);
+            return this.handleError(error);
         });
     }
 
@@ -159,7 +159,7 @@ export class LegacyCampaignManager extends CampaignManager {
                 new Error('MRAID Campaign missing markup'),
                 {mraid: json.mraid}
             );
-            this.onError.trigger(MRAIDUrlError);
+            this.handleError(MRAIDUrlError);
             return Promise.resolve();
         }
     }
@@ -172,6 +172,11 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private handleFill(campaign: Campaign): Promise<void> {
         this.onCampaign.trigger('', campaign);
+        return Promise.resolve();
+    }
+
+    private handleError(error: WebViewError): Promise<void> {
+        this.onError.trigger(error, this._configuration.getPlacementIds());
         return Promise.resolve();
     }
 }

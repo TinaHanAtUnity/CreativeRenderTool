@@ -1,3 +1,34 @@
+# Mon Aug  7 08:03:45 UTC 2017
+
+* Handle errors by placement with PLC ad plans
+* Remove unused UI styles
+* Fix MRAID parsing
+* Yet another fix for iOS video player stuck problems
+
+# Thu Aug  3 16:05:47 UTC 2017
+
+* Fix VAST campaign expiration
+* Fix a race condition with iOS video preparing and system events
+
+# Thu Aug  3 09:26:02 UTC 2017
+
+* Modify auction ad plan expiration to match old yield ad plan expiration
+* Add logging of system events to iOS video_player_stuck diagnostics
+* Remove multiple_plc_campaigns diagnostic message
+
+# Tue Aug  1 13:08:27 UTC 2017
+
+* Endscreen download button A/B test in groups 8, 9, 10 and 11
+* Fix for some iOS video_player_stuck cases
+* Improved video_validation_failed diagnostics
+* Send multiple_plc_campaigns whenever SDK receives different kinds of fill to different placements
+
+# Tue Jul 25 06:44:19 UTC 2017
+
+* Trigger mraid viewableChange event on system pause and resume
+* Follow redirects if clickAttributionUrlFollowsRedirects is true on MRAID campaigns
+* Fix some video_player_stuck errors
+
 # Tue Jul 18 10:07:39 UTC 2017
 
 * Remove A/B tests for groups 6, 7 (refresh intervals) & 13 (adaptive caching)

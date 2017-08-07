@@ -41,6 +41,8 @@ export class ViewController extends AdUnitContainer {
     }
 
     public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IIosOptions): Promise<void> {
+        this.resetDiagnosticsEvents();
+        this.addDiagnosticsEvent({type: 'open'});
         this._options = options;
         this._showing = true;
 
@@ -67,6 +69,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
+        this.addDiagnosticsEvent({type: 'close'});
         this._showing = false;
         this._nativeBridge.Notification.removeNotificationObserver(ViewController._appWillResignActive);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
@@ -75,6 +78,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        this.addDiagnosticsEvent({type: 'reconfigure'});
         const promises: Array<Promise<any>> = [];
 
         return Promise.all([
@@ -104,6 +108,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
+        this.addDiagnosticsEvent({type: 'reorient'});
         return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
             return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options.supportedOrientations, allowRotation, forceOrientation));
         });
@@ -134,10 +139,12 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
+        this.addDiagnosticsEvent({type: 'viewDidAppear'});
         this.onShow.trigger();
     }
 
     private onMemoryWarning(): void {
+        this.addDiagnosticsEvent({type: 'memoryWarning'});
         this.onLowMemoryWarning.trigger();
     }
 
@@ -149,17 +156,20 @@ export class ViewController extends AdUnitContainer {
 
         switch(event) {
             case ViewController._appWillResignActive:
+                this.addDiagnosticsEvent({type: 'appWillResignActive'});
                 this._paused = true;
-                this.onSystemPause.trigger();
+                this.onSystemInterrupt.trigger(true);
                 break;
 
             case ViewController._appDidBecomeActive:
+                this.addDiagnosticsEvent({type: 'appDidBecomeActive'});
                 this._paused = false;
                 this.onSystemInterrupt.trigger(false);
                 break;
 
             case ViewController._audioSessionInterrupt:
                 const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
+                this.addDiagnosticsEvent({type: 'audioSessionInterrupt', typeKey: interruptData.AVAudioSessionInterruptionTypeKey, optionKey: interruptData.AVAudioSessionInterruptionOptionKey});
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
@@ -172,6 +182,7 @@ export class ViewController extends AdUnitContainer {
 
             case ViewController._audioSessionRouteChange:
                 const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
+                this.addDiagnosticsEvent({type: 'audioSessionRouteChange', reasonKey: routeChangeData.AVAudioSessionRouteChangeReasonKey});
                 if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
                     this.onSystemInterrupt.trigger(false);
                 }

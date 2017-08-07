@@ -357,8 +357,21 @@ export class Cache {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
-                    return (width > 0 && height > 0 && duration > 0);
+                    const isValid = (width > 0 && height > 0 && duration > 0);
+                    if(!isValid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: video.getOriginalUrl(),
+                            width: width,
+                            height: height,
+                            duration: duration
+                        });
+                    }
+                    return isValid;
                 }).catch(error => {
+                    Diagnostics.trigger('video_validation_failed', {
+                        url: video.getOriginalUrl(),
+                        error: error
+                    });
                     return false;
                 });
             } else {
@@ -391,8 +404,21 @@ export class Cache {
                         }
                     }
 
-                    return (width > 0 && height > 0 && duration > 0);
+                    const isValid = (width > 0 && height > 0 && duration > 0);
+                    if(!isValid) {
+                        Diagnostics.trigger('video_validation_failed', {
+                            url: video.getOriginalUrl(),
+                            width: width,
+                            height: height,
+                            duration: duration
+                        });
+                    }
+                    return isValid;
                 }).catch(error => {
+                    Diagnostics.trigger('video_validation_failed', {
+                        url: video.getOriginalUrl(),
+                        error: error
+                    });
                     return false;
                 });
             }

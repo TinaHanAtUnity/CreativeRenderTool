@@ -3,14 +3,14 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { Placement, PlacementState } from 'Models/Placement';
+import { PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
-    private static NoFillDelay = 3600;
+    public static NoFillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -29,7 +29,8 @@ export class CampaignRefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe(error => this.onError(error));
+        this._campaignManager.onError.subscribe((error, placementIds) => this.onError(error, placementIds));
+        this._campaignManager.onAdPlanReceived.subscribe(refreshDelay => this.onAdPlanReceived(refreshDelay));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -45,16 +46,16 @@ export class CampaignRefreshManager {
         this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);
-            this.invalidateCampaigns(true);
-            this.setPlacementStates(PlacementState.WAITING);
+            this.invalidateCampaigns(true, this._configuration.getPlacementIds());
+            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
         });
     }
 
     public refresh(): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
-            this.setPlacementStates(PlacementState.WAITING);
+            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
-            this.invalidateCampaigns(false);
+            this.invalidateCampaigns(false, this._configuration.getPlacementIds());
             return this._campaignManager.request();
         } else if(this.checkForExpiredCampaigns()) {
             return this.onCampaignExpired();
@@ -91,26 +92,19 @@ export class CampaignRefreshManager {
         }
     }
 
-    public setPlacementStates(placementState: PlacementState): void {
-        const placements: { [id: string]: Placement } = this._configuration.getPlacements();
-        for(const placementId in placements) {
-            if(placements.hasOwnProperty(placementId)) {
-                this.setPlacementState(placementId, placementState);
-            }
+    public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
+        for(const placementId of placementIds) {
+            this.setPlacementState(placementId, placementState);
         }
-        for (const placementId in placements) {
-            if(placements.hasOwnProperty(placementId)) {
-                this.sendPlacementStateChanges(placementId);
-            }
+        for (const placementId of placementIds) {
+            this.sendPlacementStateChanges(placementId);
         }
     }
 
-    private invalidateCampaigns(needsRefill: boolean): void {
+    private invalidateCampaigns(needsRefill: boolean, placementIds: string[]): void {
         this._needsRefill = needsRefill;
-        for(const placementId in this._configuration.getPlacements()) {
-            if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
-            }
+        for(const placementId of placementIds) {
+            this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
         }
     }
 
@@ -129,15 +123,13 @@ export class CampaignRefreshManager {
 
     private onCampaignExpired(): Promise<INativeResponse | void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
-        this.setPlacementStates(PlacementState.NO_FILL);
-        this.invalidateCampaigns(false);
+        this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
+        this.invalidateCampaigns(false, this._configuration.getPlacementIds());
         return this._campaignManager.request();
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
-        if (this._configuration.isAuction()) {
-            // todo: for now, campaigns with placement level control are always refreshed after one hour regardless of response or errors
-            this._refillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
+        if(this._configuration.isAuction()) {
             this.setCampaignForPlacement(placementId, campaign);
             this.handlePlacementState(placementId, PlacementState.READY);
         } else {
@@ -152,10 +144,10 @@ export class CampaignRefreshManager {
             if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
                 const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                     this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                    this.setPlacementStates(PlacementState.READY);
+                    this.setPlacementStates(PlacementState.READY, this._configuration.getPlacementIds());
                 });
             } else {
-                this.setPlacementStates(PlacementState.READY);
+                this.setPlacementStates(PlacementState.READY, this._configuration.getPlacementIds());
             }
         }
     }
@@ -179,16 +171,16 @@ export class CampaignRefreshManager {
             if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
                 const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                     this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                    this.setPlacementStates(PlacementState.NO_FILL);
+                    this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
                 });
             } else {
-                this.setPlacementStates(PlacementState.NO_FILL);
+                this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
             }
         }
     }
 
-    private onError(error: WebViewError | Error) {
-        this.invalidateCampaigns(this._needsRefill);
+    private onError(error: WebViewError | Error, placementIds: string[]) {
+        this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
@@ -205,10 +197,17 @@ export class CampaignRefreshManager {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this.setPlacementStates(PlacementState.NO_FILL);
+                this.setPlacementStates(PlacementState.NO_FILL, placementIds);
             });
         } else {
-            this.setPlacementStates(PlacementState.NO_FILL);
+            this.setPlacementStates(PlacementState.NO_FILL, placementIds);
+        }
+    }
+
+    private onAdPlanReceived(refreshDelay: number) {
+        if(refreshDelay > 0) {
+            this._refillTimestamp = Date.now() + refreshDelay * 1000;
+            this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + refreshDelay + ' seconds');
         }
     }
 
