@@ -17,10 +17,6 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 export class VideoEventHandlers {
 
     public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
-        if(!adUnit.isPrepareCalled()) {
-            Diagnostics.trigger('video_player_prepare_not_called', 'Prepare not called by videoAdUnit');
-        }
-
         if(adUnit.getVideo().getErrorStatus() || !adUnit.isPrepareCalled()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
