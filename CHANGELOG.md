@@ -1,3 +1,10 @@
+# Mon Aug  7 08:03:45 UTC 2017
+
+* Handle errors by placement with PLC ad plans
+* Remove unused UI styles
+* Fix MRAID parsing
+* Yet another fix for iOS video player stuck problems
+
 # Thu Aug  3 16:05:47 UTC 2017
 
 * Fix VAST campaign expiration
