@@ -12,6 +12,7 @@ import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitCon
 import { Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
+import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class VideoEventHandlers {
 
@@ -26,6 +27,7 @@ export class VideoEventHandlers {
         }
 
         adUnit.setPrepareCalled(false);
+        adUnit.setVideoReady(true);
 
         if(duration > 40000) {
             const campaign = adUnit.getCampaign();
@@ -72,10 +74,14 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(adUnit.getVideo().getPosition() > 0) {
                 nativeBridge.VideoPlayer.seekTo(adUnit.getVideo().getPosition()).then(() => {
-                    nativeBridge.VideoPlayer.play();
+                    if(!adUnit.getContainer().isPaused()) {
+                        nativeBridge.VideoPlayer.play();
+                    }
                 });
             } else {
-                nativeBridge.VideoPlayer.play();
+                if(!adUnit.getContainer().isPaused()) {
+                    nativeBridge.VideoPlayer.play();
+                }
             }
         });
     }
@@ -142,6 +148,11 @@ export class VideoEventHandlers {
                         cacheMode: configuration.getCacheMode(),
                         lowMemory: adUnit.isLowMemory()
                     };
+
+                    if(nativeBridge.getPlatform() === Platform.IOS && adUnit.getContainer() instanceof ViewController) {
+                        const container = <ViewController>adUnit.getContainer();
+                        error.events = container.getDiagnosticsEvents();
+                    }
 
                     const fileId = adUnit.getVideo().getFileId();
 
