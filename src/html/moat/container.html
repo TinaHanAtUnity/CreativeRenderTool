@@ -213,6 +213,7 @@
                         case 'init':
                             var dummyElement = document.createElement('div');
                             document.body.appendChild(dummyElement);
+                            window.MOATMAPI_ENV = event.data.data.moatData;
                             moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
                             break;
 

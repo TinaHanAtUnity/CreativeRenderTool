@@ -66,7 +66,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, TestFixtures.getClientInfo(),{});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -79,7 +79,7 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), vastCampaign, config, {});
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), vastCampaign, config, TestFixtures.getClientInfo(), {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -93,7 +93,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
 
             campaign = TestFixtures.getPromoCampaign();
-            PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+            PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, TestFixtures.getClientInfo(), {});
         });
         describe('on show', () => {
             it('should trigger onStart', (done) => {
@@ -140,7 +140,7 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, TestFixtures.getClientInfo(), {});
         });
 
         describe('on hide', () => {

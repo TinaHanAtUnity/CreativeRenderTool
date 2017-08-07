@@ -21,7 +21,7 @@ export class MOAT extends View {
         iframe.srcdoc = MOATContainer;
     }
 
-    public init(ids: { [key: string]: string }, duration: number, url: string) {
+    public init(ids: { [key: string]: string }, duration: number, url: string, moatData: any) {
         this._nativeBridge.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
         this._iframe.contentWindow.postMessage('viewable', '*');
         this._iframe.contentWindow.postMessage({
@@ -34,7 +34,8 @@ export class MOAT extends View {
             data: {
                 ids,
                 duration,
-                url
+                url,
+                moatData
             }
         }, '*');
     }
