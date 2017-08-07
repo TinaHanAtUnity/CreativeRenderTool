@@ -1,5 +1,6 @@
 import { View } from 'Views/View';
-import ProgrammaticImageTemplate from 'html/MRAID.html';
+import ProgrammaticImageTemplate from 'html/Display.html';
+import DisplayContainer from 'html/DisplayContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1 } from 'Utilities/Observable';
@@ -31,6 +32,9 @@ export class ProgrammaticImage extends View {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+    private _markup: string;
+
+    private _messageListener: EventListener;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: ProgrammaticImageCampaign) {
         super(nativeBridge, 'programmatic-image');
@@ -39,6 +43,7 @@ export class ProgrammaticImage extends View {
         this._campaign = campaign;
 
         this._template = new Template(ProgrammaticImageTemplate);
+        this._messageListener = (e: Event) => this.onMessage(e);
 
         this._bindings = [
             {
@@ -51,10 +56,12 @@ export class ProgrammaticImage extends View {
 
     public render() {
         super.render();
+        this._markup = this._campaign.getDynamicMarkup();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             if(Math.abs(<number>window.orientation) === 90) {
@@ -69,13 +76,12 @@ export class ProgrammaticImage extends View {
             iframe.width = window.innerWidth;
         }
 
-        this.getSource().then(mraid => {
-            iframe.srcdoc = mraid;
-        });
     }
 
     public show(): void {
         super.show();
+
+        window.addEventListener('message', this._messageListener);
 
         const iframe: any = this._iframe;
         const closeLength = 30;
@@ -161,6 +167,8 @@ export class ProgrammaticImage extends View {
     }
 
     public hide() {
+        window.removeEventListener('message', this._messageListener);
+
         this._iframe.contentWindow.postMessage({
             type: 'viewable',
             value: false
@@ -175,10 +183,6 @@ export class ProgrammaticImage extends View {
             this._resizeHandler = undefined;
         }
         super.hide();
-    }
-
-    public getSource(): Promise<string> {
-        return Promise.resolve(this._campaign.getDynamicMarkup());
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -214,5 +218,9 @@ export class ProgrammaticImage extends View {
         } else if(this._canClose) {
             this.onClose.trigger();
         }
+    }
+
+    private onMessage(e: Event) {
+
     }
 }
