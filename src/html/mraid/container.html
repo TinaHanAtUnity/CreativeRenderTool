@@ -186,6 +186,13 @@
                 this.useCustomClose = function() {
                     trigger('error', ['not implemented', 'useCustomClose']);
                 };
+
+                this.sendAnalyticsEvent = function(event) {
+                    window.parent.postMessage({
+                        type: 'analyticsEvent',
+                        event: event
+                    }, '*');
+                };
             };
             window.mraid = new MRAID();
         })();

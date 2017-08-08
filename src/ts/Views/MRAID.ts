@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
-import { Observable0, Observable1 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
@@ -18,11 +18,14 @@ export interface IOrientationProperties {
 
 export class MRAID extends View {
 
+    private static CloseLength = 30;
+
     public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
+    public readonly onAnalyticsEvent = new Observable2<string, number>();
 
     private readonly onLoaded = new Observable0();
 
@@ -41,6 +44,9 @@ export class MRAID extends View {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+
+    private _closeRemaining: number;
+    private _showTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -90,12 +96,13 @@ export class MRAID extends View {
     public show(): void {
         super.show();
 
+        this._showTimestamp = Date.now();
+
         const iframe: any = this._iframe;
-        const closeLength = 30;
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = closeLength;
+            let closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
             const updateInterval = setInterval(() => {
                 if(closeRemaining > 0) {
@@ -116,18 +123,18 @@ export class MRAID extends View {
                 }
             }, 1000);
         } else {
-            let closeRemaining = closeLength;
+            this._closeRemaining = MRAID.CloseLength;
             const updateInterval = setInterval(() => {
-                const progress = (closeLength - closeRemaining) / closeLength;
+                const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
                     this._didReward = true;
                 }
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                     this.updateProgressCircle(this._closeElement, progress);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
@@ -286,7 +293,9 @@ export class MRAID extends View {
                     forceOrientation: forceOrientation
                 });
                 break;
-
+            case 'analyticsEvent':
+                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                break;
             default:
                 break;
         }
