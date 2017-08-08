@@ -1,3 +1,10 @@
+# Tue Aug  8 09:33:22 UTC 2017
+
+* Remove endscreen test from groups 8, 9, 10 and 11
+* Log all activity and viewcontroller events to video_player_stuck diagnostics
+* Fix cropping issue on iOS with MRAID
+* Remove video_player_prepare_not_called diagnostic message
+
 # Mon Aug  7 08:03:45 UTC 2017
 
 * Handle errors by placement with PLC ad plans
