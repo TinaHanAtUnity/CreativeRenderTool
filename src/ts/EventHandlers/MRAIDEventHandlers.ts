@@ -39,7 +39,7 @@ export class MRAIDEventHandlers {
         if(resourceUrl) {
              kafkaObject.url = resourceUrl.getOriginalUrl();
         }
-        HttpKafka.sendEvent('playable.analytics', kafkaObject);
+        HttpKafka.sendEvent('events.playable.json', kafkaObject);
     }
 
     private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
