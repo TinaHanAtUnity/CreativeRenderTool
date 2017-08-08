@@ -8,7 +8,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
-import { HttpKafka } from "../Utilities/HttpKafka";
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class MRAIDEventHandlers {
 
