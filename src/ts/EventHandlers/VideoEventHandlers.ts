@@ -148,11 +148,8 @@ export class VideoEventHandlers {
                         lowMemory: adUnit.isLowMemory()
                     };
 
-                    if(nativeBridge.getPlatform() === Platform.IOS && adUnit.getContainer() instanceof ViewController) {
-                        const container = <ViewController>adUnit.getContainer();
-                        error.events = container.getDiagnosticsEvents();
-                    }
-
+                    const container = adUnit.getContainer();
+                    error.events = container.getDiagnosticsEvents();
                     const fileId = adUnit.getVideo().getFileId();
 
                     if(fileId) {
