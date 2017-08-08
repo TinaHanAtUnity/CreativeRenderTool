@@ -60,7 +60,7 @@ export class ProgrammaticImage extends View {
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
         iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {

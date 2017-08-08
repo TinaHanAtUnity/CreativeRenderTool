@@ -1,9 +1,44 @@
+// Media queries for determining final size of display iframe.
+// Note that 736px is used as the max device width as it is the
+// largest smartphone at this time.
+
+// Smartphone (portrait)
+@media only screen and (max-device-width: 736px) and (orientation: portrait)
+  #programmatic-image
+    #display-iframe
+      width: 320px;
+      height: 480px;
+
+// Smartphone (landscape)
+@media only screen and (max-device-width: 736px) and (orientation: landscape)
+  #programmatic-image
+    #display-iframe
+      width: 480px;
+      height: 320px;
+
+// Tablet (portrait)
+@media only screen and (min-device-width: 737px) and (max-device-width: 1280px) and (orientation: portrait)
+  #programmatic-image
+    #display-iframe
+      width: 768px;
+      height: 1024px;
+
+@media only screen and (min-device-width: 737px) and (max-device-width: 1280px) and (orientation: landscape)
+  #programmatic-image
+    #display-iframe
+      width: 1024px;
+      height: 768px;
+
 #programmatic-image
-  #mraid-iframe
-    position: absolute
-    top: 0
-    left: 0
-    border: none
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+
+  #display-iframe
+    flex: none;
+    border: 1px solid white;
 
   .close-region
     position: absolute
