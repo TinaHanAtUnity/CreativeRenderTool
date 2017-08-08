@@ -12,7 +12,6 @@ import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitCon
 import { Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
-import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class VideoEventHandlers {
 
