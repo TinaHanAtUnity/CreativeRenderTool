@@ -43,7 +43,7 @@ export class ProgrammaticImage extends View {
         this._campaign = campaign;
 
         this._template = new Template(ProgrammaticImageTemplate);
-        this._messageListener = (e: Event) => this.onMessage(e);
+        this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
         this._bindings = [
             {
@@ -220,7 +220,13 @@ export class ProgrammaticImage extends View {
         }
     }
 
-    private onMessage(e: Event) {
-
+    private onMessage(e: MessageEvent) {
+        switch (e.data.type) {
+            case 'redirect':
+                this.onClick.trigger(e.data.href);
+                break;
+            default:
+                this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
+        }
     }
 }

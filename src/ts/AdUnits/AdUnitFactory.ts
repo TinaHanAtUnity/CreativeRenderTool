@@ -316,8 +316,20 @@ export class AdUnitFactory {
             programmaticAdUnit.hide();
         };
 
+        const openLink = (href: string) => {
+            if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': href
+                });
+            } else {
+                nativeBridge.UrlScheme.open(href);
+            }
+        };
+
         view.onClose.subscribe(onClose);
         view.onSkip.subscribe(onClose);
+        view.onClick.subscribe(openLink);
 
         return programmaticAdUnit;
     }
