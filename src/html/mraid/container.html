@@ -193,6 +193,13 @@
                         event: event
                     }, '*');
                 };
+
+                this.setFinishState = function(state) {
+                    window.parent.postMessage({
+                        type: 'finishState',
+                        state: state
+                    }, '*');
+                };
             };
             window.mraid = new MRAID();
         })();
