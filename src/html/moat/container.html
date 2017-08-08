@@ -223,22 +223,24 @@
                                     "type": event.data.data.type,
                                     "adVolume": event.data.data.volume
                                 });
+                                if(window.mraid) {
+                                    if(event.data.data.type === 'AdPaused') {
+                                        mraid.viewable = false;
+                                        window.postMessage({
+                                            type: 'viewable',
+                                            value: false
+                                        }, '*');
+                                    }
+                                    if(event.data.data.type === 'AdPlaying') {
+                                        mraid.viewable = true;
+                                        window.postMessage({
+                                            type: 'viewable',
+                                            value: true
+                                        }, '*');
+                                    }
+                                }
                             }
                             break;
-
-                        case 'viewable':
-                            if(window.mraid) {
-                                mraid.viewable = event.data.value;
-                                mraid.trigger('viewableChange', [mraid.viewable]);
-                            }
-                            break;
-
-                        case 'resize':
-                            window.innerWidth = mraid.width = event.data.width;
-                            window.innerHeight = mraid.height = event.data.height;
-                            mraid.trigger('sizeChange', [mraid.width, mraid.height]);
-                            break;
-
 
                         default:
                             break;
