@@ -393,7 +393,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error);
+                campaignManager.onError.trigger(error, ['rewardedVideo', 'incentivizedVideo']);
                 return Promise.resolve();
             });
 
@@ -669,7 +669,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error);
+                campaignManager.onError.trigger(error, ['rewardedVideo', 'incentivizedVideo']);
                 return Promise.resolve();
             });
 

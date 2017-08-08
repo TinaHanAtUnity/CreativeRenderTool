@@ -127,6 +127,17 @@ export class Configuration extends Model<IConfiguration> {
         return this.getPlacements()[placementId];
     }
 
+    public getPlacementIds(): string[] {
+        const placementIds: string[] = [];
+        for(const placement in this.getPlacements()) {
+            if (this.getPlacements().hasOwnProperty(placement)) {
+                placementIds.push(placement);
+            }
+        }
+
+        return placementIds;
+    }
+
     public getPlacements(): { [id: string]: Placement } {
         return this.get('placements');
     }
