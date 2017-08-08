@@ -83,6 +83,7 @@ export class VideoEventHandlers {
     }
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+        adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
@@ -351,7 +352,7 @@ export class VideoEventHandlers {
     }
 
     public static onIosVideoLikelyToKeepUp(nativeBridge: NativeBridge, adUnit: VideoAdUnit, container: AdUnitContainer, likelyToKeepUp: boolean): void {
-        adUnit.getContainer().addDiagnosticsEvent({type: 'onIosVideoLikelyToKeepUp', likelyToKeepUp: likelyToKeepUp});
+        adUnit.getContainer().addDiagnosticsEvent({type: 'onIosVideoLikelyToKeepUp', likelyToKeepUp: likelyToKeepUp, hasStarted: adUnit.getVideo().hasStarted()});
         if(!container.isPaused() && adUnit.getVideo().hasStarted() && likelyToKeepUp) {
             nativeBridge.VideoPlayer.play();
         }
