@@ -35,13 +35,14 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandlers } from 'EventHandlers/PromoEventHandlers';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, clientInfo: ClientInfo, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
+            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, clientInfo, options);
         } else if(campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
@@ -87,7 +88,7 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration, clientInfo: ClientInfo, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
         let vastAdUnit: VastAdUnit;
@@ -100,6 +101,15 @@ export class AdUnitFactory {
         }
 
         vastAdUnit.initMoat();
+        const moatData = {
+            SDK: 'UnityAds',
+            Version: '2.0',
+            SDKVersion: clientInfo.getSdkVersionName(),
+            IFA: deviceInfo.getAdvertisingIdentifier(),
+            LimitAdTracking: deviceInfo.getLimitAdTracking(),
+            COPPA: configuration.isCoppaCompliant(),
+            bundle: clientInfo.getApplicationName()
+        };
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
@@ -107,7 +117,7 @@ export class AdUnitFactory {
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, vastAdUnit);
 
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration));
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoPlaying(sessionManager, vastAdUnit));
         const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));

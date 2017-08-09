@@ -173,6 +173,15 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
+    protected onSystemInterrupt(): void {
+        super.onSystemInterrupt();
+        if (this._moat) {
+            if (this.isShowing() && this.isActive()) {
+                this._moat.resume(this.getVolume());
+            }
+        }
+    }
+
     private sendQuartileEvent(eventManager: EventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();

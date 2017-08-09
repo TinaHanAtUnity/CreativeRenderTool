@@ -4,7 +4,7 @@ import { EventType } from 'Models/Session';
 
 export class VastVideoEventHandlers {
 
-    public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number) {
+    public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number, moatData: any) {
         adUnit.setRealDuration(duration);
         const ids = {
             "level1": "_ADVERTISER_",
@@ -14,7 +14,7 @@ export class VastVideoEventHandlers {
         };
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.init(ids, duration / 1000, url);
+            moat.init(ids, duration / 1000, url, moatData);
         }
     }
 
