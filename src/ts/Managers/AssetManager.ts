@@ -63,6 +63,10 @@ export class AssetManager {
             throw new Error('Invalid required assets in campaign ' + campaign.getId());
         }
 
+        if(campaign.getAbGroup() === 6 || campaign.getAbGroup() === 7) {
+            this._cacheMode = CacheMode.ADAPTIVE;
+        }
+
         if(this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }

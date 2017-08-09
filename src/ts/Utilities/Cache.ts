@@ -845,12 +845,12 @@ export class Cache {
         const deltaPosition: number = position - this._currentDownloadPosition;
         const deltaTime: number = Date.now() - this._lastProgressEvent;
 
-        if(position > 0 && deltaPosition > 153600) { // sample size must be at least 150 kilobytes
+        if(position > 0 && deltaPosition > 102400) { // sample size must be at least 100 kilobytes
             // speed in kilobytes per second (same as bytes per millisecond)
             const speed: number = deltaPosition / deltaTime;
 
-            // if speed is over 1 megabytes per second (8mbps), the connection is fast enough for streaming
-            if(speed > 1024 && !this._fastConnectionDetected) {
+            // if speed is over 0,5 megabytes per second (4mbps), the connection is fast enough for streaming
+            if(speed > 512 && !this._fastConnectionDetected) {
                 this._fastConnectionDetected = true;
                 this.onFastConnectionDetected.trigger();
             }
