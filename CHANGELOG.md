@@ -1,3 +1,8 @@
+# Wed Aug  9 08:40:17 UTC 2017
+
+* Adaptive caching test with 0,5MB/s limit on groups 6 and 7
+* Fix some video player diagnostic problems
+
 # Tue Aug  8 09:33:22 UTC 2017
 
 * Remove endscreen test from groups 8, 9, 10 and 11
