@@ -4,6 +4,7 @@ import { NativeApi } from 'Native/NativeApi';
 import { AndroidCacheApi } from 'Native/Api/AndroidCache';
 import { IosCacheApi } from 'Native/Api/IosCache';
 import { Platform } from 'Constants/Platform';
+import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 
 export enum CacheError {
     FILE_IO_ERROR,
@@ -111,6 +112,46 @@ export class CacheApi extends NativeApi {
 
     public getFileContent(fileId: string, encoding: string) {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getFileContent', [fileId, encoding]);
+    }
+
+    public getVideoInfo(fileId: string): Promise<[number, number, number]> {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
+                return <[number, number, number]>[width, height, duration];
+            });
+        } else {
+            const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
+            return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+                let width: number = 0;
+                let height: number = 0;
+                let duration: number = 0;
+
+                for (const entry of results) {
+                    const key = entry[0];
+                    const value = entry[1];
+
+                    switch (key) {
+                        case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                            width = value;
+                            break;
+
+                        case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                            height = value;
+                            break;
+
+                        case VideoMetadata.METADATA_KEY_DURATION:
+                            duration = value;
+                            break;
+
+                        default:
+                            // unknown key, ignore
+                            break;
+                    }
+                }
+
+                return <[number, number, number]>[width, height, duration];
+            });
+        }
     }
 
     public handleEvent(event: string, parameters: any[]): void {
