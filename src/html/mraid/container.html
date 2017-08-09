@@ -192,6 +192,20 @@
                 this.useCustomClose = function() {
                     trigger('error', ['not implemented', 'useCustomClose']);
                 };
+
+                this.sendAnalyticsEvent = function(event) {
+                    window.parent.postMessage({
+                        type: 'analyticsEvent',
+                        event: event
+                    }, '*');
+                };
+
+                this.setCustomMraidState = function(state) {
+                    window.parent.postMessage({
+                        type: 'customMraidState',
+                        state: state
+                    }, '*');
+                };
             };
             window.mraid = new MRAID();
         })();
