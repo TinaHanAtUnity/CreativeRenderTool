@@ -136,7 +136,6 @@ export class VideoEventHandlers {
                     adUnit.getContainer().addDiagnosticsEvent({type: 'videoStuck'});
                     nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + position + 'ms position');
 
-
                     const error: any = {
                         repeats: repeats,
                         position: position,
