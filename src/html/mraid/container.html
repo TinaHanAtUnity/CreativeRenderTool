@@ -200,9 +200,9 @@
                     }, '*');
                 };
 
-                this.setFinishState = function(state) {
+                this.setCustomMraidState = function(state) {
                     window.parent.postMessage({
-                        type: 'finishState',
+                        type: 'customMraidState',
                         state: state
                     }, '*');
                 };

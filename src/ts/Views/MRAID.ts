@@ -254,9 +254,11 @@ export class MRAID extends View {
             case 'analyticsEvent':
                 this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
                 break;
-            case 'finishState':
-                if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                    this._closeRemaining = 5;
+            case 'customMraidState':
+                if(event.data.state === 'completed') {
+                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                        this._closeRemaining = 5;
+                    }
                 }
                 break;
             default:
