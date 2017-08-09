@@ -83,11 +83,11 @@ export class MRAID extends View {
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = MRAID.CloseLength;
+            this._closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
             const updateInterval = setInterval(() => {
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                 }
                 if(skipRemaining > 0) {
                     skipRemaining--;
@@ -98,7 +98,7 @@ export class MRAID extends View {
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                 }
