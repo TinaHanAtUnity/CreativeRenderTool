@@ -18,6 +18,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 import DummyPlayableMRAIDCampaign from 'json/DummyPlayableMRAIDCampaign.json';
 import DummyPlayableMRAIDCampaignFollowsRedirects from 'json/DummyPlayableMRAIDCampaignFollowsRedirects.json';
@@ -141,6 +142,39 @@ describe('MRAIDEventHandlersTest', () => {
                 });
             });
 
+        });
+    });
+
+    describe('with onAnalyticsEvent', () => {
+        let mraidCampaign: MRAIDCampaign;
+        let sandbox: sinon.SinonSandbox;
+
+        before(() => {
+            sandbox = sinon.sandbox.create();
+        });
+
+        beforeEach(() => {
+            const campaignObj = JSON.parse(DummyPlayableMRAIDCampaign);
+            mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
+
+            sandbox.stub(HttpKafka, 'sendEvent');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should send a analytics event', () => {
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 'win_screen', 15);
+
+            const kafkaObject: any = {};
+            kafkaObject.type = 'win_screen';
+            kafkaObject.delayFromStart = 15;
+            const resourceUrl = mraidCampaign.getResourceUrl();
+            if(resourceUrl) {
+                kafkaObject.url = resourceUrl.getOriginalUrl();
+            }
+            sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'events.playable.json', kafkaObject);
         });
     });
 });
