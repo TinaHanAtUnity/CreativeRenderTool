@@ -4,16 +4,10 @@ import MOATContainer from 'html/moat/container.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0, Observable1 } from 'Utilities/Observable';
+import { Observable0 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { IOrientationProperties } from 'Views/MRAID';
 
 export class MOAT extends View {
-    public readonly onClick = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
-
     private readonly onLoaded = new Observable0();
 
     private _iframe: HTMLIFrameElement;
@@ -97,42 +91,6 @@ export class MOAT extends View {
             case 'loaded':
                 this._loaded = true;
                 this.onLoaded.trigger();
-                break;
-
-            case 'open':
-                this.onClick.trigger();
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(encodeURI(event.data.url));
-                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': encodeURI(event.data.url) // todo: these come from 3rd party sources, should be validated before general MRAID support
-                    });
-                }
-                break;
-
-            case 'close':
-                this.onClose.trigger();
-                break;
-
-            case 'orientation':
-                let forceOrientation = ForceOrientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = ForceOrientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = ForceOrientation.LANDSCAPE;
-                        break;
-
-                    default:
-                        break;
-                }
-                this.onOrientationProperties.trigger({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                });
                 break;
 
             default:

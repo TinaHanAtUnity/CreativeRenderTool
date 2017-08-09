@@ -100,10 +100,7 @@
                 };
 
                 this.close = function() {
-                    setState('hidden');
-                    window.parent.postMessage({
-                        type: 'close'
-                    }, '*');
+                    trigger('error', ['not implemented', 'close']);
                 };
 
                 this.expand = function() {
@@ -155,10 +152,7 @@
                 };
 
                 this.open = function(url) {
-                    window.parent.postMessage({
-                        type: 'open',
-                        url: url
-                    }, '*');
+                    trigger('error', ['not implemented', 'open']);
                 };
 
                 this.playVideo = function() {
@@ -183,11 +177,7 @@
                 };
 
                 this.setOrientationProperties = function(properties) {
-                    orientationProperties = properties;
-                    window.parent.postMessage({
-                        type: 'orientation',
-                        properties: properties
-                    }, '*');
+                    trigger('error', ['not implemented', 'setOrientationProperties']);
                 };
 
                 this.setResizeProperties = function() {
