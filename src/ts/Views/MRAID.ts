@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
-import { Observable0, Observable1 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
@@ -18,11 +18,14 @@ export interface IOrientationProperties {
 
 export class MRAID extends View {
 
-    public readonly onClick = new Observable0();
+    private static CloseLength = 30;
+
+    public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
+    public readonly onAnalyticsEvent = new Observable2<string, number>();
 
     private readonly onLoaded = new Observable0();
 
@@ -34,13 +37,13 @@ export class MRAID extends View {
     private _loaded = false;
 
     private _messageListener: any;
-    private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
 
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+
+    private _closeRemaining: number;
+    private _showTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -66,19 +69,6 @@ export class MRAID extends View {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(Math.abs(<number>window.orientation) === 90) {
-                iframe.width = screen.height;
-                iframe.height = screen.width;
-            } else {
-                iframe.width = screen.width;
-                iframe.height = screen.height;
-            }
-        } else {
-            iframe.height = window.innerHeight;
-            iframe.width = window.innerWidth;
-        }
-
         this.createMRAID().then(mraid => {
             iframe.srcdoc = mraid;
         });
@@ -89,17 +79,15 @@ export class MRAID extends View {
 
     public show(): void {
         super.show();
-
-        const iframe: any = this._iframe;
-        const closeLength = 30;
+        this._showTimestamp = Date.now();
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = closeLength;
+            this._closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
             const updateInterval = setInterval(() => {
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                 }
                 if(skipRemaining > 0) {
                     skipRemaining--;
@@ -110,24 +98,24 @@ export class MRAID extends View {
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
         } else {
-            let closeRemaining = closeLength;
+            this._closeRemaining = MRAID.CloseLength;
             const updateInterval = setInterval(() => {
-                const progress = (closeLength - closeRemaining) / closeLength;
+                const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
                     this._didReward = true;
                 }
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                     this.updateProgressCircle(this._closeElement, progress);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
@@ -147,30 +135,6 @@ export class MRAID extends View {
                 this.onLoaded.unsubscribe(observer);
             });
         }
-
-        this._resizeDelayer = (event: Event) => {
-            this._resizeTimeout = setTimeout(() => {
-                this._resizeHandler(event);
-            }, 200);
-        };
-
-        this._resizeHandler = (event: Event) => {
-            iframe.width = window.innerWidth;
-            iframe.height = window.innerHeight;
-            if(this._iframe.contentWindow) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'resize',
-                    width: window.innerWidth,
-                    height: window.innerHeight
-                }, '*');
-            }
-        };
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            window.addEventListener('resize', this._resizeDelayer, false);
-        } else {
-            window.addEventListener('resize', this._resizeHandler, false);
-        }
     }
 
     public hide() {
@@ -182,15 +146,6 @@ export class MRAID extends View {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
         }
-        if(this._resizeHandler) {
-            window.removeEventListener('resize', this._resizeHandler, false);
-            this._resizeHandler = undefined;
-        }
-        if(this._resizeDelayer) {
-            window.removeEventListener('resize', this._resizeDelayer, false);
-            clearTimeout(this._resizeTimeout);
-            this._resizeHandler = undefined;
-        }
         super.hide();
     }
 
@@ -201,11 +156,30 @@ export class MRAID extends View {
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
+                mraid = this.replaceMraidSources(mraid);
 
-                return MRAIDContainer.replace('<body></body>', '<body>' + mraid.replace('<script src="mraid.js"></script>', '') + '</body>');
+                return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
         });
+    }
+
+    public setViewableState(viewable: boolean) {
+        if(this._loaded) {
+            this._iframe.contentWindow.postMessage({
+                type: 'viewable',
+                value: viewable
+            }, '*');
+        }
+    }
+
+    private replaceMraidSources(mraid: string): string {
+        const dom = new DOMParser().parseFromString(mraid, "text/html");
+        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
+        if (src && src.parentNode) {
+            src.parentNode.removeChild(src);
+        }
+        return dom.documentElement.outerHTML;
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -251,15 +225,7 @@ export class MRAID extends View {
                 break;
 
             case 'open':
-                this.onClick.trigger();
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(encodeURI(event.data.url));
-                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': encodeURI(event.data.url) // todo: these come from 3rd party sources, should be validated before general MRAID support
-                    });
-                }
+                this.onClick.trigger(encodeURI(event.data.url));
                 break;
 
             case 'close':
@@ -285,7 +251,16 @@ export class MRAID extends View {
                     forceOrientation: forceOrientation
                 });
                 break;
-
+            case 'analyticsEvent':
+                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                break;
+            case 'customMraidState':
+                if(event.data.state === 'completed') {
+                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                        this._closeRemaining = 5;
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -311,5 +286,4 @@ export class MRAID extends View {
             return Promise.resolve(this._campaign.getResource());
         }
     }
-
 }

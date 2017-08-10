@@ -140,6 +140,12 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
+            if (!this._configuration.isEnabled()) {
+                const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
+                error.name = 'DisabledGame';
+                throw error;
+            }
+
             if(this._configuration.isAnalyticsEnabled()) {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._wakeUpManager.setListenAndroidLifecycle(true);
@@ -189,12 +195,15 @@ export class WebView {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error && error.name === 'DisabledGame') {
+                return;
             } else if(error instanceof Error) {
                 error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
                 if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
                     this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
                 }
             }
+
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('initialization_error', error);
         });

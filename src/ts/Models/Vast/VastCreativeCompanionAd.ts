@@ -8,10 +8,11 @@ interface IVastCreativeCompanionAd {
     staticResourceURL: string | null;
     creativeType: string | null;
     companionClickThroughURLTemplate: string | null;
+    trackingEvents: { [eventName: string]: string[] };
 }
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
-    constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string) {
+    constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string, trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
@@ -19,7 +20,8 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
             type: ['string'],
             staticResourceURL: ['string', 'null'],
             creativeType: ['string', 'null'],
-            companionClickThroughURLTemplate: ['string', 'null']
+            companionClickThroughURLTemplate: ['string', 'null'],
+            trackingEvents: ['object']
         });
 
         this.set('id', id || null);
@@ -29,6 +31,7 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         this.set('creativeType', creativeType || null);
         this.set('staticResourceURL', staticResourceURL || null);
         this.set('companionClickThroughURLTemplate', companionClickThroughURLTemplate || null);
+        this.set('trackingEvents', trackingEvents || {});
     }
 
     public getId(): string | null {
@@ -69,5 +72,17 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
             'creativeType': this.getCreativeType(),
             'companionClickThroughURLTemplate': this.getCompanionClickThroughURLTemplate()
         };
+    }
+
+    public getTrackingEvents(): { [eventType: string]: string[] } {
+        return this.get('trackingEvents') || {};
+    }
+
+    public getEventTrackingUrls(eventType: string): string[] {
+        const trackingEvents = this.getTrackingEvents();
+        if (trackingEvents) {
+            return trackingEvents[eventType] || [];
+        }
+        return [];
     }
 }

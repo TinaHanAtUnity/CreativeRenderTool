@@ -167,6 +167,7 @@
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
+| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
 
 
 
@@ -200,4 +201,5 @@
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
+| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
 

@@ -6,6 +6,9 @@ interface IMRAIDCampaign extends ICampaign {
     resource: string | undefined;
     dynamicMarkup: string | undefined;
     additionalTrackingEvents: { [eventName: string]: string[] };
+
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -15,7 +18,9 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             resourceAsset: ['object', 'undefined'],
             resource: ['string', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            additionalTrackingEvents: ['object', 'undefined']
+            additionalTrackingEvents: ['object', 'undefined'],
+            clickAttributionUrl: ['string', 'undefined'],
+            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -30,6 +35,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('correlationId', correlationId || undefined);
         this.set('creativeId', creativeId || undefined);
         this.set('seatId', seatId || undefined);
+
+        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
+        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
+
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -63,6 +72,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getTrackingEventUrls(): { [eventName: string]: string[] } {
         return this.get('additionalTrackingEvents');
+    }
+
+    public getClickAttributionUrl(): string | undefined {
+        return this.get('clickAttributionUrl');
+    }
+
+    public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
+        return this.get('clickAttributionUrlFollowsRedirects');
     }
 
     public getDTO(): { [key: string]: any } {

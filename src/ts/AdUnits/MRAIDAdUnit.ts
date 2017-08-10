@@ -19,6 +19,8 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
+    private _onSystemInterruptObserver: any;
+    private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAID, options: any) {
@@ -58,6 +60,8 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
+        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
         return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
     }
@@ -70,6 +74,8 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptObserver);
+        this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
 
         this._mraid.hide();
 
@@ -111,6 +117,8 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     }
 
     private onShow() {
+        this._mraid.setViewableState(true);
+
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
@@ -123,6 +131,22 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
+        }
+    }
+
+    private onSystemInterrupt(interruptStarted: boolean): void {
+        if(this.isShowing()) {
+            if(interruptStarted) {
+                this._mraid.setViewableState(false);
+            } else {
+                this._mraid.setViewableState(true);
+            }
+        }
+    }
+
+    private onSystemPause(): void {
+        if(this.isShowing()) {
+            this._mraid.setViewableState(false);
         }
     }
 

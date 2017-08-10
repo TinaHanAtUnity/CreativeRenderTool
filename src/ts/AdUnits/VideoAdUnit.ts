@@ -22,6 +22,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     protected _onShowObserver: any;
     protected _onSystemKillObserver: any;
     protected _onSystemInterruptObserver: any;
+    protected _onLowMemoryWarningObserver: any;
 
     protected _options: any;
     private _video: Video;
@@ -29,15 +30,22 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _overlay: Overlay | undefined;
     private _deviceInfo: DeviceInfo;
     private _videoOrientation: 'landscape' | 'portrait' | undefined;
+    private _lowMemory: boolean;
+    private _prepareCalled: boolean;
+    private _videoReady: boolean;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._video = video;
+        this._videoReady = false;
         this._active = false;
         this._overlay = overlay;
         this._deviceInfo = deviceInfo;
         this._options = options;
+        this._prepareCalled = false;
+
+        this._lowMemory = false;
     }
 
     public show(): Promise<void> {
@@ -47,7 +55,8 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe(() => this.onSystemInterrupt());
+        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
+        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
         return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
     }
@@ -66,6 +75,22 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
+    }
+
+    public isVideoReady(): boolean {
+        return this._videoReady;
+    }
+
+    public setVideoReady(ready: boolean): void {
+        this._videoReady = ready;
+    }
+
+    public isPrepareCalled(): boolean {
+        return this._prepareCalled;
+    }
+
+    public setPrepareCalled(prepareCalled: boolean): void {
+        this._prepareCalled = prepareCalled;
     }
 
     public isCached(): boolean {
@@ -96,6 +121,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         return this._videoOrientation;
     }
 
+    public isLowMemory(): boolean {
+        return this._lowMemory;
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
@@ -111,6 +140,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             }
 
             this.getValidVideoUrl().then(url => {
+                this.setPrepareCalled(true);
                 this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
             });
         }
@@ -123,10 +153,21 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         }
     }
 
-    protected onSystemInterrupt(): void {
+    protected onSystemInterrupt(interruptStarted: boolean): void {
         if(this.isShowing() && this.isActive()) {
-            this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
-            this._nativeBridge.VideoPlayer.play();
+            if(interruptStarted) {
+                this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
+                this._nativeBridge.VideoPlayer.pause();
+            } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
+                this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+                this._nativeBridge.VideoPlayer.play();
+            }
+        }
+    }
+
+    protected onLowMemoryWarning(): void {
+        if(this.isShowing()) {
+            this._lowMemory = true;
         }
     }
 

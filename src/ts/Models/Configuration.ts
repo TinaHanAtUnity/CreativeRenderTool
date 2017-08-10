@@ -4,7 +4,8 @@ import { Model } from 'Models/Model';
 export enum CacheMode {
     FORCED,
     ALLOWED,
-    DISABLED
+    DISABLED,
+    ADAPTIVE
 }
 
 interface IConfiguration {
@@ -64,6 +65,10 @@ export class Configuration extends Model<IConfiguration> {
                 this.set('cacheMode', CacheMode.DISABLED);
                 break;
 
+            case 'adaptive':
+                this.set('cacheMode', CacheMode.ADAPTIVE);
+                break;
+
             default:
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
@@ -120,6 +125,17 @@ export class Configuration extends Model<IConfiguration> {
 
     public getPlacement(placementId: string): Placement {
         return this.getPlacements()[placementId];
+    }
+
+    public getPlacementIds(): string[] {
+        const placementIds: string[] = [];
+        for(const placement in this.getPlacements()) {
+            if (this.getPlacements().hasOwnProperty(placement)) {
+                placementIds.push(placement);
+            }
+        }
+
+        return placementIds;
     }
 
     public getPlacements(): { [id: string]: Placement } {
