@@ -158,7 +158,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
             if(interruptStarted) {
                 this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
                 this._nativeBridge.VideoPlayer.pause();
-            } else if (!interruptStarted && this.isVideoReady()) {
+            } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
                 this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }

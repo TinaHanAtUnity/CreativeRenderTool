@@ -124,6 +124,9 @@ export class AdUnitFactory {
         mraid.onReward.subscribe(() => {
             sessionManager.sendThirdQuartile(mraidAdUnit);
         });
+
+        mraid.onAnalyticsEvent.subscribe((event, delayFromStart) => MRAIDEventHandlers.onAnalyticsEvent(campaign, event, delayFromStart));
+
         mraid.onSkip.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
             mraidAdUnit.hide();

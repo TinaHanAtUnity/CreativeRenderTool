@@ -1,3 +1,22 @@
+# Wed Aug  9 08:40:17 UTC 2017
+
+* Adaptive caching test with 0,5MB/s limit on groups 6 and 7
+* Fix some video player diagnostic problems
+
+# Tue Aug  8 09:33:22 UTC 2017
+
+* Remove endscreen test from groups 8, 9, 10 and 11
+* Log all activity and viewcontroller events to video_player_stuck diagnostics
+* Fix cropping issue on iOS with MRAID
+* Remove video_player_prepare_not_called diagnostic message
+
+# Mon Aug  7 08:03:45 UTC 2017
+
+* Handle errors by placement with PLC ad plans
+* Remove unused UI styles
+* Fix MRAID parsing
+* Yet another fix for iOS video player stuck problems
+
 # Thu Aug  3 16:05:47 UTC 2017
 
 * Fix VAST campaign expiration
