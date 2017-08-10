@@ -107,7 +107,9 @@ export class TestFixtures {
             assetCaching: 'disabled',
             placements: [],
             gamerId: 'abc123',
-            abGroup: 0
+            abGroup: 0,
+            useAuction: true,
+            properties: 'abc123'
         });
     }
 
