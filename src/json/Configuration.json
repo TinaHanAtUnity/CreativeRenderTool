@@ -1,9 +1,12 @@
 {
+  "abGroup": 0,
+  "gamerId": "TestGamerId",
   "enabled": true,
   "country": "fi",
   "coppaCompliant": false,
-  "useAuction": false,
+  "useAuction": true,
   "assetCaching": "forced",
+  "properties": "TestProperties",
   "placements": [
     {
       "id": "1",
