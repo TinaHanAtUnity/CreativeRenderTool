@@ -89,7 +89,7 @@ export class MRAID extends View {
 
         const resourceUrl = this._campaign.getResourceUrl();
         const abGroup = campaign.getAbGroup();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/roll-the-ball/) && (abGroup === 8 || abGroup === 9)) {
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/bowmasters/) && (abGroup === 8 || abGroup === 9)) {
             this._loadingScreenAbTest = true;
         }
     }
@@ -276,7 +276,6 @@ export class MRAID extends View {
                 value: true
             }, '*');
         }
-        super.hide();
     }
 
     private replaceMraidSources(mraid: string): string {
