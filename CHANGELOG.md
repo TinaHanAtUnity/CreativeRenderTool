@@ -1,3 +1,8 @@
+# Thu Aug 10 08:57:51 UTC 2017
+
+* Add support for analytics events from playables
+* Prevent multiple video player errors from one ad unit
+
 # Wed Aug  9 08:40:17 UTC 2017
 
 * Adaptive caching test with 0,5MB/s limit on groups 6 and 7
