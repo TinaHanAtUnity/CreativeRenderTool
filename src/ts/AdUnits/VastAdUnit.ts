@@ -190,21 +190,21 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    protected onSystemInterrupt(interruptStarted: boolean): void {
-        super.onSystemInterrupt(interruptStarted);
-        if (this._moat) {
-            if (!interruptStarted && this.isShowing() && this.isActive()) {
-                this._moat.resume(this.getVolume());
-            }
-        }
-    }
-
     public sendCompanionTrackingEvent(eventManager: EventManager, sessionId: string, sdkVersion: number): void {
         const companion = this.getCompanionForOrientation();
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
                 this.sendThirdPartyEvent(eventManager, 'companion', sessionId, sdkVersion, url);
+            }
+        }
+    }
+
+    protected onSystemInterrupt(interruptStarted: boolean): void {
+        super.onSystemInterrupt(interruptStarted);
+        if (this._moat) {
+            if (!interruptStarted && this.isShowing() && this.isActive()) {
+                this._moat.resume(this.getVolume());
             }
         }
     }
