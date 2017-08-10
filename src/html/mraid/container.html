@@ -66,6 +66,12 @@
                     }
                 }, false);
 
+                window.addEventListener('resize', function(e) {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    trigger('sizeChange', [width, height]);
+                });
+
                 window.addEventListener('DOMContentLoaded', function() {
                     window.parent.postMessage({
                         type: 'loaded'
@@ -185,6 +191,20 @@
 
                 this.useCustomClose = function() {
                     trigger('error', ['not implemented', 'useCustomClose']);
+                };
+
+                this.sendAnalyticsEvent = function(event) {
+                    window.parent.postMessage({
+                        type: 'analyticsEvent',
+                        event: event
+                    }, '*');
+                };
+
+                this.setCustomMraidState = function(state) {
+                    window.parent.postMessage({
+                        type: 'customMraidState',
+                        state: state
+                    }, '*');
                 };
             };
             window.mraid = new MRAID();

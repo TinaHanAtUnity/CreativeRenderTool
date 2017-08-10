@@ -11,6 +11,7 @@ export class VastEndScreen extends View {
 
     public readonly onClick = new Observable0();
     public readonly onClose = new Observable0();
+    public readonly onShow = new Observable0();
 
     constructor(nativeBridge: NativeBridge, campaign: VastCampaign) {
         super(nativeBridge, 'end-screen');
@@ -43,6 +44,8 @@ export class VastEndScreen extends View {
 
     public show(): void {
         super.show();
+
+        this.onShow.trigger();
 
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {

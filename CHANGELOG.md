@@ -1,3 +1,100 @@
+# Wed Aug  9 08:40:17 UTC 2017
+
+* Adaptive caching test with 0,5MB/s limit on groups 6 and 7
+* Fix some video player diagnostic problems
+
+# Tue Aug  8 09:33:22 UTC 2017
+
+* Remove endscreen test from groups 8, 9, 10 and 11
+* Log all activity and viewcontroller events to video_player_stuck diagnostics
+* Fix cropping issue on iOS with MRAID
+* Remove video_player_prepare_not_called diagnostic message
+
+# Mon Aug  7 08:03:45 UTC 2017
+
+* Handle errors by placement with PLC ad plans
+* Remove unused UI styles
+* Fix MRAID parsing
+* Yet another fix for iOS video player stuck problems
+
+# Thu Aug  3 16:05:47 UTC 2017
+
+* Fix VAST campaign expiration
+* Fix a race condition with iOS video preparing and system events
+
+# Thu Aug  3 09:26:02 UTC 2017
+
+* Modify auction ad plan expiration to match old yield ad plan expiration
+* Add logging of system events to iOS video_player_stuck diagnostics
+* Remove multiple_plc_campaigns diagnostic message
+
+# Tue Aug  1 13:08:27 UTC 2017
+
+* Endscreen download button A/B test in groups 8, 9, 10 and 11
+* Fix for some iOS video_player_stuck cases
+* Improved video_validation_failed diagnostics
+* Send multiple_plc_campaigns whenever SDK receives different kinds of fill to different placements
+
+# Tue Jul 25 06:44:19 UTC 2017
+
+* Trigger mraid viewableChange event on system pause and resume
+* Follow redirects if clickAttributionUrlFollowsRedirects is true on MRAID campaigns
+* Fix some video_player_stuck errors
+
+# Tue Jul 18 10:07:39 UTC 2017
+
+* Remove A/B tests for groups 6, 7 (refresh intervals) & 13 (adaptive caching)
+
+# Fri Jul 14 08:59:40 UTC 2017
+
+* CPI MRAID click attribution url was not fired (ABT-255)
+
+# Wed Jul 12 12:43:02 UTC 2017
+
+* Test adaptive caching on A/B group 13
+
+# Wed Jul 12 09:10:06 UTC 2017
+
+* VAST companion tracking
+* Stop sending errors for properly stopped caching
+* Send diagnostic error if game is not enabled in config response
+
+# Mon Jul 10 06:56:26 UTC 2017
+
+* Catch a few different init errors instead of failing entire init
+* Add low memory warning detection to video_player_stuck diagnostic events
+
+# Thu Jul  6 14:00:44 UTC 2017
+
+* Endscreen ratings fix
+* Improve video_player_stuck diagnostics
+
+# Thu Jul  6 07:20:34 UTC 2017
+
+* Add bundleId to video events
+* Increase test delay to two seconds in A/B group 6
+
+# Wed Jul  5 09:48:21 UTC 2017
+
+* Refactored AssetManager and CampaignManager to support parsing and caching multiple campaigns asynchronously
+* Add new fields to video_player_stuck diagnostics
+* Add new 2.1.0 client object fields to diagnostic messages
+
+# Mon Jul  3 12:48:21 UTC 2017
+
+* Revert test in group 7 back to exponential increase of refresh interval
+* Fix strange reference to event global in end screen event handler
+
+# Mon Jul  3 09:30:10 UTC 2017
+
+* Try linear increasing of refresh interval in group 7
+* Start A/B test with 1 second refresh after start in A/B group 6
+* Add allowSkip parameter to auction ad requests
+
+# Thu Jun 29 12:47:41 UTC 2017
+
+* Reduce quick no fill refresh test initial delay to one minute
+
 # Thu Jun 29 09:09:31 UTC 2017
 
 * Add values sent via operative events for brand auction

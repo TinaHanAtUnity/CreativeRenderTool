@@ -1,4 +1,4 @@
-import { Cache, ICacheDiagnostics } from 'Utilities/Cache';
+import { Cache, ICacheDiagnostics, CacheStatus } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
@@ -14,23 +14,57 @@ enum CacheType {
     OPTIONAL
 }
 
+interface ICampaignQueueObject {
+    campaign: Campaign;
+    resolved: boolean;
+    resolve: (campaign: Campaign) => void;
+    reject: (reason?: any) => void;
+}
+
+interface IAssetQueueObject {
+    url: string;
+    diagnostics: ICacheDiagnostics;
+    resolve: (value: string[]) => void;
+    reject: (reason?: any) => void;
+}
+
 export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
+    private _caching: boolean;
+    private _fastConnectionDetected: boolean;
+    private _requiredQueue: IAssetQueueObject[];
+    private _optionalQueue: IAssetQueueObject[];
+    private _campaignQueue: { [id: number]: ICampaignQueueObject };
+    private _queueId: number;
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
+        this._caching = false;
+        this._fastConnectionDetected = false;
+        this._requiredQueue = [];
+        this._optionalQueue = [];
+        this._campaignQueue = {};
+        this._queueId = 0;
+
+        if(cacheMode === CacheMode.ADAPTIVE) {
+            this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
+        }
     }
 
-    public setup(campaign: Campaign, plc?: boolean): Promise<Campaign> {
+    public setup(campaign: Campaign): Promise<Campaign> {
         if(!this.validateAssets(campaign)) {
             throw new Error('Invalid required assets in campaign ' + campaign.getId());
+        }
+
+        if(campaign.getAbGroup() === 6 || campaign.getAbGroup() === 7) {
+            this._cacheMode = CacheMode.ADAPTIVE;
         }
 
         if(this._cacheMode === CacheMode.DISABLED) {
@@ -42,21 +76,56 @@ export class AssetManager {
                 return this.validateVideos(requiredAssets);
             });
 
-            if(this._cacheMode === CacheMode.FORCED || plc) {
+            if(this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    if(plc) {
-                        // hack to avoid race conditions with plc when there are multiple different campaigns
-                        // proper fix is to refactor AssetManager to trigger events instead of returning one promise
-                        return this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                            return campaign;
-                        });
-                    } else {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                        // allow optional assets to fail caching when in CacheMode.FORCED
+                    });
+                    return campaign;
+                });
+            } else if(this._cacheMode === CacheMode.ADAPTIVE) {
+                if(this._fastConnectionDetected) {
+                    // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
+                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                        // allow optional assets to fail
+                    });
+                    return Promise.resolve(campaign);
+                } else {
+                    const id: number = this._queueId;
+                    const promise = this.registerCampaign(campaign, id);
+                    this._queueId++;
+
+                    requiredChain.then(() => {
+                        const campaignObject = this._campaignQueue[id];
+
+                        if(campaignObject) {
+                            if(!campaignObject.resolved) {
+                                campaignObject.resolved = true;
+                                campaignObject.resolve(campaign);
+                            }
+
+                            delete this._campaignQueue[id];
+                        }
+
                         this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
                             // allow optional assets to fail caching when in CacheMode.FORCED
                         });
                         return campaign;
-                    }
-                });
+                    }).catch(error => {
+                        const campaignObject = this._campaignQueue[id];
+
+                        if(campaignObject) {
+                            if(!campaignObject.resolved) {
+                                campaignObject.resolved = true;
+                                campaignObject.reject(error);
+                            }
+
+                            delete this._campaignQueue[id];
+                        }
+                    });
+
+                    return promise;
+                }
             } else {
                 requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
@@ -89,7 +158,22 @@ export class AssetManager {
 
     public stopCaching(): void {
         this._stopped = true;
+        this._fastConnectionDetected = false;
         this._cache.stop();
+
+        while(this._requiredQueue.length) {
+            const object: IAssetQueueObject | undefined = this._requiredQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
+
+        while(this._optionalQueue.length) {
+            const object: IAssetQueueObject | undefined = this._optionalQueue.shift();
+            if(object) {
+                object.reject(CacheStatus.STOPPED);
+            }
+        }
     }
 
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
@@ -100,7 +184,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                return this._cache.cache(asset.getUrl(), this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
+                const promise = this.queueAsset(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -111,9 +195,50 @@ export class AssetManager {
 
                     return Promise.resolve();
                 });
+                this.executeAssetQueue();
+                return promise;
             });
         }
         return chain;
+    }
+
+    private queueAsset(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
+        return new Promise<string[]>((resolve,reject) => {
+            const queueObject: IAssetQueueObject = {
+                url: url,
+                diagnostics: diagnostics,
+                resolve: resolve,
+                reject: reject
+            };
+            if(cacheType === CacheType.REQUIRED) {
+                this._requiredQueue.push(queueObject);
+            } else {
+                this._optionalQueue.push(queueObject);
+            }
+        });
+    }
+
+    private executeAssetQueue(): void {
+        if(!this._caching) {
+            let currentAsset: IAssetQueueObject | undefined = this._requiredQueue.shift();
+            if(!currentAsset) {
+                currentAsset = this._optionalQueue.shift();
+            }
+
+            if(currentAsset) {
+                const asset: IAssetQueueObject = currentAsset;
+                this._caching = true;
+                this._cache.cache(asset.url, asset.diagnostics).then(([fileId, fileUrl]) => {
+                    asset.resolve([fileId, fileUrl]);
+                    this._caching = false;
+                    this.executeAssetQueue();
+                }).catch(error => {
+                    asset.reject(error);
+                    this._caching = false;
+                    this.executeAssetQueue();
+                });
+            }
+        }
     }
 
     private validateAssets(campaign: Campaign): boolean {
@@ -141,9 +266,6 @@ export class AssetManager {
             if(asset instanceof Video) {
                 promises.push(this._cache.isVideoValid(asset).then(valid => {
                     if(!valid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: asset.getOriginalUrl()
-                        });
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }
                 }));
@@ -194,6 +316,32 @@ export class AssetManager {
             }
 
             throw new WebViewError('Unable to select oriented video for caching');
+        });
+    }
+
+    private onFastConnectionDetected(): void {
+        this._fastConnectionDetected = true;
+
+        for(const id in this._campaignQueue) {
+            if(this._campaignQueue.hasOwnProperty(id)) {
+                const campaignObject = this._campaignQueue[id];
+                if(!campaignObject.resolved) {
+                    campaignObject.resolved = true;
+                    campaignObject.resolve(campaignObject.campaign);
+                }
+            }
+        }
+    }
+
+    private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {
+        return new Promise<Campaign>((resolve,reject) => {
+            const queueObject: ICampaignQueueObject = {
+                campaign: campaign,
+                resolved: false,
+                resolve: resolve,
+                reject: reject
+            };
+            this._campaignQueue[id] = queueObject;
         });
     }
 

@@ -23,6 +23,7 @@ class TestCacheApi extends CacheApi {
     private _internet: boolean = true;
     private _files: { [key: string]: IFileInfo } = {};
     private _currentFile: string;
+    private _downloadDelay: number = 1;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
@@ -44,7 +45,7 @@ class TestCacheApi extends CacheApi {
             setTimeout(() => {
                 delete this._currentFile;
                 this._nativeBridge.handleEvent(['CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []]);
-            }, 1);
+            }, this._downloadDelay);
             return Promise.resolve(void(0));
         } else {
             return Promise.reject(CacheError[CacheError.NO_INTERNET]);
@@ -107,6 +108,10 @@ class TestCacheApi extends CacheApi {
     public addFile(id: string, mtime: number, size: number): void {
         const fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
         this._files[id] = fileInfo;
+    }
+
+    public setDownloadDelay(delay: number) {
+        this._downloadDelay = delay;
     }
 }
 
@@ -243,4 +248,112 @@ describe('AssetManagerTest', () => {
         });
     });
 
+    it('should cache two campaigns', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi');
+        const asset2 = new HTML('https:/www.google.fi/2');
+        const campaign = new TestCampaign([asset], []);
+        const campaign2 = new TestCampaign([asset2], []);
+        return Promise.all([assetManager.setup(campaign),assetManager.setup(campaign2)]).then(() => {
+            assert(asset.isCached(), 'First asset was not cached');
+            assert(asset2.isCached(), 'Second asset was not cached');
+        });
+    });
+
+    it('should stop caching', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi');
+        const campaign = new TestCampaign([asset], []);
+        const promise = assetManager.setup(campaign);
+        assetManager.stopCaching();
+        return promise.then(() => {
+            throw new Error('Should not resolve');
+        }).catch(error => {
+            assert.isFalse(asset.isCached(), 'Asset was cached when caching was stopped');
+        });
+    });
+
+    describe('with cache mode adaptive', () => {
+        beforeEach(() => {
+            cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
+        });
+
+        it('should handle required assets without fast connection', () => {
+            const cache = new Cache(nativeBridge, wakeUpManager, request);
+            const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
+            const asset = new HTML('https://www.google.fi');
+            const campaign = new TestCampaign([asset], []);
+            const spy = sinon.spy(cache, 'cache');
+            return assetManager.setup(campaign).then(() => {
+                assert(spy.called, 'Cache was not called for required asset');
+                assert(asset.isCached(), 'Asset was not cached');
+            });
+        });
+
+        it('should handle optional assets without fast connection', () => {
+            const cache = new Cache(nativeBridge, wakeUpManager, request);
+            const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
+            const asset = new HTML('https://www.google.fi');
+            const campaign = new TestCampaign([], [asset]);
+            const spy = sinon.spy(cache, 'cache');
+            return assetManager.setup(campaign).then(() => {
+                return new Promise((resolve, reject) => { setTimeout(resolve, 300); }).then(() => {
+                    assert(spy.called, 'Cache was not called for optional asset');
+                    assert(asset.isCached(), 'Asset was not cached');
+                });
+            });
+        });
+
+        it('should not swallow errors without fast connection', () => {
+            const cache = new Cache(nativeBridge, wakeUpManager, request, {retries: 0, retryDelay: 1});
+            const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
+            const asset = new HTML('https://www.google.fi');
+            const campaign = new TestCampaign([asset], []);
+            cacheApi.setInternet(false);
+            return assetManager.setup(campaign).then(() => {
+                throw new Error('Should not resolve');
+            }).catch(error => {
+                assert.equal(error, CacheStatus.FAILED);
+            });
+        });
+
+        it('should resolve when fast connection is detected', () => {
+            const cache = new Cache(nativeBridge, wakeUpManager, request);
+            const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
+            const asset = new HTML('https://www.google.fi');
+            const campaign = new TestCampaign([asset], []);
+            const spy = sinon.spy(cache, 'cache');
+            cacheApi.setDownloadDelay(10000);
+
+            let fastConnectionDetected: boolean = false;
+
+            const promise = assetManager.setup(campaign).then(() => {
+                assert(spy.called, 'Cache was not called for required asset');
+                assert(fastConnectionDetected, 'Promise resolved before fast connection was detected');
+                assert.isFalse(asset.isCached(), 'Promise resolved only after asset was fully cached');
+            });
+
+            setTimeout(() => {
+                fastConnectionDetected = true;
+                cache.onFastConnectionDetected.trigger();
+            }, 300);
+
+            return promise;
+        });
+
+        it('should immediately resolve if fast connection has been detected before', () => {
+            const cache = new Cache(nativeBridge, wakeUpManager, request);
+            const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
+            const asset = new HTML('https://www.google.fi');
+            const campaign = new TestCampaign([asset], []);
+            cacheApi.setDownloadDelay(10000);
+            cache.onFastConnectionDetected.trigger();
+
+            return assetManager.setup(campaign).then(() => {
+                assert.isFalse(asset.isCached(), 'Promise resolved only after asset was fully cached');
+            });
+        });
+    });
 });

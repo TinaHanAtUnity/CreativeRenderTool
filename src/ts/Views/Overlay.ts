@@ -19,8 +19,6 @@ export class Overlay extends View {
     public readonly onMute = new Observable1<boolean>();
     public readonly onCallButton = new Observable1<boolean>();
 
-    public readonly onFullScreenButton = new Observable1<boolean>();
-
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -48,9 +46,6 @@ export class Overlay extends View {
     private _callButtonElement: HTMLElement;
 
     private _progressElement: HTMLElement;
-
-    private _fullScreenHitAreaElement: HTMLElement;
-    private _fullScreenButtonVisible: boolean = false;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
@@ -86,11 +81,6 @@ export class Overlay extends View {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onFullScreenButtonEvent(event),
-                selector: '.full-screen-hit-area'
-            },
-            {
-                event: 'click',
                 listener: (event: Event) => this.onClick(event)
             }
         ];
@@ -104,7 +94,6 @@ export class Overlay extends View {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        this._fullScreenHitAreaElement = <HTMLElement>this._container.querySelector('.full-screen-hit-area');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -185,12 +174,6 @@ export class Overlay extends View {
         }
     }
 
-    public setFullScreenButtonVisible(value: boolean) {
-        if(this._fullScreenButtonVisible !== value) {
-            this._fullScreenHitAreaElement.style.display = value ? 'block' : 'none';
-        }
-    }
-
     public isMuted(): boolean {
         return this._muted;
     }
@@ -238,14 +221,6 @@ export class Overlay extends View {
         } else {
             this.fade(true);
         }
-    }
-
-    private onFullScreenButtonEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        this.resetFadeTimer();
-        this.onFullScreenButton.trigger(true);
-
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {

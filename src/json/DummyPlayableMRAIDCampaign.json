@@ -1,0 +1,16 @@
+{
+    "id": "595415b6781d7d095b817166",
+    "platform": "android",
+    "store": "google",
+    "appStoreId": "com.test.testplayable",
+    "gameId": 15334,
+    "gameName": "Test Playable",
+    "gameIcon": "https://www.example.net/icon.png",
+    "rating": 4.530868053436279,
+    "ratingCount": 168136,
+    "clickAttributionUrl": "https://www.example.net/click_attribution",
+    "clickAttributionUrlFollowsRedirects": false,
+    "bypassAppSheet": false,
+    "appStoreCountry": "",
+    "mraidUrl": "https://www.example.net/playables/index.html"
+}

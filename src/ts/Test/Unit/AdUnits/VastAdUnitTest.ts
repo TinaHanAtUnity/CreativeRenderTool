@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { Overlay } from 'Views/Overlay';
@@ -13,6 +14,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 
@@ -53,7 +55,7 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         eventManager = new EventManager(nativeBridge, request);
-        vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     afterEach(() => sandbox.restore);
@@ -143,7 +145,7 @@ describe('VastAdUnit', () => {
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
             const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
         });
 
         it('should return correct http:// url', () => {
@@ -250,7 +252,7 @@ describe('VastAdUnit', () => {
                 hide: sinon.spy(),
                 remove: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
         });
 
         it('should return correct companion click through url', () => {
@@ -270,6 +272,22 @@ describe('VastAdUnit', () => {
         it('should return endscreen', () => {
             const endScreen = vastAdUnit.getEndScreen();
             assert.equal(endScreen, vastEndScreen);
+        });
+
+        it('it should fire companion tracking events', () => {
+            const width = 320;
+            const height = 480;
+            const url = 'http://example.com/companionCreativeView';
+            const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
+                'creativeView': [url]
+            });
+            sandbox.stub(vast, 'getLandscapeOrientedCompanionAd').returns(companion);
+            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
+
+            const mockEventManager = sinon.mock(eventManager);
+            mockEventManager.expects('thirdPartyEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
+            vastAdUnit.sendCompanionTrackingEvent(eventManager, '123', 1234);
+            mockEventManager.verify();
         });
 
         it('should hide and then remove endscreen on hide', () => {
