@@ -119,7 +119,7 @@ export class MRAID extends View {
         } else {
             // if not loaded, onIframeLoaded function shows the playable on the onload event
             if(this._iframeLoaded) {
-                this.showPlayable();
+                this.showMRAIDAd();
             }
         }
     }
@@ -177,7 +177,7 @@ export class MRAID extends View {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
 
-            this.showPlayable();
+            this.showMRAIDAd();
         }
     }
 
@@ -185,7 +185,7 @@ export class MRAID extends View {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = setTimeout(() => {
             if(this._iframeLoaded) {
-                this.showPlayable();
+                this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
                 this._prepareTimeout = setTimeout(() => {
@@ -206,7 +206,7 @@ export class MRAID extends View {
         }, 1500);
     }
 
-    private showPlayable() {
+    private showMRAIDAd() {
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = MRAID.CloseLength;
