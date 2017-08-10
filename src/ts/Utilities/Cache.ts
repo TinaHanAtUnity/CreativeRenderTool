@@ -9,6 +9,7 @@ import { Video } from 'Models/Assets/Video';
 import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
+import { VideoInfo } from 'Utilities/VideoInfo';
 
 export enum CacheStatus {
     OK,
@@ -354,7 +355,7 @@ export class Cache {
 
     public isVideoValid(video: Video): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
-            return this._nativeBridge.Cache.getVideoInfo(fileId).then(([width, height, duration]) => {
+            return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
                 const isValid = (width > 0 && height > 0 && duration > 0);
                 if(!isValid) {
                     Diagnostics.trigger('video_validation_failed', {
