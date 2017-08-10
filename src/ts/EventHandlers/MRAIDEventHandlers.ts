@@ -8,6 +8,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class MRAIDEventHandlers {
 
@@ -28,6 +29,17 @@ export class MRAIDEventHandlers {
         } else {
             MRAIDEventHandlers.openUrl(nativeBridge, url);
         }
+    }
+
+    public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, delayFromStart: number) {
+        const kafkaObject: any = {};
+        kafkaObject.type = event;
+        kafkaObject.delayFromStart = delayFromStart;
+        const resourceUrl = campaign.getResourceUrl();
+        if(resourceUrl) {
+             kafkaObject.url = resourceUrl.getOriginalUrl();
+        }
+        HttpKafka.sendEvent('events.playable.json', kafkaObject);
     }
 
     private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
