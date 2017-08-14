@@ -65,7 +65,7 @@ describe('MRAIDEventHandlersTest', () => {
             const campaignObj = JSON.parse(DummyPlayableMRAIDCampaign);
 
             const mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
-            mraidView = new MRAID(nativeBridge, placement, mraidCampaign, 'en');
+            mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
 
@@ -100,7 +100,7 @@ describe('MRAIDEventHandlersTest', () => {
             it('with response that contains location, it should launch intent', () => {
                 const campaignObj = JSON.parse(DummyPlayableMRAIDCampaignFollowsRedirects);
                 const mraidCampaign =  new MRAIDCampaign(campaignObj, 'asd', 0, campaignObj.mraidUrl);
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, 'en');
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
                 mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
 
@@ -125,7 +125,7 @@ describe('MRAIDEventHandlersTest', () => {
                 const campaignObj = JSON.parse(DummyPlayableMRAIDCampaignFollowsRedirects);
 
                 const mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, 'en');
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
                 mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
 
