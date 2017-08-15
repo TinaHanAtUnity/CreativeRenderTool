@@ -39,6 +39,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
+        this.set('meta', campaign.meta);
     }
 
     public getResourceUrl(): HTML | undefined {
