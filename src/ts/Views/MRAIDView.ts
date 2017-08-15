@@ -26,7 +26,7 @@ export abstract class MRAIDView extends View {
     protected _campaign: MRAIDCampaign;
 
     public abstract setViewableState(viewable: boolean): void;
-    
+
     public createMRAID(): Promise<string> {
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
