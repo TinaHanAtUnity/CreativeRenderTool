@@ -118,7 +118,7 @@ export class AdUnitFactory {
         let mraid: MRAIDView;
         const resourceUrl = campaign.getResourceUrl();
         const abGroup = campaign.getAbGroup();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/bowmasters/) && (abGroup === 8 || abGroup === 9)) {
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
             mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
         } else {
             mraid = new MRAID(nativeBridge, placement, campaign);

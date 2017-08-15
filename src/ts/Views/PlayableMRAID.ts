@@ -32,8 +32,6 @@ export class PlayableMRAID extends MRAIDView {
     private _closeRemaining: number;
     private _showTimestamp: number;
 
-    private _loadingScreenAbTest = false;
-
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'playable-mraid');
 
@@ -91,14 +89,7 @@ export class PlayableMRAID extends MRAIDView {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
-        if(this._loadingScreenAbTest) {
-            this.showLoadingScreen();
-        } else {
-            // if not loaded, onIframeLoaded function shows the playable on the onload event
-            if(this._iframeLoaded) {
-                this.showMRAIDAd();
-            }
-        }
+        this.showLoadingScreen();
     }
 
     public hide() {
@@ -212,32 +203,24 @@ export class PlayableMRAID extends MRAIDView {
             }, 1000);
         }
 
-        if(this._loadingScreenAbTest) {
-            ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-                if(this._loadingScreen.style.display === 'none') {
-                    return;
-                }
+        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+            if(this._loadingScreen.style.display === 'none') {
+                return;
+            }
 
-                this._loadingScreen.addEventListener(e, () => {
-                    this._closeElement.style.display = 'block';
+            this._loadingScreen.addEventListener(e, () => {
+                this._closeElement.style.display = 'block';
 
-                    this._iframe.contentWindow.postMessage({
-                        type: 'viewable',
-                        value: true
-                    }, '*');
+                this._iframe.contentWindow.postMessage({
+                    type: 'viewable',
+                    value: true
+                }, '*');
 
-                    this._loadingScreen.style.display = 'none';
-                }, false);
-            });
+                this._loadingScreen.style.display = 'none';
+            }, false);
+        });
 
-            this._loadingScreen.classList.add('hidden');
-        } else {
-            this._closeElement.style.display = 'block';
-            this._iframe.contentWindow.postMessage({
-                type: 'viewable',
-                value: true
-            }, '*');
-        }
+        this._loadingScreen.classList.add('hidden');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
