@@ -39,7 +39,7 @@ import WrappedVast2 from 'xml/WrappedVast2.xml';
 import NonWrappedVast from 'xml/NonWrappedVast.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import NoVideoWrappedVast from 'xml/NoVideoWrappedVast.xml';
-import IncorrectWrappedVastJson from 'json/IncorrectWrappedVast.json';
+import OnProgrammaticVastPlcCampaignIncorrectWrapped from 'json/OnProgrammaticVastPlcCampaignIncorrectWrapped.json';
 import IncorrectWrappedVast from 'xml/IncorrectWrappedVast.xml';
 import OnProgrammaticVastPlcCampaignJson from 'json/OnProgrammaticVastPlcCampaign.json';
 import OnProgrammaticVastPlcCampaignInsideOutsideJson from 'json/OnProgrammaticVastPlcCampaignInsideOutside.json';
@@ -512,7 +512,7 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: IncorrectWrappedVastJson
+                    response: OnProgrammaticVastPlcCampaignIncorrectWrapped
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
