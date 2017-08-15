@@ -16,6 +16,7 @@ import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { CacheStatus } from 'Utilities/Cache';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class AuctionCampaignManager extends CampaignManager {
 
@@ -168,20 +169,47 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
 
             case 'programmatic/vast':
+                if(content === null) {
+                    return this.handlePlcNoFills(placements);
+                }
                 return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
                     return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
 
             case 'programmatic/mraid-url':
+                if(content === null) {
+                    return this.handlePlcNoFills(placements);
+                }
                 // todo: handle ad plan expiration with cacheTTL or something similar
                 const jsonMraidUrl = JsonParser.parse(content);
+
+                if(!jsonMraidUrl.inlinedUrl) {
+                    const MRAIDError = new DiagnosticError(
+                        new Error('MRAID Campaign missing inlinedUrl'),
+                        {mraid: jsonMraidUrl}
+                    );
+                    return this.handlePlcError(MRAIDError, placements);
+                }
+
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
                 const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
+                if(content === null) {
+                    return this.handlePlcNoFills(placements);
+                }
                 // todo: handle ad plan expiration with cacheTTL or something similar
                 const jsonMraid = JsonParser.parse(content);
+
+                if(!jsonMraid.markup) {
+                    const MRAIDError = new DiagnosticError(
+                        new Error('MRAID Campaign missing markup'),
+                        {mraid: jsonMraid}
+                    );
+                    return this.handlePlcError(MRAIDError, placements);
+                }
+
                 jsonMraid.id = this.getProgrammaticCampaignId();
                 const markup = decodeURIComponent(jsonMraid.markup);
                 const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
@@ -204,6 +232,13 @@ export class AuctionCampaignManager extends CampaignManager {
     private handlePlcNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
         this.onNoFill.trigger(placement);
+        return Promise.resolve();
+    }
+
+    private handlePlcNoFills(placementIds: string[]): Promise<void> {
+        for(const placementId of placementIds) {
+            this.handlePlcNoFill(placementId);
+        }
         return Promise.resolve();
     }
 
