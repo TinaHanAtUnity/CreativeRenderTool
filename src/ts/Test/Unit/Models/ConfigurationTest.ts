@@ -31,7 +31,7 @@ describe('configurationTest', () => {
                 assert.property(configuration.getPlacements(), 'premium');
                 assert.property(configuration.getPlacements(), 'video');
                 assert.property(configuration.getPlacements(), 'mraid');
-                assert.property(configuration.getPlacements(), 'defaultVideoAndPictureZone');
+                assert.property(configuration.getPlacements(), 'rewardedVideoZone');
             });
 
             it('should pick default', () => {
