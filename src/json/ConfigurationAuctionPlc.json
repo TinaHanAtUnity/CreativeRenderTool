@@ -33,7 +33,7 @@
       "skipInSeconds": 5
     },
     {
-      "id": "defaultVideoAndPictureZone",
+      "id": "rewardedVideoZone",
       "name": "Rewarded Video",
       "default": false,
       "allowSkip": false,
