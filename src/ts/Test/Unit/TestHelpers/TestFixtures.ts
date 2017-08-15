@@ -6,8 +6,8 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import DummyCampaign from 'json/DummyCampaign.json';
-import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
+import PerformanceCampaignJson from 'json/PerformanceCampaign.json';
+import MRAIDCampaignJson from 'json/MRAIDCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
@@ -29,11 +29,11 @@ export class TestFixtures {
     }
 
     public static getCampaign(): PerformanceCampaign {
-        return new PerformanceCampaign(JSON.parse(DummyCampaign), 'abc123', 123);
+        return new PerformanceCampaign(JSON.parse(PerformanceCampaignJson), 'abc123', 123);
     }
 
     public static getMRAIDCampaign(): MRAIDCampaign {
-        const json = JSON.parse(DummyMRAIDCampaign);
+        const json = JSON.parse(MRAIDCampaignJson);
         return new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>', json.mraid.tracking);
     }
 

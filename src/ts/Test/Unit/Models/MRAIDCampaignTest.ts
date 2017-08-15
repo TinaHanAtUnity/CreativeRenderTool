@@ -3,13 +3,13 @@ import { assert } from 'chai';
 
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { HTML } from 'Models/Assets/HTML';
-import DummyMRAID from 'json/DummyMRAIDCampaign.json';
+import MRAIDCampaignJson from 'json/MRAIDCampaign.json';
 
 describe('MRAIDCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const json = JSON.parse(DummyMRAID);
+            const json = JSON.parse(MRAIDCampaignJson);
             const asset = new HTML(json.mraid.inlinedURL);
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>');
 
@@ -24,14 +24,14 @@ describe('MRAIDCampaign', () => {
         });
 
         it('should have correct additional tracking from the json', () => {
-            const json = JSON.parse(DummyMRAID);
+            const json = JSON.parse(MRAIDCampaignJson);
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>', json.mraid.tracking);
 
             assert.deepEqual(campaign.getTrackingEventUrls(), json.mraid.tracking);
         });
 
         it('should set resourceUrl', () => {
-            const json = JSON.parse(DummyMRAID);
+            const json = JSON.parse(MRAIDCampaignJson);
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup);
             const asset = new HTML('https://resource-url.com');
 
@@ -41,7 +41,7 @@ describe('MRAIDCampaign', () => {
         });
 
         it('should set resource', () => {
-            const json = JSON.parse(DummyMRAID);
+            const json = JSON.parse(MRAIDCampaignJson);
             const campaign = new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup);
 
             campaign.setResource('some resource');
