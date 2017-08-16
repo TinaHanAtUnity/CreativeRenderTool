@@ -228,7 +228,7 @@ export class Request {
     }
 
     private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/^https:\/\/www\.masterclass\.com/i)) {
+        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
             return true;
         } else {
             return false;
