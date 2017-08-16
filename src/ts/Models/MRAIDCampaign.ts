@@ -42,7 +42,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('resource', resource);
         this.set('dynamicMarkup', campaign.dynamicMarkup);
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
-
         this.set('adType', adType || undefined);
         this.set('correlationId', correlationId || undefined);
         this.set('creativeId', creativeId || undefined);
@@ -51,6 +50,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
+        this.set('meta', campaign.meta);
         this.set('gameName', campaign.gameName);
 
         if(campaign.gameIcon) {
