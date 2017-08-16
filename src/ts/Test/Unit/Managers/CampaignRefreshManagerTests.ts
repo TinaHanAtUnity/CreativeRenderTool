@@ -30,7 +30,8 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import CampaignRefreshManagerTestCampaign1 from 'json/CampaignRefreshManagerTestCampaign1.json';
 import CampaignRefreshManagerTestCampaign2 from 'json/CampaignRefreshManagerTestCampaign2.json';
 import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
-import CampaignRefreshManagerTestPLCConfig from 'json/CampaignRefreshManagerTestPLCConfig.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
@@ -410,41 +411,42 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestPLCConfig));
+            configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
         });
 
         it('get campaign should return undefined', () => {
-            assert.equal(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
+            assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
         });
 
         it('get campaign should return a campaign (Performance)', () => {
-            const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
+            const json: any = JSON.parse(OnCometVideoPlcCampaign);
+            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('rewardedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('rewardedVideo'), undefined);
-                assert.isTrue(campaignRefreshManager.getCampaign('rewardedVideo') instanceof PerformanceCampaign);
+                assert.notEqual(campaignRefreshManager.getCampaign('premium'), undefined);
+                assert.isTrue(campaignRefreshManager.getCampaign('premium') instanceof PerformanceCampaign);
 
-                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedVideo');
+                const tmpCampaign = campaignRefreshManager.getCampaign('premium');
                 assert.notEqual(undefined, tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), 'TestCampaignId');
                 }
 
-                assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.WAITING);
+                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('incentivizedVideo', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
-                assert.notEqual(campaignRefreshManager.getCampaign('incentivizedVideo'), undefined);
-                assert.isTrue(campaignRefreshManager.getCampaign('incentivizedVideo') instanceof PerformanceCampaign);
-                assert.equal(configuration.getPlacement('rewardedVideo').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('incentivizedVideo').getState(), PlacementState.READY);
+                campaignManager.onCampaign.trigger('video', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
+                assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
+                assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof PerformanceCampaign);
+                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
             });
         });
 
