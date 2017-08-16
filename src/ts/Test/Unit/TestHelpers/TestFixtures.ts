@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import PerformanceCampaignJson from 'json/PerformanceCampaign.json';
-import MRAIDCampaignJson from 'json/MRAIDCampaign.json';
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
@@ -33,8 +33,10 @@ export class TestFixtures {
     }
 
     public static getMRAIDCampaign(): MRAIDCampaign {
-        const json = JSON.parse(MRAIDCampaignJson);
-        return new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>', json.mraid.tracking);
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        mraidJson.id = 'testId';
+        return new MRAIDCampaign(mraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
