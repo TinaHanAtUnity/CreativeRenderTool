@@ -264,6 +264,10 @@ export class AdUnitFactory {
         }
 
         if(forceOrientation === ForceOrientation.PORTRAIT) {
+            // A/B test for disabling portrait videos if both video types are available
+            if(landscapeVideo && (campaign.getAbGroup() === 6 || campaign.getAbGroup() === 7)) {
+                return landscapeVideo;
+            }
             if(portraitVideo) {
                 return portraitVideo;
             }
