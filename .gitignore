@@ -20,6 +20,3 @@ nginx/nginx.conf
 
 # VS Code
 .vscode
-.gradle/buildOutputCleanup/built.bin
-.gradle/buildOutputCleanup/cache.properties
-.gradle/buildOutputCleanup/cache.properties.lock
