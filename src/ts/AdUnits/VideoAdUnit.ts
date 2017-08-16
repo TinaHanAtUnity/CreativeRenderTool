@@ -198,7 +198,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                     streamingUrl = portraitStreaming.getOriginalUrl();
                 }
             } else if(orientation === ForceOrientation.PORTRAIT) {
-                if(portraitStreaming) {
+                if(landscapeStreaming && (this._campaign.getAbGroup() === 6 || this._campaign.getAbGroup() === 7)) {
+                    streamingUrl = landscapeStreaming.getOriginalUrl();
+                } else if(portraitStreaming) {
                     streamingUrl = portraitStreaming.getOriginalUrl();
                 } else if(landscapeStreaming) {
                     streamingUrl = landscapeStreaming.getOriginalUrl();
