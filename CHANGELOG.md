@@ -1,3 +1,9 @@
+# Wed Aug 16 12:47:19 UTC 2017
+
+* Add meta field to operative events if comet has returned the value
+* Refactor VideoInfo API handling to a new utility class
+* Remove old MasterClass campaign hacks
+
 # Thu Aug 10 08:57:51 UTC 2017
 
 * Add support for analytics events from playables
