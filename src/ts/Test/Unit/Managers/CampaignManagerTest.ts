@@ -29,6 +29,7 @@ import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnProgrammaticMraidPlcCampaignEmpty from 'json/OnProgrammaticMraidPlcCampaignEmpty.json';
 import OnProgrammaticMraidPlcCampaignNull from 'json/OnProgrammaticMraidPlcCampaignNull.json';
+import OnProgrammaticMraidUrlPlcCampaignEmpty from 'json/OnProgrammaticMraidUrlPlcCampaignEmpty.json';
 import OnProgrammaticMraidUrlPlcCampaignJson from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
@@ -807,7 +808,7 @@ describe('CampaignManager', () => {
             });
         });
 
-        it('should trigger onNoFill if there is no inlinedURL or markup', () => {
+        it('should trigger onError if there is no markup', () => {
             const response = {
                 response: OnProgrammaticMraidPlcCampaignEmpty
             };
@@ -826,6 +827,28 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 mockRequest.verify();
                 assert.equal(triggeredError.message, 'MRAID Campaign missing markup');
+            });
+        });
+
+        it('should trigger onError if there is no inlinedUrl', () => {
+            const response = {
+                response: OnProgrammaticMraidUrlPlcCampaignEmpty
+            };
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve(response));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredError: any;
+
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'MRAID Campaign missing inlinedUrl');
             });
         });
     });
