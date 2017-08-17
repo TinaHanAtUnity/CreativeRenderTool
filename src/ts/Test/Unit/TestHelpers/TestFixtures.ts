@@ -13,6 +13,7 @@ import { ICacheDiagnostics } from 'Utilities/Cache';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 
@@ -29,6 +30,12 @@ export class TestFixtures {
             useDeviceOrientationForVideo: false,
             muteVideo: false,
         });
+    }
+
+    public static getCampaignFollowsRedirects(): PerformanceCampaign {
+        const json = JSON.parse(OnCometVideoPlcCampaignFollowsRedirects);
+        const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new PerformanceCampaign(performanceJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
     }
 
     public static getCampaign(): PerformanceCampaign {
