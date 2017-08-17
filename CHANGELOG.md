@@ -1,3 +1,9 @@
+# Thu Aug 17 07:56:14 UTC 2017
+
+* Fix iOS endscreen in portrait mode (ABT-219)
+* Test disabling portrait videos on groups 6 and 7
+* Stop adaptive caching test on groups 6 and 7
+
 # Wed Aug 16 12:47:19 UTC 2017
 
 * Add meta field to operative events if comet has returned the value
