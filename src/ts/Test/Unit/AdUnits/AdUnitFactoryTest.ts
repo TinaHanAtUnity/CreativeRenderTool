@@ -104,7 +104,7 @@ describe('AdUnitFactoryTest', () => {
                 getId: sinon.stub().returns('1111')
             });
 
-            campaign = TestFixtures.getMRAIDCampaign();
+            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
             if(resourceUrl) {
                 resourceUrl.setFileId('1234');
