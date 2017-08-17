@@ -32,7 +32,11 @@ export class MOAT extends View {
     }
 
     public resume(volume: number) {
-        this.triggerEvent('AdPlaying', volume);
+        this.triggerVideoEvent('AdPlaying', volume);
+    }
+
+    public pause(volume: number) {
+        this.triggerVideoEvent('AdPaused', volume);
     }
 
     public init(ids: { [key: string]: string }, duration: number, url: string, moatData: any) {
@@ -75,10 +79,10 @@ export class MOAT extends View {
         }, '*');
     }
 
-    public triggerEvent(type: string, volume: number) {
+    public triggerVideoEvent(type: string, volume: number) {
         this._nativeBridge.Sdk.logDebug('Calling MOAT video event "' + type + '" with volume: ' + volume);
         this._iframe.contentWindow.postMessage({
-            type: 'event',
+            type: 'videoEvent',
             data: {
                 type,
                 volume

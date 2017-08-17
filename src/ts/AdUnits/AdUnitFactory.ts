@@ -104,7 +104,7 @@ export class AdUnitFactory {
         vastAdUnit.initMoat();
         const moatData = {
             SDK: 'UnityAds',
-            Version: '2.0',
+            Version: '1.0',
             SDKVersion: clientInfo.getSdkVersionName(),
             IFA: deviceInfo.getAdvertisingIdentifier(),
             LimitAdTracking: deviceInfo.getLimitAdTracking(),

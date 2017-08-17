@@ -13,8 +13,6 @@
                     audioVolumeChange: []
                 };
 
-                var viewable = false;
-
                 var trigger = function(event, parameters) {
                     if(!parameters) {
                         parameters = [];
@@ -38,16 +36,19 @@
                     switch(event.data.type) {
                         case 'exposure':
                             trigger('exposureChange', [event.data.exposure, {
-                                inFocus: 1,
+                                inFocus: booleanHere,
                                 isAttached: 1,
                                 isHidden: 0,
                                 opacity: 1,
-                                isCovered: 0.25
+                                isCovered: 0
                             }]);
                             break;
 
                         case 'volume':
                             trigger('audioVolumeChange', [event.data.volume]);
+                            break;
+
+                        case 'adAction':
                             break;
 
                         default:
@@ -118,28 +119,12 @@
                             moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
                             break;
 
-                        case 'event':
+                        case 'videoEvent':
                             if(moat) {
                                 moat.dispatchEvent({
                                     "type": event.data.data.type,
                                     "adVolume": event.data.data.volume
                                 });
-                                if(window.mraid) {
-                                    if(event.data.data.type === 'AdPaused') {
-                                        mraid.viewable = false;
-                                        window.postMessage({
-                                            type: 'viewable',
-                                            value: false
-                                        }, '*');
-                                    }
-                                    if(event.data.data.type === 'AdPlaying') {
-                                        mraid.viewable = true;
-                                        window.postMessage({
-                                            type: 'viewable',
-                                            value: true
-                                        }, '*');
-                                    }
-                                }
                             }
                             break;
 
