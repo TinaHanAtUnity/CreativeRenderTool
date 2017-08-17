@@ -16,6 +16,8 @@ interface IMRAIDCampaign extends ICampaign {
     gameIcon: Image | undefined;
     rating: number | undefined;
     ratingCount: number | undefined;
+    landscapeImage: Image | undefined;
+    portraitImage: Image | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -31,7 +33,9 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
-            ratingCount: ['number', 'undefined']
+            ratingCount: ['number', 'undefined'],
+            landscapeImage: ['object', 'undefined'],
+            portraitImage: ['object', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -58,6 +62,13 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         }
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
+
+        if(campaign.endScreenLandscape) {
+            this.set('landscapeImage', new Image(campaign.endScreenLandscape));
+        }
+        if(campaign.endScreenPortrait) {
+            this.set('portraitImage', new Image(campaign.endScreenPortrait));
+        }
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -92,21 +103,35 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('ratingCount');
     }
 
+    public getPortrait(): Image | undefined {
+        return this.get('portraitImage');
+    }
+
+    public getLandscape(): Image | undefined {
+        return this.get('landscapeImage');
+    }
+
     public getRequiredAssets() {
         const resourceUrl =  this.getResourceUrl();
         return resourceUrl ? [resourceUrl] : [];
     }
 
     public getOptionalAssets(): Asset[] {
+        const assets: Asset[] = [];
         const gameIcon = this.getGameIcon();
-
-        if(!gameIcon) {
-            return [];
-        } else {
-            return [
-                gameIcon
-            ];
+        if(gameIcon) {
+            assets.push(gameIcon);
         }
+        const portrait = this.getPortrait();
+        if(portrait) {
+            assets.push(portrait);
+        }
+        const landscape = this.getLandscape();
+        if(landscape) {
+            assets.push(landscape);
+        }
+
+        return assets;
     }
 
     public getDynamicMarkup(): string | undefined {

@@ -9,10 +9,13 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { MRAIDView } from 'Views/MRAIDView';
+import { Observable0 } from 'Utilities/Observable';
 
 export class PlayableMRAID extends MRAIDView {
 
-    private static CloseLength = 30;
+    private static CloseLength = 4;
+
+    public readonly onEndOfPlayable = new Observable0();
 
     private _localization: Localization;
 
@@ -199,6 +202,7 @@ export class PlayableMRAID extends MRAIDView {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
+                    // this.onEndOfPlayable.trigger();
                 }
             }, 1000);
         }
@@ -293,6 +297,7 @@ export class PlayableMRAID extends MRAIDView {
                     if(!this._placement.allowSkip() && this._closeRemaining > 5) {
                         this._closeRemaining = 5;
                     }
+                    this.onEndOfPlayable.trigger();
                 }
                 break;
             default:
