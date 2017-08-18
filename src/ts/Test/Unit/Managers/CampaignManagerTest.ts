@@ -540,7 +540,7 @@ describe('CampaignManager', () => {
                 return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
             });
 
-            it('should trigger onNoFill after requesting a vast placement with null vast data', () => {
+            it('should trigger onError after requesting a vast placement with null vast data', () => {
                 // given a VAST placement with null vast
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNullData
@@ -562,13 +562,8 @@ describe('CampaignManager', () => {
 
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
-                        throw triggeredError;
-                    }
-
-                    // then the onNoFill observable is triggered
                     mockRequest.verify();
-                    assert.isTrue(noFillTriggered);
+                    return verifyErrorForResponse(response, 'No vast content');
                 });
             });
 
@@ -777,7 +772,7 @@ describe('CampaignManager', () => {
             });
         });
 
-        it('should trigger onNoFill if mraid property is null', (done) => {
+        it('should trigger onError if mraid property is null', (done) => {
             const response = {
                 response: OnProgrammaticMraidPlcCampaignNull
             };
@@ -800,11 +795,8 @@ describe('CampaignManager', () => {
             });
 
             campaignManager.request().then(() => {
-                if(triggeredError) {
-                    throw triggeredError;
-                }
-
-                return mockRequest.verify();
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'No mraid content');
             });
         });
 
