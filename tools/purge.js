@@ -295,6 +295,9 @@ if(branch === '2.0.6') {
 }
 
 let purgeList = [
+    purgeAkamai(urlRoot),
+    purgeHighwinds(urlRoot),
+    purgeChinaNetCenter(urlRoot)
     purgeAliBabaCloud(urlRoot)
 ];
 
@@ -302,6 +305,7 @@ if(branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
     purgeList.push(purgeChinaNetCenter('/webview/2.0.6'));
+    purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
 }
 
 Promise.all(purgeList).then(() => {
