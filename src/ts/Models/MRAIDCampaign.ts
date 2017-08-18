@@ -90,7 +90,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
                 this.set('store', StoreName.XIAOMI);
                 break;
             default:
-                throw new Error('Unknown store value "' + campaign.store + '"');
+                break;
         }
         this.set('appStoreId', campaign.appStoreId);
 
@@ -179,7 +179,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('bypassAppSheet');
     }
 
-    public getStore(): StoreName | undefined{
+    public getStore(): StoreName | undefined {
         return this.get('store');
     }
 

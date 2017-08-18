@@ -162,7 +162,6 @@ export class EndScreenEventHandlers {
     }
 
     private static getAppStoreUrl(campaign: PerformanceCampaign, packageName?: string) {
-        console.log(packageName);
         const store = campaign.getStore();
         switch (store) {
             case StoreName.APPLE:

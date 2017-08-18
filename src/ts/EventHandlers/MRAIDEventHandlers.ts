@@ -45,8 +45,8 @@ export class MRAIDEventHandlers {
     public static onShowEndScreen(mraidAdUnit: MRAIDAdUnit) {
         const endScreen = mraidAdUnit.getEndScreen();
         if(endScreen) {
+            mraidAdUnit.setShowingMRAID(false);
             mraidAdUnit.getMRAIDView().hide();
-            console.log('onshowEndscreen')
             endScreen.show();
         }
     }

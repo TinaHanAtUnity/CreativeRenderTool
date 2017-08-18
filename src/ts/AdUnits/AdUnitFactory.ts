@@ -145,7 +145,6 @@ export class AdUnitFactory {
             }
         }
 
-
         mraid.onSkip.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
             mraidAdUnit.hide();

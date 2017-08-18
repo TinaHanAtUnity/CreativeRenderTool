@@ -41,8 +41,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     }
 
     public getAbGroup(): number {
-        return 10;
-        // return this.get('abGroup');
+        return this.get('abGroup');
     }
 
     public getTimeout(): number | undefined {
