@@ -258,7 +258,6 @@ let purgeAliBabaCloud = (urlRoot) => {
     };
 
     const getSignedString = (value) => {
-        console.log(value);
         const hmac = crypto.createHmac('sha1', secret + '&');
         hmac.update(value);
         return hmac.digest('base64');
@@ -275,7 +274,19 @@ let purgeAliBabaCloud = (urlRoot) => {
         });
     };
 
-    console.dir(getUrls(urls));
+    return Promise.all(getUrls(urls).map((url) => {
+        return fetchRetry(url, {}, 5, 5000).then(res => {
+            if(res.status !== 200) {
+                throw new Error('ChinaNetCenter purge request failed');
+            }
+            return res.text();
+        }).then(body => {
+            console.dir(body);
+        });
+    })).then(body => {
+        console.log('AliBabaCloud purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.alibabacloud.check_url + urlRoot + path, commit)));
+    });
 };
 
 let urlRoot = '/webview/' + branch;
