@@ -124,6 +124,14 @@ export class ViewController extends AdUnitContainer {
         return this._paused;
     }
 
+    public pause() {
+        this._paused = true;
+    }
+
+    public unPause() {
+        this._paused = false;
+    }
+
     private getOrientation(supportedOrientations: UIInterfaceOrientationMask, allowRotation: boolean, forceOrientation: ForceOrientation) {
         let orientation: UIInterfaceOrientationMask = supportedOrientations;
         if(forceOrientation === ForceOrientation.LANDSCAPE) {
