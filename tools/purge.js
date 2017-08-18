@@ -283,7 +283,7 @@ let purgeAliBabaCloud = (urlRoot) => {
         }).then(body => {
             console.dir(body);
         });
-    })).then(body => {
+    })).then(() => {
         console.log('AliBabaCloud purge request successful');
         return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.alibabacloud.check_url + urlRoot + path, commit)));
     });
