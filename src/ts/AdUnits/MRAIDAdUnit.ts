@@ -5,7 +5,7 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { MRAID, IOrientationProperties } from 'Views/MRAID';
+import { MRAIDView, IOrientationProperties } from 'Views/MRAIDView';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
@@ -13,7 +13,7 @@ import { HTML } from 'Models/Assets/HTML';
 export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _sessionManager: SessionManager;
-    private _mraid: MRAID;
+    private _mraid: MRAIDView;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
 
@@ -23,7 +23,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAID, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
