@@ -297,7 +297,7 @@ if(branch === '2.0.6') {
 let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
-    purgeChinaNetCenter(urlRoot)
+    purgeChinaNetCenter(urlRoot),
     purgeAliBabaCloud(urlRoot)
 ];
 
