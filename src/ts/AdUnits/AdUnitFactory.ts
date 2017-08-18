@@ -33,7 +33,6 @@ import { FinishState } from 'Constants/FinishState';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
-import { PlayableEndScreen } from 'Views/PlayableEndScreen';
 
 export class AdUnitFactory {
 
@@ -119,10 +118,10 @@ export class AdUnitFactory {
         let mraid: MRAIDView;
         const resourceUrl = campaign.getResourceUrl();
         const abGroup = campaign.getAbGroup();
-        let endScreen: PlayableEndScreen | undefined;
+        let endScreen: EndScreen | undefined;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
             mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
-            endScreen = new PlayableEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         } else {
             mraid = new MRAID(nativeBridge, placement, campaign);
         }
@@ -140,9 +139,9 @@ export class AdUnitFactory {
 
         mraid.onAnalyticsEvent.subscribe((event, delayFromStart) => MRAIDEventHandlers.onAnalyticsEvent(campaign, event, delayFromStart));
         if(endScreen) {
-            this.preparePlyableEndScreen(endScreen, nativeBridge, sessionManager, mraidAdUnit, deviceInfo);
+            this.prepareEndScreen(endScreen, nativeBridge, sessionManager, mraidAdUnit, deviceInfo);
             if(mraid instanceof PlayableMRAID) {
-                (<PlayableMRAID>mraid).onEndOfPlayable.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
+                (<PlayableMRAID>mraid).onShowEndScreen.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
             }
         }
 
@@ -184,7 +183,7 @@ export class AdUnitFactory {
         overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted));
     }
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
@@ -202,23 +201,23 @@ export class AdUnitFactory {
         }
     }
 
-    private static preparePlyableEndScreen(endScreen: PlayableEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: MRAIDAdUnit, deviceInfo: DeviceInfo) {
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
-        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
-
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
-            // const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
-            adUnit.onClose.subscribe(() => {
-                // nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-            });
-        } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
-        }
-    }
+    // private static preparePlyableEndScreen(endScreen: PlayableEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: MRAIDAdUnit, deviceInfo: DeviceInfo) {
+    //     endScreen.render();
+    //     endScreen.hide();
+    //     document.body.appendChild(endScreen.container());
+    //     endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
+    //     endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
+    //
+    //     if (nativeBridge.getPlatform() === Platform.ANDROID) {
+    //         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
+    //         // const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
+    //         adUnit.onClose.subscribe(() => {
+    //             // nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+    //         });
+    //     } else if (nativeBridge.getPlatform() === Platform.IOS) {
+    //         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
+    //     }
+    // }
 
     private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();

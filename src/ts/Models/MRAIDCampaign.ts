@@ -2,6 +2,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
+import { StoreName } from 'Models/PerformanceCampaign';
 
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
@@ -18,6 +19,9 @@ interface IMRAIDCampaign extends ICampaign {
     ratingCount: number | undefined;
     landscapeImage: Image | undefined;
     portraitImage: Image | undefined;
+    bypassAppSheet: boolean | undefined;
+    store: StoreName | undefined;
+    appStoreId: string | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -35,7 +39,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             rating: ['number', 'undefined'],
             ratingCount: ['number', 'undefined'],
             landscapeImage: ['object', 'undefined'],
-            portraitImage: ['object', 'undefined']
+            portraitImage: ['object', 'undefined'],
+            bypassAppSheet: ['boolean', 'undefined'],
+            store: ['number', 'undefined'],
+            appStoreId: ['string', 'undefined'],
         });
 
         this.set('id', campaign.id);
@@ -69,6 +76,24 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         if(campaign.endScreenPortrait) {
             this.set('portraitImage', new Image(campaign.endScreenPortrait));
         }
+        this.set('bypassAppSheet', campaign.bypassAppSheet);
+
+        const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
+        switch(campaignStore) {
+            case 'apple':
+                this.set('store', StoreName.APPLE);
+                break;
+            case 'google':
+                this.set('store', StoreName.GOOGLE);
+                break;
+            case 'xiaomi':
+                this.set('store', StoreName.XIAOMI);
+                break;
+            default:
+                throw new Error('Unknown store value "' + campaign.store + '"');
+        }
+        this.set('appStoreId', campaign.appStoreId);
+
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -148,6 +173,18 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
         return this.get('clickAttributionUrlFollowsRedirects');
+    }
+
+    public getBypassAppSheet(): boolean | undefined {
+        return this.get('bypassAppSheet');
+    }
+
+    public getStore(): StoreName | undefined{
+        return this.get('store');
+    }
+
+    public getAppStoreId(): string | undefined {
+        return this.get('appStoreId');
     }
 
     public getDTO(): { [key: string]: any } {
