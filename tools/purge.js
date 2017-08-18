@@ -226,6 +226,9 @@ let purgeAliBabaCloud = (urlRoot) => {
         return urlsFromPath(urlRoot, cdnConfig.alibabacloud.base_urls, path, false);
     }));
 
+    console.log('Starting AliBabaCloud purge of: ');
+    console.dir(urls);
+
     const secret = cdnConfig.alibabacloud.access_key_secret;
 
     const getParameters = (path) => {
