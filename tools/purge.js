@@ -7,7 +7,6 @@ const cdnConfig = {
         'base_urls': [
             'cdn-akamai.unityads.unity3d.com',
             'cdn.unityads.unity3d.com',
-            'geocdn.unityads.unity3d.com',
             'config.unityads.unity3d.com',
             'webview.unityads.unity3d.com'
         ],
