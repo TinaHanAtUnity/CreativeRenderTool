@@ -37,6 +37,18 @@ const cdnConfig = {
         'check_url': 'china-cdn.unityads.unity3d.com',
         'username': process.env.CHINANETCENTER_USERNAME,
         'password': process.env.CHINANETCENTER_PASSWORD
+    },
+    'alibabacloud': {
+        'base_urls': [
+            'china-cdn2.unityads.unity3d.com',
+            'cdn.unityads.unity3d.com',
+            'geocdn.unityads.unity3d.com',
+            'config.unityads.unity3d.com',
+            'webview.unityads.unity3d.com'
+        ],
+        'check_url': 'china-cdn2.unityads.unity3d.com',
+        'access_key_id': process.env.ALIBABACLOUD_ACCESS_KEY_ID,
+        'access_key_secret': process.env.ALIBABACLOUD_ACCESS_KEY_SECRET
     }
 };
 
@@ -209,6 +221,76 @@ let purgeChinaNetCenter = (urlRoot) => {
     });
 };
 
+let purgeAliBabaCloud = (urlRoot) => {
+    let urls = flatten(paths.map(path => {
+        return urlsFromPath(urlRoot, cdnConfig.alibabacloud.base_urls, path, false);
+    }));
+
+    console.log('Starting AliBabaCloud purge of: ');
+    console.dir(urls);
+
+    const secret = cdnConfig.alibabacloud.access_key_secret;
+
+    const getParameters = (path) => {
+        return {
+            Format: 'JSON',
+            Version: '2014-11-11',
+            AccessKeyId: cdnConfig.alibabacloud.access_key_id,
+            SignatureMethod: 'HMAC-SHA1',
+            Timestamp: encodeURIComponent((new Date()).toISOString().slice(0, -5) + 'Z'),
+            SignatureVersion: '1.0',
+            SignatureNonce: Math.random() * Math.pow(10, 18),
+            Action: 'RefreshObjectCaches',
+            ObjectPath: encodeURIComponent(path)
+        };
+    };
+
+    const getCanonicalized = (parameters) => {
+        let canonicalized = [];
+        Object.keys(parameters).sort().forEach((key) => {
+            if(parameters[key]) {
+                canonicalized.push(encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]));
+            }
+        });
+        return canonicalized.join('%26');
+    };
+
+    const getStringToSign = (value) => {
+        return 'GET&%2F&' + value.replace(/=/g, '%3D');
+    };
+
+    const getSignedString = (value) => {
+        const hmac = crypto.createHmac('sha1', secret + '&');
+        hmac.update(value);
+        return hmac.digest('base64');
+    };
+
+    const getUrls = (urls) => {
+        return urls.map(url => {
+             const parameters = getParameters(url);
+             const signature = getSignedString(getStringToSign(getCanonicalized(parameters)));
+             parameters.Signature = encodeURIComponent(signature);
+             return 'https://cdn.aliyuncs.com/?' + Object.entries(parameters).map(([key, value]) => {
+                 return key + '=' + value;
+             }).join('&');
+        });
+    };
+
+    return Promise.all(getUrls(urls).map((url) => {
+        return fetchRetry(url, {}, 5, 5000).then(res => {
+            if(res.status !== 200) {
+                throw new Error('AliBabaCloud purge request failed');
+            }
+            return res.text();
+        }).then(body => {
+            console.dir(body);
+        });
+    })).then(() => {
+        console.log('AliBabaCloud purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.alibabacloud.check_url + urlRoot + path, commit)));
+    });
+};
+
 let urlRoot = '/webview/' + branch;
 if(branch === '2.0.6') {
     urlRoot = '/webview/master';
@@ -217,13 +299,15 @@ if(branch === '2.0.6') {
 let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
-    purgeChinaNetCenter(urlRoot)
+    purgeChinaNetCenter(urlRoot),
+    purgeAliBabaCloud(urlRoot)
 ];
 
 if(branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
     purgeList.push(purgeChinaNetCenter('/webview/2.0.6'));
+    purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
 }
 
 Promise.all(purgeList).then(() => {
