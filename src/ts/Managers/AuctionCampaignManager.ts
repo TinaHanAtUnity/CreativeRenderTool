@@ -169,19 +169,20 @@ export class AuctionCampaignManager extends CampaignManager {
                 }
 
             case 'programmatic/vast':
-                if(content === null) {
-                    return this.handlePlcNoFills(placements);
+                if(!content) {
+                    return this.handlePlcError(new Error('No vast content'), placements);
                 }
+
                 return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
                     return this.setupPlcCampaignAssets(placements, vastCampaign);
                 });
 
             case 'programmatic/mraid-url':
-                if(content === null) {
-                    return this.handlePlcNoFills(placements);
-                }
                 // todo: handle ad plan expiration with cacheTTL or something similar
                 const jsonMraidUrl = JsonParser.parse(content);
+                if(!jsonMraidUrl) {
+                    return this.handlePlcError(new Error('No mraid-url content'), placements);
+                }
 
                 if(!jsonMraidUrl.inlinedUrl) {
                     const MRAIDError = new DiagnosticError(
@@ -196,11 +197,11 @@ export class AuctionCampaignManager extends CampaignManager {
                 return this.setupPlcCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
-                if(content === null) {
-                    return this.handlePlcNoFills(placements);
-                }
                 // todo: handle ad plan expiration with cacheTTL or something similar
                 const jsonMraid = JsonParser.parse(content);
+                if(!jsonMraid) {
+                    return this.handlePlcError(new Error('No mraid content'), placements);
+                }
 
                 if(!jsonMraid.markup) {
                     const MRAIDError = new DiagnosticError(
@@ -218,7 +219,6 @@ export class AuctionCampaignManager extends CampaignManager {
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType), placements);
         }
-
     }
 
     private setupPlcCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
@@ -232,13 +232,6 @@ export class AuctionCampaignManager extends CampaignManager {
     private handlePlcNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
         this.onNoFill.trigger(placement);
-        return Promise.resolve();
-    }
-
-    private handlePlcNoFills(placementIds: string[]): Promise<void> {
-        for(const placementId of placementIds) {
-            this.handlePlcNoFill(placementId);
-        }
         return Promise.resolve();
     }
 
