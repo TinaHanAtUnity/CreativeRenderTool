@@ -44,6 +44,10 @@ export abstract class MRAIDView extends View {
 
     private replaceMraidSources(mraid: string): string {
         const dom = new DOMParser().parseFromString(mraid, "text/html");
+        if (!dom) {
+            this._nativeBridge.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
+            return mraid;
+        }
         const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
         if (src && src.parentNode) {
             src.parentNode.removeChild(src);
