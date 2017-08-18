@@ -9,11 +9,6 @@ import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 
-export interface IOrientationProperties {
-    allowOrientationChange: boolean;
-    forceOrientation: ForceOrientation;
-}
-
 export class MRAID extends MRAIDView {
 
     private static CloseLength = 30;
