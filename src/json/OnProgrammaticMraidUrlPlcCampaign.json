@@ -12,7 +12,15 @@
       "content": "{\"dynamicMarkup\":\"var markup = 'dynamic';\",\"markup\":\"\",\"inlinedUrl\":\"https://img.serveroute.com/mini_8ball_fast/inlined.html\"}",
       "trackingUrls": {
         "impression": [
-          "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"
+          "http://test.impression.com/blah1",
+          "http://test.impression.com/blah2",
+          "http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%"
+        ],
+        "complete": [
+          "http://test.complete.com/complete1"
+        ],
+        "click": [
+          "http://test.complete.com/click1"
         ]
       }
     }

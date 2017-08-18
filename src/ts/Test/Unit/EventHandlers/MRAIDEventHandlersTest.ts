@@ -20,9 +20,6 @@ import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
 import { HttpKafka } from 'Utilities/HttpKafka';
 
-import DummyPlayableMRAIDCampaign from 'json/DummyPlayableMRAIDCampaign.json';
-import DummyPlayableMRAIDCampaignFollowsRedirects from 'json/DummyPlayableMRAIDCampaignFollowsRedirects.json';
-
 describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
@@ -62,9 +59,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            const campaignObj = JSON.parse(DummyPlayableMRAIDCampaign);
-
-            const mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
+            const mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
             mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
@@ -98,8 +93,7 @@ describe('MRAIDEventHandlersTest', () => {
         describe('with follow redirects', () => {
 
             it('with response that contains location, it should launch intent', () => {
-                const campaignObj = JSON.parse(DummyPlayableMRAIDCampaignFollowsRedirects);
-                const mraidCampaign =  new MRAIDCampaign(campaignObj, 'asd', 0, campaignObj.mraidUrl);
+                const mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
                 mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
@@ -122,9 +116,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                const campaignObj = JSON.parse(DummyPlayableMRAIDCampaignFollowsRedirects);
-
-                const mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
+                const mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
 
                 mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, mraidCampaign, mraidView, {});
@@ -154,8 +146,7 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         beforeEach(() => {
-            const campaignObj = JSON.parse(DummyPlayableMRAIDCampaign);
-            mraidCampaign =  new MRAIDCampaign(campaignObj, 'testGamerId', 0, campaignObj.mraidUrl);
+            mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
 
             sandbox.stub(HttpKafka, 'sendEvent');
         });

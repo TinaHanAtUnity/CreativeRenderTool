@@ -1,0 +1,18 @@
+{
+  "correlationId": "zzzz",
+  "placements": {
+    "video": "3558634612378369864",
+    "rewardedVideoZone": "3558634612378369864"
+  },
+  "media": {
+    "3558634612378369864": {
+      "adType": "vast-sample-ad-type",
+      "creativeId": "vast-sample-creative-id",
+      "seatId": 900,
+      "contentType": "programmatic/vast",
+      "content": "{}",
+      "trackingUrls": {
+      }
+    }
+  }
+}
