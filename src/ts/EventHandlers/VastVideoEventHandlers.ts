@@ -31,7 +31,7 @@ export class VastVideoEventHandlers {
 
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.triggerEvent('AdPlaying', adUnit.getVolume());
+            moat.triggerVideoEvent('AdPlaying', adUnit.getVolume());
         }
     }
 
@@ -42,7 +42,7 @@ export class VastVideoEventHandlers {
             const event = events.shift();
             if(event) {
                 if(position / adUnit.getRealDuration() >= event[0]) {
-                    moat.triggerEvent(event[1], adUnit.getVolume());
+                    moat.triggerVideoEvent(event[1], adUnit.getVolume());
                 } else {
                     events.unshift(event);
                 }
@@ -62,7 +62,7 @@ export class VastVideoEventHandlers {
 
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.triggerEvent('AdVideoComplete', adUnit.getVolume());
+            moat.triggerVideoEvent('AdVideoComplete', adUnit.getVolume());
         }
 
         const endScreen = adUnit.getEndScreen();
@@ -76,14 +76,14 @@ export class VastVideoEventHandlers {
     public static onVideoStopped(adUnit: VastAdUnit) {
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.triggerEvent('AdStopped', adUnit.getVolume());
+            moat.triggerVideoEvent('AdStopped', adUnit.getVolume());
         }
     }
 
     public static onVideoPaused(adUnit: VastAdUnit) {
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.triggerEvent('AdPaused', adUnit.getVolume());
+            moat.triggerVideoEvent('AdPaused', adUnit.getVolume());
         }
     }
 
@@ -91,7 +91,7 @@ export class VastVideoEventHandlers {
         const moat = adUnit.getMoat();
         if(moat) {
             adUnit.setVolume(volume / maxVolume);
-            moat.triggerEvent('AdVolumeChange', adUnit.getVolume());
+            moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
         }
     }
 

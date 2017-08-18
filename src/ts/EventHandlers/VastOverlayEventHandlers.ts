@@ -20,13 +20,13 @@ export class VastOverlayEventHandlers {
         if (muted) {
             const moat = adUnit.getMoat();
             if(moat) {
-                moat.triggerEvent('AdVolumeChange', 0);
+                moat.triggerVideoEvent('AdVolumeChange', 0);
             }
             adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'mute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
         } else {
             const moat = adUnit.getMoat();
             if(moat) {
-                moat.triggerEvent('AdVolumeChange', adUnit.getVolume());
+                moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
             }
             adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'unmute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
         }
