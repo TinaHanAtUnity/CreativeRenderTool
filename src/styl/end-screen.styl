@@ -1,10 +1,13 @@
 #end-screen
+
+  @import "game-shared.styl";
+
   .campaign-container
-    width: 100%
-    height: 100%
+    width: 100vw
+    height: 100vh
 
   .btn-close-region
-    position: absolute
+    position: fixed
     z-index: 1
     top: 0
     right: 0
@@ -25,7 +28,7 @@
     line-height: 28px
 
   .game-background
-    position: absolute
+    position: fixed
     top: 0
     bottom: 47%
     width: 100%
@@ -38,7 +41,7 @@
       bottom: 0
 
   .end-screen-info-background
-    position: absolute
+    position: fixed
     bottom: 0
     width: 100%
     height: 47%
@@ -56,24 +59,15 @@
 
   .game-icon
     float: left
-    background-color: #FFF
-    background-size: cover
-    width: 75px
-    height: 75px
-    border-radius: 18pt
-    margin-bottom: 20px
 
   .name-container
     padding-left: 10px
     padding-right: 10px
     padding-top: 8px
-    font-size: 17pt
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    color: #1f1e1e
 
   .store-container
     margin-left: 10px
@@ -85,27 +79,6 @@
     -webkit-box-pack: center
     -webkit-justify-content: center
 
-  .game-rating
-    display: inline-block
-    position: relative
-    font-size: 20px
-    letter-spacing: 5px
-    color: #e6e6e6
-
-  .game-rating-mask
-    color: #ff8e00
-    position: absolute
-    left: 0
-    width: 0%
-    height: 100%
-    overflow: hidden
-    font-size: inherit
-    white-space: nowrap
-
-  .game-rating-count
-    font-size: 17px
-    color: #7c7c7c
-
   .download-container
     text-align: center
     clear: both
@@ -114,19 +87,8 @@
     color: #ffffff
     display: block
     background: #167dfb
-    left: 0px
-    right: 0px
-
-  .unityads-logo
-    background-image: url('../img/unityads.png')
-    background-position: center
-    background-size: cover
-    position: absolute
-    bottom: 10px
-    left: 50%
-    height: 16px
-    width: 68px
-    -webkit-transform: translate(-50%, 0)
+    left: 0
+    right: 0
 
   .privacy-button
     position: absolute
@@ -137,8 +99,8 @@
     font-size: 22px
 
   .btn-download
-    margin: 0 15px 0 15px
-    padding: 10px 10px 10px 10px
+    margin: 0 15px
+    padding: 10px
     border-radius: 10px
     font-size: 18pt
     line-height: 24pt
@@ -179,7 +141,6 @@ body.landscape
       margin: auto
 
     .name-container
-      font-size: 18pt
       padding-top: 95px
       font-size: 20pt
       text-overflow: ellipsis;
@@ -208,7 +169,6 @@ body.portrait
     .game-background-landscape
       display: none
 
-
 // Device specific
 body.iphone
 body.ipad
@@ -222,16 +182,16 @@ body.android
         border-radius: 12pt
 
       .name-container
-          font-size: 15pt
+        font-size: 15pt
 
       .btn-download
-        padding: 5px 5px 5px 5px
+        padding: 5px
         font-size: 16pt
 
     &.landscape
       #end-screen
         .name-container
-            font-size: 13pt
+          font-size: 13pt
 
         .game-rating
           font-size: 17px
@@ -247,7 +207,7 @@ body.android
         margin-top: 10px
 
       .btn-download
-        padding: 15px 10px 15px 10px
+        padding: 15px 10px
 
     &.landscape
       #end-screen
@@ -280,14 +240,14 @@ body.android
           padding-top: 115px
 
         .btn-download
-          padding: 10px 10px 10px 10px
+          padding: 10px
 
   // 384 x 360 - LG Optimus G
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
     &.landscape
       #end-screen
         .btn-download
-          padding: 15px 10px 15px 10px;
+          padding: 15px 10px
           font-size: 16pt;
 
   // 424 x 753 - LG Optimus 4X HD
@@ -307,7 +267,7 @@ body.android
         font-size: 24px
 
       .btn-download
-        padding: 25px 20px 25px 20px
+        padding: 25px 20px
         font-size: 22pt
         line-height: 22pt
 
@@ -455,7 +415,7 @@ body.android
         font-size: 45px
 
       .btn-download
-        padding: 45px 25px 45px 25px
+        padding: 45px 25px
         font-size: 35pt
         line-height: 35pt
 
@@ -466,6 +426,6 @@ body.android
           padding-top: 200px
 
         .btn-download
-          padding: 40px 20px 40px 20px
+          padding: 40px 20px
           font-size: 30pt
           line-height: 30pt

@@ -1,0 +1,40 @@
+<div class="close-region">
+    <div class="close">
+        <span class="icon-close"></span>
+        <div class="circle-base"></div>
+        <div class="progress-wrapper">
+            <div class="circle-left"></div>
+            <div class="circle-right"></div>
+        </div>
+    </div>
+</div>
+<div class="loading-screen">
+    <div class="container">
+        <div class="user-text">Try out the playable demo for:</div>
+        <div class="game-icon" style="background-image:  url(<%= data.gameIcon %>)"></div>
+        <div class="store-container">
+
+            <% if(!!data.rating) { %>
+            <span class="game-rating">
+                <span class="game-rating-mask" style="width: <%= data.rating %>%">
+                    <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+                </span>
+                <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+            </span>
+            <% } %>
+
+            <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
+            <span class="game-rating-count">
+                (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+            </span>
+            <% } %>
+
+        </div>
+        <div class="name-container"><%= data.gameName %></div>
+        <div class="progress-bar">
+            <span class="filling"></span>
+        </div>
+    </div>
+    <div class="unityads-logo"></div>
+</div>
+<iframe id="mraid-iframe" scrolling="no" sandbox="allow-scripts"></iframe>
