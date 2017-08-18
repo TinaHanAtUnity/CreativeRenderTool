@@ -22,12 +22,14 @@ export class VastOverlayEventHandlers {
             const moat = adUnit.getMoat();
             if(moat) {
                 moat.triggerVideoEvent('AdVolumeChange', 0);
+                moat.triggerViewabilityEvent('volume', 0.0);
             }
             adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'mute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
         } else {
             const moat = adUnit.getMoat();
             if(moat) {
                 moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
+                moat.triggerViewabilityEvent('volume', adUnit.getVolume() * 100);
             }
             adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'unmute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
         }
@@ -65,6 +67,7 @@ export class VastOverlayEventHandlers {
             nativeBridge.VideoPlayer.play();
             const moat = adUnit.getMoat();
             if(moat) {
+                moat.triggerViewabilityEvent('exposure', true);
                 moat.triggerVideoEvent('AdPlaying', adUnit.getVolume());
             }
             VastOverlayEventHandlers.paused = false;

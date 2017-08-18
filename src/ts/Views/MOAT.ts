@@ -90,6 +90,13 @@ export class MOAT extends View {
         }, '*');
     }
 
+    public triggerViewabilityEvent(type: string, payload: any) {
+        this._iframe.contentWindow.postMessage({
+            type: type,
+            payload: payload
+        }, '*');
+    }
+
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':

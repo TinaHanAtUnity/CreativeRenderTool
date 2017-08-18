@@ -31,6 +31,7 @@ export class VastVideoEventHandlers {
 
         const moat = adUnit.getMoat();
         if(moat) {
+            moat.triggerViewabilityEvent('exposure', true);
             moat.triggerVideoEvent('AdPlaying', adUnit.getVolume());
         }
     }
@@ -84,6 +85,7 @@ export class VastVideoEventHandlers {
         const moat = adUnit.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdPaused', adUnit.getVolume());
+            moat.triggerViewabilityEvent('exposure', false);
         }
     }
 
@@ -92,6 +94,7 @@ export class VastVideoEventHandlers {
         if(moat) {
             adUnit.setVolume(volume / maxVolume);
             moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
+            moat.triggerViewabilityEvent('volume', adUnit.getVolume() * 100);
         }
     }
 

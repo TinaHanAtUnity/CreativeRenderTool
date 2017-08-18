@@ -35,8 +35,9 @@
                 window.addEventListener('message', function(event) {
                     switch(event.data.type) {
                         case 'exposure':
-                            trigger('exposureChange', [event.data.exposure, {
-                                inFocus: booleanHere,
+                            trigger('exposureChange', [
+                                {
+                                inFocus: event.data.payload,
                                 isAttached: 1,
                                 isHidden: 0,
                                 opacity: 1,
@@ -45,7 +46,7 @@
                             break;
 
                         case 'volume':
-                            trigger('audioVolumeChange', [event.data.volume]);
+                            trigger('audioVolumeChange', [event.data.payload]);
                             break;
 
                         case 'adAction':
