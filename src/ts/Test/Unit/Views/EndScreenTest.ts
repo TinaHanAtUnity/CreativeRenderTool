@@ -5,9 +5,7 @@ import { assert } from 'chai';
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Localization } from 'Utilities/Localization';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-
-import TestCampaign from 'json/TestCampaign.json';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 
 describe('EndScreen', () => {
@@ -28,13 +26,13 @@ describe('EndScreen', () => {
     });
 
     xit('should render', () => {
-        const endScreen = new EndScreen(nativeBridge, new PerformanceCampaign(JSON.parse(TestCampaign), '', 0), true, 'en');
+        const endScreen = new EndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const endScreen = new EndScreen(nativeBridge, new PerformanceCampaign(JSON.parse(TestCampaign), '', 0), true, 'fi');
+        const endScreen = new EndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'fi');
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');

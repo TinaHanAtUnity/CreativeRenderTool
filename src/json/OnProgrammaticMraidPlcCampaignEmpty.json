@@ -9,7 +9,7 @@
       "creativeId": "mraid-sample-creative-id",
       "seatId": 902,
       "contentType": "programmatic/mraid",
-      "content": "{\"markup\":\"<div>markup</div>\",\"inlinedUrl\":\"https://cdn.unityads.unity3d.com/playables/xinstall.html\"}",
+      "content": "{}",
       "trackingUrls": {
         "impression": [
           "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"

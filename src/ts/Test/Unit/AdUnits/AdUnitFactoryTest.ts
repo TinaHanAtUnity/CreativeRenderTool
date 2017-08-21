@@ -27,7 +27,7 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
-import ConfigurationJson from 'json/Configuration.json';
+import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -107,7 +107,7 @@ describe('AdUnitFactoryTest', () => {
                 getId: sinon.stub().returns('1111')
             });
 
-            campaign = TestFixtures.getMRAIDCampaign();
+            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
             if(resourceUrl) {
                 resourceUrl.setFileId('1234');

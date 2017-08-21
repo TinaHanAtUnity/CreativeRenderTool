@@ -12,7 +12,7 @@ import { Configuration } from 'Models/Configuration';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 
-import ConfigurationJson from 'json/Configuration.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 describe('DiagnosticsTest', () => {
     const handleInvocation = sinon.spy();
@@ -102,7 +102,7 @@ describe('DiagnosticsTest', () => {
             false
         ]);
 
-        const configuration = new Configuration(JSON.parse(ConfigurationJson));
+        const configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
 
         HttpKafka.setRequest(request);
         HttpKafka.setClientInfo(clientInfo);
@@ -111,7 +111,7 @@ describe('DiagnosticsTest', () => {
 
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false},"device":null,"country":"fi"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false},"device":null,"country":"FI"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true}}}');
         });
     });
 });

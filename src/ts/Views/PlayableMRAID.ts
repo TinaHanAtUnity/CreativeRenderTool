@@ -1,25 +1,29 @@
-import MRAIDTemplate from 'html/MRAID.html';
+import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDView } from 'Views/MRAIDView';
-import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
+import { Localization } from 'Utilities/Localization';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { MRAIDView } from 'Views/MRAIDView';
 
-export class MRAID extends MRAIDView {
+export class PlayableMRAID extends MRAIDView {
 
     private static CloseLength = 30;
 
-    private readonly onLoaded = new Observable0();
+    private _localization: Localization;
 
     private _closeElement: HTMLElement;
+    private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _loaded = false;
+    private _iframeLoaded = false;
 
     private _messageListener: any;
+    private _loadingScreenTimeout: any;
+    private _prepareTimeout: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -28,13 +32,33 @@ export class MRAID extends MRAIDView {
     private _closeRemaining: number;
     private _showTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
-        super(nativeBridge, 'mraid');
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
+        super(nativeBridge, 'playable-mraid');
 
         this._placement = placement;
         this._campaign = campaign;
+        this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(MRAIDTemplate);
+        this._template = new Template(PlayableMRAIDTemplate);
+
+        if(campaign) {
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+            };
+            const gameIcon = campaign.getGameIcon();
+            if(gameIcon) {
+                this._templateData.gameIcon = gameIcon.getUrl();
+            }
+            const rating = campaign.getRating();
+            if(rating) {
+                const adjustedRating: number = rating * 20;
+                this._templateData.rating = adjustedRating.toString();
+            }
+            const ratingCount = campaign.getRatingCount();
+            if(ratingCount) {
+                this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
+            }
+        }
 
         this._bindings = [
             {
@@ -49,10 +73,12 @@ export class MRAID extends MRAIDView {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
         this.createMRAID().then(mraid => {
+            iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
         });
 
@@ -63,10 +89,80 @@ export class MRAID extends MRAIDView {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        this.showLoadingScreen();
+    }
 
+    public hide() {
+        this._iframe.contentWindow.postMessage({
+            type: 'viewable',
+            value: false
+        }, '*');
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
+        }
+
+        if(this._loadingScreenTimeout) {
+            clearTimeout(this._loadingScreenTimeout);
+            this._loadingScreenTimeout = undefined;
+        }
+
+        if(this._prepareTimeout) {
+            clearTimeout(this._prepareTimeout);
+            this._prepareTimeout = undefined;
+        }
+        super.hide();
+    }
+
+    public setViewableState(viewable: boolean) {
+        if(this._iframeLoaded && !this._loadingScreenTimeout) {
+            this._iframe.contentWindow.postMessage({
+                type: 'viewable',
+                value: viewable
+            }, '*');
+        }
+    }
+
+    private onIframeLoaded() {
+        this._iframeLoaded = true;
+
+        if(!this._loadingScreenTimeout) {
+            clearTimeout(this._prepareTimeout);
+            this._prepareTimeout = undefined;
+
+            this.showMRAIDAd();
+        }
+    }
+
+    private showLoadingScreen() {
+        this._loadingScreen.style.display = 'block';
+        this._loadingScreenTimeout = setTimeout(() => {
+            if(this._iframeLoaded) {
+                this.showMRAIDAd();
+            } else {
+                // start the prepare timeout and wait for the onload event
+                this._prepareTimeout = setTimeout(() => {
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this._closeElement.style.display = 'block';
+                    this.updateProgressCircle(this._closeElement, 1);
+
+                    const resourceUrl = this._campaign.getResourceUrl();
+                    Diagnostics.trigger('playable_prepare_timeout', {
+                        'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
+                    });
+
+                    this._prepareTimeout = undefined;
+                }, 5000);
+            }
+            this._loadingScreenTimeout = undefined;
+        }, 1500);
+    }
+
+    private showMRAIDAd() {
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            this._closeRemaining = MRAID.CloseLength;
+            this._closeRemaining = PlayableMRAID.CloseLength;
             let skipRemaining = skipLength;
             const updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
@@ -87,9 +183,9 @@ export class MRAID extends MRAIDView {
                 }
             }, 1000);
         } else {
-            this._closeRemaining = MRAID.CloseLength;
+            this._closeRemaining = PlayableMRAID.CloseLength;
             const updateInterval = setInterval(() => {
-                const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
+                const progress = (PlayableMRAID.CloseLength - this._closeRemaining) / PlayableMRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
                     this._didReward = true;
@@ -107,38 +203,24 @@ export class MRAID extends MRAIDView {
             }, 1000);
         }
 
-        if(this._loaded) {
-            this._iframe.contentWindow.postMessage('viewable', '*');
-        } else {
-            const observer = this.onLoaded.subscribe(() => {
+        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+            if(this._loadingScreen.style.display === 'none') {
+                return;
+            }
+
+            this._loadingScreen.addEventListener(e, () => {
+                this._closeElement.style.display = 'block';
+
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
                 }, '*');
-                this.onLoaded.unsubscribe(observer);
-            });
-        }
-    }
 
-    public hide() {
-        this._iframe.contentWindow.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-        super.hide();
-    }
+                this._loadingScreen.style.display = 'none';
+            }, false);
+        });
 
-    public setViewableState(viewable: boolean) {
-        if(this._loaded) {
-            this._iframe.contentWindow.postMessage({
-                type: 'viewable',
-                value: viewable
-            }, '*');
-        }
+        this._loadingScreen.classList.add('hidden');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -178,19 +260,12 @@ export class MRAID extends MRAIDView {
 
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
-            case 'loaded':
-                this._loaded = true;
-                this.onLoaded.trigger();
-                break;
-
             case 'open':
                 this.onClick.trigger(encodeURI(event.data.url));
                 break;
-
             case 'close':
                 this.onClose.trigger();
                 break;
-
             case 'orientation':
                 let forceOrientation = ForceOrientation.NONE;
                 switch(event.data.properties.forceOrientation) {
@@ -212,6 +287,13 @@ export class MRAID extends MRAIDView {
                 break;
             case 'analyticsEvent':
                 this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                break;
+            case 'customMraidState':
+                if(event.data.state === 'completed') {
+                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                        this._closeRemaining = 5;
+                    }
+                }
                 break;
             default:
                 break;
