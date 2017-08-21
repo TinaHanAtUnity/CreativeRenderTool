@@ -4,7 +4,6 @@ import { View } from 'Views/View';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
-import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 
@@ -57,23 +56,22 @@ export abstract class MRAIDView extends View {
 
     private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
-        if (resourceUrl) {
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(resourceUrl) {
+            const fileId = resourceUrl.getFileId();
+            if(fileId) {
+                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+            } else {
                 return new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
                     xhr.addEventListener('load', () => {
                         resolve(xhr.responseText);
                     }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
+                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
                     xhr.send();
                 });
-            } else {
-                const fileId = resourceUrl.getFileId();
-                if (fileId) {
-                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
-                }
             }
+        } else {
+            return Promise.resolve(this._campaign.getResource());
         }
-        return Promise.resolve(this._campaign.getResource());
     }
 }
