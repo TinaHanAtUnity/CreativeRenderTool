@@ -38,6 +38,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class WebView {
 
@@ -61,6 +62,7 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
+    private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
 
     private _showing: boolean = false;
@@ -88,7 +90,8 @@ export class WebView {
     public initialize(): Promise<void | any[]> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._deviceInfo = new DeviceInfo(this._nativeBridge);
-            this._wakeUpManager = new WakeUpManager(this._nativeBridge);
+            this._focusManager = new FocusManager(this._nativeBridge);
+            this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
             this._resolve = new Resolve(this._nativeBridge);
@@ -118,7 +121,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, this._metadataManager);
@@ -128,9 +131,10 @@ export class WebView {
 
             this._wakeUpManager.setListenConnectivity(true);
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._wakeUpManager.setListenAppForeground(true);
+                this._focusManager.setListenAppForeground(true);
+                this._focusManager.setListenAppBackground(true);
             } else {
-                this._wakeUpManager.setListenScreen(true);
+                this._focusManager.setListenScreen(true);
             }
 
             return this.setupTestEnvironment();
@@ -148,10 +152,10 @@ export class WebView {
 
             if(this._configuration.isAnalyticsEnabled()) {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._wakeUpManager.setListenAndroidLifecycle(true);
+                    this._focusManager.setListenAndroidLifecycle(true);
                 }
 
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return this._sessionManager.create();
@@ -183,9 +187,9 @@ export class WebView {
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
+                this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
             } else {
-                this._wakeUpManager.onScreenOn.subscribe(() => this.onScreenOn());
+                this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
             }
 
             this._initialized = true;
