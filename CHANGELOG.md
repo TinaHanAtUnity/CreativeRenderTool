@@ -1,3 +1,10 @@
+# Mon Aug 21 12:07:58 UTC 2017
+
+* Loading screen for selected Unity made playables
+* Refactored yield based tests to use auction
+* Fix DOMParser on Android 4.*
+* Add AliBabaCloud purge script
+
 # Thu Aug 17 07:56:14 UTC 2017
 
 * Fix iOS endscreen in portrait mode (ABT-219)
