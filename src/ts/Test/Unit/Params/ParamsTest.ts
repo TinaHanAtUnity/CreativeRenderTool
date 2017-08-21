@@ -30,6 +30,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
 import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -199,7 +200,8 @@ class TestHelper {
 
         let container: AdUnitContainer;
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            const focusManager = new FocusManager(nativeBridge);
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
         } else {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
@@ -213,7 +215,8 @@ describe('Event parameters should match specifications', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const focusManager = new FocusManager(nativeBridge);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
@@ -226,7 +229,8 @@ describe('Event parameters should match specifications', () => {
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const focusManager = new FocusManager(nativeBridge);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
@@ -247,7 +251,8 @@ describe('Event parameters should match specifications', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-            const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
+            const focusManager = new FocusManager(nativeBridge);
+            const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const eventManager = new EventManager(nativeBridge, request);
@@ -269,7 +274,8 @@ describe('Event parameters should match specifications', () => {
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-            const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
+            const focusManager = new FocusManager(nativeBridge);
+            const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const eventManager = new EventManager(nativeBridge, request);
@@ -292,7 +298,8 @@ describe('Event parameters should match specifications', () => {
     describe('with click event', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const focusManager = new FocusManager(nativeBridge);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             sessionManager.setGameSessionId(1234);
@@ -308,7 +315,8 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            const focusManager = new FocusManager(nativeBridge);
+            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             sessionManager.setGameSessionId(1234);
@@ -333,7 +341,8 @@ describe('Event parameters should match specifications', () => {
         describe('on Android', () => {
             beforeEach(() => {
                 nativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
-                request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+                const focusManager = new FocusManager(nativeBridge);
+                request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 sessionManager.setGameSessionId(1234);
@@ -394,7 +403,8 @@ describe('Event parameters should match specifications', () => {
         describe('on iOS', () => {
             beforeEach(() => {
                 nativeBridge = TestHelper.getNativeBridge(Platform.IOS);
-                request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+                const focusManager = new FocusManager(nativeBridge);
+                request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 sessionManager.setGameSessionId(1234);

@@ -9,6 +9,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestStorageApi extends StorageApi {
 
@@ -174,6 +175,7 @@ describe('EventManagerTest', () => {
     let requestApi: TestRequestApi;
     let request: Request;
     let eventManager: EventManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -181,9 +183,10 @@ describe('EventManagerTest', () => {
             handleCallback
         });
 
+        focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         eventManager = new EventManager(nativeBridge, request);
     });
 

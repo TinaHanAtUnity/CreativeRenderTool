@@ -23,6 +23,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EndScreenTestPerformanceCampaign1 from 'json/EndScreenTestPerformanceCampaign1.json';
 import { Video } from 'Models/Assets/Video';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -32,6 +33,7 @@ describe('EndScreenEventHandlersTest', () => {
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -42,6 +44,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -56,7 +59,7 @@ describe('EndScreenEventHandlersTest', () => {
             metaDataManager = new MetaDataManager(nativeBridge);
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -151,7 +154,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
 
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -164,7 +167,7 @@ describe('EndScreenEventHandlersTest', () => {
             };
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());

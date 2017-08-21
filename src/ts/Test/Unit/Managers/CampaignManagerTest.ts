@@ -26,6 +26,7 @@ import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
+import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
@@ -70,6 +71,7 @@ describe('CampaignManager', () => {
     let metaDataManager: MetaDataManager;
     let eventManager: EventManager;
     let sessionManager: SessionManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestConfig));
@@ -168,13 +170,15 @@ describe('CampaignManager', () => {
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1()
+                onActivityPaused: new Observable1(),
+                onActivityDestroyed: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;
             }
         };
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         deviceInfo = new DeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);

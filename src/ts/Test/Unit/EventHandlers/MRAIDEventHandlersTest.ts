@@ -19,6 +19,7 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { FocusManager } from 'Managers/FocusManager';
 
 import DummyPlayableMRAIDCampaign from 'json/DummyPlayableMRAIDCampaign.json';
 import DummyPlayableMRAIDCampaignFollowsRedirects from 'json/DummyPlayableMRAIDCampaignFollowsRedirects.json';
@@ -33,6 +34,7 @@ describe('MRAIDEventHandlersTest', () => {
     let metaDataManager: MetaDataManager;
     let mraidView: MRAID;
     let placement: Placement;
+    let focusManager: FocusManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -43,6 +45,7 @@ describe('MRAIDEventHandlersTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
             metaDataManager = new MetaDataManager(nativeBridge);
@@ -50,7 +53,7 @@ describe('MRAIDEventHandlersTest', () => {
             placement = TestFixtures.getPlacement();
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
