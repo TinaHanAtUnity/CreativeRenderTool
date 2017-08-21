@@ -6,6 +6,7 @@ import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
+import { Platform } from "Constants/Platform";
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -56,22 +57,33 @@ export abstract class MRAIDView extends View {
 
     private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
-            const fileId = resourceUrl.getFileId();
-            if(fileId) {
-                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+        if (resourceUrl) {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                return this.requestMRaid(resourceUrl.getUrl());
             } else {
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.addEventListener('load', () => {
-                        resolve(xhr.responseText);
-                    }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
-                    xhr.send();
-                });
+                const fileId = resourceUrl.getFileId();
+                if (fileId) {
+                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                } else {
+                    return this.requestMRaid(resourceUrl.getOriginalUrl());
+                }
             }
-        } else {
-            return Promise.resolve(this._campaign.getResource());
         }
+        return Promise.resolve(this._campaign.getResource());
+    }
+
+    private requestMRaid(url: string): Promise<string | undefined> {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status <= 299) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
+                }
+            }, false);
+            xhr.open('GET', decodeURIComponent(url));
+            xhr.send();
+        });
     }
 }
