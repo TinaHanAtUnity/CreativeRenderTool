@@ -200,24 +200,6 @@ export class AdUnitFactory {
         }
     }
 
-    // private static preparePlyableEndScreen(endScreen: PlayableEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: MRAIDAdUnit, deviceInfo: DeviceInfo) {
-    //     endScreen.render();
-    //     endScreen.hide();
-    //     document.body.appendChild(endScreen.container());
-    //     endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
-    //     endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
-    //
-    //     if (nativeBridge.getPlatform() === Platform.ANDROID) {
-    //         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, adUnit));
-    //         // const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
-    //         adUnit.onClose.subscribe(() => {
-    //             // nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-    //         });
-    //     } else if (nativeBridge.getPlatform() === Platform.IOS) {
-    //         endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, adUnit, deviceInfo));
-    //     }
-    // }
-
     private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();
         endScreen.hide();

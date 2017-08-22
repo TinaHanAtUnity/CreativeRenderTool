@@ -13,7 +13,7 @@ import { Observable0 } from 'Utilities/Observable';
 
 export class PlayableMRAID extends MRAIDView {
 
-    private static CloseLength = 4;
+    private static CloseLength = 30;
 
     public readonly onShowEndScreen = new Observable0();
 
