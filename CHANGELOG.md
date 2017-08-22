@@ -1,3 +1,7 @@
+# Tue Aug 22 12:41:29 UTC 2017
+
+* Fix non-cached playables on iOS SDK 2.1.0
+
 # Mon Aug 21 12:07:58 UTC 2017
 
 * Loading screen for selected Unity made playables
