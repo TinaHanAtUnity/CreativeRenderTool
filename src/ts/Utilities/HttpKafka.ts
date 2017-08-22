@@ -65,6 +65,9 @@ export class HttpKafka {
         if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
             HttpKafka._deviceInfoUpdating = true;
             return deviceInfo.getDTO().then(deviceInfoDTO => {
+                if(typeof navigator !== 'undefined' && navigator.userAgent) {
+                    deviceInfoDTO.userAgent = navigator.userAgent;
+                }
                 HttpKafka._deviceInfoUpdating = false;
                 common.common.device = deviceInfoDTO;
                 return common;
