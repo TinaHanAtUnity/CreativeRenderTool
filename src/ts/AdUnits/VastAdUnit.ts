@@ -203,9 +203,15 @@ export class VastAdUnit extends VideoAdUnit {
     protected onSystemInterrupt(interruptStarted: boolean): void {
         super.onSystemInterrupt(interruptStarted);
         if (this._moat) {
-            if (!interruptStarted && this.isShowing() && this.isActive()) {
+            if (!interruptStarted) {
                 this._moat.resume(this.getVolume());
             }
+        }
+    }
+
+    protected onSystemPause(): void {
+        if (this._moat && !this._container.isPaused()) {
+            this._moat.pause(this.getVolume());
         }
     }
 

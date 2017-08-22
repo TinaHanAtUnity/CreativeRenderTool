@@ -14,7 +14,7 @@ export class VastVideoEventHandlers {
         };
         const moat = adUnit.getMoat();
         if(moat) {
-            moat.init(ids, duration / 1000, url, moatData);
+            moat.init(ids, duration / 1000, url, moatData, adUnit.getVolume());
         }
     }
 
