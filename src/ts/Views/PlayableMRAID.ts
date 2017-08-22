@@ -183,7 +183,6 @@ export class PlayableMRAID extends MRAIDView {
                 if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
-                    this.onShowEndScreen.trigger();
                 }
             }, 1000);
         } else {
