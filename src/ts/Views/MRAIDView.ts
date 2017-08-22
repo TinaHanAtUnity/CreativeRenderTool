@@ -6,7 +6,7 @@ import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
-import { Platform } from "Constants/Platform";
+import { Platform } from 'Constants/Platform';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -76,7 +76,7 @@ export abstract class MRAIDView extends View {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('load', () => {
-                if (xhr.status >= 200 && xhr.status <= 299) {
+                if ((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
                     resolve(xhr.responseText);
                 } else {
                     reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
