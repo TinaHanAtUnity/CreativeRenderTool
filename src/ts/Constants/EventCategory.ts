@@ -9,5 +9,6 @@ export enum EventCategory {
     RESOLVE,
     BROADCAST,
     NOTIFICATION,
-    LIFECYCLE
+    LIFECYCLE,
+    DEVICEINFO
 }

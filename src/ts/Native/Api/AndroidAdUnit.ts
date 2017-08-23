@@ -43,8 +43,8 @@ export class AndroidAdUnitApi extends NativeApi {
         super(nativeBridge, 'AdUnit');
     }
 
-    public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel]);
+    public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent]);
     }
 
     public close(): Promise<void> {

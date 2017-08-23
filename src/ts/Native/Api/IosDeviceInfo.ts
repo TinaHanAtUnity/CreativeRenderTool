@@ -1,8 +1,12 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { Observable2 } from 'Utilities/Observable';
 
 export class IosDeviceInfoApi extends NativeApi {
+    public readonly onVolumeChanged = new Observable2<number, number>();
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo');
     }
@@ -37,5 +41,27 @@ export class IosDeviceInfoApi extends NativeApi {
 
     public getStatusBarHeight(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getStatusBarHeight');
+    }
+
+    public getDeviceMaxVolume(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceMaxVolume');
+    }
+
+    public registerVolumeChangeListener(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'registerVolumeChangeListener');
+    }
+
+    public unregisterVolumeChangeListener(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'unregisterVolumeChangeListener');
+    }
+
+    public handleEvent(event: string, parameters: any[]): void {
+        switch (event) {
+            case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
+                this.onVolumeChanged.trigger(parameters[0], parameters[1]);
+                break;
+            default:
+                super.handleEvent(event, parameters);
+        }
     }
 }
