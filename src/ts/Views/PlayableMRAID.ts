@@ -202,7 +202,6 @@ export class PlayableMRAID extends MRAIDView {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
-                    this.onShowEndScreen.trigger();
                 }
             }, 1000);
         }
