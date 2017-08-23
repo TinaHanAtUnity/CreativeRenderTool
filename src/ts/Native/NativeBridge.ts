@@ -211,6 +211,14 @@ export class NativeBridge implements INativeBridge {
                 this.Storage.handleEvent(event, parameters);
                 break;
 
+            case EventCategory[EventCategory.DEVICEINFO]:
+                if(this.getPlatform() === Platform.IOS) {
+                    this.DeviceInfo.Ios.handleEvent(event, parameters);
+                } else {
+                    this.DeviceInfo.Android.handleEvent(event, parameters);
+                }
+                break;
+
             default:
                 throw new Error('Unknown event category: ' + category);
         }

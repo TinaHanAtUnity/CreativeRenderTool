@@ -323,14 +323,14 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         }
     }
 
-    public getDeviceVolume(): Promise<number> {
+    public getDeviceVolume(streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
         if (this._nativeBridge.getPlatform()  === Platform.IOS) {
             return this._nativeBridge.DeviceInfo.Ios.getDeviceVolume().then(volume => {
                 this.set('volume', volume);
                 return this.get('volume');
             });
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_SYSTEM).then(volume => {
+            return this._nativeBridge.DeviceInfo.Android.getDeviceVolume(streamType).then(volume => {
                 this.set('volume', volume);
                 return this.get('volume');
             });
