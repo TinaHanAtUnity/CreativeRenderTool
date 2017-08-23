@@ -5,9 +5,17 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { Rotation } from 'Constants/Android/Rotation';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
+    display: IDisplay;
+}
+
+interface IDisplay {
+    rotation: Rotation;
+    width: number;
+    height: number;
 }
 
 export class Activity extends AdUnitContainer {
@@ -21,6 +29,8 @@ export class Activity extends AdUnitContainer {
     private _onResumeObserver: any;
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
+
+    private _androidOptions: IAndroidOptions;
 
     constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
         super();
@@ -36,11 +46,12 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
         this.resetDiagnosticsEvents();
         this.addDiagnosticsEvent({type: 'open'});
         this._activityId++;
         this._currentActivityFinished = false;
+        this._androidOptions = options;
 
         let views: string[] = ['webview'];
         if(videoplayer) {
@@ -63,7 +74,7 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + ForceOrientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, this.getOrientation(allowRotation, this._lockedOrientation), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel);
+        return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
@@ -104,20 +115,40 @@ export class Activity extends AdUnitContainer {
 
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
         this.addDiagnosticsEvent({type: 'reorient'});
-        return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation));
+        return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
 
     public isPaused() {
         return false;
     }
 
-    private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation) {
+    private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation, options: IAndroidOptions) {
         let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
         if(allowRotation) {
             if(forceOrientation === ForceOrientation.PORTRAIT) {
-                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+                if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
+                } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+                } else if (options.display && this.getNaturalRotation(options.display) === Rotation.ROTATION_0) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
+                } else if (options.display && this.getNaturalRotation(options.display) === Rotation.ROTATION_180) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+                } else {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+                }
             } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
-                orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+                if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
+                } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+                } else if (options.display && this.getNaturalRotation(options.display) === Rotation.ROTATION_90) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
+                } else if (options.display && this.getNaturalRotation(options.display) === Rotation.ROTATION_270) {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+                } else {
+                    orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+                }
             }
         } else {
             if(forceOrientation === ForceOrientation.PORTRAIT) {
@@ -174,5 +205,33 @@ export class Activity extends AdUnitContainer {
         }
 
         return true;
+    }
+
+    private getNaturalRotation(display: IDisplay): Rotation {
+        switch(display.rotation) {
+            case Rotation.ROTATION_0:
+                if(display.width > display.height) {
+                    // the natural orientation (Rotation_0) is landscape on some Android tablets
+                    return Rotation.ROTATION_90;
+                }
+                return Rotation.ROTATION_0;
+            case Rotation.ROTATION_90:
+                if(display.width < display.height) {
+                    return Rotation.ROTATION_180;
+                }
+                return Rotation.ROTATION_90;
+            case Rotation.ROTATION_180:
+                if(display.width > display.height) {
+                    return Rotation.ROTATION_270;
+                }
+                return Rotation.ROTATION_180;
+            case Rotation.ROTATION_270:
+                if(display.width < display.height) {
+                    return Rotation.ROTATION_180;
+                }
+                return Rotation.ROTATION_270;
+            default:
+                return display.rotation;
+        }
     }
 }

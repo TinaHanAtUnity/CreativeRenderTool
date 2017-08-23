@@ -21,7 +21,7 @@ export enum StorageEvent {
 }
 
 export class StorageApi extends NativeApi {
-    public onSet: Observable2<string, string> = new Observable2();
+    public onSet: Observable2<string, object> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Storage');

@@ -16,9 +16,10 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 ## 2.1.1
 
-* Added width and height to Android show options object sent to webview
+* Added rotation, width and height to Android show options object sent to webview
 * Added statusBarHidden to iOS show options object sent to webview
-* Added transparency parameter to AdUnit.open method
+* Added transparency parameter to Android and iOS AdUnit.open method
+* Added animation parameter to iOS AdUnit.open method
 * Added Android DeviceInfo.getPackageInfo method
 * Added DeviceInfo.getMaxVolume, DeviceInfo.registerVolumeChangeListener and DeviceInfo.unregisterVolumeChangeListener methods
 * Added DeviceInfo.VOLUME_CHANGED events
