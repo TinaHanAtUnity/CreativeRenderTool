@@ -17,7 +17,7 @@ describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let container: Activity;
     let testAdUnit: TestAdUnit;
-    let testDisplay: any = {
+    const testDisplay: any = {
         rotation: Rotation.ROTATION_0,
         width: 800,
         height: 600
