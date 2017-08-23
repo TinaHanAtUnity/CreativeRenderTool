@@ -22,41 +22,41 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { EventManager } from 'Managers/EventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
-import DummyMRAIDNonInlined from 'json/DummyMRAIDCampaignNonInlined.json';
-import OnVastCampaignJson from 'json/OnVastCampaign.json';
-import OnProgrammaticVastPlcCampaignJson from 'json/OnProgrammaticVastPlcCampaign.json';
+import OnProgrammaticMraidPlcCampaignEmpty from 'json/OnProgrammaticMraidPlcCampaignEmpty.json';
+import OnProgrammaticMraidPlcCampaignNull from 'json/OnProgrammaticMraidPlcCampaignNull.json';
+import OnProgrammaticMraidUrlPlcCampaignEmpty from 'json/OnProgrammaticMraidUrlPlcCampaignEmpty.json';
 import OnProgrammaticMraidUrlPlcCampaignJson from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignJson from 'json/OnCometVideoPlcCampaign.json';
-import InsideOutsideJson from 'json/InsideOutside.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
-import WrappedVastJson from 'json/WrappedVast.json';
 import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
-import MaxDepthVastJson from 'json/MaxDepthVast.json';
 import NonWrappedVast from 'xml/NonWrappedVast.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
-import NoVideoVastJson from 'json/NoVideoVast.json';
-import NoVideoWrappedVastJson from 'json/NoVideoWrappedVast.json';
 import NoVideoWrappedVast from 'xml/NoVideoWrappedVast.xml';
-import IncorrectVastJson from 'json/IncorrectVast.json';
-import IncorrectWrappedVastJson from 'json/IncorrectWrappedVast.json';
+import OnProgrammaticVastPlcCampaignIncorrectWrapped from 'json/OnProgrammaticVastPlcCampaignIncorrectWrapped.json';
 import IncorrectWrappedVast from 'xml/IncorrectWrappedVast.xml';
-import FailingVastJson from 'json/FailingVast.json';
-import NoImpressionVastJson from 'json/NoImpressionVast.json';
-import TooMuchWrappingVastJson from 'json/TooMuchWrappingVast.json';
-import MissingErrorUrlsVastJson from 'json/MissingErrorUrlsVast.json';
-import AdLevelErrorUrlsVastJson from 'json/AdLevelErrorUrlsVast.json';
-import CustomTrackingVastJson from 'json/CustomTrackingVast.json';
-import CampaignRefreshManagerTestConfig from 'json/CampaignRefreshManagerTestConfig.json';
+import OnProgrammaticVastPlcCampaignJson from 'json/OnProgrammaticVastPlcCampaign.json';
+import OnProgrammaticVastPlcCampaignInsideOutsideJson from 'json/OnProgrammaticVastPlcCampaignInsideOutside.json';
+import OnProgrammaticVastPlcCampaignMaxDepth from 'json/OnProgrammaticVastPlcCampaignMaxDepth.json';
+import OnProgrammaticVastPlcCampaignNoVideo from 'json/OnProgrammaticVastPlcCampaignNoVideo.json';
+import OnProgrammaticVastPlcCampaignNoVideoWrapped from 'json/OnProgrammaticVastPlcCampaignNoVideoWrapped.json';
+import OnProgrammaticVastPlcCampaignWrapped from 'json/OnProgrammaticVastPlcCampaignWrapped.json';
+import OnProgrammaticVastPlcCampaignIncorrect from 'json/OnProgrammaticVastPlcCampaignIncorrect.json';
+import OnProgrammaticVastPlcCampaignNoData from 'json/OnProgrammaticVastPlcCampaignNoData.json';
+import OnProgrammaticVastPlcCampaignNullData from 'json/OnProgrammaticVastPlcCampaignNullData.json';
+import OnProgrammaticVastPlcCampaignFailing from 'json/OnProgrammaticVastPlcCampaignFailing.json';
+import OnProgrammaticVastPlcCampaignNoImpression from 'json/OnProgrammaticVastPlcCampaignNoImpression.json';
+import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVastPlcCampaignTooMuchWrapping.json';
+import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVastPlcCampaignMissingErrorUrls.json';
+import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
+import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -72,7 +72,7 @@ describe('CampaignManager', () => {
     let sessionManager: SessionManager;
 
     beforeEach(() => {
-        configuration = new Configuration(JSON.parse(CampaignRefreshManagerTestConfig));
+        configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
 
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
@@ -188,11 +188,11 @@ describe('CampaignManager', () => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnVastCampaignJson
+                response: OnProgrammaticVastPlcCampaignJson
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -210,9 +210,9 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), 3);
-                assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
-                assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+                assert.equal(triggeredCampaign.getAbGroup(), 99);
+                assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
+                assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
         });
 
@@ -221,7 +221,7 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: InsideOutsideJson
+                response: OnProgrammaticVastPlcCampaignInsideOutsideJson
             }));
             mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: VastInlineLinear
@@ -229,7 +229,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(1);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 if (!triggeredCampaign && campaign) {
@@ -237,9 +237,10 @@ describe('CampaignManager', () => {
                     // then the onVastCampaign observable is triggered with the correct campaign data
                     mockRequest.verify();
 
-                    assert.equal(triggeredCampaign.getAbGroup(), 3);
-                    assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
+                    assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
+
                     assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                         'http://myErrorURL/error',
                         'http://myErrorURL/wrapper/error'
@@ -296,7 +297,7 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: WrappedVastJson
+                response: OnProgrammaticVastPlcCampaignWrapped
             }));
             mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: WrappedVast1
@@ -307,7 +308,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(2);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
                 assert.equal(1, 2, error.message);
@@ -317,8 +318,8 @@ describe('CampaignManager', () => {
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getAbGroup(), 3);
-                assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+                assert.equal(triggeredCampaign.getAbGroup(), 99);
+                assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
                 assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
                     'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
@@ -400,7 +401,7 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: MaxDepthVastJson
+                response: OnProgrammaticVastPlcCampaignMaxDepth
             }));
 
             const nonWrappedVAST = NonWrappedVast;
@@ -419,7 +420,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             campaignManager.onError.subscribe((err: Error) => {
                 assert.equal(err.message, 'VAST wrapper depth exceeded');
                 done();
@@ -435,7 +436,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: Error;
             campaignManager.onError.subscribe((error: Error) => {
                 triggeredError = error;
@@ -456,7 +457,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: WebViewError | Error;
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
@@ -487,14 +488,14 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement without a video url', () => {
                 const response = {
-                    response: NoVideoVastJson
+                    response: OnProgrammaticVastPlcCampaignNoVideo
                 };
                 return verifyErrorForResponse(response, 'No video URL found for VAST');
             });
 
             it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
                 const response = {
-                    response: NoVideoWrappedVastJson
+                    response: OnProgrammaticVastPlcCampaignNoVideoWrapped
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
@@ -505,14 +506,14 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: IncorrectVastJson
+                    response: OnProgrammaticVastPlcCampaignIncorrect
                 };
                 return verifyErrorForResponse(response, 'VAST xml data is missing');
             });
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: IncorrectWrappedVastJson
+                    response: OnProgrammaticVastPlcCampaignIncorrectWrapped
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
@@ -524,18 +525,14 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement with no vast data', () => {
                 const response = {
-                    response: `{
-                    "abGroup": 3,
-                    "vast": {},
-                    "gamerId": "5712983c481291b16e1be03b"
-                }`
+                    response: OnProgrammaticVastPlcCampaignNoData
                 };
                 return verifyErrorForResponse(response, 'VAST xml data is missing');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
                 const response = {
-                    response: FailingVastJson
+                    response: OnProgrammaticVastPlcCampaignFailing
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.reject('Some kind of request error happened');
@@ -543,21 +540,17 @@ describe('CampaignManager', () => {
                 return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
             });
 
-            it('should trigger onNoFill after requesting a vast placement with null vast data', () => {
+            it('should trigger onError after requesting a vast placement with null vast data', () => {
                 // given a VAST placement with null vast
                 const response = {
-                    response: `{
-                    "abGroup": 3,
-                    "vast": null,
-                    "gamerId": "5712983c481291b16e1be03b"
-                }`
+                    response: OnProgrammaticVastPlcCampaignNullData
                 };
 
                 const mockRequest = sinon.mock(request);
                 mockRequest.expects('post').returns(Promise.resolve(response));
 
                 const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
                 let noFillTriggered = false;
                 let triggeredError: any;
                 campaignManager.onNoFill.subscribe(() => {
@@ -569,19 +562,14 @@ describe('CampaignManager', () => {
 
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
-                        throw triggeredError;
-                    }
-
-                    // then the onNoFill observable is triggered
                     mockRequest.verify();
-                    assert.isTrue(noFillTriggered);
+                    return verifyErrorForResponse(response, 'No vast content');
                 });
             });
 
             it('should trigger onError after requesting a vast placement without an impression url', () => {
                 const response = {
-                    response: NoImpressionVastJson
+                    response: OnProgrammaticVastPlcCampaignNoImpression
                 };
                 return verifyErrorForResponse(response, 'Campaign does not have an impression url');
             });
@@ -590,7 +578,7 @@ describe('CampaignManager', () => {
 
                 // given a valid VAST response containing a wrapper
                 const response = {
-                    response: TooMuchWrappingVastJson
+                    response: OnProgrammaticVastPlcCampaignTooMuchWrapping
                 };
 
                 // when the parser's max wrapper depth is set to 0 to disallow wrapping
@@ -608,7 +596,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -626,8 +614,8 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), 3);
-                assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+                assert.equal(triggeredCampaign.getAbGroup(), 99);
+                assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
         };
@@ -636,12 +624,11 @@ describe('CampaignManager', () => {
             it('should warn about missing error urls', () => {
                 // given a VAST response that has no error URLs
                 const response = {
-                    response: MissingErrorUrlsVastJson
+                    response: OnProgrammaticVastPlcCampaignMissingErrorUrls
                 };
 
                 // when the campaign manager requests the placement
                 return verifyCampaignForResponse(response).then(() => {
-
                     // then the SDK's logWarning function is called with an appropriate message
                     assert.isTrue(warningSpy.calledWith(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`));
                 });
@@ -650,7 +637,7 @@ describe('CampaignManager', () => {
             it('should not warn about missing error urls if error url exists at ad level', () => {
                 // given a VAST response that an error URL in the ad
                 const response = {
-                    response: AdLevelErrorUrlsVastJson
+                    response: OnProgrammaticVastPlcCampaignAdLevelErrorUrls
                 };
 
                 // when the campaign manager requests the placement
@@ -666,11 +653,11 @@ describe('CampaignManager', () => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: CustomTrackingVastJson
+                response: OnProgrammaticVastPlcCampaignCustomTracking
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -688,8 +675,8 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), 3);
-                assert.equal(triggeredCampaign.getGamerId(), '5712983c481291b16e1be03b');
+                assert.equal(triggeredCampaign.getAbGroup(), 99);
+                assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
 
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
@@ -717,13 +704,14 @@ describe('CampaignManager', () => {
         it('should trigger onMRAIDCampaign after receiving a MRAID campaign inlined', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: DummyMRAIDCampaign
+                response: OnProgrammaticMraidUrlPlcCampaignJson
             }));
 
-            const json = JSON.parse(DummyMRAIDCampaign);
-            const asset = new HTML(json.mraid.inlinedURL);
+            const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
+            const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+            const asset = new HTML(content.inlinedUrl);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
@@ -741,24 +729,25 @@ describe('CampaignManager', () => {
                 mockRequest.verify();
 
                 assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
-                assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
-                assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getResourceUrl(), asset);
                 assert.deepEqual(triggeredCampaign.getRequiredAssets(), [asset]);
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getDynamicMarkup(), json.mraid.dynamicMarkup);
+                assert.equal(triggeredCampaign.getDynamicMarkup(), content.dynamicMarkup);
             });
         });
 
         it('should trigger onMRAIDCampaign after receiving a MRAID campaign non-inlined', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: DummyMRAIDNonInlined
+                response: OnProgrammaticMraidPlcCampaignJson
             }));
 
-            const json = JSON.parse(DummyMRAIDNonInlined);
+            const json = JSON.parse(OnProgrammaticMraidPlcCampaignJson);
+            const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
@@ -776,20 +765,16 @@ describe('CampaignManager', () => {
                 mockRequest.verify();
 
                 assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
-                assert.equal(triggeredCampaign.getAbGroup(), json.abGroup);
-                assert.equal(triggeredCampaign.getGamerId(), json.gamerId);
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getResource(), json.mraid.markup);
+                assert.equal(triggeredCampaign.getResource(), content.markup);
             });
         });
 
-        it('should trigger onNoFill if mraid property is null', (done) => {
+        it('should trigger onError if mraid property is null', (done) => {
             const response = {
-                response: `{
-                    "abGroup": 3,
-                    "mraid": null,
-                    "gamerId": "5712983c481291b16e1be03b"
-                }`
+                response: OnProgrammaticMraidPlcCampaignNull
             };
 
             const mockRequest = sinon.mock(request);
@@ -797,7 +782,7 @@ describe('CampaignManager', () => {
 
             let doneCalled = false;
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
                 if (!doneCalled) {
@@ -810,28 +795,21 @@ describe('CampaignManager', () => {
             });
 
             campaignManager.request().then(() => {
-                if(triggeredError) {
-                    throw triggeredError;
-                }
-
                 mockRequest.verify();
+                assert.equal(triggeredError.message, 'No mraid content');
             });
         });
 
-        it('should trigger onNoFill if there is no inlinedURL or markup', () => {
+        it('should trigger onError if there is no markup', () => {
             const response = {
-                response: `{
-                    "abGroup": 3,
-                    "mraid": {},
-                    "gamerId": "5712983c481291b16e1be03b"
-                }`
+                response: OnProgrammaticMraidPlcCampaignEmpty
             };
 
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
             let triggeredError: any;
 
             campaignManager.onError.subscribe(error => {
@@ -841,6 +819,28 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 mockRequest.verify();
                 assert.equal(triggeredError.message, 'MRAID Campaign missing markup');
+            });
+        });
+
+        it('should trigger onError if there is no inlinedUrl', () => {
+            const response = {
+                response: OnProgrammaticMraidUrlPlcCampaignEmpty
+            };
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve(response));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredError: any;
+
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'MRAID Campaign missing inlinedUrl');
             });
         });
     });
@@ -956,7 +956,19 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html'));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {
+                        "impression": [
+                            "http://test.impression.com/blah1",
+                            "http://test.impression.com/blah2",
+                            "http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%"
+                        ],
+                        "complete": [
+                            "http://test.complete.com/complete1"
+                        ],
+                        "click": [
+                            "http://test.complete.com/click1"
+                        ]
+                    });
                 });
             });
 
@@ -1046,7 +1058,7 @@ describe('CampaignManager', () => {
 
     it('test previous campaign', () => {
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
         let previousCampaign = campaignManager.getPreviousPlacementId();
 
         assert.equal(previousCampaign, undefined);
@@ -1065,7 +1077,7 @@ describe('CampaignManager', () => {
         });
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new AuctionCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
 
         return campaignManager.request().then(() => {
             const requestBody = JSON.parse(requestData);

@@ -3,29 +3,34 @@ import { assert } from 'chai';
 
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Configuration } from 'Models/Configuration';
 
-import DummyAdPlan from 'json/DummyAdPlan.json';
+import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import SimpleVast from 'xml/SimpleVast.xml';
 import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
 describe('PerformanceCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const json = JSON.parse(DummyAdPlan);
-            const campaign = new PerformanceCampaign(json.campaign, json.gamerId, json.abGroup);
-            assert.equal(campaign.getAbGroup(), json.abGroup);
-            assert.equal(campaign.getGamerId(), json.gamerId);
-            assert.equal(campaign.getAppStoreId(), json.campaign.appStoreId);
-            assert.equal(campaign.getLandscape().getUrl(), json.campaign.endScreenLandscape);
-            assert.equal(campaign.getPortrait().getUrl(), json.campaign.endScreenPortrait);
-            assert.equal(campaign.getGameIcon().getUrl(), json.campaign.gameIcon);
-            assert.equal(campaign.getGameId(), json.campaign.gameId);
-            assert.equal(campaign.getGameName(), json.campaign.gameName);
-            assert.equal(campaign.getId(), json.campaign.id);
-            assert.equal(campaign.getRating(), json.campaign.rating);
-            assert.equal(campaign.getRatingCount(), json.campaign.ratingCount);
+            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
+            const configuration = new Configuration(configurationJson);
+            const json: any = JSON.parse(OnCometVideoPlcCampaign);
+            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+            const campaign = new PerformanceCampaign(campaignObject, configuration.getGamerId(), configuration.getAbGroup());
+            assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
+            assert.equal(campaign.getGamerId(), configuration.getGamerId());
+            assert.equal(campaign.getAppStoreId(), campaignObject.appStoreId);
+            assert.equal(campaign.getLandscape().getUrl(), campaignObject.endScreenLandscape);
+            assert.equal(campaign.getPortrait().getUrl(), campaignObject.endScreenPortrait);
+            assert.equal(campaign.getGameIcon().getUrl(), campaignObject.gameIcon);
+            assert.equal(campaign.getGameId(), campaignObject.gameId);
+            assert.equal(campaign.getGameName(), campaignObject.gameName);
+            assert.equal(campaign.getId(), campaignObject.id);
+            assert.equal(campaign.getRating(), campaignObject.rating);
+            assert.equal(campaign.getRatingCount(), campaignObject.ratingCount);
         });
     });
 });
