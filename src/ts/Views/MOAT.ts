@@ -84,7 +84,9 @@ export class MOAT extends View {
                 height: window.innerHeight
             }, '*');
         } else {
-            this.resume(volume);
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this.resume(volume);
+            }
         }
 
     }
