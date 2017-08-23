@@ -102,6 +102,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             default:
                 throw new Error('Unknown store value "' + campaign.store + '"');
         }
+
+        this.set('meta', campaign.meta);
     }
 
     public getStore(): StoreName {

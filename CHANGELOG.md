@@ -1,3 +1,31 @@
+# Tue Aug 22 12:41:29 UTC 2017
+
+* Fix non-cached playables on iOS SDK 2.1.0
+
+# Mon Aug 21 12:07:58 UTC 2017
+
+* Loading screen for selected Unity made playables
+* Refactored yield based tests to use auction
+* Fix DOMParser on Android 4.*
+* Add AliBabaCloud purge script
+
+# Thu Aug 17 07:56:14 UTC 2017
+
+* Fix iOS endscreen in portrait mode (ABT-219)
+* Test disabling portrait videos on groups 6 and 7
+* Stop adaptive caching test on groups 6 and 7
+
+# Wed Aug 16 12:47:19 UTC 2017
+
+* Add meta field to operative events if comet has returned the value
+* Refactor VideoInfo API handling to a new utility class
+* Remove old MasterClass campaign hacks
+
+# Thu Aug 10 08:57:51 UTC 2017
+
+* Add support for analytics events from playables
+* Prevent multiple video player errors from one ad unit
+
 # Wed Aug  9 08:40:17 UTC 2017
 
 * Adaptive caching test with 0,5MB/s limit on groups 6 and 7

@@ -57,7 +57,10 @@ export class SessionManagerEventMetadataCreator {
             'deviceModel': this._deviceInfo.getModel(),
             'sdkVersion': this._clientInfo.getSdkVersion(),
             'previousPlacementId': previousPlacementId,
-            'bundleId': this._clientInfo.getApplicationName()
+            'bundleId': this._clientInfo.getApplicationName(),
+            'meta': adUnit.getCampaign().getMeta(),
+            'screenDensity': this._deviceInfo.getScreenDensity(),
+            'screenSize': this._deviceInfo.getScreenLayout()
         };
 
         const campaign = adUnit.getCampaign();

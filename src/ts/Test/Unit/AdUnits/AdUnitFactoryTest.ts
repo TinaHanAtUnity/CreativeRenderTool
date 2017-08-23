@@ -25,10 +25,7 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 
-import ConfigurationJson from 'json/Configuration.json';
-import { PromoCampaign } from 'Models/PromoCampaign';
-import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -86,36 +83,6 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
-    describe('Promo AdUnit', () => {
-        let PromoAdUnit: PromoAdUnit;
-        let campaign: PromoCampaign;
-        beforeEach(() => {
-            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
-
-            campaign = TestFixtures.getPromoCampaign();
-            PromoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, TestFixtures.getClientInfo(), {});
-        });
-        describe('on show', () => {
-            it('should trigger onStart', (done) => {
-                PromoAdUnit.onStart.subscribe(() => {
-                    done();
-                });
-                PromoAdUnit.show();
-            });
-        });
-        describe('on hide', () => {
-            it('should trigger onClose when hide is called', (done) => {
-                PromoAdUnit.setShowing(true);
-                PromoAdUnit.onClose.subscribe(() => {
-                    assert.equal(PromoAdUnit.isShowing(), false);
-                    done();
-                });
-
-                PromoAdUnit.hide();
-            });
-        });
-    });
-
     describe('MRAID AdUnit', () => {
         let MRAIDAdUnit: MRAIDAdUnit;
         let eventManager: any;
@@ -134,7 +101,7 @@ describe('AdUnitFactoryTest', () => {
                 getId: sinon.stub().returns('1111')
             });
 
-            campaign = TestFixtures.getMRAIDCampaign();
+            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
             if(resourceUrl) {
                 resourceUrl.setFileId('1234');

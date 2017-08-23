@@ -6,10 +6,9 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Video } from 'Models/Assets/Video';
-import { Platform } from 'Constants/Platform';
-import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
+import { VideoInfo } from 'Utilities/VideoInfo';
 
 export enum CacheStatus {
     OK,
@@ -355,73 +354,24 @@ export class Cache {
 
     public isVideoValid(video: Video): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
-                    const isValid = (width > 0 && height > 0 && duration > 0);
-                    if(!isValid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: video.getOriginalUrl(),
-                            width: width,
-                            height: height,
-                            duration: duration
-                        });
-                    }
-                    return isValid;
-                }).catch(error => {
+            return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
+                const isValid = (width > 0 && height > 0 && duration > 0);
+                if(!isValid) {
                     Diagnostics.trigger('video_validation_failed', {
                         url: video.getOriginalUrl(),
-                        error: error
+                        width: width,
+                        height: height,
+                        duration: duration
                     });
-                    return false;
+                }
+                return isValid;
+            }).catch(error => {
+                Diagnostics.trigger('video_validation_failed', {
+                    url: video.getOriginalUrl(),
+                    error: error
                 });
-            } else {
-                const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
-                return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
-                    let width: number = 0;
-                    let height: number = 0;
-                    let duration: number = 0;
-
-                    for(const entry of results) {
-                        const key = entry[0];
-                        const value = entry[1];
-
-                        switch(key) {
-                            case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
-                                width = value;
-                                break;
-
-                            case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
-                                height = value;
-                                break;
-
-                            case VideoMetadata.METADATA_KEY_DURATION:
-                                duration = value;
-                                break;
-
-                            default:
-                                // unknown key, ignore
-                                break;
-                        }
-                    }
-
-                    const isValid = (width > 0 && height > 0 && duration > 0);
-                    if(!isValid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: video.getOriginalUrl(),
-                            width: width,
-                            height: height,
-                            duration: duration
-                        });
-                    }
-                    return isValid;
-                }).catch(error => {
-                    Diagnostics.trigger('video_validation_failed', {
-                        url: video.getOriginalUrl(),
-                        error: error
-                    });
-                    return false;
-                });
-            }
+                return false;
+            });
         });
     }
 

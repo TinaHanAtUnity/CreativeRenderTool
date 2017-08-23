@@ -1,5 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
+import { Image } from 'Models/Assets/Image';
+import { Asset } from 'Models/Assets/Asset';
 
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
@@ -9,6 +11,11 @@ interface IMRAIDCampaign extends ICampaign {
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
+
+    gameName: string | undefined;
+    gameIcon: Image | undefined;
+    rating: number | undefined;
+    ratingCount: number | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -20,7 +27,11 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             dynamicMarkup: ['string', 'undefined'],
             additionalTrackingEvents: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
-            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined']
+            clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            gameName: ['string', 'undefined'],
+            gameIcon: ['object', 'undefined'],
+            rating: ['number', 'undefined'],
+            ratingCount: ['number', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -39,6 +50,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
+        this.set('meta', campaign.meta);
+        this.set('gameName', campaign.gameName);
+
+        if(campaign.gameIcon) {
+            this.set('gameIcon', new Image(campaign.gameIcon));
+        }
+        this.set('rating', campaign.rating);
+        this.set('ratingCount', campaign.ratingCount);
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -57,13 +76,37 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('resource');
     }
 
+    public getGameName(): string | undefined {
+        return this.get('gameName');
+    }
+
+    public getGameIcon(): Image | undefined {
+        return this.get('gameIcon');
+    }
+
+    public getRating(): number | undefined {
+        return this.get('rating');
+    }
+
+    public getRatingCount(): number | undefined {
+        return this.get('ratingCount');
+    }
+
     public getRequiredAssets() {
         const resourceUrl =  this.getResourceUrl();
         return resourceUrl ? [resourceUrl] : [];
     }
 
-    public getOptionalAssets() {
-        return [];
+    public getOptionalAssets(): Asset[] {
+        const gameIcon = this.getGameIcon();
+
+        if(!gameIcon) {
+            return [];
+        } else {
+            return [
+                gameIcon
+            ];
+        }
     }
 
     public getDynamicMarkup(): string | undefined {
