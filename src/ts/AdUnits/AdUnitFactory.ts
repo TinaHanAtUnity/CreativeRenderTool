@@ -121,9 +121,12 @@ export class AdUnitFactory {
         let endScreen: EndScreen | undefined;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
             mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
-            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         } else {
             mraid = new MRAID(nativeBridge, placement, campaign);
+        }
+
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
         }
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options, endScreen);
