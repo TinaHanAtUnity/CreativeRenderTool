@@ -3,45 +3,14 @@
 <head>
     <meta charset="utf-8"/>
     <script>
-        /*Copyright (c) 2011-2016 Moat Inc. All Rights Reserved.*/
-        function initMoatTracking(c, d, e, k, l) {
-            var g = document.createElement("script"), a = [];
-            d = {
-                adData: {ids: d, duration: e, url: l}, dispatchEvent: function(b) {
-                    this.sendEvent ? (a && (a.push(b), b = a, a = !1), this.sendEvent(b)) : a.push(b)
-                }
-            };
-            e = "_moatApi" + Math.floor(1E8 * Math.random());
-            var f, h;
-            try {
-                f = c.ownerDocument, h = f.defaultView || f.parentWindow
-            } catch(b) {
-                f = document, h = window
-            }
-            h[e] = d;
-            g.type = "text/javascript";
-            c && c.insertBefore(g, c.childNodes[0] || null);
-            g.src = "https://z.moatads.com/" + k + "/moatvideo.js#" + e;
-            return d
-        }
-
         (function() {
-            var MRAID = function() {
+            var MoatMAPI = function() {
                 var state = 'loading';
 
                 var listeners = {
-                    ready: [],
-                    error: [],
                     stateChange: [],
-                    viewableChange: [],
-                    sizeChange: []
-                };
-
-                var viewable = false;
-
-                var orientationProperties = {
-                    allowOrientationChange: true,
-                    forceOrientation: 'none'
+                    exposureChange: [],
+                    audioVolumeChange: []
                 };
 
                 var trigger = function(event, parameters) {
@@ -65,15 +34,19 @@
 
                 window.addEventListener('message', function(event) {
                     switch(event.data.type) {
-                        case 'viewable':
-                            viewable = event.data.value;
-                            trigger('viewableChange', [viewable]);
+                        case 'exposure':
+                            trigger('exposureChange', [
+                                {
+                                inFocus: event.data.payload,
+                                isAttached: 1,
+                                isHidden: 0,
+                                opacity: 1,
+                                isCovered: 0
+                            }]);
                             break;
 
-                        case 'resize':
-                            window.innerWidth = width = event.data.width;
-                            window.innerHeight = height = event.data.height;
-                            trigger('sizeChange', [width, height]);
+                        case 'volume':
+                            trigger('audioVolumeChange', [event.data.payload]);
                             break;
 
                         default:
@@ -95,70 +68,6 @@
                     }
                 };
 
-                this.createCalendarEvent = function() {
-                    trigger('error', ['not implemented', 'createCalendarEvent']);
-                };
-
-                this.close = function() {
-                    trigger('error', ['not implemented', 'close']);
-                };
-
-                this.expand = function() {
-                    trigger('error', ['not implemented', 'expand']);
-                };
-
-                this.getCurrentPosition = this.getDefaultPosition = function() {
-                    return {
-                        x: 0,
-                        y: 0,
-                        width: width,
-                        height: height
-                    };
-                };
-
-                this.getExpandProperties = function() {
-                    trigger('error', ['not implemented', 'getExpandProperties']);
-                };
-
-                this.getMaxSize = this.getScreenSize = function() {
-                    return {
-                        width: width,
-                        height: height
-                    };
-                };
-
-                this.getOrientationProperties = function() {
-                    return orientationProperties;
-                };
-
-                this.getPlacementType = function() {
-                    return 'interstitial';
-                };
-
-                this.getResizeProperties = function() {
-                    trigger('error', ['not implemented', 'getResizeProperties']);
-                };
-
-                this.getState = function() {
-                    return state;
-                };
-
-                this.getVersion = function() {
-                    return '2.0';
-                };
-
-                this.isViewable = function() {
-                    return viewable;
-                };
-
-                this.open = function(url) {
-                    trigger('error', ['not implemented', 'open']);
-                };
-
-                this.playVideo = function() {
-                    trigger('error', ['not implemented', 'playVideo']);
-                };
-
                 this.removeEventListener = function(event, listener) {
                     if(event in listeners) {
                         var index = listeners[event].indexOf(listener);
@@ -168,31 +77,32 @@
                     }
                 };
 
-                this.resize = function() {
-                    trigger('error', ['not implemented', 'resize']);
+                this.getScreenSize = function() {
+                    return {
+                        width: width,
+                        height: height
+                    };
                 };
 
-                this.setExpandProperties = function() {
-                    trigger('error', ['not implemented', 'setExpandProperties']);
+                this.getCurrentPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    };
                 };
 
-                this.setOrientationProperties = function(properties) {
-                    trigger('error', ['not implemented', 'setOrientationProperties']);
+                this.getState = function() {
+                    return state;
                 };
 
-                this.setResizeProperties = function() {
-                    trigger('error', ['not implemented', 'setResizeProperties']);
+                this.getVersion = function() {
+                    return '3.0';
                 };
 
-                this.storePicture = function() {
-                    trigger('error', ['not implemented', 'storePicture']);
-                };
-
-                this.useCustomClose = function() {
-                    trigger('error', ['not implemented', 'useCustomClose']);
-                };
             };
-            window.mraid = new MRAID();
+            window.MoatMAPI = new MoatMAPI();
         })();
 
         var moat = undefined;
@@ -207,28 +117,12 @@
                             moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
                             break;
 
-                        case 'event':
+                        case 'videoEvent':
                             if(moat) {
                                 moat.dispatchEvent({
                                     "type": event.data.data.type,
                                     "adVolume": event.data.data.volume
                                 });
-                                if(window.mraid) {
-                                    if(event.data.data.type === 'AdPaused') {
-                                        mraid.viewable = false;
-                                        window.postMessage({
-                                            type: 'viewable',
-                                            value: false
-                                        }, '*');
-                                    }
-                                    if(event.data.data.type === 'AdPlaying') {
-                                        mraid.viewable = true;
-                                        window.postMessage({
-                                            type: 'viewable',
-                                            value: true
-                                        }, '*');
-                                    }
-                                }
                             }
                             break;
 
@@ -239,6 +133,29 @@
             }, false);
 
         });
+    </script>
+    <script>
+        /*Copyright (c) 2011-2016 Moat Inc. All Rights Reserved.*/
+        function initMoatTracking(c, d, e, k, l) {
+            var g = document.createElement("script"), a = [];
+            d = {
+                adData: {ids: d, duration: e, url: l}, dispatchEvent: function(b) {
+                    this.sendEvent ? (a && (a.push(b), b = a, a = !1), this.sendEvent(b)) : a.push(b)
+                }
+            };
+            e = "_moatApi" + Math.floor(1E8 * Math.random());
+            var f, h;
+            try {
+                f = c.ownerDocument, h = f.defaultView || f.parentWindow
+            } catch(b) {
+                f = document, h = window
+            }
+            h[e] = d;
+            g.type = "text/javascript";
+            c && c.insertBefore(g, c.childNodes[0] || null);
+            g.src = "https://z.moatads.com/" + k + "/moatvideo.js#" + e;
+            return d
+        }
     </script>
 </head>
 <body>

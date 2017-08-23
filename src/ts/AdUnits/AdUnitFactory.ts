@@ -106,7 +106,7 @@ export class AdUnitFactory {
         vastAdUnit.initMoat();
         const moatData = {
             SDK: 'UnityAds',
-            Version: '2.0',
+            Version: '1.0',
             SDKVersion: clientInfo.getSdkVersionName(),
             IFA: deviceInfo.getAdvertisingIdentifier(),
             LimitAdTracking: deviceInfo.getLimitAdTracking(),
@@ -234,6 +234,7 @@ export class AdUnitFactory {
     private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
         overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
         overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit));
+        overlay.onPauseForTesting.subscribe(() => VastOverlayEventHandlers.onPauseForTesting(nativeBridge, adUnit));
         overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted));
     }
 
