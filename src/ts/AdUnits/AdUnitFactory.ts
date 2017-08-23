@@ -25,7 +25,9 @@ import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitCont
 import { Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
+import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FinishState } from 'Constants/FinishState';
 import { StreamType } from 'Constants/Android/StreamType';
@@ -158,7 +160,15 @@ export class AdUnitFactory {
     }
 
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
-        const mraid = new MRAID(nativeBridge, placement, campaign);
+        let mraid: MRAIDView;
+        const resourceUrl = campaign.getResourceUrl();
+        const abGroup = campaign.getAbGroup();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
+            mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
+        } else {
+            mraid = new MRAID(nativeBridge, placement, campaign);
+        }
+
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
 
         mraid.render();
@@ -328,6 +338,10 @@ export class AdUnitFactory {
         }
 
         if(forceOrientation === ForceOrientation.PORTRAIT) {
+            // A/B test for disabling portrait videos if both video types are available
+            if(landscapeVideo && (campaign.getAbGroup() === 6 || campaign.getAbGroup() === 7)) {
+                return landscapeVideo;
+            }
             if(portraitVideo) {
                 return portraitVideo;
             }

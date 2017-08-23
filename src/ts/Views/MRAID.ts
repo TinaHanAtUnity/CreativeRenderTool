@@ -1,36 +1,19 @@
 import MRAIDTemplate from 'html/MRAID.html';
-import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { View } from 'Views/View';
-import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
+import { MRAIDView } from 'Views/MRAIDView';
+import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
-import { WebViewError } from 'Errors/WebViewError';
 
-export interface IOrientationProperties {
-    allowOrientationChange: boolean;
-    forceOrientation: ForceOrientation;
-}
-
-export class MRAID extends View {
+export class MRAID extends MRAIDView {
 
     private static CloseLength = 30;
 
-    public readonly onClick = new Observable1<string>();
-    public readonly onReward = new Observable0();
-    public readonly onSkip = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
-    public readonly onAnalyticsEvent = new Observable2<string, number>();
-
     private readonly onLoaded = new Observable0();
-
-    private _placement: Placement;
-    private _campaign: MRAIDCampaign;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -149,21 +132,6 @@ export class MRAID extends View {
         super.hide();
     }
 
-    public createMRAID(): Promise<string> {
-        return this.fetchMRAID().then(mraid => {
-            if(mraid) {
-                const markup = this._campaign.getDynamicMarkup();
-                if(markup) {
-                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
-                }
-                mraid = this.replaceMraidSources(mraid);
-
-                return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
-            }
-            throw new WebViewError('Unable to fetch MRAID');
-        });
-    }
-
     public setViewableState(viewable: boolean) {
         if(this._loaded) {
             this._iframe.contentWindow.postMessage({
@@ -171,15 +139,6 @@ export class MRAID extends View {
                 value: viewable
             }, '*');
         }
-    }
-
-    private replaceMraidSources(mraid: string): string {
-        const dom = new DOMParser().parseFromString(mraid, "text/html");
-        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
-        if (src && src.parentNode) {
-            src.parentNode.removeChild(src);
-        }
-        return dom.documentElement.outerHTML;
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -254,36 +213,8 @@ export class MRAID extends View {
             case 'analyticsEvent':
                 this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
                 break;
-            case 'customMraidState':
-                if(event.data.state === 'completed') {
-                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                        this._closeRemaining = 5;
-                    }
-                }
-                break;
             default:
                 break;
-        }
-    }
-
-    private fetchMRAID(): Promise<string | undefined> {
-        const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
-            const fileId = resourceUrl.getFileId();
-            if(fileId) {
-                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
-            } else {
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.addEventListener('load', () => {
-                        resolve(xhr.responseText);
-                    }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
-                    xhr.send();
-                });
-            }
-        } else {
-            return Promise.resolve(this._campaign.getResource());
         }
     }
 }

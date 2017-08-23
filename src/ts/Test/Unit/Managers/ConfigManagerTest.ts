@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { INativeResponse } from 'Utilities/Request';
 
-import ConfigurationJson from 'json/Configuration.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -69,7 +69,7 @@ describe('ConfigManagerTest', () => {
         beforeEach(() => {
             const nativeResponse: INativeResponse = {
                 url: '',
-                response: ConfigurationJson,
+                response: ConfigurationAuctionPlc,
                 responseCode: 200,
                 headers: []
             };
