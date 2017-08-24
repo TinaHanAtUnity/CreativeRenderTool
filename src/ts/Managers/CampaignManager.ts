@@ -214,7 +214,7 @@ export abstract class CampaignManager {
             });
         }
 
-        if(this._clientInfo.getTestMode()) {
+        if(this._configuration.getConfigurationTestMode()) {
             url = Url.addParameters(url, {test: true});
         }
 
