@@ -13,6 +13,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { Platform } from 'Constants/Platform';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -60,7 +61,8 @@ export class SessionManagerEventMetadataCreator {
             'bundleId': this._clientInfo.getApplicationName(),
             'meta': adUnit.getCampaign().getMeta(),
             'screenDensity': this._deviceInfo.getScreenDensity(),
-            'screenSize': this._deviceInfo.getScreenLayout()
+            'screenSize': this._deviceInfo.getScreenLayout(),
+            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase()
         };
 
         const campaign = adUnit.getCampaign();
