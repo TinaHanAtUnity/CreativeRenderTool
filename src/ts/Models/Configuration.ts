@@ -195,6 +195,6 @@ export class Configuration extends Model<IConfiguration> {
     }
 
     public getConfigurationTestMode(): boolean {
-        return this.get('test');
+       return this.get('test') ? true : false;
     }
 }

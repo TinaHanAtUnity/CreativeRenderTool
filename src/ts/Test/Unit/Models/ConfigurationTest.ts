@@ -26,6 +26,15 @@ describe('configurationTest', () => {
             assert.equal(configuration.getCacheMode(), CacheMode.FORCED);
         });
 
+        it('should have server side test mode false when undefined in config', () => {
+           assert.equal(configuration.getConfigurationTestMode(), false);
+        });
+
+        it('should have server side test mode true when defined in config', () => {
+            configuration.set('test', true);
+            assert.equal(configuration.getConfigurationTestMode(), true);
+        });
+
         describe('parsing placements', () => {
             it('should get all placements', () => {
                 assert.property(configuration.getPlacements(), 'premium');
