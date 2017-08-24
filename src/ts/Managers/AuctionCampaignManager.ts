@@ -188,7 +188,7 @@ export class AuctionCampaignManager extends CampaignManager {
                 const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
-            case 'programmatic/image':
+            case 'programmatic/static-interstitial':
                 const domString = decodeURIComponent(content);
                 const progImageCampaign = new ProgrammaticImageCampaign(domString, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, progImageCampaign);
