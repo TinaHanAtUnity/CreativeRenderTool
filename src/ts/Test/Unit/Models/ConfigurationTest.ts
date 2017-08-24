@@ -27,12 +27,12 @@ describe('configurationTest', () => {
         });
 
         it('should have server side test mode false when undefined in config', () => {
-           assert.equal(configuration.getConfigurationTestMode(), false);
+           assert.equal(configuration.getTestMode(), false);
         });
 
         it('should have server side test mode true when defined in config', () => {
             configuration.set('test', true);
-            assert.equal(configuration.getConfigurationTestMode(), true);
+            assert.equal(configuration.getTestMode(), true);
         });
 
         describe('parsing placements', () => {

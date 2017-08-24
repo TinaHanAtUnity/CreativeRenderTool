@@ -54,10 +54,7 @@ export class Configuration extends Model<IConfiguration> {
 
         this.set('analytics', configJson.analytics ? true : false);
 
-        const test: boolean = configJson.test;
-        if(test) {
-            this.set('test', true);
-        }
+        this.set('test', configJson.test ? true : false);
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -194,7 +191,7 @@ export class Configuration extends Model<IConfiguration> {
         };
     }
 
-    public getConfigurationTestMode(): boolean {
-       return this.get('test') ? true : false;
+    public getTestMode(): boolean {
+       return this.get('test');
     }
 }
