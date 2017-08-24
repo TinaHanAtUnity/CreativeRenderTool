@@ -104,7 +104,7 @@ export class MRAIDEventHandlers {
         return new Promise((resolve, reject) => {
             const makeRequest = (url: string) => {
                 url = url.trim();
-                if (!url.startsWith('http')) {
+                if (url.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
                     resolve(url);
                 } else {
