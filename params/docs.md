@@ -164,12 +164,13 @@
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
-| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
-| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 | bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
+| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 
 
 
@@ -203,7 +204,8 @@
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
+| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
 | screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
-| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 
