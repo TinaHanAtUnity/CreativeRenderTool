@@ -1,3 +1,9 @@
+# Fri Aug 25 07:57:13 UTC 2017
+
+* MRAID loading fix
+* Include user agent in diagnostic messages
+* Refactoring for the upcoming 2.1.1 release
+
 # Tue Aug 22 12:41:29 UTC 2017
 
 * Fix non-cached playables on iOS SDK 2.1.0
