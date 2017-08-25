@@ -1,11 +1,11 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 
-interface IProgrammaticImageCampaign extends ICampaign {
+interface IDisplayInterstitialCampaign extends ICampaign {
     dynamicMarkup: string;
 }
 
-export class ProgrammaticImageCampaign extends Campaign<IProgrammaticImageCampaign> {
+export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
     constructor(markup: string, gamerId: string, abGroup: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('ProgrammaticImageCampaign', {
             ... Campaign.Schema,

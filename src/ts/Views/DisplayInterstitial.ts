@@ -1,15 +1,15 @@
 import { View } from 'Views/View';
-import ProgrammaticImageTemplate from 'html/Display.html';
-import DisplayContainer from 'html/DisplayContainer.html';
+import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import DisplayContainer from 'html/display/DisplayContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
-import { ProgrammaticImageCampaign } from 'Models/ProgrammaticImageCampaign';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
-export class ProgrammaticImage extends View {
+export class DisplayInterstitial extends View {
 
     public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();
@@ -19,7 +19,7 @@ export class ProgrammaticImage extends View {
     private readonly onLoaded = new Observable0();
 
     private _placement: Placement;
-    private _campaign: ProgrammaticImageCampaign;
+    private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -36,13 +36,13 @@ export class ProgrammaticImage extends View {
 
     private _messageListener: EventListener;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: ProgrammaticImageCampaign) {
-        super(nativeBridge, 'programmatic-image');
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign) {
+        super(nativeBridge, 'display-interstitial');
 
         this._placement = placement;
         this._campaign = campaign;
 
-        this._template = new Template(ProgrammaticImageTemplate);
+        this._template = new Template(DisplayInterstitialTemplate);
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
         this._bindings = [

@@ -4,41 +4,42 @@
 
 // Smartphone (portrait)
 @media only screen and (max-device-width: 736px) and (orientation: portrait)
-  #programmatic-image
+  #display-interstitial
     #display-iframe
       width: 320px;
       height: 480px;
 
 // Smartphone (landscape)
 @media only screen and (max-device-width: 736px) and (orientation: landscape)
-  #programmatic-image
+  #display-interstitial
     #display-iframe
       width: 480px;
       height: 320px;
 
 // Tablet (portrait)
-@media only screen and (min-device-width: 737px) and (max-device-width: 1280px) and (orientation: portrait)
-  #programmatic-image
+@media only screen and (min-device-width: 737px) and (orientation: portrait)
+  #display-interstitial
     #display-iframe
       width: 768px;
       height: 1024px;
 
-@media only screen and (min-device-width: 737px) and (max-device-width: 1280px) and (orientation: landscape)
-  #programmatic-image
+@media only screen and (min-device-width: 737px) and (orientation: landscape)
+  #display-interstitial
     #display-iframe
       width: 1024px;
       height: 768px;
 
-#programmatic-image
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#display-interstitial
   width: 100vw;
   height: 100vh;
 
   #display-iframe
-    flex: none;
     border: 1px solid white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
 
   .close-region
     position: absolute

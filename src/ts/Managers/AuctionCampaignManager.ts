@@ -11,7 +11,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { ProgrammaticImageCampaign } from 'Models/ProgrammaticImageCampaign';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import { Url } from 'Utilities/Url';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
@@ -190,7 +190,7 @@ export class AuctionCampaignManager extends CampaignManager {
 
             case 'programmatic/static-interstitial':
                 const domString = decodeURIComponent(content);
-                const progImageCampaign = new ProgrammaticImageCampaign(domString, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, adType, creativeId, seatId, correlationId);
+                const progImageCampaign = new DisplayInterstitialCampaign(domString, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, adType, creativeId, seatId, correlationId);
                 return this.setupPlcCampaignAssets(placements, progImageCampaign);
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType), placements);

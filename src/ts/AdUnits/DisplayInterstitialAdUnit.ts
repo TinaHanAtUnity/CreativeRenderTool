@@ -4,19 +4,19 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { SessionManager } from 'Managers/SessionManager';
-import { ProgrammaticImageCampaign } from 'Models/ProgrammaticImageCampaign';
-import { ProgrammaticImage } from 'Views/ProgrammaticImage';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
-export class ProgrammaticImageAdUnit extends AbstractAdUnit {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _sessionManager: SessionManager;
-    private _view: ProgrammaticImage;
+    private _view: DisplayInterstitial;
     private _options: any;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: ProgrammaticImageCampaign, view: ProgrammaticImage, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: DisplayInterstitialCampaign, view: DisplayInterstitial, options: any) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._view = view;

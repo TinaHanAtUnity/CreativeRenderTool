@@ -6,9 +6,9 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { ProgrammaticImageCampaign } from 'Models/ProgrammaticImageCampaign';
-import { ProgrammaticImageAdUnit } from 'AdUnits/ProgrammaticImageAdUnit';
-import { ProgrammaticImage } from 'Views/ProgrammaticImage';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
@@ -45,8 +45,8 @@ export class AdUnitFactory {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
-        } else if (campaign instanceof ProgrammaticImageCampaign) {
-            return this.createProgrammaticImageAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
+        } else if (campaign instanceof DisplayInterstitialCampaign) {
+            return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -305,9 +305,9 @@ export class AdUnitFactory {
         return undefined;
     }
 
-    private static createProgrammaticImageAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: ProgrammaticImageCampaign, options: any): AbstractAdUnit {
-        const view = new ProgrammaticImage(nativeBridge, placement, campaign);
-        const programmaticAdUnit = new ProgrammaticImageAdUnit(nativeBridge, container, sessionManager, placement, campaign, view, options);
+    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: DisplayInterstitialCampaign, options: any): AbstractAdUnit {
+        const view = new DisplayInterstitial(nativeBridge, placement, campaign);
+        const programmaticAdUnit = new DisplayInterstitialAdUnit(nativeBridge, container, sessionManager, placement, campaign, view, options);
 
         view.render();
         document.body.appendChild(view.container());
