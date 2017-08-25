@@ -12,29 +12,7 @@
         </style>
         <script>
             (function() {
-
-                function handleMessage(message) {
-                    console.log('Received message', message);
-                    switch (message.type) {
-                        case 'data':
-                            injectMarkup(message.data);
-                            break;
-                    }
-                }
-
-                function injectMarkup(markup) {
-                    var div = document.querySelector('.container');
-                    if (div) {
-                        // do nothing, already loaded.
-                        return;
-                    }
-                    div = document.createElement('div');
-                    div.classList.add('container');
-                    div.innerHTML = decodeURIComponent(markup);
-                    document.body.appendChild(div);
-                }
-
-                function isEventTargetingALinkElement(e) {
+                function isEventTargetingAnchorElement(e) {
                     return e.target.nodeName === 'A';
                 }
 
@@ -42,7 +20,7 @@
                     e.stopPropagation();
                     e.preventDefault();
                     var href = e.target.href;
-                    console.log('href', href);
+
                     window.parent.postMessage({
                         type: 'redirect',
                         href: href
@@ -50,18 +28,13 @@
                 }
 
                 document.addEventListener('click', function(e) {
-                    if (isEventTargetingALinkElement(e)) {
+                    if (isEventTargetingAnchorElement(e)) {
                         handleRedirect(e);
                         return false;
                     } else {
                         return true;
                     }
                 });
-
-                window.addEventListener('message', function (e) {
-                    handleMessage(e.data);
-                });
-                console.log('Display container init.');
             })();
         </script>
     </head>
