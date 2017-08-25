@@ -49,6 +49,11 @@
                             trigger('audioVolumeChange', [event.data.payload]);
                             break;
 
+                        case 'resize':
+                            width = event.data.width;
+                            height = event.data.height;
+                            break;
+
                         default:
                             break;
                     }
