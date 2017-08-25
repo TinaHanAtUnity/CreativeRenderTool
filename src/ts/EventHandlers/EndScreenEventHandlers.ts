@@ -13,6 +13,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { EventType } from 'Models/Session';
+import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 
 export class EndScreenEventHandlers {
 
@@ -115,9 +116,15 @@ export class EndScreenEventHandlers {
         adUnit.hide();
     }
 
-    public static onKeyEvent(keyCode: number, adUnit: VideoAdUnit): void {
-        if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isActive()) {
-            adUnit.hide();
+    public static onKeyEvent(keyCode: number, adUnit: AbstractAdUnit): void {
+        if(adUnit instanceof VideoAdUnit) {
+            if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isActive()) {
+                adUnit.hide();
+            }
+        } else if(adUnit instanceof MRAIDAdUnit) {
+            if(keyCode === KeyCode.BACK && adUnit.isShowing() && !adUnit.isShowingMRAID()) {
+                adUnit.hide();
+            }
         }
     }
 

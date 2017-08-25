@@ -46,6 +46,15 @@ export class MRAIDEventHandlers {
         HttpKafka.sendEvent('events.playable.json', kafkaObject);
     }
 
+    public static onShowEndScreen(mraidAdUnit: MRAIDAdUnit) {
+        const endScreen = mraidAdUnit.getEndScreen();
+        if(endScreen) {
+            mraidAdUnit.setShowingMRAID(false);
+            mraidAdUnit.getMRAIDView().hide();
+            endScreen.show();
+        }
+    }
+
     private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
         const currentSession = sessionManager.getSession();
         if(currentSession) {

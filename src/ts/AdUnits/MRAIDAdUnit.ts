@@ -9,6 +9,7 @@ import { MRAIDView, IOrientationProperties } from 'Views/MRAIDView';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
+import { EndScreen } from 'Views/EndScreen';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -16,6 +17,8 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _mraid: MRAIDView;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
+    private _endScreen?: EndScreen;
+    private _showingMRAID: boolean;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -23,11 +26,12 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();
+        this._endScreen = endScreen;
 
         this._orientationProperties = {
             allowOrientationChange: true,
@@ -52,6 +56,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     public show(): Promise<void> {
         this.setShowing(true);
+        this.setShowingMRAID(true);
         this._mraid.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
@@ -71,6 +76,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
             return Promise.resolve();
         }
         this.setShowing(false);
+        this.setShowingMRAID(false);
 
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
@@ -78,6 +84,9 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
 
         this._mraid.hide();
+        if(this._endScreen) {
+            this._endScreen.hide();
+        }
 
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
@@ -116,6 +125,22 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this.sendTrackingEvent('click');
     }
 
+    public getEndScreen(): EndScreen | undefined {
+        return this._endScreen;
+    }
+
+    public getMRAIDView(): MRAIDView {
+        return this._mraid;
+    }
+
+    public setShowingMRAID(showing: boolean) {
+        this._showingMRAID = showing;
+    }
+
+    public isShowingMRAID(): boolean {
+        return this._showingMRAID;
+    }
+
     private onShow() {
         this._mraid.setViewableState(true);
 
@@ -152,6 +177,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     private unsetReferences() {
         delete this._mraid;
+        delete this._endScreen;
     }
 
     private sendTrackingEvent(eventName: string): void {
