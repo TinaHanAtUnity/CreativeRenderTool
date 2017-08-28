@@ -1,3 +1,9 @@
+# Mon Aug 28 07:48:06 UTC 2017
+
+* Endscreen for playables support
+* MRAID url redirects for app store
+* Platform parameter to operative events
+
 # Fri Aug 25 07:57:13 UTC 2017
 
 * MRAID loading fix
