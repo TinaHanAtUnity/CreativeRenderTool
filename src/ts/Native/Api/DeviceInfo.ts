@@ -4,6 +4,10 @@ import { AndroidDeviceInfoApi } from 'Native/Api/AndroidDeviceInfo';
 import { IosDeviceInfoApi } from 'Native/Api/IosDeviceInfo';
 import { Platform } from 'Constants/Platform';
 
+export enum DeviceInfoEvent {
+    VOLUME_CHANGED
+}
+
 export class DeviceInfoApi extends NativeApi {
     public Android: AndroidDeviceInfoApi;
     public Ios: IosDeviceInfoApi;

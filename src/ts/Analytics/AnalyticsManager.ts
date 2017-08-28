@@ -173,12 +173,8 @@ export class AnalyticsManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: string) {
-        if(data && data.indexOf('price') !== -1 && data.indexOf('currency') !== -1) {
-            this._storage.getIAPTransactions().then(transactions => {
-                this.sendIAPTransactions(transactions);
-            });
-        }
+    private onStorageSet(eventType: string, data: any) {
+        // todo: handle IAP purchase data with new 2.1.1 storage format
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

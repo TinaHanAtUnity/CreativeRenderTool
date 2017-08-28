@@ -6,7 +6,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Video } from 'Models/Assets/Video';
-import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { VideoInfo } from 'Utilities/VideoInfo';
@@ -765,25 +764,9 @@ export class Cache {
     private onStorageSet(eventType: string, data: any) {
         let deleteValue: boolean = false;
 
-        // note: these match Android and iOS storage event formats for 2.1 and earlier versions
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            if(data.indexOf('caching.pause.value=true') !== -1) {
-                this.pause(true);
-                deleteValue = true;
-            } else if(data.indexOf('caching.pause.value=false') !== -1) {
-                this.pause(false);
-                deleteValue = true;
-            }
-        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(typeof data['caching.pause.value'] !== 'undefined') {
-                if(data['caching.pause.value'] === true) {
-                    this.pause(true);
-                    deleteValue = true;
-                } else {
-                    this.pause(false);
-                    deleteValue = true;
-                }
-            }
+        if(data && data.caching && data.caching.pause && 'value' in data.caching.pause) {
+            this.pause(data.caching.pause.value);
+            deleteValue = true;
         }
 
         if(deleteValue) {

@@ -186,6 +186,12 @@
       "required": "android",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

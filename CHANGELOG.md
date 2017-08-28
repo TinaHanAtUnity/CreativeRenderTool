@@ -1,3 +1,19 @@
+# Mon Aug 28 07:48:06 UTC 2017
+
+* Endscreen for playables support
+* MRAID url redirects for app store
+* Platform parameter to operative events
+
+# Fri Aug 25 07:57:13 UTC 2017
+
+* MRAID loading fix
+* Include user agent in diagnostic messages
+* Refactoring for the upcoming 2.1.1 release
+
+# Tue Aug 22 12:41:29 UTC 2017
+
+* Fix non-cached playables on iOS SDK 2.1.0
+
 # Mon Aug 21 12:07:58 UTC 2017
 
 * Loading screen for selected Unity made playables

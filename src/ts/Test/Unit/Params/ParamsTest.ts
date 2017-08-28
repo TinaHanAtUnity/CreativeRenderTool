@@ -194,7 +194,7 @@ class TestHelper {
         return sessionManager;
     }
 
-    public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager): AbstractAdUnit {
+    public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, request: Request): AbstractAdUnit {
         const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
@@ -206,7 +206,7 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
     }
 }
 
@@ -303,7 +303,7 @@ describe('Event parameters should match specifications', () => {
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             sessionManager.setGameSessionId(1234);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
             return sessionManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -320,7 +320,7 @@ describe('Event parameters should match specifications', () => {
             const requestSpy: any = sinon.spy(request, 'post');
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             sessionManager.setGameSessionId(1234);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
             return sessionManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -346,7 +346,7 @@ describe('Event parameters should match specifications', () => {
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 sessionManager.setGameSessionId(1234);
-                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
             });
 
             it('with start event', () => {
@@ -408,7 +408,7 @@ describe('Event parameters should match specifications', () => {
                 requestSpy = sinon.spy(request, 'post');
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 sessionManager.setGameSessionId(1234);
-                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager);
+                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
             });
 
             it('with start event', () => {

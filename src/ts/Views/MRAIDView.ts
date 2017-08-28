@@ -4,9 +4,9 @@ import { View } from 'Views/View';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
-import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
+import { Platform } from 'Constants/Platform';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -59,21 +59,31 @@ export abstract class MRAIDView extends View {
         const resourceUrl = this._campaign.getResourceUrl();
         if (resourceUrl) {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.addEventListener('load', () => {
-                        resolve(xhr.responseText);
-                    }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getUrl()));
-                    xhr.send();
-                });
+                return this.requestMRaid(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if (fileId) {
                     return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                } else {
+                    return this.requestMRaid(resourceUrl.getOriginalUrl());
                 }
             }
         }
         return Promise.resolve(this._campaign.getResource());
+    }
+
+    private requestMRaid(url: string): Promise<string | undefined> {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                if ((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
+                }
+            }, false);
+            xhr.open('GET', decodeURIComponent(url));
+            xhr.send();
+        });
     }
 }
