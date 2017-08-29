@@ -11,6 +11,7 @@ import { Video } from 'Models/Assets/Video';
 import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { CacheError } from 'Native/Api/Cache';
 import { Request } from 'Utilities/Request';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';
@@ -25,13 +26,15 @@ describe('VideoMetadataTest', () => {
     let wakeUpManager: WakeUpManager;
     let request: Request;
     let cache: Cache;
+    let focusManager: FocusManager;
 
     describe('on Android', () => {
         const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-            wakeUpManager = new WakeUpManager(nativeBridge);
+            focusManager = new FocusManager(nativeBridge);
+            wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cache = new Cache(nativeBridge, wakeUpManager, request);
         });
@@ -64,7 +67,8 @@ describe('VideoMetadataTest', () => {
     describe('on iOS', () => {
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-            wakeUpManager = new WakeUpManager(nativeBridge);
+            focusManager = new FocusManager(nativeBridge);
+            wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cache = new Cache(nativeBridge, wakeUpManager, request);
         });

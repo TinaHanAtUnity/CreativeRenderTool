@@ -10,6 +10,7 @@ import { Cache } from 'Utilities/Cache';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { FakeSdkApi } from '../TestHelpers/FakeSdkApi';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestCacheApi extends CacheApi {
     private _files: IFileInfo[];
@@ -207,7 +208,8 @@ describe('CacheCleanTest', () => {
 
     beforeEach(() => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
-        const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge);
+        const focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request: Request = new Request(nativeBridge, wakeUpManager);
         cache = new Cache(nativeBridge, wakeUpManager, request);
         cacheApi = new TestCacheApi(nativeBridge);

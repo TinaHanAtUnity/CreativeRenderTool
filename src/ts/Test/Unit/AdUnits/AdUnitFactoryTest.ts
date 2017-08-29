@@ -25,6 +25,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
+import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
@@ -32,6 +33,7 @@ describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+    let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
     let sessionManager: SessionManager;
@@ -46,7 +48,8 @@ describe('AdUnitFactoryTest', () => {
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         metaDataManager = new MetaDataManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'close').returns(Promise.resolve());
