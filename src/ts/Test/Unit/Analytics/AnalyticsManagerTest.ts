@@ -101,7 +101,6 @@ describe('AnalyticsManagerTest', () => {
             const requestSpy = sinon.spy(request, 'post');
 
             focusManager.onActivityPaused.trigger('com.test.activity');
-            // wakeUpManager.onActivityPaused.trigger('com.test.activity');
 
             sinon.assert.called(requestSpy);
             assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
