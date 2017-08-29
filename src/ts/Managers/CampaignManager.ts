@@ -18,8 +18,13 @@ import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { SessionManager } from 'Managers/SessionManager';
+import { JsonParser } from 'Utilities/JsonParser';
+import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { CacheStatus } from 'Utilities/Cache';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 
-export abstract class CampaignManager {
+export class CampaignManager {
 
     public static setAbGroup(abGroup: number) {
         CampaignManager.AbGroup = abGroup;
@@ -37,9 +42,20 @@ export abstract class CampaignManager {
         CampaignManager.CampaignResponse = campaignResponse;
     }
 
+    public static setBaseUrl(baseUrl: string): void {
+        CampaignManager.BaseUrl = baseUrl + '/v4/games';
+    }
+
+    public static setTestBaseUrl(testBaseUrl: string): void {
+        CampaignManager.BaseUrl = testBaseUrl;
+    }
+
     protected static CampaignResponse: string | undefined;
 
     protected static AbGroup: number | undefined;
+
+    private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
 
@@ -92,6 +108,16 @@ export abstract class CampaignManager {
                 retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: true
+            }).then(response => {
+                if(response) {
+                    return this.parseCampaigns(response);
+                }
+                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+            }).then(() => {
+                this._requesting = false;
+            }).catch((error) => {
+                this._requesting = false;
+                return this.handleError(error, this._configuration.getPlacementIds());
             });
         });
     }
@@ -104,9 +130,174 @@ export abstract class CampaignManager {
         return this._previousPlacementId;
     }
 
-    protected abstract getBaseUrl(): string;
+    private parseCampaigns(response: INativeResponse) {
+        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
-    protected getParameter(field: string, value: any, expectedType: string) {
+        if('placements' in json) {
+            const fill: { [mediaId: string]: string[] } = {};
+            const noFill: string[] = [];
+
+            const placements = this._configuration.getPlacements();
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
+                    const mediaId: string = json.placements[placement];
+
+                    if(mediaId) {
+                        if(fill[mediaId]) {
+                            fill[mediaId].push(placement);
+                        } else {
+                            fill[mediaId] = [placement];
+                        }
+                    } else {
+                        noFill.push(placement);
+                    }
+                }
+            }
+
+            let refreshDelay: number = 0;
+            const promises: Array<Promise<void>> = [];
+
+            for(const placement of noFill) {
+                promises.push(this.handleNoFill(placement));
+                refreshDelay = CampaignRefreshManager.NoFillDelay;
+            }
+
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
+                    promises.push(this.handleCampaign(fill[mediaId],
+                        json.media[mediaId].contentType,
+                        json.media[mediaId].content,
+                        json.media[mediaId].trackingUrls,
+                        json.media[mediaId].cacheTTL,
+                        json.media[mediaId].adType,
+                        json.media[mediaId].creativeId,
+                        json.media[mediaId].seatId,
+                        json.correlationId).catch(error => {
+                        if(error === CacheStatus.STOPPED) {
+                            return Promise.resolve();
+                        }
+
+                        return this.handleError(error, fill[mediaId]);
+                    }));
+
+                    // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
+                    const contentType = json.media[mediaId].contentType;
+                    const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                        refreshDelay = cacheTTL;
+                    }
+                }
+            }
+
+            this.onAdPlanReceived.trigger(refreshDelay);
+
+            return Promise.all(promises).catch(error => {
+                return this.handleError(error, this._configuration.getPlacementIds());
+            });
+        } else {
+            return this.handleError(new Error('No placements found'), this._configuration.getPlacementIds());
+        }
+    }
+
+    private handleCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
+        const abGroup: number = this._configuration.getAbGroup();
+        const gamerId: string = this._configuration.getGamerId();
+
+        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
+        switch (contentType) {
+            case 'comet/campaign':
+                const json = JsonParser.parse(content);
+                if(json && json.mraidUrl) {
+                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
+                    return this.setupCampaignAssets(placements, campaign);
+                } else {
+                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                    return this.setupCampaignAssets(placements, campaign);
+                }
+
+            case 'programmatic/vast':
+                if(!content) {
+                    return this.handleError(new Error('No vast content'), placements);
+                }
+
+                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
+                    return this.setupCampaignAssets(placements, vastCampaign);
+                });
+
+            case 'programmatic/mraid-url':
+                // todo: handle ad plan expiration with cacheTTL or something similar
+                const jsonMraidUrl = JsonParser.parse(content);
+                if(!jsonMraidUrl) {
+                    return this.handleError(new Error('No mraid-url content'), placements);
+                }
+
+                if(!jsonMraidUrl.inlinedUrl) {
+                    const MRAIDError = new DiagnosticError(
+                        new Error('MRAID Campaign missing inlinedUrl'),
+                        {mraid: jsonMraidUrl}
+                    );
+                    return this.handleError(MRAIDError, placements);
+                }
+
+                jsonMraidUrl.id = this.getProgrammaticCampaignId();
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
+                return this.setupCampaignAssets(placements, mraidUrlCampaign);
+
+            case 'programmatic/mraid':
+                // todo: handle ad plan expiration with cacheTTL or something similar
+                const jsonMraid = JsonParser.parse(content);
+                if(!jsonMraid) {
+                    return this.handleError(new Error('No mraid content'), placements);
+                }
+
+                if(!jsonMraid.markup) {
+                    const MRAIDError = new DiagnosticError(
+                        new Error('MRAID Campaign missing markup'),
+                        {mraid: jsonMraid}
+                    );
+                    return this.handleError(MRAIDError, placements);
+                }
+
+                jsonMraid.id = this.getProgrammaticCampaignId();
+                const markup = decodeURIComponent(jsonMraid.markup);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
+                return this.setupCampaignAssets(placements, mraidCampaign);
+
+            default:
+                return this.handleError(new Error('Unsupported content-type: ' + contentType), placements);
+        }
+    }
+
+    private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
+        return this._assetManager.setup(campaign).then(() => {
+            for(const placement of placements) {
+                this.onCampaign.trigger(placement, campaign);
+            }
+        });
+    }
+
+    private handleNoFill(placement: string): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
+        this.onNoFill.trigger(placement);
+        return Promise.resolve();
+    }
+
+    private handleError(error: any, placementIds: string[]): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
+        this.onError.trigger(error, placementIds);
+
+        return Promise.resolve();
+    }
+
+    private getBaseUrl(): string {
+        return [
+            CampaignManager.BaseUrl,
+            this._clientInfo.getGameId(),
+            'requests'
+        ].join('/');
+    }
+
+    private getParameter(field: string, value: any, expectedType: string) {
         if(value === undefined) {
             return undefined;
         }
@@ -139,7 +330,7 @@ export abstract class CampaignManager {
         }
     }
 
-    protected parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
+    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
@@ -169,7 +360,7 @@ export abstract class CampaignManager {
         });
     }
 
-    protected getProgrammaticCampaignId(): string {
+    private getProgrammaticCampaignId(): string {
         switch (this._nativeBridge.getPlatform()) {
             case Platform.IOS:
                 return '00005472656d6f7220694f53';
@@ -180,7 +371,7 @@ export abstract class CampaignManager {
         }
     }
 
-    protected createRequestUrl(): Promise<string> {
+    private createRequestUrl(): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -248,13 +439,14 @@ export abstract class CampaignManager {
                 screenHeight: this.getParameter('screenHeight', screenHeight, 'number'),
                 connectionType: this.getParameter('connectionType', connectionType, 'string'),
                 networkType: this.getParameter('networkType', networkType, 'number'),
+                gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
             });
 
             return url;
         });
     }
 
-    protected createRequestBody(): Promise<any> {
+    private createRequestBody(): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -304,6 +496,21 @@ export abstract class CampaignManager {
                     body.frameworkName = this.getParameter('frameworkName', framework.getName(), 'string');
                     body.frameworkVersion = this.getParameter('frameworkVersion', framework.getVersion(), 'string');
                 }
+
+                const placementRequest: any = {};
+
+                const placements = this._configuration.getPlacements();
+                for(const placement in placements) {
+                    if(placements.hasOwnProperty(placement)) {
+                        placementRequest[placement] = {
+                            adTypes: placements[placement].getAdTypes(),
+                            allowSkip: placements[placement].allowSkip()
+                        };
+                    }
+                }
+
+                body.placements = placementRequest;
+                body.properties = this._configuration.getProperties();
 
                 return body;
             });
