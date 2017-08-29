@@ -27,6 +27,8 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 
 import ConfigurationJson from 'json/Configuration.json';
+import { DisplayInterstitialAdUnit } from "AdUnits/DisplayInterstitialAdUnit";
+import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
 
 describe('AdUnitFactoryTest', () => {
 
@@ -185,6 +187,57 @@ describe('AdUnitFactoryTest', () => {
         it('should call click tracker', () => {
             MRAIDAdUnit.sendClick();
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
+        });
+    });
+
+    describe('DisplayInterstitialAdUnit', () => {
+        let adUnit: DisplayInterstitialAdUnit;
+        let campaign: DisplayInterstitialCampaign;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, {});
+        });
+
+        describe('on click', () => {
+            it('should open an intent on Android', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                sandbox.stub(nativeBridge.Intent, 'launch');
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'http://google.com'
+                });
+            });
+
+            it('should open the url on iOS', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+                sandbox.stub(nativeBridge.UrlScheme, 'open');
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
+            });
+        });
+
+        describe('on close', () => {
+            it('should hide the adUnit', () => {
+                sandbox.stub(adUnit, 'hide');
+
+                adUnit.onClose.trigger();
+
+                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
+        });
+
+        describe('on skip', () => {
+            it('should hide the adUnit', () => {
+                sandbox.stub(adUnit, 'hide');
+
+                adUnit.onSkip.trigger();
+
+                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
         });
     });
 });

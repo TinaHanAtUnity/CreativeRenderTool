@@ -327,9 +327,9 @@ export class AdUnitFactory {
             }
         };
 
-        view.onClose.subscribe(onClose);
-        view.onSkip.subscribe(onClose);
-        view.onClick.subscribe(openLink);
+        programmaticAdUnit.onClose.subscribe(onClose);
+        programmaticAdUnit.onSkip.subscribe(onClose);
+        programmaticAdUnit.onRedirect.subscribe(openLink);
 
         return programmaticAdUnit;
     }

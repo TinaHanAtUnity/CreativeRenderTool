@@ -3,12 +3,16 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
+import { Observable1, Observable0 } from 'Utilities/Observable';
 import { SessionManager } from 'Managers/SessionManager';
 import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit {
+    public onRedirect = new Observable1<string>();
+    public onSkip = new Observable0();
+
     private _sessionManager: SessionManager;
     private _view: DisplayInterstitial;
     private _options: any;
@@ -23,6 +27,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
         this._options = options;
         this.setShowing(false);
+
+        view.onClick.subscribe((href) => this.onRedirect.trigger(href));
     }
 
     public show(): Promise<void> {

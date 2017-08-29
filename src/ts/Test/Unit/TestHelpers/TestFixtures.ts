@@ -8,12 +8,18 @@ import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import DummyCampaign from 'json/DummyCampaign.json';
 import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
+import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
 
 export class TestFixtures {
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup);
+    }
 
     public static getPlacement(): Placement {
         return new Placement({
