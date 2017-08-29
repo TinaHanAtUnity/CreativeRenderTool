@@ -20,6 +20,7 @@
 * Refactored yield based tests to use auction
 * Fix DOMParser on Android 4.*
 * Add AliBabaCloud purge script
+* Add screenSize and screenDensity for operative events
 
 # Thu Aug 17 07:56:14 UTC 2017
 
