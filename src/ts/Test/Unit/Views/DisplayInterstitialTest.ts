@@ -8,25 +8,19 @@ import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign"
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from "Constants/Platform";
+import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial', () => {
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
-    let mockNativeBridge: sinon.SinonMock;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
-    let container: HTMLElement;
+    let sandbox: sinon.SinonSandbox;
 
     beforeEach(() => {
-        container = document.createElement('div');
-        document.body.appendChild(container);
-
-        nativeBridge = <NativeBridge><any>{
-            getPlatform: () => null,
-            getApiLevel: () => null
-        };
-        mockNativeBridge = sinon.mock(nativeBridge);
+        sandbox = sinon.sandbox.create();
+        nativeBridge = TestFixtures.getNativeBridge();
         placement = new Placement({
             id: '123',
             name: 'test',
@@ -40,12 +34,12 @@ describe('DisplayInterstitial', () => {
         campaign = new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-        mockNativeBridge.expects('getPlatform').atLeast(0).returns(Platform.ANDROID);
-        mockNativeBridge.expects('getApiLevel').atLeast(0).returns(16);
+        sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+        sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
     });
 
     afterEach(() => {
-        document.body.removeChild(container);
+        sandbox.reset();
     });
 
     it('should render', () => {
