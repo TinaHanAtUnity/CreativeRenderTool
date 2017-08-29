@@ -39,7 +39,7 @@ describe('DisplayInterstitial', () => {
     });
 
     afterEach(() => {
-        sandbox.reset();
+        sandbox.restore();
     });
 
     it('should render', () => {
