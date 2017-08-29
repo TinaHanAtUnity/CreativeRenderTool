@@ -5,6 +5,7 @@ import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorag
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;
@@ -15,6 +16,7 @@ export class AnalyticsManager {
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
+    private _focusManager: FocusManager;
 
     private _bgTimestamp: number;
     private _topActivity: string;
@@ -22,8 +24,9 @@ export class AnalyticsManager {
     private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
+        this._focusManager = focusManager;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
         this._clientInfo = clientInfo;
@@ -95,10 +98,10 @@ export class AnalyticsManager {
     }
 
     private subscribeListeners(): void {
-        this._wakeUpManager.onAppForeground.subscribe(() => this.onAppForeground());
-        this._wakeUpManager.onAppBackground.subscribe(() => this.onAppBackground());
-        this._wakeUpManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
-        this._wakeUpManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
+        this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+        this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
+        this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
+        this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
@@ -170,12 +173,8 @@ export class AnalyticsManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: string) {
-        if(data && data.indexOf('price') !== -1 && data.indexOf('currency') !== -1) {
-            this._storage.getIAPTransactions().then(transactions => {
-                this.sendIAPTransactions(transactions);
-            });
-        }
+    private onStorageSet(eventType: string, data: any) {
+        // todo: handle IAP purchase data with new 2.1.1 storage format
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

@@ -168,6 +168,9 @@
 | cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 | bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
+| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 
 
 
@@ -202,4 +205,7 @@
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
 | bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
+| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 

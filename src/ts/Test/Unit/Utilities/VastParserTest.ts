@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
+import { FocusManager } from 'Managers/FocusManager';
 
 import VastRaw from 'xml/VastRaw.xml';
 import RootVastClean from 'xml/RootVastClean.xml';
@@ -268,13 +269,15 @@ describe('VastParser', () => {
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1()
+                onActivityPaused: new Observable1(),
+                onActivityDestroyed: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;
             }
         };
-        const wakeUpManager = new WakeUpManager(nativeBridge);
+        const focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
     });
 });

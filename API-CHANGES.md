@@ -14,6 +14,18 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 2.1.1
+
+* Added rotation, width and height to Android show options object sent to webview
+* Added statusBarHidden to iOS show options object sent to webview
+* Added transparency parameter to Android and iOS AdUnit.open method
+* Added animation parameter to iOS AdUnit.open method
+* Added Android DeviceInfo.getPackageInfo method
+* Added DeviceInfo.getMaxVolume, DeviceInfo.registerVolumeChangeListener and DeviceInfo.unregisterVolumeChangeListener methods
+* Added DeviceInfo.VOLUME_CHANGED events
+* Fixed Android DeviceInfo.getDeviceVolume to report proper errors
+* Fixed Storage API events
+
 ## 2.1.0
 
 * Added WKWebView based bridge for new iOS versions

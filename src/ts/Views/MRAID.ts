@@ -1,33 +1,19 @@
 import MRAIDTemplate from 'html/MRAID.html';
-import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { View } from 'Views/View';
-import { Observable0, Observable1 } from 'Utilities/Observable';
+import { MRAIDView } from 'Views/MRAIDView';
+import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
-import { WebViewError } from 'Errors/WebViewError';
 
-export interface IOrientationProperties {
-    allowOrientationChange: boolean;
-    forceOrientation: ForceOrientation;
-}
+export class MRAID extends MRAIDView {
 
-export class MRAID extends View {
-
-    public readonly onClick = new Observable1<string>();
-    public readonly onReward = new Observable0();
-    public readonly onSkip = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
+    private static CloseLength = 30;
 
     private readonly onLoaded = new Observable0();
-
-    private _placement: Placement;
-    private _campaign: MRAIDCampaign;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -38,6 +24,9 @@ export class MRAID extends View {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+
+    private _closeRemaining: number;
+    private _showTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -73,16 +62,15 @@ export class MRAID extends View {
 
     public show(): void {
         super.show();
-
-        const closeLength = 30;
+        this._showTimestamp = Date.now();
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = closeLength;
+            this._closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
             const updateInterval = setInterval(() => {
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                 }
                 if(skipRemaining > 0) {
                     skipRemaining--;
@@ -93,24 +81,24 @@ export class MRAID extends View {
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
         } else {
-            let closeRemaining = closeLength;
+            this._closeRemaining = MRAID.CloseLength;
             const updateInterval = setInterval(() => {
-                const progress = (closeLength - closeRemaining) / closeLength;
+                const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
                     this._didReward = true;
                 }
-                if(closeRemaining > 0) {
-                    closeRemaining--;
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
                     this.updateProgressCircle(this._closeElement, progress);
                 }
-                if (closeRemaining <= 0) {
+                if (this._closeRemaining <= 0) {
                     clearInterval(updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
@@ -144,21 +132,6 @@ export class MRAID extends View {
         super.hide();
     }
 
-    public createMRAID(): Promise<string> {
-        return this.fetchMRAID().then(mraid => {
-            if(mraid) {
-                const markup = this._campaign.getDynamicMarkup();
-                if(markup) {
-                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
-                }
-                mraid = this.replaceMraidSources(mraid);
-
-                return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
-            }
-            throw new WebViewError('Unable to fetch MRAID');
-        });
-    }
-
     public setViewableState(viewable: boolean) {
         if(this._loaded) {
             this._iframe.contentWindow.postMessage({
@@ -166,15 +139,6 @@ export class MRAID extends View {
                 value: viewable
             }, '*');
         }
-    }
-
-    private replaceMraidSources(mraid: string): string {
-        const dom = new DOMParser().parseFromString(mraid, "text/html");
-        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
-        if (src && src.parentNode) {
-            src.parentNode.removeChild(src);
-        }
-        return dom.documentElement.outerHTML;
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -246,30 +210,11 @@ export class MRAID extends View {
                     forceOrientation: forceOrientation
                 });
                 break;
-
+            case 'analyticsEvent':
+                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                break;
             default:
                 break;
-        }
-    }
-
-    private fetchMRAID(): Promise<string | undefined> {
-        const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
-            const fileId = resourceUrl.getFileId();
-            if(fileId) {
-                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
-            } else {
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.addEventListener('load', () => {
-                        resolve(xhr.responseText);
-                    }, false);
-                    xhr.open('GET', decodeURIComponent(resourceUrl.getOriginalUrl()));
-                    xhr.send();
-                });
-            }
-        } else {
-            return Promise.resolve(this._campaign.getResource());
         }
     }
 }

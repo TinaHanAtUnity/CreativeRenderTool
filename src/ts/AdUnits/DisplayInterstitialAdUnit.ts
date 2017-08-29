@@ -44,7 +44,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         // Display ads are always completed.
         this.setFinishState(FinishState.COMPLETED);
 
-        return this._container.open(this, false, true, this._forceOrientation, true, this._options);
+        return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {

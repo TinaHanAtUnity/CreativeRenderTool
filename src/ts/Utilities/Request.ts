@@ -55,6 +55,10 @@ export class Request {
         return null;
     }
 
+    public static is2xxSuccessful(sc: number): boolean {
+        return sc >= 200 && sc < 300;
+    }
+
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
 
@@ -228,7 +232,7 @@ export class Request {
     }
 
     private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/^https:\/\/www\.masterclass\.com/i)) {
+        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
             return true;
         } else {
             return false;

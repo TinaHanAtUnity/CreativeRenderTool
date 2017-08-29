@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
 
-import ConfigurationJson from 'json/Configuration.json';
+import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('configurationTest', () => {
 
@@ -19,25 +19,36 @@ describe('configurationTest', () => {
         });
 
         it('should have country parameter from configuration', () => {
-            assert.equal(configuration.getCountry(), 'fi');
+            assert.equal(configuration.getCountry(), 'FI');
         });
 
         it('should have forced cache mode', () => {
             assert.equal(configuration.getCacheMode(), CacheMode.FORCED);
         });
 
-        describe('parsing two placements', () => {
-            it('should get both placements', () => {
-                assert.property(configuration.getPlacements(), '1');
-                assert.property(configuration.getPlacements(), '2');
+        it('should have server side test mode false when undefined in config', () => {
+           assert.equal(configuration.getTestMode(), false);
+        });
+
+        it('should have server side test mode true when defined in config', () => {
+            configuration.set('test', true);
+            assert.equal(configuration.getTestMode(), true);
+        });
+
+        describe('parsing placements', () => {
+            it('should get all placements', () => {
+                assert.property(configuration.getPlacements(), 'premium');
+                assert.property(configuration.getPlacements(), 'video');
+                assert.property(configuration.getPlacements(), 'mraid');
+                assert.property(configuration.getPlacements(), 'rewardedVideoZone');
             });
 
             it('should pick default', () => {
-                assert.equal(configuration.getDefaultPlacement().getId(), '2');
+                assert.equal(configuration.getDefaultPlacement().getId(), 'video');
             });
 
             it('should return placement by id', () => {
-                assert.equal(configuration.getPlacement('1').getName(), 'placementName1');
+                assert.equal(configuration.getPlacement('premium').getName(), 'Premium placement');
             });
         });
 

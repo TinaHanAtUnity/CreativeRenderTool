@@ -27,6 +27,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -38,6 +39,7 @@ describe('VideoEventHandlersTest', () => {
     let sessionManager: SessionManager;
     let video: Video;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -45,6 +47,7 @@ describe('VideoEventHandlersTest', () => {
             handleCallback
         });
 
+        focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
@@ -69,7 +72,7 @@ describe('VideoEventHandlersTest', () => {
             container: sinon.spy()
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,

@@ -174,6 +174,24 @@
       "required": "yes",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "screenSize",
+      "required": "android",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

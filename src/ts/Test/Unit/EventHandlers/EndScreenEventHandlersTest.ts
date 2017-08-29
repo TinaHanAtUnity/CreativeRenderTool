@@ -13,16 +13,14 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { StoreName } from "Models/PerformanceCampaign";
 import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-
-import EndScreenTestPerformanceCampaign1 from 'json/EndScreenTestPerformanceCampaign1.json';
 import { Video } from 'Models/Assets/Video';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -32,6 +30,7 @@ describe('EndScreenEventHandlersTest', () => {
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -42,6 +41,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -56,7 +56,7 @@ describe('EndScreenEventHandlersTest', () => {
             metaDataManager = new MetaDataManager(nativeBridge);
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -64,9 +64,8 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                TestFixtures.getCampaign(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -77,9 +76,8 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                    TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -99,9 +97,8 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                    TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
@@ -133,7 +130,7 @@ describe('EndScreenEventHandlersTest', () => {
             it('should launch market view', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
-                    'uri': 'market://details?id=fooAppId'
+                    'uri': 'market://details?id=com.iUnity.angryBots'
                 });
             });
 
@@ -151,7 +148,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
 
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -164,7 +161,7 @@ describe('EndScreenEventHandlersTest', () => {
             };
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -172,11 +169,11 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
-            campaignObj.store = 'apple';
-            campaignObj.appStoreId = '11111';
+            const campaign = TestFixtures.getCampaign();
+            campaign.set('store', StoreName.APPLE);
+            campaign.set('appStoreId', '11111');
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+                campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
         it('should send a click with session manager', () => {
@@ -189,10 +186,10 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with follow redirects', () => {
             deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
             it('with response that contains location, it should open url scheme', () => {
-                const campaignObj = JSON.parse(EndScreenTestPerformanceCampaign1);
-                campaignObj.store = 'apple';
+                const campaign = TestFixtures.getCampaignFollowsRedirects();
+                campaign.set('store', StoreName.APPLE);
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    new PerformanceCampaign(campaignObj, 'asd', 10), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+                    campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',

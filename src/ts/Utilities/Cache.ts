@@ -6,10 +6,9 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Video } from 'Models/Assets/Video';
-import { Platform } from 'Constants/Platform';
-import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
+import { VideoInfo } from 'Utilities/VideoInfo';
 
 export enum CacheStatus {
     OK,
@@ -355,73 +354,24 @@ export class Cache {
 
     public isVideoValid(video: Video): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                return this._nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
-                    const isValid = (width > 0 && height > 0 && duration > 0);
-                    if(!isValid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: video.getOriginalUrl(),
-                            width: width,
-                            height: height,
-                            duration: duration
-                        });
-                    }
-                    return isValid;
-                }).catch(error => {
+            return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
+                const isValid = (width > 0 && height > 0 && duration > 0);
+                if(!isValid) {
                     Diagnostics.trigger('video_validation_failed', {
                         url: video.getOriginalUrl(),
-                        error: error
+                        width: width,
+                        height: height,
+                        duration: duration
                     });
-                    return false;
+                }
+                return isValid;
+            }).catch(error => {
+                Diagnostics.trigger('video_validation_failed', {
+                    url: video.getOriginalUrl(),
+                    error: error
                 });
-            } else {
-                const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
-                return this._nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
-                    let width: number = 0;
-                    let height: number = 0;
-                    let duration: number = 0;
-
-                    for(const entry of results) {
-                        const key = entry[0];
-                        const value = entry[1];
-
-                        switch(key) {
-                            case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
-                                width = value;
-                                break;
-
-                            case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
-                                height = value;
-                                break;
-
-                            case VideoMetadata.METADATA_KEY_DURATION:
-                                duration = value;
-                                break;
-
-                            default:
-                                // unknown key, ignore
-                                break;
-                        }
-                    }
-
-                    const isValid = (width > 0 && height > 0 && duration > 0);
-                    if(!isValid) {
-                        Diagnostics.trigger('video_validation_failed', {
-                            url: video.getOriginalUrl(),
-                            width: width,
-                            height: height,
-                            duration: duration
-                        });
-                    }
-                    return isValid;
-                }).catch(error => {
-                    Diagnostics.trigger('video_validation_failed', {
-                        url: video.getOriginalUrl(),
-                        error: error
-                    });
-                    return false;
-                });
-            }
+                return false;
+            });
         });
     }
 
@@ -814,25 +764,9 @@ export class Cache {
     private onStorageSet(eventType: string, data: any) {
         let deleteValue: boolean = false;
 
-        // note: these match Android and iOS storage event formats for 2.1 and earlier versions
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            if(data.indexOf('caching.pause.value=true') !== -1) {
-                this.pause(true);
-                deleteValue = true;
-            } else if(data.indexOf('caching.pause.value=false') !== -1) {
-                this.pause(false);
-                deleteValue = true;
-            }
-        } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(typeof data['caching.pause.value'] !== 'undefined') {
-                if(data['caching.pause.value'] === true) {
-                    this.pause(true);
-                    deleteValue = true;
-                } else {
-                    this.pause(false);
-                    deleteValue = true;
-                }
-            }
+        if(data && data.caching && data.caching.pause && 'value' in data.caching.pause) {
+            this.pause(data.caching.pause.value);
+            deleteValue = true;
         }
 
         if(deleteValue) {
@@ -845,12 +779,12 @@ export class Cache {
         const deltaPosition: number = position - this._currentDownloadPosition;
         const deltaTime: number = Date.now() - this._lastProgressEvent;
 
-        if(position > 0 && deltaPosition > 153600) { // sample size must be at least 150 kilobytes
+        if(position > 0 && deltaPosition > 102400) { // sample size must be at least 100 kilobytes
             // speed in kilobytes per second (same as bytes per millisecond)
             const speed: number = deltaPosition / deltaTime;
 
-            // if speed is over 1 megabytes per second (8mbps), the connection is fast enough for streaming
-            if(speed > 1024 && !this._fastConnectionDetected) {
+            // if speed is over 0,5 megabytes per second (4mbps), the connection is fast enough for streaming
+            if(speed > 512 && !this._fastConnectionDetected) {
                 this._fastConnectionDetected = true;
                 this.onFastConnectionDetected.trigger();
             }

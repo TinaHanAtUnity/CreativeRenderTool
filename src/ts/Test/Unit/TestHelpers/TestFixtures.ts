@@ -6,14 +6,18 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import DummyCampaign from 'json/DummyCampaign.json';
-import DummyMRAIDCampaign from 'json/DummyMRAIDCampaign.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+
+import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
+import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
+import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
@@ -34,13 +38,35 @@ export class TestFixtures {
         });
     }
 
-    public static getCampaign(): PerformanceCampaign {
-        return new PerformanceCampaign(JSON.parse(DummyCampaign), 'abc123', 123);
+    public static getCampaignFollowsRedirects(): PerformanceCampaign {
+        const json = JSON.parse(OnCometVideoPlcCampaignFollowsRedirects);
+        const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new PerformanceCampaign(performanceJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
     }
 
-    public static getMRAIDCampaign(): MRAIDCampaign {
-        const json = JSON.parse(DummyMRAIDCampaign);
-        return new MRAIDCampaign(json.mraid, json.gamerId, json.abGroup, json.mraid.inlinedURL, '<div>resource</div>', json.mraid.tracking);
+    public static getCampaign(): PerformanceCampaign {
+        const json = JSON.parse(OnCometVideoPlcCampaign);
+        const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new PerformanceCampaign(performanceJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
+    }
+
+    public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
+        const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
+        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+    }
+
+    public static getPlayableMRAIDCampaign(): MRAIDCampaign {
+        const json = JSON.parse(OnCometMraidPlcCampaign);
+        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+    }
+
+    public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        mraidJson.id = 'testId';
+        return new MRAIDCampaign(mraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
@@ -113,7 +139,9 @@ export class TestFixtures {
             assetCaching: 'disabled',
             placements: [],
             gamerId: 'abc123',
-            abGroup: 0
+            abGroup: 0,
+            useAuction: true,
+            properties: 'abc123'
         });
     }
 

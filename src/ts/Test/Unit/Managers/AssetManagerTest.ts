@@ -16,6 +16,7 @@ import { HTML } from 'Models/Assets/HTML';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestCacheApi extends CacheApi {
 
@@ -163,6 +164,7 @@ describe('AssetManagerTest', () => {
     let wakeUpManager: WakeUpManager;
     let request: Request;
     let deviceInfo: DeviceInfo;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -171,7 +173,8 @@ describe('AssetManagerTest', () => {
             handleInvocation,
             handleCallback
         });
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);

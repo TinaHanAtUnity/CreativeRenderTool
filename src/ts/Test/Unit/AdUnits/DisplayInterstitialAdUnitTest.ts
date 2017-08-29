@@ -17,6 +17,7 @@ import { EventManager } from "Managers/EventManager";
 import { DeviceInfo } from "Models/DeviceInfo";
 import { MetaDataManager } from "Managers/MetaDataManager";
 import { WakeUpManager } from "Managers/WakeUpManager";
+import { FocusManager } from "Managers/FocusManager";
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 describe('DisplayInterstitialAdUnit', () => {
@@ -35,7 +36,8 @@ describe('DisplayInterstitialAdUnit', () => {
         placement = TestFixtures.getPlacement();
 
         const metaDataManager = new MetaDataManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge);
+        const focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'open').returns(Promise.resolve());

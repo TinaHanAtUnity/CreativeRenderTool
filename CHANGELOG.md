@@ -1,3 +1,56 @@
+# Mon Aug 28 07:48:06 UTC 2017
+
+* Endscreen for playables support
+* MRAID url redirects for app store
+* Platform parameter to operative events
+
+# Fri Aug 25 07:57:13 UTC 2017
+
+* MRAID loading fix
+* Include user agent in diagnostic messages
+* Refactoring for the upcoming 2.1.1 release
+
+# Tue Aug 22 12:41:29 UTC 2017
+
+* Fix non-cached playables on iOS SDK 2.1.0
+
+# Mon Aug 21 12:07:58 UTC 2017
+
+* Loading screen for selected Unity made playables
+* Refactored yield based tests to use auction
+* Fix DOMParser on Android 4.*
+* Add AliBabaCloud purge script
+* Add screenSize and screenDensity for operative events
+
+# Thu Aug 17 07:56:14 UTC 2017
+
+* Fix iOS endscreen in portrait mode (ABT-219)
+* Test disabling portrait videos on groups 6 and 7
+* Stop adaptive caching test on groups 6 and 7
+
+# Wed Aug 16 12:47:19 UTC 2017
+
+* Add meta field to operative events if comet has returned the value
+* Refactor VideoInfo API handling to a new utility class
+* Remove old MasterClass campaign hacks
+
+# Thu Aug 10 08:57:51 UTC 2017
+
+* Add support for analytics events from playables
+* Prevent multiple video player errors from one ad unit
+
+# Wed Aug  9 08:40:17 UTC 2017
+
+* Adaptive caching test with 0,5MB/s limit on groups 6 and 7
+* Fix some video player diagnostic problems
+
+# Tue Aug  8 09:33:22 UTC 2017
+
+* Remove endscreen test from groups 8, 9, 10 and 11
+* Log all activity and viewcontroller events to video_player_stuck diagnostics
+* Fix cropping issue on iOS with MRAID
+* Remove video_player_prepare_not_called diagnostic message
+
 # Mon Aug  7 08:03:45 UTC 2017
 
 * Handle errors by placement with PLC ad plans

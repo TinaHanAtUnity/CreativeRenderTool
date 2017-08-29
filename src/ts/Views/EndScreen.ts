@@ -7,7 +7,9 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
 export class EndScreen extends View {
 
@@ -19,21 +21,17 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
-    private _isMasterClassCampaign = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
-        this._gameName = campaign.getGameName();
         this._localization = new Localization(language, 'endscreen');
-
-        if (campaign.getId() === '58e2c6139b4fd70d2454b051') {
-            this._isMasterClassCampaign = true;
-        }
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
-        if(campaign) {
+        if(campaign && campaign instanceof  PerformanceCampaign) {
+            this._gameName = campaign.getGameName();
+
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
                 'gameName': campaign.getGameName(),
@@ -45,6 +43,36 @@ export class EndScreen extends View {
                 'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
                 'endscreenAlt': this.getEndscreenAlt(campaign)
             };
+        } else if(campaign && campaign instanceof MRAIDCampaign) {
+            const gameName = campaign.getGameName();
+            if(gameName) {
+                this._gameName = gameName;
+            }
+            this._templateData = {
+                'gameName': campaign.getGameName(),
+                'endscreenAlt': this.getEndscreenAlt(campaign)
+            };
+            const gameIcon = campaign.getGameIcon();
+            if(gameIcon) {
+                this._templateData.gameIcon = gameIcon.getUrl();
+            }
+            const rating = campaign.getRating();
+            if(rating) {
+                const adjustedRating: number = rating * 20;
+                this._templateData.rating = adjustedRating.toString();
+            }
+            const ratingCount = campaign.getRatingCount();
+            if(ratingCount) {
+                this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
+            }
+            const portrait = campaign.getPortrait();
+            if(portrait) {
+                this._templateData.endScreenLandscape = portrait.getUrl();
+            }
+            const landscape = campaign.getLandscape();
+            if(landscape) {
+                this._templateData.endScreenPortrait = landscape.getUrl();
+            }
         }
 
         this._bindings = [
@@ -64,15 +92,6 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
-    }
-
-    public render(): void {
-        super.render();
-
-        if(this._isMasterClassCampaign) {
-            const downloadText: HTMLElement = <HTMLElement>this._container.querySelector('.download-text');
-            downloadText.innerHTML = 'Find Out More';
-        }
     }
 
     public show(): void {
@@ -104,11 +123,7 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: PerformanceCampaign) {
-        if (this._isMasterClassCampaign) {
-            return 'masterclass';
-        }
-
+    private getEndscreenAlt(campaign: Campaign) {
         return undefined;
     }
 
@@ -138,5 +153,4 @@ export class EndScreen extends View {
             }
         });
     }
-
 }
