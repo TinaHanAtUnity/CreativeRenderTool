@@ -12,7 +12,6 @@ interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
-    useAuction: boolean;
     abGroup: number;
     gamerId: string;
     properties: string;
@@ -28,7 +27,6 @@ export class Configuration extends Model<IConfiguration> {
             enabled: ['boolean'],
             country: ['string'],
             coppaCompliant: ['boolean'],
-            useAuction: ['boolean'],
             abGroup: ['number'],
             gamerId: ['string'],
             properties: ['string'],
@@ -41,14 +39,9 @@ export class Configuration extends Model<IConfiguration> {
         this.set('enabled', configJson.enabled);
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
-        const useAuction: boolean = configJson.useAuction;
-
-        if(useAuction) {
-            this.set('useAuction', useAuction);
-            this.set('abGroup', configJson.abGroup);
-            this.set('gamerId', configJson.gamerId);
-            this.set('properties', configJson.properties);
-        }
+        this.set('abGroup', configJson.abGroup);
+        this.set('gamerId', configJson.gamerId);
+        this.set('properties', configJson.properties);
 
         this.set('analytics', configJson.analytics ? true : false);
 
@@ -97,10 +90,6 @@ export class Configuration extends Model<IConfiguration> {
 
     public isCoppaCompliant(): boolean {
         return this.get('coppaCompliant');
-    }
-
-    public isAuction(): boolean {
-        return this.get('useAuction');
     }
 
     public isAnalyticsEnabled(): boolean {
@@ -178,7 +167,6 @@ export class Configuration extends Model<IConfiguration> {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
-            'placementLevelControl': this.isAuction(),
             'abGroup': this.getAbGroup(),
             'gamerId': this.getGamerId(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
