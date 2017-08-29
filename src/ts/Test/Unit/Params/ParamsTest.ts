@@ -29,7 +29,8 @@ import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitCont
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -61,7 +62,7 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
-            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "placements": []}', 200, []);
+            this.onComplete.trigger(id, url, ConfigurationAuctionPlc, 200, []);
         }, 1);
         return Promise.resolve(id);
     }
@@ -194,7 +195,7 @@ class TestHelper {
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, request: Request): AbstractAdUnit {
-        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
+        const config: Configuration = TestFixtures.getConfiguration();
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
         let container: AdUnitContainer;
@@ -217,7 +218,6 @@ describe('Event parameters should match specifications', () => {
             const requestSpy: any = sinon.spy(request, 'get');
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
-
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
                 verifier.assert();
             });
@@ -256,10 +256,13 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
+                console.log("URL: " + url);
                 const body: string = requestSpy.getCall(0).args[1];
+                console.log("BODY:");
+                console.dir(body);
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
@@ -278,7 +281,7 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new LegacyCampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
