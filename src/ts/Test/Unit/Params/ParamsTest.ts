@@ -259,10 +259,7 @@ describe('Event parameters should match specifications', () => {
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
-                console.log("URL: " + url);
                 const body: string = requestSpy.getCall(0).args[1];
-                console.log("BODY:");
-                console.dir(body);
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
