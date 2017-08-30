@@ -159,7 +159,7 @@ export class PlayableMRAID extends MRAIDView {
                 }, 5000);
             }
             this._loadingScreenTimeout = undefined;
-        }, 1500);
+        }, 2000);
     }
 
     private showMRAIDAd() {
