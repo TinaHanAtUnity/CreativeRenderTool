@@ -16,16 +16,14 @@ export default class RequestUtilities {
                             if (location) {
                                 makeRequest(location);
                             } else {
-                                reject('302 Found did not have a "Location" header');
+                                reject(new Error('302 Found did not have a "Location" header'));
                             }
                         } else if (Request.is2xxSuccessful(response.responseCode)) {
                             resolve(url);
                         } else {
                             reject(new Error(`Request to ${url} failed with status ${response.responseCode}`));
                         }
-                    }).catch(() => {
-                        reject();
-                    });
+                    }).catch(reject);
                 }
             };
             makeRequest(link);
