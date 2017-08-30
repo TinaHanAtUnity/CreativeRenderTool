@@ -2,6 +2,8 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
+import { Request } from 'Utilities/Request';
+import RequestUtilities from 'Utilities/RequestUtilities';
 
 export class VastOverlayEventHandlers {
 
@@ -23,22 +25,25 @@ export class VastOverlayEventHandlers {
         }
     }
 
-    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit): void {
+    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, request: Request): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
         adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            if(nativeBridge.getPlatform() === Platform.IOS) {
-                nativeBridge.UrlScheme.open(clickThroughURL);
-            } else {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': clickThroughURL
-                });
-            }
+            return RequestUtilities.followUrl(request, clickThroughURL).then((url: string) => {
+                if(nativeBridge.getPlatform() === Platform.IOS) {
+                    nativeBridge.UrlScheme.open(url);
+                } else {
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': url
+                    });
+                }
+            });
         }
+        return Promise.reject(new Error('No clickThroughURL was defined'));
     }
 
 }

@@ -9,7 +9,6 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { EventManager } from 'Managers/EventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
@@ -23,6 +22,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { Request, INativeResponse } from 'Utilities/Request';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -40,6 +40,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let nativeBridge: NativeBridge, testAdUnit: VastAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
+    let request: Request;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -73,6 +74,8 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo();
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         sessionManager.setSession(new Session('123'));
+
+        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
 
         testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
@@ -141,26 +144,70 @@ describe('VastOverlayEventHandlersTest', () => {
         });
 
         it('should call video click through tracking url', () => {
+            sinon.stub(request, 'head').withArgs('http://foo.com').returns(Promise.resolve(<INativeResponse>{
+                responseCode: 200
+            }));
+
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
-            sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
+            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
+            });
         });
 
         it('should open click trough link in iOS web browser when call button is clicked', () => {
+            sinon.stub(request, 'head').withArgs('http://foo.com').returns(Promise.resolve(<INativeResponse>{
+                responseCode: 200
+            }));
+
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foo.com');
+            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foo.com');
+            });
         });
 
         it('should open click trough link in Android web browser when call button is clicked', () => {
+            sinon.stub(request, 'head').withArgs('http://foo.com').returns(Promise.resolve(<INativeResponse>{
+                responseCode: 200
+            }));
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
             sinon.stub(nativeBridge.Intent, 'launch');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit);
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                'action': 'android.intent.action.VIEW',
-                'uri': 'http://foo.com'
+            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'http://foo.com'
+                });
+            });
+        });
+
+        it('should follow redirects from links and open the last one in the chain', () => {
+            sinon.stub(request, 'head').callsFake((url) => {
+                if (url === 'http://foo.com') {
+                    return Promise.resolve(<INativeResponse>{
+                        responseCode: 302,
+                        headers: [
+                            ['location', 'https://bar.com']
+                        ]
+                    });
+                } else if (url === 'https://bar.com') {
+                    return Promise.resolve(<INativeResponse>{
+                        responseCode: 200
+                    });
+                } else {
+                    return Promise.resolve(<INativeResponse>{
+                        responseCode: 404
+                    });
+                }
+            });
+
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sinon.stub(nativeBridge.Intent, 'launch');
+            VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'https://bar.com'
+                });
             });
         });
     });
