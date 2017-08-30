@@ -104,7 +104,7 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, '345', listener, true);
@@ -176,7 +176,7 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '345', listener, true);
