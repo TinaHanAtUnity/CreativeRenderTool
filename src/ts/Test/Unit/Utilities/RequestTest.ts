@@ -7,6 +7,7 @@ import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
@@ -105,6 +106,7 @@ describe('RequestTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -114,7 +116,8 @@ describe('RequestTest', () => {
 
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
         const clock = sinon.useFakeTimers();
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         clock.restore();
         request = new Request(nativeBridge, wakeUpManager);
     });

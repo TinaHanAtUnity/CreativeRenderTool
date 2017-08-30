@@ -9,11 +9,13 @@ import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let container: ViewController;
     let testAdUnit: TestAdUnit;
+    let focusManager: FocusManager;
 
     const defaultOptions: any = {
         supportedOrientations: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
@@ -28,7 +30,8 @@ describe('IosAdUnitTest', () => {
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            focusManager = new FocusManager(nativeBridge);
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
             testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.Sdk, 'logInfo').returns(Promise.resolve());
             stub = sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
@@ -51,7 +54,8 @@ describe('IosAdUnitTest', () => {
 
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+        focusManager = new FocusManager(nativeBridge);
+        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
         const stub = sinon.stub(nativeBridge.IosAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -63,7 +67,7 @@ describe('IosAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
 
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());
@@ -77,7 +81,8 @@ describe('IosAdUnitTest', () => {
 
     it('should trigger onShow', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+        focusManager = new FocusManager(nativeBridge);
+        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
         testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
@@ -96,7 +101,8 @@ describe('IosAdUnitTest', () => {
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            focusManager = new FocusManager(nativeBridge);
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
             testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
             onSystemInterruptTriggered = false;

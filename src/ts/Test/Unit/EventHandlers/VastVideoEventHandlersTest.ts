@@ -20,6 +20,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -40,6 +41,7 @@ describe('VastVideoEventHandlers tests', () => {
     let sessionManager: SessionManager;
     let testAdUnit: VastAdUnit;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -47,6 +49,7 @@ describe('VastVideoEventHandlers tests', () => {
             handleCallback
         });
 
+        focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
@@ -71,7 +74,7 @@ describe('VastVideoEventHandlers tests', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
 
         clientInfo = TestFixtures.getClientInfo();
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager, undefined);

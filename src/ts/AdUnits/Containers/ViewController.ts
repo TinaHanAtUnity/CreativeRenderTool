@@ -4,6 +4,7 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
+import { FocusManager } from 'Managers/FocusManager';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -15,12 +16,11 @@ interface IIosOptions {
 
 export class ViewController extends AdUnitContainer {
 
-    private static _appWillResignActive: string = 'UIApplicationWillResignActiveNotification';
-    private static _appDidBecomeActive: string = 'UIApplicationDidBecomeActiveNotification';
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
 
     private _nativeBridge: NativeBridge;
+    private _focusManager: FocusManager;
     private _deviceInfo: DeviceInfo;
     private _showing: boolean;
     private _paused = false;
@@ -29,11 +29,14 @@ export class ViewController extends AdUnitContainer {
     private _onViewControllerDidAppearObserver: any;
     private _onMemoryWarningObserver: any;
     private _onNotificationObserver: any;
+    private _onAppBackgroundObserver: any;
+    private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         super();
 
         this._nativeBridge = nativeBridge;
+        this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
 
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -60,7 +63,8 @@ export class ViewController extends AdUnitContainer {
             this._lockedOrientation = forceOrientation;
         }
 
-        this._nativeBridge.Notification.addNotificationObserver(ViewController._appWillResignActive, []);
+        this._onAppBackgroundObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
+        this._onAppForegroundObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
@@ -77,7 +81,8 @@ export class ViewController extends AdUnitContainer {
     public close(): Promise<void> {
         this.addDiagnosticsEvent({type: 'close'});
         this._showing = false;
-        this._nativeBridge.Notification.removeNotificationObserver(ViewController._appWillResignActive);
+        this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundObserver);
+        this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
         return this._nativeBridge.IosAdUnit.close();
@@ -154,6 +159,18 @@ export class ViewController extends AdUnitContainer {
         this.onLowMemoryWarning.trigger();
     }
 
+    private onAppBackground(): void {
+        this.addDiagnosticsEvent({type: 'appWillResignActive'});
+        this._paused = true;
+        this.onSystemInterrupt.trigger(true);
+    }
+
+    private onAppForeground(): void {
+        this.addDiagnosticsEvent({type: 'appDidBecomeActive'});
+        this._paused = false;
+        this.onSystemInterrupt.trigger(false);
+    }
+
     private onNotification(event: string, parameters: any): void {
         // ignore notifications if ad unit is not active
         if(!this._showing) {
@@ -161,18 +178,6 @@ export class ViewController extends AdUnitContainer {
         }
 
         switch(event) {
-            case ViewController._appWillResignActive:
-                this.addDiagnosticsEvent({type: 'appWillResignActive'});
-                this._paused = true;
-                this.onSystemInterrupt.trigger(true);
-                break;
-
-            case ViewController._appDidBecomeActive:
-                this.addDiagnosticsEvent({type: 'appDidBecomeActive'});
-                this._paused = false;
-                this.onSystemInterrupt.trigger(false);
-                break;
-
             case ViewController._audioSessionInterrupt:
                 const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
                 this.addDiagnosticsEvent({type: 'audioSessionInterrupt', typeKey: interruptData.AVAudioSessionInterruptionTypeKey, optionKey: interruptData.AVAudioSessionInterruptionOptionKey});
