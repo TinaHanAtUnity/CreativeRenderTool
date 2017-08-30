@@ -46,10 +46,6 @@ export class CampaignManager {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
     }
 
-    public static setTestBaseUrl(testBaseUrl: string): void {
-        CampaignManager.BaseUrl = testBaseUrl;
-    }
-
     protected static CampaignResponse: string | undefined;
 
     protected static AbGroup: number | undefined;
