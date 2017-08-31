@@ -1,4 +1,3 @@
-import RequestUtilities from 'Utilities/RequestUtilities';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
@@ -12,7 +11,7 @@ export class VastEndScreenEventHandlers {
         const platform = nativeBridge.getPlatform();
         const clickThroughURL = adUnit.getCompanionClickThroughUrl() || adUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
-            return RequestUtilities.followUrl(request, clickThroughURL).then((url: string) => {
+            return request.followRedirectChain(clickThroughURL).then((url: string) => {
                 if (platform === Platform.IOS) {
                     nativeBridge.UrlScheme.open(url);
                 } else if (nativeBridge.getPlatform() === Platform.ANDROID) {

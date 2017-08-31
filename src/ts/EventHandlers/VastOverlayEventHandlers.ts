@@ -3,7 +3,6 @@ import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
-import RequestUtilities from 'Utilities/RequestUtilities';
 
 export class VastOverlayEventHandlers {
 
@@ -32,7 +31,7 @@ export class VastOverlayEventHandlers {
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            return RequestUtilities.followUrl(request, clickThroughURL).then((url: string) => {
+            return request.followRedirectChain(clickThroughURL).then((url: string) => {
                 if(nativeBridge.getPlatform() === Platform.IOS) {
                     nativeBridge.UrlScheme.open(url);
                 } else {
