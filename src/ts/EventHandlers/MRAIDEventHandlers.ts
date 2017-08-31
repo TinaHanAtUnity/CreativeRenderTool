@@ -35,9 +35,10 @@ export class MRAIDEventHandlers {
         }
     }
 
-    public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, delayFromStart: number) {
+    public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, eventData: any, delayFromStart: number) {
         const kafkaObject: any = {};
         kafkaObject.type = event;
+        kafkaObject.eventData = eventData;
         kafkaObject.delayFromStart = delayFromStart;
         const resourceUrl = campaign.getResourceUrl();
         if(resourceUrl) {

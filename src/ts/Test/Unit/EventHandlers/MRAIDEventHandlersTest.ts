@@ -218,11 +218,12 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         it('should send a analytics event', () => {
-            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 'win_screen', 15);
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 'win_screen', {'level': 2}, 15);
 
             const kafkaObject: any = {};
             kafkaObject.type = 'win_screen';
             kafkaObject.delayFromStart = 15;
+            kafkaObject.eventData = {'level': 2};
             const resourceUrl = mraidCampaign.getResourceUrl();
             if(resourceUrl) {
                 kafkaObject.url = resourceUrl.getOriginalUrl();

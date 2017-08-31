@@ -289,7 +289,7 @@ export class PlayableMRAID extends MRAIDView {
                 });
                 break;
             case 'analyticsEvent':
-                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                this.onAnalyticsEvent.trigger(event.data.event, event.data.eventData, (Date.now() - this._showTimestamp) / 1000);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {

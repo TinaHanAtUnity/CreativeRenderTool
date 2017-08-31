@@ -141,7 +141,7 @@ export class AdUnitFactory {
             sessionManager.sendThirdQuartile(mraidAdUnit);
         });
 
-        mraid.onAnalyticsEvent.subscribe((event, delayFromStart) => MRAIDEventHandlers.onAnalyticsEvent(campaign, event, delayFromStart));
+        mraid.onAnalyticsEvent.subscribe((event, eventData, delayFromStart) => MRAIDEventHandlers.onAnalyticsEvent(campaign, event, eventData, delayFromStart));
         if(endScreen) {
             this.prepareEndScreen(endScreen, nativeBridge, sessionManager, mraidAdUnit, deviceInfo);
             if(mraid instanceof PlayableMRAID) {
