@@ -1,3 +1,9 @@
+# Thu Aug 31 11:56:13 UTC 2017
+
+* Refactoring focus related handling to FocusManager
+* Fix some test mode edge cases with auction
+* Stop disabling portrait videos on groups 6 and 7
+
 # Mon Aug 28 07:48:06 UTC 2017
 
 * Endscreen for playables support
