@@ -192,12 +192,10 @@ export class SessionManager {
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.START)) {
-                return Promise.resolve();
-            }
-            this._currentSession.setEventSent(EventType.START);
+        if(adUnit.getSession().getEventSent(EventType.START)) {
+            return Promise.resolve();
         }
+        adUnit.getSession().setEventSent(EventType.START);
 
         return this._metaDataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
@@ -216,12 +214,10 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.FIRST_QUARTILE)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.FIRST_QUARTILE);
+        if(adUnit.getSession().getEventSent(EventType.FIRST_QUARTILE)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.FIRST_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
@@ -231,12 +227,10 @@ export class SessionManager {
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.MIDPOINT)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.MIDPOINT);
+        if(adUnit.getSession().getEventSent(EventType.MIDPOINT)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.MIDPOINT);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
@@ -246,12 +240,10 @@ export class SessionManager {
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if (this._currentSession.getEventSent(EventType.THIRD_QUARTILE)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.THIRD_QUARTILE);
+        if(adUnit.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.THIRD_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
@@ -261,12 +253,10 @@ export class SessionManager {
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.SKIP)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.SKIP);
+        if(adUnit.getSession().getEventSent(EventType.SKIP)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.SKIP);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             if(videoProgress) {
@@ -297,12 +287,10 @@ export class SessionManager {
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.VIEW)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.VIEW);
+        if(adUnit.getSession().getEventSent(EventType.VIEW)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.VIEW);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
@@ -312,15 +300,13 @@ export class SessionManager {
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.CLICK)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.CLICK);
+        if(adUnit.getSession().getEventSent(EventType.CLICK)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getSession().setEventSent(EventType.CLICK);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
-            this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
+            this._eventManager.operativeEvent('click', id, adUnit.getSession().getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
