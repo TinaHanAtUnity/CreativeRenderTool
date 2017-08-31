@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
@@ -31,7 +32,8 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should not allow primitives as root values', () => {
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        const focusManager = new FocusManager(nativeBridge);
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
         HttpKafka.setRequest(request);
@@ -64,7 +66,8 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request', () => {
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        const focusManager = new FocusManager(nativeBridge);
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
         HttpKafka.setRequest(request);
@@ -77,7 +80,8 @@ describe('DiagnosticsTest', () => {
     });
 
     it('should generate proper request with info', () => {
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+        const focusManager = new FocusManager(nativeBridge);
+        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
 
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);

@@ -27,6 +27,7 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -48,6 +49,7 @@ describe('CampaignRefreshManager', () => {
     let container: AdUnitContainer;
     let campaignRefreshManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -109,15 +111,17 @@ describe('CampaignRefreshManager', () => {
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1()
+                onActivityPaused: new Observable1(),
+                onActivityDestroyed: new Observable1()
             },
             getPlatform: () => {
                 return Platform.TEST;
             }
         };
 
+        focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
         deviceInfo = new DeviceInfo(nativeBridge);

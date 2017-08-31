@@ -17,6 +17,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
+import { FocusManager } from 'Managers/FocusManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -26,6 +27,7 @@ describe('VastAdUnit', () => {
     let eventManager: EventManager;
     let vastAdUnit: VastAdUnit;
     let campaign: VastCampaign;
+    let focusManager: FocusManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -51,7 +53,8 @@ describe('VastAdUnit', () => {
         });
         const overlay = <Overlay><any>sinon.createStubInstance(Overlay);
         const nativeBridge = TestFixtures.getNativeBridge();
-        const wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         eventManager = new EventManager(nativeBridge, request);

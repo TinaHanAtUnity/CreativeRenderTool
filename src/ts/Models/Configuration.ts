@@ -19,6 +19,7 @@ interface IConfiguration {
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
     analytics: boolean;
+    test: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -33,7 +34,8 @@ export class Configuration extends Model<IConfiguration> {
             cacheMode: ['number'],
             placements: ['object'],
             defaultPlacement: ['object'],
-            analytics: ['boolean']
+            analytics: ['boolean'],
+            test: ['boolean']
         });
 
         this.set('enabled', configJson.enabled);
@@ -44,6 +46,8 @@ export class Configuration extends Model<IConfiguration> {
         this.set('properties', configJson.properties);
 
         this.set('analytics', configJson.analytics ? true : false);
+
+        this.set('test', configJson.test ? true : false);
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -173,5 +177,9 @@ export class Configuration extends Model<IConfiguration> {
             'placements': placements,
             'defaultPlacement': defaultPlacementId
         };
+    }
+
+    public getTestMode(): boolean {
+       return this.get('test');
     }
 }

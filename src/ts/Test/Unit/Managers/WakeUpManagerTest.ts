@@ -1,5 +1,4 @@
 import 'mocha';
-import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -9,6 +8,7 @@ import { BroadcastApi } from 'Native/Api/Broadcast';
 import { Platform } from 'Constants/Platform';
 import { NotificationApi } from 'Native/Api/Notification';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
+import { FocusManager } from 'Managers/FocusManager';
 
 class TestConnectivityApi extends ConnectivityApi {
     public setListeningStatus(status: boolean): Promise<void> {
@@ -51,6 +51,7 @@ describe('WakeUpManagerTest', () => {
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
+    let focusManager: FocusManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -62,7 +63,8 @@ describe('WakeUpManagerTest', () => {
         nativeBridge.Notification = new TestNotificationApi(nativeBridge);
         nativeBridge.Lifecycle = new TestLifecycleApi(nativeBridge);
 
-        wakeUpManager = new WakeUpManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
     });
 
     it('should set connection listening status true', () => {
@@ -79,136 +81,5 @@ describe('WakeUpManagerTest', () => {
             sinon.assert.calledOnce(spy);
             sinon.assert.calledWith(spy, false);
         });
-    });
-
-    it('should start listening to screen broadcasts', () => {
-        const spy = sinon.spy(nativeBridge.Broadcast, 'addBroadcastListener');
-        return wakeUpManager.setListenScreen(true).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[1], ['android.intent.action.SCREEN_ON', 'android.intent.action.SCREEN_OFF']);
-        });
-    });
-
-    it('should stop listening to screen broadcasts', () => {
-        const spy = sinon.spy(nativeBridge.Broadcast, 'removeBroadcastListener');
-        return wakeUpManager.setListenScreen(false).then(() => {
-            sinon.assert.calledOnce(spy);
-        });
-    });
-
-    it('should start listening to app foreground events', () => {
-        const spy = sinon.spy(nativeBridge.Notification, 'addNotificationObserver');
-        return wakeUpManager.setListenAppForeground(true).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[0], 'UIApplicationDidBecomeActiveNotification');
-            assert.deepEqual(spy.getCall(0).args[1], []);
-        });
-    });
-
-    it('should stop listening to app foreground events', () => {
-        const spy = sinon.spy(nativeBridge.Notification, 'removeNotificationObserver');
-        return wakeUpManager.setListenAppForeground(false).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[0], 'UIApplicationDidBecomeActiveNotification');
-        });
-    });
-
-    it('should start listening to app background events', () => {
-        const spy = sinon.spy(nativeBridge.Notification, 'addNotificationObserver');
-        return wakeUpManager.setListenAppBackground(true).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[0], 'UIApplicationWillResignActiveNotification');
-            assert.deepEqual(spy.getCall(0).args[1], []);
-        });
-    });
-
-    it('should stop listening to app background events', () => {
-        const spy = sinon.spy(nativeBridge.Notification, 'removeNotificationObserver');
-        return wakeUpManager.setListenAppBackground(false).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[0], 'UIApplicationWillResignActiveNotification');
-        });
-    });
-
-    it('should start listening to Android lifecycle events', () => {
-        const spy = sinon.spy(nativeBridge.Lifecycle, 'register');
-        return wakeUpManager.setListenAndroidLifecycle(true).then(() => {
-            sinon.assert.calledOnce(spy);
-            assert.deepEqual(spy.getCall(0).args[0], ['onActivityResumed', 'onActivityPaused']);
-        });
-    });
-
-    it('should stop listening to Android lifecycle events', () => {
-        const spy = sinon.spy(nativeBridge.Lifecycle, 'unregister');
-        return wakeUpManager.setListenAndroidLifecycle(false).then(() => {
-            sinon.assert.calledOnce(spy);
-        });
-    });
-
-    it('should trigger onNetworkConnected', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onNetworkConnected.subscribe(spy);
-
-        nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        sinon.assert.callCount(spy, 1);
-    });
-
-    it('should throttle onNetworkConnected to 10 events', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onNetworkConnected.subscribe(spy);
-
-        for(let i: number = 0; i < 20; i++) {
-            nativeBridge.Connectivity.handleEvent('CONNECTED', [true, 0]);
-        }
-
-        sinon.assert.callCount(spy, 10);
-    });
-
-    it('should trigger onScreenOn', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onScreenOn.subscribe(spy);
-
-        nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_ON', '', {}]);
-        sinon.assert.calledOnce(spy);
-    });
-
-    it('should trigger onScreenOff', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onScreenOff.subscribe(spy);
-
-        nativeBridge.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_OFF', '', {}]);
-        sinon.assert.calledOnce(spy);
-    });
-
-    it('should trigger onAppForeground', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onAppForeground.subscribe(spy);
-
-        nativeBridge.Notification.handleEvent('ACTION', ['UIApplicationDidBecomeActiveNotification', {}]);
-        sinon.assert.calledOnce(spy);
-    });
-
-    it('should trigger onAppBackground', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onAppBackground.subscribe(spy);
-
-        nativeBridge.Notification.handleEvent('ACTION', ['UIApplicationWillResignActiveNotification', {}]);
-        sinon.assert.calledOnce(spy);
-    });
-
-    it('should trigger onActivityResumed', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onActivityResumed.subscribe(spy);
-
-        nativeBridge.Lifecycle.handleEvent('RESUMED', ['com.test.activity']);
-        sinon.assert.calledOnce(spy);
-    });
-
-    it('should trigger onActivityPaused', () => {
-        const spy = sinon.spy();
-        wakeUpManager.onActivityPaused.subscribe(spy);
-
-        nativeBridge.Lifecycle.handleEvent('PAUSED', ['com.test.activity']);
-        sinon.assert.calledOnce(spy);
     });
 });

@@ -401,7 +401,7 @@ export class CampaignManager {
             });
         }
 
-        if(this._clientInfo.getTestMode()) {
+        if(this._configuration.getTestMode()) {
             url = Url.addParameters(url, {test: true});
         }
 

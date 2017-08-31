@@ -20,6 +20,7 @@ import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -31,6 +32,7 @@ describe('MRAIDEventHandlersTest', () => {
     let metaDataManager: MetaDataManager;
     let mraidView: MRAID;
     let placement: Placement;
+    let focusManager: FocusManager;
     let request: Request;
 
     describe('with onClick', () => {
@@ -42,15 +44,16 @@ describe('MRAIDEventHandlersTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            request = new Request(nativeBridge, new WakeUpManager(nativeBridge));
+            request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
 
             metaDataManager = new MetaDataManager(nativeBridge);
 
             placement = TestFixtures.getPlacement();
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
