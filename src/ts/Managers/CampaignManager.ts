@@ -12,7 +12,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
@@ -293,39 +292,6 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private getParameter(field: string, value: any, expectedType: string) {
-        if(value === undefined) {
-            return undefined;
-        }
-
-        if(typeof value === expectedType) {
-            return value;
-        } else {
-            Diagnostics.trigger('internal_type_error', {
-                context: 'campaign_request',
-                field: field,
-                value: JSON.stringify(value),
-                expectedType: expectedType,
-                observedType: typeof value
-            });
-
-            if(expectedType === 'string') {
-                return '';
-            }
-
-            if(expectedType === 'number') {
-                return 0;
-            }
-
-            if(expectedType === 'boolean') {
-                return false;
-            }
-
-            // we only use string, number and boolean so this code is not reachable
-            return value;
-        }
-    }
-
     private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
@@ -372,32 +338,32 @@ export class CampaignManager {
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: this.getParameter('advertisingTrackingId', this._deviceInfo.getAdvertisingIdentifier(), 'string'),
-                limitAdTracking: this.getParameter('limitAdTracking', this._deviceInfo.getLimitAdTracking(), 'boolean')
+                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: this.getParameter('androidId', this._deviceInfo.getAndroidId(), 'string')
+                androidId: this._deviceInfo.getAndroidId()
             });
         }
 
         url = Url.addParameters(url, {
-            deviceMake: this.getParameter('deviceMake', this._deviceInfo.getManufacturer(), 'string'),
-            deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
-            platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),
-            screenDensity: this.getParameter('screenDensity', this._deviceInfo.getScreenDensity(), 'number'),
-            sdkVersion: this.getParameter('sdkVersion', this._clientInfo.getSdkVersion(), 'number'),
-            screenSize: this.getParameter('screenSize', this._deviceInfo.getScreenLayout(), 'number'),
-            stores: this.getParameter('stores', this._deviceInfo.getStores(), 'string')
+            deviceMake: this._deviceInfo.getManufacturer(),
+            deviceModel: this._deviceInfo.getModel(),
+            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            screenDensity: this._deviceInfo.getScreenDensity(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            screenSize: this._deviceInfo.getScreenLayout(),
+            stores: this._deviceInfo.getStores()
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
-                osVersion: this.getParameter('osVersion', this._deviceInfo.getOsVersion(), 'string')
+                osVersion: this._deviceInfo.getOsVersion()
             });
         } else {
             url = Url.addParameters(url, {
-                apiLevel: this.getParameter('apiLevel', this._deviceInfo.getApiLevel(), 'number')
+                apiLevel: this._deviceInfo.getApiLevel()
             });
         }
 
@@ -431,11 +397,11 @@ export class CampaignManager {
 
         return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
             url = Url.addParameters(url, {
-                screenWidth: this.getParameter('screenWidth', screenWidth, 'number'),
-                screenHeight: this.getParameter('screenHeight', screenHeight, 'number'),
-                connectionType: this.getParameter('connectionType', connectionType, 'string'),
-                networkType: this.getParameter('networkType', networkType, 'number'),
-                gamerId: this.getParameter('gamerId', this._configuration.getGamerId(), 'string')
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                connectionType: connectionType,
+                networkType: networkType,
+                gamerId: this._configuration.getGamerId()
             });
 
             return url;
@@ -450,26 +416,26 @@ export class CampaignManager {
         promises.push(this.getFullyCachedCampaigns());
 
         const body: any = {
-            bundleVersion: this.getParameter('bundleVersion', this._clientInfo.getApplicationVersion(), 'string'),
-            bundleId: this.getParameter('bundleId', this._clientInfo.getApplicationName(), 'string'),
-            coppa: this.getParameter('coppa', this._configuration.isCoppaCompliant(), 'boolean'),
-            language: this.getParameter('language', this._deviceInfo.getLanguage(), 'string'),
-            gameSessionId: this.getParameter('sessionId', this._sessionManager.getGameSessionId(), 'number'),
-            timeZone: this.getParameter('timeZone', this._deviceInfo.getTimeZone(), 'string')
+            bundleVersion: this._clientInfo.getApplicationVersion(),
+            bundleId: this._clientInfo.getApplicationName(),
+            coppa: this._configuration.isCoppaCompliant(),
+            language: this._deviceInfo.getLanguage(),
+            gameSessionId: this._sessionManager.getGameSessionId(),
+            timeZone: this._deviceInfo.getTimeZone()
         };
 
         if (this.getPreviousPlacementId()) {
             body.previousPlacementId = this.getPreviousPlacementId();
         }
 
-        if(typeof navigator !== 'undefined' && navigator.userAgent) {
-            body.webviewUa = this.getParameter('webviewUa', navigator.userAgent, 'string');
+        if(typeof navigator !== 'undefined' && navigator.userAgent && typeof navigator.userAgent === 'string') {
+            body.webviewUa = navigator.userAgent;
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
-            body.deviceFreeSpace = this.getParameter('deviceFreeSpace', freeSpace, 'number');
-            body.networkOperator = this.getParameter('networkOperator', networkOperator, 'string');
-            body.networkOperatorName = this.getParameter('networkOperatorName', networkOperatorName, 'string');
+            body.deviceFreeSpace = freeSpace;
+            body.networkOperator = networkOperator;
+            body.networkOperatorName = networkOperatorName;
 
             if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
@@ -481,16 +447,16 @@ export class CampaignManager {
 
             return Promise.all(metaDataPromises).then(([mediation, framework]) => {
                 if(mediation) {
-                    body.mediationName = this.getParameter('mediationName', mediation.getName(), 'string');
-                    body.mediationVersion = this.getParameter('mediationVersion', mediation.getVersion(), 'string');
+                    body.mediationName = mediation.getName();
+                    body.mediationVersion = mediation.getVersion();
                     if(mediation.getOrdinal()) {
-                        body.mediationOrdinal = this.getParameter('mediationOrdinal', mediation.getOrdinal(), 'number');
+                        body.mediationOrdinal = mediation.getOrdinal();
                     }
                 }
 
                 if(framework) {
-                    body.frameworkName = this.getParameter('frameworkName', framework.getName(), 'string');
-                    body.frameworkVersion = this.getParameter('frameworkVersion', framework.getVersion(), 'string');
+                    body.frameworkName = framework.getName();
+                    body.frameworkVersion = framework.getVersion();
                 }
 
                 const placementRequest: any = {};
