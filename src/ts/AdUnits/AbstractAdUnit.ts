@@ -91,6 +91,10 @@ export abstract class AbstractAdUnit {
         return this._finishState;
     }
 
+    public getSession() {
+        return this._session;
+    }
+
     public setFinishState(finishState: FinishState) {
         if(this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
