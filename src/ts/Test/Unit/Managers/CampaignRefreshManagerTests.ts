@@ -316,7 +316,7 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(CampaignRefreshManagerTestCampaign1);
             const campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            const currentAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('', campaign);
@@ -349,7 +349,7 @@ describe('CampaignRefreshManager', () => {
             let campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const campaign2 = new PerformanceCampaign(campaignObject2, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('rewardedVideo');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            const currentAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('', campaign);
@@ -589,7 +589,7 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            const currentAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, 'TestGamerId', 12345));
@@ -627,7 +627,7 @@ describe('CampaignRefreshManager', () => {
             let campaign: Campaign = new PerformanceCampaign(campaignObject, 'TestGamerId', 12345);
             const campaign2 = new MRAIDCampaign(campaignObject2, 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            const currentAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);

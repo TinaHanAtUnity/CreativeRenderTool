@@ -74,7 +74,7 @@ describe('VastOverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         sessionManager.setSession(new Session('123'));
 
-        testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        testAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     describe('When calling onSkip', () => {
@@ -92,7 +92,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = <VastEndScreen><any> {
                     show: sinon.spy()
                 };
-                const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+                const vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
                 VastOverlayEventHandlers.onSkip(vastAdUnit);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
@@ -130,7 +130,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         beforeEach(() => {
             video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
+            vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
             }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);

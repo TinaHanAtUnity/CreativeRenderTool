@@ -10,6 +10,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
+import { Session } from 'Models/Session';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
@@ -146,5 +147,9 @@ export class TestFixtures {
             targetGameId: 5678,
             targetCampaignId: '123456abcdef'
         };
+    }
+
+    public static getSession(): Session {
+        return new Session('12345');
     }
 }

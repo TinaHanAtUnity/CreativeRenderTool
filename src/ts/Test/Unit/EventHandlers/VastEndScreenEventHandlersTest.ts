@@ -36,7 +36,7 @@ describe('VastEndScreenEventHandlersTest', () => {
                 hide: sinon.spy()
             };
             const video = new Video('');
-            const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, <Placement><any>{}, <VastCampaign><any>{
+            const vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, <Placement><any>{}, <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
             }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
@@ -56,7 +56,7 @@ describe('VastEndScreenEventHandlersTest', () => {
                 hide: sinon.spy()
             };
             video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, <Placement><any>{}, <VastCampaign><any>{
+            vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, <Placement><any>{}, <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
             }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);

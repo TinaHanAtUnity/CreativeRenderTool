@@ -16,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { StoreName } from "Models/PerformanceCampaign";
+import { StoreName } from 'Models/PerformanceCampaign';
 import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
@@ -64,7 +64,7 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                 TestFixtures.getCampaign(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
@@ -76,7 +76,7 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                     TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
@@ -97,7 +97,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                     TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
                 const response = TestFixtures.getOkNativeResponse();
@@ -172,7 +172,7 @@ describe('EndScreenEventHandlersTest', () => {
             const campaign = TestFixtures.getCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                 campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
         });
 
@@ -188,7 +188,7 @@ describe('EndScreenEventHandlersTest', () => {
             it('with response that contains location, it should open url scheme', () => {
                 const campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                     campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
 
                 sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({

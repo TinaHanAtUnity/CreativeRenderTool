@@ -50,7 +50,7 @@ describe('OverlayEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVast: sinon.spy(),
                 getVideo: () => video,
                 getStreamingVideo: () => video
