@@ -84,7 +84,9 @@ export abstract class CampaignManager {
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+        return this._sessionManager.create().then(() => {
+            return Promise.all([this.createRequestUrl(), this.createRequestBody()]);
+        }).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -195,6 +197,7 @@ export abstract class CampaignManager {
         }
 
         url = Url.addParameters(url, {
+            auctionId: this.getParameter('auctionId', this._sessionManager.getSession().getId(), 'string'),
             deviceMake: this.getParameter('deviceMake', this._deviceInfo.getManufacturer(), 'string'),
             deviceModel: this.getParameter('deviceModel', this._deviceInfo.getModel(), 'string'),
             platform: this.getParameter('platform', Platform[this._clientInfo.getPlatform()].toLowerCase(), 'string'),

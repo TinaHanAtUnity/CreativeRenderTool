@@ -158,14 +158,14 @@ export class WebView {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                    return this._sessionManager.create();
+                    return Promise.resolve();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
                 return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
                     this._sessionManager.setGameSessionId(gameSessionId);
-                    return this._sessionManager.create();
+                    return Promise.resolve();
                 });
             }
         }).then(() => {
@@ -326,7 +326,6 @@ export class WebView {
             this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
         } else {
-            this._sessionManager.create();
             this._campaignRefreshManager.refresh();
         }
     }
