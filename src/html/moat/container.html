@@ -126,7 +126,8 @@
                             if(moat) {
                                 moat.dispatchEvent({
                                     "type": event.data.data.type,
-                                    "adVolume": event.data.data.volume
+                                    "adVolume": event.data.data.volume !== 0 ? 1 : 0,
+                                    "deviceVolume": event.data.data.volume
                                 });
                             }
                             break;
