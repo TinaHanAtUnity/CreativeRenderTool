@@ -135,7 +135,8 @@ export class TestFixtures {
             gamerId: 'abc123',
             abGroup: 0,
             useAuction: true,
-            properties: 'abc123'
+            properties: 'abc123',
+            projectId: 'abcd-1234'
         });
     }
 

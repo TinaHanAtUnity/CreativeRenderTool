@@ -62,7 +62,7 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         setTimeout(() => {
             // get is used only for config request
-            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "placements": []}', 200, []);
+            this.onComplete.trigger(id, url, '{"enabled": true, "country": "fi", "coppaCompliant": true, "assetCaching": "forced", "projectId": "abcd-1234", "placements": []}', 200, []);
         }, 1);
         return Promise.resolve(id);
     }
@@ -195,7 +195,7 @@ class TestHelper {
     }
 
     public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, request: Request): AbstractAdUnit {
-        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'placements': []});
+        const config: Configuration = new Configuration({'enabled': true, 'country': 'fi', 'coppaCompliant': true, 'assetCaching': 'forced', 'projectId': 'abcd-1234', 'placements': []});
         const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
 
         let container: AdUnitContainer;

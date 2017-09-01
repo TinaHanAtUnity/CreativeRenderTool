@@ -4,6 +4,7 @@
   "coppaCompliant": false,
   "placementLevelControl": false,
   "assetCaching": "disabled",
+  "projectId": "abcd-1234",
   "placements": [
     {
       "id": "rewardedVideo",

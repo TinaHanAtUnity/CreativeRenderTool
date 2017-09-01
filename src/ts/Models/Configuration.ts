@@ -21,6 +21,7 @@ interface IConfiguration {
     defaultPlacement: Placement;
     analytics: boolean;
     test: boolean;
+    projectId: string;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -37,12 +38,14 @@ export class Configuration extends Model<IConfiguration> {
             placements: ['object'],
             defaultPlacement: ['object'],
             analytics: ['boolean'],
-            test: ['boolean']
+            test: ['boolean'],
+            projectId: ['string']
         });
 
         this.set('enabled', configJson.enabled);
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
+        this.set('projectId', configJson.projectId);
         const useAuction: boolean = configJson.useAuction;
 
         if(useAuction) {
@@ -163,6 +166,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
+    }
+
+    public getUnityProjectId(): string {
+        return this.get('projectId');
     }
 
     public getDTO(): { [key: string]: any } {

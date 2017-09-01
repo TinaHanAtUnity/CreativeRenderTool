@@ -155,7 +155,7 @@ export class WebView {
                     this._focusManager.setListenAndroidLifecycle(true);
                 }
 
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._focusManager);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return this._sessionManager.create();

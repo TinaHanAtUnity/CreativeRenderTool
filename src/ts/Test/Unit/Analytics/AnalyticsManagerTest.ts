@@ -14,6 +14,7 @@ import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
 import { RequestApi } from 'Native/Api/Request';
 import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { FocusManager } from 'Managers/FocusManager';
+import { Configuration } from 'Models/Configuration';
 
 class FakeStorageApi extends StorageApi {
     private _values: { [key: string]: any } = {};
@@ -68,6 +69,7 @@ describe('AnalyticsManagerTest', () => {
     let request: Request;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
+    let configuration: Configuration;
     let storage: FakeStorageApi;
     let analyticsManager: AnalyticsManager;
     let focusManager: FocusManager;
@@ -79,12 +81,13 @@ describe('AnalyticsManagerTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = TestFixtures.getDeviceInfo();
+        configuration = TestFixtures.getConfiguration();
 
         sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
         storage = new FakeStorageApi(nativeBridge);
         nativeBridge.Storage = storage;
 
-        analyticsManager = new AnalyticsManager(nativeBridge, wakeUpManager, request, clientInfo, deviceInfo, focusManager);
+        analyticsManager = new AnalyticsManager(nativeBridge, wakeUpManager, request, clientInfo, deviceInfo, configuration, focusManager);
     });
 
     it('should send session start event', () => {
