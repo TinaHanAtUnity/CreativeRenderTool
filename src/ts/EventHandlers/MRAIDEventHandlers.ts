@@ -7,12 +7,12 @@ import { RequestError } from 'Errors/RequestError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
-import { Request, INativeResponse } from 'Utilities/Request';
+import { Request } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class MRAIDEventHandlers {
 
-    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, request: Request, url: string) {
+    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, request: Request, url: string): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         sessionManager.sendThirdQuartile(adUnit);
         sessionManager.sendView(adUnit);
@@ -24,15 +24,16 @@ export class MRAIDEventHandlers {
         if(campaign.getClickAttributionUrl()) {
             this.handleClickAttribution(nativeBridge, sessionManager, campaign);
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
+                return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
                     MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
                 });
             }
         } else {
-            MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
+            return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
                 MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
             });
         }
+        return Promise.resolve();
     }
 
     public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, delayFromStart: number) {
@@ -110,30 +111,6 @@ export class MRAIDEventHandlers {
 
     // Follows the redirects of a URL, returning the final location.
     private static followUrl(request: Request, link: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const makeRequest = (url: string) => {
-                url = url.trim();
-                if (url.indexOf('http') === -1) {
-                    // market:// or itunes:// urls can be opened directly
-                    resolve(url);
-                } else {
-                    request.head(url).then((response: INativeResponse) => {
-                        if (response.responseCode === 302) {
-                            const location = Request.getHeader(response.headers, 'location');
-                            if (location) {
-                                makeRequest(location);
-                            } else {
-                                reject('302 Found did not have a "Location" header');
-                            }
-                        } else if (Request.is2xxSuccessful(response.responseCode)) {
-                            resolve(url);
-                        } else {
-                            reject(new Error(`Request to ${url} failed with status ${response.responseCode}`));
-                        }
-                    }).catch(reject);
-                }
-            };
-            makeRequest(link);
-        });
+        return request.followRedirectChain(link);
     }
 }
