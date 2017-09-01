@@ -245,7 +245,7 @@ export class WebView {
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
-                timeoutInSeconds: campaign.getTimeout()
+                willExpireAt: campaign.getWillExpireAt()
             });
             Diagnostics.trigger('campaign_expired', error);
             return;
