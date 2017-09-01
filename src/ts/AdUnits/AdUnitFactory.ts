@@ -118,9 +118,8 @@ export class AdUnitFactory {
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
         let mraid: MRAIDView;
         const resourceUrl = campaign.getResourceUrl();
-        const abGroup = campaign.getAbGroup();
         let endScreen: EndScreen | undefined;
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
             mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
         } else {
             mraid = new MRAID(nativeBridge, placement, campaign);
