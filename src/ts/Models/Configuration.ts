@@ -194,7 +194,8 @@ export class Configuration extends Model<IConfiguration> {
             'gamerId': this.getGamerId(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId
+            'defaultPlacement': defaultPlacementId,
+            'projectId': this.getUnityProjectId()
         };
     }
 
