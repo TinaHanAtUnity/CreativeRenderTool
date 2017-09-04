@@ -254,7 +254,7 @@ export class Cache {
 
                 // check consistency of kept files so that bookkeeping and files on device match
                 keepFiles.map(file => {
-                    promises.push(this.getCacheResponse(file).then(response => {
+                    promises.push(this.getCacheResponse(file).then((response): Promise<any[]> => {
                         if(response.fullyDownloaded === true) {
                             // file and bookkeeping ok
                             return Promise.all([]);
