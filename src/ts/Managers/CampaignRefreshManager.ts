@@ -129,54 +129,14 @@ export class CampaignRefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
-        if(this._configuration.isAuction()) {
-            this.setCampaignForPlacement(placementId, campaign);
-            this.handlePlacementState(placementId, PlacementState.READY);
-        } else {
-            // TODO: remove this whole else -block when we get rid of LegacyCampaignManager
-            if(this._configuration.getPlacements()) {
-                for(placementId in this._configuration.getPlacements()) {
-                    if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                        this.setCampaignForPlacement(placementId, campaign);
-                    }
-                }
-            }
-            if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
-                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                    this.setPlacementStates(PlacementState.READY, this._configuration.getPlacementIds());
-                });
-            } else {
-                this.setPlacementStates(PlacementState.READY, this._configuration.getPlacementIds());
-            }
-        }
+        this.setCampaignForPlacement(placementId, campaign);
+        this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-
-        if (this._configuration.isAuction()) {
-            this.setCampaignForPlacement(placementId, undefined);
-            this.handlePlacementState(placementId, PlacementState.NO_FILL);
-        } else {
-            // TODO: remove this whole else -block when we get rid of LegacyCampaignManager
-            this._refillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
-            if(this._configuration.getPlacements()) {
-                for(placementId in this._configuration.getPlacements()) {
-                    if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                        this.setCampaignForPlacement(placementId, undefined);
-                    }
-                }
-            }
-            if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
-                const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                    this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                    this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
-                });
-            } else {
-                this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
-            }
-        }
+        this.setCampaignForPlacement(placementId, undefined);
+        this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
     private onError(error: WebViewError | Error, placementIds: string[]) {
@@ -186,12 +146,7 @@ export class CampaignRefreshManager {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        let messageType = 'campaign_request_failed';
-        if (this._configuration.isAuction()) {
-            messageType = 'plc_request_failed';
-        }
-
-        Diagnostics.trigger(messageType, error);
+        Diagnostics.trigger('plc_request_failed', error);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
