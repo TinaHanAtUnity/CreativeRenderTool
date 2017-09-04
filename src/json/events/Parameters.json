@@ -369,5 +369,20 @@
     "description": "Previously shown placementId",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "properties",
+    "type": "string",
+    "description": "Gamer specific parameters",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "placements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
   }
+
 ]

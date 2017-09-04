@@ -12,7 +12,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 describe('EventsTest', () => {
 
@@ -28,7 +28,8 @@ describe('EventsTest', () => {
 
     const validateRequestLog = (requestLog: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
-        assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
+        // assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
+        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile'), 1, 'Did not find a first_quartile event');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint'), 1, 'Did not find a midpoint event');
@@ -103,10 +104,10 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '667', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -175,10 +176,10 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '667', listener, true);
+        UnityAds.initialize(Platform.IOS, '345', listener, true);
     });
 
 });
