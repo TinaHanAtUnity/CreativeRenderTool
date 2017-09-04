@@ -1,6 +1,5 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
 import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -62,12 +61,9 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(sessionManager, 'sendView').returns(resolvedPromise);
             sinon.stub(sessionManager, 'sendThirdQuartile').returns(resolvedPromise);
             sinon.stub(nativeBridge.Listener, 'sendClickEvent').returns(Promise.resolve());
-            sinon.stub(request, 'head').callsFake((url: string) => {
-                return Promise.resolve(<INativeResponse>{
-                    responseCode: 200,
-                });
+            sinon.stub(request, 'followRedirectChain').callsFake((url) => {
+                return Promise.resolve(url);
             });
-
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
@@ -146,57 +142,6 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
         });
-
-        describe('clicking a URL that redirects', () => {
-
-            beforeEach(() => {
-                sinon.restore(nativeBridge.Intent);
-                sinon.restore(request);
-            });
-
-            it('should follow the redirects, returning the final url', () => {
-
-                const fixture = {
-                    'http://redirect.com': {
-                        promise: Promise.resolve(<INativeResponse>{
-                            responseCode: 302,
-                            headers: [['location', 'http://redirectagain.com']]
-                        })
-                    },
-                    'http://redirectagain.com': {
-                        promise: Promise.resolve(<INativeResponse>{
-                            responseCode: 302,
-                            headers: [['location', 'market://com.unity3d.angrybots']]
-                        })
-                    }
-                };
-                const openedIntent = new Promise((resolve, reject) => {
-                    sinon.stub(nativeBridge.Intent, 'launch').callsFake((actual) => {
-                        const expected = {
-                            'action': 'android.intent.action.VIEW',
-                            'uri': 'market://com.unity3d.angrybots'
-                        };
-                        try {
-                            assert.deepEqual(actual, expected);
-                            resolve();
-                        } catch (e) {
-                            reject(e);
-                        }
-                    });
-                });
-
-                sinon.stub(request, 'head').callsFake((url) => {
-                    return fixture[url].promise || Promise.reject(<INativeResponse>{
-                        responseCode: 404
-                    });
-                });
-
-                MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, sessionManager, request, 'http://redirect.com');
-
-                return openedIntent;
-            });
-        });
-
     });
 
     describe('with onAnalyticsEvent', () => {
