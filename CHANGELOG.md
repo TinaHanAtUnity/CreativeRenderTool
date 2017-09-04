@@ -1,3 +1,11 @@
+# Mon Sep  4 12:30:36 UTC 2017
+
+* Refactor campaign handling code to drop support for yield and use auction unconditionally
+* Campaign expiration now consistently uses willExpireAt instead of timeout
+* Fix VAST links to properly follow redirections
+* Set fixed position for info popup
+* Show playable loading screen on all groups
+
 # Thu Aug 31 11:56:13 UTC 2017
 
 * Refactoring focus related handling to FocusManager
