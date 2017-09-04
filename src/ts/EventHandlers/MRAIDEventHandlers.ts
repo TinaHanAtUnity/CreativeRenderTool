@@ -36,11 +36,13 @@ export class MRAIDEventHandlers {
         return Promise.resolve();
     }
 
-    public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, eventData: any, delayFromStart: number) {
+    public static onAnalyticsEvent(campaign: MRAIDCampaign, timeFromShow: number, timeFromPlayableStart: number, event: any, eventData: any) {
         const kafkaObject: any = {};
         kafkaObject.type = event;
         kafkaObject.eventData = eventData;
-        kafkaObject.delayFromStart = delayFromStart;
+        kafkaObject.timeFromShow = timeFromShow;
+        kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
+
         const resourceUrl = campaign.getResourceUrl();
         if(resourceUrl) {
              kafkaObject.url = resourceUrl.getOriginalUrl();

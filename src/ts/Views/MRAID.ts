@@ -210,9 +210,6 @@ export class MRAID extends MRAIDView {
                     forceOrientation: forceOrientation
                 });
                 break;
-            case 'analyticsEvent':
-                this.onAnalyticsEvent.trigger(event.data.event, event.data.eventData, (Date.now() - this._showTimestamp) / 1000);
-                break;
             default:
                 break;
         }
