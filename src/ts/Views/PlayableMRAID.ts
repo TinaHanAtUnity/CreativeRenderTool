@@ -27,6 +27,7 @@ export class PlayableMRAID extends MRAIDView {
     private _messageListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
+    private _updateInterval: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -114,6 +115,11 @@ export class PlayableMRAID extends MRAIDView {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
         }
+
+        if(this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = undefined;
+        }
         super.hide();
     }
 
@@ -167,7 +173,7 @@ export class PlayableMRAID extends MRAIDView {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = PlayableMRAID.CloseLength;
             let skipRemaining = skipLength;
-            const updateInterval = setInterval(() => {
+            this._updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -181,7 +187,7 @@ export class PlayableMRAID extends MRAIDView {
                     this.updateProgressCircle(this._closeElement, 1);
                 }
                 if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    clearInterval(this._updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
