@@ -422,14 +422,12 @@ export class WebView {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 LegacyCampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
+                AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
             if(TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
-            }
-
-            if(TestEnvironment.get('auctionUrl')) {
-                AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {
