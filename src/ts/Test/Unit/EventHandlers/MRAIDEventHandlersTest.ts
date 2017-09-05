@@ -161,11 +161,28 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         it('should send a analytics event', () => {
-            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 'win_screen', 15);
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 'win_screen', {'level': 2});
 
             const kafkaObject: any = {};
             kafkaObject.type = 'win_screen';
-            kafkaObject.delayFromStart = 15;
+            kafkaObject.eventData = {'level': 2};
+            kafkaObject.timeFromShow = 15;
+            kafkaObject.timeFromPlayableStart = 12;
+            const resourceUrl = mraidCampaign.getResourceUrl();
+            if(resourceUrl) {
+                kafkaObject.url = resourceUrl.getOriginalUrl();
+            }
+            sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'events.playable.json', kafkaObject);
+        });
+
+        it('should send a analytics event without extra event data', () => {
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 'win_screen', undefined);
+
+            const kafkaObject: any = {};
+            kafkaObject.type = 'win_screen';
+            kafkaObject.eventData = undefined;
+            kafkaObject.timeFromShow = 15;
+            kafkaObject.timeFromPlayableStart = 12;
             const resourceUrl = mraidCampaign.getResourceUrl();
             if(resourceUrl) {
                 kafkaObject.url = resourceUrl.getOriginalUrl();

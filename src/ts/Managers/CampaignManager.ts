@@ -167,8 +167,8 @@ export class CampaignManager {
                     promises.push(this.handleCampaign(fill[mediaId],
                         json.media[mediaId].contentType,
                         json.media[mediaId].content,
-                        json.media[mediaId].trackingUrls,
                         json.media[mediaId].cacheTTL,
+                        json.media[mediaId].trackingUrls,
                         json.media[mediaId].adType,
                         json.media[mediaId].creativeId,
                         json.media[mediaId].seatId,
@@ -199,7 +199,7 @@ export class CampaignManager {
         }
     }
 
-    private handleCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
+    private handleCampaign(placements: string[], contentType: string, content: string, cacheTTL: number, trackingUrls?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
@@ -208,7 +208,7 @@ export class CampaignManager {
             case 'comet/campaign':
                 const json = JsonParser.parse(content);
                 if(json && json.mraidUrl) {
-                    const campaign = new MRAIDCampaign(json, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
+                    const campaign = new MRAIDCampaign(json, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, json.mraidUrl);
                     return this.setupCampaignAssets(placements, campaign);
                 } else {
                     const campaign = new PerformanceCampaign(json, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
@@ -240,7 +240,7 @@ export class CampaignManager {
                 }
 
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
@@ -260,7 +260,7 @@ export class CampaignManager {
 
                 jsonMraid.id = this.getProgrammaticCampaignId();
                 const markup = decodeURIComponent(jsonMraid.markup);
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidCampaign);
 
             default:

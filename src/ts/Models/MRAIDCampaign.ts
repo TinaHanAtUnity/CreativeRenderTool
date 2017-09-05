@@ -26,7 +26,7 @@ interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -65,6 +65,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
         this.set('meta', campaign.meta);
         this.set('gameName', campaign.gameName);
+
+        if(cacheTTL) {
+            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
+        }
 
         if(campaign.gameIcon) {
             this.set('gameIcon', new Image(campaign.gameIcon));

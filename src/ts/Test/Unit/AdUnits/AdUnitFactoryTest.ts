@@ -159,30 +159,34 @@ describe('AdUnitFactoryTest', () => {
         });
 
         describe('on show', () => {
-            xit('should trigger onStart', (done) => {
+            it('should trigger onStart', (done) => {
                 adUnit.onStart.subscribe(() => {
+                    adUnit.hide();
                     done();
                 });
 
                 adUnit.show();
             });
 
-            xit('should call sendStart', () => {
+            it('should call sendStart', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+                adUnit.hide();
             });
 
-            xit('should send impressions', () => {
+            it('should send impressions', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
+                adUnit.hide();
             });
 
-            xit('should replace macros in the postback impression url', () => {
+            it('should replace macros in the postback impression url', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                adUnit.hide();
             });
         });
 

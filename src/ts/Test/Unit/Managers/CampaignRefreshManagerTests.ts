@@ -205,7 +205,7 @@ describe('CampaignRefreshManager', () => {
         it('get campaign should return a campaign (MRAID)', () => {
             const json: any = JSON.parse(OnCometVideoPlcCampaign);
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const mraid = new MRAIDCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
+            const mraid = new MRAIDCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', mraid);
@@ -242,7 +242,7 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
-                campaign = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345);
+                campaign = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
                 return Promise.resolve();
             });
 
@@ -340,7 +340,7 @@ describe('CampaignRefreshManager', () => {
             const json2: any = JSON.parse(OnCometMraidPlcCampaign);
             const campaignObject2: any = JSON.parse(json2.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             let campaign: Campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
-            const campaign2 = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345);
+            const campaign2 = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
             const placement: Placement = configuration.getPlacement('premium');
             const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
 

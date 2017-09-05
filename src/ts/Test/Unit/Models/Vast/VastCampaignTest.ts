@@ -13,16 +13,24 @@ describe('VastCampaign', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
-        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 3600 * 1000);
-        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        const willExpireAt = campaign.getWillExpireAt();
+        assert.isDefined(willExpireAt, 'Will expire at should be defined');
+        if(willExpireAt) {
+            const timeDiff = willExpireAt - (Date.now() + 3600 * 1000);
+            assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        }
     });
 
     it('should return default cache TTL represented in seconds if server provides TTL of 0', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1, 0);
-        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 3600 * 1000);
-        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        const willExpireAt = campaign.getWillExpireAt();
+        assert.isDefined(willExpireAt, 'Will expire at should be defined');
+        if(willExpireAt) {
+            const timeDiff = willExpireAt - (Date.now() + 3600 * 1000);
+            assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        }
     });
 
     it('should return cache TTL provided by the server', () => {
@@ -45,8 +53,12 @@ describe('VastCampaign', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), json.gamerId, json.abGroup, json.cacheTTL);
-        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 5000 * 1000);
-        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        const willExpireAt = campaign.getWillExpireAt();
+        assert.isDefined(willExpireAt, 'Will expire at should be defined');
+        if(willExpireAt) {
+            const timeDiff = willExpireAt - (Date.now() + 5000 * 1000);
+            assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+        }
     });
 
     describe('when VAST has a companion ad', () => {
