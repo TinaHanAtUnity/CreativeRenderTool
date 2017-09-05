@@ -48,20 +48,20 @@ export class TestFixtures {
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
         const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined, playableMraidJson.mraidUrl);
     }
 
     public static getPlayableMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
         const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined, playableMraidJson.mraidUrl);
     }
 
     public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
         const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         mraidJson.id = 'testId';
-        return new MRAIDCampaign(mraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
+        return new MRAIDCampaign(mraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), 3600, mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
