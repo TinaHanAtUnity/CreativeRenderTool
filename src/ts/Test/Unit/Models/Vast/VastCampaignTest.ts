@@ -13,14 +13,16 @@ describe('VastCampaign', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
-        assert.equal(campaign.getTimeout(), 3600);
+        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 3600 * 1000);
+        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
     });
 
     it('should return default cache TTL represented in seconds if server provides TTL of 0', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1, 0);
-        assert.equal(campaign.getTimeout(), 3600);
+        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 3600 * 1000);
+        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
     });
 
     it('should return cache TTL provided by the server', () => {
@@ -43,7 +45,8 @@ describe('VastCampaign', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
         const campaign = new VastCampaign(vast, 'campaignId', json.gamerId, json.abGroup, json.cacheTTL);
-        assert.equal(campaign.getTimeout(), 5000);
+        const timeDiff = campaign.getWillExpireAt() - (Date.now() + 5000 * 1000);
+        assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
     });
 
     describe('when VAST has a companion ad', () => {

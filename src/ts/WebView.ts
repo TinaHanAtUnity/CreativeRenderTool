@@ -239,7 +239,7 @@ export class WebView {
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
-                timeoutInSeconds: campaign.getTimeout()
+                willExpireAt: campaign.getWillExpireAt()
             });
             Diagnostics.trigger('campaign_expired', error);
             return;
@@ -419,14 +419,11 @@ export class WebView {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
             if(TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
-            }
-
-            if(TestEnvironment.get('auctionUrl')) {
-                CampaignManager.setBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {
