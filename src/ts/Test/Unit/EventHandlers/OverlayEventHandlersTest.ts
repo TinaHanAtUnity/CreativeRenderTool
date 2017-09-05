@@ -100,7 +100,6 @@ describe('OverlayEventHandlersTest', () => {
     describe('When calling onMute', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge.VideoPlayer, 'setVolume');
-            sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
         });
 
         it('should set volume to zero when muted', () => {

@@ -104,10 +104,6 @@ describe('AdUnitFactoryTest', () => {
                 eventManager
             );
 
-            sandbox.stub(sessionManager, 'getSession').returns({
-                getId: sinon.stub().returns('1111')
-            });
-
             campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
             if(resourceUrl) {
