@@ -5,7 +5,7 @@ export interface ICampaign {
     id: string;
     gamerId: string;
     abGroup: number;
-    willExpireAt: number;
+    willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
@@ -18,7 +18,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         id: ['string'],
         gamerId: ['string'],
         abGroup: ['number'],
-        willExpireAt: ['number'],
+        willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
@@ -62,7 +62,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('meta');
     }
 
-    public getWillExpireAt(): number {
+    public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
     }
 
