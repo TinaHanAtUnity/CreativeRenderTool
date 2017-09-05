@@ -55,6 +55,10 @@ export class Request {
         return null;
     }
 
+    public static is2xxSuccessful(sc: number): boolean {
+        return sc >= 200 && sc < 300;
+    }
+
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
 
@@ -140,6 +144,39 @@ export class Request {
             options: options
         });
         return promise;
+    }
+
+    // Follows the redirects of a URL, returning the final location.
+    public followRedirectChain(url: string, resolveOnHttpError = false): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const makeRequest = (requestUrl: string) => {
+                requestUrl = requestUrl.trim();
+                if (requestUrl.indexOf('http') === -1) {
+                    // market:// or itunes:// urls can be opened directly
+                    resolve(requestUrl);
+                } else {
+                    this.head(requestUrl).then((response: INativeResponse) => {
+                        if (response.responseCode === 302) {
+                            const location = Request.getHeader(response.headers, 'location');
+                            if (location) {
+                                makeRequest(location);
+                            } else {
+                                reject(new Error('302 Found did not have a "Location" header'));
+                            }
+                        } else if (Request.is2xxSuccessful(response.responseCode)) {
+                            resolve(requestUrl);
+                        } else {
+                            if (resolveOnHttpError) {
+                                resolve(requestUrl);
+                            } else {
+                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
+                            }
+                        }
+                    }).catch(reject);
+                }
+            };
+            makeRequest(url);
+        });
     }
 
     private registerCallback(id: number): Promise<INativeResponse> {

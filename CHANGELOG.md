@@ -1,3 +1,29 @@
+# Mon Sep  4 12:30:36 UTC 2017
+
+* Refactor campaign handling code to drop support for yield and use auction unconditionally
+* Campaign expiration now consistently uses willExpireAt instead of timeout
+* Fix VAST links to properly follow redirections
+* Set fixed position for info popup
+* Show playable loading screen on all groups
+
+# Thu Aug 31 11:56:13 UTC 2017
+
+* Refactoring focus related handling to FocusManager
+* Fix some test mode edge cases with auction
+* Stop disabling portrait videos on groups 6 and 7
+
+# Mon Aug 28 07:48:06 UTC 2017
+
+* Endscreen for playables support
+* MRAID url redirects for app store
+* Platform parameter to operative events
+
+# Fri Aug 25 07:57:13 UTC 2017
+
+* MRAID loading fix
+* Include user agent in diagnostic messages
+* Refactoring for the upcoming 2.1.1 release
+
 # Tue Aug 22 12:41:29 UTC 2017
 
 * Fix non-cached playables on iOS SDK 2.1.0
@@ -8,6 +34,7 @@
 * Refactored yield based tests to use auction
 * Fix DOMParser on Android 4.*
 * Add AliBabaCloud purge script
+* Add screenSize and screenDensity for operative events
 
 # Thu Aug 17 07:56:14 UTC 2017
 

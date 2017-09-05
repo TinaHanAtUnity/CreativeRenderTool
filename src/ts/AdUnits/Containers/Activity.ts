@@ -9,7 +9,7 @@ import { Rotation } from 'Constants/Android/Rotation';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
-    display?: IDisplay;
+    display: IDisplay;
 }
 
 interface IDisplay {
@@ -208,7 +208,7 @@ export class Activity extends AdUnitContainer {
     }
 
     private getNaturalRotation(display: IDisplay): Rotation {
-        switch (display.rotation) {
+        switch(display.rotation) {
             case Rotation.ROTATION_0:
                 if(display.width > display.height) {
                     // the natural orientation (Rotation_0) is landscape on some Android tablets

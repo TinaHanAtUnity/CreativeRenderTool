@@ -128,6 +128,12 @@
       "body": true
     },
     {
+      "parameter": "meta",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "frameworkName",
       "required": "no",
       "queryString": false,
@@ -184,6 +190,12 @@
     {
       "parameter": "screenSize",
       "required": "android",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
       "queryString": false,
       "body": true
     }

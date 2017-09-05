@@ -16,10 +16,11 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { StoreName } from "Models/PerformanceCampaign";
+import { PerformanceCampaign, StoreName } from "Models/PerformanceCampaign";
 import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -29,6 +30,7 @@ describe('EndScreenEventHandlersTest', () => {
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
+    let focusManager: FocusManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -39,6 +41,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -53,7 +56,7 @@ describe('EndScreenEventHandlersTest', () => {
             metaDataManager = new MetaDataManager(nativeBridge);
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -114,8 +117,8 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects', () => {
             beforeEach(() => {
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
                 EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
             });
@@ -145,7 +148,7 @@ describe('EndScreenEventHandlersTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS));
+            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
 
             overlay = <Overlay><any> {
                 setSkipEnabled: sinon.spy(),
@@ -158,7 +161,7 @@ describe('EndScreenEventHandlersTest', () => {
             };
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge))), metaDataManager);
+                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
             sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -221,9 +224,9 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with no follow redirects and OS version 8.1', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '8.1'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
@@ -238,9 +241,9 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with no follow redirects and bypass app sheet', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
@@ -255,8 +258,8 @@ describe('EndScreenEventHandlersTest', () => {
         describe('open app sheet', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
             });

@@ -12,7 +12,6 @@ interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
-    useAuction: boolean;
     abGroup: number;
     gamerId: string;
     properties: string;
@@ -20,6 +19,7 @@ interface IConfiguration {
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
     analytics: boolean;
+    test: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -28,29 +28,26 @@ export class Configuration extends Model<IConfiguration> {
             enabled: ['boolean'],
             country: ['string'],
             coppaCompliant: ['boolean'],
-            useAuction: ['boolean'],
             abGroup: ['number'],
             gamerId: ['string'],
             properties: ['string'],
             cacheMode: ['number'],
             placements: ['object'],
             defaultPlacement: ['object'],
-            analytics: ['boolean']
+            analytics: ['boolean'],
+            test: ['boolean']
         });
 
         this.set('enabled', configJson.enabled);
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
-        const useAuction: boolean = configJson.useAuction;
-
-        if(useAuction) {
-            this.set('useAuction', useAuction);
-            this.set('abGroup', configJson.abGroup);
-            this.set('gamerId', configJson.gamerId);
-            this.set('properties', configJson.properties);
-        }
+        this.set('abGroup', configJson.abGroup);
+        this.set('gamerId', configJson.gamerId);
+        this.set('properties', configJson.properties);
 
         this.set('analytics', configJson.analytics ? true : false);
+
+        this.set('test', configJson.test ? true : false);
 
         switch(configJson.assetCaching) {
             case 'forced':
@@ -97,10 +94,6 @@ export class Configuration extends Model<IConfiguration> {
 
     public isCoppaCompliant(): boolean {
         return this.get('coppaCompliant');
-    }
-
-    public isAuction(): boolean {
-        return this.get('useAuction');
     }
 
     public isAnalyticsEnabled(): boolean {
@@ -178,12 +171,15 @@ export class Configuration extends Model<IConfiguration> {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
-            'placementLevelControl': this.isAuction(),
             'abGroup': this.getAbGroup(),
             'gamerId': this.getGamerId(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
             'defaultPlacement': defaultPlacementId
         };
+    }
+
+    public getTestMode(): boolean {
+       return this.get('test');
     }
 }

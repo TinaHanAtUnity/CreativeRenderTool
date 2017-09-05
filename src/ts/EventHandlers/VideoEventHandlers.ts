@@ -83,13 +83,14 @@ export class VideoEventHandlers {
 
     public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
+        const overlay = adUnit.getOverlay();
+
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
             sessionManager.sendStart(adUnit);
 
-            const overlay = adUnit.getOverlay();
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
@@ -106,7 +107,6 @@ export class VideoEventHandlers {
                 adUnit.getVideo().getPosition());
         }
 
-        const overlay = adUnit.getOverlay();
         if(position >= 0) {
             const lastPosition = adUnit.getVideo().getPosition();
 

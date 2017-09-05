@@ -205,9 +205,6 @@ if(window.parent !== window) {
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
                 console.log('onUnityAdsPlacementStateChanged: ' + placement + ' ' + PlacementState[oldState] + ' -> ' + PlacementState[newState]);
-            },
-            onUnityAdsInitiatePurchaseEvent: (eventString: string) => {
-                console.log('onUnityAdsInitiatePurchaseEvent: ' + eventString);
             }
         };
         // tslint:enable:no-console

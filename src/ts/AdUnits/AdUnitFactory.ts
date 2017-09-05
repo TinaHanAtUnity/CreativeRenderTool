@@ -39,15 +39,16 @@ import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
+import { Request } from 'Utilities/Request';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, clientInfo: ClientInfo, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, clientInfo: ClientInfo, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, clientInfo, options);
+            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, request, configuration, clientInfo, options);
         } else if(campaign instanceof MRAIDCampaign) {
-            return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
+            return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, request, configuration, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else if(campaign instanceof PromoCampaign) {
@@ -91,14 +92,15 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, configuration: Configuration, clientInfo: ClientInfo, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, request: Request, configuration: Configuration, clientInfo: ClientInfo, options: any): AbstractAdUnit {
+
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
-            this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo);
+            this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo, request);
         } else {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
@@ -117,7 +119,7 @@ export class AdUnitFactory {
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
-        this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit);
+        this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit, request);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, configuration, vastAdUnit);
 
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData));
@@ -159,28 +161,38 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, options: any): AbstractAdUnit {
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
         let mraid: MRAIDView;
         const resourceUrl = campaign.getResourceUrl();
-        const abGroup = campaign.getAbGroup();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/unity\/bowmasters|roll-the-ball/) && (abGroup === 10 || abGroup === 11)) {
+        let endScreen: EndScreen | undefined;
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
             mraid = new PlayableMRAID(nativeBridge, placement, campaign, deviceInfo.getLanguage());
         } else {
             mraid = new MRAID(nativeBridge, placement, campaign);
         }
 
-        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options);
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+        }
+
+        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options, endScreen);
 
         mraid.render();
         document.body.appendChild(mraid.container());
 
-        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, sessionManager, url));
+        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, sessionManager, request, url));
 
         mraid.onReward.subscribe(() => {
             sessionManager.sendThirdQuartile(mraidAdUnit);
         });
 
         mraid.onAnalyticsEvent.subscribe((event, delayFromStart) => MRAIDEventHandlers.onAnalyticsEvent(campaign, event, delayFromStart));
+        if(endScreen) {
+            this.prepareEndScreen(endScreen, nativeBridge, sessionManager, mraidAdUnit, deviceInfo);
+            if(mraid instanceof PlayableMRAID) {
+                (<PlayableMRAID>mraid).onShowEndScreen.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
+            }
+        }
 
         mraid.onSkip.subscribe(() => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
@@ -231,14 +243,14 @@ export class AdUnitFactory {
         overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(adUnit));
     }
 
-    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit) {
+    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, request: Request) {
         overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
-        overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit));
+        overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, sessionManager, adUnit, request));
         overlay.onPauseForTesting.subscribe(() => VastOverlayEventHandlers.onPauseForTesting(nativeBridge, adUnit));
         overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(sessionManager, adUnit, muted));
     }
 
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: PerformanceAdUnit, deviceInfo: DeviceInfo) {
+    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
@@ -256,7 +268,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo) {
+    private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo, request: Request) {
         endScreen.render();
         endScreen.hide();
         document.body.appendChild(endScreen.container());
@@ -264,13 +276,13 @@ export class AdUnitFactory {
         endScreen.onShow.subscribe(() => VastEndScreenEventHandlers.onShow(sessionManager, adUnit));
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit, request));
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
             adUnit.onClose.subscribe(() => {
                 nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
             });
         } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit));
+            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, adUnit, request));
         }
     }
 
@@ -338,10 +350,6 @@ export class AdUnitFactory {
         }
 
         if(forceOrientation === ForceOrientation.PORTRAIT) {
-            // A/B test for disabling portrait videos if both video types are available
-            if(landscapeVideo && (campaign.getAbGroup() === 6 || campaign.getAbGroup() === 7)) {
-                return landscapeVideo;
-            }
             if(portraitVideo) {
                 return portraitVideo;
             }

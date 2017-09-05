@@ -12,7 +12,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 
 export class MRAIDEventHandlers {
 
-    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, url: string) {
+    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, request: Request, url: string): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
         sessionManager.sendThirdQuartile(adUnit);
         sessionManager.sendView(adUnit);
@@ -24,11 +24,16 @@ export class MRAIDEventHandlers {
         if(campaign.getClickAttributionUrl()) {
             this.handleClickAttribution(nativeBridge, sessionManager, campaign);
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                MRAIDEventHandlers.openUrl(nativeBridge, url);
+                return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
+                    MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
+                });
             }
         } else {
-            MRAIDEventHandlers.openUrl(nativeBridge, url);
+            return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
+                MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
+            });
         }
+        return Promise.resolve();
     }
 
     public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, delayFromStart: number) {
@@ -40,6 +45,15 @@ export class MRAIDEventHandlers {
              kafkaObject.url = resourceUrl.getOriginalUrl();
         }
         HttpKafka.sendEvent('events.playable.json', kafkaObject);
+    }
+
+    public static onShowEndScreen(mraidAdUnit: MRAIDAdUnit) {
+        const endScreen = mraidAdUnit.getEndScreen();
+        if(endScreen) {
+            mraidAdUnit.setShowingMRAID(false);
+            mraidAdUnit.getMRAIDView().hide();
+            endScreen.show();
+        }
     }
 
     private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
@@ -93,5 +107,10 @@ export class MRAIDEventHandlers {
                 'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
             });
         }
+    }
+
+    // Follows the redirects of a URL, returning the final location.
+    private static followUrl(request: Request, link: string): Promise<string> {
+        return request.followRedirectChain(link);
     }
 }

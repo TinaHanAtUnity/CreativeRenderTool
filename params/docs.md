@@ -40,6 +40,7 @@
 | mediationOrdinal | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
 | mediationName | string | Mediation provider name | Mediation | all |
 | mediationVersion | string | Mediation SDK version | Mediation | all |
+| meta | string | Encrypted data passed through the SDK | Server | all |
 | networkOperator | string | MCC + MNC codes | SDK | all |
 | networkOperatorName | string | Cell network operator name | SDK | all |
 | networkType | number | Detailed cellular network type | SDK | all |
@@ -64,6 +65,8 @@
 | cachedOrientation | string | Cached video orientation | SDK | all |
 | cachedCampaigns | object | Campaign ID's which are fully cached on the device | SDK | all |
 | previousPlacementId | string | Previously shown placementId | SDK | all |
+| properties | string | Gamer specific parameters | Server | all |
+| placements | object | All placements received in configuration | SDK | all |
 
 
 
@@ -112,7 +115,7 @@
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
 | stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
-| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
+| gamerId | yes | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -133,6 +136,8 @@
 | force_country | no | True | False | string | Force country targeting for internal testing purposes | SDK | all |
 | cachedCampaigns | no | False | True | object | Campaign ID's which are fully cached on the device | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
+| properties | all | False | True | string | Gamer specific parameters | Server | all |
+| placements | all | False | True | object | All placements received in configuration | SDK | all |
 
 
 
@@ -160,16 +165,18 @@
 | mediationName | no | False | True | string | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | string | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+| meta | no | False | True | string | Encrypted data passed through the SDK | Server | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
-| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
-| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | cachedOrientation | no | False | True | string | Cached video orientation | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 | bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
+| screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 
 
 
@@ -199,11 +206,13 @@
 | mediationName | no | False | True | string | Mediation provider name | Mediation | all |
 | mediationVersion | no | False | True | string | Mediation SDK version | Mediation | all |
 | mediationOrdinal | no | False | True | number | Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5 | Mediation | all |
+| meta | no | False | True | string | Encrypted data passed through the SDK | Server | all |
 | frameworkName | no | False | True | string | Game framework, both Asset Store package and engine integration set this to "Unity" | SDK | all |
 | frameworkVersion | no | False | True | string | Unity engine version | SDK | all |
 | screenWidth | yes | False | True | number | Screen width in pixels | SDK | all |
 | screenHeight | yes | False | True | number | Screen height in pixels | SDK | all |
+| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
 | screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
-| bundleId | yes | False | True | string | Bundle identifier for the app | SDK | all |
+| platform | all | False | True | string | "android" or "ios" | SDK | all |
 

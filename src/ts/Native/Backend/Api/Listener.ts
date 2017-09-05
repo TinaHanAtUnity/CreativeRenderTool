@@ -33,13 +33,6 @@ export class Listener {
         }
     }
 
-    public static sendInitiatePurchaseEvent(eventString: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsInitiatePurchaseEvent(eventString);
-        }
-    }
-
     public static sendClickEvent(placement: string) {
         const listener = UnityAds.getListener();
         if(listener) {

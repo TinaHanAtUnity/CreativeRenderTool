@@ -24,6 +24,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
+import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
@@ -31,10 +32,12 @@ describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+    let focusManager: FocusManager;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
     let config: Configuration;
     let metaDataManager: MetaDataManager;
+    let request: Request;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -43,8 +46,9 @@ describe('AdUnitFactoryTest', () => {
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         metaDataManager = new MetaDataManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge);
-        const request = new Request(nativeBridge, wakeUpManager);
+        focusManager = new FocusManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'close').returns(Promise.resolve());
         const eventManager = new EventManager(nativeBridge, request);
@@ -63,7 +67,8 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, TestFixtures.getClientInfo(),{});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, TestFixtures.getClientInfo(Platform.ANDROID), {});
+
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -76,7 +81,7 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), vastCampaign, config, TestFixtures.getClientInfo(), {});
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), vastCampaign, config, request, TestFixtures.getClientInfo(), {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -84,7 +89,7 @@ describe('AdUnitFactoryTest', () => {
     });
 
     describe('MRAID AdUnit', () => {
-        let MRAIDAdUnit: MRAIDAdUnit;
+        let adUnit: MRAIDAdUnit;
         let eventManager: any;
         let campaign: MRAIDCampaign;
 
@@ -107,34 +112,34 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, TestFixtures.getClientInfo(), {});
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getDeviceInfo(Platform.ANDROID), sessionManager, TestFixtures.getPlacement(), campaign, config, request, TestFixtures.getClientInfo(), {});
         });
 
         describe('on hide', () => {
             it('should trigger onClose when hide is called', (done) => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.onClose.subscribe(() => {
-                    assert.equal(MRAIDAdUnit.isShowing(), false);
+                adUnit.setShowing(true);
+                adUnit.onClose.subscribe(() => {
+                    assert.equal(adUnit.isShowing(), false);
                     done();
                 });
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
             });
 
             it('should trigger onFinish when hide is called', (done) => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.onFinish.subscribe(() => {
+                adUnit.setShowing(true);
+                adUnit.onFinish.subscribe(() => {
                     done();
                 });
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
             });
 
             it('should call trackers on on finish state completed', () => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.setFinishState(FinishState.COMPLETED);
+                adUnit.setShowing(true);
+                adUnit.setFinishState(FinishState.COMPLETED);
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
@@ -142,10 +147,10 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should call sendSkip on finish state skipped', () => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.setFinishState(FinishState.SKIPPED);
+                adUnit.setShowing(true);
+                adUnit.setFinishState(FinishState.SKIPPED);
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendSkip);
             });
@@ -153,34 +158,34 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on show', () => {
             it('should trigger onStart', (done) => {
-                MRAIDAdUnit.onStart.subscribe(() => {
+                adUnit.onStart.subscribe(() => {
                     done();
                 });
 
-                MRAIDAdUnit.show();
+                adUnit.show();
             });
 
             it('should call sendStart', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
             });
 
             it('should send impressions', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
             });
 
             it('should replace macros in the postback impression url', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
             });
         });
 
         it('should call click tracker', () => {
-            MRAIDAdUnit.sendClick();
+            adUnit.sendClick();
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
         });
     });

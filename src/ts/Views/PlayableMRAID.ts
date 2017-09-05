@@ -9,10 +9,13 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { MRAIDView } from 'Views/MRAIDView';
+import { Observable0 } from 'Utilities/Observable';
 
 export class PlayableMRAID extends MRAIDView {
 
     private static CloseLength = 30;
+
+    public readonly onShowEndScreen = new Observable0();
 
     private _localization: Localization;
 
@@ -153,10 +156,10 @@ export class PlayableMRAID extends MRAIDView {
                     });
 
                     this._prepareTimeout = undefined;
-                }, 5000);
+                }, 4500);
             }
             this._loadingScreenTimeout = undefined;
-        }, 1500);
+        }, 2500);
     }
 
     private showMRAIDAd() {
@@ -289,12 +292,18 @@ export class PlayableMRAID extends MRAIDView {
                 this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
                 break;
             case 'customMraidState':
-                if(event.data.state === 'completed') {
-                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                        this._closeRemaining = 5;
-                    }
+                switch(event.data.state) {
+                    case 'completed':
+                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                            this._closeRemaining = 5;
+                        }
+                        break;
+                    case 'showEndScreen':
+                        this.onShowEndScreen.trigger();
+                        break;
+                    default:
+                        break;
                 }
-                break;
             default:
                 break;
         }
