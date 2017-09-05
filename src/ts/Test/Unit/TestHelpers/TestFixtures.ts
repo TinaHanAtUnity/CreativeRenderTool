@@ -17,6 +17,7 @@ import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 export class TestFixtures {
 
@@ -126,18 +127,8 @@ export class TestFixtures {
     }
 
     public static getConfiguration(): Configuration {
-        return new Configuration({
-            enabled: true,
-            country: 'US',
-            coppaCompliant: false,
-            placementLevelControl: false,
-            assetCaching: 'disabled',
-            placements: [],
-            gamerId: 'abc123',
-            abGroup: 0,
-            useAuction: true,
-            properties: 'abc123'
-        });
+        const json = JSON.parse(ConfigurationAuctionPlc);
+        return new Configuration(json);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {

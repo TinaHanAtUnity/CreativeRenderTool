@@ -111,7 +111,7 @@
     },
     {
       "parameter": "gamerId",
-      "required": "no",
+      "required": "yes",
       "queryString": true,
       "body": false
     },
@@ -232,6 +232,18 @@
     {
       "parameter": "previousPlacementId",
       "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "properties",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "placements",
+      "required": "all",
       "queryString": false,
       "body": true
     }

@@ -16,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { StoreName } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign, StoreName } from "Models/PerformanceCampaign";
 import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
@@ -117,8 +117,8 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects', () => {
             beforeEach(() => {
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
                 EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
 
             });
@@ -224,9 +224,9 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with no follow redirects and OS version 8.1', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '8.1'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
@@ -241,9 +241,9 @@ describe('EndScreenEventHandlersTest', () => {
         describe('with no follow redirects and bypass app sheet', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
 
@@ -258,8 +258,8 @@ describe('EndScreenEventHandlersTest', () => {
         describe('open app sheet', () => {
             beforeEach(() => {
                 deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-                sinon.stub(performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
                 EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
             });

@@ -9,7 +9,7 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ConfigManager } from 'Managers/ConfigManager';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 describe('IntegrationTest', () => {
 
@@ -69,10 +69,10 @@ describe('IntegrationTest', () => {
         DeviceInfo.setRingerMode(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
     });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -130,10 +130,10 @@ describe('IntegrationTest', () => {
         DeviceInfo.setStatusBarHeight(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '456', listener, true);
+        UnityAds.initialize(Platform.IOS, '345', listener, true);
     });
 
 });

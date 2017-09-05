@@ -210,6 +210,13 @@
     "platforms": "all"
   },
   {
+    "key": "meta",
+    "type": "string",
+    "description": "Encrypted data passed through the SDK",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "networkOperator",
     "type": "string",
     "description": "MCC + MNC codes",
@@ -369,5 +376,20 @@
     "description": "Previously shown placementId",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "properties",
+    "type": "string",
+    "description": "Gamer specific parameters",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "placements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "Server",
+    "platforms": "all"
   }
+
 ]
