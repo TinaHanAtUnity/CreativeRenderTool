@@ -35,6 +35,7 @@ export class PlayableMRAID extends MRAIDView {
 
     private _closeRemaining: number;
     private _showTimestamp: number;
+    private _playableStartTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'playable-mraid');
@@ -220,6 +221,8 @@ export class PlayableMRAID extends MRAIDView {
             this._loadingScreen.addEventListener(e, () => {
                 this._closeElement.style.display = 'block';
 
+                this._playableStartTimestamp = Date.now();
+                this.onAnalyticsEvent.trigger((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined);
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -295,7 +298,9 @@ export class PlayableMRAID extends MRAIDView {
                 });
                 break;
             case 'analyticsEvent':
-                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp) / 1000;
+                this.onAnalyticsEvent.trigger(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
