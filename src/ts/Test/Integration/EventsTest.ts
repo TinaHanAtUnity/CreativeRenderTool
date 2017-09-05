@@ -13,6 +13,7 @@ import { PlacementState } from 'Models/Placement';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { CampaignManager } from 'Managers/CampaignManager';
+import { Sdk } from 'Native/Backend/Api/Sdk';
 
 describe('EventsTest', () => {
 
@@ -71,6 +72,18 @@ describe('EventsTest', () => {
         };
 
         Request.setLog([]);
+
+        Sdk.setAppName('com.test.app.name');
+        Sdk.setAppVersion('1.2.3-appversion');
+        Sdk.setSdkVersion(2000);
+        Sdk.setSdkVersionName('2.0.0-sdkversion');
+        Sdk.setDebuggable(false);
+        Sdk.setConfigUrl('https://test.config.url');
+        Sdk.setWebViewUrl('https://test.webview.url');
+        Sdk.setWebViewHash(null);
+        Sdk.setWebViewVersion('2.0.0.-webviewversion');
+        Sdk.setInitTimeStamp(12345);
+        Sdk.setReinitialized(false);
 
         DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
         DeviceInfo.setLimitAdTrackingFlag(true);
@@ -144,6 +157,18 @@ describe('EventsTest', () => {
         };
 
         Request.setLog([]);
+
+        Sdk.setAppName('com.test.app.name');
+        Sdk.setAppVersion('1.2.3-appversion');
+        Sdk.setSdkVersion(2000);
+        Sdk.setSdkVersionName('2.0.0-sdkversion');
+        Sdk.setDebuggable(false);
+        Sdk.setConfigUrl('https://test.config.url');
+        Sdk.setWebViewUrl('https://test.webview.url');
+        Sdk.setWebViewHash(null);
+        Sdk.setWebViewVersion('2.0.0.-webviewversion');
+        Sdk.setInitTimeStamp(12345);
+        Sdk.setReinitialized(false);
 
         DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
         DeviceInfo.setLimitAdTrackingFlag(true);
