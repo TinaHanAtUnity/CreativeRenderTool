@@ -422,7 +422,6 @@ export class WebView {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 LegacyCampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
                 AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
