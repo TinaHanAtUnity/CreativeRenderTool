@@ -107,7 +107,7 @@ describe('VastOverlayEventHandlersTest', () => {
         const testMuteEvent = function(muted: boolean) {
             const eventName = muted ? 'mute' : 'unmute';
             const mockEventManager = sinon.mock(sessionManager.getEventManager());
-            mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '123', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=testPlacement`);
+            mockEventManager.expects('thirdPartyEvent').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=testPlacement`);
 
             VastOverlayEventHandlers.onMute(sessionManager, testAdUnit, muted);
             mockEventManager.verify();
@@ -136,12 +136,12 @@ describe('VastOverlayEventHandlersTest', () => {
             video = new Video('');
             vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
                 getVast: sinon.spy(),
-                getVideo: () => video
+                getVideo: () => video,
+                getSession: () => TestFixtures.getSession()
             }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
-            sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
         });
 
         it('should call video click through tracking url', () => {

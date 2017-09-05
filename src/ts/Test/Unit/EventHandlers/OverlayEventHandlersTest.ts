@@ -52,8 +52,9 @@ describe('OverlayEventHandlersTest', () => {
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVast: sinon.spy(),
-                getVideo: () => video,
-                getStreamingVideo: () => video
+            getVideo: () => video,
+            getStreamingVideo: () => video,
+            getSession: () => TestFixtures.getSession()
         }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 

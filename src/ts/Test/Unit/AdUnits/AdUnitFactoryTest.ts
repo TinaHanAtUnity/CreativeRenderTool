@@ -145,7 +145,7 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid complete', '1111', 'http://test.complete.com/complete1');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid complete', '12345', 'http://test.complete.com/complete1');
             });
 
             it('should call sendSkip on finish state skipped', () => {
@@ -188,7 +188,7 @@ describe('AdUnitFactoryTest', () => {
 
         it('should call click tracker', () => {
             adUnit.sendClick();
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
         });
     });
 });

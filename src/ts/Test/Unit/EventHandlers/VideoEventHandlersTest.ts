@@ -75,7 +75,8 @@ describe('VideoEventHandlersTest', () => {
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
-            getStreamingVideo: () => video
+            getStreamingVideo: () => video,
+            getSession: () => TestFixtures.getSession()
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
     });
@@ -93,7 +94,8 @@ describe('VideoEventHandlersTest', () => {
             video = new Video('');
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
                 getVideo: () => video,
-                getStreamingVideo: () => video
+                getStreamingVideo: () => video,
+                getSession: () => TestFixtures.getSession()
             }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
