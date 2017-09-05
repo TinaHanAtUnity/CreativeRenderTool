@@ -5,6 +5,7 @@
   },
   "media": {
     "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
+      "cacheTTL": 12345,
       "adType": "mraid-url-sample-ad-type",
       "creativeId": "mraid-url-sample-creative-id",
       "seatId": 901,

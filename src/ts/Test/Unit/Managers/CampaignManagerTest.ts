@@ -739,6 +739,12 @@ describe('CampaignManager', () => {
                 assert.deepEqual(triggeredCampaign.getRequiredAssets(), [asset]);
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getDynamicMarkup(), content.dynamicMarkup);
+                const willExpireAt = triggeredCampaign.getWillExpireAt();
+                assert.isDefined(willExpireAt, 'Will expire at should be defined');
+                if(willExpireAt) {
+                    const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
+                    assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+                }
             });
         });
 
@@ -773,6 +779,12 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getResource(), content.markup);
+                const willExpireAt = triggeredCampaign.getWillExpireAt();
+                assert.isDefined(willExpireAt, 'Will expire at should be defined');
+                if(willExpireAt) {
+                    const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
+                    assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+                }
             });
         });
 
