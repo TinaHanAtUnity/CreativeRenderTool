@@ -5,9 +5,11 @@ import html from 'rollup-plugin-html';
 import alias from 'rollup-plugin-alias';
 
 export default {
-    entry: 'build/release/js/Device.js',
-    format: 'iife',
-    dest: 'build/release/bundle.js',
+    input: 'build/release/js/Device.js',
+    output: {
+        format: 'iife',
+        file: 'build/release/bundle.js'
+    },
     plugins: [
         include({
             paths: [
