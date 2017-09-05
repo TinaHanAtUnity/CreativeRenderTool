@@ -82,7 +82,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(VastVideoEventHandlers, 'onVideoError').returns(null);
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
-            const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
+            const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
             const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
             videoAdUnit.onError.trigger();
 

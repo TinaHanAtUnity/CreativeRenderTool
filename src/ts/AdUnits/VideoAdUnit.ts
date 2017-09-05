@@ -14,7 +14,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { Session } from 'Models/Session';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -35,8 +34,8 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _prepareCalled: boolean;
     private _videoReady: boolean;
 
-    constructor(nativeBridge: NativeBridge, session: Session, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
-        super(nativeBridge, session, forceOrientation, container, placement, campaign);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
+        super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._video = video;
         this._videoReady = false;

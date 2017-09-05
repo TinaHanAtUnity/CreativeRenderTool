@@ -13,7 +13,6 @@ import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { Platform } from 'Constants/Platform';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { Session } from 'Models/Session';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
@@ -53,7 +52,6 @@ describe('MRAIDEventHandlersTest', () => {
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
                 new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
-            sessionManager.setSession(new Session('sessionId'));
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 

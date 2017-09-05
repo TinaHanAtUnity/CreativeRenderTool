@@ -40,7 +40,7 @@ export class SessionManagerEventMetadataCreator {
     private getInfoJson(adUnit: AbstractAdUnit, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
-            'auctionId': adUnit.getSession().getId(),
+            'auctionId': adUnit.getCampaign().getSession().getId(),
             'gameSessionId': gameSession,
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
@@ -138,7 +138,6 @@ export class SessionManager {
     private _metaDataManager: MetaDataManager;
 
     private _gameSessionId: number;
-    private _currentSession: Session;
 
     private _gamerServerId: string;
     private _previousPlacementId: string | undefined;
@@ -152,19 +151,14 @@ export class SessionManager {
         this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge, metaDataManager);
     }
 
-    public create(): Promise<void[]> {
+    public create(): Promise<Session> {
+        let session: Session;
         return this._eventManager.getUniqueEventId().then(id => {
-            this._currentSession = new Session(id);
+            session = new Session(id);
             return this._eventManager.startNewSession(id);
+        }).then(() => {
+            return session;
         });
-    }
-
-    public getSession(): Session {
-        return this._currentSession;
-    }
-
-    public setSession(session: Session) {
-        this._currentSession = session;
     }
 
     public getGameSessionId(): number {
@@ -192,10 +186,10 @@ export class SessionManager {
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.START)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.START)) {
             return Promise.resolve();
         }
-        adUnit.getSession().setEventSent(EventType.START);
+        adUnit.getCampaign().getSession().setEventSent(EventType.START);
 
         return this._metaDataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
@@ -214,10 +208,10 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.FIRST_QUARTILE)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.FIRST_QUARTILE)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.FIRST_QUARTILE);
+        adUnit.getCampaign().getSession().setEventSent(EventType.FIRST_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
@@ -227,10 +221,10 @@ export class SessionManager {
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.MIDPOINT)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.MIDPOINT)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.MIDPOINT);
+        adUnit.getCampaign().getSession().setEventSent(EventType.MIDPOINT);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
@@ -240,10 +234,10 @@ export class SessionManager {
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.THIRD_QUARTILE);
+        adUnit.getCampaign().getSession().setEventSent(EventType.THIRD_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
@@ -253,10 +247,10 @@ export class SessionManager {
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.SKIP)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.SKIP)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.SKIP);
+        adUnit.getCampaign().getSession().setEventSent(EventType.SKIP);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             if(videoProgress) {
@@ -287,10 +281,10 @@ export class SessionManager {
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.VIEW)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.VIEW);
+        adUnit.getCampaign().getSession().setEventSent(EventType.VIEW);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
@@ -300,13 +294,13 @@ export class SessionManager {
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
-        if(adUnit.getSession().getEventSent(EventType.CLICK)) {
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
-        adUnit.getSession().setEventSent(EventType.CLICK);
+        adUnit.getCampaign().getSession().setEventSent(EventType.CLICK);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
-            this._eventManager.operativeEvent('click', id, adUnit.getSession().getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
+            this._eventManager.operativeEvent('click', id, adUnit.getCampaign().getSession().getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
         return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);

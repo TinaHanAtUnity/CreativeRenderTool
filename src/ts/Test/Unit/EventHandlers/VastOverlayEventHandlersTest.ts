@@ -17,7 +17,6 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
-import { Session } from 'Models/Session';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -53,7 +52,7 @@ describe('VastOverlayEventHandlersTest', () => {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+        campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
         overlay = new Overlay(nativeBridge, false, 'en');
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
@@ -73,14 +72,13 @@ describe('VastOverlayEventHandlersTest', () => {
 
         clientInfo = TestFixtures.getClientInfo();
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
-        sessionManager.setSession(new Session('123'));
 
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
 
-        testAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
     });
 
     describe('When calling onSkip', () => {
@@ -98,7 +96,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = <VastEndScreen><any> {
                     show: sinon.spy()
                 };
-                const vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+                const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
                 VastOverlayEventHandlers.onSkip(vastAdUnit);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
@@ -136,7 +134,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         beforeEach(() => {
             video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, TestFixtures.getSession(), ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
+            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
                 getVast: sinon.spy(),
                 getVideo: () => video
             }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);

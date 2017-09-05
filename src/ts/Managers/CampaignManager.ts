@@ -22,6 +22,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Session } from 'Models/Session';
 
 export class CampaignManager {
 
@@ -70,6 +71,7 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
+    private _currentSession: Session;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -95,8 +97,9 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        return this._sessionManager.create().then(() => {
-            return Promise.all([this.createRequestUrl(), this.createRequestBody()]);
+        return this._sessionManager.create().then((session) => {
+            this._currentSession = session;
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]);
         }).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
@@ -205,10 +208,10 @@ export class CampaignManager {
             case 'comet/campaign':
                 const json = JsonParser.parse(content);
                 if(json && json.mraidUrl) {
-                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
+                    const campaign = new MRAIDCampaign(json, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
                     return this.setupCampaignAssets(placements, campaign);
                 } else {
-                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                    const campaign = new PerformanceCampaign(json, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                     return this.setupCampaignAssets(placements, campaign);
                 }
 
@@ -217,7 +220,7 @@ export class CampaignManager {
                     return this.handleError(new Error('No vast content'), placements);
                 }
 
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
+                return this.parseVastCampaignHelper(content, this._currentSession, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
                     return this.setupCampaignAssets(placements, vastCampaign);
                 });
 
@@ -237,7 +240,7 @@ export class CampaignManager {
                 }
 
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
@@ -257,7 +260,7 @@ export class CampaignManager {
 
                 jsonMraid.id = this.getProgrammaticCampaignId();
                 const markup = decodeURIComponent(jsonMraid.markup);
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, this._currentSession, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidCampaign);
 
             default:
@@ -294,11 +297,11 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
+    private parseVastCampaignHelper(content: any, session: Session, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
-            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
+            const campaign = new VastCampaign(vast, campaignId, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 return Promise.reject(new Error('Campaign does not have an impression url'));
             }
@@ -335,7 +338,7 @@ export class CampaignManager {
         }
     }
 
-    private createRequestUrl(): Promise<string> {
+    private createRequestUrl(session: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -350,7 +353,7 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
-            auctionId: this._sessionManager.getSession().getId(),
+            auctionId: session.getId(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),

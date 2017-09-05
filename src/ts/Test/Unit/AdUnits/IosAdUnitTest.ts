@@ -32,7 +32,7 @@ describe('IosAdUnitTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
             focusManager = new FocusManager(nativeBridge);
             container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-            testAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.Sdk, 'logInfo').returns(Promise.resolve());
             stub = sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
         });
@@ -83,7 +83,7 @@ describe('IosAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
         container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-        testAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+        testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
         let onShowTriggered: boolean = false;
@@ -103,7 +103,7 @@ describe('IosAdUnitTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
             focusManager = new FocusManager(nativeBridge);
             container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-            testAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
             onSystemInterruptTriggered = false;
             container.onSystemInterrupt.subscribe(() => { onSystemInterruptTriggered = true; });

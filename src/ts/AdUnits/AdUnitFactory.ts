@@ -55,7 +55,7 @@ export class AdUnitFactory {
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
 
         const video = this.getOrientedVideo(campaign, forceOrientation);
-        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, sessionManager.getSession(), forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
+        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, performanceAdUnit);
 
@@ -90,10 +90,10 @@ export class AdUnitFactory {
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
             const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
-            vastAdUnit = new VastAdUnit(nativeBridge, sessionManager.getSession(), forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
+            vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo, request);
         } else {
-            vastAdUnit = new VastAdUnit(nativeBridge, sessionManager.getSession(), forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
+            vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
         this.prepareOverlay(overlay, nativeBridge, sessionManager, vastAdUnit);

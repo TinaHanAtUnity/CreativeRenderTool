@@ -6,6 +6,7 @@ import { HTML } from 'Models/Assets/HTML';
 import { Configuration } from 'Models/Configuration';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('MRAIDCampaign', () => {
 
@@ -17,7 +18,7 @@ describe('MRAIDCampaign', () => {
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const asset = new HTML(mraidJson.inlinedUrl);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, configuration.getGamerId(), configuration.getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>');
+            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>');
 
             assert.equal(campaign.getId(), mraidJson.id);
             assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
@@ -35,7 +36,7 @@ describe('MRAIDCampaign', () => {
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, configuration.getGamerId(), configuration.getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
+            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
 
             assert.deepEqual(campaign.getTrackingEventUrls(), json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
         });
@@ -46,7 +47,7 @@ describe('MRAIDCampaign', () => {
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, configuration.getGamerId(), configuration.getAbGroup());
+            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup());
             const asset = new HTML('https://resource-url.com');
 
             campaign.setResourceUrl('https://resource-url.com');
@@ -60,7 +61,7 @@ describe('MRAIDCampaign', () => {
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, configuration.getGamerId(), configuration.getAbGroup());
+            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup());
 
             campaign.setResource('some resource');
 

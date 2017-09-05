@@ -57,7 +57,7 @@ export class MRAIDEventHandlers {
     }
 
     private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
-        const currentSession = sessionManager.getSession();
+        const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
                 return;
@@ -84,7 +84,7 @@ export class MRAIDEventHandlers {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        sessionId: sessionManager.getSession().getId(),
+                        auctionId: campaign.getSession().getId(),
                         url: campaign.getClickAttributionUrl(),
                         response: (<RequestError>error).nativeResponse
                     });

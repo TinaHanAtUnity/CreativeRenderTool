@@ -29,7 +29,7 @@ describe('AndroidAdUnitTest', () => {
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            testAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.Sdk, 'logInfo').returns(Promise.resolve());
             stub = sinon.stub(nativeBridge.AndroidAdUnit, 'open').returns(Promise.resolve());
         });
@@ -82,7 +82,7 @@ describe('AndroidAdUnitTest', () => {
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            testAdUnit = new TestAdUnit(nativeBridge, TestFixtures.getSession(), container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
             sinon.stub(nativeBridge.AndroidAdUnit, 'open').returns(Promise.resolve());
             options = { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, display: testDisplay };
         });

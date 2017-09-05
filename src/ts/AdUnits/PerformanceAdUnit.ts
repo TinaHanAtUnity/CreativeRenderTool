@@ -7,14 +7,13 @@ import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Video } from 'Models/Assets/Video';
-import { Session } from 'Models/Session';
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, session: Session, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
-        super(nativeBridge, session, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options);
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
+        super(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options);
         this._endScreen = endScreen;
     }
 

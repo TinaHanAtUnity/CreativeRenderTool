@@ -27,7 +27,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
-        super(nativeBridge, sessionManager.getSession(), ForceOrientation.NONE, container, placement, campaign);
+        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._sessionManager = sessionManager;
         this._mraid = mraid;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();
@@ -184,7 +184,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         const eventManager = this._sessionManager.getEventManager();
         const sdkVersion = this._sessionManager.getClientInfo().getSdkVersion();
         const placementId = this.getPlacement().getId();
-        const sessionId = this._sessionManager.getSession().getId();
+        const sessionId = this.getCampaign().getSession().getId();
         const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
         if(trackingEventUrls) {

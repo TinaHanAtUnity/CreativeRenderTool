@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { MRAID } from 'Views/MRAID';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -34,7 +35,7 @@ describe('MRAID', () => {
     });
 
     it('should render', (done) => {
-        const campaign = new MRAIDCampaign({id: '123abc'}, '123456', 1, undefined, `<script src="mraid.js"></script><div>Hello</div>`);
+        const campaign = new MRAIDCampaign({id: '123abc'}, TestFixtures.getSession(), '123456', 1, undefined, `<script src="mraid.js"></script><div>Hello</div>`);
         const mraid = new MRAID(nativeBridge, placement, campaign);
 
         mraid.render();
@@ -56,7 +57,7 @@ describe('MRAID', () => {
     });
 
     it('should replace placeholder with dynamic markup injected', () => {
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, '123456', 1, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`);
+        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`);
         const mraid = new MRAID(nativeBridge, placement, campaign);
         return mraid.createMRAID().then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
@@ -65,7 +66,7 @@ describe('MRAID', () => {
 
     it('should remove the mraid.js placeholder when it has a query parameter', () => {
         const markup = '<script src="mraid.js?foo=bar&baz=blah><div>Hello, world!</div>';
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, '123456', 1, undefined, markup);
+        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, markup);
         const mraid = new MRAID(nativeBridge, placement, campaign);
         return mraid.createMRAID().then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');

@@ -18,7 +18,6 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
-import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -191,7 +190,6 @@ class TestHelper {
         const eventManager: EventManager = new EventManager(nativeBridge, request);
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
-        sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
 

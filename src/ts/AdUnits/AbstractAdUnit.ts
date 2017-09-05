@@ -4,7 +4,6 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
-import { Session } from 'Models/Session';
 
 export abstract class AbstractAdUnit {
 
@@ -34,7 +33,6 @@ export abstract class AbstractAdUnit {
     public readonly onError = new Observable0();
 
     protected readonly _nativeBridge: NativeBridge;
-    protected readonly _session: Session;
     protected readonly _forceOrientation: ForceOrientation;
     protected readonly _container: AdUnitContainer;
     protected readonly _placement: Placement;
@@ -43,9 +41,8 @@ export abstract class AbstractAdUnit {
     private _showing: boolean;
     private _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, session: Session, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
         this._nativeBridge = nativeBridge;
-        this._session = session;
         this._forceOrientation = forceOrientation;
         this._container = container;
         this._placement = placement;
@@ -89,10 +86,6 @@ export abstract class AbstractAdUnit {
 
     public getFinishState() {
         return this._finishState;
-    }
-
-    public getSession() {
-        return this._session;
     }
 
     public setFinishState(finishState: FinishState) {
