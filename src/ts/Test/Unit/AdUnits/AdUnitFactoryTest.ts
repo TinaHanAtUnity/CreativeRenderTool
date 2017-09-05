@@ -161,15 +161,16 @@ describe('AdUnitFactoryTest', () => {
         describe('on show', () => {
             it('should trigger onStart', (done) => {
                 MRAIDAdUnit.onStart.subscribe(() => {
+                    MRAIDAdUnit.hide();
                     done();
                 });
 
                 MRAIDAdUnit.show();
             });
-
             it('should call sendStart', () => {
                 MRAIDAdUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+                MRAIDAdUnit.hide();
             });
 
             it('should send impressions', () => {
@@ -177,12 +178,14 @@ describe('AdUnitFactoryTest', () => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
+                MRAIDAdUnit.hide();
             });
 
             it('should replace macros in the postback impression url', () => {
                 MRAIDAdUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                MRAIDAdUnit.hide();
             });
         });
 
