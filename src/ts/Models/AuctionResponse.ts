@@ -57,7 +57,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('trackingUrls');
     }
 
-    public getAdType(): string | undefined {
+    public getAdType(): string {
         return this.get('adType');
     }
 
@@ -69,7 +69,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('seatId');
     }
 
-    public getCorrelationId(): string | undefined {
+    public getCorrelationId(): string {
         return this.get('correlationId');
     }
 
