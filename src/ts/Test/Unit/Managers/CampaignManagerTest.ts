@@ -567,7 +567,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
                     mockRequest.verify();
-                    return verifyErrorForResponse(response, 'No vast content');
+                    return verifyErrorForResponse(response, 'model: AuctionResponse key: content with value: null: null is not in: string');
                 });
             });
 
@@ -812,7 +812,7 @@ describe('CampaignManager', () => {
 
             campaignManager.request().then(() => {
                 mockRequest.verify();
-                assert.equal(triggeredError.message, 'No mraid content');
+                assert.equal(triggeredError.message, 'model: AuctionResponse key: content with value: null: null is not in: string');
             });
         });
 
