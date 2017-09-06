@@ -21,7 +21,19 @@ export class ConfigManager {
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
             ConfigManager.fetchGamerId(nativeBridge)
-        ]).then(([framework, adapter, gamerId]) => {
+        ]).then(([framework, adapter, storedGamerId]) => {
+            let gamerId: string | undefined;
+
+            if(storedGamerId) {
+                if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+                    // only use stored gamerId for iOS when ad tracking is limited
+                    gamerId = storedGamerId;
+                } else {
+                    // delete previously stored gamerIds for all other devices because they should not be stored
+                    ConfigManager.deleteGamerId(nativeBridge);
+                }
+            }
+
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
@@ -35,7 +47,9 @@ export class ConfigManager {
                     const config: Configuration = new Configuration(configJson);
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getGamerId()) {
-                        ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                        if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+                            ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                        }
                     } else {
                         Diagnostics.trigger('plc_config_failure', {
                             configUrl: url,
@@ -133,6 +147,13 @@ export class ConfigManager {
     private static storeGamerId(nativeBridge: NativeBridge, gamerId: string): Promise<void[]> {
         return Promise.all([
             nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]);
+    }
+
+    private static deleteGamerId(nativeBridge: NativeBridge): Promise<void[]> {
+        return Promise.all([
+            nativeBridge.Storage.delete(StorageType.PRIVATE, 'gamerId'),
             nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
     }
