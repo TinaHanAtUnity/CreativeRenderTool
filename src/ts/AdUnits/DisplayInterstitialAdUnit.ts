@@ -29,6 +29,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this.setShowing(false);
 
         view.onClick.subscribe((href) => this.onRedirect.trigger(href));
+        view.onClose.subscribe(() => this.onClose.trigger());
     }
 
     public show(): Promise<void> {
@@ -64,9 +65,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
-        return this._container.close().then(() => {
-            this.onClose.trigger();
-        });
+        return this._container.close();
     }
 
     public isCached(): boolean {
