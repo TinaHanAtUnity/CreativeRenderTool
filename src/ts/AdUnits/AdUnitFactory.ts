@@ -341,6 +341,7 @@ export class AdUnitFactory {
         };
 
         const openLink = (href: string) => {
+            sessionManager.sendClick(programmaticAdUnit);
             if(nativeBridge.getPlatform() === Platform.ANDROID) {
                 nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
@@ -351,6 +352,13 @@ export class AdUnitFactory {
             }
         };
 
+        programmaticAdUnit.onStart.subscribe(() => {
+            for (let url of campaign.getTrackingUrlsForEvent('impression')) {
+                url = url.replace(/%ZONE%/, placement.getId());
+                url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
+                sessionManager.getEventManager().thirdPartyEvent('display impression', sessionManager.getSession().getId(), url);
+            }
+        });
         programmaticAdUnit.onClose.subscribe(onClose);
         programmaticAdUnit.onSkip.subscribe(onClose);
         programmaticAdUnit.onRedirect.subscribe(openLink);

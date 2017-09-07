@@ -3,7 +3,10 @@
     "display": {
       "id": "583dfda0d933a3630a53249c",
       "markup": "<a>hello,world</a>",
-      "clickThroughURL": "http://unity3d.com"
+      "clickThroughURL": "http://unity3d.com",
+      "tracking": {
+        "impression": [ "http://unity3d.com/impression" ]
+      }
     },
     "gamerId": "583dfda0d933a3630a53249c",
     "cacheTTL": 7200

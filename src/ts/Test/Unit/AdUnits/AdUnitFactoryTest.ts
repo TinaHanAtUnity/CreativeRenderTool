@@ -225,6 +225,14 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
             });
+
+            it('should send a tracking event', () => {
+                sandbox.stub(sessionManager, 'sendClick');
+
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendClick);
+            });
         });
 
         describe('on close', () => {
@@ -244,6 +252,26 @@ describe('AdUnitFactoryTest', () => {
                 adUnit.onSkip.trigger();
 
                 sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
+        });
+
+        describe('on start', () => {
+            let eventManager: any;
+
+            beforeEach(() => {
+                eventManager = {
+                    thirdPartyEvent: sinon.stub().returns(Promise.resolve())
+                };
+                sandbox.stub(sessionManager, 'getEventManager').returns(eventManager);
+                sandbox.stub(sessionManager, 'getSession').returns({
+                    getId: sinon.stub().returns('11111')
+                });
+            });
+
+            it('should send tracking events', () => {
+                adUnit.onStart.trigger();
+
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'display impression', '11111', 'http://unity3d.com/impression');
             });
         });
     });

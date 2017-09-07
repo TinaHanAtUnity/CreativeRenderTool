@@ -4,14 +4,16 @@ import { Asset } from 'Models/Assets/Asset';
 interface IDisplayInterstitialCampaign extends ICampaign {
     dynamicMarkup: string;
     clickThroughUrl: string | undefined;
+    tracking: object | undefined;
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, gamerId: string, abGroup: number, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string, gamerId: string, abGroup: number, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('ProgrammaticImageCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
-            clickThroughUrl: ['string', 'undefined']
+            clickThroughUrl: ['string', 'undefined'],
+            tracking: ['object', 'undefined']
         });
         this.set('dynamicMarkup', markup);
         this.set('clickThroughUrl', clickThroughUrl || undefined);
@@ -21,6 +23,7 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('correlationId', correlationId || undefined);
         this.set('creativeId', creativeId || undefined);
         this.set('seatId', seatId || undefined);
+        this.set('tracking', tracking || undefined);
     }
 
     public getDynamicMarkup(): string {
@@ -29,6 +32,14 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
 
     public getClickThroughUrl(): string | undefined {
         return this.get('clickThroughUrl');
+    }
+
+    public getTrackingUrlsForEvent(eventName: string): string[] {
+        const tracking = this.get('tracking');
+        if (tracking) {
+            return tracking[eventName] || [];
+        }
+        return [];
     }
 
     public getRequiredAssets(): Asset[] {

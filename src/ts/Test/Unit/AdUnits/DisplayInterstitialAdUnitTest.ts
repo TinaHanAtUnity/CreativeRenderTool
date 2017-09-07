@@ -86,15 +86,6 @@ describe('DisplayInterstitialAdUnit', () => {
             return adUnit.show();
         });
 
-        it('should call the onClose observer', () => {
-            const spy = sinon.spy();
-            adUnit.onClose.subscribe(spy);
-
-            return adUnit.hide().then(() => {
-                sinon.assert.called(spy);
-            });
-        });
-
         it('should close the view', () => {
             return adUnit.hide().then(() => {
                 sinon.assert.called(<sinon.SinonSpy>view.hide);
