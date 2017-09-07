@@ -1,7 +1,7 @@
 import MRAIDContainer from 'html/mraid/container.html';
 
 import { View } from 'Views/View';
-import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
@@ -20,7 +20,7 @@ export abstract class MRAIDView extends View {
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
     public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
-    public readonly onAnalyticsEvent = new Observable2<string, number>();
+    public readonly onAnalyticsEvent = new Observable4<number, number, string, any>();
 
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;

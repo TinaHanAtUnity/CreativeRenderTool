@@ -27,6 +27,7 @@ export class PlayableMRAID extends MRAIDView {
     private _messageListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
+    private _updateInterval: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -34,6 +35,7 @@ export class PlayableMRAID extends MRAIDView {
 
     private _closeRemaining: number;
     private _showTimestamp: number;
+    private _playableStartTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'playable-mraid');
@@ -114,6 +116,11 @@ export class PlayableMRAID extends MRAIDView {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
         }
+
+        if(this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = undefined;
+        }
         super.hide();
     }
 
@@ -156,10 +163,10 @@ export class PlayableMRAID extends MRAIDView {
                     });
 
                     this._prepareTimeout = undefined;
-                }, 5000);
+                }, 4500);
             }
             this._loadingScreenTimeout = undefined;
-        }, 1500);
+        }, 2500);
     }
 
     private showMRAIDAd() {
@@ -167,7 +174,7 @@ export class PlayableMRAID extends MRAIDView {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = PlayableMRAID.CloseLength;
             let skipRemaining = skipLength;
-            const updateInterval = setInterval(() => {
+            this._updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -181,7 +188,7 @@ export class PlayableMRAID extends MRAIDView {
                     this.updateProgressCircle(this._closeElement, 1);
                 }
                 if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    clearInterval(this._updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
@@ -214,6 +221,8 @@ export class PlayableMRAID extends MRAIDView {
             this._loadingScreen.addEventListener(e, () => {
                 this._closeElement.style.display = 'block';
 
+                this._playableStartTimestamp = Date.now();
+                this.onAnalyticsEvent.trigger((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined);
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -289,7 +298,9 @@ export class PlayableMRAID extends MRAIDView {
                 });
                 break;
             case 'analyticsEvent':
-                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
+                const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp) / 1000;
+                this.onAnalyticsEvent.trigger(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {

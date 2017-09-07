@@ -23,6 +23,7 @@ class CustomDOMParser {
 
 global.document = document;
 global.window = document.defaultView;
+global.HTMLElement = global.window.HTMLElement;
 global.DOMParser = CustomDOMParser;
 global.XMLHttpRequest = XMLHttpRequest;
 global.window.localStorage = new LocalStorage('./localStorage');
