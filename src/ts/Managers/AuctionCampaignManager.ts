@@ -218,9 +218,11 @@ export class AuctionCampaignManager extends CampaignManager {
                 return this.setupPlcCampaignAssets(placements, mraidCampaign);
 
             case 'programmatic/static-interstitial':
-                const domString = decodeURIComponent(content);
-                const progImageCampaign = new DisplayInterstitialCampaign(domString, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, adType, creativeId, seatId, correlationId);
-                return this.setupPlcCampaignAssets(placements, progImageCampaign);
+                const jsonDisplay = JsonParser.parse(content);
+                const displayMarkup = decodeURIComponent(jsonDisplay.markup);
+                const clickThroughUrl = jsonDisplay.clickThroughURL;
+                const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, clickThroughUrl, adType, creativeId, seatId, correlationId);
+                return this.setupPlcCampaignAssets(placements, displayInterstitialCampaign);
             default:
                 return this.handlePlcError(new Error('Unsupported content-type: ' + contentType), placements);
         }
