@@ -1,3 +1,7 @@
+# Thu Sep  7 10:05:12 UTC 2017
+
+* Store gamerId and send stored gamerId only for iOS devices with limit ad tracking
+
 # Wed Sep  6 08:32:29 UTC 2017
 
 * Update to TypeScript 2.5 and update other dependencies
