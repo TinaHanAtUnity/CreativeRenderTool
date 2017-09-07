@@ -2,7 +2,8 @@
     "abGroup": 0,
     "display": {
       "id": "583dfda0d933a3630a53249c",
-      "markup": "<a>hello,world</a>"
+      "markup": "<a>hello,world</a>",
+      "clickThroughURL": "http://unity3d.com"
     },
     "gamerId": "583dfda0d933a3630a53249c",
     "cacheTTL": 7200

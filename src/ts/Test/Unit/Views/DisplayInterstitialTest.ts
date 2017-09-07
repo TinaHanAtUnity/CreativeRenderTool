@@ -76,4 +76,27 @@ describe('DisplayInterstitial', () => {
             }, 100);
         });
     });
+
+    it('should redirect when the click catcher is clicked', () => {
+        campaign.set('clickThroughUrl', 'http://unity3d.com');
+
+        const spy = sinon.spy();
+        view.onClick.subscribe(spy);
+
+        view.render();
+        view.show();
+
+        (<HTMLElement>view.container().querySelector('.iframe-click-catcher')!).click();
+
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                try {
+                    assert.isTrue(spy.calledWith('http://unity3d.com'));
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
+            }, 100);
+        });
+    });
 });

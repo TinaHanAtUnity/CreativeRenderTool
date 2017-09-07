@@ -52,18 +52,19 @@ export class DisplayInterstitial extends View {
                 selector: '.close-region'
             }
         ];
-
-        if (campaign.getClickThroughUrl()) {
-            this._bindings.push({
-                event: 'click',
-                selector: '.iframe-click-catcher',
-                listener: (e: Event) => this.onIFrameClicked(e)
-            });
-        }
     }
 
     public render() {
         super.render();
+
+        if (this._campaign.getClickThroughUrl()) {
+            const clickCatcher = document.createElement('div');
+            clickCatcher.classList.add('iframe-click-catcher');
+            this._container.appendChild(clickCatcher);
+
+            clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+        }
+
         this._markup = this._campaign.getDynamicMarkup();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
