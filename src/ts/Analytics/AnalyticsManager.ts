@@ -36,8 +36,8 @@ export class AnalyticsManager {
         this._configuration = configuration;
         this._storage = new AnalyticsStorage(nativeBridge);
 
-        // this._endpoint = 'https://fake-ads-backend.applifier.info/ack/' + clientInfo.getGameId();
-        this._endpoint = 'https://api.uca.cloud.unity3d.com/v1/events';
+        // staging endpoint
+        this._endpoint = 'https://stg-lender.cdp.internal.unity3d.com/v1/events';
     }
 
     public init(): Promise<void> {
