@@ -12,7 +12,8 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { Sdk } from 'Native/Backend/Api/Sdk';
 
 describe('EventsTest', () => {
 
@@ -28,7 +29,8 @@ describe('EventsTest', () => {
 
     const validateRequestLog = (requestLog: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
-        assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
+        // assert.equal(findEventCount(requestLog, '/games/\\d+/fill'), 2, 'Did not find 2 fill requests');
+        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile'), 1, 'Did not find a first_quartile event');
         assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint'), 1, 'Did not find a midpoint event');
@@ -71,6 +73,18 @@ describe('EventsTest', () => {
 
         Request.setLog([]);
 
+        Sdk.setAppName('com.test.app.name');
+        Sdk.setAppVersion('1.2.3-appversion');
+        Sdk.setSdkVersion(2000);
+        Sdk.setSdkVersionName('2.0.0-sdkversion');
+        Sdk.setDebuggable(false);
+        Sdk.setConfigUrl('https://test.config.url');
+        Sdk.setWebViewUrl('https://test.webview.url');
+        Sdk.setWebViewHash(null);
+        Sdk.setWebViewVersion('2.0.0.-webviewversion');
+        Sdk.setInitTimeStamp(12345);
+        Sdk.setReinitialized(false);
+
         DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
         DeviceInfo.setLimitAdTrackingFlag(true);
         DeviceInfo.setAndroidId('de88c6a5d783745b');
@@ -103,10 +117,10 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '667', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -144,6 +158,18 @@ describe('EventsTest', () => {
 
         Request.setLog([]);
 
+        Sdk.setAppName('com.test.app.name');
+        Sdk.setAppVersion('1.2.3-appversion');
+        Sdk.setSdkVersion(2000);
+        Sdk.setSdkVersionName('2.0.0-sdkversion');
+        Sdk.setDebuggable(false);
+        Sdk.setConfigUrl('https://test.config.url');
+        Sdk.setWebViewUrl('https://test.webview.url');
+        Sdk.setWebViewHash(null);
+        Sdk.setWebViewVersion('2.0.0.-webviewversion');
+        Sdk.setInitTimeStamp(12345);
+        Sdk.setReinitialized(false);
+
         DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
         DeviceInfo.setLimitAdTrackingFlag(true);
         DeviceInfo.setManufacturer('Apple');
@@ -175,10 +201,10 @@ describe('EventsTest', () => {
         AbstractAdUnit.setAutoClose(true);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        LegacyCampaignManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '667', listener, true);
+        UnityAds.initialize(Platform.IOS, '345', listener, true);
     });
 
 });

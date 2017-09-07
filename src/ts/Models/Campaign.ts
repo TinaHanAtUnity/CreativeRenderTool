@@ -5,8 +5,7 @@ export interface ICampaign {
     id: string;
     gamerId: string;
     abGroup: number;
-    timeout: number;
-    willExpireAt: number;
+    willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
@@ -19,8 +18,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         id: ['string'],
         gamerId: ['string'],
         abGroup: ['number'],
-        timeout: ['number'],
-        willExpireAt: ['number'],
+        willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
@@ -44,10 +42,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('abGroup');
     }
 
-    public getTimeout(): number | undefined {
-        return this.get('timeout');
-    }
-
     public getAdType(): string | undefined {
         return this.get('adType');
     }
@@ -68,6 +62,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('meta');
     }
 
+    public getWillExpireAt(): number | undefined {
+        return this.get('willExpireAt');
+    }
+
     public isExpired(): boolean {
         const willExpireAt = this.get('willExpireAt');
         return willExpireAt !== undefined && Date.now() > willExpireAt;
@@ -78,8 +76,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
             'id': this.getId(),
             'gamerId': this.getGamerId(),
             'abGroup': this.getAbGroup(),
-            'timeout': this.getTimeout(),
-            'willExpireAt': this.get('willExpireAt')
+            'willExpireAt': this.getWillExpireAt()
         };
     }
 

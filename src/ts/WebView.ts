@@ -36,8 +36,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
-import { AuctionCampaignManager } from 'Managers/AuctionCampaignManager';
-import { LegacyCampaignManager } from 'Managers/LegacyCampaignManager';
 import { FocusManager } from 'Managers/FocusManager';
 
 export class WebView {
@@ -177,11 +175,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
-            if(this._configuration.isAuction()) {
-                this._campaignManager = new AuctionCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
-            } else {
-                this._campaignManager = new LegacyCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
-            }
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -245,7 +239,7 @@ export class WebView {
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
-                timeoutInSeconds: campaign.getTimeout()
+                willExpireAt: campaign.getWillExpireAt()
             });
             Diagnostics.trigger('campaign_expired', error);
             return;
@@ -424,16 +418,12 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                LegacyCampaignManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
             if(TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
-            }
-
-            if(TestEnvironment.get('auctionUrl')) {
-                AuctionCampaignManager.setAuctionBaseUrl(TestEnvironment.get('auctionUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {

@@ -91,7 +91,7 @@ describe('AdUnitFactoryTest', () => {
     });
 
     describe('MRAID AdUnit', () => {
-        let MRAIDAdUnit: MRAIDAdUnit;
+        let adUnit: MRAIDAdUnit;
         let eventManager: any;
         let campaign: MRAIDCampaign;
 
@@ -114,34 +114,34 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            MRAIDAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, request, {});
         });
 
         describe('on hide', () => {
             it('should trigger onClose when hide is called', (done) => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.onClose.subscribe(() => {
-                    assert.equal(MRAIDAdUnit.isShowing(), false);
+                adUnit.setShowing(true);
+                adUnit.onClose.subscribe(() => {
+                    assert.equal(adUnit.isShowing(), false);
                     done();
                 });
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
             });
 
             it('should trigger onFinish when hide is called', (done) => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.onFinish.subscribe(() => {
+                adUnit.setShowing(true);
+                adUnit.onFinish.subscribe(() => {
                     done();
                 });
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
             });
 
             it('should call trackers on on finish state completed', () => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.setFinishState(FinishState.COMPLETED);
+                adUnit.setShowing(true);
+                adUnit.setFinishState(FinishState.COMPLETED);
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
@@ -149,10 +149,10 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should call sendSkip on finish state skipped', () => {
-                MRAIDAdUnit.setShowing(true);
-                MRAIDAdUnit.setFinishState(FinishState.SKIPPED);
+                adUnit.setShowing(true);
+                adUnit.setFinishState(FinishState.SKIPPED);
 
-                MRAIDAdUnit.hide();
+                adUnit.hide();
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendSkip);
             });
@@ -160,34 +160,37 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on show', () => {
             it('should trigger onStart', (done) => {
-                MRAIDAdUnit.onStart.subscribe(() => {
+                adUnit.onStart.subscribe(() => {
+                    adUnit.hide();
                     done();
                 });
 
-                MRAIDAdUnit.show();
+                adUnit.show();
             });
-
             it('should call sendStart', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+                adUnit.hide();
             });
 
             it('should send impressions', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
+                adUnit.hide();
             });
 
             it('should replace macros in the postback impression url', () => {
-                MRAIDAdUnit.show();
+                adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                adUnit.hide();
             });
         });
 
         it('should call click tracker', () => {
-            MRAIDAdUnit.sendClick();
+            adUnit.sendClick();
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
         });
     });
