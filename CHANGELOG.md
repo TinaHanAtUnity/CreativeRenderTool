@@ -1,3 +1,21 @@
+# Thu Sep  7 13:35:33 UTC 2017
+
+* Add handle_campaign_failed diagnostic message
+
+# Thu Sep  7 10:05:12 UTC 2017
+
+* Store gamerId and send stored gamerId only for iOS devices with limit ad tracking
+
+# Wed Sep  6 08:32:29 UTC 2017
+
+* Update to TypeScript 2.5 and update other dependencies
+* Update rollup config for changed parameters
+* Fix ClientInfo settings in browser build
+* Improve playable analytics
+* Fix edge cases with programmatic MRAID expiration
+* Remove test.auctionUrl test setting
+* Refactor code so that unit tests will not have pending timers
+
 # Mon Sep  4 12:30:36 UTC 2017
 
 * Refactor campaign handling code to drop support for yield and use auction unconditionally
