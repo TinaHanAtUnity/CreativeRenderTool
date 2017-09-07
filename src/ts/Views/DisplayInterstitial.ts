@@ -41,8 +41,8 @@ export class DisplayInterstitial extends View {
 
         this._placement = placement;
         this._campaign = campaign;
-
         this._template = new Template(DisplayInterstitialTemplate);
+
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
         this._bindings = [
@@ -52,6 +52,14 @@ export class DisplayInterstitial extends View {
                 selector: '.close-region'
             }
         ];
+
+        if (campaign.getClickThroughUrl()) {
+            this._bindings.push({
+                event: 'click',
+                selector: '.iframe-click-catcher',
+                listener: (e: Event) => this.onIFrameClicked(e)
+            });
+        }
     }
 
     public render() {
@@ -61,7 +69,12 @@ export class DisplayInterstitial extends View {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-        iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+
+        if (this._campaign.getClickThroughUrl()) {
+            iframe.srcdoc = this._markup;
+        } else {
+            iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+        }
 
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             if(Math.abs(<number>window.orientation) === 90) {
@@ -183,6 +196,16 @@ export class DisplayInterstitial extends View {
             this._resizeHandler = undefined;
         }
         super.hide();
+    }
+
+    private onIFrameClicked(e: Event) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const clickThroughUrl = this._campaign.getClickThroughUrl();
+        if (clickThroughUrl) {
+            this.onClick.trigger(clickThroughUrl);
+        }
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
