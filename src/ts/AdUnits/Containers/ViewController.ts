@@ -14,6 +14,14 @@ interface IIosOptions {
     statusBarHidden: boolean;
 }
 
+enum UIInterfaceOrientation {
+    UNKNOWN = 0,
+    PORTRAIT = 1,
+    PORTRAIT_UPSIDE_DOWN = 2,
+    LANDSCAPE_RIGHT = 3,
+    LANDSCAPE_LEFT = 4
+}
+
 export class ViewController extends AdUnitContainer {
 
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
@@ -75,7 +83,7 @@ export class ViewController extends AdUnitContainer {
             hideStatusBar = options.statusBarHidden;
         }
 
-        return this._nativeBridge.IosAdUnit.open(views, this.getOrientation(options.supportedOrientations, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
+        return this._nativeBridge.IosAdUnit.open(views, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
@@ -121,7 +129,7 @@ export class ViewController extends AdUnitContainer {
     public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
         this.addDiagnosticsEvent({type: 'reorient'});
         return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
-            return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options.supportedOrientations, allowRotation, forceOrientation));
+            return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
         });
     }
 
@@ -129,21 +137,29 @@ export class ViewController extends AdUnitContainer {
         return this._paused;
     }
 
-    private getOrientation(supportedOrientations: UIInterfaceOrientationMask, allowRotation: boolean, forceOrientation: ForceOrientation) {
-        let orientation: UIInterfaceOrientationMask = supportedOrientations;
+    private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: ForceOrientation) {
+        let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
         if(forceOrientation === ForceOrientation.LANDSCAPE) {
-            if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE;
-            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
-            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+            switch (options.statusBarOrientation) {
+                case UIInterfaceOrientation.LANDSCAPE_LEFT:
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
+                    break;
+                case UIInterfaceOrientation.LANDSCAPE_RIGHT:
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
+                    break;
+                default:
+                    break;
             }
         } else if(forceOrientation === ForceOrientation.PORTRAIT) {
-            if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
-            } else if((supportedOrientations & UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) === UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN) {
-                orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
+            switch (options.statusBarOrientation) {
+                case UIInterfaceOrientation.PORTRAIT:
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
+                    break;
+                case UIInterfaceOrientation.PORTRAIT_UPSIDE_DOWN:
+                    orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
+                    break;
+                default:
+                    break;
             }
         }
         return orientation;
