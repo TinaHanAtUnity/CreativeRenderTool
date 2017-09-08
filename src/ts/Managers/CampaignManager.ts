@@ -23,6 +23,9 @@ import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { VPAID } from 'Models/VPAID/VPAID';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 export class CampaignManager {
 
@@ -277,7 +280,10 @@ export class CampaignManager {
                 const markup = decodeURIComponent(jsonMraid.markup);
                 const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidCampaign);
-
+            case 'programmatic/vpaid':
+                const vpaid = this.parseVPAID(content);
+                const vpaidCampaign = new VPAIDCampaign(vpaid, this.getProgrammaticCampaignId(), gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
+                return this.setupCampaignAssets(placements, vpaidCampaign);
             default:
                 return this.handleError(new Error('Unsupported content-type: ' + contentType), placements);
         }
@@ -505,5 +511,10 @@ export class CampaignManager {
         }).catch(() => {
             return [];
         });
+    }
+
+    private parseVPAID(dom: string): VPAID {
+        dom = decodeURIComponent(dom).trim();
+        return new VPAIDParser().parse(dom);
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<VAST version="2.0">
+    <Ad id="1h41kg">
+        <InLine>
+            <AdSystem>Innovid Ads</AdSystem>
+            <AdTitle><![CDATA[Certification Testing VPAID - MRAID - Click on Main copy (5/20/2016)]]></AdTitle>
+            <Impression><![CDATA[about:blank]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:15</Duration>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" width="16" height="9" type="application/javascript" apiFramework="VPAID"><![CDATA[http://static.innovid.com/mobileapps/js/vpaid/1h41kg?cb=0340c549-16ea-ad56-a689-5cfaf3c08d25&deviceid=&ivc=[ecp]]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>

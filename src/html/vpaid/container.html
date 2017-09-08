@@ -1,0 +1,137 @@
+<html>
+<head>
+    <style>
+        /* just a shadow iframe for loading the VPAID src */
+        iframe {
+            display: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .video-player-slot {
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-player-slot video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-player-slot">
+        <video></video>
+    </div>
+    <iframe></iframe>
+    <script>
+        (function() {
+            // List of all ad events
+            var creativeEvents = [
+                'loaded', 'skipped', 'started', 'stopped',
+                'linearChange', 'expandedChange', 'remaningTimeChange',
+                'volumeChange', 'impression', 'videoStart', 'videoFirstQuartile',
+                'videoMidpoint', 'videoThirdQuartile', 'videoComplete',
+                'clickThru', 'interaction', 'userAcceptInvitation',
+                'userMinimize', 'userClose', 'paused', 'playing',
+                'log', 'error'
+            ];
+
+            // VPAID_SRC_URL will be replaced by the WebView programmatically.
+            function getIFrameDocumentContent() {
+                return '<scr' + 'ipt src="{{VPAID_SRC_URL}}"></scr' + 'ipt>';
+            }
+
+            var Container = function() {
+                this._iframe = document.querySelector('iframe');
+                this._creative = null;
+                this._slot = document.querySelector('.video-player-slot');
+                this._videoSlot = this._slot.querySelector('video');
+                window.addEventListener('message', this._onMessage.bind(this));
+            };
+
+            Container.prototype.init = function() {
+                this._iframe.addEventListener('load', this._onIFrameReady.bind(this));
+                this._iframe.contentDocument.write(getIFrameDocumentContent());
+                this._iframe.contentDocument.close();
+            };
+
+            Container.prototype._onIFrameReady = function() {
+                var getVPAID = this._getVPAIDFunction();
+                this._creative = getVPAID();
+
+                this._subscribeToAllEvents();
+
+                window.parent.postMessage({
+                    type: 'ready'
+                }, '*');
+            }
+
+            Container.prototype._subscribeToAllEvents = function() {
+                var len = creativeEvents.length;
+                for (var i = 0; i < creativeEvents.length; i++) {
+                    var creativeEvent = creativeEvents[i];
+                    var normalizedEventName = 'Ad' + creativeEvent.charAt(0).toUpperCase() + creativeEvent.substring(1);
+                    this._subscribeToEvent(normalizedEventName);
+                }
+            };
+
+            Container.prototype._subscribeToEvent = function(eventName) {
+                this._creative.subscribe(function() {
+                    var args = [eventName].concat(Array.prototype.slice.call(arguments));
+                    this._handleEvent.apply(this, args);
+                }.bind(this), eventName, this);
+            }
+
+            Container.prototype._getVPAIDFunction = function() {
+                return this._iframe.contentWindow['getVPAIDAd'];
+            };
+
+            Container.prototype._handleEvent = function() {
+                var eventType = arguments[0];
+                var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [];
+
+                window.parent.postMessage({
+                    type: 'VPAID',
+                    eventType: eventType,
+                    args: args
+                }, '*');
+            };
+
+            Container.prototype._initAd = function(width, height, viewMode, bitrate, creativeData, envVars) {
+                this._creative.initAd(width, height, viewMode, bitrate, creativeData, envVars);
+            }
+
+            Container.prototype._showAd = function() {
+                this._creative.startAd();
+            };
+
+            Container.prototype._onMessage = function(e) {
+                switch (e.data.type) {
+                    case 'init':
+                        this._initAd(e.data.width, e.data.height, e.data.viewMode, e.data.bitrate, e.data.creativeData, {
+                            slot: this._slot,
+                            videoSlot: this._videoSlot
+                        });
+                        break;
+                    case 'show':
+                        this._showAd();
+                        break;
+                    default:
+                        // todo post back error
+                        break;
+                }
+            }
+
+            var container = new Container();
+            container.init();
+        })();
+    </script>
+</body>
+
+</html>

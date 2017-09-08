@@ -34,9 +34,11 @@ import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
 import { Request } from 'Utilities/Request';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { VPAID } from 'Views/VPAID';
+import { VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 
 export class AdUnitFactory {
-
     public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
@@ -45,6 +47,8 @@ export class AdUnitFactory {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, request, configuration, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+        } else if (campaign instanceof VPAIDCampaign) {
+            return this.createVPAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -322,5 +326,12 @@ export class AdUnitFactory {
             }
         }
         return undefined;
+    }
+
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+        const vpaid = new VPAID(nativeBridge, campaign);
+        vpaid.render();
+        const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, sessionManager, forceOrientation, container, placement, campaign);
+        return vpaidAdUnit;
     }
 }
