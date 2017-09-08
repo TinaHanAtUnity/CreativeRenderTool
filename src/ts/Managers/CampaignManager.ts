@@ -23,6 +23,7 @@ import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -170,6 +171,25 @@ export class CampaignManager {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();
                         }
+
+                        let diagnosticError = error;
+
+                        if(diagnosticError instanceof Error) {
+                            diagnosticError = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+                        }
+
+                        // todo: this is overlapping with plc_request_failed so this should be refactored to not overlap
+                        Diagnostics.trigger('handle_campaign_failed', {
+                            error: diagnosticError,
+                            contentType: json.media[mediaId].contentType,
+                            content: json.media[mediaId].content,
+                            cacheTTL: json.media[mediaId].cacheTTL,
+                            trackingUrls: json.media[mediaId].trackingUrls,
+                            adType: json.media[mediaId].adType,
+                            creativeId: json.media[mediaId].creativeId,
+                            seatId: json.media[mediaId].seatId,
+                            correlationId: json.correlationId
+                        });
 
                         return this.handleError(error, fill[mediaId]);
                     }));
