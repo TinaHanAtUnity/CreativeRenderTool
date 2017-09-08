@@ -41,7 +41,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         return this.get('cachedUrl');
     }
 
-    public setCachedUrl(url: string) {
+    public setCachedUrl(url: string | undefined) {
         this.set('cachedUrl', url);
     }
 
