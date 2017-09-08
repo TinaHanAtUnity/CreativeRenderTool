@@ -221,6 +221,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                             campaignId: this._campaign.getId()
                         }));
 
+                        // Modify asset cached status to false
+                        this.getVideo().setCachedUrl(undefined);
+
                         // cached file not found (deleted by the system?), use streaming fallback
                         return streamingUrl;
                     }
@@ -230,6 +233,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
                     }));
+
+                    // Modify asset cached status to false
+                    this.getVideo().setCachedUrl(undefined);
 
                     // cached file not found (deleted by the system?), use streaming fallback
                     return streamingUrl;
