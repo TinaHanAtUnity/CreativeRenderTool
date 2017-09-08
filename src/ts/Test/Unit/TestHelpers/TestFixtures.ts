@@ -23,7 +23,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        return new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup, json.display.tracking, json.display.clickThroughURL);
+        return new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
     }
 
     public static getPlacement(): Placement {

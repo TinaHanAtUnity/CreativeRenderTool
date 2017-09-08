@@ -27,8 +27,8 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
-import { DisplayInterstitialAdUnit } from "AdUnits/DisplayInterstitialAdUnit";
-import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {

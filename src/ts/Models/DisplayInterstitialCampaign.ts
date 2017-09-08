@@ -8,13 +8,16 @@ interface IDisplayInterstitialCampaign extends ICampaign {
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, gamerId: string, abGroup: number, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
-        super('ProgrammaticImageCampaign', {
+    constructor(markup: string, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+        super('DisplayInterstitialCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
             clickThroughUrl: ['string', 'undefined'],
             tracking: ['object', 'undefined']
         });
+        if(cacheTTL) {
+            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
+        }
         this.set('dynamicMarkup', markup);
         this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);

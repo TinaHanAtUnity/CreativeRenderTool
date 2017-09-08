@@ -262,7 +262,7 @@ export class CampaignManager {
                 const jsonDisplay = JsonParser.parse(content);
                 const displayMarkup = decodeURIComponent(jsonDisplay.markup);
                 const clickThroughUrl = jsonDisplay.clickThroughURL;
-                const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, trackingUrls, clickThroughUrl, adType, creativeId, seatId, correlationId);
+                const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, clickThroughUrl, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, displayInterstitialCampaign);
 
             default:

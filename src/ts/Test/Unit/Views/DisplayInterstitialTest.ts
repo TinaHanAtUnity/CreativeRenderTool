@@ -31,7 +31,7 @@ describe('DisplayInterstitial', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        campaign = new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup);
+        campaign = new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup, undefined);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
         sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);

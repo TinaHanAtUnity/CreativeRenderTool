@@ -44,7 +44,7 @@ describe('DisplayInterstitialAdUnit', () => {
         sandbox.stub(container, 'close').returns(Promise.resolve());
         const eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
-        campaign = new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup);
+        campaign = new DisplayInterstitialCampaign(json.display.markup, json.gamerId, json.abGroup, undefined);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
         view.render();
