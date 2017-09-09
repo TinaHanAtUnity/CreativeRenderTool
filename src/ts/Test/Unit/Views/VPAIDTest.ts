@@ -1,0 +1,142 @@
+import 'mocha';
+import * as sinon from 'sinon';
+import { assert } from 'chai';
+
+import VPAIDTestXML from 'xml/VPAIDWithAdParameters.xml';
+import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
+import { VPAID } from 'Views/VPAID';
+import { NativeBridge } from 'Native/NativeBridge';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { VPAIDParser } from 'Utilities/VPAIDParser';
+
+describe('VPAID View', () => {
+    let nativeBridge: NativeBridge;
+    let campaign: VPAIDCampaign;
+    let vpaid: VPAID;
+
+    beforeEach(() => {
+        nativeBridge = sinon.createStubInstance(NativeBridge);
+
+        const vpaidModel = new VPAIDParser().parse(VPAIDTestXML);
+        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
+        campaign = new VPAIDCampaign(vpaidModel, vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+
+        vpaid = new VPAID(nativeBridge, campaign);
+    });
+
+    describe('rendering', () => {
+
+        beforeEach(() => {
+            vpaid.render();
+        });
+
+        it('should replace the VPAID src url with the placeholder', () => {
+            const iframe = vpaid.container().querySelector('iframe')!;
+            const srcdoc = iframe.getAttribute('srcdoc')!;
+            assert.isTrue(srcdoc.indexOf(campaign.getVPAID().getScriptUrl()) !== -1);
+        });
+    });
+
+    describe('when iframe is ready', () => {
+
+        let iframe: HTMLIFrameElement;
+
+        beforeEach(() => {
+            vpaid.render();
+            vpaid.show();
+            iframe = <HTMLIFrameElement>vpaid.container().querySelector('iframe');
+            document.body.appendChild(vpaid.container());
+        });
+
+        afterEach(() => {
+            document.body.removeChild(vpaid.container());
+            vpaid.hide();
+        });
+
+        it('should send the init message', () => {
+            const promise = new Promise((resolve, reject) => {
+                iframe.contentWindow.addEventListener('message', (e: MessageEvent) => {
+                    try {
+                        assert.isTrue(e.data.type === 'init');
+                        resolve();
+                    } catch {
+                        reject();
+                    }
+                });
+            });
+            window.postMessage({ type: 'ready' }, '*');
+            return promise;
+        });
+    });
+
+    describe('showing the ad', () => {
+        let iframe: HTMLIFrameElement;
+
+        beforeEach(() => {
+            vpaid.render();
+            vpaid.show();
+            iframe = <HTMLIFrameElement>vpaid.container().querySelector('iframe');
+            document.body.appendChild(vpaid.container());
+        });
+
+        afterEach(() => {
+            document.body.removeChild(vpaid.container());
+            vpaid.hide();
+        });
+
+        it('should send the show message', () => {
+            const promise = new Promise((resolve, reject) => {
+                iframe.contentWindow.addEventListener('message', (e: MessageEvent) => {
+                    try {
+                        assert.isTrue(e.data.type === 'show');
+                        resolve();
+                    } catch {
+                        reject();
+                    }
+                });
+            });
+            vpaid.showAd();
+            return promise;
+        });
+    });
+
+    describe('handling VPAID events', () => {
+        let iframe: HTMLIFrameElement;
+
+        beforeEach(() => {
+            vpaid.render();
+            vpaid.show();
+            iframe = <HTMLIFrameElement>vpaid.container().querySelector('iframe');
+            document.body.appendChild(vpaid.container());
+        });
+
+        afterEach(() => {
+            document.body.removeChild(vpaid.container());
+            vpaid.hide();
+        });
+
+        it('should forward the event to the observer', () => {
+            const spy = sinon.spy();
+            const eventType = 'AdEvent';
+            const args = ['foo', 1, true, 'bar'];
+            vpaid.onVPAIDEvent.subscribe(spy);
+
+            window.postMessage({
+                type: 'VPAID',
+                eventType: eventType,
+                args: args
+            }, '*');
+
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    try {
+                        sinon.assert.calledWith(spy, eventType, args);
+                        resolve();
+                    } catch {
+                        reject();
+                    }
+                });
+            });
+        });
+    });
+});
