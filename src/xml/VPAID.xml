@@ -12,6 +12,23 @@
                         <MediaFiles>
                             <MediaFile delivery="progressive" width="16" height="9" type="application/javascript" apiFramework="VPAID"><![CDATA[http://static.innovid.com/mobileapps/js/vpaid/1h41kg?cb=0340c549-16ea-ad56-a689-5cfaf3c08d25&deviceid=&ivc=[ecp]]]></MediaFile>
                         </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="error"><![CDATA[http://tracking.unityads.unity3d.com/error]]></Tracking>
+                            <Tracking event="resume"><![CDATA[http://tracking.unityads.unity3d.com/resume]]></Tracking>
+                            <Tracking event="creativeView"><![CDATA[http://tracking.unityads.unity3d.com/creativeView]]></Tracking>
+                            <Tracking event="impression"><![CDATA[http://tracking.unityads.unity3d.com/impression]]></Tracking>
+                            <Tracking event="start"><![CDATA[http://tracking.unityads.unity3d.com/start]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://tracking.unityads.unity3d.com/firstQuartile]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://tracking.unityads.unity3d.com/midpoint]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://tracking.unityads.unity3d.com/thirdQuartile]]></Tracking>
+                            <Tracking event="complete"><![CDATA[http://tracking.unityads.unity3d.com/complete]]></Tracking>
+                            <Tracking event="paused"><![CDATA[http://tracking.unityads.unity3d.com/paused]]></Tracking>
+                            <Tracking event="resume"><![CDATA[http://tracking.unityads.unity3d.com/resume]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[http://learnmore.unityads.unity3d.com]]></ClickThrough>
+                            <ClickTracking><![CDATA[http://trackiing.unityads.unity3d.com/click]]></ClickTracking>
+                        </VideoClicks>
                     </Linear>
                 </Creative>
             </Creatives>

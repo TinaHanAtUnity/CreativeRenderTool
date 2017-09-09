@@ -81,7 +81,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logInfo(`vpaid event received ${eventType} ` + args.join(' '));
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);
@@ -103,7 +102,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAdStopped() {
-        this.setFinishState(FinishState.COMPLETED);
         this.hide();
     }
 
@@ -138,6 +136,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAdVideoComplete() {
         this.sendTrackingEvent('complete');
+        this.setFinishState(FinishState.COMPLETED);
         this._sessionManager.sendView(this);
     }
 
@@ -167,7 +166,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
             } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
-                    'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
+                    'uri': url
                 });
             }
         }
