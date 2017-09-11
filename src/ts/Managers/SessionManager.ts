@@ -14,6 +14,7 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -80,6 +81,13 @@ export class SessionManagerEventMetadataCreator {
             }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
+        } else if(campaign instanceof MRAIDCampaign) {
+            const resouceUrl = campaign.getResourceUrl();
+            if((resouceUrl && resouceUrl.isCached()) || campaign.getResource()) {
+                infoJson.cached = true;
+            } else {
+                infoJson.cached = false;
+            }
         }
 
         if(adUnit instanceof PerformanceAdUnit) {
