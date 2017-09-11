@@ -337,11 +337,19 @@ export class AdUnitFactory {
         document.body.appendChild(view.container());
 
         const onClose = () => {
+            sessionManager.sendView(programmaticAdUnit);
             programmaticAdUnit.hide();
         };
 
         const openLink = (href: string) => {
             sessionManager.sendClick(programmaticAdUnit);
+
+            for (let url of campaign.getTrackingUrlsForEvent('click')) {
+                url = url.replace(/%ZONE%/, placement.getId());
+                url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
+                sessionManager.getEventManager().thirdPartyEvent('display click', sessionManager.getSession().getId(), url);
+            }
+
             if(nativeBridge.getPlatform() === Platform.ANDROID) {
                 nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
@@ -358,6 +366,7 @@ export class AdUnitFactory {
                 url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
                 sessionManager.getEventManager().thirdPartyEvent('display impression', sessionManager.getSession().getId(), url);
             }
+            sessionManager.sendStart(programmaticAdUnit);
         });
         programmaticAdUnit.onClose.subscribe(onClose);
         programmaticAdUnit.onSkip.subscribe(onClose);

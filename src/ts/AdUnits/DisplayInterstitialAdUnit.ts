@@ -87,8 +87,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private onSystemKill() {
         if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
+            this.onClose.trigger();
         }
     }
 
