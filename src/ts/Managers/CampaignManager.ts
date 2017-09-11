@@ -22,6 +22,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { Session } from 'Models/Session';
 
 export class CampaignManager {
 
@@ -95,24 +96,26 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-            const body = JSON.stringify(requestBody);
-            return this._request.post(requestUrl, body, [], {
-                retries: 2,
-                retryDelay: 10000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }).then(response => {
-                if(response) {
-                    return this.parseCampaigns(response);
-                }
-                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
-            }).then(() => {
-                this._requesting = false;
-            }).catch((error) => {
-                this._requesting = false;
-                return this.handleError(error, this._configuration.getPlacementIds());
+        return this._sessionManager.create().then((session) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+                this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+                const body = JSON.stringify(requestBody);
+                return this._request.post(requestUrl, body, [], {
+                    retries: 2,
+                    retryDelay: 10000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }).then(response => {
+                    if (response) {
+                        return this.parseCampaigns(response, session);
+                    }
+                    throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+                }).then(() => {
+                    this._requesting = false;
+                }).catch((error) => {
+                    this._requesting = false;
+                    return this.handleError(error, this._configuration.getPlacementIds());
+                });
             });
         });
     }
@@ -125,7 +128,7 @@ export class CampaignManager {
         return this._previousPlacementId;
     }
 
-    private parseCampaigns(response: INativeResponse) {
+    private parseCampaigns(response: INativeResponse, session: Session) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         if('placements' in json) {
@@ -160,6 +163,7 @@ export class CampaignManager {
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     promises.push(this.handleCampaign(fill[mediaId],
+                        session,
                         json.media[mediaId].contentType,
                         json.media[mediaId].content,
                         json.media[mediaId].cacheTTL,
@@ -194,7 +198,7 @@ export class CampaignManager {
         }
     }
 
-    private handleCampaign(placements: string[], contentType: string, content: string, cacheTTL: number, trackingUrls?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
+    private handleCampaign(placements: string[], session: Session, contentType: string, content: string, cacheTTL: number, trackingUrls?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
@@ -203,10 +207,10 @@ export class CampaignManager {
             case 'comet/campaign':
                 const json = JsonParser.parse(content);
                 if(json && json.mraidUrl) {
-                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, json.mraidUrl);
+                    const campaign = new MRAIDCampaign(json, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, json.mraidUrl);
                     return this.setupCampaignAssets(placements, campaign);
                 } else {
-                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
+                    const campaign = new PerformanceCampaign(json, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
                     return this.setupCampaignAssets(placements, campaign);
                 }
 
@@ -215,7 +219,7 @@ export class CampaignManager {
                     return this.handleError(new Error('No vast content'), placements);
                 }
 
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
+                return this.parseVastCampaignHelper(content, session, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId).then((vastCampaign) => {
                     return this.setupCampaignAssets(placements, vastCampaign);
                 });
 
@@ -235,7 +239,7 @@ export class CampaignManager {
                 }
 
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidUrlCampaign);
 
             case 'programmatic/mraid':
@@ -255,7 +259,7 @@ export class CampaignManager {
 
                 jsonMraid.id = this.getProgrammaticCampaignId();
                 const markup = decodeURIComponent(jsonMraid.markup);
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
+                const mraidCampaign = new MRAIDCampaign(jsonMraid, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
                 return this.setupCampaignAssets(placements, mraidCampaign);
 
             default:
@@ -292,11 +296,11 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
+    private parseVastCampaignHelper(content: any, session: Session, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
-            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
+            const campaign = new VastCampaign(vast, campaignId, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 return Promise.reject(new Error('Campaign does not have an impression url'));
             }
@@ -333,7 +337,7 @@ export class CampaignManager {
         }
     }
 
-    private createRequestUrl(): Promise<string> {
+    private createRequestUrl(session: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -348,6 +352,7 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
+            auctionId: session.getId(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
