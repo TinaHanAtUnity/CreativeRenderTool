@@ -69,7 +69,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     public isCached(): boolean {
-        return true;
+        return false;
     }
 
     public description(): string {
