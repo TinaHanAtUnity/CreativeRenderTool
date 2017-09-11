@@ -16,18 +16,11 @@ export class DisplayInterstitial extends View {
     public readonly onSkip = new Observable0();
     public readonly onClose = new Observable0();
 
-    private readonly onLoaded = new Observable0();
-
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _loaded = false;
-
-    private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
 
     private _canClose = false;
     private _canSkip = false;
@@ -97,7 +90,6 @@ export class DisplayInterstitial extends View {
 
         window.addEventListener('message', this._messageListener);
 
-        const iframe: any = this._iframe;
         const closeLength = 30;
 
         if(this._placement.allowSkip()) {
@@ -142,60 +134,10 @@ export class DisplayInterstitial extends View {
                 }
             }, 1000);
         }
-
-        if(this._loaded) {
-            this._iframe.contentWindow.postMessage('viewable', '*');
-        } else {
-            const observer = this.onLoaded.subscribe(() => {
-                this._iframe.contentWindow.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
-                this.onLoaded.unsubscribe(observer);
-            });
-        }
-
-        this._resizeDelayer = (event: Event) => {
-            this._resizeTimeout = setTimeout(() => {
-                this._resizeHandler(event);
-            }, 200);
-        };
-
-        this._resizeHandler = (event: Event) => {
-            iframe.width = window.innerWidth;
-            iframe.height = window.innerHeight;
-            if(this._iframe.contentWindow) {
-                this._iframe.contentWindow.postMessage({
-                    type: 'resize',
-                    width: window.innerWidth,
-                    height: window.innerHeight
-                }, '*');
-            }
-        };
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            window.addEventListener('resize', this._resizeDelayer, false);
-        } else {
-            window.addEventListener('resize', this._resizeHandler, false);
-        }
     }
 
     public hide() {
         window.removeEventListener('message', this._messageListener);
-
-        this._iframe.contentWindow.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
-        if(this._resizeHandler) {
-            window.removeEventListener('resize', this._resizeHandler, false);
-            this._resizeHandler = undefined;
-        }
-        if(this._resizeDelayer) {
-            window.removeEventListener('resize', this._resizeDelayer, false);
-            clearTimeout(this._resizeTimeout);
-            this._resizeHandler = undefined;
-        }
         super.hide();
     }
 
