@@ -13,6 +13,7 @@ export class Diagnostics {
         const kafkaObject: any = {};
         kafkaObject.type = type;
         kafkaObject[type] = error;
+        kafkaObject.timestamp = Date.now();
 
         return HttpKafka.sendEvent('diagnostics', kafkaObject);
     }
