@@ -63,12 +63,12 @@ describe('DisplayInterstitial', () => {
         view.render();
         view.show();
 
-        window.postMessage({ type: 'redirect', href: 'http://unity3d.com' }, '*');
+        window.postMessage({ type: 'redirect', href: 'https://unity3d.com' }, '*');
 
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 try {
-                    assert.isTrue(spy.calledWith('http://unity3d.com'));
+                    assert.isTrue(spy.calledWith('https://unity3d.com'));
                     resolve();
                 } catch (e) {
                     reject(e);
@@ -78,7 +78,7 @@ describe('DisplayInterstitial', () => {
     });
 
     it('should redirect when the click catcher is clicked', () => {
-        campaign.set('clickThroughUrl', 'http://unity3d.com');
+        campaign.set('clickThroughUrl', 'https://unity3d.com');
 
         const spy = sinon.spy();
         view.onClick.subscribe(spy);
@@ -91,7 +91,7 @@ describe('DisplayInterstitial', () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 try {
-                    assert.isTrue(spy.calledWith('http://unity3d.com'));
+                    assert.isTrue(spy.calledWith('https://unity3d.com'));
                     resolve();
                 } catch (e) {
                     reject(e);

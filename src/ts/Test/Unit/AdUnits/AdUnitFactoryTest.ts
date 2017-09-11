@@ -271,7 +271,7 @@ describe('AdUnitFactoryTest', () => {
             it('should send tracking events', () => {
                 adUnit.onStart.trigger();
 
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'display impression', '11111', 'http://unity3d.com/impression');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'display impression', '11111', 'https://unity3d.com/impression');
             });
         });
     });
