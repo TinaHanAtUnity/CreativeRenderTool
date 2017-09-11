@@ -46,9 +46,9 @@ export class VPAID extends View {
     }
 
     public hide() {
-        super.hide();
-        window.addEventListener('message', this._messageListener);
         this._iframe.contentWindow.postMessage({ type: 'destroy' }, '*');
+        window.removeEventListener('message', this._messageListener);
+        super.hide();
     }
 
     public showAd() {

@@ -28,7 +28,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
         this._vpaidEventHandlers.AdStarted = this.onAdStarted;
         this._vpaidEventHandlers.AdStopped = this.onAdStopped;
-        this._vpaidEventHandlers.onAdSkipped = this.onAdSkipped;
+        this._vpaidEventHandlers.AdSkipped = this.onAdSkipped;
         this._vpaidEventHandlers.AdImpression = this.onAdImpression;
         this._vpaidEventHandlers.AdVideoStart = this.onAdVideoStart;
         this._vpaidEventHandlers.AdVideoFirstQuartile = this.onAdVideoFirstQuartile;
@@ -96,6 +96,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAdSkipped() {
+        this.sendTrackingEvent('skip');
         this._sessionManager.sendSkip(this);
         this.setFinishState(FinishState.SKIPPED);
         this.hide();

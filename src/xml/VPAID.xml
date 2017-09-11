@@ -23,7 +23,7 @@
                             <Tracking event="thirdQuartile"><![CDATA[http://tracking.unityads.unity3d.com/thirdQuartile]]></Tracking>
                             <Tracking event="complete"><![CDATA[http://tracking.unityads.unity3d.com/complete]]></Tracking>
                             <Tracking event="paused"><![CDATA[http://tracking.unityads.unity3d.com/paused]]></Tracking>
-                            <Tracking event="resume"><![CDATA[http://tracking.unityads.unity3d.com/resume]]></Tracking>
+                            <Tracking event="skip"><![CDATA[http://tracking.unityads.unity3d.com/skip]]></Tracking>
                         </TrackingEvents>
                         <VideoClicks>
                             <ClickThrough><![CDATA[http://learnmore.unityads.unity3d.com]]></ClickThrough>

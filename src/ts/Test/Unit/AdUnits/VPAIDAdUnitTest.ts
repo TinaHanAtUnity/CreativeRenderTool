@@ -1,5 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
+
 import { VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
@@ -18,6 +20,7 @@ import { ListenerApi } from 'Native/Api/Listener';
 import { EventManager } from 'Managers/EventManager';
 import { Platform } from 'Constants/Platform';
 import { IntentApi } from 'Native/Api/Intent';
+import { FinishState } from 'Constants/FinishState';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -111,6 +114,7 @@ describe('VPAIDAdUnit', () => {
         const sdkVersion = 210;
         const verifyTrackingEvent = (eventType: string): (() => void) => {
             return () => {
+                sinon.assert.called(<sinon.SinonSpy>eventManager.thirdPartyEvent);
                 const urls = campaign.getTrackingEventUrls(eventType);
                 for (const url of urls) {
                     sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid ${eventType}`, sessionId, url);
@@ -187,6 +191,36 @@ describe('VPAIDAdUnit', () => {
             it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>sessionManager.sendView);
+            });
+            it('should set the finish state to COMPLETE', () => {
+                assert.isTrue(adUnit.getFinishState() === FinishState.COMPLETED);
+            });
+        });
+
+        describe('on AdSkipped', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
+                (<sinon.SinonStub>container.open).returns(Promise.resolve());
+                (<sinon.SinonStub>container.close).returns(Promise.resolve());
+                (<sinon.SinonStub>nativeBridge.Listener.sendFinishEvent).returns(Promise.resolve());
+                return adUnit.show();
+            });
+            beforeEach(triggerVPAIDEvent('AdSkipped'));
+
+            it('should trigger skip tracking', verifyTrackingEvent('skip'));
+            it('should send the view operative event', () => {
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendSkip);
+            });
+            it('should set the finish state to COMPLETE', () => {
+                assert.isTrue(adUnit.getFinishState() === FinishState.SKIPPED);
+            });
+
+            it('should hide the view', () => {
+                sinon.assert.called(<sinon.SinonSpy>vpaidView.hide);
+            });
+
+            it('should close the container', () => {
+                sinon.assert.called(<sinon.SinonSpy>container.close);
             });
         });
 
