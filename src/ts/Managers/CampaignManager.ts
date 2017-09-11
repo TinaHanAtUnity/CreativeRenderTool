@@ -171,12 +171,9 @@ export class CampaignManager {
                             return Promise.resolve();
                         }
 
-                        const auctionResponseError: any = {
-                            error: error,
-                            adPlan: json
-                        };
+                        error.adPlan = json;
 
-                        return this.handleError(auctionResponseError, fill[mediaId]);
+                        return this.handleError(error, fill[mediaId]);
                     }));
 
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
