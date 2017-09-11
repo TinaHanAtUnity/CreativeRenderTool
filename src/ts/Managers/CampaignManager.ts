@@ -23,7 +23,6 @@ import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -172,26 +171,12 @@ export class CampaignManager {
                             return Promise.resolve();
                         }
 
-                        let diagnosticError = error;
+                        const auctionResponseError: any = {
+                            error: error,
+                            adPlan: json
+                        };
 
-                        if(diagnosticError instanceof Error) {
-                            diagnosticError = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-                        }
-
-                        // todo: this is overlapping with plc_request_failed so this should be refactored to not overlap
-                        Diagnostics.trigger('handle_campaign_failed', {
-                            error: diagnosticError,
-                            contentType: json.media[mediaId].contentType,
-                            content: json.media[mediaId].content,
-                            cacheTTL: json.media[mediaId].cacheTTL,
-                            trackingUrls: json.media[mediaId].trackingUrls,
-                            adType: json.media[mediaId].adType,
-                            creativeId: json.media[mediaId].creativeId,
-                            seatId: json.media[mediaId].seatId,
-                            correlationId: json.correlationId
-                        });
-
-                        return this.handleError(error, fill[mediaId]);
+                        return this.handleError(auctionResponseError, fill[mediaId]);
                     }));
 
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
