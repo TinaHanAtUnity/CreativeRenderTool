@@ -347,7 +347,7 @@ export class AdUnitFactory {
             for (let url of campaign.getTrackingUrlsForEvent('click')) {
                 url = url.replace(/%ZONE%/, placement.getId());
                 url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
-                sessionManager.getEventManager().thirdPartyEvent('display click', sessionManager.getSession().getId(), url);
+                sessionManager.getEventManager().thirdPartyEvent('display click', campaign.getSession().getId(), url);
             }
 
             if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -364,7 +364,7 @@ export class AdUnitFactory {
             for (let url of campaign.getTrackingUrlsForEvent('impression')) {
                 url = url.replace(/%ZONE%/, placement.getId());
                 url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
-                sessionManager.getEventManager().thirdPartyEvent('display impression', sessionManager.getSession().getId(), url);
+                sessionManager.getEventManager().thirdPartyEvent('display impression', campaign.getSession().getId(), url);
             }
             sessionManager.sendStart(programmaticAdUnit);
         });

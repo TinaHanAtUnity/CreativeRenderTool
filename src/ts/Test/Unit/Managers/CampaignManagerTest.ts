@@ -150,6 +150,7 @@ describe('CampaignManager', () => {
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
                 getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345')),
                 Ios: {
                     getScreenScale: sinon.stub().returns(Promise.resolve(2)),
                     isSimulator: sinon.stub().returns(Promise.resolve(true)),

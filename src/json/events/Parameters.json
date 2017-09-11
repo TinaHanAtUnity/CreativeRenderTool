@@ -35,6 +35,13 @@
     "platforms": "android"
   },
   {
+    "key": "auctionId",
+    "type": "string",
+    "description": "Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "bundleId",
     "type": "string",
     "description": "Bundle identifier for the app",
@@ -297,13 +304,6 @@
     "key": "sdkVersion",
     "type": "number",
     "description": "SDK version in four digits",
-    "provider": "SDK",
-    "platforms": "all"
-  },
-  {
-    "key": "sessionId",
-    "type": "string",
-    "description": "Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.",
     "provider": "SDK",
     "platforms": "all"
   },

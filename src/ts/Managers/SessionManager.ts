@@ -14,6 +14,7 @@ import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
+import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 
 export class SessionManagerEventMetadataCreator {
 
@@ -31,16 +32,16 @@ export class SessionManagerEventMetadataCreator {
         this._metaDataManager = metaDataManager;
     }
 
-    public createUniqueEventMetadata(adUnit: AbstractAdUnit, session: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    public createUniqueEventMetadata(adUnit: AbstractAdUnit, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         return this._eventManager.getUniqueEventId().then(id => {
-            return this.getInfoJson(adUnit, id, session, gameSession, gamerSid, previousPlacementId);
+            return this.getInfoJson(adUnit, id, gameSession, gamerSid, previousPlacementId);
         });
     }
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string, currentSession: Session, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    private getInfoJson(adUnit: AbstractAdUnit, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
-            'sessionId': currentSession.getId(),
+            'auctionId': adUnit.getCampaign().getSession().getId(),
             'gameSessionId': gameSession,
             'gamerId': adUnit.getCampaign().getGamerId(),
             'campaignId': adUnit.getCampaign().getId(),
@@ -80,6 +81,13 @@ export class SessionManagerEventMetadataCreator {
             }
         } else if(campaign instanceof VastCampaign) {
             infoJson.cached = campaign.getVideo().isCached();
+        } else if(campaign instanceof MRAIDCampaign) {
+            const resouceUrl = campaign.getResourceUrl();
+            if((resouceUrl && resouceUrl.isCached()) || campaign.getResource()) {
+                infoJson.cached = true;
+            } else {
+                infoJson.cached = false;
+            }
         }
 
         if(adUnit instanceof PerformanceAdUnit) {
@@ -138,7 +146,6 @@ export class SessionManager {
     private _metaDataManager: MetaDataManager;
 
     private _gameSessionId: number;
-    private _currentSession: Session;
 
     private _gamerServerId: string;
     private _previousPlacementId: string | undefined;
@@ -152,19 +159,14 @@ export class SessionManager {
         this._eventMetadataCreator = eventMetadataCreator || new SessionManagerEventMetadataCreator(this._eventManager, this._clientInfo, this._deviceInfo, this._nativeBridge, metaDataManager);
     }
 
-    public create(): Promise<void[]> {
+    public create(): Promise<Session> {
+        let session: Session;
         return this._eventManager.getUniqueEventId().then(id => {
-            this._currentSession = new Session(id);
+            session = new Session(id);
             return this._eventManager.startNewSession(id);
+        }).then(() => {
+            return session;
         });
-    }
-
-    public getSession(): Session {
-        return this._currentSession;
-    }
-
-    public setSession(session: Session) {
-        this._currentSession = session;
     }
 
     public getGameSessionId(): number {
@@ -192,12 +194,10 @@ export class SessionManager {
     }
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.START)) {
-                return Promise.resolve();
-            }
-            this._currentSession.setEventSent(EventType.START);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.START)) {
+            return Promise.resolve();
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.START);
 
         return this._metaDataManager.fetch(PlayerMetaData).then(player => {
             if(player) {
@@ -206,7 +206,7 @@ export class SessionManager {
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
-            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId());
+            return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId());
         }).then(([id, infoJson]) => {
             return this._eventManager.operativeEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         }).then(() => {
@@ -216,57 +216,49 @@ export class SessionManager {
     }
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.FIRST_QUARTILE)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.FIRST_QUARTILE);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.FIRST_QUARTILE)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.FIRST_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.MIDPOINT)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.MIDPOINT);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.MIDPOINT)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.MIDPOINT);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if (this._currentSession.getEventSent(EventType.THIRD_QUARTILE)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.THIRD_QUARTILE);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.THIRD_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.SKIP)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.SKIP);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.SKIP)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.SKIP);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             if(videoProgress) {
@@ -293,37 +285,33 @@ export class SessionManager {
             HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.VIEW)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.VIEW);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.VIEW);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this._eventManager.operativeEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
-        if(this._currentSession) {
-            if(this._currentSession.getEventSent(EventType.CLICK)) {
-                return Promise.resolve(void(0));
-            }
-            this._currentSession.setEventSent(EventType.CLICK);
+        if(adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
+            return Promise.resolve(void(0));
         }
+        adUnit.getCampaign().getSession().setEventSent(EventType.CLICK);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
-            this._eventManager.operativeEvent('click', id, this._currentSession.getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
+            this._eventManager.operativeEvent('click', id, adUnit.getCampaign().getSession().getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
-        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._currentSession, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this._eventMetadataCreator.createUniqueEventMetadata(adUnit, this._gameSessionId, this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public setGamerServerId(serverId: string): void {

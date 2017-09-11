@@ -1,5 +1,6 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
+import { Session } from 'Models/Session';
 
 interface IDisplayInterstitialCampaign extends ICampaign {
     dynamicMarkup: string;
@@ -8,7 +9,7 @@ interface IDisplayInterstitialCampaign extends ICampaign {
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('DisplayInterstitialCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
@@ -27,6 +28,7 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('creativeId', creativeId || undefined);
         this.set('seatId', seatId || undefined);
         this.set('tracking', tracking || undefined);
+        this.set('session', session);
     }
 
     public getDynamicMarkup(): string {
