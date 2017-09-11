@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
+import { Session } from 'Models/Session';
 
 export enum StoreName {
     APPLE,
@@ -36,7 +37,7 @@ interface IPerformanceCampaign extends ICampaign {
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number) {
         super('PerformanceCampaign', {
             ... Campaign.Schema,
             appStoreId: ['string'],
@@ -58,6 +59,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         });
 
         this.set('id', campaign.id);
+        this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 

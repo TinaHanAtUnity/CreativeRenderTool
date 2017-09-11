@@ -184,7 +184,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         const eventManager = this._sessionManager.getEventManager();
         const sdkVersion = this._sessionManager.getClientInfo().getSdkVersion();
         const placementId = this.getPlacement().getId();
-        const sessionId = this._sessionManager.getSession().getId();
+        const sessionId = this.getCampaign().getSession().getId();
         const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
         if(trackingEventUrls) {
