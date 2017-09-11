@@ -162,6 +162,11 @@ export class ViewController extends AdUnitContainer {
                     break;
             }
         }
+        // safety check
+        if((options.supportedOrientations & orientation) !== orientation) {
+            orientation = options.supportedOrientations;
+        }
+
         return orientation;
     }
 
