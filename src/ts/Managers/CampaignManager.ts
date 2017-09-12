@@ -167,6 +167,7 @@ export class CampaignManager {
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
                     } catch(error) {
+                        error.adPlan = json;
                         return this.handleError(error, fill[mediaId]);
                     }
                     promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
@@ -175,7 +176,6 @@ export class CampaignManager {
                         }
 
                         error.adPlan = json;
-
                         return this.handleError(error, fill[mediaId]);
                     }));
 
