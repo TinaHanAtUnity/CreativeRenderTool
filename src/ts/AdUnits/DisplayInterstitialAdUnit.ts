@@ -10,8 +10,8 @@ import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit {
-    public onRedirect = new Observable1<string>();
-    public onSkip = new Observable0();
+    public readonly onRedirect = new Observable1<string>();
+    public readonly onSkip = new Observable0();
 
     private _sessionManager: SessionManager;
     private _view: DisplayInterstitial;
