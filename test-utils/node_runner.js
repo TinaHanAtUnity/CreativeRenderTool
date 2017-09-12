@@ -101,21 +101,6 @@ let runner = new Mocha({
 });
 runner.suite.emit('pre-require', global, 'global-mocha-context', runner);
 
-const isDebugEnabled = () => {
-    const argv = process.execArgv;
-    for (let i = 0; i < argv.length; i++) {
-        if (argv[i].startsWith('--debug')) {
-            return true;
-        }
-    }
-    return false;
-};
-
-if (isDebugEnabled()) {
-    // Set timeout high when debugging is enabled.
-    runner.timeout(120000);
-}
-
 if(coverageDir) {
     let instrumenter = new Istanbul.Instrumenter();
 
@@ -141,13 +126,8 @@ process.on('unhandledRejection', (error, promise) => {
     process.exit(1);
 });
 
-let file = process.argv.length > 2 ? process.argv[2] : null;
-if (file) {
-    file = file.replace(/(.js|.ts)$/, '');
-}
-
 const sourcePaths = getSourcePaths('src/ts');
-const testPaths = file ? [file] : getTestPaths('src/ts/Test', testFilter);
+const testPaths = getTestPaths('src/ts/Test', testFilter);
 
 Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
     return System.import(testPath);
