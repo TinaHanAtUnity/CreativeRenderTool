@@ -1,5 +1,6 @@
 import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
+import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
@@ -14,6 +15,8 @@ import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
+import ChineseSimplifiedLoadingScreen from 'json/locale/zh_Hans/loadingscreen.json';
+import ChineseTraditionalLoadingScreen from 'json/locale/zh_Hant/loadingscreen.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
@@ -93,7 +96,8 @@ export class Localization {
     private static _languageMap: ILanguageMap = {
         'en.*': {
             'endscreen': JSON.parse(EnglishEndscreen),
-            'overlay': JSON.parse(EnglishOverlay)
+            'overlay': JSON.parse(EnglishOverlay),
+            'loadingscreen': JSON.parse(EnglishLoadingScreen)
         },
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
@@ -117,11 +121,13 @@ export class Localization {
         },
         'zh(_Hant)?(_TW|_HK|_MO|_Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
-            'overlay': JSON.parse(ChineseTraditionalOverlay)
+            'overlay': JSON.parse(ChineseTraditionalOverlay),
+            'loadingscreen': JSON.parse(ChineseTraditionalLoadingScreen)
         },
         'zh(_Hans)?(_\\D\\D)?$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
-            'overlay': JSON.parse(ChineseSimplifiedOverlay)
+            'overlay': JSON.parse(ChineseSimplifiedOverlay),
+            'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)
         },
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),
