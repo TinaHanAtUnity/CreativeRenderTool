@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
@@ -12,14 +13,6 @@ interface IIosOptions {
     shouldAutorotate: boolean;
     statusBarOrientation: number;
     statusBarHidden: boolean;
-}
-
-enum UIInterfaceOrientation {
-    UNKNOWN = 0,
-    PORTRAIT = 1,
-    PORTRAIT_UPSIDE_DOWN = 2,
-    LANDSCAPE_RIGHT = 3,
-    LANDSCAPE_LEFT = 4
 }
 
 export class ViewController extends AdUnitContainer {
