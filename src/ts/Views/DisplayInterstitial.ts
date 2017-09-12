@@ -28,6 +28,7 @@ export class DisplayInterstitial extends View {
     private _markup: string;
 
     private _messageListener: EventListener;
+    private _timers: number[] = [];
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign) {
         super(nativeBridge, 'display-interstitial');
@@ -96,7 +97,7 @@ export class DisplayInterstitial extends View {
             const skipLength = this._placement.allowSkipInSeconds();
             let closeRemaining = closeLength;
             let skipRemaining = skipLength;
-            const updateInterval = setInterval(() => {
+            const updateInterval = window.setInterval(() => {
                 if(closeRemaining > 0) {
                     closeRemaining--;
                 }
@@ -110,13 +111,14 @@ export class DisplayInterstitial extends View {
                     this.updateProgressCircle(this._closeElement, 1);
                 }
                 if (closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    this.clearTimer(updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
+            this._timers.push(updateInterval);
         } else {
             let closeRemaining = closeLength;
-            const updateInterval = setInterval(() => {
+            const updateInterval = window.setInterval(() => {
                 const progress = (closeLength - closeRemaining) / closeLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
@@ -127,18 +129,32 @@ export class DisplayInterstitial extends View {
                     this.updateProgressCircle(this._closeElement, progress);
                 }
                 if (closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    this.clearTimer(updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
                 }
             }, 1000);
+            this._timers.push(updateInterval);
         }
     }
 
     public hide() {
         window.removeEventListener('message', this._messageListener);
         super.hide();
+
+        for (const timer of this._timers) {
+            window.clearInterval(timer);
+        }
+        this._timers = [];
+    }
+
+    private clearTimer(handle: number) {
+        const indx = this._timers.indexOf(handle);
+        if (indx !== -1) {
+            this._timers.splice(indx, 1);
+        }
+        window.clearInterval(handle);
     }
 
     private onIFrameClicked(e: Event) {
