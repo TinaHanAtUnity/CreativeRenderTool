@@ -18,7 +18,6 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
-import { Session } from 'Models/Session';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -191,7 +190,6 @@ class TestHelper {
         const eventManager: EventManager = new EventManager(nativeBridge, request);
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
-        sessionManager.setSession(new Session('1234'));
         return sessionManager;
     }
 
@@ -255,7 +253,10 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager = new EventManager(nativeBridge, request);
+            const eventManager: EventManager = <EventManager><any>{
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
+                startNewSession: sinon.stub().returns(Promise.resolve([]))
+            };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
@@ -278,7 +279,10 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager = new EventManager(nativeBridge, request);
+            const eventManager: EventManager = <EventManager><any>{
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
+                startNewSession: sinon.stub().returns(Promise.resolve([]))
+            };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
