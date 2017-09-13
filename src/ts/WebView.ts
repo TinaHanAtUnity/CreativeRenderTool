@@ -37,6 +37,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class WebView {
 
@@ -99,6 +100,7 @@ export class WebView {
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
+            SdkStats.setInitTimestamp();
 
             return this._deviceInfo.fetch();
         }).then(() => {

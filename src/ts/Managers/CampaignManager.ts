@@ -23,6 +23,7 @@ import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { Session } from 'Models/Session';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class CampaignManager {
 
@@ -100,6 +101,9 @@ export class CampaignManager {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
+                SdkStats.increaseAdRequestOrdinal();
+                SdkStats.setAdRequestTimestamp();
+                const requestTimestamp: number = Date.now();
                 return this._request.post(requestUrl, body, [], {
                     retries: 2,
                     retryDelay: 10000,
@@ -107,6 +111,7 @@ export class CampaignManager {
                     retryWithConnectionEvents: true
                 }).then(response => {
                     if (response) {
+                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                         return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -126,6 +131,14 @@ export class CampaignManager {
 
     public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
+    }
+
+    public getFullyCachedCampaigns(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
+        });
     }
 
     private parseCampaigns(response: INativeResponse, session: Session) {
@@ -481,14 +494,6 @@ export class CampaignManager {
 
                 return body;
             });
-        });
-    }
-
-    private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
         });
     }
 }
