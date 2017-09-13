@@ -18,7 +18,7 @@ describe('IntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 2) {
+                if(++readyCount === 1) {
                     done();
                 }
             },
@@ -51,7 +51,7 @@ describe('IntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -59,7 +59,7 @@ describe('IntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 2) {
+                if(++readyCount === 1) {
                     done();
                 }
             },
@@ -92,7 +92,7 @@ describe('IntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '345', listener, true);
+        UnityAds.initialize(Platform.IOS, '456', listener, true);
     });
 
 });
