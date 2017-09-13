@@ -70,20 +70,6 @@ export class DisplayInterstitial extends View {
         } else {
             iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
         }
-
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            if(Math.abs(<number>window.orientation) === 90) {
-                iframe.width = screen.height;
-                iframe.height = screen.width;
-            } else {
-                iframe.width = screen.width;
-                iframe.height = screen.height;
-            }
-        } else {
-            iframe.height = window.innerHeight;
-            iframe.width = window.innerWidth;
-        }
-
     }
 
     public show(): void {
