@@ -36,13 +36,15 @@
                     switch(event.data.type) {
                         case 'exposure':
                             trigger('exposureChange', [
+                                event.data.payload ? 100 : 0,
                                 {
-                                inFocus: event.data.payload,
-                                isAttached: 1,
-                                isHidden: 0,
-                                opacity: 1,
-                                isCovered: 0
-                            }]);
+                                    inFocus: event.data.payload ? 1 : 0,
+                                    isAttached: 1,
+                                    isHidden: 0,
+                                    opacity: 1,
+                                    isCovered: 0
+                                }
+                            ]);
                             break;
 
                         case 'volume':
