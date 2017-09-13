@@ -148,6 +148,7 @@ describe('CampaignManager', () => {
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
                 getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345')),
                 Ios: {
                     getScreenScale: sinon.stub().returns(Promise.resolve(2)),
                     isSimulator: sinon.stub().returns(Promise.resolve(true)),
@@ -434,14 +435,14 @@ describe('CampaignManager', () => {
             campaignManager.request();
         });
 
-        const verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
+        const verifyErrorForResponse = (response: any, expectedErrorMessage: string, shouldHaveAdPlan: boolean = false): Promise<void> => {
             // given a VAST placement with invalid XML
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
-            let triggeredError: Error;
+            let triggeredError: any;
             campaignManager.onError.subscribe((error: Error) => {
                 triggeredError = error;
             });
@@ -451,6 +452,9 @@ describe('CampaignManager', () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
                 assert.equal(triggeredError.message, expectedErrorMessage);
+                if(shouldHaveAdPlan) {
+                    assert.isDefined(triggeredError.adPlan, 'Should have adPlan in error');
+                }
             });
         };
 
@@ -567,7 +571,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
                     mockRequest.verify();
-                    return verifyErrorForResponse(response, 'No vast content');
+                    return verifyErrorForResponse(response, 'model: AuctionResponse key: content with value: null: null is not in: string', true);
                 });
             });
 
@@ -812,7 +816,8 @@ describe('CampaignManager', () => {
 
             campaignManager.request().then(() => {
                 mockRequest.verify();
-                assert.equal(triggeredError.message, 'No mraid content');
+                assert.equal(triggeredError.message, 'model: AuctionResponse key: content with value: null: null is not in: string');
+                assert.isDefined(triggeredError.adPlan, 'Should have adPlan in error');
             });
         });
 

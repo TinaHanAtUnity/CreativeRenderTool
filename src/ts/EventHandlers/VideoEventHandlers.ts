@@ -98,10 +98,10 @@ export class VideoEventHandlers {
             nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
         }
 
-        if (sessionManager.getSession() && adUnit instanceof VastAdUnit) {
+        if(adUnit.getCampaign().getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
                 sessionManager.getEventManager(),
-                sessionManager.getSession().getId(),
+                adUnit.getCampaign().getSession().getId(),
                 sessionManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideo().getPosition());

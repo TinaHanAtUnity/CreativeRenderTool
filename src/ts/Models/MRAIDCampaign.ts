@@ -3,6 +3,7 @@ import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/PerformanceCampaign';
+import { Session } from 'Models/Session';
 
 interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
@@ -25,7 +26,7 @@ interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -46,6 +47,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         });
 
         this.set('id', campaign.id);
+        this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 

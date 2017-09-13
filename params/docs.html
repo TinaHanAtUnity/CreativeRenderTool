@@ -14,6 +14,7 @@
 <tr><td>advertisingTrackingId</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>androidId</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
 <tr><td>apiLevel</td><td>number</td><td>Android device API level</td><td>SDK</td><td>android</td></tr>
+<tr><td>auctionId</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleId</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleVersion</td><td>string</td><td>Game version</td><td>SDK</td><td>all</td></tr>
 <tr><td>cached</td><td>boolean</td><td>If video is cached or streamed</td><td>SDK</td><td>all</td></tr>
@@ -52,7 +53,6 @@
 <tr><td>screenSize</td><td>number</td><td>Android raw screen layout value</td><td>SDK</td><td>android</td></tr>
 <tr><td>screenWidth</td><td>number</td><td>Screen width in pixels</td><td>SDK</td><td>all</td></tr>
 <tr><td>sdkVersion</td><td>number</td><td>SDK version in four digits</td><td>SDK</td><td>all</td></tr>
-<tr><td>sessionId</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>sid</td><td>string</td><td>Server side reward callback id</td><td>App</td><td>all</td></tr>
 <tr><td>skippedAt</td><td>number</td><td>Milliseconds from video start to video skip</td><td>SDK</td><td>all</td></tr>
 <tr><td>stores</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
@@ -64,7 +64,7 @@
 <tr><td>cachedCampaigns</td><td>object</td><td>Campaign ID's which are fully cached on the device</td><td>SDK</td><td>all</td></tr>
 <tr><td>previousPlacementId</td><td>string</td><td>Previously shown placementId</td><td>SDK</td><td>all</td></tr>
 <tr><td>properties</td><td>string</td><td>Gamer specific parameters</td><td>Server</td><td>all</td></tr>
-<tr><td>placements</td><td>object</td><td>All placements received in configuration</td><td>SDK</td><td>all</td></tr>
+<tr><td>placements</td><td>object</td><td>All placements received in configuration</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -91,6 +91,7 @@
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
 <tr><td>androidId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
+<tr><td>auctionId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceMake</td><td>android</td><td>True</td><td>False</td><td>string</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
 <tr><td>deviceModel</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
 <tr><td>platform</td><td>all</td><td>True</td><td>False</td><td>string</td><td>"android" or "ios"</td><td>SDK</td><td>all</td></tr>
@@ -127,11 +128,11 @@
 <tr><td>cachedCampaigns</td><td>no</td><td>False</td><td>True</td><td>object</td><td>Campaign ID's which are fully cached on the device</td><td>SDK</td><td>all</td></tr>
 <tr><td>previousPlacementId</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Previously shown placementId</td><td>SDK</td><td>all</td></tr>
 <tr><td>properties</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Gamer specific parameters</td><td>Server</td><td>all</td></tr>
-<tr><td>placements</td><td>all</td><td>False</td><td>True</td><td>object</td><td>All placements received in configuration</td><td>SDK</td><td>all</td></tr>
+<tr><td>placements</td><td>all</td><td>False</td><td>True</td><td>object</td><td>All placements received in configuration</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
-<tr><td>sessionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
+<tr><td>auctionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameSessionId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gamerId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>campaignId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal campaign identifier</td><td>Server</td><td>all</td></tr>
@@ -168,7 +169,7 @@
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>redirect</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Legacy parameter, always false</td><td>SDK</td><td>all</td></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
-<tr><td>sessionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId.</td><td>SDK</td><td>all</td></tr>
+<tr><td>auctionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameSessionId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>gamerId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>campaignId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Internal campaign identifier</td><td>Server</td><td>all</td></tr>
