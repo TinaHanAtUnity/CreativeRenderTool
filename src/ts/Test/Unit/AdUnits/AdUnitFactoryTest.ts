@@ -94,6 +94,7 @@ describe('AdUnitFactoryTest', () => {
         let adUnit: MRAIDAdUnit;
         let eventManager: any;
         let campaign: MRAIDCampaign;
+        let resolvedConnectionPromise: Promise<string>;
 
         beforeEach(() => {
             eventManager = {
@@ -103,6 +104,11 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(sessionManager, 'getEventManager').returns(
                 eventManager
             );
+
+            deviceInfo = <DeviceInfo>{ getLanguage: () => 'en' };
+
+            resolvedConnectionPromise = Promise.resolve('wifi');
+            sinon.stub(nativeBridge.DeviceInfo, 'getConnectionType').returns(resolvedConnectionPromise);
 
             campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
@@ -156,39 +162,76 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on show', () => {
             it('should trigger onStart', (done) => {
+
+                adUnit.show();
                 adUnit.onStart.subscribe(() => {
                     adUnit.hide();
                     done();
                 });
-
-                adUnit.show();
             });
 
             it('should call sendStart', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
-                adUnit.hide();
+
+                resolvedConnectionPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+                    adUnit.hide();
+                });
             });
 
             it('should send impressions', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
-                adUnit.hide();
+
+                resolvedConnectionPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
+                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
+                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
+                    adUnit.hide();
+                });
+
             });
 
             it('should replace macros in the postback impression url', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
-                adUnit.hide();
+                resolvedConnectionPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
+                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                    adUnit.hide();
+                });
             });
         });
 
         it('should call click tracker', () => {
             adUnit.sendClick();
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
+        });
+    });
+
+    describe('MRAID AdUnit, no network connection', () => {
+        let mraidAdUnit: MRAIDAdUnit;
+        let resolvedPromise: Promise<string>;
+
+        beforeEach(() => {
+
+            deviceInfo = <DeviceInfo>{ getLanguage: () => 'en' };
+            const native = TestFixtures.getNativeBridge();
+
+            resolvedPromise = Promise.resolve('none');
+            sinon.stub(native.DeviceInfo, 'getConnectionType').returns(resolvedPromise);
+
+            const playableCampaign = TestFixtures.getPlayableMRAIDCampaign();
+
+            mraidAdUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(native, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), playableCampaign, config, request, {});
+        });
+
+        it('should return an error if no connection', (done) => {
+            resolvedPromise.then(() => {
+                mraidAdUnit.show().then().catch((error) => {
+                    assert.equal(error.message, 'No connection');
+                    mraidAdUnit.hide();
+                    done();
+                });
+            });
         });
     });
 });
