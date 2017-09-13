@@ -183,6 +183,7 @@ export class CampaignRefreshManager {
                 this.sendPlacementStateChanges(placementId);
                 if(placementState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
+                    SdkStats.sendReadyEvent(placementId);
                 }
             });
         } else {
@@ -191,6 +192,7 @@ export class CampaignRefreshManager {
             this.sendPlacementStateChanges(placementId);
             if(placementState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
+                SdkStats.sendReadyEvent(placementId);
             }
         }
     }

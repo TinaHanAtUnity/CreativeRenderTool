@@ -179,6 +179,9 @@ export class WebView {
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
+
+            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager);
+
             return this._campaignRefreshManager.refresh();
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -234,6 +237,8 @@ export class WebView {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
+
+        SdkStats.sendShowEvent(placementId);
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');

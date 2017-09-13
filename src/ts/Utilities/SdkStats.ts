@@ -136,9 +136,7 @@ export class SdkStats {
     private static _readyEventSent: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        const abGroup: number = SdkStats._configuration.getAbGroup();
-
-        return (abGroup === 123 || abGroup === 456 || abGroup === 789); // todo: figure out the real A/B groups for this test
+        return true; // todo: always true for testing, needs a proper A/B group
     }
 
     private static getSdkStatsEvent(eventType: string, placementId: string): Promise<ISdkStatsEvent> {
