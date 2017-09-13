@@ -55,20 +55,27 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     }
 
     public show(): Promise<void> {
-        this.setShowing(true);
-        this.setShowingMRAID(true);
-        this._mraid.show();
-        this.onStart.trigger();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._sessionManager.sendStart(this);
-        this.sendTrackingEvent('impression');
+        // do a connectivity check for 3rd party MRAIDs
+        return this._nativeBridge.DeviceInfo.getConnectionType().then((connectionType) => {
+            if (connectionType === 'none') {
+                throw new Error('No connection');
+            } else {
+                this.setShowing(true);
+                this.setShowingMRAID(true);
+                this._mraid.show();
+                this.onStart.trigger();
+                this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+                this._sessionManager.sendStart(this);
+                this.sendTrackingEvent('impression');
 
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
-        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
+                this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
+                this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+                this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
+                this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
-        return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
+                return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
+            }
+        });
     }
 
     public hide(): Promise<void> {
