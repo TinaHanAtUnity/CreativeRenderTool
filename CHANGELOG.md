@@ -1,3 +1,7 @@
+# Tue Sep 12 08:50:43 UTC 2017
+
+* Add auctionId to ad requests and all operative events, remove sessionId from operative events
+
 # Mon Sep 11 12:02:52 UTC 2017
 
 * Remove handle_campaign_failed diagnostic message
