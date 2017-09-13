@@ -185,11 +185,11 @@ export class SdkStats {
             }
 
             const eventInfo: IEventInfo = {
-                eventType: eventType, // primary: ready delegate event has been called, other events: "show"
-                adRequestOrdinal: SdkStats._adRequestOrdinal, // primary: Order number of the latest adrequest in this session, starting from 0
-                delayInitToRequest: SdkStats._latestAdRequestTimestamp - SdkStats._initTimestamp, // secondary: how many milliseconds from first sdk init to starting the latest adrequest
-                requestDuration: SdkStats._latestAdRequestDuration, // secondary: how many milliseconds did the latest adrequest take from starting adrequest to receiving adplan, including network delays
-                delayInitToReady: SdkStats._readyEventSent[placementId] - SdkStats._initTimestamp, // primary: how many milliseconds from first sdk init to sending the latest ready delegate event (sent for both ready and show events)
+                eventType: eventType,
+                adRequestOrdinal: SdkStats._adRequestOrdinal,
+                delayInitToRequest: SdkStats._latestAdRequestTimestamp - SdkStats._initTimestamp,
+                requestDuration: SdkStats._latestAdRequestDuration,
+                delayInitToReady: SdkStats._readyEventSent[placementId] - SdkStats._initTimestamp
             };
 
             if(eventType === 'show') {
