@@ -75,30 +75,28 @@ export class SdkStats {
         SdkStats._sessionManager = sessionManager;
         SdkStats._campaignManager = campaignManager;
         SdkStats._metaDataManager = metaDataManager;
+
+        SdkStats._initialized = true;
     }
 
     public static sendReadyEvent(placementId: string): void {
-        if(!SdkStats.isTestActive()) {
-            return;
+        if(SdkStats._initialized && SdkStats.isTestActive()) {
+            SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
+                // todo: once Kafka topic is available, send event instead of printing it to log
+                // HttpKafka.sendEvent(SdkStats._topic, event);
+                SdkStats._nativeBridge.Sdk.logInfo('READY EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
+            });
         }
-
-        SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
-            // todo: once Kafka topic is available, send event instead of printing it to log
-            // HttpKafka.sendEvent(SdkStats._topic, event);
-            SdkStats._nativeBridge.Sdk.logInfo('READY EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
-        });
     }
 
     public static sendShowEvent(placementId: string): void {
-        if(!SdkStats.isTestActive()) {
-            return;
+        if(SdkStats._initialized && SdkStats.isTestActive()) {
+            SdkStats.getSdkStatsEvent('show', placementId).then(event => {
+                // todo: once Kafka topic is available, send event instead of printing it to log
+                // HttpKafka.sendEvent(SdkStats._topic, event);
+                SdkStats._nativeBridge.Sdk.logInfo('SHOW EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
+            });
         }
-
-        SdkStats.getSdkStatsEvent('show', placementId).then(event => {
-            // todo: once Kafka topic is available, send event instead of printing it to log
-            // HttpKafka.sendEvent(SdkStats._topic, event);
-            SdkStats._nativeBridge.Sdk.logInfo('SHOW EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
-        });
     }
 
     public static increaseAdRequestOrdinal(): void {
@@ -129,6 +127,7 @@ export class SdkStats {
     private static _metaDataManager: MetaDataManager;
     // private static _topic = 'sdk.cachestudy.stats'; todo: get proper name for Kafka topic
 
+    private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;
     private static _initTimestamp: number;
     private static _latestAdRequestTimestamp: number;
