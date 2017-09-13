@@ -10,7 +10,6 @@ import { PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
-import { Sdk } from 'Native/Backend/Api/Sdk';
 
 describe('MraidTest', () => {
 
@@ -40,46 +39,13 @@ describe('MraidTest', () => {
             }
         };
 
-        Sdk.setAppName('com.test.app.name');
-        Sdk.setAppVersion('1.2.3-appversion');
-        Sdk.setSdkVersion(2000);
-        Sdk.setSdkVersionName('2.0.0-sdkversion');
-        Sdk.setDebuggable(false);
-        Sdk.setConfigUrl('https://test.config.url');
-        Sdk.setWebViewUrl('https://test.webview.url');
-        Sdk.setWebViewHash(null);
-        Sdk.setWebViewVersion('2.0.0.-webviewversion');
-        Sdk.setInitTimeStamp(12345);
-        Sdk.setReinitialized(false);
-
         DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
-        DeviceInfo.setLimitAdTrackingFlag(true);
-        DeviceInfo.setAndroidId('de88c6a5d783745b');
         DeviceInfo.setManufacturer('LGE');
         DeviceInfo.setModel('Nexus 5');
         DeviceInfo.setOsVersion('6.0.1');
-        DeviceInfo.setApiLevel(23);
-        DeviceInfo.setRooted(false);
         DeviceInfo.setScreenWidth(1080);
         DeviceInfo.setScreenHeight(1776);
-        DeviceInfo.setScreenDensity(480);
-        DeviceInfo.setScreenLayout(268435794);
-        DeviceInfo.setScreenBrightness(1);
-        DeviceInfo.setSystemLanguage('en_US');
         DeviceInfo.setTimeZone('GMT+02:00');
-        DeviceInfo.setTotalMemory(1899508);
-        DeviceInfo.setFreeMemory(1000000);
-        DeviceInfo.setTotalSpace(13162172);
-        DeviceInfo.setFreeSpace(10159440);
-        DeviceInfo.setConnectionType('wifi');
-        DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator('24412');
-        DeviceInfo.setNetworkOperatorName('DNA');
-        DeviceInfo.setHeadset(false);
-        DeviceInfo.setDeviceVolume(1);
-        DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus(1);
-        DeviceInfo.setRingerMode(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
@@ -114,45 +80,13 @@ describe('MraidTest', () => {
             }
         };
 
-        Sdk.setAppName('com.test.app.name');
-        Sdk.setAppVersion('1.2.3-appversion');
-        Sdk.setSdkVersion(2000);
-        Sdk.setSdkVersionName('2.0.0-sdkversion');
-        Sdk.setDebuggable(false);
-        Sdk.setConfigUrl('https://test.config.url');
-        Sdk.setWebViewUrl('https://test.webview.url');
-        Sdk.setWebViewHash(null);
-        Sdk.setWebViewVersion('2.0.0.-webviewversion');
-        Sdk.setInitTimeStamp(12345);
-        Sdk.setReinitialized(false);
-
         DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setLimitAdTrackingFlag(true);
         DeviceInfo.setManufacturer('Apple');
         DeviceInfo.setModel('iPhone7,2');
         DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setRooted(false);
         DeviceInfo.setScreenWidth(357);
         DeviceInfo.setScreenHeight(647);
-        DeviceInfo.setScreenScale(2);
-        DeviceInfo.setScreenBrightness(1);
-        DeviceInfo.setSystemLanguage('en_US');
         DeviceInfo.setTimeZone('+0200');
-        DeviceInfo.setTotalMemory(1899508);
-        DeviceInfo.setFreeMemory(1000000);
-        DeviceInfo.setTotalSpace(13162172);
-        DeviceInfo.setFreeSpace(10159440);
-        DeviceInfo.setConnectionType('wifi');
-        DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator('24412');
-        DeviceInfo.setNetworkOperatorName('DNA');
-        DeviceInfo.setHeadset(false);
-        DeviceInfo.setDeviceVolume(1);
-        DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus(1);
-        DeviceInfo.setUserInterfaceIdiom(0);
-        DeviceInfo.setSimulator(false);
-        DeviceInfo.setStatusBarHeight(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
