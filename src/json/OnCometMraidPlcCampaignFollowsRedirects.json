@@ -11,7 +11,8 @@
         "start": [
           "https://pixel.com/start"
         ]
-      }
+      },
+      "adType": "comet-mraid-sample-ad-type"
     }
   }
 }
