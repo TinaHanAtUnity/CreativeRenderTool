@@ -25,6 +25,7 @@ interface IAnalyticsCommonObjectInternal {
     ads_coppa: boolean;
     ads_gamerid: string;
     ads_gameid: string;
+    ads_sdk: boolean;
 }
 
 interface IAnalyticsDeviceInfoEvent {
@@ -88,7 +89,8 @@ export class AnalyticsProtocol {
             ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
             ads_coppa: configuration.isCoppaCompliant(),
             ads_gamerid: configuration.getGamerId(),
-            ads_gameid: clientInfo.getGameId()
+            ads_gameid: clientInfo.getGameId(),
+            ads_sdk: true
         };
         return {
             common: common
