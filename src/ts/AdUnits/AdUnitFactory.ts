@@ -337,6 +337,7 @@ export class AdUnitFactory {
         document.body.appendChild(view.container());
 
         const onClose = () => {
+            sessionManager.sendThirdQuartile(programmaticAdUnit);
             sessionManager.sendView(programmaticAdUnit);
             programmaticAdUnit.hide();
         };

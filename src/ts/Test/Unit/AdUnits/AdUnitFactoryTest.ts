@@ -240,6 +240,14 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
             });
+            it('should send the view diagnostic event', () => {
+                adUnit.onClose.trigger();
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendView);
+            });
+            it('should send the third quartile diagnostic event', () => {
+                adUnit.onClose.trigger();
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
+            });
         });
 
         describe('on skip', () => {
