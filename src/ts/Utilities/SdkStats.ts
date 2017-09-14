@@ -119,6 +119,14 @@ export class SdkStats {
         SdkStats._readyEventSent[placementId] = Date.now();
     }
 
+    public static setCachingStartTimestamp(fileId: string): void {
+        SdkStats._cachingStarted[fileId] = Date.now();
+    }
+
+    public static setCachingFinishTimestamp(fileId: string): void {
+        SdkStats._cachingFinished[fileId] = Date.now();
+    }
+
     private static _nativeBridge: NativeBridge;
     private static _request: Request;
     private static _configuration: Configuration;
@@ -133,6 +141,8 @@ export class SdkStats {
     private static _latestAdRequestTimestamp: number;
     private static _latestAdRequestDuration: number;
     private static _readyEventSent: { [id: string]: number } = {};
+    private static _cachingStarted: { [id: string]: number } = {};
+    private static _cachingFinished: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
         return true; // todo: always true for testing, needs a proper A/B group
@@ -169,8 +179,8 @@ export class SdkStats {
                 cachedCampaigns: cachedCampaigns,
                 isVideoCached: SdkStats.isCampaignCached(campaign),
                 cachingMode: CacheMode[SdkStats._configuration.getCacheMode()],
-                videoCachedMsAgo: undefined, // todo: this would be available only for assets cached in the same game session
-                cacheDuration: undefined, // todo: this would be available only for assets cached in the same game session
+                videoCachedMsAgo: SdkStats.getCachedMsAgo(campaign),
+                cacheDuration: SdkStats.getCachingDuration(campaign),
                 size: assetSize > 0 ? assetSize : undefined
             };
 
@@ -223,58 +233,17 @@ export class SdkStats {
         }
     }
 
-    // todo: fragile method that breaks when we add new campaign types
     private static isCampaignCached(campaign: Campaign): boolean {
-        if(campaign instanceof PerformanceCampaign) {
-            const video = (<PerformanceCampaign>campaign).getVideo();
-            const portraitVideo = (<PerformanceCampaign>campaign).getPortraitVideo();
-            if(video && video.isCached()) {
-                return true;
-            }
-            if(portraitVideo && portraitVideo.isCached()) {
-                return true;
-            }
-            return false;
-        } else if(campaign instanceof VastCampaign) {
-            const video = (<VastCampaign>campaign).getVideo();
-            if(video && video.isCached()) {
-                return true;
-            }
-            return false;
-        } else if(campaign instanceof MRAIDCampaign) {
-            const resource = (<MRAIDCampaign>campaign).getResourceUrl();
-            if(resource && resource.isCached()) {
-                return true;
-            }
-            return false;
-        } else {
-            return false;
+        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+        if(asset && asset.isCached()) {
+            return true;
         }
+        return false;
     }
 
-    // todo: fragile method that breaks when we add new campaign types
     private static getAssetSize(campaign: Campaign): Promise<number> {
         if(SdkStats.isCampaignCached(campaign)) {
-            let asset: Asset | undefined;
-            if(campaign instanceof PerformanceCampaign) {
-                const video = (<PerformanceCampaign>campaign).getVideo();
-                const portraitVideo = (<PerformanceCampaign>campaign).getPortraitVideo();
-                if(video && video.isCached()) {
-                    asset = video;
-                } else if(portraitVideo && portraitVideo.isCached()) {
-                    asset = portraitVideo;
-                }
-            } else if(campaign instanceof VastCampaign) {
-                const video = (<VastCampaign>campaign).getVideo();
-                if(video && video.isCached()) {
-                    asset = video;
-                }
-            } else if(campaign instanceof MRAIDCampaign) {
-                const resource = (<MRAIDCampaign>campaign).getResourceUrl();
-                if(resource && resource.isCached()) {
-                    asset = resource;
-                }
-            }
+            const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
 
             if(asset) {
                 return SdkStats._nativeBridge.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
@@ -292,5 +261,62 @@ export class SdkStats {
         } else {
             return Promise.resolve(0);
         }
+    }
+
+    private static getCachedMsAgo(campaign: Campaign): number | undefined {
+        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+
+        if(asset) {
+            const fileId: string | undefined = asset.getFileId();
+            if(fileId) {
+                // check that asset was fully cached within this game session (not resumed from earlier sessions)
+                if(SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
+                    return Date.now() - SdkStats._cachingFinished[fileId];
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    private static getCachingDuration(campaign: Campaign): number | undefined {
+        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+
+        if(asset) {
+            const fileId: string | undefined = asset.getFileId();
+            if(fileId) {
+                // check that asset was fully cached within this game session (not resumed from earlier sessions)
+                if(SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
+                    return SdkStats._cachingFinished[fileId] - SdkStats._cachingStarted[fileId];
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    // todo: fragile method that breaks when we add new campaign types
+    private static getMainAsset(campaign: Campaign): Asset | undefined {
+        if(campaign instanceof PerformanceCampaign) {
+            const video = (<PerformanceCampaign>campaign).getVideo();
+            const portraitVideo = (<PerformanceCampaign>campaign).getPortraitVideo();
+            if(video && video.isCached()) {
+                return video;
+            } else if(portraitVideo && portraitVideo.isCached()) {
+                return portraitVideo;
+            }
+        } else if(campaign instanceof VastCampaign) {
+            const video = (<VastCampaign>campaign).getVideo();
+            if(video && video.isCached()) {
+                return video;
+            }
+        } else if(campaign instanceof MRAIDCampaign) {
+            const resource = (<MRAIDCampaign>campaign).getResourceUrl();
+            if(resource && resource.isCached()) {
+                return resource;
+            }
+        }
+
+        return undefined;
     }
 }
