@@ -93,6 +93,8 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAdError() {
         this.sendTrackingEvent('error');
+        this.setFinishState(FinishState.ERROR);
+        this.hide();
     }
 
     private onAdSkipped() {

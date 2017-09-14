@@ -140,7 +140,6 @@ describe('VPAIDAdUnit', () => {
         // Generic events that translate to VAST tracking with
         // no additional processing on our end.
         const vpaidToVASTTracking = {
-            AdError: 'error',
             AdImpression: 'impression',
             AdVideoStart: 'start',
             AdPaused: 'paused',
@@ -208,11 +207,35 @@ describe('VPAIDAdUnit', () => {
             beforeEach(triggerVPAIDEvent('AdSkipped'));
 
             it('should trigger skip tracking', verifyTrackingEvent('skip'));
-            it('should send the view operative event', () => {
+            it('should send the skip operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>sessionManager.sendSkip);
             });
             it('should set the finish state to COMPLETE', () => {
                 assert.isTrue(adUnit.getFinishState() === FinishState.SKIPPED);
+            });
+
+            it('should hide the view', () => {
+                sinon.assert.called(<sinon.SinonSpy>vpaidView.hide);
+            });
+
+            it('should close the container', () => {
+                sinon.assert.called(<sinon.SinonSpy>container.close);
+            });
+        });
+
+        describe('on AdError', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
+                (<sinon.SinonStub>container.open).returns(Promise.resolve());
+                (<sinon.SinonStub>container.close).returns(Promise.resolve());
+                (<sinon.SinonStub>nativeBridge.Listener.sendFinishEvent).returns(Promise.resolve());
+                return adUnit.show();
+            });
+            beforeEach(triggerVPAIDEvent('AdError'));
+
+            it('should trigger error tracking', verifyTrackingEvent('error'));
+            it('should set the finish state to ERROR', () => {
+                assert.isTrue(adUnit.getFinishState() === FinishState.ERROR);
             });
 
             it('should hide the view', () => {
