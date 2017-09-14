@@ -263,6 +263,11 @@ export class WebView {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placementId, 'No connection');
+
+                const error = new DiagnosticError(new Error('No connection is available'), {
+                    id: campaign.getId(),
+                });
+                Diagnostics.trigger('mraid_no_connection', error);
                 return;
             }
 
