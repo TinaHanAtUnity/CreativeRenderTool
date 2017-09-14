@@ -1,5 +1,6 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
+import LoadingTemplate from 'html/loading.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -22,6 +23,7 @@ export class VPAID extends View {
     private _campaign: VPAIDCampaign;
     private _iframe: HTMLIFrameElement;
     private _messageListener: (e: MessageEvent) => void;
+    private _loadingScreen: HTMLElement;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign) {
         super(nativeBridge, 'vpaid');
@@ -30,6 +32,10 @@ export class VPAID extends View {
         this._campaign = campaign;
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
         this._bindings = [];
+
+        this._loadingScreen = document.createElement('div');
+        this._loadingScreen.classList.add('loading-container');
+        this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
     }
 
     public render() {
@@ -38,6 +44,7 @@ export class VPAID extends View {
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
         this._iframe.setAttribute('srcdoc', iframeSrcDoc);
+        this._container.insertBefore(this._loadingScreen, this._container.firstChild);
     }
 
     public show() {
@@ -52,6 +59,7 @@ export class VPAID extends View {
     }
 
     public showAd() {
+        this._container.removeChild(this._loadingScreen);
         this._iframe.contentWindow.postMessage({
             type: 'show'
         }, '*');
