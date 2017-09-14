@@ -1,5 +1,5 @@
 import { Request } from 'Utilities/Request';
-// import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
@@ -82,9 +82,7 @@ export class SdkStats {
     public static sendReadyEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
-                // todo: once Kafka topic is available, send event instead of printing it to log
-                // HttpKafka.sendEvent(SdkStats._topic, event);
-                SdkStats._nativeBridge.Sdk.logInfo('READY EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
+                HttpKafka.sendEvent(SdkStats._topic, event);
             });
         }
     }
@@ -92,9 +90,7 @@ export class SdkStats {
     public static sendShowEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('show', placementId).then(event => {
-                // todo: once Kafka topic is available, send event instead of printing it to log
-                // HttpKafka.sendEvent(SdkStats._topic, event);
-                SdkStats._nativeBridge.Sdk.logInfo('SHOW EVENT FOR ' + placementId + ': ' + JSON.stringify(event));
+                HttpKafka.sendEvent(SdkStats._topic, event);
             });
         }
     }
@@ -133,7 +129,7 @@ export class SdkStats {
     private static _sessionManager: SessionManager;
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
-    // private static _topic = 'sdk.cachestudy.stats'; todo: get proper name for Kafka topic
+    private static _topic: string = 'events.cachingstats.json';
 
     private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;
@@ -145,7 +141,13 @@ export class SdkStats {
     private static _cachingFinished: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        return true; // todo: always true for testing, needs a proper A/B group
+        const abGroup: number = SdkStats._configuration.getAbGroup();
+
+        if(abGroup === 1 || abGroup === 2 || abGroup === 12 || abGroup === 13 || abGroup === 16 || abGroup === 17) {
+            return true;
+        }
+
+        return false;
     }
 
     private static getSdkStatsEvent(eventType: string, placementId: string): Promise<ISdkStatsEvent> {
