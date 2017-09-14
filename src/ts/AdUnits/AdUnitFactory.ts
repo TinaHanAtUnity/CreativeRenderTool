@@ -342,6 +342,16 @@ export class AdUnitFactory {
             programmaticAdUnit.hide();
         };
 
+        const isWhiteListedLinkType = (href: string) => {
+            const whiteListedProtocols = ['http', 'market', 'itunes'];
+            for (const protocol of whiteListedProtocols) {
+                if (href.indexOf(protocol) === 0) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         const openLink = (href: string) => {
             sessionManager.sendClick(programmaticAdUnit);
 
@@ -351,13 +361,15 @@ export class AdUnitFactory {
                 sessionManager.getEventManager().thirdPartyEvent('display click', campaign.getSession().getId(), url);
             }
 
-            if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': href
-                });
-            } else {
-                nativeBridge.UrlScheme.open(href);
+            if (isWhiteListedLinkType(href)) {
+                if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': href
+                    });
+                } else {
+                    nativeBridge.UrlScheme.open(href);
+                }
             }
         };
 

@@ -230,6 +230,14 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.called(<sinon.SinonSpy>sessionManager.sendClick);
             });
+
+            it('should not redirect if the protocol is whitelisted', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                sandbox.stub(nativeBridge.Intent, 'launch');
+                adUnit.onRedirect.trigger('tel://127.0.0.1:5000');
+
+                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
+            });
         });
 
         describe('on close', () => {
