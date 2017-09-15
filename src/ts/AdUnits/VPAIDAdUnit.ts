@@ -195,7 +195,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private sendThirdPartyEvent(eventType: string, url: string) {
-        const sessionId = this._sessionManager.getSession().getId();
+        const sessionId = this._vpaidCampaign.getSession().getId();
         const sdkVersion = this._sessionManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());

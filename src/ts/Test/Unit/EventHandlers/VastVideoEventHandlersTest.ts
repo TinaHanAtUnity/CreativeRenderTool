@@ -5,7 +5,6 @@ import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
 import { EventManager } from 'Managers/EventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { Session } from 'Models/Session';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -54,7 +53,7 @@ describe('VastVideoEventHandlers tests', () => {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+        campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
@@ -78,7 +77,6 @@ describe('VastVideoEventHandlers tests', () => {
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager, undefined);
-        sessionManager.setSession(new Session('123'));
         testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
         sinon.spy(testAdUnit, 'hide');
     });
@@ -88,9 +86,9 @@ describe('VastVideoEventHandlers tests', () => {
         // when the session manager is told that the video has started
         // then the VAST start callback URL should be requested by the event manager
         const mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '123', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '123', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
         VastVideoEventHandlers.onVideoStart(sessionManager, testAdUnit);
 
@@ -114,16 +112,16 @@ describe('VastVideoEventHandlers tests', () => {
                 'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
             ]
         };
-        const campaignWithTrackers = new VastCampaign(vast, '12345', 'gamerId', 1, 10, customTracking);
+        const campaignWithTrackers = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1, 10, customTracking);
         const adUnitWithTrackers = new VastAdUnit(nativeBridge, ForceOrientation.NONE,  container, placement, campaignWithTrackers, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
 
         const mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://customTrackingUrl/start');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://customTrackingUrl/start2');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://customTrackingUrl/start3/123/blah?sdkVersion=2000');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '123', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '123', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '12345', 'http://customTrackingUrl/start');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '12345', 'http://customTrackingUrl/start2');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '12345', 'http://customTrackingUrl/start3/123/blah?sdkVersion=2000');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
         VastVideoEventHandlers.onVideoStart(sessionManager, adUnitWithTrackers);
 
@@ -135,7 +133,7 @@ describe('VastVideoEventHandlers tests', () => {
         // when the session manager is told that the video has completed
         // then the VAST complete callback URL should be requested by the event manager
         const mockEventManager = sinon.mock(eventManager);
-        mockEventManager.expects('thirdPartyEvent').withArgs('vast complete', '123', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+        mockEventManager.expects('thirdPartyEvent').withArgs('vast complete', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
         VastVideoEventHandlers.onVideoCompleted(sessionManager, testAdUnit);
 

@@ -1,3 +1,24 @@
+# Thu Sep 14 09:43:51 UTC 2017
+
+* Refactored AuctionResponse to be a typed model.
+* Added Chinese translations to the playable loading screen.
+* 2.0.6+ fixed issue on iOS with opening in incorrect orientation.
+
+# Tue Sep 12 08:50:43 UTC 2017
+
+* Add auctionId to ad requests and all operative events, remove sessionId from operative events
+
+# Mon Sep 11 12:02:52 UTC 2017
+
+* Remove handle_campaign_failed diagnostic message
+* Always send cached parameter in operative events
+* Send timestamp for all diagnostic events
+* Increase minimum config.json check delay from 15 minutes to 60 minutes for all versions 2.1.0 and earlier to reduce reinit crashes
+
+# Thu Sep  7 13:35:33 UTC 2017
+
+* Add handle_campaign_failed diagnostic message
+
 # Thu Sep  7 10:05:12 UTC 2017
 
 * Store gamerId and send stored gamerId only for iOS devices with limit ad tracking

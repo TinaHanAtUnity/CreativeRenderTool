@@ -8,7 +8,7 @@
       "body": true
     },
     {
-      "parameter": "sessionId",
+      "parameter": "auctionId",
       "required": "all",
       "queryString": false,
       "body": true

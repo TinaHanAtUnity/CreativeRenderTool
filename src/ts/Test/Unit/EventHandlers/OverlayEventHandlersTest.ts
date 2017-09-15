@@ -52,8 +52,9 @@ describe('OverlayEventHandlersTest', () => {
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVast: sinon.spy(),
-                getVideo: () => video,
-                getStreamingVideo: () => video
+            getVideo: () => video,
+            getStreamingVideo: () => video,
+            getSession: () => TestFixtures.getSession()
         }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
@@ -99,7 +100,6 @@ describe('OverlayEventHandlersTest', () => {
     describe('When calling onMute', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge.VideoPlayer, 'setVolume');
-            sinon.stub(sessionManager, 'getSession').returns({getId: sinon.spy()});
         });
 
         it('should set volume to zero when muted', () => {

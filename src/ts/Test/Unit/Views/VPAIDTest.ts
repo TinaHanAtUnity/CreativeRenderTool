@@ -8,6 +8,7 @@ import { VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('VPAID View', () => {
     let nativeBridge: NativeBridge;
@@ -19,7 +20,7 @@ describe('VPAID View', () => {
 
         const vpaidModel = new VPAIDParser().parse(VPAIDTestXML);
         const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
-        campaign = new VPAIDCampaign(vpaidModel, vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+        campaign = new VPAIDCampaign(vpaidModel, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
 
         vpaid = new VPAID(nativeBridge, campaign);
     });

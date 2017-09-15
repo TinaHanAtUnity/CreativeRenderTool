@@ -82,7 +82,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(VastVideoEventHandlers, 'onVideoError').returns(null);
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
-            const vastCampaign = new VastCampaign(vast, 'campaignId', 'gamerId', 1);
+            const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
             const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
             videoAdUnit.onError.trigger();
 
@@ -103,10 +103,6 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(sessionManager, 'getEventManager').returns(
                 eventManager
             );
-
-            sandbox.stub(sessionManager, 'getSession').returns({
-                getId: sinon.stub().returns('1111')
-            });
 
             campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
@@ -145,7 +141,7 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid complete', '1111', 'http://test.complete.com/complete1');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid complete', '12345', 'http://test.complete.com/complete1');
             });
 
             it('should call sendSkip on finish state skipped', () => {
@@ -167,6 +163,7 @@ describe('AdUnitFactoryTest', () => {
 
                 adUnit.show();
             });
+
             it('should call sendStart', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
@@ -176,22 +173,22 @@ describe('AdUnitFactoryTest', () => {
             it('should send impressions', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah1');
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/blah2');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
                 adUnit.hide();
             });
 
             it('should replace macros in the postback impression url', () => {
                 adUnit.show();
                 sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
-                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '1111', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
                 adUnit.hide();
             });
         });
 
         it('should call click tracker', () => {
             adUnit.sendClick();
-            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '1111', 'http://test.complete.com/click1');
+            sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
         });
     });
 });

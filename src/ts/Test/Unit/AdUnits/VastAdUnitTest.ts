@@ -39,7 +39,7 @@ describe('VastAdUnit', () => {
         const vastXml = EventTestVast;
 
         const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', 'gamerId', 1);
+        campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
         const placement = new Placement({
             id: '123',
@@ -143,7 +143,7 @@ describe('VastAdUnit', () => {
             const placement = TestFixtures.getPlacement();
             const video = new Video('');
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
@@ -246,7 +246,7 @@ describe('VastAdUnit', () => {
             const placement = TestFixtures.getPlacement();
             const video = new Video('');
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            campaign = new VastCampaign(vast, 'campaignId', 'gamerId', 12);
+            campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
             const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();

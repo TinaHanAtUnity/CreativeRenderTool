@@ -21,6 +21,7 @@ import { EventManager } from 'Managers/EventManager';
 import { Platform } from 'Constants/Platform';
 import { IntentApi } from 'Native/Api/Intent';
 import { FinishState } from 'Constants/FinishState';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -58,7 +59,7 @@ describe('VPAIDAdUnit', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        campaign = new VPAIDCampaign(vpaid, vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
         adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, sessionManager, ForceOrientation.NONE, container, placement, campaign);
     });
 
@@ -110,14 +111,13 @@ describe('VPAIDAdUnit', () => {
     });
 
     describe('VPAID events', () => {
-        const sessionId = 123;
         const sdkVersion = 210;
         const verifyTrackingEvent = (eventType: string): (() => void) => {
             return () => {
                 sinon.assert.called(<sinon.SinonSpy>eventManager.thirdPartyEvent);
                 const urls = campaign.getTrackingEventUrls(eventType);
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid ${eventType}`, sessionId, url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid ${eventType}`, campaign.getSession().getId(), url);
                 }
             };
         };
@@ -129,9 +129,6 @@ describe('VPAIDAdUnit', () => {
         };
 
         beforeEach(() => {
-            (<sinon.SinonStub>sessionManager.getSession).returns({
-                getId: () => sessionId
-            });
             (<sinon.SinonStub>sessionManager.getClientInfo).returns({
                 getSdkVersion: () => sdkVersion
             });
@@ -252,7 +249,7 @@ describe('VPAIDAdUnit', () => {
             const checkClickThroughTracking = () => {
                 const urls = campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid video click`, sessionId, url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid video click`, campaign.getSession().getId(), url);
                 }
             };
 

@@ -1,6 +1,7 @@
 import { ICampaign, Campaign } from "Models/Campaign";
 import { VPAID } from "Models/VPAID/VPAID";
 import { IAsset, Asset } from "Models/Assets/Asset";
+import { Session } from "Models/Session";
 
 interface IVPAIDCampaign extends ICampaign {
     vpaid: VPAID;
@@ -8,12 +9,13 @@ interface IVPAIDCampaign extends ICampaign {
 
 export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
 
-    constructor(vpaid: VPAID, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(vpaid: VPAID, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('VPAIDCampaign', {
             ... Campaign.Schema,
             vpaid: ['object']
         });
         this.set('vpaid', vpaid);
+        this.set('session', session);
 
         this.set('id', campaignId);
         this.set('gamerId', gamerId);
