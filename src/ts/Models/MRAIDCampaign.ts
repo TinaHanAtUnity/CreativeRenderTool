@@ -195,7 +195,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public isConnectionNeeded(): boolean {
         const resourceUrl = this.getResourceUrl();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/https:\/\/cdn\.unityads\.unity3d\.com/)) {
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             return false;
         }
         return true;
