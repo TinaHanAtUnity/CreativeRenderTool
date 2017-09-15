@@ -11,14 +11,14 @@ import { SessionManager } from 'Managers/SessionManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 
-describe('IntegrationTest', () => {
+describe('MraidTest', () => {
 
     it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
+                if (++readyCount === 2) {
                     done();
                 }
             },
@@ -51,7 +51,7 @@ describe('IntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '444', listener, true);
     });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -59,7 +59,7 @@ describe('IntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
+                if(++readyCount === 2) {
                     done();
                 }
             },
@@ -92,7 +92,6 @@ describe('IntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '456', listener, true);
+        UnityAds.initialize(Platform.IOS, '444', listener, true);
     });
-
 });

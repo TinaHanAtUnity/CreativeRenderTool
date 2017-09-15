@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -58,6 +59,7 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVastPlcCampaignMissingErrorUrls.json';
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
+import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -862,6 +864,41 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 mockRequest.verify();
                 assert.equal(triggeredError.message, 'MRAID Campaign missing inlinedUrl');
+            });
+        });
+    });
+
+    describe('static interstitial display', () => {
+        it('should process the programmatic/static-interstitial content-type', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayCampaign
+            }));
+
+            const json = JSON.parse(OnStaticInterstitialDisplayCampaign);
+            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            let triggeredCampaign: DisplayInterstitialCampaign;
+            let triggeredError: any;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: DisplayInterstitialCampaign) => {
+                triggeredCampaign = campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
             });
         });
     });
