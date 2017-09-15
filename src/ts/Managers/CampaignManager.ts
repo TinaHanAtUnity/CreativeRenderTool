@@ -25,6 +25,7 @@ import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Models/VPAID/VPAID';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 
@@ -262,6 +263,12 @@ export class CampaignManager {
                 const vpaid = this.parseVPAID(response.getContent());
                 const vpaidCampaign = new VPAIDCampaign(vpaid, session, this.getProgrammaticCampaignId(), gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
                 return this.setupCampaignAssets(response.getPlacements(), vpaidCampaign);
+            case 'programmatic/static-interstitial':
+                const jsonDisplay = JsonParser.parse(response.getContent());
+                const displayMarkup = decodeURIComponent(jsonDisplay.markup);
+                const clickThroughUrl = jsonDisplay.clickThroughURL;
+                const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
+                return this.setupCampaignAssets(response.getPlacements(), displayInterstitialCampaign);
             default:
                 return this.handleError(new Error('Unsupported content-type: ' + response.getContentType()), response.getPlacements());
         }

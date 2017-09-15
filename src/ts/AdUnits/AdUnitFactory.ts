@@ -6,6 +6,9 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
@@ -49,6 +52,8 @@ export class AdUnitFactory {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
         } else if (campaign instanceof VPAIDCampaign) {
             return this.createVPAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, configuration, options);
+        } else if (campaign instanceof DisplayInterstitialCampaign) {
+            return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, sessionManager, placement, campaign, options);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -333,5 +338,64 @@ export class AdUnitFactory {
         vpaid.render();
         const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, sessionManager, forceOrientation, container, placement, campaign);
         return vpaidAdUnit;
+    }
+
+    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: DisplayInterstitialCampaign, options: any): AbstractAdUnit {
+        const view = new DisplayInterstitial(nativeBridge, placement, campaign);
+        const programmaticAdUnit = new DisplayInterstitialAdUnit(nativeBridge, container, sessionManager, placement, campaign, view, options);
+
+        view.render();
+        document.body.appendChild(view.container());
+
+        const onClose = () => {
+            sessionManager.sendThirdQuartile(programmaticAdUnit);
+            sessionManager.sendView(programmaticAdUnit);
+            programmaticAdUnit.hide();
+        };
+
+        const isWhiteListedLinkType = (href: string) => {
+            const whiteListedProtocols = ['http', 'market', 'itunes'];
+            for (const protocol of whiteListedProtocols) {
+                if (href.indexOf(protocol) === 0) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        const openLink = (href: string) => {
+            sessionManager.sendClick(programmaticAdUnit);
+
+            for (let url of campaign.getTrackingUrlsForEvent('click')) {
+                url = url.replace(/%ZONE%/, placement.getId());
+                url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
+                sessionManager.getEventManager().thirdPartyEvent('display click', campaign.getSession().getId(), url);
+            }
+
+            if (isWhiteListedLinkType(href)) {
+                if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                    nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': href
+                    });
+                } else {
+                    nativeBridge.UrlScheme.open(href);
+                }
+            }
+        };
+
+        programmaticAdUnit.onStart.subscribe(() => {
+            for (let url of campaign.getTrackingUrlsForEvent('impression')) {
+                url = url.replace(/%ZONE%/, placement.getId());
+                url = url.replace(/%SDK_VERSION%/, sessionManager.getClientInfo().getSdkVersion().toString());
+                sessionManager.getEventManager().thirdPartyEvent('display impression', campaign.getSession().getId(), url);
+            }
+            sessionManager.sendStart(programmaticAdUnit);
+        });
+        programmaticAdUnit.onClose.subscribe(onClose);
+        programmaticAdUnit.onSkip.subscribe(onClose);
+        programmaticAdUnit.onRedirect.subscribe(openLink);
+
+        return programmaticAdUnit;
     }
 }
