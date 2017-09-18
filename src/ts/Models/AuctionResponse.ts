@@ -1,6 +1,7 @@
 import { Model } from 'Models/Model';
 
 export interface IAuctionResponse {
+    rawData: string;
     placements: string[];
     contentType: string;
     content: string;
@@ -13,8 +14,9 @@ export interface IAuctionResponse {
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, correlationId: string) {
+    constructor(placements: string[], rawData: string, data: any, correlationId: string) {
         super('AuctionResponse', {
+            rawData: ['string'],
             placements: ['array'],
             contentType: ['string'],
             content: ['string'],
@@ -26,6 +28,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             correlationId: ['string']
         });
 
+        this.set('rawData', rawData);
         this.set('placements', placements);
         this.set('contentType', data.contentType);
         this.set('content', data.content);
@@ -35,6 +38,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
+    }
+
+    public getRawData(): string {
+        return this.get('rawData');
     }
 
     public getPlacements(): string[] {
