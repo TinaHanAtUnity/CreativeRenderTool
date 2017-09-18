@@ -73,6 +73,8 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
+    private _rawResponse: string | undefined;
+    private _parsedResponse: any;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -98,6 +100,14 @@ export class CampaignManager {
 
         this._requesting = true;
 
+        if(this._rawResponse) {
+            delete this._rawResponse;
+        }
+
+        if(this._parsedResponse) {
+            delete this._parsedResponse;
+        }
+
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
@@ -108,11 +118,9 @@ export class CampaignManager {
                     followRedirects: false,
                     retryWithConnectionEvents: true
                 }).then(response => {
-                    if (response) {
-                        return this.parseCampaigns(response, session).catch((error) => {
-                            this._requesting = false;
-                            return this.handleError(error, this._configuration.getPlacementIds(), response.response);
-                        });
+                    if(response) {
+                        this._rawResponse = response.response;
+                        return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
                 }).then(() => {
@@ -135,6 +143,8 @@ export class CampaignManager {
 
     private parseCampaigns(response: INativeResponse, session: Session) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+
+        this._parsedResponse = json;
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
@@ -169,16 +179,16 @@ export class CampaignManager {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
-                        auctionResponse = new AuctionResponse(fill[mediaId], response.response, json.media[mediaId], json.correlationId);
+                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
                     } catch(error) {
-                        return this.handleError(error, fill[mediaId], response.response, json);
+                        return this.handleError(error, fill[mediaId]);
                     }
                     promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();
                         }
 
-                        return this.handleError(error, fill[mediaId], response.response, json);
+                        return this.handleError(error, fill[mediaId]);
                     }));
 
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
@@ -193,10 +203,10 @@ export class CampaignManager {
             this.onAdPlanReceived.trigger(refreshDelay);
 
             return Promise.all(promises).catch(error => {
-                return this.handleError(error, this._configuration.getPlacementIds(), response.response, json);
+                return this.handleError(error, this._configuration.getPlacementIds());
             });
         } else {
-            return this.handleError(new Error('No placements found'), this._configuration.getPlacementIds(), response.response, json);
+            return this.handleError(new Error('No placements found'), this._configuration.getPlacementIds());
         }
     }
 
@@ -224,7 +234,7 @@ export class CampaignManager {
             case 'programmatic/mraid-url':
                 const jsonMraidUrl = JsonParser.parse(response.getContent());
                 if(!jsonMraidUrl) {
-                    return this.handleError(new Error('Corrupted mraid-url content'), response.getPlacements(), response.getRawData(), response.getDTO());
+                    return this.handleError(new Error('Corrupted mraid-url content'), response.getPlacements());
                 }
 
                 if(!jsonMraidUrl.inlinedUrl) {
@@ -232,7 +242,7 @@ export class CampaignManager {
                         new Error('MRAID Campaign missing inlinedUrl'),
                         {mraid: jsonMraidUrl}
                     );
-                    return this.handleError(MRAIDError, response.getPlacements(), response.getRawData(), response.getDTO());
+                    return this.handleError(MRAIDError, response.getPlacements());
                 }
 
                 jsonMraidUrl.id = this.getProgrammaticCampaignId();
@@ -242,7 +252,7 @@ export class CampaignManager {
             case 'programmatic/mraid':
                 const jsonMraid = JsonParser.parse(response.getContent());
                 if(!jsonMraid) {
-                    return this.handleError(new Error('Corrupted mraid content'), response.getPlacements(), response.getRawData(), response.getDTO());
+                    return this.handleError(new Error('Corrupted mraid content'), response.getPlacements());
                 }
 
                 if(!jsonMraid.markup) {
@@ -250,7 +260,7 @@ export class CampaignManager {
                         new Error('MRAID Campaign missing markup'),
                         {mraid: jsonMraid}
                     );
-                    return this.handleError(MRAIDError, response.getPlacements(), response.getRawData(), response.getDTO());
+                    return this.handleError(MRAIDError, response.getPlacements());
                 }
 
                 jsonMraid.id = this.getProgrammaticCampaignId();
@@ -264,7 +274,7 @@ export class CampaignManager {
                 const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
                 return this.setupCampaignAssets(response.getPlacements(), displayInterstitialCampaign);
             default:
-                return this.handleError(new Error('Unsupported content-type: ' + response.getContentType()), response.getPlacements(), response.getRawData(), response);
+                return this.handleError(new Error('Unsupported content-type: ' + response.getContentType()), response.getPlacements());
         }
     }
 
@@ -282,9 +292,9 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[], rawAdPlan?: string, parsedResponse?: any): Promise<void> {
+    private handleError(error: any, placementIds: string[]): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, rawAdPlan, parsedResponse);
+        this.onError.trigger(error, placementIds, this._rawResponse, this._parsedResponse);
 
         return Promise.resolve();
     }

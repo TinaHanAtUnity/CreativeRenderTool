@@ -400,7 +400,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error, ['premium', 'video'], '', {});
+                campaignManager.onError.trigger(error, ['premium', 'video'], undefined, undefined);
                 return Promise.resolve();
             });
 
