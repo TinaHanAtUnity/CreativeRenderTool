@@ -1,4 +1,5 @@
-import EndScreenTemplate from 'html/EndScreen.html';
+// import EndScreenTemplate from 'html/EndScreen.html';
+import EndScreenDarkTemplate from 'html/EndScreenDark.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -27,7 +28,11 @@ export class EndScreen extends View {
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        // if (false) {
+        //     this._template = new Template(EndScreenTemplate, this._localization);
+        // } else {
+        this._template = new Template(EndScreenDarkTemplate, this._localization);
+        // }
 
         if(campaign && campaign instanceof  PerformanceCampaign) {
             this._gameName = campaign.getGameName();

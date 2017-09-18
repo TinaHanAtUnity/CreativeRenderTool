@@ -48,7 +48,98 @@
     border-top: 4px solid #e6e6e6
     background-color: #fafafa
 
-  .end-screen-info
+    &.dark
+      font-family: -apple-system, Helvetica, sans-serif
+
+      @keyframes slideInUp {
+        0% {
+          transform: translate3d(0, 100%, 0);
+        }
+
+        40% {
+          transform: translate3d(0, -10px, 0);
+          opacity: 0.25;
+        }
+
+        100% {
+          transform: translate3d(0, 0, 0);
+          opacity: 1;
+        }
+      }
+
+      .game-icon,
+      .name-container,
+      .store-container,
+      .download-container
+        animation: slideInUp
+        animation-fill-mode: forwards
+        animation-delay: 1s
+        animation-timing-function: ease-out
+        opacity: 0
+
+      &.animate
+        .game-icon
+          animation-duration: 0.5s
+
+        .name-container
+          animation-duration: 0.75s
+
+        .store-container
+          animation-duration: 1s
+
+        .download-container
+          animation-duration: 1.25s
+
+      .name-container,
+      .game-rating-count
+        color: #ffffff
+
+      .game-rating-count
+        margin-left: 5pt;
+
+      .end-screen-underlay
+        width: 100vw
+        height: 100vh
+        background-size: cover
+        background-repeat: no-repeat
+        background-position: center
+        /* TODO: Think which filter is better */
+        //filter: blur(20px)
+        filter: brightness(100%) blur(20px);
+        transform: scale(1.5)
+
+        &:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-image: linear-gradient(rgba(255,255,255,0), #000 80%);
+        }
+
+      .game-icon
+        //top: -20pt;
+        width: 115px;
+        height: 115px;
+
+      .game-info
+        margin-left: 0
+
+      .unityads-logo {
+        background-image: url('../img/unityads-white.png')
+      }
+
+      /* Make sure about the colors here */
+      .btn-download
+        background: linear-gradient(#00e3c8, #00cbd6)
+        margin: 12.5pt auto
+        padding: 5px
+        width 40%
+        font-weight: 600
+        font-size: 20pt
+
+.end-screen-info
     position: absolute
     top: 45%
     width: 100%
@@ -64,10 +155,10 @@
     padding-left: 10px
     padding-right: 10px
     padding-top: 8px
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    text-overflow: ellipsis
+    -webkit-line-clamp: 2
+    display: -webkit-box
+    -webkit-box-orient: vertical
 
   .store-container
     margin-left: 10px
@@ -109,9 +200,11 @@
 // END SCREEN landscape specific
 body.landscape
   #end-screen
-    .game-background-portrait
+    .game-background-portrait,
+    .underlay-portrait
       display: none
-    .game-background-landscape
+    .game-background-landscape,
+    .underlay-landscape
       display: block
 
     .game-background
@@ -126,6 +219,20 @@ body.landscape
       right: 0
       border-top: none
       border-left: 4px solid #e6e6e6
+
+      &.dark
+        width: 100vw
+        height: 100vh
+
+        .end-screen-info
+          left: 0;
+          right: 0;
+          top: 45%;
+          bottom: 0;
+          margin: auto;
+
+      .btn-download
+        font-size: 14pt
 
     a.btn-close
       color: #7c7c7c
@@ -143,11 +250,11 @@ body.landscape
     .name-container
       padding-top: 95px
       font-size: 20pt
-      text-overflow: ellipsis;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
+      text-overflow: ellipsis
+      -webkit-line-clamp: 2
+      overflow: hidden
+      display: -webkit-box
+      -webkit-box-orient: vertical
       text-align: center
 
     .store-container
@@ -164,10 +271,33 @@ body.landscape
 // END SCREEN portrait specific
 body.portrait
   #end-screen
-    .game-background-portrait
+    .game-background-portrait,
+    .underlay-portrait
       display: block
-    .game-background-landscape
+    .game-background-landscape,
+    .underlay-landscape
       display: none
+
+    .end-screen-info-background.dark
+      width: 100vw
+      height: 100vh
+
+      .game-icon
+        float: none
+        margin: 15pt auto
+        width: 150px
+        height: 150px
+
+      .name-container
+        text-align: center
+
+      .store-container
+        float: none
+
+      .btn-download
+        padding: 15px 10px
+        width: 75%
+        font-size: 18pt
 
 // Device specific
 body.iphone
@@ -180,6 +310,11 @@ body.android
         width: 60px
         height: 60px
         border-radius: 12pt
+
+      .end-screen-info-background.dark .game-icon
+        width: 120px
+        height: 120px
+        border-radius: 15pt
 
       .name-container
         font-size: 15pt
@@ -209,6 +344,9 @@ body.android
       .btn-download
         padding: 15px 10px
 
+      .end-screen-info-background.dark .store-container
+        margin-top: 5px
+
     &.landscape
       #end-screen
         .btn-download
@@ -224,6 +362,8 @@ body.android
       .game-icon
         width: 85px
         height: 85px
+
+
 
       .name-container
         font-size: 20pt
@@ -241,6 +381,10 @@ body.android
 
         .btn-download
           padding: 10px
+
+        .end-screen-info-background.dark .game-icon
+          width: 125px
+          height: 125px
 
   // 384 x 360 - LG Optimus G
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
@@ -283,6 +427,10 @@ body.android
         .btn-download
           font-size: 19pt
           line-height: 19pt
+
+        .end-screen-info-background.dark .game-icon
+          width: 125px
+          height: 125px
 
   // 540 x 960 - Motorola Droid 3
   @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px)
@@ -330,6 +478,10 @@ body.android
           padding: 25px 20px 25px 20px
           font-size: 21pt
           line-height: 21pt
+
+        .end-screen-info-background.dark .game-icon
+          width: 150px
+          height: 150px
 
   // 960 x 600 - Google Nexus 7
   @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px)
