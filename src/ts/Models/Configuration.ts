@@ -20,6 +20,7 @@ interface IConfiguration {
     defaultPlacement: Placement;
     analytics: boolean;
     test: boolean;
+    projectId: string;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -35,12 +36,14 @@ export class Configuration extends Model<IConfiguration> {
             placements: ['object'],
             defaultPlacement: ['object'],
             analytics: ['boolean'],
-            test: ['boolean']
+            test: ['boolean'],
+            projectId: ['string']
         });
 
         this.set('enabled', configJson.enabled);
         this.set('country', configJson.country);
         this.set('coppaCompliant', configJson.coppaCompliant);
+        this.set('projectId', configJson.projectId);
         this.set('abGroup', configJson.abGroup);
         this.set('gamerId', configJson.gamerId);
         this.set('properties', configJson.properties);
@@ -154,6 +157,10 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('defaultPlacement');
     }
 
+    public getUnityProjectId(): string {
+        return this.get('projectId');
+    }
+
     public getDTO(): { [key: string]: any } {
         const placements = [];
         for(const placement in this.getPlacements()) {
@@ -175,7 +182,8 @@ export class Configuration extends Model<IConfiguration> {
             'gamerId': this.getGamerId(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId
+            'defaultPlacement': defaultPlacementId,
+            'projectId': this.getUnityProjectId()
         };
     }
 
