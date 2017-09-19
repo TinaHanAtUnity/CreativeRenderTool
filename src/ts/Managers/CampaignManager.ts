@@ -20,12 +20,12 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
-import { CometCampaignParser } from 'Utilities/Campaigns/CometCampaignParser';
-import { ProgrammaticVastParser } from 'Utilities/Campaigns/ProgrammaticVastParser';
-import { ProgrammaticMraidUrlParser } from 'Utilities/Campaigns/ProgrammaticMraidUrlParser';
-import { ProgrammaticMraidParser } from 'Utilities/Campaigns/ProgrammaticMraidParser';
-import { ProgrammaticStaticInterstitialParser } from 'Utilities/Campaigns/ProgrammaticStaticInterstitialParser';
-import { CampaignParser } from 'Utilities/Campaigns/CampaignParser';
+import { CometCampaignParser } from 'Parsers/CometCampaignParser';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
+import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
+import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
+import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { CampaignParser } from 'Parsers/CampaignParser';
 
 export class CampaignManager {
 
@@ -142,7 +142,7 @@ export class CampaignManager {
         return this._previousPlacementId;
     }
 
-    private parseCampaigns(response: INativeResponse, session: Session) {
+    private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
 
         this._parsedResponse = json;
@@ -178,19 +178,21 @@ export class CampaignManager {
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    let auctionResponse: AuctionResponse;
+                    let auctionResponse: AuctionResponse | undefined;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
                     } catch(error) {
-                        return this.handleError(error, fill[mediaId]);
+                        this.handleError(error, fill[mediaId]);
                     }
-                    promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
-                        if(error === CacheStatus.STOPPED) {
-                            return Promise.resolve();
-                        }
+                    if(auctionResponse) {
+                        promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
+                            if(error === CacheStatus.STOPPED) {
+                                return Promise.resolve();
+                            }
 
-                        return this.handleError(error, fill[mediaId]);
-                    }));
+                            return this.handleError(error, fill[mediaId]);
+                        }));
+                    }
 
                     // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
                     const contentType = json.media[mediaId].contentType;
@@ -203,11 +205,9 @@ export class CampaignManager {
 
             this.onAdPlanReceived.trigger(refreshDelay);
 
-            return Promise.all(promises).catch(error => {
-                return this.handleError(error, this._configuration.getPlacementIds());
-            });
+            return Promise.all(promises);
         } else {
-            return this.handleError(new Error('No placements found'), this._configuration.getPlacementIds());
+            throw new Error('No placements found');
         }
     }
 
