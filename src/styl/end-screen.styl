@@ -3,8 +3,8 @@
   @import "game-shared.styl";
 
   .campaign-container
-    width: 100vw
-    height: 100vh
+    width: 100%
+    height: 100%
 
   .btn-close-region
     position: fixed
@@ -51,18 +51,40 @@
     &.dark
       font-family: -apple-system, Helvetica, sans-serif
 
-      @keyframes slideInUp {
+      @-webkit-keyframes slideInUp {
         0% {
-          transform: translate3d(0, 100%, 0);
+          -webkit-transform: translate3d(0, 200px, 0);
+                  transform: translate3d(0, 200px, 0);
         }
 
         40% {
-          transform: translate3d(0, -10px, 0);
+          -webkit-transform: translate3d(0, -10px, 0);
+                  transform: translate3d(0, -10px, 0);
           opacity: 0.25;
         }
 
         100% {
-          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+                  transform: translate3d(0, 0, 0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInUp {
+        0% {
+          -webkit-transform: translate3d(0, 200px, 0);
+                  transform: translate3d(0, 200px, 0);
+        }
+
+        40% {
+          -webkit-transform: translate3d(0, -10px, 0);
+                  transform: translate3d(0, -10px, 0);
+          opacity: 0.25;
+        }
+
+        100% {
+          -webkit-transform: translate3d(0, 0, 0);
+                  transform: translate3d(0, 0, 0);
           opacity: 1;
         }
       }
@@ -71,24 +93,50 @@
       .name-container,
       .store-container,
       .download-container
-        animation: slideInUp
-        animation-fill-mode: forwards
-        animation-delay: 1s
-        animation-timing-function: ease-out
-        opacity: 0
+        -webkit-animation-fill-mode: forwards;
+        animation-fill-mode: forwards;
+        -webkit-animation-timing-function: ease-out;
+        animation-timing-function: ease-out;
+        opacity: 0;
+
+      &.without-animation
+        .game-icon,
+        .name-container,
+        .store-container,
+        .download-container
+          opacity: 1;
 
       &.animate
+        .game-icon,
+        .name-container,
+        .store-container,
+        .download-container
+          -webkit-animation-name: slideInUp;
+          animation-name: slideInUp;
+
         .game-icon
-          animation-duration: 0.5s
+          -webkit-animation-duration: 0.75s;
+          animation-duration: 0.75s;
+          -webkit-animation-delay: 0s;
+          animation-delay: 0s;
 
         .name-container
-          animation-duration: 0.75s
+          -webkit-animation-duration: 0.75s;
+          animation-duration: 0.75s;
+          -webkit-animation-delay: 0.08s;
+          animation-delay: 0.08s;
 
         .store-container
-          animation-duration: 1s
+          -webkit-animation-duration: 0.75s;
+          animation-duration: 0.75s;
+          -webkit-animation-delay: 0.08s;
+          animation-delay: 0.08s;
 
         .download-container
-          animation-duration: 1.25s
+          -webkit-animation-duration: 0.75s;
+          animation-duration: 0.75s;
+          -webkit-animation-delay: 0.16s;
+          animation-delay: 0.16s;
 
       .name-container,
       .game-rating-count
@@ -103,9 +151,9 @@
         background-size: cover
         background-repeat: no-repeat
         background-position: center
-        /* TODO: Think which filter is better */
-        //filter: blur(20px)
-        filter: brightness(100%) blur(20px);
+        -webkit-filter: brightness(100%) blur(20px)
+        filter: brightness(100%) blur(20px)
+        -webkit-transform: scale(1.5)
         transform: scale(1.5)
 
         &:before {
@@ -115,6 +163,8 @@
           right: 0;
           bottom: 0;
           left: 0;
+          background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,0)), color-stop(80%, #000));
+          background-image: -webkit-linear-gradient(rgba(255,255,255,0), #000 80%);
           background-image: linear-gradient(rgba(255,255,255,0), #000 80%);
         }
 
@@ -130,8 +180,9 @@
         background-image: url('../img/unityads-white.png')
       }
 
-      /* Make sure about the colors here */
       .btn-download
+        background: -webkit-gradient(linear, left top, left bottom, from(#00e3c8),  to(#00cbd6));
+        background: -webkit-linear-gradient(#00e3c8, #00cbd6);
         background: linear-gradient(#00e3c8, #00cbd6)
         margin: 12.5pt auto
         padding: 5px
@@ -144,6 +195,7 @@
     top: 45%
     width: 100%
     -webkit-transform: translate(0, -50%)
+    transform: translate(0, -50%)
 
   .game-info
     margin-left: 18px
@@ -530,6 +582,13 @@ body.android
 
       .game-rating-count
         font-size: 40px
+
+
+    &.portrait #end-screen
+      .end-screen-info-background.dark .btn-download
+        font-size: 24pt
+        padding: 30px
+        width: 50%
 
     &.landscape
       #end-screen

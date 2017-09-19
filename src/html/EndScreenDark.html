@@ -1,13 +1,11 @@
 <div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>"><a class="btn-close"><span class="icon-close"></span></a></div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
-  <!--<div class="game-background game-background-landscape" style="background-image: url(<%= data.endScreenLandscape.replace("file://", '') %>)"></div>-->
-  <!--<div class="game-background game-background-portrait" style="background-image: url(<%= data.endScreenPortrait.replace("file://", '') %>)"></div>-->
-  <div class="end-screen-info-background dark animate">
-    <div class="end-screen-underlay underlay-landscape" style="background-image: url(<%= data.endScreenLandscape.replace("file://", '') %>)"></div>
-    <div class="end-screen-underlay underlay-portrait" style="background-image: url(<%= data.endScreenPortrait.replace("file://", '') %>)"></div>
+  <div class="end-screen-info-background dark">
+    <div class="end-screen-underlay underlay-landscape" style="background-image: url(<%= data.endScreenLandscape %>)"></div>
+    <div class="end-screen-underlay underlay-portrait" style="background-image: url(<%= data.endScreenPortrait %>)"></div>
     <div class="end-screen-info">
       <div class="game-info">
-        <div class="game-icon" style="background-image: url(<%= data.gameIcon.replace("file://", '') %>)"></div>
+        <div class="game-icon" style="background-image: url(<%= data.gameIcon %>)"></div>
         <div class="name-container"><%= data.gameName %></div>
       </div>
       <div class="store-container">
