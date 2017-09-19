@@ -54,4 +54,8 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
     public getOptionalAssets(): Asset[] {
         return [];
     }
+
+    public isConnectionNeeded(): boolean {
+        return false;
+    }
 }
