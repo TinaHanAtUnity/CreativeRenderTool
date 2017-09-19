@@ -60,6 +60,7 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import { ProgrammaticVastParser } from 'Utilities/Campaigns/ProgrammaticVastParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -592,7 +593,7 @@ describe('CampaignManager', () => {
                 };
 
                 // when the parser's max wrapper depth is set to 0 to disallow wrapping
-                vastParser.setMaxWrapperDepth(0);
+                ProgrammaticVastParser.setVastParserMaxDepth(0);
 
                 // then we should get an error because there was no video URL,
                 // because the video url would have been in the wrapped xml
@@ -640,7 +641,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return verifyCampaignForResponse(response).then(() => {
                     // then the SDK's logWarning function is called with an appropriate message
-                    assert.isTrue(warningSpy.calledWith(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`));
+                    assert.isTrue(warningSpy.calledWith('Campaign does not have an error url!'));
                 });
             });
 
