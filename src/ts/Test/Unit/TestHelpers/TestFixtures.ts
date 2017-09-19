@@ -6,10 +6,12 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
+import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
 import { Session } from 'Models/Session';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -20,6 +22,10 @@ import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCam
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 export class TestFixtures {
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
+    }
 
     public static getPlacement(): Placement {
         return new Placement({

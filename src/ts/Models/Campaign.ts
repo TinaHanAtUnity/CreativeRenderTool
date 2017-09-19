@@ -89,5 +89,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public abstract getRequiredAssets(): Asset[];
     public abstract getOptionalAssets(): Asset[];
+    public abstract isConnectionNeeded(): boolean;
 
 }

@@ -257,8 +257,20 @@ export class WebView {
 
         Promise.all([
             this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getConnectionType()
+        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            if(campaign.isConnectionNeeded() && connectionType === 'none') {
+                this._showing = false;
+                this.showError(true, placementId, 'No connection');
+
+                const error = new DiagnosticError(new Error('No connection is available'), {
+                    id: campaign.getId(),
+                });
+                Diagnostics.trigger('mraid_no_connection', error);
+                return;
+            }
+
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);

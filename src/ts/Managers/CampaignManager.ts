@@ -22,6 +22,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 
@@ -255,7 +256,12 @@ export class CampaignManager {
                 const markup = decodeURIComponent(jsonMraid.markup);
                 const mraidCampaign = new MRAIDCampaign(jsonMraid, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, response.getCacheTTL(), undefined, markup, response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
                 return this.setupCampaignAssets(response.getPlacements(), mraidCampaign);
-
+            case 'programmatic/static-interstitial':
+                const jsonDisplay = JsonParser.parse(response.getContent());
+                const displayMarkup = decodeURIComponent(jsonDisplay.markup);
+                const clickThroughUrl = jsonDisplay.clickThroughURL;
+                const displayInterstitialCampaign = new DisplayInterstitialCampaign(displayMarkup, session, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
+                return this.setupCampaignAssets(response.getPlacements(), displayInterstitialCampaign);
             default:
                 return this.handleError(new Error('Unsupported content-type: ' + response.getContentType()), response.getPlacements());
         }
