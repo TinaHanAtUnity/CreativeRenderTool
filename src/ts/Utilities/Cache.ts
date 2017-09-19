@@ -552,6 +552,18 @@ export class Cache {
         } else {
             this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
         }
+
+        // reject all files larger than 20 megabytes
+        if(totalSize > 20971520) {
+            this._nativeBridge.Cache.stop();
+            Diagnostics.trigger('too_large_file', {
+                url: url,
+                size: size,
+                totalSize: totalSize,
+                responseCode: responseCode,
+                headers: headers
+            });
+        }
     }
 
     private onDownloadProgress(url: string, size: number, totalSize: number): void {
@@ -622,7 +634,10 @@ export class Cache {
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
             this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback);
-            if(!callback.paused) {
+            if(callback.contentLength > 20971520) {
+                // files larger than 20 megabytes should be handled as failures
+                this.fulfillCallback(url, CacheStatus.FAILED);
+            } else if(!callback.paused) {
                 this.fulfillCallback(url, CacheStatus.STOPPED);
             }
         }
