@@ -53,6 +53,7 @@ describe('DisplayInterstitial', () => {
     it('should show', () => {
         view.render();
         view.show();
+        view.hide();
     });
 
     it('should redirect when the redirect message is sent', () => {
@@ -69,8 +70,10 @@ describe('DisplayInterstitial', () => {
             setTimeout(() => {
                 try {
                     assert.isTrue(spy.calledWith('https://unity3d.com'));
+                    view.hide();
                     resolve();
                 } catch (e) {
+                    view.hide();
                     reject(e);
                 }
             }, 100);
@@ -92,8 +95,10 @@ describe('DisplayInterstitial', () => {
             setTimeout(() => {
                 try {
                     assert.isTrue(spy.calledWith('https://unity3d.com'));
+                    view.hide();
                     resolve();
                 } catch (e) {
+                    view.hide();
                     reject(e);
                 }
             }, 100);
