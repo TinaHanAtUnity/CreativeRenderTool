@@ -1,7 +1,11 @@
 export class Lifecycle {
 
-    public static register(events: string[]) {}
+    public static register(events: string[]) {
+        // not implemented
+    }
 
-    public static unregister() {}
+    public static unregister() {
+        // not implemented
+    }
 
 }
