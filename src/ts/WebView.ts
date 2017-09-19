@@ -148,12 +148,12 @@ export class WebView {
                 throw error;
             }
 
-            if(this._configuration.isAnalyticsEnabled()) {
+            if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._focusManager.setListenAndroidLifecycle(true);
                 }
 
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._focusManager);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return Promise.resolve();
