@@ -438,7 +438,7 @@ describe('CampaignManager', () => {
             campaignManager.request();
         });
 
-        const verifyErrorForResponse = (response: any, expectedErrorMessage: string, shouldHaveAdPlan: boolean = false): Promise<void> => {
+        const verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
             // given a VAST placement with invalid XML
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
@@ -455,9 +455,6 @@ describe('CampaignManager', () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
                 assert.equal(triggeredError.message, expectedErrorMessage);
-                if(shouldHaveAdPlan) {
-                    assert.isDefined(triggeredError.adPlan, 'Should have adPlan in error');
-                }
             });
         };
 
@@ -574,7 +571,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
                     mockRequest.verify();
-                    return verifyErrorForResponse(response, 'model: AuctionResponse key: content with value: null: null is not in: string', true);
+                    return verifyErrorForResponse(response, 'model: AuctionResponse key: content with value: null: null is not in: string');
                 });
             });
 
@@ -820,7 +817,6 @@ describe('CampaignManager', () => {
             campaignManager.request().then(() => {
                 mockRequest.verify();
                 assert.equal(triggeredError.message, 'model: AuctionResponse key: content with value: null: null is not in: string');
-                assert.isDefined(triggeredError.adPlan, 'Should have adPlan in error');
             });
         });
 

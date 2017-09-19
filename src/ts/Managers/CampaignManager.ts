@@ -1,4 +1,4 @@
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -60,7 +60,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable2<WebViewError, string[]>();
+    public readonly onError = new Observable4<WebViewError, string[], string | undefined, any>();
     public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
@@ -74,6 +74,8 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
+    private _rawResponse: string | undefined;
+    private _parsedResponse: any;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -99,6 +101,14 @@ export class CampaignManager {
 
         this._requesting = true;
 
+        if(this._rawResponse) {
+            delete this._rawResponse;
+        }
+
+        if(this._parsedResponse) {
+            delete this._parsedResponse;
+        }
+
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
@@ -109,7 +119,8 @@ export class CampaignManager {
                     followRedirects: false,
                     retryWithConnectionEvents: true
                 }).then(response => {
-                    if (response) {
+                    if(response) {
+                        this._rawResponse = response.response;
                         return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -133,6 +144,8 @@ export class CampaignManager {
 
     private parseCampaigns(response: INativeResponse, session: Session) {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+
+        this._parsedResponse = json;
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
@@ -169,7 +182,6 @@ export class CampaignManager {
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
                     } catch(error) {
-                        error.adPlan = json;
                         return this.handleError(error, fill[mediaId]);
                     }
                     promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
@@ -177,7 +189,6 @@ export class CampaignManager {
                             return Promise.resolve();
                         }
 
-                        error.adPlan = json;
                         return this.handleError(error, fill[mediaId]);
                     }));
 
@@ -242,7 +253,7 @@ export class CampaignManager {
 
     private handleError(error: any, placementIds: string[]): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds);
+        this.onError.trigger(error, placementIds, this._rawResponse, this._parsedResponse);
 
         return Promise.resolve();
     }
