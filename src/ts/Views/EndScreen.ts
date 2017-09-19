@@ -30,7 +30,7 @@ export class EndScreen extends View {
         this._localization = new Localization(language, 'endscreen');
 
         /* TODO: Redundant check, the same as on line 42? */
-        this._abGroup = 9 || campaign && campaign.getAbGroup();
+        this._abGroup = campaign && campaign.getAbGroup();
 
         if (this._abGroup === 8 || this._abGroup === 9) {
             this._template = new Template(EndScreenDarkTemplate, this._localization);
