@@ -81,6 +81,7 @@ export class Cache {
 
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
+    private _maxFileSize: number = 20971520;
 
     private _currentDownloadPosition: number = -1;
     private _lastProgressEvent: number;
@@ -554,7 +555,7 @@ export class Cache {
         }
 
         // reject all files larger than 20 megabytes
-        if(totalSize > 20971520) {
+        if(totalSize > this._maxFileSize) {
             this._nativeBridge.Cache.stop();
             Diagnostics.trigger('too_large_file', {
                 url: url,
@@ -634,7 +635,7 @@ export class Cache {
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
             this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback);
-            if(callback.contentLength > 20971520) {
+            if(callback.contentLength > this._maxFileSize) {
                 // files larger than 20 megabytes should be handled as failures
                 this.fulfillCallback(url, CacheStatus.FAILED);
             } else if(!callback.paused) {
