@@ -93,6 +93,10 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         return this.get('portrait');
     }
 
+    public isConnectionNeeded(): boolean {
+        return false;
+    }
+
     public getDTO(): { [key: string]: any } {
         let portrait;
         const portraitAsset = this.get('portrait');
