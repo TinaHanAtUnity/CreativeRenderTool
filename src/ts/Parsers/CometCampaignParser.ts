@@ -1,6 +1,6 @@
 import { Campaign } from 'Models/Campaign';
 import { JsonParser } from 'Utilities/JsonParser';
-import { CampaignParser } from 'Utilities/Campaigns/CampaignParser';
+import { CampaignParser } from 'Parsers/CampaignParser';
 import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Models/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';

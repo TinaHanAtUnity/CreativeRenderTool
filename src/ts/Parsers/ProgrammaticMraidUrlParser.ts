@@ -1,4 +1,4 @@
-import { CampaignParser } from 'Utilities/Campaigns/CampaignParser';
+import { CampaignParser } from 'Parsers/CampaignParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { JsonParser } from 'Utilities/JsonParser';
