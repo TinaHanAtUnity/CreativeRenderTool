@@ -152,6 +152,10 @@ class TestCampaign extends Campaign {
     public getOptionalAssets() {
         return this._optional;
     }
+
+    public isConnectionNeeded() {
+        return false;
+    }
 }
 
 describe('AssetManagerTest', () => {

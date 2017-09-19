@@ -193,6 +193,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('appStoreId');
     }
 
+    public isConnectionNeeded(): boolean {
+        const resourceUrl = this.getResourceUrl();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            return false;
+        }
+        return true;
+    }
+
     public getDTO(): { [key: string]: any } {
         let resourceUrlDTO: any;
         const resourceUrlAsset = this.getResourceUrl();
