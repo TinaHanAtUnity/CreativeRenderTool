@@ -60,7 +60,7 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
-import { ProgrammaticVastParser } from 'Utilities/Campaigns/ProgrammaticVastParser';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
