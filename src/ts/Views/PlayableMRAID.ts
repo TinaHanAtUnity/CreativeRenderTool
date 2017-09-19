@@ -42,9 +42,9 @@ export class PlayableMRAID extends MRAIDView {
 
         this._placement = placement;
         this._campaign = campaign;
-        this._localization = new Localization(language, 'endscreen');
+        this._localization = new Localization(language, 'loadingscreen');
 
-        this._template = new Template(PlayableMRAIDTemplate);
+        this._template = new Template(PlayableMRAIDTemplate, this._localization);
 
         if(campaign) {
             this._templateData = {

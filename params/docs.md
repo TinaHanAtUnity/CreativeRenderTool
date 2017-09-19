@@ -16,6 +16,7 @@
 | advertisingTrackingId | string | Advertising identifier in raw format | SDK | all |
 | androidId | string | Android ID | SDK | android |
 | apiLevel | number | Android device API level | SDK | android |
+| auctionId | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | bundleId | string | Bundle identifier for the app | SDK | all |
 | bundleVersion | string | Game version | SDK | all |
 | cached | boolean | If video is cached or streamed | SDK | all |
@@ -54,7 +55,6 @@
 | screenSize | number | Android raw screen layout value | SDK | android |
 | screenWidth | number | Screen width in pixels | SDK | all |
 | sdkVersion | number | SDK version in four digits | SDK | all |
-| sessionId | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
 | sid | string | Server side reward callback id | App | all |
 | skippedAt | number | Milliseconds from video start to video skip | SDK | all |
 | stores | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
@@ -66,7 +66,7 @@
 | cachedCampaigns | object | Campaign ID's which are fully cached on the device | SDK | all |
 | previousPlacementId | string | Previously shown placementId | SDK | all |
 | properties | string | Gamer specific parameters | Server | all |
-| placements | object | All placements received in configuration | SDK | all |
+| placements | object | All placements received in configuration | Server | all |
 
 
 
@@ -101,6 +101,7 @@
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
 | androidId | no | True | False | string | Android ID | SDK | android |
+| auctionId | all | True | False | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | platform | all | True | False | string | "android" or "ios" | SDK | all |
@@ -137,7 +138,7 @@
 | cachedCampaigns | no | False | True | object | Campaign ID's which are fully cached on the device | SDK | all |
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 | properties | all | False | True | string | Gamer specific parameters | Server | all |
-| placements | all | False | True | object | All placements received in configuration | SDK | all |
+| placements | all | False | True | object | All placements received in configuration | Server | all |
 
 
 
@@ -145,7 +146,7 @@
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
-| sessionId | all | False | True | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
+| auctionId | all | False | True | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |
@@ -186,7 +187,7 @@
 | gameId | all | True | False | string | Source game identifier | App | all |
 | redirect | all | True | False | boolean | Legacy parameter, always false | SDK | all |
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
-| sessionId | all | False | True | string | Unique ad unit session identifier. This identifies one ad unit lifecycle so e.g. start and end events share same sessionId. | SDK | all |
+| auctionId | all | False | True | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |

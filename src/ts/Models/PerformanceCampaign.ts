@@ -188,6 +188,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         ];
     }
 
+    public isConnectionNeeded(): boolean {
+        return false;
+    }
+
     public getDTO(): { [key: string]: any } {
         let gameIcon: any;
         const gameIconObject = this.getGameIcon();

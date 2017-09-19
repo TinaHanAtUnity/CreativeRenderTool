@@ -34,8 +34,9 @@ export abstract class MRAIDView extends View {
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
-                mraid = this.replaceMraidSources(mraid);
 
+                mraid = mraid.replace(/\$/g, '$$$');
+                mraid = this.replaceMraidSources(mraid);
                 return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');

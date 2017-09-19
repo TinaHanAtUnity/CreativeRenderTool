@@ -1,3 +1,13 @@
+# Thu Sep 14 09:43:51 UTC 2017
+
+* Refactored AuctionResponse to be a typed model.
+* Added Chinese translations to the playable loading screen.
+* 2.0.6+ fixed issue on iOS with opening in incorrect orientation.
+
+# Tue Sep 12 08:50:43 UTC 2017
+
+* Add auctionId to ad requests and all operative events, remove sessionId from operative events
+
 # Mon Sep 11 12:02:52 UTC 2017
 
 * Remove handle_campaign_failed diagnostic message

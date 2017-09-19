@@ -21,7 +21,7 @@ describe('IosAdUnitTest', () => {
         supportedOrientations: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         supportedOrientationsPlist: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         shouldAutorotate: true,
-        statusBarOrientation: 1,
+        statusBarOrientation: 4, // landscape left
         statusBarHidden: false
     };
 
@@ -39,7 +39,7 @@ describe('IosAdUnitTest', () => {
 
         it('with all options true', () => {
             return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, true, true, true, defaultOptions).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['videoplayer', 'webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE, false, true, true, true);
+                sinon.assert.calledWith(<sinon.SinonSpy>stub, ['videoplayer', 'webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT, false, true, true, true);
                 return;
             });
         });
