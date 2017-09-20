@@ -178,13 +178,9 @@ export class CampaignManager {
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    let auctionResponse: AuctionResponse | undefined;
+                    let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
-                    } catch(error) {
-                        this.handleError(error, fill[mediaId]);
-                    }
-                    if(auctionResponse) {
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
@@ -192,13 +188,15 @@ export class CampaignManager {
 
                             return this.handleError(error, fill[mediaId]);
                         }));
-                    }
 
-                    // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
-                    const contentType = json.media[mediaId].contentType;
-                    const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
-                        refreshDelay = cacheTTL;
+                        // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
+                        const contentType = json.media[mediaId].contentType;
+                        const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                        if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                            refreshDelay = cacheTTL;
+                        }
+                    } catch(error) {
+                        this.handleError(error, fill[mediaId]);
                     }
                 }
             }
