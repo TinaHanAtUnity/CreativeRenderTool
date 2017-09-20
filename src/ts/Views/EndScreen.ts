@@ -22,7 +22,7 @@ export class EndScreen extends View {
     private _privacy: Privacy;
     private _localization: Localization;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
@@ -92,6 +92,15 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+
+        // todo: add game id check
+        if(gameId !== '-1') {
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.campaign-container, .game-background, .btn.download'
+            });
+        }
     }
 
     public show(): void {

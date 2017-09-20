@@ -51,7 +51,7 @@ export class Overlay extends View {
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
         super(nativeBridge, 'overlay');
 
         this._localization = new Localization(language, 'overlay');
@@ -84,6 +84,14 @@ export class Overlay extends View {
                 listener: (event: Event) => this.onClick(event)
             }
         ];
+
+        // todo: add real game id
+        if(gameId !== '-1') {
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onSkipEvent(event)
+            });
+        }
     }
 
     public render(): void {
