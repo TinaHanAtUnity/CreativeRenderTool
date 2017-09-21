@@ -94,7 +94,7 @@ export class AdUnitFactory {
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
-            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign, sessionManager.getClientInfo().getGameId());
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo, request);
         } else {
