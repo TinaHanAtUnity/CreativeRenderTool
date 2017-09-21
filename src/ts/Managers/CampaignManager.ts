@@ -5,7 +5,6 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
@@ -72,12 +71,11 @@ export class CampaignManager {
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
-    private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
     private _parsedResponse: any;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -85,7 +83,6 @@ export class CampaignManager {
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._vastParser = vastParser;
         this._metaDataManager = metaDataManager;
 
         this._requesting = false;
