@@ -1,3 +1,15 @@
+# Wed Sep 20 12:10:38 UTC 2017
+
+* Initial display ads support
+* Send analytics test data from gameIds 14850 and 14851
+* Do not show 3rd party MRAIDs if no connectivity is available
+* Include ad request response in plc_request_failed diagnostics
+* Refactor campaign response parsers
+* Make sure that string replacement patterns are not removed on string.replace operations
+* Reject files larger than 20MB
+* Call AdUnit.hide on display interstitial tests
+* Browser build fixes
+
 # Thu Sep 14 09:43:51 UTC 2017
 
 * Refactored AuctionResponse to be a typed model.
