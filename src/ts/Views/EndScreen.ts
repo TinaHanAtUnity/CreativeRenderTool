@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import EndScreenDarkTemplate from 'html/EndScreenDark.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -21,14 +22,23 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        /* TODO: Redundant check, the same as on line 42? */
+        this._abGroup = campaign && campaign.getAbGroup();
 
+        if (this._abGroup === 8 || this._abGroup === 9) {
+            this._template = new Template(EndScreenDarkTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
+
+        /* TODO: Why is there a check for campaign */
         if(campaign && campaign instanceof  PerformanceCampaign) {
             this._gameName = campaign.getGameName();
 
@@ -110,6 +120,15 @@ export class EndScreen extends View {
            setTimeout(() => {
                this.onClose.trigger();
            }, AbstractAdUnit.getAutoCloseDelay());
+        }
+
+        const darkEndScreenInfo = <HTMLElement>this._container.querySelector(".end-screen-info-background.dark");
+        if (darkEndScreenInfo) {
+            if (this._abGroup === 9) {
+                darkEndScreenInfo.classList.add("animate");
+            } else {
+                darkEndScreenInfo.classList.add("without-animation");
+            }
         }
     }
 
