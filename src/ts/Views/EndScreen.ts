@@ -21,6 +21,7 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
+    private _isSwipeToCloseEnabled: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
         super(nativeBridge, 'end-screen');
@@ -94,11 +95,21 @@ export class EndScreen extends View {
         ];
 
         if(gameId === '1300023' || gameId === '1300024') {
+            this._isSwipeToCloseEnabled = true;
+
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.campaign-container, .game-background, .btn.download'
             });
+        }
+    }
+
+    public render(): void {
+        super.render();
+
+        if(this._isSwipeToCloseEnabled) {
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
     }
 
