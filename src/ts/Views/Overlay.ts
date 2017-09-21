@@ -85,8 +85,7 @@ export class Overlay extends View {
             }
         ];
 
-        // todo: add real game id
-        if(gameId !== '-1') {
+        if(gameId === '1300023' || gameId === '1300024') {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onSkipEvent(event)

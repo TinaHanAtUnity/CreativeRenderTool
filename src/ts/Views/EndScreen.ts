@@ -93,8 +93,7 @@ export class EndScreen extends View {
             }
         ];
 
-        // todo: add game id check
-        if(gameId !== '-1') {
+        if(gameId === '1300023' || gameId === '1300024') {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onCloseEvent(event),
