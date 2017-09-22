@@ -76,7 +76,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
     private _parsedResponse: any;
-    private _parserMap: { [key: string]: CampaignParser};
+    private _parserMap: { [key: string]: CampaignParser };
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
