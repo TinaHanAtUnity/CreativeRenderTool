@@ -42,14 +42,11 @@ export class Swipe {
         if(Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
             if (Math.abs(xDiff) > Swipe._moveTolerance) {
                 // left or right swipe
-                const fakeEvent = new MouseEvent('swipe', {
-                    view: window,
-                    bubbles: true,
-                    cancelable: true
-                });
+                const swipeEvent = document.createEvent('MouseEvent');
+                swipeEvent.initMouseEvent('swipe', true, true, window,0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
                 event.stopPropagation();
-                if(!event.target.dispatchEvent(fakeEvent)) {
+                if(!event.target.dispatchEvent(swipeEvent)) {
                     event.preventDefault();
                 }
             }
