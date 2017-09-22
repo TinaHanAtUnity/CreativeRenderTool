@@ -76,6 +76,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
     private _parsedResponse: any;
+    private _parserMap: { [key: string]: CampaignParser};
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -87,7 +88,7 @@ export class CampaignManager {
         this._deviceInfo = deviceInfo;
         this._vastParser = vastParser;
         this._metaDataManager = metaDataManager;
-
+        this._parserMap = {};
         this._requesting = false;
     }
 
@@ -211,28 +212,40 @@ export class CampaignManager {
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        const parser = this.getCampaignParser(response, session);
+        let parser: CampaignParser;
+
+        switch (response.getContentType()) {
+            case 'comet/campaign':
+                parser = this.getCampaignParser(CometCampaignParser, response, session);
+                break;
+            case 'programmatic/vast':
+                parser = this.getCampaignParser(ProgrammaticVastParser, response, session);
+                break;
+            case 'programmatic/mraid-url':
+                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response, session);
+                break;
+            case 'programmatic/mraid':
+                parser = this.getCampaignParser(ProgrammaticMraidParser, response, session);
+                break;
+            case 'programmatic/static-interstitial':
+                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response, session);
+                break;
+            default:
+                throw new Error('Unsupported content-type: ' + response.getContentType());
+        }
+
         return parser.parse(this._nativeBridge, this._request).then((campaign) => {
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
 
-    private getCampaignParser(response: AuctionResponse, session: Session): CampaignParser {
-        const gamerId: string = this._configuration.getGamerId();
-        switch (response.getContentType()) {
-            case 'comet/campaign':
-                return new CometCampaignParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/vast':
-                return new ProgrammaticVastParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/mraid-url':
-                return new ProgrammaticMraidUrlParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/mraid':
-                return new ProgrammaticMraidParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/static-interstitial':
-                return new ProgrammaticStaticInterstitialParser(response, session, gamerId, this.getAbGroup());
-            default:
-                throw new Error('Unsupported content-type: ' + response.getContentType());
+    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(r: AuctionResponse, s: Session, g: string, ab: number): T; }, response: AuctionResponse, session: Session): CampaignParser {
+        if(!this._parserMap[response.getContentType()]) {
+            const campaignParser: T = new CampaignParserConstructor(response, session, this._configuration.getGamerId(), this.getAbGroup());
+            this._parserMap[response.getContentType()] = campaignParser;
         }
+
+        return this._parserMap[response.getContentType()];
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {

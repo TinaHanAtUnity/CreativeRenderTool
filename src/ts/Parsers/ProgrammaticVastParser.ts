@@ -14,15 +14,20 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private static VAST_PARSER_MAX_DEPTH: number;
 
+    private _vastParser: VastParser;
+
     public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
         const decodedVast = decodeURIComponent(this.getAuctionResponse().getContent()).trim();
-        const vastParser = new VastParser();
 
-        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
-            vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        if(!this._vastParser) {
+            this._vastParser = new VastParser();
         }
 
-        return vastParser.retrieveVast(decodedVast, nativeBridge, request).then(vast => {
+        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        }
+
+        return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             const campaign = new VastCampaign(vast, campaignId, this.getSession(), this.getGamerId(), this.getAbGroup(), this.getAuctionResponse().getCacheTTL(), this.getAuctionResponse().getTrackingUrls(), this.getAuctionResponse().getAdType(), this.getAuctionResponse().getCreativeId(), this.getAuctionResponse().getSeatId(), this.getAuctionResponse().getCorrelationId());
             if(campaign.getVast().getImpressionUrls().length === 0) {
