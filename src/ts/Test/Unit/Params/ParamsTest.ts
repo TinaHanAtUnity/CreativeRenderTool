@@ -262,7 +262,7 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -288,7 +288,7 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, TestFixtures.getVastParser(), metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
