@@ -14,14 +14,10 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private static VAST_PARSER_MAX_DEPTH: number;
 
-    private _vastParser: VastParser;
+    private _vastParser: VastParser = new VastParser();
 
     public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
         const decodedVast = decodeURIComponent(this.getAuctionResponse().getContent()).trim();
-
-        if(!this._vastParser) {
-            this._vastParser = new VastParser();
-        }
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
