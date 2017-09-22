@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Configuration } from 'Models/Configuration';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
