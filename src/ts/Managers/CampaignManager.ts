@@ -239,7 +239,7 @@ export class CampaignManager {
         });
     }
 
-    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(r: AuctionResponse, s: Session, g: string, ab: number): T; }, response: AuctionResponse, session: Session): CampaignParser {
+    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(response: AuctionResponse, session: Session, gamerId: string, abGroup: number): T; }, response: AuctionResponse, session: Session): CampaignParser {
         if(!this._parserMap[response.getContentType()]) {
             const campaignParser: T = new CampaignParserConstructor(response, session, this._configuration.getGamerId(), this.getAbGroup());
             this._parserMap[response.getContentType()] = campaignParser;
