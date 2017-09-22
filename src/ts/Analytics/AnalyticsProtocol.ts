@@ -2,6 +2,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
+import { Configuration } from 'Models/Configuration';
 
 export interface IAnalyticsObject {
     type: string;
@@ -18,39 +19,27 @@ interface IAnalyticsCommonObjectInternal {
     sessionid: number;
     platform: string;
     platformid: number;
-    deviceid: string | undefined | null;
-    sdkver: string;
-    debug_device?: boolean;
+    sdk_ver: string;
+    adsid: string | undefined | null;
+    ads_tracking: boolean;
+    ads_coppa: boolean;
+    ads_gamerid: string;
+    ads_gameid: string;
+    ads_sdk: boolean;
 }
 
 interface IAnalyticsDeviceInfoEvent {
     ts: number;
-    app_ver?: string;
+    app_ver: string;
     adsid: string | undefined | null;
-    ads_tracking?: boolean;
-    os_ver?: string;
-    model?: string;
+    ads_tracking: boolean;
+    os_ver: string;
+    model: string;
     make?: string;
-    app_name?: string; // bundle id
-    gfx_name?: string;
-    gfx_vendor?: string;
-    gfx_ver?: string;
-    gfx_driver?: string;
-    gfx_shader?: number;
-    gfx_api?: number;
-    gfx_tex?: number;
-    gfx_rt?: number;
-    gfx_flags?: number;
-    cpu?: string;
-    cpu_count?: number;
-    cpu_freq?: number;
-    ram?: number;
-    vram?: number;
-    screen?: string;
-    dpi?: number;
-    lang?: string;
-    sensors?: number;
-    flags?: number;
+    app_name: string;
+    ram: number;
+    screen: string;
+    lang: string;
     rooted_jailbroken?: boolean;
 }
 
@@ -88,16 +77,20 @@ interface IAnalyticsTransactionReceipt {
 }
 
 export class AnalyticsProtocol {
-    public static getCommonObject(platform: Platform, userId: string, sessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo): IAnalyticsCommonObject {
+    public static getCommonObject(platform: Platform, userId: string, sessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: Configuration): IAnalyticsCommonObject {
         const common: IAnalyticsCommonObjectInternal = {
-            appid: 'gameid.' + clientInfo.getGameId(),
+            appid: configuration.getUnityProjectId(),
             userid: userId,
             sessionid: sessionId,
-            platform: platform === Platform.IOS ? 'IPhonePlayer' : 'Android',
+            platform: platform === Platform.IOS ? 'IPhonePlayer' : 'AndroidPlayer',
             platformid: platform === Platform.IOS ? 8 : 11,
-            deviceid: deviceInfo.getAdvertisingIdentifier(), // todo: ios 10 limit ad tracking?
-            sdkver: clientInfo.getSdkVersionName(),
-            debug_device: clientInfo.getTestMode() // todo: is it ok to use testmode for this?
+            sdk_ver: clientInfo.getSdkVersionName(),
+            adsid: deviceInfo.getAdvertisingIdentifier(),
+            ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
+            ads_coppa: configuration.isCoppaCompliant(),
+            ads_gamerid: configuration.getGamerId(),
+            ads_gameid: clientInfo.getGameId(),
+            ads_sdk: true
         };
         return {
             common: common
@@ -120,32 +113,17 @@ export class AnalyticsProtocol {
                 ts: Date.now(),
                 app_ver: clientInfo.getApplicationVersion(),
                 adsid: deviceInfo.getAdvertisingIdentifier(),
-                ads_tracking: !deviceInfo.getLimitAdTracking(),
+                ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
                 os_ver: deviceInfo.getOsVersion(),
                 model: deviceInfo.getModel(),
                 make: deviceInfo.getManufacturer(), // empty for iOS
                 app_name: clientInfo.getApplicationName(),
-                // gfx_name?: string;
-                // gfx_vendor?: string;
-                // gfx_ver?: string;
-                // gfx_driver?: string;
-                // gfx_shader?: number;
-                // gfx_api?: number;
-                // gfx_tex?: number;
-                // gfx_rt?: number;
-                // gfx_flags?: number;
-                // cpu?: string;
-                // cpu_count?: number;
-                // cpu_freq?: number;
                 ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
-                // vram?: number;
                 screen: screenWidth + ' x ' + screenHeight,
-                // dpi?: number; TODO: should be possible to get from device info but maybe not directly
-                lang: deviceInfo.getLanguage(), // todo: ads probably has stuff like 'en_US', analytics has 'en'
-                // sensors?: number;
-                // flags?: number;
+                lang: deviceInfo.getLanguage(),
                 rooted_jailbroken: deviceInfo.isRooted() ? true : undefined
             };
+
             return {
                 type: 'analytics.deviceInfo.v1',
                 msg: event

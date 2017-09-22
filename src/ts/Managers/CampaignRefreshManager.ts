@@ -30,7 +30,7 @@ export class CampaignRefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds) => this.onError(error, placementIds));
+        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan, parsedAdPlan) => this.onError(error, placementIds, rawAdPlan, parsedAdPlan));
         this._campaignManager.onAdPlanReceived.subscribe(refreshDelay => this.onAdPlanReceived(refreshDelay));
     }
 
@@ -140,14 +140,18 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[]) {
+    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string, parsedAdPlan?: any) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger('plc_request_failed', error);
+        Diagnostics.trigger('plc_request_failed', {
+            error: error,
+            rawAdResponse: rawAdPlan,
+            adResponse: parsedAdPlan
+        });
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {

@@ -27,6 +27,8 @@ import { MRAIDCampaign } from 'Models/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
+import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
@@ -189,6 +191,98 @@ describe('AdUnitFactoryTest', () => {
         it('should call click tracker', () => {
             adUnit.sendClick();
             sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
+        });
+    });
+
+    describe('DisplayInterstitialAdUnit', () => {
+        let adUnit: DisplayInterstitialAdUnit;
+        let campaign: DisplayInterstitialCampaign;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, request, {});
+        });
+
+        describe('on click', () => {
+            it('should open an intent on Android', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                sandbox.stub(nativeBridge.Intent, 'launch');
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'http://google.com'
+                });
+            });
+
+            it('should open the url on iOS', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+                sandbox.stub(nativeBridge.UrlScheme, 'open');
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
+            });
+
+            it('should send a tracking event', () => {
+                sandbox.stub(sessionManager, 'sendClick');
+
+                adUnit.onRedirect.trigger('http://google.com');
+
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendClick);
+            });
+
+            it('should not redirect if the protocol is whitelisted', () => {
+                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                sandbox.stub(nativeBridge.Intent, 'launch');
+                adUnit.onRedirect.trigger('tel://127.0.0.1:5000');
+
+                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
+            });
+        });
+
+        describe('on close', () => {
+            it('should hide the adUnit', () => {
+                sandbox.stub(adUnit, 'hide');
+
+                adUnit.onClose.trigger();
+
+                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
+            it('should send the view diagnostic event', () => {
+                adUnit.onClose.trigger();
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendView);
+            });
+            it('should send the third quartile diagnostic event', () => {
+                adUnit.onClose.trigger();
+                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
+            });
+        });
+
+        describe('on skip', () => {
+            it('should hide the adUnit', () => {
+                sandbox.stub(adUnit, 'hide');
+
+                adUnit.onSkip.trigger();
+
+                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
+        });
+
+        describe('on start', () => {
+            let eventManager: any;
+
+            beforeEach(() => {
+                eventManager = {
+                    thirdPartyEvent: sinon.stub().returns(Promise.resolve())
+                };
+                sandbox.stub(sessionManager, 'getEventManager').returns(eventManager);
+            });
+
+            it('should send tracking events', () => {
+                adUnit.onStart.trigger();
+
+                sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+            });
         });
     });
 });
