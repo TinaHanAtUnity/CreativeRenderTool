@@ -2,7 +2,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
-import { StoreName } from 'Models/PerformanceCampaign';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Session } from 'Models/Session';
 
 interface IMRAIDCampaign extends ICampaign {

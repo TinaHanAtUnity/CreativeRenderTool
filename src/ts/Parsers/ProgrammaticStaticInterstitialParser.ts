@@ -3,7 +3,7 @@ import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { JsonParser } from 'Utilities/JsonParser';
-import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {

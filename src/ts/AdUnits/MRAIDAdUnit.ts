@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';

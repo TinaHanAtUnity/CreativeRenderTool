@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { DisplayInterstitial } from "Views/DisplayInterstitial";
 import { NativeBridge } from "Native/NativeBridge";
 import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from "Constants/Platform";

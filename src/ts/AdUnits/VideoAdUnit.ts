@@ -12,7 +12,7 @@ import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {

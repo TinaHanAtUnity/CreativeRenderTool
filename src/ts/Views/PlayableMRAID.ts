@@ -2,7 +2,7 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';

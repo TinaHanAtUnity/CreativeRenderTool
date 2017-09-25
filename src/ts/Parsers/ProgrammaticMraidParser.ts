@@ -3,7 +3,7 @@ import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { JsonParser } from 'Utilities/JsonParser';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class ProgrammaticMraidParser extends CampaignParser {
