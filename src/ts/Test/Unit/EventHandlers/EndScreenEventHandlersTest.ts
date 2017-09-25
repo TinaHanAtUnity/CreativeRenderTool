@@ -16,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { PerformanceCampaign, StoreName } from "Models/PerformanceCampaign";
+import { PerformanceCampaign, StoreName } from "Models/Campaigns/PerformanceCampaign";
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';

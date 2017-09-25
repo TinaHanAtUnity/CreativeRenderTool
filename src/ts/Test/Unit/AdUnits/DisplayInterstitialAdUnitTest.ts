@@ -8,7 +8,7 @@ import { AdUnitContainer } from "AdUnits/Containers/AdUnitContainer";
 import { SessionManager } from "Managers/SessionManager";
 import { Placement } from "Models/Placement";
 import { Request } from 'Utilities/Request';
-import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 import { DisplayInterstitial } from "Views/DisplayInterstitial";
 import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
 import { Activity } from "AdUnits/Containers/Activity";
