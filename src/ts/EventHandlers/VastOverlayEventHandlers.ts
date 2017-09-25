@@ -1,8 +1,9 @@
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
-import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
+import { EventManager } from 'Managers/EventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class VastOverlayEventHandlers {
 
@@ -16,18 +17,18 @@ export class VastOverlayEventHandlers {
         }
     }
 
-    public static onMute(sessionManager: SessionManager, adUnit: VastAdUnit, muted: boolean): void {
+    public static onMute(eventManager: EventManager, adUnit: VastAdUnit, muted: boolean, clientInfo: ClientInfo): void {
         if (muted) {
-            adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'mute', adUnit.getCampaign().getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+            adUnit.sendTrackingEvent(eventManager, 'mute', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
         } else {
-            adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'unmute', adUnit.getCampaign().getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+            adUnit.sendTrackingEvent(eventManager, 'unmute', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
         }
     }
 
-    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, request: Request): Promise<void> {
+    public static onCallButton(nativeBridge: NativeBridge, eventManager: EventManager, adUnit: VastAdUnit, request: Request, clientInfo: ClientInfo): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), adUnit.getCampaign().getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendVideoClickTrackingEvent(eventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

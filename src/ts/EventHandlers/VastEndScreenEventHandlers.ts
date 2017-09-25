@@ -1,13 +1,14 @@
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { VastAdUnit} from 'AdUnits/VastAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { EventManager } from 'Managers/EventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class VastEndScreenEventHandlers {
-    public static onClick(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, request: Request): Promise<void> {
+    public static onClick(nativeBridge: NativeBridge, adUnit: VastAdUnit, request: Request): Promise<void> {
         const platform = nativeBridge.getPlatform();
         const clickThroughURL = adUnit.getCompanionClickThroughUrl() || adUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
@@ -35,7 +36,7 @@ export class VastEndScreenEventHandlers {
         }
     }
 
-    public static onShow(sessionManager: SessionManager, adUnit: VastAdUnit): void {
-        adUnit.sendCompanionTrackingEvent(sessionManager.getEventManager(), adUnit.getCampaign().getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+    public static onShow(eventManager: EventManager, adUnit: VastAdUnit, clientInfo: ClientInfo): void {
+        adUnit.sendCompanionTrackingEvent(eventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
     }
 }
