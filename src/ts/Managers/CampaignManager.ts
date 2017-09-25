@@ -5,7 +5,6 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
@@ -72,12 +71,12 @@ export class CampaignManager {
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
-    private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
     private _parsedResponse: any;
+    private _parserMap: { [key: string]: CampaignParser };
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -85,9 +84,8 @@ export class CampaignManager {
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._vastParser = vastParser;
         this._metaDataManager = metaDataManager;
-
+        this._parserMap = {};
         this._requesting = false;
     }
 
@@ -178,13 +176,9 @@ export class CampaignManager {
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    let auctionResponse: AuctionResponse | undefined;
+                    let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
-                    } catch(error) {
-                        this.handleError(error, fill[mediaId]);
-                    }
-                    if(auctionResponse) {
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
@@ -192,13 +186,15 @@ export class CampaignManager {
 
                             return this.handleError(error, fill[mediaId]);
                         }));
-                    }
 
-                    // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
-                    const contentType = json.media[mediaId].contentType;
-                    const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
-                        refreshDelay = cacheTTL;
+                        // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
+                        const contentType = json.media[mediaId].contentType;
+                        const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                        if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                            refreshDelay = cacheTTL;
+                        }
+                    } catch(error) {
+                        this.handleError(error, fill[mediaId]);
                     }
                 }
             }
@@ -213,28 +209,40 @@ export class CampaignManager {
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        const parser = this.getCampaignParser(response, session);
+        let parser: CampaignParser;
+
+        switch (response.getContentType()) {
+            case 'comet/campaign':
+                parser = this.getCampaignParser(CometCampaignParser, response, session);
+                break;
+            case 'programmatic/vast':
+                parser = this.getCampaignParser(ProgrammaticVastParser, response, session);
+                break;
+            case 'programmatic/mraid-url':
+                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response, session);
+                break;
+            case 'programmatic/mraid':
+                parser = this.getCampaignParser(ProgrammaticMraidParser, response, session);
+                break;
+            case 'programmatic/static-interstitial':
+                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response, session);
+                break;
+            default:
+                throw new Error('Unsupported content-type: ' + response.getContentType());
+        }
+
         return parser.parse(this._nativeBridge, this._request).then((campaign) => {
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
 
-    private getCampaignParser(response: AuctionResponse, session: Session): CampaignParser {
-        const gamerId: string = this._configuration.getGamerId();
-        switch (response.getContentType()) {
-            case 'comet/campaign':
-                return new CometCampaignParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/vast':
-                return new ProgrammaticVastParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/mraid-url':
-                return new ProgrammaticMraidUrlParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/mraid':
-                return new ProgrammaticMraidParser(response, session, gamerId, this.getAbGroup());
-            case 'programmatic/static-interstitial':
-                return new ProgrammaticStaticInterstitialParser(response, session, gamerId, this.getAbGroup());
-            default:
-                throw new Error('Unsupported content-type: ' + response.getContentType());
+    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(response: AuctionResponse, session: Session, gamerId: string, abGroup: number): T; }, response: AuctionResponse, session: Session): CampaignParser {
+        if(!this._parserMap[response.getContentType()]) {
+            const campaignParser: T = new CampaignParserConstructor(response, session, this._configuration.getGamerId(), this.getAbGroup());
+            this._parserMap[response.getContentType()] = campaignParser;
         }
+
+        return this._parserMap[response.getContentType()];
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {

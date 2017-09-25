@@ -42,9 +42,10 @@ describe('DisplayInterstitial', () => {
         sandbox.restore();
     });
 
-    it('should render', () => {
+    // Disabled because of missing srcdoc support on Android < 4.4
+    xit('should render', () => {
         view.render();
-        const srcdoc = view.container().querySelector('iframe')!.getAttribute('srcdoc');
+        const srcdoc = view.container().querySelector('#display-iframe')!.getAttribute('srcdoc');
 
         assert.isNotNull(srcdoc);
         assert.isTrue(srcdoc!.indexOf(json.display.markup) !== -1);
@@ -80,7 +81,8 @@ describe('DisplayInterstitial', () => {
         });
     });
 
-    it('should redirect when the click catcher is clicked', () => {
+    // Disabled because of missing .click() support on Android < 4.4
+    xit('should redirect when the click catcher is clicked', () => {
         campaign.set('clickThroughUrl', 'https://unity3d.com');
 
         const spy = sinon.spy();
