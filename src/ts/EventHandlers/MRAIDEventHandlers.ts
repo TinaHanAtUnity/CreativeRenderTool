@@ -6,7 +6,7 @@ import { Platform } from 'Constants/Platform';
 import { RequestError } from 'Errors/RequestError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
 

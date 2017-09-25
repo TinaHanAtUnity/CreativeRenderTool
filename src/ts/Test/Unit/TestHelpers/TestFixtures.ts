@@ -7,11 +7,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
-import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 import { Session } from 'Models/Session';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
