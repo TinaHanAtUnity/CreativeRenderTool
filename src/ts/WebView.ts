@@ -36,6 +36,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class WebView {
 
@@ -57,6 +58,7 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
+    private _operativeEventManager: OperativeEventManager;
     private _eventManager: EventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
@@ -121,7 +123,8 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, this._metadataManager);
+            this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._clientInfo, this._deviceInfo);
+            this._sessionManager = new SessionManager(this._nativeBridge);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -154,19 +157,19 @@ export class WebView {
 
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
-                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
+                    this._operativeEventManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return Promise.resolve();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
                 return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
-                    this._sessionManager.setGameSessionId(gameSessionId);
+                    this._operativeEventManager.setGameSessionId(gameSessionId);
                     return Promise.resolve();
                 });
             }
         }).then(() => {
-            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
+            if(this._operativeEventManager.getGameSessionId() % 10000 === 0) {
                 this._cache.setDiagnostics(true);
             }
 
@@ -187,7 +190,7 @@ export class WebView {
 
             this._initialized = true;
 
-            return this._eventManager.sendUnsentSessions();
+            return this._sessionManager.sendUnsentSessions(this._operativeEventManager);
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -271,7 +274,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, this._request, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._eventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
@@ -294,7 +297,7 @@ export class WebView {
                 }
             }
 
-            this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+            this._operativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
             this._campaignManager.setPreviousPlacementId(placementId);
             this._currentAdUnit.show();
         });
@@ -355,7 +358,7 @@ export class WebView {
                     }
                 } else {
                     this._campaignRefreshManager.refresh();
-                    this._eventManager.sendUnsentSessions();
+                    this._sessionManager.sendUnsentSessions(this._operativeEventManager);
                 }
             });
         }
@@ -428,7 +431,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
