@@ -49,6 +49,4 @@ export abstract class CampaignParser {
                 return 'UNKNOWN';
         }
     }
-
-
 }
