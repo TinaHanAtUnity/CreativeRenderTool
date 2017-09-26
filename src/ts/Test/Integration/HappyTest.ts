@@ -7,9 +7,9 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
-import { SessionManager } from 'Managers/SessionManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('IntegrationTest', () => {
 
@@ -49,7 +49,7 @@ describe('IntegrationTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
@@ -90,7 +90,7 @@ describe('IntegrationTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '456', listener, true);
     });
