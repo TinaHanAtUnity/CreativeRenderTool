@@ -257,11 +257,6 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            /*
-            const thirdPartyEventManager: ThirdPartyEventManager = <ThirdPartyEventManager><any>{
-                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
-                startNewSession: sinon.stub().returns(Promise.resolve([]))
-            };*/
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
@@ -286,11 +281,6 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            /*
-            const thirdPartyEventManager: ThirdPartyEventManager = <ThirdPartyEventManager><any>{
-                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
-                startNewSession: sinon.stub().returns(Promise.resolve([]))
-            };*/
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
