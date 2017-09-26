@@ -1,6 +1,7 @@
-# Mon Sep 25 12:40:23 UTC 2017
+# Tue Sep 26 12:37:07 UTC 2017
 
 * Dark end screen theme AB Test (groups 8 & 9)
+* Remove additional click zones from end screen AB test (groups 10 & 11)
 * Clean up parts of the campaign parsing refactoring
 
 # Wed Sep 20 12:10:38 UTC 2017
