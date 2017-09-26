@@ -12,6 +12,13 @@ import { INativeResponse } from 'Utilities/Request';
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
 
+    public static setSingleCampaignMode(mode: boolean) {
+        CampaignRefreshManager._singleCampaignMode = mode;
+    }
+
+    private static _singleCampaignMode: boolean = false;
+    private static _singleCampaignErrorCount: number = 0;
+
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
@@ -129,11 +136,15 @@ export class CampaignRefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        CampaignRefreshManager._singleCampaignErrorCount = 0;
+
         this.setCampaignForPlacement(placementId, campaign);
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
+        CampaignRefreshManager._singleCampaignErrorCount = 0;
+
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
@@ -160,6 +171,14 @@ export class CampaignRefreshManager {
             });
         } else {
             this.setPlacementStates(PlacementState.NO_FILL, placementIds);
+        }
+
+        if(CampaignRefreshManager._singleCampaignMode) {
+            CampaignRefreshManager._singleCampaignErrorCount++;
+
+            if(CampaignRefreshManager._singleCampaignErrorCount === 1) {
+                // todo: set refresh timer here
+            }
         }
     }
 

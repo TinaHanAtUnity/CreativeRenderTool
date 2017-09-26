@@ -107,6 +107,8 @@ export class CampaignManager {
             delete this._parsedResponse;
         }
 
+        CampaignRefreshManager.setSingleCampaignMode(false);
+
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
@@ -174,6 +176,27 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
+            let campaigns: number = 0;
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
+                    campaigns++;
+
+                    const contentType = json.media[mediaId].contentType;
+                    const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                        refreshDelay = cacheTTL;
+                    }
+                }
+            }
+
+            if(campaigns === 1) {
+                CampaignRefreshManager.setSingleCampaignMode(true);
+            } else {
+                CampaignRefreshManager.setSingleCampaignMode(false);
+            }
+
+            this.onAdPlanReceived.trigger(refreshDelay);
+
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -186,20 +209,11 @@ export class CampaignManager {
 
                             return this.handleError(error, fill[mediaId]);
                         }));
-
-                        // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
-                        const contentType = json.media[mediaId].contentType;
-                        const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                        if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
-                            refreshDelay = cacheTTL;
-                        }
                     } catch(error) {
                         this.handleError(error, fill[mediaId]);
                     }
                 }
             }
-
-            this.onAdPlanReceived.trigger(refreshDelay);
 
             return Promise.all(promises);
         } else {
