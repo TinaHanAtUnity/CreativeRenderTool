@@ -11,14 +11,17 @@ export abstract class CampaignParser {
     private _gamerId: string;
     private _abGroup: number;
 
-    constructor(auctionResponse: AuctionResponse, session: Session, gamerId: string, abGroup: number) {
+    constructor(auctionResponse: AuctionResponse, gamerId: string, abGroup: number) {
         this._auctionResponse = auctionResponse;
-        this._session = session;
         this._gamerId = gamerId;
         this._abGroup = abGroup;
     }
 
     public abstract parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign>;
+
+    public setSession(session: Session) {
+        this._session = session;
+    }
 
     protected getAuctionResponse(): AuctionResponse {
         return this._auctionResponse;
