@@ -70,6 +70,8 @@ export class WebView {
 
     private _metadataManager: MetaDataManager;
 
+    private _creativeUrl?: string;
+
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
     // we want to be safe in case of error situations on the backend and mistimings on the device
@@ -136,7 +138,52 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            if(this._creativeUrl) {
+                return new Configuration(JSON.parse(`{
+                    "enabled": true,
+                    "coppaCompliant": false,
+                    "assetCaching": "forced",
+                    "projectId": "0a379f5a-c4fa-4f7f-a5c1-e49fd3dd63d4",
+                    "placements": [{
+                        "id": "defaultVideoAndPictureZone",
+                        "name": "Placement",
+                        "default": true,
+                        "allowSkip": true,
+                        "disableBackButton": true,
+                        "muteVideo": false,
+                        "useDeviceOrientationForVideo": false,
+                        "adTypes": ["MRAID", "VIDEO"],
+                        "skipInSeconds": 3
+                    }, {
+                        "id": "incentivizedZone",
+                        "name": "Placement",
+                        "default": false,
+                        "allowSkip": false,
+                        "disableBackButton": true,
+                        "muteVideo": false,
+                        "useDeviceOrientationForVideo": false,
+                        "adTypes": ["MRAID", "VIDEO"]
+                    }, {
+                        "id": "rewardedVideoZone",
+                        "name": "rewardedVideoZone",
+                        "default": false,
+                        "allowSkip": false,
+                        "disableBackButton": true,
+                        "muteVideo": false,
+                        "useDeviceOrientationForVideo": false,
+                        "adTypes": ["MRAID", "VIDEO"]
+                    }],
+                    "properties": "tynbvvQLwnpf382fQqw4MzIk8YYdMj8DWebgn+QoOgpVVRYNFXY=",
+                    "organizationId": "2475366",
+                    "country": "FI",
+                    "gamerId": "59a964fd13dcc10984985e6d",
+                    "abGroup": 13,
+                    "useAuction": true,
+                    "placementLevelControl": true
+                }`));
+            } else {
+                return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            }
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
@@ -462,10 +509,32 @@ export class WebView {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
             }
 
-            if (TestEnvironment.get('forcedOrientation')) {
+            if(TestEnvironment.get('forcedOrientation')) {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
-            return;
+
+            if(TestEnvironment.get('creativeUrl')) {
+                this._creativeUrl = TestEnvironment.get('creativeUrl');
+                CampaignManager.setCampaignResponse(`{
+                  "correlationId": "zGg2TfRsBNbqlc7AVdhLAw",
+                  "placements": {
+                    "defaultVideoAndPictureZone": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85",
+                    "incentivizedZone": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85"
+                  },
+                  "media": {
+                    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
+                      "contentType": "comet/campaign",
+                      "content": "{\\"id\\": \\"58dec182f01b1c0cdef54f0f\\", \\"platform\\": \\"android\\", \\"store\\": \\"google\\", \\"appStoreId\\": \\"934596429\\", \\"gameId\\": 53872, \\"gameName\\": \\"Mobile Strike\\", \\"gameIcon\\": \\"https://cdn-highwinds.unityads.unity3d.com/store-icons/3e29a3a2-6857-4b34-ab1b-27dae5d31ae2.png\\", \\"rating\\": 3.5, \\"ratingCount\\": 25131, \\"clickAttributionUrl\\": \\"https://www.example.net/click_attribution\\", \\"clickAttributionUrlFollowsRedirects\\": false, \\"bypassAppSheet\\": false, \\"appStoreCountry\\": \\"au\\", \\"mraidUrl\\": \\"${this._creativeUrl}\\"}",
+                      "trackingUrls": {
+                        "start": [
+                          "https://pixel.com/start"
+                        ]
+                      },
+                      "adType": "comet-mraid-sample-ad-type"
+                    }
+                  }
+                }`);
+            }
         });
     }
 }
