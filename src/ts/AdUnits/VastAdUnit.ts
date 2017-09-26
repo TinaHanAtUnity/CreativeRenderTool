@@ -150,7 +150,7 @@ export class VastAdUnit extends VideoAdUnit {
     private sendThirdPartyEvent(thirdPartyEventManager: ThirdPartyEventManager, event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        thirdPartyEventManager.thirdPartyEvent(event, sessionId, url);
+        thirdPartyEventManager.sendEvent(event, sessionId, url);
     }
 
     private getTrackingEventUrls(eventName: string): string[] | null {

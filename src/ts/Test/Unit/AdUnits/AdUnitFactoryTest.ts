@@ -70,7 +70,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
-        sandbox.spy(thirdPartyEventManager, 'thirdPartyEvent');
+        sandbox.spy(thirdPartyEventManager, 'sendEvent');
     });
 
     afterEach(() => {
@@ -147,7 +147,7 @@ describe('AdUnitFactoryTest', () => {
 
                 sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
                 sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendView);
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid complete', '12345', 'http://test.complete.com/complete1');
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid complete', '12345', 'http://test.complete.com/complete1');
             });
 
             it('should call sendSkip on finish state skipped', () => {
@@ -178,21 +178,21 @@ describe('AdUnitFactoryTest', () => {
 
             it('should send impressions', () => {
                 adUnit.show();
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
                 adUnit.hide();
             });
 
             it('should replace macros in the postback impression url', () => {
                 adUnit.show();
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
                 adUnit.hide();
             });
         });
 
         it('should call click tracker', () => {
             adUnit.sendClick();
-            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
+            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid click', '12345', 'http://test.complete.com/click1');
         });
     });
 
@@ -282,7 +282,7 @@ describe('AdUnitFactoryTest', () => {
             it('should send tracking events', () => {
                 adUnit.onStart.trigger();
 
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
             });
         });
     });

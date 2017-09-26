@@ -23,7 +23,7 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public thirdPartyEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
+    public sendEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
         this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
         return this._request.get(url, [], {
             retries: 0,

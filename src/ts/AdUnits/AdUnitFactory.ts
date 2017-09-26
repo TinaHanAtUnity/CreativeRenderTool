@@ -360,7 +360,7 @@ export class AdUnitFactory {
             for (let url of campaign.getTrackingUrlsForEvent('click')) {
                 url = url.replace(/%ZONE%/, placement.getId());
                 url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.thirdPartyEvent('display click', campaign.getSession().getId(), url);
+                thirdPartyEventManager.sendEvent('display click', campaign.getSession().getId(), url);
             }
 
             if (isWhiteListedLinkType(href)) {
@@ -379,7 +379,7 @@ export class AdUnitFactory {
             for (let url of campaign.getTrackingUrlsForEvent('impression')) {
                 url = url.replace(/%ZONE%/, placement.getId());
                 url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.thirdPartyEvent('display impression', campaign.getSession().getId(), url);
+                thirdPartyEventManager.sendEvent('display impression', campaign.getSession().getId(), url);
             }
             operativeEventManager.sendStart(programmaticAdUnit);
         });

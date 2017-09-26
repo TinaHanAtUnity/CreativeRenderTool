@@ -73,7 +73,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'get');
 
-        return thirdPartyEventManager.thirdPartyEvent('click', 'abcde-12345', url).then(() => {
+        return thirdPartyEventManager.sendEvent('click', 'abcde-12345', url).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
         });
