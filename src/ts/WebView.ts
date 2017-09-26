@@ -9,7 +9,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
@@ -59,7 +59,7 @@ export class WebView {
 
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;
-    private _eventManager: EventManager;
+    private _eventManager: ThirdPartyEventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -95,7 +95,7 @@ export class WebView {
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            this._eventManager = new EventManager(this._nativeBridge, this._request);
+            this._eventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
 
             HttpKafka.setRequest(this._request);
@@ -123,8 +123,8 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._clientInfo, this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge);
+            this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._sessionManager, this._clientInfo, this._deviceInfo);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -157,19 +157,19 @@ export class WebView {
 
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
-                    this._operativeEventManager.setGameSessionId(this._analyticsManager.getGameSessionId());
+                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return Promise.resolve();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
                 return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
-                    this._operativeEventManager.setGameSessionId(gameSessionId);
+                    this._sessionManager.setGameSessionId(gameSessionId);
                     return Promise.resolve();
                 });
             }
         }).then(() => {
-            if(this._operativeEventManager.getGameSessionId() % 10000 === 0) {
+            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._cache.setDiagnostics(true);
             }
 
