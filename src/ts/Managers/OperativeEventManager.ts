@@ -203,17 +203,7 @@ export class OperativeEventManager {
         return this._clientInfo;
     }
 
-    public createUniqueEventMetadata(adUnit: AbstractAdUnit, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            return this.getInfoJson(adUnit, id, gameSession, gamerSid, previousPlacementId);
-        });
-    }
-
-    private getUnsentEvents(sessionId: string): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
-    }
-
-    private sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
+    public sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
         this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
@@ -226,6 +216,16 @@ export class OperativeEventManager {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId), data);
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
+    }
+
+    private createUniqueEventMetadata(adUnit: AbstractAdUnit, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+            return this.getInfoJson(adUnit, id, gameSession, gamerSid, previousPlacementId);
+        });
+    }
+
+    private getUnsentEvents(sessionId: string): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
     }
 
     private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
