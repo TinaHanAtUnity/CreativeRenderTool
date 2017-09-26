@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
@@ -22,7 +21,6 @@ describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    const sessionManager = <SessionManager><any>{};
     let container: AdUnitContainer;
     let request: Request;
 
@@ -76,7 +74,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('https://bar.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://bar.com');
             });
         });
@@ -86,7 +84,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://foo.com');
             });
         });
@@ -96,7 +94,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.Intent, 'launch');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, sessionManager, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
                     'uri': 'https://foo.com'

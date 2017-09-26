@@ -187,7 +187,7 @@ describe('CampaignManager', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, thirdPartyEventManager, metaDataManager);
+        sessionManager = new SessionManager(nativeBridge);
     });
 
     describe('on VAST campaign', () => {

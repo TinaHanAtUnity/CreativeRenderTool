@@ -29,6 +29,8 @@ import { FocusManager } from 'Managers/FocusManager';
 
 import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
@@ -38,9 +40,12 @@ describe('AdUnitFactoryTest', () => {
     let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
     let sessionManager: SessionManager;
+    let operativeEventManager: OperativeEventManager;
     let config: Configuration;
     let metaDataManager: MetaDataManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
 
     before(() => {
@@ -55,14 +60,17 @@ describe('AdUnitFactoryTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'close').returns(Promise.resolve());
-        const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), thirdPartyEventManager, metaDataManager);
-        sandbox.stub(sessionManager, 'sendStart').returns(Promise.resolve());
-        sandbox.stub(sessionManager, 'sendView').returns(Promise.resolve());
-        sandbox.stub(sessionManager, 'sendThirdQuartile').returns(Promise.resolve());
-        sandbox.stub(sessionManager, 'sendSkip').returns(Promise.resolve());
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        sessionManager = new SessionManager(nativeBridge);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+        sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+        sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+        sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+        sandbox.spy(thirdPartyEventManager, 'thirdPartyEvent');
     });
 
     afterEach(() => {
@@ -72,7 +80,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -85,7 +93,7 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -94,17 +102,13 @@ describe('AdUnitFactoryTest', () => {
 
     describe('MRAID AdUnit', () => {
         let adUnit: MRAIDAdUnit;
-        let thirdPartyEventManager: any;
+        let testThirdPartyEventManager: any;
         let campaign: MRAIDCampaign;
 
         beforeEach(() => {
-            thirdPartyEventManager = {
+            testThirdPartyEventManager = {
                 thirdPartyEvent: sinon.stub().returns(Promise.resolve())
             };
-
-            sandbox.stub(sessionManager, 'getEventManager').returns(
-                thirdPartyEventManager
-            );
 
             campaign = TestFixtures.getProgrammaticMRAIDCampaign();
             const resourceUrl = campaign.getResourceUrl();
@@ -112,7 +116,7 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
         });
 
         describe('on hide', () => {
@@ -141,8 +145,8 @@ describe('AdUnitFactoryTest', () => {
 
                 adUnit.hide();
 
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendView);
+                sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
+                sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendView);
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid complete', '12345', 'http://test.complete.com/complete1');
             });
 
@@ -152,7 +156,7 @@ describe('AdUnitFactoryTest', () => {
 
                 adUnit.hide();
 
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendSkip);
+                sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendSkip);
             });
         });
 
@@ -168,13 +172,12 @@ describe('AdUnitFactoryTest', () => {
 
             it('should call sendStart', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.sendStart);
+                sinon.assert.calledOnce(<sinon.SinonSpy>operativeEventManager.sendStart);
                 adUnit.hide();
             });
 
             it('should send impressions', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah1');
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/blah2');
                 adUnit.hide();
@@ -182,7 +185,6 @@ describe('AdUnitFactoryTest', () => {
 
             it('should replace macros in the postback impression url', () => {
                 adUnit.show();
-                sinon.assert.calledOnce(<sinon.SinonSpy>sessionManager.getEventManager);
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.thirdPartyEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
                 adUnit.hide();
             });
@@ -200,7 +202,7 @@ describe('AdUnitFactoryTest', () => {
 
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
         });
 
         describe('on click', () => {
@@ -224,11 +226,11 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should send a tracking event', () => {
-                sandbox.stub(sessionManager, 'sendClick');
+                sandbox.stub(operativeEventManager, 'sendClick');
 
                 adUnit.onRedirect.trigger('http://google.com');
 
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendClick);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             });
 
             it('should not redirect if the protocol is whitelisted', () => {
@@ -250,11 +252,11 @@ describe('AdUnitFactoryTest', () => {
             });
             it('should send the view diagnostic event', () => {
                 adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendView);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
             });
             it('should send the third quartile diagnostic event', () => {
                 adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
             });
         });
 
@@ -269,13 +271,12 @@ describe('AdUnitFactoryTest', () => {
         });
 
         describe('on start', () => {
-            let thirdPartyEventManager: any;
+            let testThirdPartyEventManager: any;
 
             beforeEach(() => {
-                thirdPartyEventManager = {
+                testThirdPartyEventManager = {
                     thirdPartyEvent: sinon.stub().returns(Promise.resolve())
                 };
-                sandbox.stub(sessionManager, 'getEventManager').returns(thirdPartyEventManager);
             });
 
             it('should send tracking events', () => {

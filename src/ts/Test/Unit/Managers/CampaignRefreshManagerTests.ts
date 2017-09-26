@@ -125,7 +125,7 @@ describe('CampaignRefreshManager', () => {
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         deviceInfo = new DeviceInfo(nativeBridge);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, thirdPartyEventManager, metaDataManager);
+        sessionManager = new SessionManager(nativeBridge);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
     });
