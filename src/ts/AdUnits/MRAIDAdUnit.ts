@@ -10,13 +10,13 @@ import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
-    private _eventManager: EventManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
@@ -30,10 +30,10 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, eventManager: EventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._operativeEventManager = operativeEventManager;
-        this._eventManager = eventManager;
+        this._thirdPartyEventManager = thirdPartyEventManager;
         this._mraid = mraid;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();
         this._endScreen = endScreen;
@@ -196,7 +196,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
             for (let url of trackingEventUrls) {
                 url = url.replace(/%ZONE%/, placementId);
                 url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-                this._eventManager.thirdPartyEvent(`mraid ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.thirdPartyEvent(`mraid ${eventName}`, sessionId, url);
             }
         }
     }

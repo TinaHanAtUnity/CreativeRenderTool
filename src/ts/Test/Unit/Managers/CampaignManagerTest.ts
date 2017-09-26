@@ -20,7 +20,7 @@ import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -72,7 +72,7 @@ describe('CampaignManager', () => {
     let warningSpy: sinon.SinonSpy;
     let configuration: Configuration;
     let metaDataManager: MetaDataManager;
-    let eventManager: EventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let sessionManager: SessionManager;
     let focusManager: FocusManager;
 
@@ -186,8 +186,8 @@ describe('CampaignManager', () => {
         request = new Request(nativeBridge, wakeUpManager);
         deviceInfo = new DeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, thirdPartyEventManager, metaDataManager);
     });
 
     describe('on VAST campaign', () => {

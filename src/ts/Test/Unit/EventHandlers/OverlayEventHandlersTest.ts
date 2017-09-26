@@ -8,7 +8,7 @@ import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { FinishState } from 'Constants/FinishState';
@@ -47,7 +47,7 @@ describe('OverlayEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new ThirdPartyEventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{

@@ -4,7 +4,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 
-export class EventManager {
+export class ThirdPartyEventManager {
 
     private _nativeBridge: NativeBridge;
     private _request: Request;

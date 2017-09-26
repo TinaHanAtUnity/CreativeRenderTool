@@ -12,7 +12,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request } from 'Utilities/Request';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
@@ -71,7 +71,7 @@ describe('VideoEventHandlersTest', () => {
             container: sinon.spy()
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new ThirdPartyEventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,

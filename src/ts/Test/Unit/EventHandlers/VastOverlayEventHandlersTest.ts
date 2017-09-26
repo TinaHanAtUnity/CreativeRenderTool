@@ -7,7 +7,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
@@ -71,7 +71,7 @@ describe('VastOverlayEventHandlersTest', () => {
         deviceInfo = new DeviceInfo(nativeBridge);
 
         clientInfo = TestFixtures.getClientInfo();
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new ThirdPartyEventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
 
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {

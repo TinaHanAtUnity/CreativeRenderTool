@@ -14,19 +14,19 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { EventType } from 'Models/Session';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
 export class EndScreenEventHandlers {
 
-    public static onDownloadAndroid(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, eventManager: EventManager, adUnit: AbstractAdUnit, clientInfo: ClientInfo): void {
+    public static onDownloadAndroid(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: AbstractAdUnit, clientInfo: ClientInfo): void {
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
         operativeEventManager.sendClick(adUnit);
         if(campaign.getClickAttributionUrl()) {
-            EndScreenEventHandlers.handleClickAttribution(nativeBridge, eventManager, campaign);
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
 
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign);
@@ -36,14 +36,14 @@ export class EndScreenEventHandlers {
         }
     }
 
-    public static onDownloadIos(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, eventManager: EventManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo, clientInfo: ClientInfo): void {
+    public static onDownloadIos(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo, clientInfo: ClientInfo): void {
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
         operativeEventManager.sendClick(adUnit);
         if(campaign.getClickAttributionUrl()) {
-            EndScreenEventHandlers.handleClickAttribution(nativeBridge, eventManager, campaign);
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
 
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
@@ -53,7 +53,7 @@ export class EndScreenEventHandlers {
         }
     }
 
-    public static handleClickAttribution(nativeBridge: NativeBridge, eventManager: EventManager, campaign: PerformanceCampaign) {
+    public static handleClickAttribution(nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, campaign: PerformanceCampaign) {
         const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
@@ -66,7 +66,7 @@ export class EndScreenEventHandlers {
         const clickAttributionUrl = campaign.getClickAttributionUrl();
 
         if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -97,7 +97,7 @@ export class EndScreenEventHandlers {
             });
         } else {
             if (clickAttributionUrl) {
-                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+                thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
             }
         }
     }

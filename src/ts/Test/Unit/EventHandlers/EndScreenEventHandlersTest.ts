@@ -8,7 +8,7 @@ import { EndScreen } from 'Views/EndScreen';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -55,7 +55,7 @@ describe('EndScreenEventHandlersTest', () => {
             metaDataManager = new MetaDataManager(nativeBridge);
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+                new ThirdPartyEventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -159,7 +159,7 @@ describe('EndScreenEventHandlersTest', () => {
             };
 
             sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+                new ThirdPartyEventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 

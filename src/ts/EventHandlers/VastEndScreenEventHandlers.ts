@@ -4,7 +4,7 @@ import { Platform } from 'Constants/Platform';
 import { VastAdUnit} from 'AdUnits/VastAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
 export class VastEndScreenEventHandlers {
@@ -36,7 +36,7 @@ export class VastEndScreenEventHandlers {
         }
     }
 
-    public static onShow(eventManager: EventManager, adUnit: VastAdUnit, clientInfo: ClientInfo): void {
-        adUnit.sendCompanionTrackingEvent(eventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+    public static onShow(thirdPartyEventManager: ThirdPartyEventManager, adUnit: VastAdUnit, clientInfo: ClientInfo): void {
+        adUnit.sendCompanionTrackingEvent(thirdPartyEventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
     }
 }

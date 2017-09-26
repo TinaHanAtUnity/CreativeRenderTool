@@ -43,15 +43,16 @@ export class OperativeEventManager {
     private _gamerServerId: string;
     private _nativeBridge: NativeBridge;
     private _metaDataManager: MetaDataManager;
+    private _sessionManager: SessionManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _gameSessionId: number;
     private _previousPlacementId: string | undefined;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, request: Request, metaDataManager: MetaDataManager, sessionManager: SessionManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
         this._metaDataManager = metaDataManager;
+        this._sessionManager = sessionManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -70,7 +71,7 @@ export class OperativeEventManager {
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
-            return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId());
+            return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId());
         }).then(([id, infoJson]) => {
             return this.sendEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_start'), JSON.stringify(infoJson));
         }).then(() => {
@@ -89,7 +90,7 @@ export class OperativeEventManager {
             this.sendEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'first_quartile'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
@@ -102,7 +103,7 @@ export class OperativeEventManager {
             this.sendEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'midpoint'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
@@ -115,7 +116,7 @@ export class OperativeEventManager {
             this.sendEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'third_quartile'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
@@ -149,7 +150,7 @@ export class OperativeEventManager {
             HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
@@ -162,7 +163,7 @@ export class OperativeEventManager {
             this.sendEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(adUnit, 'video_end'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
@@ -175,7 +176,7 @@ export class OperativeEventManager {
             this.sendEvent('click', id, adUnit.getCampaign().getSession().getId(), this.createClickEventUrl(adUnit), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(adUnit, this.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
     public sendUnsentEvents(sessionId: string): Promise<any[]> {
@@ -188,14 +189,6 @@ export class OperativeEventManager {
 
     public setGamerServerId(serverId: string): void {
         this._gamerServerId = serverId;
-    }
-
-    public setGameSessionId(gameSessionId: number): void {
-        this._gameSessionId = gameSessionId;
-    }
-
-    public getGameSessionId(): number {
-        return this._gameSessionId;
     }
 
     public setPreviousPlacementId(id: string | undefined) {

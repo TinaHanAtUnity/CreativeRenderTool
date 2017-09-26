@@ -13,7 +13,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
@@ -187,9 +187,9 @@ class TestHelper {
     }
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
-        const eventManager: EventManager = new EventManager(nativeBridge, request);
+        const thirdPartyEventManager: ThirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), thirdPartyEventManager, metaDataManager);
         return sessionManager;
     }
 
@@ -253,14 +253,14 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager: EventManager = <EventManager><any>{
+            const thirdPartyEventManager: ThirdPartyEventManager = <ThirdPartyEventManager><any>{
                 getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
                 startNewSession: sinon.stub().returns(Promise.resolve([]))
             };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, thirdPartyEventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
@@ -279,14 +279,14 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager: EventManager = <EventManager><any>{
+            const thirdPartyEventManager: ThirdPartyEventManager = <ThirdPartyEventManager><any>{
                 getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
                 startNewSession: sinon.stub().returns(Promise.resolve([]))
             };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, thirdPartyEventManager, metaDataManager);
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {

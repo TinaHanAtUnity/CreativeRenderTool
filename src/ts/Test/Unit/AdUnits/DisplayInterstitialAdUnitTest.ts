@@ -13,7 +13,7 @@ import { DisplayInterstitial } from "Views/DisplayInterstitial";
 import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
 import { Activity } from "AdUnits/Containers/Activity";
 import { Platform } from "Constants/Platform";
-import { EventManager } from "Managers/EventManager";
+import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
 import { DeviceInfo } from "Models/DeviceInfo";
 import { MetaDataManager } from "Managers/MetaDataManager";
 import { WakeUpManager } from "Managers/WakeUpManager";
@@ -42,8 +42,8 @@ describe('DisplayInterstitialAdUnit', () => {
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'open').returns(Promise.resolve());
         sandbox.stub(container, 'close').returns(Promise.resolve());
-        const eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
+        const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), thirdPartyEventManager, metaDataManager);
         campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);

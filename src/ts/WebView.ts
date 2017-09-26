@@ -59,7 +59,7 @@ export class WebView {
 
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;
-    private _eventManager: ThirdPartyEventManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -95,7 +95,7 @@ export class WebView {
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            this._eventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
+            this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
 
             HttpKafka.setRequest(this._request);
@@ -274,7 +274,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._eventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());

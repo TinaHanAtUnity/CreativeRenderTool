@@ -6,7 +6,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class SessionManager {
-
     public static getSessionKey(sessionId: string): string {
         return 'session.' + sessionId;
     }
@@ -16,6 +15,7 @@ export class SessionManager {
     }
 
     private _nativeBridge: NativeBridge;
+    private _gameSessionId: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -61,6 +61,14 @@ export class SessionManager {
                 return Promise.resolve([]);
             });
         });
+    }
+
+    public setGameSessionId(gameSessionId: number): void {
+        this._gameSessionId = gameSessionId;
+    }
+
+    public getGameSessionId(): number {
+        return this._gameSessionId;
     }
 
     private deleteSession(sessionId: string): Promise<any[]> {

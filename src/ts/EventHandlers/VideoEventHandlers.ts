@@ -11,7 +11,7 @@ import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitCon
 import { Configuration } from 'Models/Configuration';
 import { VideoInfo } from 'Utilities/VideoInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class VideoEventHandlers {
 
@@ -82,7 +82,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, eventManager: EventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
@@ -101,7 +101,7 @@ export class VideoEventHandlers {
 
         if(adUnit.getCampaign().getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
-                eventManager,
+                thirdPartyEventManager,
                 adUnit.getCampaign().getSession().getId(),
                 operativeEventManager.getClientInfo().getSdkVersion(),
                 position,
