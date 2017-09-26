@@ -17,6 +17,7 @@ import { Url } from 'Utilities/Url';
 import { StorageType } from 'Native/Api/Storage';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class OperativeEventManager {
 
@@ -60,8 +61,12 @@ export class OperativeEventManager {
 
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.START)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.START]
+            });
             return Promise.resolve();
         }
+
         adUnit.getCampaign().getSession().setEventSent(EventType.START);
 
         return this._metaDataManager.fetch(PlayerMetaData).then(player => {
@@ -82,8 +87,12 @@ export class OperativeEventManager {
 
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.FIRST_QUARTILE)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.FIRST_QUARTILE]
+            });
             return Promise.resolve(void(0));
         }
+
         adUnit.getCampaign().getSession().setEventSent(EventType.FIRST_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -95,8 +104,12 @@ export class OperativeEventManager {
 
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.MIDPOINT)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.MIDPOINT]
+            });
             return Promise.resolve(void(0));
         }
+
         adUnit.getCampaign().getSession().setEventSent(EventType.MIDPOINT);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -108,8 +121,12 @@ export class OperativeEventManager {
 
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.THIRD_QUARTILE]
+            });
             return Promise.resolve(void(0));
         }
+
         adUnit.getCampaign().getSession().setEventSent(EventType.THIRD_QUARTILE);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
@@ -121,6 +138,9 @@ export class OperativeEventManager {
 
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.SKIP)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.SKIP]
+            });
             return Promise.resolve(void(0));
         }
         adUnit.getCampaign().getSession().setEventSent(EventType.SKIP);
@@ -155,6 +175,9 @@ export class OperativeEventManager {
 
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.VIEW]
+            });
             return Promise.resolve(void(0));
         }
         adUnit.getCampaign().getSession().setEventSent(EventType.VIEW);
@@ -168,6 +191,9 @@ export class OperativeEventManager {
 
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
+            Diagnostics.trigger('operative_event_not_sent', {
+                event: EventType[EventType.CLICK]
+            });
             return Promise.resolve(void(0));
         }
         adUnit.getCampaign().getSession().setEventSent(EventType.CLICK);
