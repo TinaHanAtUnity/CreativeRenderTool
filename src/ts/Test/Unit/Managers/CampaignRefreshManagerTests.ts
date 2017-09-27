@@ -497,7 +497,6 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
-
         it('should send diagnostics when campaign response parsing fails because of wrong types', () => {
             let receivedErrorType: string;
             let receivedError: any;
