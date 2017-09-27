@@ -6,6 +6,8 @@ import { Request } from 'Utilities/Request';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Platform } from 'Constants/Platform';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static setVastParserMaxDepth(depth: number): void {
@@ -16,7 +18,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const decodedVast = decodeURIComponent(this.getAuctionResponse().getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
