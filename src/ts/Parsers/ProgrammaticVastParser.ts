@@ -6,6 +6,8 @@ import { Request } from 'Utilities/Request';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Platform } from 'Constants/Platform';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static setVastParserMaxDepth(depth: number): void {
@@ -16,8 +18,8 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
-        const decodedVast = decodeURIComponent(this.getAuctionResponse().getContent()).trim();
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+        const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
@@ -25,7 +27,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            const campaign = new VastCampaign(vast, campaignId, this.getSession(), this.getGamerId(), this.getAbGroup(), this.getAuctionResponse().getCacheTTL(), this.getAuctionResponse().getTrackingUrls(), this.getAuctionResponse().getAdType(), this.getAuctionResponse().getCreativeId(), this.getAuctionResponse().getSeatId(), this.getAuctionResponse().getCorrelationId());
+            const campaign = new VastCampaign(vast, campaignId, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 throw new Error('Campaign does not have an impression url');
             }
@@ -36,14 +38,14 @@ export class ProgrammaticVastParser extends CampaignParser {
             if(!campaign.getVideo().getUrl()) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign does not have a video url'),
-                    {rootWrapperVast: this.getAuctionResponse().getContent()}
+                    {rootWrapperVast: response.getContent()}
                 );
                 throw videoUrlError;
             }
             if(nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
                 const videoUrlError = new DiagnosticError(
                     new Error('Campaign video url needs to be https for iOS'),
-                    {rootWrapperVast: this.getAuctionResponse().getContent()}
+                    {rootWrapperVast: response.getContent()}
                 );
                 throw videoUrlError;
             }
