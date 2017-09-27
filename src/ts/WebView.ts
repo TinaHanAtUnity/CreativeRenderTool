@@ -142,7 +142,7 @@ export class WebView {
                 return new Configuration(JSON.parse(`{
                     "enabled": true,
                     "coppaCompliant": false,
-                    "assetCaching": "forced",
+                    "assetCaching": "disabled",
                     "projectId": "0a379f5a-c4fa-4f7f-a5c1-e49fd3dd63d4",
                     "placements": [{
                         "id": "defaultVideoAndPictureZone",
@@ -153,7 +153,7 @@ export class WebView {
                         "muteVideo": false,
                         "useDeviceOrientationForVideo": false,
                         "adTypes": ["MRAID", "VIDEO"],
-                        "skipInSeconds": 3
+                        "skipInSeconds": 5
                     }, {
                         "id": "incentivizedZone",
                         "name": "Placement",
@@ -163,23 +163,11 @@ export class WebView {
                         "muteVideo": false,
                         "useDeviceOrientationForVideo": false,
                         "adTypes": ["MRAID", "VIDEO"]
-                    }, {
-                        "id": "rewardedVideoZone",
-                        "name": "rewardedVideoZone",
-                        "default": false,
-                        "allowSkip": false,
-                        "disableBackButton": true,
-                        "muteVideo": false,
-                        "useDeviceOrientationForVideo": false,
-                        "adTypes": ["MRAID", "VIDEO"]
                     }],
                     "properties": "tynbvvQLwnpf382fQqw4MzIk8YYdMj8DWebgn+QoOgpVVRYNFXY=",
-                    "organizationId": "2475366",
                     "country": "FI",
                     "gamerId": "59a964fd13dcc10984985e6d",
-                    "abGroup": 13,
-                    "useAuction": true,
-                    "placementLevelControl": true
+                    "abGroup": 0
                 }`));
             } else {
                 return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
@@ -515,25 +503,43 @@ export class WebView {
 
             if(TestEnvironment.get('creativeUrl')) {
                 this._creativeUrl = TestEnvironment.get('creativeUrl');
-                CampaignManager.setCampaignResponse(`{
-                  "correlationId": "zGg2TfRsBNbqlc7AVdhLAw",
-                  "placements": {
-                    "defaultVideoAndPictureZone": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85",
-                    "incentivizedZone": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85"
-                  },
-                  "media": {
-                    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
-                      "contentType": "comet/campaign",
-                      "content": "{\\"id\\": \\"58dec182f01b1c0cdef54f0f\\", \\"platform\\": \\"android\\", \\"store\\": \\"google\\", \\"appStoreId\\": \\"934596429\\", \\"gameId\\": 53872, \\"gameName\\": \\"Mobile Strike\\", \\"gameIcon\\": \\"https://cdn-highwinds.unityads.unity3d.com/store-icons/3e29a3a2-6857-4b34-ab1b-27dae5d31ae2.png\\", \\"rating\\": 3.5, \\"ratingCount\\": 25131, \\"clickAttributionUrl\\": \\"https://www.example.net/click_attribution\\", \\"clickAttributionUrlFollowsRedirects\\": false, \\"bypassAppSheet\\": false, \\"appStoreCountry\\": \\"au\\", \\"mraidUrl\\": \\"${this._creativeUrl}\\"}",
-                      "trackingUrls": {
-                        "start": [
-                          "https://pixel.com/start"
-                        ]
-                      },
-                      "adType": "comet-mraid-sample-ad-type"
-                    }
-                  }
-                }`);
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    CampaignManager.setCampaignResponse(`{
+                        "correlationId": "PFweE7m9HRHUg2y08qU1PL",
+                        "placements": {
+                            "defaultVideoAndPictureZone": "000000000000000000000000",
+                            "incentivizedZone": "000000000000000000000000"
+                        },
+                        "media": {
+                            "000000000000000000000000": {
+                                "contentType": "comet/campaign",
+                                "content": "{\\"id\\":\\"000000000000000000000000\\",\\"platform\\":\\"android\\",\\"store\\":\\"google\\",\\"appStoreId\\":\\"com.iUnity.angryBots\\",\\"gameId\\":11017,\\"gameName\\":\\"Test game android\\",\\"gameIcon\\":\\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\\",\\"rating\\":4.5,\\"ratingCount\\":10000,\\"bypassAppSheet\\":false,\\"mraidUrl\\":\\"${ this._creativeUrl }\\"}",
+                                "trackingUrls": {},
+                                "campaignId": "000000000000000000000000",
+                                "seatId": 9000,
+                                "adType": "VIDEO"
+                            }
+                        }
+                    }`);
+                } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    CampaignManager.setCampaignResponse(`{
+                        "correlationId": "S8z40tOCRnTjCmX59PWh48",
+                        "placements": {
+                            "defaultVideoAndPictureZone": "000000000000000000000000",
+                            "incentivizedZone": "000000000000000000000000"
+                        },
+                        "media": {
+                            "000000000000000000000000": {
+                                "contentType": "comet/campaign",
+                                "content": "{\\"id\\":\\"000000000000000000000000\\",\\"platform\\":\\"ios\\",\\"store\\":\\"apple\\",\\"appStoreId\\":\\"453467175\\",\\"gameId\\":11017,\\"gameName\\":\\"Test game ios\\",\\"gameIcon\\":\\"https://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\\",\\"rating\\":4.5,\\"ratingCount\\":10000,\\"bypassAppSheet\\":false,\\"mraidUrl\\":\\"${ this._creativeUrl }\\"}",
+                                "trackingUrls": {},
+                                "campaignId": "000000000000000000000000",
+                                "seatId": 9000,
+                                "adType": "VIDEO"
+                            }
+                        }
+                    }`);
+                }
             }
         });
     }
