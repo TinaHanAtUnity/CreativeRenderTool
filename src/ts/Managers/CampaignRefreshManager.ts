@@ -148,8 +148,7 @@ export class CampaignRefreshManager {
 
         Diagnostics.trigger('plc_request_failed', {
             error: error,
-            rawAdResponse: rawAdPlan,
-            adResponse: parsedAdPlan
+            rawAdResponse: rawAdPlan
         });
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
