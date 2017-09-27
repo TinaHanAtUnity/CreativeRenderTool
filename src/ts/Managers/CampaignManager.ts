@@ -74,7 +74,6 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
     private _parsedResponse: any;
-    private _parserMap: { [key: string]: CampaignParser };
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -85,7 +84,6 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
-        this._parserMap = {};
         this._requesting = false;
     }
 
@@ -213,19 +211,19 @@ export class CampaignManager {
 
         switch (response.getContentType()) {
             case 'comet/campaign':
-                parser = this.getCampaignParser(CometCampaignParser, response.getContentType());
+                parser = this.getCampaignParser(CometCampaignParser);
                 break;
             case 'programmatic/vast':
-                parser = this.getCampaignParser(ProgrammaticVastParser, response.getContentType());
+                parser = this.getCampaignParser(ProgrammaticVastParser);
                 break;
             case 'programmatic/mraid-url':
-                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response.getContentType());
+                parser = this.getCampaignParser(ProgrammaticMraidUrlParser);
                 break;
             case 'programmatic/mraid':
-                parser = this.getCampaignParser(ProgrammaticMraidParser, response.getContentType());
+                parser = this.getCampaignParser(ProgrammaticMraidParser);
                 break;
             case 'programmatic/static-interstitial':
-                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response.getContentType());
+                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser);
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
@@ -236,13 +234,8 @@ export class CampaignManager {
         });
     }
 
-    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(): T; }, contentType: string): CampaignParser {
-        if(!this._parserMap[contentType]) {
-            const campaignParser: T = new CampaignParserConstructor();
-            this._parserMap[contentType] = campaignParser;
-        }
-
-        return this._parserMap[contentType];
+    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(): T; }): CampaignParser {
+        return new CampaignParserConstructor();
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
