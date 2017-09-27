@@ -213,39 +213,36 @@ export class CampaignManager {
 
         switch (response.getContentType()) {
             case 'comet/campaign':
-                parser = this.getCampaignParser(CometCampaignParser, response);
+                parser = this.getCampaignParser(CometCampaignParser, response.getContentType());
                 break;
             case 'programmatic/vast':
-                parser = this.getCampaignParser(ProgrammaticVastParser, response);
+                parser = this.getCampaignParser(ProgrammaticVastParser, response.getContentType());
                 break;
             case 'programmatic/mraid-url':
-                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response);
+                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response.getContentType());
                 break;
             case 'programmatic/mraid':
-                parser = this.getCampaignParser(ProgrammaticMraidParser, response);
+                parser = this.getCampaignParser(ProgrammaticMraidParser, response.getContentType());
                 break;
             case 'programmatic/static-interstitial':
-                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response);
+                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response.getContentType());
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
-        // Update session to existing parser
-        parser.setSession(session);
-
-        return parser.parse(this._nativeBridge, this._request).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
 
-    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(response: AuctionResponse, gamerId: string, abGroup: number): T; }, response: AuctionResponse): CampaignParser {
-        if(!this._parserMap[response.getContentType()]) {
-            const campaignParser: T = new CampaignParserConstructor(response, this._configuration.getGamerId(), this.getAbGroup());
-            this._parserMap[response.getContentType()] = campaignParser;
+    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(): T; }, contentType: string): CampaignParser {
+        if(!this._parserMap[contentType]) {
+            const campaignParser: T = new CampaignParserConstructor();
+            this._parserMap[contentType] = campaignParser;
         }
 
-        return this._parserMap[response.getContentType()];
+        return this._parserMap[contentType];
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
