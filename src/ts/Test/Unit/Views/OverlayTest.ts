@@ -20,7 +20,7 @@ describe('Overlay', () => {
     });
 
     it('should render', () => {
-        const overlay = new Overlay(nativeBridge, true, 'en');
+        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-icon'));
