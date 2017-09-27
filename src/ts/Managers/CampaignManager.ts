@@ -211,19 +211,19 @@ export class CampaignManager {
 
         switch (response.getContentType()) {
             case 'comet/campaign':
-                parser = this.getCampaignParser(CometCampaignParser);
+                parser = new CometCampaignParser();
                 break;
             case 'programmatic/vast':
-                parser = this.getCampaignParser(ProgrammaticVastParser);
+                parser = new ProgrammaticVastParser();
                 break;
             case 'programmatic/mraid-url':
-                parser = this.getCampaignParser(ProgrammaticMraidUrlParser);
+                parser = new ProgrammaticMraidUrlParser();
                 break;
             case 'programmatic/mraid':
-                parser = this.getCampaignParser(ProgrammaticMraidParser);
+                parser = new ProgrammaticMraidParser();
                 break;
             case 'programmatic/static-interstitial':
-                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser);
+                parser = new ProgrammaticStaticInterstitialParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
@@ -232,10 +232,6 @@ export class CampaignManager {
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
-    }
-
-    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(): T; }): CampaignParser {
-        return new CampaignParserConstructor();
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
