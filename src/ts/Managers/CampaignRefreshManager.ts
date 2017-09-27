@@ -11,6 +11,7 @@ import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
+    public static ErrorRefillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -152,6 +153,12 @@ export class CampaignRefreshManager {
             adResponse: parsedAdPlan
         });
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
+
+        const minimumRefreshTimestamp = Date.now() + CampaignRefreshManager.ErrorRefillDelay * 1000;
+        if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
+            this._refillTimestamp = minimumRefreshTimestamp;
+            this._nativeBridge.Sdk.logInfo('Unity Ads will refresh ads in ' + CampaignRefreshManager.ErrorRefillDelay + ' seconds');
+        }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
