@@ -29,7 +29,7 @@ export class CampaignRefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan, parsedAdPlan) => this.onError(error, placementIds, rawAdPlan, parsedAdPlan));
+        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
         this._campaignManager.onAdPlanReceived.subscribe(refreshDelay => this.onAdPlanReceived(refreshDelay));
     }
 
@@ -139,7 +139,7 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string, parsedAdPlan?: any) {
+    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
