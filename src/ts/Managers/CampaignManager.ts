@@ -60,7 +60,7 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<WebViewError, string[], string | undefined, any>();
-    public readonly onAdPlanReceived = new Observable1<number>();
+    public readonly onAdPlanReceived = new Observable2<number, boolean>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
@@ -106,8 +106,6 @@ export class CampaignManager {
         if(this._parsedResponse) {
             delete this._parsedResponse;
         }
-
-        CampaignRefreshManager.setSingleCampaignMode(false);
 
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
@@ -189,13 +187,7 @@ export class CampaignManager {
                 }
             }
 
-            if(campaigns === 1) {
-                CampaignRefreshManager.setSingleCampaignMode(true);
-            } else {
-                CampaignRefreshManager.setSingleCampaignMode(false);
-            }
-
-            this.onAdPlanReceived.trigger(refreshDelay);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns === 1 ? true : false);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
