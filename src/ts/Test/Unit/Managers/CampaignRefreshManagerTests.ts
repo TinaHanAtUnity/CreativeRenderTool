@@ -10,7 +10,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
+import { INativeResponse, Request } from 'Utilities/Request';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastParser } from 'Utilities/VastParser';
@@ -33,6 +33,7 @@ import { Campaign } from 'Models/Campaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -94,7 +95,8 @@ describe('CampaignRefreshManager', () => {
             Sdk: {
                 logWarning: sinon.spy(),
                 logInfo: sinon.spy(),
-                logError: sinon.spy()
+                logError: sinon.spy(),
+                logDebug: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
@@ -107,7 +109,8 @@ describe('CampaignRefreshManager', () => {
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345'))
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
@@ -124,7 +127,7 @@ describe('CampaignRefreshManager', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
@@ -411,6 +414,115 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
+            });
+        });
+
+        it('should send diagnostics when campaign caching fails', () => {
+            sinon.stub(assetManager, 'setup').callsFake(() => {
+                throw new Error('test error');
+            });
+
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                return Promise.resolve(<INativeResponse> {
+                    response: OnCometVideoPlcCampaign,
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
+                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
+            });
+        });
+
+        it('should send diagnostics when campaign request fails', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                return Promise.reject(new Error('test error'));
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+            });
+        });
+
+        it('should send diagnostics when campaign response content type is wrong', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                const json = JSON.parse(OnCometVideoPlcCampaign);
+                json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 'wrong/contentType';
+                return Promise.resolve(<INativeResponse> {
+                    response: JSON.stringify(json),
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'Unsupported content-type: wrong/contentType', 'Incorrect error message');
+                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
+                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
+            });
+        });
+
+        it('should send diagnostics when campaign response parsing fails because of wrong types', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                const json = JSON.parse(OnCometVideoPlcCampaign);
+                json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 1;
+                return Promise.resolve(<INativeResponse> {
+                    response: JSON.stringify(json),
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
+                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
+                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
     });
