@@ -11,7 +11,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { Platform } from 'Constants/Platform';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';

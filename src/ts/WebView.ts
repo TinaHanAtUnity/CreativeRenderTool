@@ -17,14 +17,13 @@ import { Platform } from 'Constants/Platform';
 import { Resolve } from 'Utilities/Resolve';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { VastParser } from 'Utilities/VastParser';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Overlay } from 'Views/Overlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -37,6 +36,10 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
+
+import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
+import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 
 export class WebView {
 
@@ -70,6 +73,8 @@ export class WebView {
     private _configJsonCheckedAt: number;
 
     private _metadataManager: MetaDataManager;
+
+    private _creativeUrl?: string;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -137,7 +142,11 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            if(this._creativeUrl) {
+                return new Configuration(JsonParser.parse(CreativeUrlConfiguration));
+            } else {
+                return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            }
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
@@ -148,12 +157,12 @@ export class WebView {
                 throw error;
             }
 
-            if(this._configuration.isAnalyticsEnabled()) {
+            if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._focusManager.setListenAndroidLifecycle(true);
                 }
 
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._focusManager);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                     return Promise.resolve();
@@ -175,7 +184,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, new VastParser(), this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -257,8 +266,20 @@ export class WebView {
 
         Promise.all([
             this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getConnectionType()
+        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            if(campaign.isConnectionNeeded() && connectionType === 'none') {
+                this._showing = false;
+                this.showError(true, placementId, 'No connection');
+
+                const error = new DiagnosticError(new Error('No connection is available'), {
+                    id: campaign.getId(),
+                });
+                Diagnostics.trigger('mraid_no_connection', error);
+                return;
+            }
+
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
@@ -451,10 +472,18 @@ export class WebView {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
             }
 
-            if (TestEnvironment.get('forcedOrientation')) {
+            if(TestEnvironment.get('forcedOrientation')) {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
-            return;
+
+            if(TestEnvironment.get('creativeUrl')) {
+                const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                }
+            }
         });
     }
 }

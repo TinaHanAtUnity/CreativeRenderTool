@@ -54,10 +54,11 @@ describe('VastVideoEventHandlers tests', () => {
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+        clientInfo = TestFixtures.getClientInfo();
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
-        overlay = new Overlay(nativeBridge, false, 'en');
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         placement = new Placement({
             id: '123',
@@ -72,7 +73,6 @@ describe('VastVideoEventHandlers tests', () => {
 
         deviceInfo = new DeviceInfo(nativeBridge);
 
-        clientInfo = TestFixtures.getClientInfo();
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         eventManager = new EventManager(nativeBridge, request);

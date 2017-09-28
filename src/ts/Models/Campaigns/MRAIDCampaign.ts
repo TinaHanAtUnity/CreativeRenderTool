@@ -2,7 +2,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
-import { StoreName } from 'Models/PerformanceCampaign';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Session } from 'Models/Session';
 
 interface IMRAIDCampaign extends ICampaign {
@@ -191,6 +191,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getAppStoreId(): string | undefined {
         return this.get('appStoreId');
+    }
+
+    public isConnectionNeeded(): boolean {
+        const resourceUrl = this.getResourceUrl();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            return false;
+        }
+        return true;
     }
 
     public getDTO(): { [key: string]: any } {

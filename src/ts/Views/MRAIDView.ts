@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import { View } from 'Views/View';
 import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
@@ -34,8 +34,9 @@ export abstract class MRAIDView extends View {
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
-                mraid = this.replaceMraidSources(mraid);
 
+                mraid = mraid.replace(/\$/g, '$$$');
+                mraid = this.replaceMraidSources(mraid);
                 return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');

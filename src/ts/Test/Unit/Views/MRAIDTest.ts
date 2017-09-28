@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { MRAID } from 'Views/MRAID';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -72,6 +72,15 @@ describe('MRAID', () => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
             assert.isNotNull(dom);
             assert.isNull(dom.querySelector('script[src^="mraid.js"]'));
+        });
+    });
+
+    it('should not remove string replacement patterns', () => {
+        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>`);
+        const mraid = new MRAID(nativeBridge, placement, campaign);
+        return mraid.createMRAID().then((mraidSrc) => {
+            assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
+            assert.notEqual(mraidSrc.indexOf('<script>var test = "Hello $&"</script>'), -1);
         });
     });
 });

@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { EndScreen } from 'Views/EndScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';

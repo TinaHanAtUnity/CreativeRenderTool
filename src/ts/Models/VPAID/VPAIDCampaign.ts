@@ -53,6 +53,10 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
         return this.getVPAID().getVideoClickThroughURL();
     }
 
+    public isConnectionNeeded(): boolean {
+        return true;
+    }
+
     private addTrackingToVAST(tracking: any) {
         if (tracking) {
             for (const trackingEventName in tracking) {

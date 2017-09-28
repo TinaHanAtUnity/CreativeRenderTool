@@ -1,3 +1,27 @@
+# Thu Sep 28 13:54:13 UTC 2017
+
+* Enable creative testing without backend
+* Fix retrying after campaign parsing or caching failure
+* Remove parsed ad plan from diagnostics (ES indexing)
+
+# Wed Sep 27 13:10:22 UTC 2017
+
+* Dark end screen theme AB Test (groups 8 & 9)
+* Remove additional click zones from end screen AB test (groups 10 & 11)
+* Clean up parts of the campaign parsing refactoring
+
+# Wed Sep 20 12:10:38 UTC 2017
+
+* Initial display ads support
+* Send analytics test data from gameIds 14850 and 14851
+* Do not show 3rd party MRAIDs if no connectivity is available
+* Include ad request response in plc_request_failed diagnostics
+* Refactor campaign response parsers
+* Make sure that string replacement patterns are not removed on string.replace operations
+* Reject files larger than 20MB
+* Call AdUnit.hide on display interstitial tests
+* Browser build fixes
+
 # Thu Sep 14 09:43:51 UTC 2017
 
 * Refactored AuctionResponse to be a typed model.

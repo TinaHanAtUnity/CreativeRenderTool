@@ -6,7 +6,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
@@ -23,10 +23,10 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
@@ -60,8 +60,8 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
-        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), sessionManager.getClientInfo().getGameId());
+        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), sessionManager.getClientInfo().getGameId());
 
         const video = this.getOrientedVideo(campaign, forceOrientation);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
@@ -94,11 +94,11 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, sessionManager: SessionManager, placement: Placement, campaign: VastCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), sessionManager.getClientInfo().getGameId());
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
-            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign, sessionManager.getClientInfo().getGameId());
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, sessionManager, vastAdUnit, deviceInfo, request);
         } else {
@@ -135,7 +135,7 @@ export class AdUnitFactory {
         }
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), sessionManager.getClientInfo().getGameId());
         }
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, sessionManager, placement, campaign, mraid, options, endScreen);
