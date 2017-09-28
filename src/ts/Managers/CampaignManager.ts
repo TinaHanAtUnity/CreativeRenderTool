@@ -104,11 +104,21 @@ export class CampaignManager {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
-                return this._request.post(requestUrl, body, [], {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
+                return Promise.resolve().then((): Promise<INativeResponse> => {
+                    if(CampaignManager.CampaignResponse) {
+                        return Promise.resolve({
+                            url: requestUrl,
+                            response: CampaignManager.CampaignResponse,
+                            responseCode: 200,
+                            headers: []
+                        });
+                    }
+                    return this._request.post(requestUrl, body, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    });
                 }).then(response => {
                     if(response) {
                         this._rawResponse = response.response;
@@ -134,8 +144,7 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-
+        const json = JsonParser.parse(response.response);
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];

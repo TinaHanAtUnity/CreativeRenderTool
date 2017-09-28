@@ -38,6 +38,10 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
+import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
+import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+
 export class WebView {
 
     private _nativeBridge: NativeBridge;
@@ -71,6 +75,8 @@ export class WebView {
     private _configJsonCheckedAt: number;
 
     private _metadataManager: MetaDataManager;
+
+    private _creativeUrl?: string;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -139,7 +145,11 @@ export class WebView {
 
             return this.setupTestEnvironment();
         }).then(() => {
-            return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            if(this._creativeUrl) {
+                return new Configuration(JsonParser.parse(CreativeUrlConfiguration));
+            } else {
+                return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            }
         }).then((configuration) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
@@ -465,10 +475,18 @@ export class WebView {
                 AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
             }
 
-            if (TestEnvironment.get('forcedOrientation')) {
+            if(TestEnvironment.get('forcedOrientation')) {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
-            return;
+
+            if(TestEnvironment.get('creativeUrl')) {
+                const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                }
+            }
         });
     }
 }
