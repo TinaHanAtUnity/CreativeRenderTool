@@ -3,10 +3,15 @@ import { IViewBinding } from 'Views/IViewBinding';
 import { Tap } from 'Utilities/Tap';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
+import { Swipe } from 'Utilities/Swipe';
 
 export class View {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
+        if(binding.event === 'swipe') {
+            binding.swipe = new Swipe(<HTMLElement>element);
+        }
+
         if(attachTap && binding.event === 'click') {
             binding.tap = new Tap(<HTMLElement>element);
         }
