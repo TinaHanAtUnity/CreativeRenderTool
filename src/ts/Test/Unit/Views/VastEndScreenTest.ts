@@ -28,7 +28,7 @@ describe('VastEndScreen', () => {
         const vastParser = TestFixtures.getVastParser();
         const vast = vastParser.parseVast(VastCompanionXml);
         const vastCampaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
-        const endScreen = new VastEndScreen(nativeBridge, vastCampaign);
+        const endScreen = new VastEndScreen(nativeBridge, vastCampaign, 'testGameId');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);
     });
