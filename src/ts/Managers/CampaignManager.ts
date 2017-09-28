@@ -1,4 +1,4 @@
-import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable3 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -59,7 +59,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable4<WebViewError, string[], string | undefined, any>();
+    public readonly onError = new Observable3<WebViewError, string[], string | undefined>();
     public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
@@ -73,8 +73,6 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
-    private _parsedResponse: any;
-    private _parserMap: { [key: string]: CampaignParser };
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -85,7 +83,6 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
-        this._parserMap = {};
         this._requesting = false;
     }
 
@@ -103,19 +100,25 @@ export class CampaignManager {
             delete this._rawResponse;
         }
 
-        if(this._parsedResponse) {
-            delete this._parsedResponse;
-        }
-
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
-                return this._request.post(requestUrl, body, [], {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
+                return Promise.resolve().then((): Promise<INativeResponse> => {
+                    if(CampaignManager.CampaignResponse) {
+                        return Promise.resolve({
+                            url: requestUrl,
+                            response: CampaignManager.CampaignResponse,
+                            responseCode: 200,
+                            headers: []
+                        });
+                    }
+                    return this._request.post(requestUrl, body, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    });
                 }).then(response => {
                     if(response) {
                         this._rawResponse = response.response;
@@ -141,10 +144,7 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-
-        this._parsedResponse = json;
-
+        const json = JsonParser.parse(response.response);
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
@@ -213,39 +213,27 @@ export class CampaignManager {
 
         switch (response.getContentType()) {
             case 'comet/campaign':
-                parser = this.getCampaignParser(CometCampaignParser, response);
+                parser = new CometCampaignParser();
                 break;
             case 'programmatic/vast':
-                parser = this.getCampaignParser(ProgrammaticVastParser, response);
+                parser = new ProgrammaticVastParser();
                 break;
             case 'programmatic/mraid-url':
-                parser = this.getCampaignParser(ProgrammaticMraidUrlParser, response);
+                parser = new ProgrammaticMraidUrlParser();
                 break;
             case 'programmatic/mraid':
-                parser = this.getCampaignParser(ProgrammaticMraidParser, response);
+                parser = new ProgrammaticMraidParser();
                 break;
             case 'programmatic/static-interstitial':
-                parser = this.getCampaignParser(ProgrammaticStaticInterstitialParser, response);
+                parser = new ProgrammaticStaticInterstitialParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
-        // Update session to existing parser
-        parser.setSession(session);
-
-        return parser.parse(this._nativeBridge, this._request).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
-    }
-
-    private getCampaignParser<T extends CampaignParser>(CampaignParserConstructor: { new(response: AuctionResponse, gamerId: string, abGroup: number): T; }, response: AuctionResponse): CampaignParser {
-        if(!this._parserMap[response.getContentType()]) {
-            const campaignParser: T = new CampaignParserConstructor(response, this._configuration.getGamerId(), this.getAbGroup());
-            this._parserMap[response.getContentType()] = campaignParser;
-        }
-
-        return this._parserMap[response.getContentType()];
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
@@ -264,7 +252,7 @@ export class CampaignManager {
 
     private handleError(error: any, placementIds: string[]): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, this._rawResponse, this._parsedResponse);
+        this.onError.trigger(error, placementIds, this._rawResponse);
 
         return Promise.resolve();
     }
