@@ -404,7 +404,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error, ['premium', 'video'], undefined, undefined);
+                campaignManager.onError.trigger(error, ['premium', 'video'], undefined);
                 return Promise.resolve();
             });
 
@@ -444,7 +444,6 @@ describe('CampaignRefreshManager', () => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
-                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
                 assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
@@ -493,7 +492,6 @@ describe('CampaignRefreshManager', () => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'Unsupported content-type: wrong/contentType', 'Incorrect error message');
-                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
                 assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
@@ -522,7 +520,6 @@ describe('CampaignRefreshManager', () => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
-                assert.isDefined(receivedError.adResponse, 'Ad Response should be defined in error');
                 assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
