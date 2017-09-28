@@ -1,4 +1,4 @@
-import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable3 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -59,7 +59,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable4<WebViewError, string[], string | undefined, any>();
+    public readonly onError = new Observable3<WebViewError, string[], string | undefined>();
     public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
@@ -73,7 +73,6 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
-    private _parsedResponse: any;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -99,10 +98,6 @@ export class CampaignManager {
 
         if(this._rawResponse) {
             delete this._rawResponse;
-        }
-
-        if(this._parsedResponse) {
-            delete this._parsedResponse;
         }
 
         return this._sessionManager.create().then((session) => {
@@ -140,8 +135,6 @@ export class CampaignManager {
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
         const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-
-        this._parsedResponse = json;
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
@@ -250,7 +243,7 @@ export class CampaignManager {
 
     private handleError(error: any, placementIds: string[]): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, this._rawResponse, this._parsedResponse);
+        this.onError.trigger(error, placementIds, this._rawResponse);
 
         return Promise.resolve();
     }
