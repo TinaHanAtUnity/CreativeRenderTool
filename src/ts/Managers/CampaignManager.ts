@@ -115,7 +115,7 @@ export class CampaignManager {
                     if(CampaignManager.CampaignResponse) {
                         return Promise.resolve({
                             url: requestUrl,
-                            response: JsonParser.parse(CampaignManager.CampaignResponse),
+                            response: CampaignManager.CampaignResponse,
                             responseCode: 200,
                             headers: []
                         });
@@ -151,10 +151,7 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
-
-        this._parsedResponse = json;
-
+        const json = this._parsedResponse = JsonParser.parse(response.response);
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
