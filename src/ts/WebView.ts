@@ -37,6 +37,8 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 
+import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+
 export class WebView {
 
     private _nativeBridge: NativeBridge;
@@ -139,36 +141,7 @@ export class WebView {
             return this.setupTestEnvironment();
         }).then(() => {
             if(this._creativeUrl) {
-                return new Configuration(JSON.parse(`{
-                    "enabled": true,
-                    "coppaCompliant": false,
-                    "assetCaching": "disabled",
-                    "projectId": "0a379f5a-c4fa-4f7f-a5c1-e49fd3dd63d4",
-                    "placements": [{
-                        "id": "defaultVideoAndPictureZone",
-                        "name": "Placement",
-                        "default": true,
-                        "allowSkip": true,
-                        "disableBackButton": true,
-                        "muteVideo": false,
-                        "useDeviceOrientationForVideo": false,
-                        "adTypes": ["MRAID", "VIDEO"],
-                        "skipInSeconds": 5
-                    }, {
-                        "id": "incentivizedZone",
-                        "name": "Placement",
-                        "default": false,
-                        "allowSkip": false,
-                        "disableBackButton": true,
-                        "muteVideo": false,
-                        "useDeviceOrientationForVideo": false,
-                        "adTypes": ["MRAID", "VIDEO"]
-                    }],
-                    "properties": "tynbvvQLwnpf382fQqw4MzIk8YYdMj8DWebgn+QoOgpVVRYNFXY=",
-                    "country": "FI",
-                    "gamerId": "59a964fd13dcc10984985e6d",
-                    "abGroup": 0
-                }`));
+                return new Configuration(JsonParser.parse(CreativeUrlConfiguration));
             } else {
                 return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             }
