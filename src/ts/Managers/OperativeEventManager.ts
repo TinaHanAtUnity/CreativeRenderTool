@@ -18,6 +18,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 export class OperativeEventManager {
 
@@ -325,6 +326,8 @@ export class OperativeEventManager {
             } else {
                 infoJson.cached = false;
             }
+        } else if(campaign instanceof DisplayInterstitialCampaign) {
+            infoJson.cached = false;
         }
 
         if(adUnit instanceof PerformanceAdUnit) {
