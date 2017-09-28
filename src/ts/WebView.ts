@@ -38,6 +38,8 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
+import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 
 export class WebView {
 
@@ -475,43 +477,11 @@ export class WebView {
             }
 
             if(TestEnvironment.get('creativeUrl')) {
-                this._creativeUrl = TestEnvironment.get('creativeUrl');
+                const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    CampaignManager.setCampaignResponse(`{
-                        "correlationId": "PFweE7m9HRHUg2y08qU1PL",
-                        "placements": {
-                            "defaultVideoAndPictureZone": "000000000000000000000000",
-                            "incentivizedZone": "000000000000000000000000"
-                        },
-                        "media": {
-                            "000000000000000000000000": {
-                                "contentType": "comet/campaign",
-                                "content": "{\\"id\\":\\"000000000000000000000000\\",\\"platform\\":\\"android\\",\\"store\\":\\"google\\",\\"appStoreId\\":\\"com.iUnity.angryBots\\",\\"gameId\\":11017,\\"gameName\\":\\"Test game android\\",\\"gameIcon\\":\\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\\",\\"rating\\":4.5,\\"ratingCount\\":10000,\\"bypassAppSheet\\":false,\\"mraidUrl\\":\\"${ this._creativeUrl }\\"}",
-                                "trackingUrls": {},
-                                "campaignId": "000000000000000000000000",
-                                "seatId": 9000,
-                                "adType": "VIDEO"
-                            }
-                        }
-                    }`);
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
                 } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    CampaignManager.setCampaignResponse(`{
-                        "correlationId": "S8z40tOCRnTjCmX59PWh48",
-                        "placements": {
-                            "defaultVideoAndPictureZone": "000000000000000000000000",
-                            "incentivizedZone": "000000000000000000000000"
-                        },
-                        "media": {
-                            "000000000000000000000000": {
-                                "contentType": "comet/campaign",
-                                "content": "{\\"id\\":\\"000000000000000000000000\\",\\"platform\\":\\"ios\\",\\"store\\":\\"apple\\",\\"appStoreId\\":\\"453467175\\",\\"gameId\\":11017,\\"gameName\\":\\"Test game ios\\",\\"gameIcon\\":\\"https://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\\",\\"rating\\":4.5,\\"ratingCount\\":10000,\\"bypassAppSheet\\":false,\\"mraidUrl\\":\\"${ this._creativeUrl }\\"}",
-                                "trackingUrls": {},
-                                "campaignId": "000000000000000000000000",
-                                "seatId": 9000,
-                                "adType": "VIDEO"
-                            }
-                        }
-                    }`);
+                    CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
                 }
             }
         });
