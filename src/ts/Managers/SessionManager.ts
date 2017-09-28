@@ -23,11 +23,12 @@ export class SessionManager {
 
     public create(): Promise<Session> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            return this.startNewSession(id);
+            this.startNewSession(id);
+            return Promise.resolve(new Session(id));
         });
     }
 
-    public startNewSession(sessionId: string): Promise<Session> {
+    public startNewSession(sessionId: string): Promise<any[]> {
         const sessionTimestampKey = SessionManager.getSessionTimestampKey(sessionId);
         const timestamp = Date.now();
 
@@ -40,8 +41,6 @@ export class SessionManager {
                 timestamp: timestamp
             }));
             return Promise.resolve([]);
-        }).then(() => {
-            return Promise.resolve(new Session(sessionId));
         });
     }
 
