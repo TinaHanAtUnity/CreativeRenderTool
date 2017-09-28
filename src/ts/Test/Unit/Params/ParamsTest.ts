@@ -195,7 +195,6 @@ class TestHelper {
 
     public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit {
         const config: Configuration = TestFixtures.getConfiguration();
-        // const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
         let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
 
