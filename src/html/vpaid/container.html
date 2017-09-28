@@ -26,6 +26,7 @@
 </head>
 <body>
     <div class="video-player-slot">
+        <video></video>
     </div>
     <iframe></iframe>
     <script>
@@ -50,7 +51,7 @@
                 this._iframe = document.querySelector('iframe');
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
-                this._videoSlot = document.createElement('video');
+                this._videoSlot = this._slot.querySelector('video');
                 window.addEventListener('message', this._onMessage.bind(this));
             };
 
@@ -107,8 +108,6 @@
             }
 
             Container.prototype._showAd = function() {
-                this._slot.appendChild(this._videoSlot);
-
                 this._creative.startAd();
             };
 
