@@ -5,10 +5,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
-    public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
-        const jsonDisplay = JsonParser.parse(this.getAuctionResponse().getContent());
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+        const jsonDisplay = JsonParser.parse(response.getContent());
 
         if(!jsonDisplay.markup) {
             throw new DiagnosticError(
@@ -25,6 +27,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
-        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, this.getSession(), this.getGamerId(), this.getAbGroup(), this.getAuctionResponse().getCacheTTL(), this.getAuctionResponse().getTrackingUrls(), clickThroughUrl, this.getAuctionResponse().getAdType(), this.getAuctionResponse().getCreativeId(), this.getAuctionResponse().getSeatId(), this.getAuctionResponse().getCorrelationId()));
+        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }

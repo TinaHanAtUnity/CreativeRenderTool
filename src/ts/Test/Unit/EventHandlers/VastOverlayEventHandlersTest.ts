@@ -55,7 +55,9 @@ describe('VastOverlayEventHandlersTest', () => {
         const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
-        overlay = new Overlay(nativeBridge, false, 'en');
+        clientInfo = TestFixtures.getClientInfo();
+
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
         placement = new Placement({
@@ -73,10 +75,8 @@ describe('VastOverlayEventHandlersTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
-
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);

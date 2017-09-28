@@ -58,8 +58,8 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
-        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
 
         const video = this.getOrientedVideo(campaign, forceOrientation);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
@@ -92,11 +92,11 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: VastCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage());
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId());
 
         let vastAdUnit: VastAdUnit;
         if (campaign.hasEndscreen()) {
-            const vastEndScreen = new VastEndScreen(nativeBridge, campaign);
+            const vastEndScreen = new VastEndScreen(nativeBridge, campaign, clientInfo.getGameId());
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options, vastEndScreen);
             this.prepareVastEndScreen(vastEndScreen, nativeBridge, thirdPartyEventManager, vastAdUnit, deviceInfo, clientInfo, request);
         } else {
@@ -133,7 +133,7 @@ export class AdUnitFactory {
         }
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage());
+            endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         }
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, container, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, mraid, options, endScreen);
