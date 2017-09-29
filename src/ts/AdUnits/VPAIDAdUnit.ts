@@ -58,7 +58,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public isCached(): boolean {
-        return true;
+        return false;
     }
 
     private onShow() {
