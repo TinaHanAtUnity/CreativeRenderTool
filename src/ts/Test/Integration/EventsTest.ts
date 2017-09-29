@@ -11,8 +11,8 @@ import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
 import { ConfigManager } from 'Managers/ConfigManager';
-import { SessionManager } from 'Managers/SessionManager';
 import { CampaignManager } from 'Managers/CampaignManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('EventsTest', () => {
 
@@ -83,7 +83,7 @@ describe('EventsTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
@@ -135,7 +135,7 @@ describe('EventsTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '456', listener, true);
     });

@@ -9,7 +9,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
@@ -36,6 +36,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -61,7 +62,8 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
-    private _eventManager: EventManager;
+    private _operativeEventManager: OperativeEventManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -99,7 +101,7 @@ export class WebView {
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
-            this._eventManager = new EventManager(this._nativeBridge, this._request);
+            this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
 
             HttpKafka.setRequest(this._request);
@@ -127,7 +129,8 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._clientInfo, this._deviceInfo, this._eventManager, this._metadataManager);
+            this._sessionManager = new SessionManager(this._nativeBridge);
+            this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._sessionManager, this._clientInfo, this._deviceInfo);
 
             this._initializedAt = this._configJsonCheckedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -197,7 +200,7 @@ export class WebView {
 
             this._initialized = true;
 
-            return this._eventManager.sendUnsentSessions();
+            return this._sessionManager.sendUnsentSessions(this._operativeEventManager);
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -281,7 +284,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._sessionManager, placement, campaign, this._configuration, this._request, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
@@ -304,7 +307,7 @@ export class WebView {
                 }
             }
 
-            this._sessionManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+            this._operativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
             this._campaignManager.setPreviousPlacementId(placementId);
             this._currentAdUnit.show();
         });
@@ -365,7 +368,7 @@ export class WebView {
                     }
                 } else {
                     this._campaignRefreshManager.refresh();
-                    this._eventManager.sendUnsentSessions();
+                    this._sessionManager.sendUnsentSessions(this._operativeEventManager);
                 }
             });
         }
@@ -438,7 +441,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                SessionManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
