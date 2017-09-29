@@ -11,17 +11,17 @@ import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Views/VPAID';
 import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
 import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { Observable2 } from 'Utilities/Observable';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ListenerApi } from 'Native/Api/Listener';
-import { EventManager } from 'Managers/EventManager';
 import { Platform } from 'Constants/Platform';
 import { IntentApi } from 'Native/Api/Intent';
 import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -29,8 +29,8 @@ describe('VPAIDAdUnit', () => {
     let vpaidView: VPAID;
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
-    let sessionManager: SessionManager;
-    let eventManager: EventManager;
+    let operativeEventManager: OperativeEventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let vpaid: VPAIDModel;
 
@@ -42,9 +42,8 @@ describe('VPAIDAdUnit', () => {
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
-        sessionManager = <SessionManager>sinon.createStubInstance(SessionManager);
-        eventManager = <EventManager>sinon.createStubInstance(EventManager);
-        (<sinon.SinonStub>sessionManager.getEventManager).returns(eventManager);
+        operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
+        thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
         container = <AdUnitContainer>sinon.createStubInstance(Activity);
 
         vpaid = new VPAIDParser().parse(VPAIDTestXML);
@@ -60,7 +59,7 @@ describe('VPAIDAdUnit', () => {
             muteVideo: false
         });
         campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, sessionManager, ForceOrientation.NONE, container, placement, campaign);
+        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, operativeEventManager, thirdPartyEventManager, ForceOrientation.NONE, container, placement, campaign);
     });
 
     afterEach(() => {
@@ -114,10 +113,10 @@ describe('VPAIDAdUnit', () => {
         const sdkVersion = 210;
         const verifyTrackingEvent = (eventType: string): (() => void) => {
             return () => {
-                sinon.assert.called(<sinon.SinonSpy>eventManager.thirdPartyEvent);
+                sinon.assert.called(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
                 const urls = campaign.getTrackingEventUrls(eventType);
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid ${eventType}`, campaign.getSession().getId(), url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, `vpaid ${eventType}`, campaign.getSession().getId(), url);
                 }
             };
         };
@@ -129,7 +128,7 @@ describe('VPAIDAdUnit', () => {
         };
 
         beforeEach(() => {
-            (<sinon.SinonStub>sessionManager.getClientInfo).returns({
+            (<sinon.SinonStub>operativeEventManager.getClientInfo).returns({
                 getSdkVersion: () => sdkVersion
             });
         });
@@ -162,7 +161,7 @@ describe('VPAIDAdUnit', () => {
             beforeEach(triggerVPAIDEvent('AdVideoFirstQuartile'));
             it('should trigger firstQuartile tracking', verifyTrackingEvent('firstQuartile'));
             it('should send the first quartile operative event', () => {
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendFirstQuartile);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile);
             });
         });
 
@@ -170,7 +169,7 @@ describe('VPAIDAdUnit', () => {
             beforeEach(triggerVPAIDEvent('AdVideoMidpoint'));
             it('should trigger midpoint tracking', verifyTrackingEvent('midpoint'));
             it('should send the midpoint operative event', () => {
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendMidpoint);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendMidpoint);
             });
         });
 
@@ -178,7 +177,7 @@ describe('VPAIDAdUnit', () => {
             beforeEach(triggerVPAIDEvent('AdVideoThirdQuartile'));
             it('should trigger thirdQuartile tracking', verifyTrackingEvent('thirdQuartile'));
             it('should send the third quartile operative event', () => {
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendThirdQuartile);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
             });
         });
 
@@ -186,7 +185,7 @@ describe('VPAIDAdUnit', () => {
             beforeEach(triggerVPAIDEvent('AdVideoComplete'));
             it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendView);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
             });
             it('should set the finish state to COMPLETE', () => {
                 assert.isTrue(adUnit.getFinishState() === FinishState.COMPLETED);
@@ -205,7 +204,7 @@ describe('VPAIDAdUnit', () => {
 
             it('should trigger skip tracking', verifyTrackingEvent('skip'));
             it('should send the skip operative event', () => {
-                sinon.assert.called(<sinon.SinonSpy>sessionManager.sendSkip);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendSkip);
             });
             it('should set the finish state to COMPLETE', () => {
                 assert.isTrue(adUnit.getFinishState() === FinishState.SKIPPED);
@@ -249,7 +248,7 @@ describe('VPAIDAdUnit', () => {
             const checkClickThroughTracking = () => {
                 const urls = campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>eventManager.thirdPartyEvent, `vpaid video click`, campaign.getSession().getId(), url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, `vpaid video click`, campaign.getSession().getId(), url);
                 }
             };
 

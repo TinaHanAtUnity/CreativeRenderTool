@@ -5,22 +5,25 @@ import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
-import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class VPAIDAdUnit extends AbstractAdUnit {
 
-    private _sessionManager: SessionManager;
+    private _operativeEventManager: OperativeEventManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
     private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
 
-    constructor(view: VPAID, nativeBridge: NativeBridge, sessionManager: SessionManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
+    constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._vpaidCampaign = campaign;
-        this._sessionManager = sessionManager;
+        this._operativeEventManager = operativeEventManager;
+        this._thirdPartyEventManager = thirdPartyEventManager;
 
         this._view = view;
         this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
@@ -100,7 +103,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAdSkipped() {
         this.sendTrackingEvent('skip');
-        this._sessionManager.sendSkip(this);
+        this._operativeEventManager.sendSkip(this);
         this.setFinishState(FinishState.SKIPPED);
         this.hide();
     }
@@ -112,7 +115,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onAdStarted() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('creativeView');
-        this._sessionManager.sendStart(this);
+        this._operativeEventManager.sendStart(this);
     }
 
     private onAdImpression() {
@@ -125,23 +128,23 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAdVideoFirstQuartile() {
         this.sendTrackingEvent('firstQuartile');
-        this._sessionManager.sendFirstQuartile(this);
+        this._operativeEventManager.sendFirstQuartile(this);
     }
 
     private onAdVideoMidpoint() {
         this.sendTrackingEvent('midpoint');
-        this._sessionManager.sendMidpoint(this);
+        this._operativeEventManager.sendMidpoint(this);
     }
 
     private onAdVideoThirdQuartile() {
         this.sendTrackingEvent('thirdQuartile');
-        this._sessionManager.sendThirdQuartile(this);
+        this._operativeEventManager.sendThirdQuartile(this);
     }
 
     private onAdVideoComplete() {
         this.sendTrackingEvent('complete');
         this.setFinishState(FinishState.COMPLETED);
-        this._sessionManager.sendView(this);
+        this._operativeEventManager.sendView(this);
     }
 
     private onAdPaused() {
@@ -197,9 +200,9 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private sendThirdPartyEvent(eventType: string, url: string) {
         const sessionId = this._vpaidCampaign.getSession().getId();
-        const sdkVersion = this._sessionManager.getClientInfo().getSdkVersion();
+        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._sessionManager.getEventManager().thirdPartyEvent(eventType, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
     }
 }
