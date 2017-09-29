@@ -52,11 +52,16 @@
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
                 this._videoSlot = this._slot.querySelector('video');
-                window.addEventListener('message', this._onMessage.bind(this));
+
+                var self = this;
+                window.addEventListener('message', function(e) {
+                    self._onMessage(e);
+                });
             };
 
             Container.prototype.init = function() {
-                this._iframe.addEventListener('load', this._onIFrameReady.bind(this));
+                var self = this;
+                this._iframe.addEventListener('load', function() { self._onIFrameReady(); });
                 this._iframe.contentDocument.write(getIFrameDocumentContent());
                 this._iframe.contentDocument.close();
             };
@@ -85,7 +90,7 @@
                 this._creative.subscribe(function() {
                     var args = [eventName].concat(Array.prototype.slice.call(arguments));
                     this._handleEvent.apply(this, args);
-                }.bind(this), eventName, this);
+                }, eventName, this);
             }
 
             Container.prototype._getVPAIDFunction = function() {
