@@ -12,6 +12,7 @@ import { INativeResponse } from 'Utilities/Request';
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
     public static ErrorRefillDelay = 3600;
+    public static QuickRefillTestDelay = 60;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -34,7 +35,7 @@ export class CampaignRefreshManager {
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, singleCampaignMode) => this.onAdPlanReceived(refreshDelay));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, singleCampaignMode) => this.onAdPlanReceived(refreshDelay, singleCampaignMode));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -180,9 +181,9 @@ export class CampaignRefreshManager {
             this._singleCampaignErrorCount++;
 
             if(this._singleCampaignErrorCount === 1) {
-                const retryDelaySeconds: number = CampaignRefreshManager.NoFillDelay + Math.random() * CampaignRefreshManager.NoFillDelay;
+                const retryDelaySeconds: number = CampaignRefreshManager.QuickRefillTestDelay + Math.random() * CampaignRefreshManager.QuickRefillTestDelay;
                 this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
-                this._refillTimestamp = Date.now() + CampaignRefreshManager.NoFillDelay * 1000;
+                this._refillTimestamp = Date.now() + CampaignRefreshManager.QuickRefillTestDelay * 1000;
                 setTimeout(() => {
                     this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign now');
                     this.refresh();
