@@ -1,5 +1,4 @@
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { SessionManager } from 'Managers/SessionManager';
 import { EventType } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
@@ -9,20 +8,22 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class MRAIDEventHandlers {
 
-    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, request: Request, url: string): Promise<void> {
+    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request, url: string): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
-        sessionManager.sendThirdQuartile(adUnit);
-        sessionManager.sendView(adUnit);
-        sessionManager.sendClick(adUnit);
+        operativeEventManager.sendThirdQuartile(adUnit);
+        operativeEventManager.sendView(adUnit);
+        operativeEventManager.sendClick(adUnit);
         adUnit.sendClick();
 
         const campaign = <MRAIDCampaign>adUnit.getCampaign();
 
         if(campaign.getClickAttributionUrl()) {
-            this.handleClickAttribution(nativeBridge, sessionManager, campaign);
+            this.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
                     MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
@@ -59,7 +60,7 @@ export class MRAIDEventHandlers {
         }
     }
 
-    private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
+    private static handleClickAttribution(nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, campaign: MRAIDCampaign) {
         const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
@@ -68,11 +69,10 @@ export class MRAIDEventHandlers {
             currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
         }
 
-        const eventManager = sessionManager.getEventManager();
         const clickAttributionUrl = campaign.getClickAttributionUrl();
 
         if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(nativeBridge, location);
@@ -96,7 +96,7 @@ export class MRAIDEventHandlers {
             });
         } else {
             if (clickAttributionUrl) {
-                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+                thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
             }
         }
     }
