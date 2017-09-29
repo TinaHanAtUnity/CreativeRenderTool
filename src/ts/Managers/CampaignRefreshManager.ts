@@ -11,7 +11,7 @@ import { INativeResponse } from 'Utilities/Request';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
-    public static ErrorFillDelay = 60;
+    public static ErrorRefillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -33,8 +33,8 @@ export class CampaignRefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan, parsedAdPlan) => this.onError(error, placementIds, rawAdPlan, parsedAdPlan));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, singleCampaignMode) => this.onAdPlanReceived(refreshDelay, singleCampaignMode));
+        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, singleCampaignMode) => this.onAdPlanReceived(refreshDelay));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -148,7 +148,7 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string, parsedAdPlan?: any) {
+    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
@@ -157,10 +157,15 @@ export class CampaignRefreshManager {
 
         Diagnostics.trigger('plc_request_failed', {
             error: error,
-            rawAdResponse: rawAdPlan,
-            adResponse: parsedAdPlan
+            rawAdResponse: rawAdPlan
         });
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
+
+        const minimumRefreshTimestamp = Date.now() + CampaignRefreshManager.ErrorRefillDelay * 1000;
+        if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
+            this._refillTimestamp = minimumRefreshTimestamp;
+            this._nativeBridge.Sdk.logInfo('Unity Ads will refresh ads in ' + CampaignRefreshManager.ErrorRefillDelay + ' seconds');
+        }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {

@@ -1,4 +1,10 @@
-# Tue Sep 26 12:37:07 UTC 2017
+# Thu Sep 28 13:54:13 UTC 2017
+
+* Enable creative testing without backend
+* Fix retrying after campaign parsing or caching failure
+* Remove parsed ad plan from diagnostics (ES indexing)
+
+# Wed Sep 27 13:10:22 UTC 2017
 
 * Dark end screen theme AB Test (groups 8 & 9)
 * Remove additional click zones from end screen AB test (groups 10 & 11)
