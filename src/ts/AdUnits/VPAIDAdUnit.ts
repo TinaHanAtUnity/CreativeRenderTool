@@ -9,14 +9,23 @@ import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Timer } from 'Utilities/Timer';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class VPAIDAdUnit extends AbstractAdUnit {
 
+    public static setAdLoadTimeout(timeout: number) {
+        VPAIDAdUnit._adLoadTimeout = timeout;
+    }
+
+    private static _adLoadTimeout: number = 10 * 1000;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
     private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
+    private _timer: Timer;
 
     constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
@@ -42,6 +51,8 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._vpaidEventHandlers.AdPaused = this.onAdPaused;
         this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
         this._vpaidEventHandlers.AdClickThru = this.onAdClickThru;
+
+        this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
     }
 
     public show(): Promise<void> {
@@ -64,11 +75,21 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         return false;
     }
 
+    private onAdUnitNotLoaded() {
+        this.setFinishState(FinishState.ERROR);
+        Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
+            id: this._vpaidCampaign.getId()
+        }));
+        this.hide();
+    }
+
     private onShow() {
         this.setShowing(true);
+        this._timer.start();
     }
 
     private onHide() {
+        this._timer.stop();
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
@@ -92,6 +113,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAdLoaded() {
+        this._timer.stop();
         this._view.showAd();
     }
 
