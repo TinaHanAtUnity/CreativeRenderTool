@@ -1,5 +1,7 @@
 export class Url {
 
+
+
     public static addParameters(url: string, parameters: { [key: string]: any }): string {
         let newUrl: string = url.toString();
         if(newUrl.indexOf('?') !== -1) {
@@ -44,4 +46,15 @@ export class Url {
 
         return false;
     }
+
+    public static isProtocolWhitelisted(url: string): boolean {
+        for (const protocol of this.whitelistedProtocols) {
+            if (url.indexOf(protocol) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
 }

@@ -7,6 +7,7 @@ import { VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
 import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
 
 export class VPAIDAdUnit extends AbstractAdUnit {
 
@@ -163,7 +164,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private openUrl(url: string | null) {
-        if (url) {
+        if (url && Url.isProtocolWhitelisted(url)) {
             if (this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._nativeBridge.UrlScheme.open(url);
             } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
