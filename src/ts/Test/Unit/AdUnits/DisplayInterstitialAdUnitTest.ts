@@ -2,7 +2,6 @@ import 'mocha';
 import * as sinon from 'sinon';
 
 import { DisplayInterstitialAdUnit } from "AdUnits/DisplayInterstitialAdUnit";
-import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { NativeBridge } from "Native/NativeBridge";
 import { AdUnitContainer } from "AdUnits/Containers/AdUnitContainer";
 import { SessionManager } from "Managers/SessionManager";
@@ -13,11 +12,14 @@ import { DisplayInterstitial } from "Views/DisplayInterstitial";
 import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
 import { Activity } from "AdUnits/Containers/Activity";
 import { Platform } from "Constants/Platform";
-import { EventManager } from "Managers/EventManager";
+import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
 import { DeviceInfo } from "Models/DeviceInfo";
 import { MetaDataManager } from "Managers/MetaDataManager";
 import { WakeUpManager } from "Managers/WakeUpManager";
 import { FocusManager } from "Managers/FocusManager";
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 describe('DisplayInterstitialAdUnit', () => {
@@ -29,6 +31,10 @@ describe('DisplayInterstitialAdUnit', () => {
     let campaign: DisplayInterstitialCampaign;
     let view: DisplayInterstitial;
     let sandbox: sinon.SinonSandbox;
+    let operativeEventManager: OperativeEventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -42,8 +48,11 @@ describe('DisplayInterstitialAdUnit', () => {
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'open').returns(Promise.resolve());
         sandbox.stub(container, 'close').returns(Promise.resolve());
-        const eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), eventManager, metaDataManager);
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
@@ -52,7 +61,7 @@ describe('DisplayInterstitialAdUnit', () => {
         sandbox.stub(view, 'show');
         sandbox.stub(view, 'hide');
 
-        adUnit = new DisplayInterstitialAdUnit(nativeBridge, container, sessionManager, placement, campaign, view, {});
+        adUnit = new DisplayInterstitialAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, {});
     });
 
     afterEach(() => {
