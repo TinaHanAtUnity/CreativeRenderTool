@@ -180,6 +180,7 @@ export class CampaignRefreshManager {
         if(this._singleCampaignMode) {
             this._singleCampaignErrorCount++;
 
+            // todo: check A/B group for testing
             if(this._singleCampaignErrorCount === 1) {
                 const retryDelaySeconds: number = CampaignRefreshManager.QuickRefillTestDelay + Math.random() * CampaignRefreshManager.QuickRefillTestDelay;
                 this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
