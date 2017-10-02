@@ -26,16 +26,14 @@ describe('EventsTest', () => {
         return count;
     };
 
-    const validateRequestLog = (requestLog: string[], campaignIds: string[]) => {
+    const validateRequestLog = (requestLog: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
-        for(const campaignId of campaignIds) {
-            assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start/' + campaignId), 1, 'Did not find a video_start event for campaignId: ' + campaignId);
-            assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile/' + campaignId), 1, 'Did not find a first_quartile event for campaignId: ' + campaignId);
-            assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint/' + campaignId), 1, 'Did not find a midpoint event for campaignId: ' + campaignId);
-            assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/third_quartile/' + campaignId), 1, 'Did not find a third_quartile event for campaignId: ' + campaignId);
-            assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_end/' + campaignId), 1, 'Did not find a video_end event for campaignId: ' + campaignId);
-        }
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile'), 1, 'Did not find a first_quartile event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint'), 1, 'Did not find a midpoint event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/third_quartile'), 1, 'Did not find a third_quartile event');
+        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_end'), 1, 'Did not find a video_end event');
     };
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -53,13 +51,11 @@ describe('EventsTest', () => {
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    if(startCount === 1) {
-                        setTimeout(() => {
-                            validateRequestLog(Request.getLog(), ['5909d3dcc850990014eb1c69']);
-                            assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 times');
-                            done();
-                        }, 2500);
-                    }
+                    setTimeout(() => {
+                        validateRequestLog(Request.getLog());
+                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
+                        done();
+                    }, 2500);
                 }
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
@@ -89,7 +85,7 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -107,13 +103,11 @@ describe('EventsTest', () => {
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    if(startCount === 1) {
-                        setTimeout(() => {
-                            validateRequestLog(Request.getLog(), ['5909d3dcc850990014eb1c69']);
-                            assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 times');
-                            done();
-                        }, 2500);
-                    }
+                    setTimeout(() => {
+                        validateRequestLog(Request.getLog());
+                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
+                        done();
+                    }, 2500);
                 }
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
@@ -143,7 +137,7 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '345', listener, true);
+        UnityAds.initialize(Platform.IOS, '456', listener, true);
     });
 
 });
