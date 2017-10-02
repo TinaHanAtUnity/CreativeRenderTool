@@ -28,7 +28,7 @@ describe('EventsTest', () => {
 
     const validateRequestLog = (requestLog: string[], campaignIds: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
-        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 3, 'Did not find 3 fill requests');
+        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
         for(const campaignId of campaignIds) {
             assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start/' + campaignId), 1, 'Did not find a video_start event for campaignId: ' + campaignId);
             assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile/' + campaignId), 1, 'Did not find a first_quartile event for campaignId: ' + campaignId);
@@ -47,19 +47,16 @@ describe('EventsTest', () => {
                 if(++readyCount === 1) {
                     UnityAds.show(placement);
                 }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
-                }
             },
             onUnityAdsStart: (placement: string) => {
                 ++startCount;
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    if(startCount === 2) {
+                    if(startCount === 1) {
                         setTimeout(() => {
-                            validateRequestLog(Request.getLog(), ['000000000000000000000000', '005472656d6f7220416e6472']);
-                            assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
+                            validateRequestLog(Request.getLog(), ['5909d3dcc850990014eb1c69']);
+                            assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 times');
                             done();
                         }, 2500);
                     }
@@ -92,7 +89,7 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '111', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -104,19 +101,16 @@ describe('EventsTest', () => {
                 if(++readyCount === 1) {
                     UnityAds.show(placement);
                 }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
-                }
             },
             onUnityAdsStart: (placement: string) => {
                 ++startCount;
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    if(startCount === 2) {
+                    if(startCount === 1) {
                         setTimeout(() => {
-                            validateRequestLog(Request.getLog(), ['000000000000000000000000', '00005472656d6f7220694f53']);
-                            assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
+                            validateRequestLog(Request.getLog(), ['5909d3dcc850990014eb1c69']);
+                            assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 times');
                             done();
                         }, 2500);
                     }
@@ -149,7 +143,7 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '111', listener, true);
+        UnityAds.initialize(Platform.IOS, '345', listener, true);
     });
 
 });
