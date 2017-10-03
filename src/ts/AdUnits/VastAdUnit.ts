@@ -3,12 +3,9 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
-import { Overlay } from 'Views/Overlay';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 enum Orientation {
     LANDSCAPE,
@@ -26,13 +23,17 @@ class DeviceOrientation {
     }
 }
 
+export interface IVastAdUnitParameters extends IVideoAdUnitParameters {
+    endScreen?: VastEndScreen;
+}
+
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
-        this._endScreen = endScreen || null;
+    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
+        super(nativeBridge, parameters);
+        this._endScreen = parameters.endScreen || null;
     }
 
     public hide(): Promise<void> {

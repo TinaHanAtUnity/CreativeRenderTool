@@ -1,9 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
-import { Placement } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Assets/Video';
 import { Overlay } from 'Views/Overlay';
@@ -14,6 +11,12 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+
+export interface IVideoAdUnitParameters extends IAdUnitParameters {
+    video: Video;
+    overlay: Overlay;
+}
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
 
@@ -34,15 +37,15 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _prepareCalled: boolean;
     private _videoReady: boolean;
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any) {
-        super(nativeBridge, forceOrientation, container, placement, campaign);
+    constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters) {
+        super(nativeBridge, parameters.forceOrientation, parameters.container, parameters.placement, parameters.campaign);
 
-        this._video = video;
+        this._video = parameters.video;
         this._videoReady = false;
         this._active = false;
-        this._overlay = overlay;
-        this._deviceInfo = deviceInfo;
-        this._options = options;
+        this._overlay = parameters.overlay;
+        this._deviceInfo = parameters.deviceInfo;
+        this._options = parameters.options;
         this._prepareCalled = false;
 
         this._lowMemory = false;

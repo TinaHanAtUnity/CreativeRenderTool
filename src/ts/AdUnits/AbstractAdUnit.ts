@@ -4,6 +4,26 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Configuration } from 'Models/Configuration';
+import { Request } from 'Utilities/Request';
+
+export interface IAdUnitParameters {
+    forceOrientation: ForceOrientation;
+    container: AdUnitContainer;
+    deviceInfo: DeviceInfo;
+    clientInfo: ClientInfo;
+    thirdPartyEventManager: ThirdPartyEventManager;
+    operativeEventManager: OperativeEventManager;
+    placement: Placement;
+    campaign: Campaign;
+    configuration: Configuration;
+    request: Request;
+    options: any;
+}
 
 export abstract class AbstractAdUnit {
 

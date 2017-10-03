@@ -4,7 +4,7 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
-import { MRAIDView, IOrientationProperties } from 'Views/MRAIDView';
+import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
@@ -17,7 +17,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView;
+    private _mraid: MRAIDView<IMRAIDViewHandler>;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
@@ -30,7 +30,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView<IMRAIDViewHandler>, options: any, endScreen?: EndScreen) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
         this._operativeEventManager = operativeEventManager;
         this._thirdPartyEventManager = thirdPartyEventManager;
@@ -135,7 +135,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         return this._endScreen;
     }
 
-    public getMRAIDView(): MRAIDView {
+    public getMRAIDView(): MRAIDView<IMRAIDViewHandler> {
         return this._mraid;
     }
 
