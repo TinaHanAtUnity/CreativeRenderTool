@@ -1,3 +1,8 @@
+# Mon Oct  2 11:43:28 UTC 2017
+
+* Refactor SessionManager and EventManager
+* Accept unsafe but legal URL characters in campaign assets
+
 # Thu Sep 28 13:54:13 UTC 2017
 
 * Enable creative testing without backend
