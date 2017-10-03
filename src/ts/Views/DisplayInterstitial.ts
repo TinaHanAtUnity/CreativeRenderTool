@@ -1,7 +1,7 @@
-import { View } from 'Views/View';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import DisplayContainer from 'html/display/DisplayContainer.html';
 
+import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
@@ -9,7 +9,14 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
-export class DisplayInterstitial extends View {
+export interface IDisplayInterstitialHandler {
+    onClick(url: string): void;
+    onReward(): void;
+    onSkip(): void;
+    onClose(): void;
+}
+
+export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();

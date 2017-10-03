@@ -13,7 +13,16 @@ export interface IOrientationProperties {
     forceOrientation: ForceOrientation;
 }
 
-export abstract class MRAIDView extends View {
+export interface IMRAIDViewHandler {
+    onClick(url: string): void;
+    onReward(): void;
+    onSkip(): void;
+    onClose(): void;
+    onOrientationProperties(orientationProperties: IOrientationProperties): void;
+    onAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, event: string, eventData: any): void;
+}
+
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> {
 
     public readonly onClick = new Observable1<string>();
     public readonly onReward = new Observable0();

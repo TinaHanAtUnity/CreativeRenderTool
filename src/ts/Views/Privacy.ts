@@ -5,7 +5,12 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 
-export class Privacy extends View {
+export interface IPrivacyHandler {
+    onPrivacy(url: string): void;
+    onClose(): void;
+}
+
+export class Privacy extends View<IPrivacyHandler> {
 
     public readonly onPrivacy = new Observable1<string> ();
     public readonly onClose = new Observable0();

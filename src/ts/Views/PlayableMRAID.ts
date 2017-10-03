@@ -8,10 +8,14 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { MRAIDView } from 'Views/MRAIDView';
+import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { Observable0 } from 'Utilities/Observable';
 
-export class PlayableMRAID extends MRAIDView {
+export interface IPlayableMRAIDHandler extends IMRAIDViewHandler {
+    onShowEndScreen(): void;
+}
+
+export class PlayableMRAID extends MRAIDView<IPlayableMRAIDHandler> {
 
     private static CloseLength = 30;
 

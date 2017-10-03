@@ -7,7 +7,13 @@ import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 
-export class VastEndScreen extends View {
+export interface IVastEndScreenHandler {
+    onClick(): void;
+    onClose(): void;
+    onShow(): void;
+}
+
+export class VastEndScreen extends View<IVastEndScreenHandler> {
 
     public readonly onClick = new Observable0();
     public readonly onClose = new Observable0();

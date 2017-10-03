@@ -1,7 +1,7 @@
 import MRAIDTemplate from 'html/MRAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDView } from 'Views/MRAIDView';
+import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -9,7 +9,11 @@ import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 
-export class MRAID extends MRAIDView {
+export interface IMRAIDHandler extends IMRAIDViewHandler {
+    onLoaded(): void;
+}
+
+export class MRAID extends MRAIDView<IMRAIDHandler> {
 
     private static CloseLength = 30;
 

@@ -7,7 +7,13 @@ import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { View } from 'Views/View';
 
-export class Overlay extends View {
+export interface IOverlayHandler {
+    onSkip(position: number): void;
+    onMute(isMuted: boolean): void;
+    onCallButton(): void;
+}
+
+export class Overlay extends View<IOverlayHandler> {
 
     public static setAutoSkip(value: boolean) {
         Overlay.AutoSkip = value;
