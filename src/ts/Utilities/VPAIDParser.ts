@@ -11,12 +11,20 @@ export class VPAIDParser {
 
     public parse(dom: string): VPAID {
         const vast = this.vastParser.parseVast(dom);
+        return this.parseFromVast(vast);
+    }
+
+    public parseFromVast(vast: Vast): VPAID {
         const mediaFile = this.getSupportedMediaFile(vast);
         if (mediaFile) {
             return new VPAID(mediaFile, vast);
         } else {
             throw new Error('VAST object does not contain a VPAID MediaFile');
         }
+    }
+
+    public checkVASTSupportsVPAID(vast: Vast): boolean {
+        return !!this.getSupportedMediaFile(vast);
     }
 
     private getSupportedMediaFile(vast: Vast): VastMediaFile | null {

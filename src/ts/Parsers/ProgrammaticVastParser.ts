@@ -8,6 +8,9 @@ import { Platform } from 'Constants/Platform';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
+import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { Vast } from 'Models/Vast/Vast';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static setVastParserMaxDepth(depth: number): void {
@@ -17,6 +20,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     private static VAST_PARSER_MAX_DEPTH: number;
 
     private _vastParser: VastParser = new VastParser();
+    private _vpaidParser: VPAIDParser = new VPAIDParser();
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
@@ -25,8 +29,13 @@ export class ProgrammaticVastParser extends CampaignParser {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
 
-        return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then(vast => {
+        return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
+            if (this.isVPAID(vast)) {
+                const vpaid = this._vpaidParser.parseFromVast(vast);
+                return Promise.resolve(new VPAIDCampaign(vpaid, session, campaignId, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+            }
+
             const campaign = new VastCampaign(vast, campaignId, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId());
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 throw new Error('Campaign does not have an impression url');
@@ -51,5 +60,9 @@ export class ProgrammaticVastParser extends CampaignParser {
             }
             return Promise.resolve(campaign);
         });
+    }
+
+    private isVPAID(vast: Vast): boolean {
+        return this._vpaidParser.checkVASTSupportsVPAID(vast);
     }
 }
