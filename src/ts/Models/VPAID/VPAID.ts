@@ -1,6 +1,7 @@
 import { Vast } from "Models/Vast/Vast";
 import { VastMediaFile } from "Models/Vast/VastMediaFile";
 import { VastCreativeLinear } from "Models/Vast/VastCreativeLinear";
+import { VastCreativeCompanionAd } from "Models/Vast/VastCreativeCompanionAd";
 
 export class VPAID {
     private vast: Vast;
@@ -9,6 +10,41 @@ export class VPAID {
     constructor(mediaFile: VastMediaFile, vast: Vast) {
         this.vast = vast;
         this.mediaFile = mediaFile;
+    }
+
+    public getCompanionClickThroughURL(): string | null {
+        return this.vast.getCompanionClickThroughUrl();
+    }
+
+    public hasEndScreen(): boolean {
+        return !!this.getCompanionLandscapeUrl() && !!this.getCompanionPortraitUrl();
+    }
+
+    public hasCompanionAd(): boolean {
+        const ad = this.vast.getAd();
+        if (ad) {
+            const companions = ad.getCompanionAds();
+            return companions.length !== 0;
+        }
+        return false;
+    }
+
+    public getCompanion(): VastCreativeCompanionAd | null {
+        const ad = this.vast.getAd();
+        if (ad) {
+            const companions = ad.getCompanionAds();
+            if (companions.length) {
+                return companions[0];
+            }
+        }
+        return null;
+    }
+
+    public getCompanionPortraitUrl(): string | null {
+        return this.vast.getCompanionPortraitUrl();
+    }
+    public getCompanionLandscapeUrl(): string | null {
+        return this.vast.getCompanionLandscapeUrl();
     }
 
     public getScriptUrl(): string {

@@ -2,6 +2,7 @@ import { ICampaign, Campaign } from "Models/Campaign";
 import { VPAID } from "Models/VPAID/VPAID";
 import { IAsset, Asset } from "Models/Assets/Asset";
 import { Session } from "Models/Session";
+import { VastCreativeCompanionAd } from "Models/Vast/VastCreativeCompanionAd";
 
 interface IVPAIDCampaign extends ICampaign {
     vpaid: VPAID;
@@ -28,6 +29,30 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
         this.set('seatId', seatId || undefined);
 
         this.addTrackingToVAST(tracking);
+    }
+
+    public hasEndScreen(): boolean {
+        return this.getVPAID().hasEndScreen();
+    }
+
+    public getCompanionAd(): VastCreativeCompanionAd | null {
+        return this.getVPAID().getCompanion();
+    }
+
+    public getCompanionClickThroughURL(): string | null {
+        return this.getVPAID().getCompanionClickThroughURL();
+    }
+
+    public getCompanionLandscapeUrl(): string | null {
+        return this.getVPAID().getCompanionLandscapeUrl();
+    }
+
+    public getCompanionPortraitUrl(): string | null {
+        return this.getVPAID().getCompanionPortraitUrl();
+    }
+
+    public hasCompanionAd(): boolean {
+        return this.getVPAID().hasCompanionAd();
     }
 
     public getVPAID(): VPAID {

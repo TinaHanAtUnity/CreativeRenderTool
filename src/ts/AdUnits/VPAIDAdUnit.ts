@@ -30,12 +30,13 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
-        this._vpaidCampaign = campaign;
+        this._vpaidCampaign = campaign
         this._operativeEventManager = operativeEventManager;
         this._thirdPartyEventManager = thirdPartyEventManager;
 
         this._view = view;
         this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
+        this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -133,7 +134,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAdStopped() {
-        this.hide();
+        if (this._vpaidCampaign.hasEndScreen()) {
+            this._view.showEndScreen();
+        } else {
+            this.hide();
+        }
     }
 
     private onAdStarted() {
@@ -205,6 +210,15 @@ export class VPAIDAdUnit extends AbstractAdUnit {
                 });
             }
         }
+    }
+
+    private onCompanionClick() {
+        const url = this.getCompanionClickThroughURL() || this.getClickThroughURL();
+        this.openUrl(url);
+    }
+
+    private getCompanionClickThroughURL(): string | null {
+        return this._vpaidCampaign.getCompanionClickThroughURL();
     }
 
     private getClickThroughURL(): string | null {
