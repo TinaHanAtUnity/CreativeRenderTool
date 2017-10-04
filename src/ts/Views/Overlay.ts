@@ -50,14 +50,16 @@ export class Overlay extends View {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
+    private _abGroup: number;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
         super(nativeBridge, 'overlay');
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
 
         this._muted = muted;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted: this._muted
@@ -275,23 +277,32 @@ export class Overlay extends View {
     }
 
     private fade(value: boolean) {
-        if(value) {
-            this._skipElement.classList.remove('slide-down');
-            this._skipElement.classList.add('slide-up');
-            this._progressElement.classList.remove('slide-down');
-            this._progressElement.classList.add('slide-up');
-            this._muteButtonElement.classList.remove('bottom-slide-up');
-            this._muteButtonElement.classList.add('bottom-slide-down');
-
-            this._fadeStatus = false;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            if (value) {
+                this._skipElement.classList.remove('slide-down');
+                this._skipElement.classList.add('slide-up');
+                this._progressElement.classList.remove('slide-down');
+                this._progressElement.classList.add('slide-up');
+                this._muteButtonElement.classList.remove('bottom-slide-up');
+                this._muteButtonElement.classList.add('bottom-slide-down');
+                this._fadeStatus = false;
+            } else {
+                this._skipElement.classList.remove('slide-up');
+                this._skipElement.classList.add('slide-down');
+                this._progressElement.classList.remove('slide-up');
+                this._progressElement.classList.add('slide-down');
+                this._muteButtonElement.classList.remove('bottom-slide-down');
+                this._muteButtonElement.classList.add('bottom-slide-up');
+                this._fadeStatus = true;
+            }
         } else {
-            this._skipElement.classList.remove('slide-up');
-            this._skipElement.classList.add('slide-down');
-            this._progressElement.classList.remove('slide-up');
-            this._progressElement.classList.add('slide-down');
-            this._muteButtonElement.classList.remove('bottom-slide-down');
-            this._muteButtonElement.classList.add('bottom-slide-up');
-            this._fadeStatus = true;
+            if(value) {
+                this._container.classList.add('fade');
+                this._fadeStatus = false;
+            } else {
+                this._container.classList.remove('fade');
+                this._fadeStatus = true;
+            }
         }
     }
 }
