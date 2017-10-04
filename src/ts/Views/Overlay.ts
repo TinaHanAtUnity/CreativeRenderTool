@@ -276,10 +276,21 @@ export class Overlay extends View {
 
     private fade(value: boolean) {
         if(value) {
-            this._container.classList.add('fade');
+            this._skipElement.classList.remove('slide-down');
+            this._skipElement.classList.add('slide-up');
+            this._progressElement.classList.remove('slide-down');
+            this._progressElement.classList.add('slide-up');
+            this._muteButtonElement.classList.remove('bottom-slide-up');
+            this._muteButtonElement.classList.add('bottom-slide-down');
+
             this._fadeStatus = false;
         } else {
-            this._container.classList.remove('fade');
+            this._skipElement.classList.remove('slide-up');
+            this._skipElement.classList.add('slide-down');
+            this._progressElement.classList.remove('slide-up');
+            this._progressElement.classList.add('slide-down');
+            this._muteButtonElement.classList.remove('bottom-slide-down');
+            this._muteButtonElement.classList.add('bottom-slide-up');
             this._fadeStatus = true;
         }
     }
