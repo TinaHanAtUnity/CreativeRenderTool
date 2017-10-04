@@ -30,7 +30,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
-        this._vpaidCampaign = campaign
+        this._vpaidCampaign = campaign;
         this._operativeEventManager = operativeEventManager;
         this._thirdPartyEventManager = thirdPartyEventManager;
 

@@ -13,7 +13,11 @@ export class VPAID {
     }
 
     public getCompanionClickThroughURL(): string | null {
-        return this.vast.getCompanionClickThroughUrl();
+        const companion = this.getCompanion();
+        if (companion) {
+            return companion.getCompanionClickThroughURLTemplate();
+        }
+        return null;
     }
 
     public hasEndScreen(): boolean {
