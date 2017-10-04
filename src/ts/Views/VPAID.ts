@@ -22,6 +22,7 @@ interface InitAdOptions {
 
 export class VPAID extends View {
     public readonly onCompanionClick: Observable0 = new Observable0();
+    public readonly onCompanionView: Observable0 = new Observable0();
     public readonly onVPAIDEvent: Observable2<string, any[]> = new Observable2<string, any[]>();
     public readonly endScreen: VPAIDEndScreen;
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
@@ -104,10 +105,15 @@ export class VPAID extends View {
 
     public show() {
         super.show();
+
         window.addEventListener('message', this._messageListener);
         this._overlayUpdateHandle = window.setInterval(() => {
             this.updateTimeoutWidget();
         }, 1000);
+
+        if (this._campaign.hasCompanionAd()) {
+            this.onCompanionView.trigger();
+        }
     }
 
     public hide() {

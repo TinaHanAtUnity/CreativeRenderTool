@@ -13,7 +13,7 @@ import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
-import { Observable2 } from 'Utilities/Observable';
+import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ListenerApi } from 'Native/Api/Listener';
 import { Platform } from 'Constants/Platform';
@@ -39,6 +39,8 @@ describe('VPAIDAdUnit', () => {
 
         vpaidView = <VPAID>sinon.createStubInstance(VPAID);
         (<any>vpaidView).onVPAIDEvent = new Observable2<string, any[]>();
+        (<any>vpaidView).onCompanionView = new Observable0();
+        (<any>vpaidView).onCompanionClick = new Observable0();
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);

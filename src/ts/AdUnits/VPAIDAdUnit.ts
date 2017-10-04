@@ -37,6 +37,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view = view;
         this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
         this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
+        this._view.onCompanionView.subscribe(() => this.onCompanionView());
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -215,6 +216,16 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onCompanionClick() {
         const url = this.getCompanionClickThroughURL() || this.getClickThroughURL();
         this.openUrl(url);
+    }
+
+    private onCompanionView() {
+        const companion = this._vpaidCampaign.getCompanionAd();
+        if (companion) {
+            const urls = companion.getEventTrackingUrls('creativeView');
+            for (const url of urls) {
+                this.sendThirdPartyEvent('vpaid companion creativeView', url);
+            }
+        }
     }
 
     private getCompanionClickThroughURL(): string | null {
