@@ -54,7 +54,7 @@ export class AdUnitFactory {
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, placement, campaign, configuration, options);
         } else if (campaign instanceof VPAIDCampaign) {
-            return this.createVPAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, configuration, options);
+            return this.createVPAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, configuration, options);
         } else if (campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
         } else {
@@ -336,8 +336,8 @@ export class AdUnitFactory {
         return undefined;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const vpaid = new VPAID(nativeBridge, campaign);
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+        const vpaid = new VPAID(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId());
         vpaid.render();
         const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, operativeEventManager, thirdPartyEventManager, forceOrientation, container, placement, campaign);
         return vpaidAdUnit;

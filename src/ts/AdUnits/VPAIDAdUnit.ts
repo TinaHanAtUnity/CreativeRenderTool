@@ -51,6 +51,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._vpaidEventHandlers.AdPaused = this.onAdPaused;
         this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
         this._vpaidEventHandlers.AdClickThru = this.onAdClickThru;
+        this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
 
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
     }
@@ -114,6 +115,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAdLoaded() {
         this._timer.stop();
+        this._view.updateTimeoutWidget();
         this._view.showAd();
     }
 
@@ -186,6 +188,10 @@ export class VPAIDAdUnit extends AbstractAdUnit {
                 this.openUrl(this.getClickThroughURL());
             }
         }
+    }
+
+    private onAdDurationChange() {
+        this._view.updateTimeoutWidget();
     }
 
     private openUrl(url: string | null) {

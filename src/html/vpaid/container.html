@@ -66,6 +66,26 @@
                 this._iframe.contentDocument.close();
             };
 
+            Container.prototype.getHandshakeVersion = function() {
+                return this._creative.handshakeVersion('2.0');
+            };
+
+            Container.prototype.getAdDuration = function() {
+                if (this._creative.getAdDuration) {
+                    return this._creative.getAdDuration();
+                } else {
+                    return this._creative.adDuration || -2;
+                }
+            };
+
+            Container.prototype.getAdRemainingTime = function() {
+                if (this._creative.getAdRemainingTime) {
+                    return this._creative.getAdRemainingTime();
+                } else {
+                    return this._creative.adRemainingTime || -2;
+                }
+            };
+
             Container.prototype._onIFrameReady = function() {
                 var getVPAID = this._getVPAIDFunction();
                 this._creative = getVPAID();
@@ -109,6 +129,7 @@
             };
 
             Container.prototype._initAd = function(width, height, viewMode, bitrate, creativeData, envVars) {
+                this._version = this._creative.handshakeVersion('2.0');
                 this._creative.initAd(width, height, viewMode, bitrate, creativeData, envVars);
             }
 
@@ -140,7 +161,7 @@
                 }
             }
 
-            var container = new Container();
+            var container = window.container = new Container();
             container.init();
         })();
     </script>
