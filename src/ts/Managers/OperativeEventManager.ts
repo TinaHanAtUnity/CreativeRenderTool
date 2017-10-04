@@ -63,7 +63,8 @@ export class OperativeEventManager {
     public sendStart(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.START)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.START]
+                event: EventType[EventType.START],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve();
         }
@@ -89,7 +90,8 @@ export class OperativeEventManager {
     public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.FIRST_QUARTILE)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.FIRST_QUARTILE]
+                event: EventType[EventType.FIRST_QUARTILE],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
@@ -106,7 +108,8 @@ export class OperativeEventManager {
     public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.MIDPOINT)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.MIDPOINT]
+                event: EventType[EventType.MIDPOINT],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
@@ -123,7 +126,8 @@ export class OperativeEventManager {
     public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.THIRD_QUARTILE]
+                event: EventType[EventType.THIRD_QUARTILE],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
@@ -140,7 +144,8 @@ export class OperativeEventManager {
     public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.SKIP)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.SKIP]
+                event: EventType[EventType.SKIP],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
@@ -177,7 +182,8 @@ export class OperativeEventManager {
     public sendView(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.VIEW]
+                event: EventType[EventType.VIEW],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
@@ -193,7 +199,8 @@ export class OperativeEventManager {
     public sendClick(adUnit: AbstractAdUnit): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
             Diagnostics.trigger('operative_event_not_sent', {
-                event: EventType[EventType.CLICK]
+                event: EventType[EventType.CLICK],
+                campaign: adUnit.getCampaign().getDTO()
             });
             return Promise.resolve(void(0));
         }
