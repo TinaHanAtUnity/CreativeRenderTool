@@ -39,6 +39,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
         this._view.onCompanionView.subscribe(() => this.onCompanionView());
 
+        if (campaign.hasEndScreen()) {
+            this._view.endScreen.onClick.subscribe(() => this.onCompanionClick());
+            this._view.endScreen.onClose.unsubscribe(() => this.onEndScreenClose());
+        }
+
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
         this._vpaidEventHandlers.AdStarted = this.onAdStarted;
@@ -140,6 +145,10 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         } else {
             this.hide();
         }
+    }
+
+    private onEndScreenClose() {
+        this.hide();
     }
 
     private onAdStarted() {
