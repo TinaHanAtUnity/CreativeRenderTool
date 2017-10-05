@@ -53,12 +53,16 @@ export class Cache {
 
     public static getFileContent(fileId: string, encoding: string) {
         return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => {
-                resolve(xhr.responseText);
-            }, false);
-            xhr.open('GET', decodeURIComponent(Cache._fileIdMap[fileId]));
-            xhr.send();
+            window.localStorage.getItem(fileId);
+        });
+    }
+
+    public static setFileContent(fileId: string, encoding: string, content: string) {
+        return new Promise((resolve, reject) => {
+            window.localStorage.setItem(fileId, content);
+
+            Cache._fileIdMap[fileId] = content;
+            resolve();
         });
     }
 
