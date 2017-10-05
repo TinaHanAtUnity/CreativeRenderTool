@@ -42,6 +42,7 @@ describe('VPAIDAdUnit', () => {
         (<any>vpaidView).onVPAIDEvent = new Observable2<string, any[]>();
         (<any>vpaidView).onCompanionView = new Observable0();
         (<any>vpaidView).onCompanionClick = new Observable0();
+        (<any>vpaidView).onStuck = new Observable0();
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);

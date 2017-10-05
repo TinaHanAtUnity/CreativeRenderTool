@@ -40,6 +40,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
         this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
         this._view.onCompanionView.subscribe(() => this.onCompanionView());
+        this._view.onStuck.subscribe(() => this.onAdStuck());
 
         if (campaign.hasEndScreen()) {
             this._view.endScreen.onClick.subscribe(() => this.onCompanionClick());
@@ -149,6 +150,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         } else {
             this.hide();
         }
+    }
+
+    private onAdStuck() {
+        Diagnostics.trigger('vpaid_ad_stuck', new DiagnosticError(new Error('Ad playback stuck'), {
+            campaignId: this._campaign.getId()
+        }));
+        this.setFinishState(FinishState.ERROR);
+        this.hide();
     }
 
     private onEndScreenClose() {

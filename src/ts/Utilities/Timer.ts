@@ -15,6 +15,11 @@ export class Timer {
         }, this._duration);
     }
 
+    public reset() {
+        this.stop();
+        this.start();
+    }
+
     public stop() {
         window.clearTimeout(this._handle);
     }

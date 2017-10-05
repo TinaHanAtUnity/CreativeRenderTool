@@ -11,6 +11,7 @@ import { Overlay } from 'Views/Overlay';
 
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { Timer } from 'Utilities/Timer';
 interface InitAdOptions {
     width: number;
     height: number;
@@ -21,9 +22,13 @@ interface InitAdOptions {
 }
 
 export class VPAID extends View {
+
+    private static stuckDelay = 5 * 1000;
+
     public readonly onCompanionClick: Observable0 = new Observable0();
     public readonly onCompanionView: Observable0 = new Observable0();
     public readonly onVPAIDEvent: Observable2<string, any[]> = new Observable2<string, any[]>();
+    public readonly onStuck: Observable0 = new Observable0();
     public readonly endScreen: VPAIDEndScreen;
 
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
@@ -36,6 +41,7 @@ export class VPAID extends View {
     private _overlay: Overlay;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
+    private _stuckTimer: Timer;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, language: string, gameId: string) {
         super(nativeBridge, 'vpaid');
@@ -50,6 +56,8 @@ export class VPAID extends View {
 
         this._overlay = new Overlay(nativeBridge, false, language, gameId);
         this._overlay.setFadeEnabled(false);
+
+        this._stuckTimer = new Timer(() => this.onStuck.trigger(), VPAID.stuckDelay);
 
         if (campaign.hasEndScreen()) {
             this.endScreen = new VPAIDEndScreen(nativeBridge, campaign, gameId);
@@ -117,6 +125,7 @@ export class VPAID extends View {
         this._iframe.contentWindow.postMessage({ type: 'destroy' }, '*');
         window.removeEventListener('message', this._messageListener);
         super.hide();
+        this._stuckTimer.stop();
     }
 
     public showAd() {
@@ -124,6 +133,7 @@ export class VPAID extends View {
         this._iframe.contentWindow.postMessage({
             type: 'show'
         }, '*');
+        this._stuckTimer.start();
     }
 
     public updateTimeoutWidget() {
@@ -144,6 +154,7 @@ export class VPAID extends View {
                 this._adDuration = e.data.adDuration;
                 this._adRemainingTime = e.data.adRemainingTime;
                 this.updateTimeoutWidget();
+                this._stuckTimer.reset();
                 break;
             case 'VPAID':
                 this.onVPAIDEvent.trigger(e.data.eventType, e.data.args);
