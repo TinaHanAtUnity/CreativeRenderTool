@@ -4,7 +4,6 @@ import EndScreenDarkTemplate from 'html/EndScreenDark.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-// import { Observable0, Observable1 } from 'Utilities/Observable';
 import { IPrivacyHandler, Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
@@ -173,7 +172,7 @@ export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandle
         }
     }
 
-    public onClose(): void {
+    public onPrivacyClose(): void {
         if(this._privacy) {
             this._privacy.removeHandler(this);
             this._privacy.hide();
@@ -193,13 +192,11 @@ export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandle
     private onDownloadEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onEndScreenDownload());
-        // this.onDownload.trigger();
     }
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onEndScreenClose());
-        // this.onClose.trigger();
     }
 
     private onPrivacyEvent(event: Event): void {
@@ -208,16 +205,5 @@ export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandle
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addHandler(this);
-/*
-        this._privacy.onPrivacy.subscribe((url) => {
-            this.onPrivacy.trigger(url);
-        });
-        this._privacy.onClose.subscribe(() => {
-            if(this._privacy) {
-                this._privacy.hide();
-                this._privacy.container().parentElement!.removeChild(this._privacy.container());
-                delete this._privacy;
-            }
-        });*/
     }
 }
