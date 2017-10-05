@@ -116,6 +116,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onVPAIDEvent(eventType: string, args: any[]) {
+        this._nativeBridge.Sdk.logInfo(`vpaid event ${eventType} with args ${args ? args.join(' '): 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);
@@ -126,6 +127,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._timer.stop();
         this._view.updateTimeoutWidget();
         this._view.showAd();
+        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
 
     private onAdError() {
@@ -189,7 +191,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAdPaused() {
-        this.sendTrackingEvent('paused');
+        if (this.getFinishState() === FinishState.COMPLETED) {
+            this.onAdStopped();
+        } else {
+            this.sendTrackingEvent('paused');
+        }
     }
 
     private onAdPlaying() {

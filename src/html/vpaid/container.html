@@ -26,7 +26,8 @@
 </head>
 <body>
     <div class="video-player-slot">
-        <video></video>
+        <video playsinline>
+        </video>
     </div>
     <iframe></iframe>
     <script>
@@ -81,19 +82,31 @@
             Container.prototype.getAdRemainingTime = function() {
                 if (this._creative.getAdRemainingTime) {
                     return this._creative.getAdRemainingTime();
-                } else {
+            } else {
                     return this._creative.adRemainingTime || -2;
                 }
             };
 
             Container.prototype._onIFrameReady = function() {
                 var getVPAID = this._getVPAIDFunction();
-                this._creative = getVPAID();
+                if (getVPAID && typeof getVPAID === 'function') {
+                    this._creative = getVPAID();
 
-                this._subscribeToAllEvents();
+                    this._subscribeToAllEvents();
 
+                    window.parent.postMessage({
+                        type: 'ready'
+                    }, '*');
+                } else {
+                    this._triggerError('getVPAIDAd is not defined');
+                }
+            }
+
+            Container.prototype._triggerError = function(e) {
                 window.parent.postMessage({
-                    type: 'ready'
+                    type: 'VPAID',
+                    eventType: 'AdError',
+                    args: [e]
                 }, '*');
             }
 
