@@ -61,7 +61,7 @@ describe('VPAIDAdUnit', () => {
             muteVideo: false
         });
         campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, operativeEventManager, thirdPartyEventManager, ForceOrientation.NONE, container, placement, campaign);
+        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, operativeEventManager, thirdPartyEventManager, ForceOrientation.NONE, container, placement, campaign, {});
     });
 
     afterEach(() => {

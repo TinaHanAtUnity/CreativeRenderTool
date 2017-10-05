@@ -339,7 +339,7 @@ export class AdUnitFactory {
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const vpaid = new VPAID(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId());
         vpaid.render();
-        const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, operativeEventManager, thirdPartyEventManager, forceOrientation, container, placement, campaign);
+        const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, operativeEventManager, thirdPartyEventManager, forceOrientation, container, placement, campaign, options);
         return vpaidAdUnit;
     }
 

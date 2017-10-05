@@ -26,13 +26,15 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
+    private _options: any;
 
-    constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign) {
+    constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
         this._vpaidCampaign = campaign;
         this._operativeEventManager = operativeEventManager;
         this._thirdPartyEventManager = thirdPartyEventManager;
+        this._options = options;
 
         this._view = view;
         this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
@@ -66,7 +68,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.onShow();
         this.showView();
-        return this._container.open(this, false, false, this._forceOrientation, false, false, true, false, {});
+        return this._container.open(this, false, false, this._forceOrientation, false, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
