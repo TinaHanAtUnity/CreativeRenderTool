@@ -11,6 +11,7 @@ import { Session } from 'Models/Session';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { Vast } from 'Models/Vast/Vast';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static setVastParserMaxDepth(depth: number): void {
@@ -31,8 +32,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            if (this.isVPAID(vast)) {
-                const vpaid = this._vpaidParser.parseFromVast(vast);
+            const vpaidMediaFile = this.getVPAIDMediaFile(vast);
+            if (vpaidMediaFile) {
+                const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
                 return Promise.resolve(new VPAIDCampaign(vpaid, session, campaignId, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
             }
 
@@ -62,7 +64,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         });
     }
 
-    private isVPAID(vast: Vast): boolean {
-        return this._vpaidParser.checkVASTSupportsVPAID(vast);
+    private getVPAIDMediaFile(vast: Vast): VastMediaFile | null {
+        return this._vpaidParser.getSupportedMediaFile(vast);
     }
 }
