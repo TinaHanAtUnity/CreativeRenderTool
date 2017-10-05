@@ -56,6 +56,9 @@
                 window.addEventListener('message', function(e) {
                     self._onMessage(e);
                 });
+                this._videoSlot.addEventListener('timeupdate', function(e) {
+                    self._sendProgressEvent();
+                });
             };
 
             Container.prototype.init = function() {
@@ -143,6 +146,14 @@
 
             Container.prototype._stopAd = function() {
                 return this._creative.stopAd();
+            };
+
+            Container.prototype._sendProgressEvent = function() {
+                window.parent.postMessage({
+                    type: 'progress',
+                    adDuration: this._videoSlot.duration,
+                    adRemainingTime: this._videoSlot.duration - this._videoSlot.currentTime,
+                }, '*');
             };
 
             Container.prototype._onMessage = function(e) {
