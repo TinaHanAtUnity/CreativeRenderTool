@@ -22,7 +22,7 @@ import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEve
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Overlay } from 'Views/Overlay';
+import { IOverlayHandler, Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
@@ -38,6 +38,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { EndScreenEventHandler } from 'EventHandlers/EndScreenEventHandler';
+import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 
 export class AdUnitFactory {
 
@@ -61,12 +62,13 @@ export class AdUnitFactory {
         const endScreen = new EndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
 
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
-        const performanceAdUnitParameters: IPerformanceAdUnitParameters<IEndScreenHandler> = {
+        const performanceAdUnitParameters: IPerformanceAdUnitParameters<IEndScreenHandler, IOverlayHandler> = {
             ... parameters,
             video: video,
             overlay: overlay,
             endScreen: endScreen,
-            endScreenEventHandler: EndScreenEventHandler
+            endScreenEventHandler: EndScreenEventHandler,
+            overlayEventHandler: OverlayEventHandler
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

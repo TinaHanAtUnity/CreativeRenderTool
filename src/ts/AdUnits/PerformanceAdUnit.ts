@@ -2,21 +2,23 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
+// import { PerformanceOverlayEventHandlers } from 'EventHandlers/PerformanceOverlayEventHandlers';
+import { IOverlayHandler } from 'Views/Overlay';
 
-export interface IPerformanceAdUnitParameters<T extends IEndScreenHandler> extends IVideoAdUnitParameters {
+export interface IPerformanceAdUnitParameters<T extends IEndScreenHandler, T2 extends IOverlayHandler> extends IVideoAdUnitParameters {
     endScreen: EndScreen;
     endScreenEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
+    overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
 }
 
 export class PerformanceAdUnit extends VideoAdUnit {
 
     private _endScreen: EndScreen | undefined;
     private _endScreenEventHandler: IEndScreenHandler;
+    private _overlayEventHandler: IOverlayHandler;
 
-    constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters<IEndScreenHandler>) {
+    constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters<IEndScreenHandler, IOverlayHandler>) {
         parameters.overlay.render();
         document.body.appendChild(parameters.overlay.container());
 
@@ -49,9 +51,11 @@ export class PerformanceAdUnit extends VideoAdUnit {
             this.hide();
         });
 
-        parameters.overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, parameters.operativeEventManager, this));
-        parameters.overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(this));
-        parameters.overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
+        this._overlayEventHandler = new parameters.overlayEventHandler(nativeBridge, this, parameters);
+        parameters.overlay.addHandler(this._overlayEventHandler);
+        // parameters.overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, parameters.operativeEventManager, this));
+        // parameters.overlay.onSkip.subscribe((videoProgress) => PerformanceOverlayEventHandlers.onSkip(this));
+        // parameters.overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
     public hide(): Promise<void> {
