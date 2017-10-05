@@ -89,6 +89,11 @@ export class EndScreen extends View {
         this._bindings = [
             {
                 event: 'click',
+                listener: (event: Event) => this.onDownloadEvent(event),
+                selector: '.game-background, .btn-download, .game-icon'
+            },
+            {
+                event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
             },
@@ -98,20 +103,6 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
-
-        if(this._abGroup === 10 || this._abGroup === 11) {
-            this._bindings.push({
-                event: 'click',
-                listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.btn-download'
-            });
-        } else {
-            this._bindings.push({
-                event: 'click',
-                listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
-            });
-        }
 
         if(gameId === '1300023' || gameId === '1300024') {
             this._isSwipeToCloseEnabled = true;
