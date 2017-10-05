@@ -190,7 +190,7 @@ build-css:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css -u autoprefixer-stylus --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo
