@@ -25,6 +25,7 @@ export class VPAID extends View {
     public readonly onCompanionView: Observable0 = new Observable0();
     public readonly onVPAIDEvent: Observable2<string, any[]> = new Observable2<string, any[]>();
     public readonly endScreen: VPAIDEndScreen;
+
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
     private _iframe: HTMLIFrameElement;
@@ -33,7 +34,8 @@ export class VPAID extends View {
     private _loadingScreen: HTMLElement;
 
     private _overlay: Overlay;
-    private _overlayUpdateHandle: number;
+    private _adDuration: number = -2;
+    private _adRemainingTime: number = -2;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, language: string, gameId: string) {
         super(nativeBridge, 'vpaid');
@@ -65,7 +67,6 @@ export class VPAID extends View {
         this._overlay.render();
         this._overlay.setSkipEnabled(false);
         this._overlay.setMuteEnabled(false);
-        this._overlay.setVideoDurationEnabled(true);
 
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
@@ -107,17 +108,12 @@ export class VPAID extends View {
         super.show();
 
         window.addEventListener('message', this._messageListener);
-        this._overlayUpdateHandle = window.setInterval(() => {
-            this.updateTimeoutWidget();
-        }, 1000);
-
         if (this._campaign.hasCompanionAd()) {
             this.onCompanionView.trigger();
         }
     }
 
     public hide() {
-        window.clearInterval(this._overlayUpdateHandle);
         this._iframe.contentWindow.postMessage({ type: 'destroy' }, '*');
         window.removeEventListener('message', this._messageListener);
         super.hide();
@@ -131,9 +127,8 @@ export class VPAID extends View {
     }
 
     public updateTimeoutWidget() {
-        const container: IVPAIDContainer = (<IVPAIDWindowExt>this._iframe.contentWindow).container;
-        const adDuration = container.getAdDuration();
-        const adRemainingTime = container.getAdRemainingTime();
+        const adDuration = this._adDuration;
+        const adRemainingTime = this._adRemainingTime;
         if ((adDuration && adDuration !== -2) && (adRemainingTime && adRemainingTime !== -2)) {
             this._overlay.setVideoDurationEnabled(true);
             this._overlay.setVideoDuration(adDuration * 1000);
@@ -146,6 +141,8 @@ export class VPAID extends View {
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'progress':
+                this._adDuration = e.data.adDuration;
+                this._adRemainingTime = e.data.adRemainingTime;
                 this.updateTimeoutWidget();
                 break;
             case 'VPAID':
@@ -262,14 +259,4 @@ export class VPAIDEndScreen extends View {
         this.onClick.trigger();
     }
 
-}
-
-interface IVPAIDWindowExt extends Window {
-    container: IVPAIDContainer;
-}
-
-interface IVPAIDContainer {
-    getHandshakeVersion(): string;
-    getAdDuration(): number;
-    getAdRemainingTime(): number;
 }

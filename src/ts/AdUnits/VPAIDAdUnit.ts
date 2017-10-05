@@ -116,7 +116,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logInfo(`vpaid event ${eventType} with args ${args ? args.join(' '): 'None'}`);
+        this._nativeBridge.Sdk.logInfo(`vpaid event ${eventType} with args ${args && args.length ? args.join(' '): 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);
