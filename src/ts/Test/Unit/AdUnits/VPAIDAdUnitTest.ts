@@ -22,6 +22,7 @@ import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { SdkApi } from 'Native/Api/Sdk';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -44,6 +45,7 @@ describe('VPAIDAdUnit', () => {
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
+        nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
         operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
         thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
         container = <AdUnitContainer>sinon.createStubInstance(Activity);
