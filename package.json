@@ -40,6 +40,7 @@
     "rollup-plugin-node-resolve": "3.0.0",
     "rollup-plugin-string": "2.0.2",
     "sinon": "3.2.1",
+    "stylint": "^1.5.9",
     "xmldom": "0.1.27",
     "xmlhttprequest": "1.8.0"
   },

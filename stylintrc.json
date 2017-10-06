@@ -1,0 +1,55 @@
+{
+  "blocks": false,
+  "brackets": "always",
+  "colons": "always",
+  "colors": "always",
+  "commaSpace": "always",
+  "commentSpace": "always",
+  "cssLiteral": "never",
+  "customProperties": [],
+  "depthLimit": false,
+  "duplicates": true,
+  "efficient": "always",
+  "exclude": [],
+  "extendPref": false,
+  "globalDupe": false,
+  "groupOutputByFile": true,
+  "indentPref": 2,
+  "leadingZero": "never",
+  "maxErrors": 0,
+  "maxWarnings": 5,
+  "mixed": true,
+  "mixins": [],
+  "namingConvention": "lowercase-dash",
+  "namingConventionStrict": true,
+  "none": false,
+  "noImportant": true,
+  "parenSpace": false,
+  "placeholders": "always",
+  "prefixVarsWithDollar": "always",
+  "quotePref": "double",
+  "reporterOptions": {
+    "columns": [
+      "lineData",
+      "severity",
+      "description",
+      "rule"
+    ],
+    "columnSplitter": "  ",
+    "showHeaders": true,
+    "truncate": true
+  },
+  "semicolons": "always",
+  "sortOrder":  "grouped",
+  "stackedProperties": "never",
+  "trailingWhitespace": "never",
+  "universal": "never",
+  "valid": true,
+  "zeroUnits": "never",
+  "zIndexNormalize": false
+}
+
+/*
+Sort order
+https://github.com/SimenB/stylint/blob/master/src/data/ordering.json#L2
+*/
