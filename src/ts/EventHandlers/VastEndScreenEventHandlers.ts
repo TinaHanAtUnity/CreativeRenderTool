@@ -8,9 +8,11 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
 export class VastEndScreenEventHandlers {
-    public static onClick(nativeBridge: NativeBridge, adUnit: VastAdUnit, request: Request): Promise<void> {
+    public static onClick(nativeBridge: NativeBridge, adUnit: VastAdUnit, request: Request, thirdPartyEventManager: ThirdPartyEventManager, clientInfo: ClientInfo): Promise<void> {
         const platform = nativeBridge.getPlatform();
         const clickThroughURL = adUnit.getCompanionClickThroughUrl() || adUnit.getVideoClickThroughURL();
+        adUnit.sendTrackingEvent(thirdPartyEventManager, 'videoEndCardClick', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+
         if (clickThroughURL) {
             return request.followRedirectChain(clickThroughURL).then((url: string) => {
                 if (platform === Platform.IOS) {
