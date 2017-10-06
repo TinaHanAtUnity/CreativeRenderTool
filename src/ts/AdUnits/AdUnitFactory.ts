@@ -58,7 +58,7 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId(), campaign.getAbGroup());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
 
         const video = this.getOrientedVideo(campaign, forceOrientation);

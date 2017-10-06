@@ -185,3 +185,19 @@
   opacity: 0
   transition: opacity 0.45s ease-in-out
 
+slide-animation($duration = 0.4s, $function = ease-in, $translation = 0%)
+  -webkit-transform: translateY($translation)
+  -transform: translateY($translation)
+  -webkit-transition: -webkit-transform $duration $function
+  transition: -webkit-transform $duration $function
+  transition: transform $duration $function
+  transition: transform $duration $function, -webkit-transform $duration $function
+
+.slide-up
+  slide-animation 0.4s ease-in -150%
+
+.slide-down
+  slide-animation 0.4s ease-in 150%
+
+.slide-back-in-place
+  slide-animation 0.2s ease-in-out 0%
