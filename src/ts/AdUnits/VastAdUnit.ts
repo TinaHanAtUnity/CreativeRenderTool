@@ -4,8 +4,11 @@ import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { VastEndScreen } from 'Views/VastEndScreen';
+import { IVastEndScreenHandler, VastEndScreen } from 'Views/VastEndScreen';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { IOverlayHandler } from 'Views/Overlay';
+import { Platform } from 'Constants/Platform';
 
 enum Orientation {
     LANDSCAPE,
@@ -23,17 +26,50 @@ class DeviceOrientation {
     }
 }
 
-export interface IVastAdUnitParameters extends IVideoAdUnitParameters {
+export interface IVastAdUnitParameters<T extends IVastEndScreenHandler, T2 extends IOverlayHandler> extends IVideoAdUnitParameters {
     endScreen?: VastEndScreen;
+    endScreenEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
+    overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
+    vastOverlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
 }
 
 export class VastAdUnit extends VideoAdUnit {
 
     private _endScreen: VastEndScreen | null;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _vastEndScreenEventHandler: IVastEndScreenHandler;
+    private _overlayEventHandler: IOverlayHandler;
+    private _vastOverlayEventHandler: IOverlayHandler;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters<IVastEndScreenHandler, IOverlayHandler>) {
         super(nativeBridge, parameters);
+
+        this.prepareOverlay();
+        const campaign = <VastCampaign>parameters.campaign;
+        parameters.overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+
         this._endScreen = parameters.endScreen || null;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+
+        if(this._endScreen) {
+            this._endScreen.render();
+            this._endScreen.hide();
+            document.body.appendChild(this._endScreen.container());
+            this._vastEndScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
+            this._endScreen.addHandler(this._vastEndScreenEventHandler);
+
+            if (nativeBridge.getPlatform() === Platform.ANDROID) {
+                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => this._vastEndScreenEventHandler.onKeyEvent(keyCode));
+                this.onClose.subscribe(() => {
+                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                });
+            }
+        }
+
+        this._overlayEventHandler = new parameters.overlayEventHandler(nativeBridge, this, parameters);
+        parameters.overlay.addHandler(this._overlayEventHandler);
+        this._vastOverlayEventHandler = new parameters.vastOverlayEventHandler(nativeBridge, this, parameters);
+        parameters.overlay.addHandler(this._vastOverlayEventHandler);
     }
 
     public hide(): Promise<void> {
@@ -58,20 +94,20 @@ export class VastAdUnit extends VideoAdUnit {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public sendImpressionEvent(sessionId: string, sdkVersion: number): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'vast impression', sessionId, sdkVersion, impressionUrl);
+                this.sendThirdPartyEvent('vast impression', sessionId, sdkVersion, impressionUrl);
             }
         }
     }
 
-    public sendTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, eventName: string, sessionId: string, sdkVersion: number): void {
+    public sendTrackingEvent(eventName: string, sessionId: string, sdkVersion: number): void {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, `vast ${eventName}`, sessionId, sdkVersion, url);
+                this.sendThirdPartyEvent(`vast ${eventName}`, sessionId, sdkVersion, url);
             }
         }
     }
@@ -100,12 +136,12 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendVideoClickTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrl);
+                this.sendThirdPartyEvent('vast video click', sessionId, sdkVersion, clickTrackingEventUrl);
             }
         }
     }
@@ -114,12 +150,12 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    public sendCompanionTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public sendCompanionTrackingEvent(sessionId: string, sdkVersion: number): void {
         const companion = this.getCompanionForOrientation();
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'companion', sessionId, sdkVersion, url);
+                this.sendThirdPartyEvent('companion', sessionId, sdkVersion, url);
             }
         }
     }
@@ -143,15 +179,15 @@ export class VastAdUnit extends VideoAdUnit {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
             if (duration && duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                this.sendTrackingEvent(thirdPartyEventManager, quartileEventName, sessionId, sdkVersion);
+                this.sendTrackingEvent(quartileEventName, sessionId, sdkVersion);
             }
         }
     }
 
-    private sendThirdPartyEvent(thirdPartyEventManager: ThirdPartyEventManager, event: string, sessionId: string, sdkVersion: number, url: string): void {
+    private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        thirdPartyEventManager.sendEvent(event, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(event, sessionId, url);
     }
 
     private getTrackingEventUrls(eventName: string): string[] | null {

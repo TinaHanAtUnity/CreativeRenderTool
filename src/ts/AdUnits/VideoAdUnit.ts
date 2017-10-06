@@ -132,6 +132,22 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         delete this._overlay;
     }
 
+    protected prepareOverlay() {
+        const overlay = this.getOverlay();
+
+        if(overlay) {
+            overlay.render();
+            document.body.appendChild(overlay.container());
+
+            if(!this.getPlacement().allowSkip()) {
+                overlay.setSkipEnabled(false);
+            } else {
+                overlay.setSkipEnabled(true);
+                overlay.setSkipDuration(this.getPlacement().allowSkipInSeconds());
+            }
+        }
+    }
+
     protected onShow() {
         if(this.isShowing() && this.isActive()) {
             if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {

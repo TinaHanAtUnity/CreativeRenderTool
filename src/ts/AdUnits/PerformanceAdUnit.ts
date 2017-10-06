@@ -22,9 +22,6 @@ export class PerformanceAdUnit extends VideoAdUnit {
     private _onBackKeyObserver: any;
 
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters<IEndScreenHandler, IOverlayHandler>) {
-        parameters.overlay.render();
-        document.body.appendChild(parameters.overlay.container());
-
         parameters.endScreen.render();
         parameters.endScreen.hide();
         document.body.appendChild(parameters.endScreen.container());
@@ -35,20 +32,14 @@ export class PerformanceAdUnit extends VideoAdUnit {
         const portraitVideo = campaign.getPortraitVideo();
         const portraitVideoCached = portraitVideo && portraitVideo.isCached();
 
-        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
-
         super(nativeBridge, parameters);
 
         this._endScreen = parameters.endScreen;
         this._endScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
         this._endScreen.addHandler(this._endScreenEventHandler);
 
-        if(!this.getPlacement().allowSkip()) {
-            parameters.overlay.setSkipEnabled(false);
-        } else {
-            parameters.overlay.setSkipEnabled(true);
-            parameters.overlay.setSkipDuration(this.getPlacement().allowSkipInSeconds());
-        }
+        this.prepareOverlay();
+        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this._onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => this._endScreenEventHandler.onKeyEvent(keyCode));
@@ -65,7 +56,6 @@ export class PerformanceAdUnit extends VideoAdUnit {
         parameters.overlay.addHandler(this._overlayEventHandler);
         this._performanceOverlayEventHandler = new parameters.performanceOverlayEventHandler(nativeBridge, this, parameters);
         parameters.overlay.addHandler(this._performanceOverlayEventHandler);
-
     }
 
     public hide(): Promise<void> {
