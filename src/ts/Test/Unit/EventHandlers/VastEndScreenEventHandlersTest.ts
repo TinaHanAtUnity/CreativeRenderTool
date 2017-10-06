@@ -16,8 +16,8 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import {ThirdPartyEventManager} from "../../../Managers/ThirdPartyEventManager";
-import {ClientInfo} from "../../../Models/ClientInfo";
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 import EventTestVast from 'xml/EventTestVast.xml';
 
 describe('VastEndScreenEventHandlersTest', () => {
