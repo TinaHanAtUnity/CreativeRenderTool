@@ -12,6 +12,7 @@ import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { EventType } from 'Models/Session';
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -96,8 +97,12 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
-            this._operativeEventManager.sendThirdQuartile(this);
-            this._operativeEventManager.sendView(this);
+            if(!this.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+                this._operativeEventManager.sendThirdQuartile(this);
+            }
+            if(!this.getCampaign().getSession().getEventSent(EventType.VIEW)) {
+                this._operativeEventManager.sendView(this);
+            }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(this);
