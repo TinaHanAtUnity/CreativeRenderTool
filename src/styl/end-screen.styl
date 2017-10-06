@@ -1,3 +1,4 @@
+/* Move this within correct scope */
 @import "game-shared.styl";
 
 #end-screen {
@@ -8,24 +9,24 @@
 
   .btn-close-region {
     position: fixed;
-    z-index: 1;
     top: 0;
     right: 0;
+    z-index: 1;
     width: 55px;
     height: 55px;
   }
 
   a.btn-close {
-    z-index: 1;
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 28px;
+    z-index: 1;
     width: 32px;
     height: 32px;
-    color: #ffffff;
-    text-shadow: 2px 2px 20px #7c7c7c;
+    color: $white;
     text-align: center;
+    text-shadow: 2px 2px 20px $gray;
+    font-size: 28px;
     line-height: 28px;
   }
 
@@ -34,13 +35,13 @@
     top: 0;
     bottom: 47%;
     width: 100%;
-    background-size: cover;
+    background-color: $black;
     background-position: center;
+    background-size: cover;
     background-repeat: no-repeat;
-    background-color: #000;
     &.brand {
-      background-size: contain;
       bottom: 0;
+      background-size: contain;
     }
   }
 
@@ -49,10 +50,10 @@
     bottom: 0;
     width: 100%;
     height: 47%;
-    border-top: 4px solid #e6e6e6;
-    background-color: #fafafa;
+    border-top: 4px solid $end-screen-info-gray;
+    background-color: $end-screen-info-white;
 
-    &.dark
+    &.dark {
       font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
 
       @keyframes slideInUp {
@@ -78,11 +79,9 @@
       .name-container,
       .store-container,
       .download-container {
-        -webkit-animation-fill-mode: forwards;
-        animation-fill-mode: forwards;
-        -webkit-animation-timing-function: ease-out;
-        animation-timing-function: ease-out;
         opacity: 0;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease-out;
       }
 
       &.without-animation {
@@ -103,29 +102,29 @@
         }
 
         .game-icon {
-          animation-duration: 0.75s;
+          animation-duration: .75s;
           animation-delay: 0s;
         }
 
         .name-container {
-          animation-duration: 0.75s;
-          animation-delay: 0.08s;
+          animation-duration: .75s;
+          animation-delay: .08s;
         }
 
         .store-container {
-          animation-duration: 0.75s;
-          animation-delay: 0.08s;
+          animation-duration: .75s;
+          animation-delay: .08s;
         }
 
         .download-container {
-          animation-duration: 0.75s;
-          animation-delay: 0.16s;
+          animation-duration: .75s;
+          animation-delay: .16s;
         }
       }
 
       .name-container,
       .game-rating-count {
-        color: #ffffff;
+        color: $white;
       }
 
       .game-rating-count {
@@ -135,20 +134,20 @@
       .end-screen-underlay {
         width: 100vw;
         height: 100vh;
+        filter: brightness(100%) blur(20px);
+        background-position: center;
         background-size: cover;
         background-repeat: no-repeat;
-        background-position: center;
-        filter: brightness(100%) blur(20px);
         transform: scale(1.5);
 
         &:before {
-          content: '';
           position: absolute;
           top: 0;
           right: 0;
           bottom: 0;
           left: 0;
-          background-image: linear-gradient(rgba(255, 255, 255, 0), #000 80%);
+          background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
+          content: "";
         }
       }
 
@@ -163,17 +162,18 @@
       }
 
       .unityads-logo {
-        background-image: url('../img/unityads-white.png');
+        background-image: url("../img/unityads-white.png");
       }
 
       .btn-download {
-        background: linear-gradient(#00e3c8, #00cbd6);
         margin: 12.5pt auto;
         padding: 5px;
-        width 50%;
+        width: 50%;
+        background: linear-gradient($dark-blue-gradient-light, $dark-blue-gradient-dark);
         font-weight: 600;
         font-size: 20pt;
       }
+    }
   }
 
   .end-screen-info {
@@ -191,55 +191,51 @@
     }
 
     .name-container {
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-top: 8px;
+      display: flex;
+      padding: 8px 10px 0 10px;
       text-overflow: ellipsis;
-      -webkit-line-clamp: 2;
-      display: -webkit-box;
       -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2; // @stylint ignore
     }
 
     .store-container {
-      margin-left: 10px;
-      margin-top: 5px;
+      display: flex;
       float: left;
-      display: -webkit-box;
-      display: -webkit-flex;
+      margin-top: 5px;
+      margin-left: 10px;
       -webkit-box-align: center;
       -webkit-box-pack: center;
       -webkit-justify-content: center;
     }
 
     .download-container {
-      text-align: center;
       clear: both;
+      text-align: center;
     }
 
     .btn-download {
-      color: #ffffff;
-      display: block;
-      background: #167dfb;
-      left: 0;
       right: 0;
+      left: 0;
+      display: block;
+      background: $blue;
+      color: $white;
     }
 
     .privacy-button {
       position: absolute;
       bottom: 10px;
       left: 15px;
-      color: #e6e6e6;
+      color: $end-screen-info-gray;
       text-decoration: none;
       font-size: 22px;
     }
 
     .btn-download {
-      margin: 0 15px;
+      margin: 45px 15px;
       padding: 10px;
       border-radius: 10px;
       font-size: 18pt;
       line-height: 24pt;
-      margin-top: 45px;
     }
   }
 }
@@ -257,29 +253,29 @@ body.landscape {
     }
 
     .game-background {
-      width: 53%;
       bottom: 0;
+      width: 53%;
       &.brand {
         width: 100%;
       }
     }
 
     .end-screen-info-background {
+      right: 0;
       width: 47%;
       height: 100%;
-      right: 0;
       border-top: none;
-      border-left: 4px solid #e6e6e6;
+      border-left: 4px solid $end-screen-info-gray;
 
       &.dark {
         width: 100vw;
         height: 100vh;
 
         .end-screen-info {
-          left: 0;
-          right: 0;
           top: 45%;
+          right: 0;
           bottom: 0;
+          left: 0;
           margin: auto;
         }
       }
@@ -290,8 +286,8 @@ body.landscape {
     }
 
     a.btn-close {
-      color: #7c7c7c;
-      text-shadow: 0 0 0 #fafafa;
+      color: $gray;
+      text-shadow: 0 0 0 $end-screen-info-white;
     }
 
     .game-info {
@@ -299,21 +295,21 @@ body.landscape {
     }
 
     .game-icon {
-      left: 0;
-      right: 0;
       position: absolute;
+      right: 0;
+      left: 0;
       margin: auto;
     }
 
     .name-container {
-      padding-top: 95px;
-      font-size: 20pt;
-      text-overflow: ellipsis;
-      -webkit-line-clamp: 2;
+      display: flex;
       overflow: hidden;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
+      padding-top: 95px;
       text-align: center;
+      text-overflow: ellipsis;
+      font-size: 20pt;
+      -webkit-line-clamp: 2; // @stylint ignore
+      -webkit-box-orient: vertical;
     }
 
     .store-container {
@@ -324,9 +320,9 @@ body.landscape {
     }
 
     .btn-download {
-      font-size: 11pt;
-      padding: 5px 10px 5px 10px;
       margin-top: 15px;
+      padding: 5px 10px;
+      font-size: 11pt;
     }
   }
 }
@@ -379,40 +375,41 @@ body.android {
   @media screen and (max-height: 320px) and (max-width: 427px), screen and (max-height: 427px) and (max-width: 320px) {
     #end-screen {
       .game-icon {
-        width: 60px
-        height: 60px
-        border-radius: 12pt
+        width: 60px;
+        height: 60px;
+        border-radius: 12pt;
       }
 
       .end-screen-info-background.dark .game-icon {
-        width: 120px
-        height: 120px
-        border-radius: 15pt
+        width: 120px;
+        height: 120px;
+        border-radius: 15pt;
       }
 
       .name-container {
-        font-size: 15pt
+        font-size: 15pt;
       }
 
       .btn-download {
-        padding: 5px
-        font-size: 16pt
+        padding: 5px;
+        font-size: 16pt;
       }
     }
 
     &.landscape {
-      #end-screen
-      .name-container {
-        font-size: 13pt
-      }
+      #end-screen {
+        .name-container {
+          font-size: 13pt;
+        }
 
-      .game-rating {
-        font-size: 17px
-      }
+        .game-rating {
+          font-size: 17px;
+        }
 
-      .btn-download {
-        font-size: 9pt
-        padding: 5px 5px 5px 5px // 320 x 568 - iPhone 5
+        .btn-download {
+          padding: 5px; // 320 x 568 - iPhone 5
+          font-size: 9pt;
+        }
       }
     }
   }
@@ -420,21 +417,21 @@ body.android {
   @media screen and (min-height: 568px) and (min-width: 320px), screen and (min-height: 320px) and (min-width: 568px) {
     #end-screen {
       .store-container {
-        margin-top: 10px
+        margin-top: 10px;
       }
 
       .btn-download {
-        padding: 15px 10px
+        padding: 15px 10px;
       }
 
       .end-screen-info-background.dark .store-container {
-        margin-top: 5px
+        margin-top: 5px;
       }
     }
 
     &.landscape {
       #end-screen .btn-download {
-        font-size: 14pt // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
+        font-size: 14pt; // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
       }
     }
   }
@@ -442,40 +439,40 @@ body.android {
   @media screen and (min-height: 360px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 360px) {
     #end-screen {
       .btn-close-region {
-        width: 75px
-        height: 75px
+        width: 75px;
+        height: 75px;
       }
 
       .game-icon {
-        width: 85px
-        height: 85px
+        width: 85px;
+        height: 85px;
       }
 
       .name-container {
-        font-size: 20pt
+        font-size: 20pt;
       }
 
       .game-rating {
-        font-size: 25px
+        font-size: 25px;
       }
 
       .game-rating-count {
-        font-size: 22px
+        font-size: 22px;
       }
     }
 
     &.landscape #end-screen {
       .name-container {
-        padding-top: 115px
+        padding-top: 115px;
       }
 
       .btn-download {
-        padding: 10px
+        padding: 10px;
       }
 
       .end-screen-info-background.dark .game-icon {
-        width: 125px
-        height: 125px // 384 x 360 - LG Optimus G
+        width: 125px;
+        height: 125px; // 384 x 360 - LG Optimus G
       }
     }
   }
@@ -483,8 +480,8 @@ body.android {
   @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px) {
     &.landscape #end-screen {
       .btn-download {
-        padding: 15px 10px
-        font-size: 16pt // 424 x 753 - LG Optimus 4X HD
+        padding: 15px 10px;
+        font-size: 16pt; // 424 x 753 - LG Optimus 4X HD
       }
     }
   }
@@ -492,48 +489,48 @@ body.android {
   @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px) {
     #end-screen {
       .name-container {
-        font-size: 21pt
+        font-size: 21pt;
       }
 
       .game-icon {
-        width: 100px
-        height: 100px
+        width: 100px;
+        height: 100px;
       }
 
       .game-rating {
-        font-size: 30px
+        font-size: 30px;
       }
 
       .game-rating-count {
-        font-size: 24px
+        font-size: 24px;
       }
 
       .btn-download {
-        padding: 25px 20px
-        font-size: 22pt
-        line-height: 22pt
+        padding: 25px 20px;
+        font-size: 22pt;
+        line-height: 22pt;
       }
 
       .unityads-logo {
-        width: 102px
-        height: 24px
+        width: 102px;
+        height: 24px;
       }
     }
 
     &.landscape {
       #end-screen {
         .name-container {
-          padding-top: 125px
+          padding-top: 125px;
         }
 
         .btn-download {
-          font-size: 19pt
-          line-height: 19pt
+          font-size: 19pt;
+          line-height: 19pt;
         }
 
         .end-screen-info-background.dark .game-icon {
-          width: 125px
-          height: 125px // 540 x 960 - Motorola Droid 3
+          width: 125px;
+          height: 125px; // 540 x 960 - Motorola Droid 3
         }
       }
     }
@@ -542,62 +539,62 @@ body.android {
   @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px) {
     #end-screen {
       .btn-close-region {
-        width: 95px
-        height: 95px
+        width: 95px;
+        height: 95px;
       }
 
       a.btn-close {
-        top: 20px
-        right: 20px
-        width: 50px
-        height: 50px
-        font-size: 42px
-        line-height: 45px
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 42px;
+        line-height: 45px;
       }
 
       .game-icon {
-        width: 130px
-        height: 130px
+        width: 130px;
+        height: 130px;
       }
 
       .name-container {
-        font-size: 27pt
+        font-size: 27pt;
       }
 
       .game-rating {
-        font-size: 40px
+        font-size: 40px;
       }
 
       .game-rating-count {
-        font-size: 30px
+        font-size: 30px;
       }
 
       .btn-download {
-        padding: 30px 25px 30px 25px
-        font-size: 26pt
-        line-height: 26pt
+        padding: 30px 25px;
+        font-size: 26pt;
+        line-height: 26pt;
       }
     }
 
     &.landscape #end-screen {
       a.btn-close {
-        top: 20px
-        right: 20px
+        top: 20px;
+        right: 20px;
       }
 
       .name-container {
-        padding-top: 175px
+        padding-top: 175px;
       }
 
       .btn-download {
-        padding: 25px 20px 25px 20px
-        font-size: 21pt
-        line-height: 21pt
+        padding: 25px 20px 25px 20px;
+        font-size: 21pt;
+        line-height: 21pt;
       }
 
       .end-screen-info-background.dark .game-icon {
-        width: 150px
-        height: 150px // 960 x 600 - Google Nexus 7
+        width: 150px;
+        height: 150px; // 960 x 600 - Google Nexus 7
       }
     }
   }
@@ -605,12 +602,12 @@ body.android {
   @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px) {
     #end-screen {
       .name-container {
-        font-size: 29pt
+        font-size: 29pt;
       }
 
       .unityads-logo {
-        width: 153px
-        height: 36px // 1024 x 600 - Samsung Galaxy Tab 7"
+        width: 153px;
+        height: 36px; // 1024 x 600 - Samsung Galaxy Tab 7"
       }
     }
   }
@@ -618,116 +615,116 @@ body.android {
   @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px) {
     #end-screen {
       .name-container {
-        font-size: 31pt
+        font-size: 31pt;
       }
 
       .game-rating {
-        font-size: 45px
+        font-size: 45px;
       }
 
       .game-rating-count {
-        font-size: 35px
+        font-size: 35px;
       }
     }
 
     &.landscape #end-screen {
       .btn-download {
-        padding: 30px 20px 30px 20px
-        font-size: 24pt
-        line-height: 24pt // 1024 x 768 - iPad
+        padding: 30px 20px 30px 20px;
+        font-size: 24pt;
+        line-height: 24pt; // 1024 x 768 - iPad
       }
     }
   }
 
   @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px) {
     #end-screen {
-      font-weight: lighter
+      font-weight: lighter;
 
       .name-container {
-        padding-left: 30px
-        font-size: 38pt
+        padding-left: 30px;
+        font-size: 38pt;
       }
 
       .store-container {
-        margin-left: 30px
+        margin-left: 30px;
       }
 
       .game-rating {
-        font-size: 50px
-        letter-spacing: 15px
+        letter-spacing: 15px;
+        font-size: 50px;
       }
 
       .game-rating-count {
-        font-size: 40px
+        font-size: 40px;
       }
     }
 
     &.portrait #end-screen .end-screen-info-background.dark .btn-download {
-      font-size: 24pt
-      padding: 30px
-      width: 50%
+      padding: 30px;
+      width: 50%;
+      font-size: 24pt;
     }
 
     &.landscape #end-screen {
       .name-container {
-        font-size: 32pt
-        padding-left: 10px
+        padding-left: 10px;
+        font-size: 32pt;
       }
 
       .game-rating {
-        font-size: 45px
-        letter-spacing: 5px // 800 x 1280 - Samsung Galaxy Tab 10
+        letter-spacing: 5px; // 800 x 1280 - Samsung Galaxy Tab 10
+        font-size: 45px;
       }
     }
   }
 
   @media screen and (min-height: 800px) and (min-width: 1280px), screen and (min-height: 1280px) and (min-width: 800px) {
     #end-screen {
-      font-weight: lighter
+      font-weight: lighter;
 
       .btn-close-region {
-        width: 130px
-        height: 130px
+        width: 130px;
+        height: 130px;
       }
 
       a.btn-close {
-        width: 75px
-        height: 75px
-        font-size: 80px
-        line-height: 60px
+        width: 75px;
+        height: 75px;
+        font-size: 80px;
+        line-height: 60px;
       }
 
       .game-icon {
-        width: 150px
-        height: 150px
+        width: 150px;
+        height: 150px;
       }
 
       .game-rating {
-        font-size: 55px
+        font-size: 55px;
       }
 
       .game-rating-count {
-        font-size: 45px
+        font-size: 45px;
       }
 
       .btn-download {
-        padding: 45px 25px
-        font-size: 35pt
-        line-height: 35pt
+        padding: 45px 25px;
+        font-size: 35pt;
+        line-height: 35pt;
       }
     }
 
     &.landscape {
       #end-screen {
         .name-container {
-          font-size: 37pt
-          padding-top: 200px
+          padding-top: 200px;
+          font-size: 37pt;
         }
 
         .btn-download {
-          padding: 40px 20px
-          font-size: 30pt
-          line-height: 30pt
+          padding: 40px 20px;
+          font-size: 30pt;
+          line-height: 30pt;
         }
       }
     }

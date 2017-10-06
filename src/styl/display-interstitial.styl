@@ -3,147 +3,161 @@
 // largest smartphone at this time.
 
 // Smartphone (portrait)
-@media only screen and (max-device-width: 736px) and (orientation: portrait)
-    #display-interstitial {
-        #display-iframe
-            width: 320px;
-            height: 480px;
-        .iframe-click-catcher
-            width: 320px;
-            height: 480px;
+@media only screen and (max-device-width: 736px) and (orientation: portrait) {
+  #display-interstitial {
+    #display-iframe {
+      width: 320px;
+      height: 480px;
     }
-
-// Smartphone (landscape)
-@media only screen and (max-device-width: 736px) and (orientation: landscape)
-    #display-interstitial {
-        #display-iframe
-            width: 480px;
-            height: 320px;
-        .iframe-click-catcher
-            width: 480px;
-            height: 320px;
-    }
-
-// Tablet (portrait)
-@media only screen and (min-device-width: 737px) and (orientation: portrait)
-    #display-interstitial {
-        #display-iframe
-            width: 768px;
-            height: 1024px;
-        .iframe-click-catcher
-            width: 768px;
-            height: 1024px;
-    }
-
-@media only screen and (min-device-width: 737px) and (orientation: landscape)
-    #display-interstitial {
-        #display-iframe
-            width: 1024px;
-            height: 768px;
-        .iframe-click-catcher
-            width: 1024px;
-            height: 768px;
-    }
-
-#display-interstitial {
-    width: 100vw;
-    height: 100vh;
 
     .iframe-click-catcher {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        z-index: 1;
-        margin: 0 -50% 0 0;
-        padding: 0;
-        transform: translate(-50%, -50%);
+      width: 320px;
+      height: 480px;
     }
+  }
+}
 
+// Smartphone (landscape)
+@media only screen and (max-device-width: 736px) and (orientation: landscape) {
+  #display-interstitial {
     #display-iframe {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        border: 1px solid white;
-        transform: translate(-50%, -50%);
+      width: 480px;
+      height: 320px;
     }
 
-    .close-region {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        z-index: 9999;
-        width: 50px;
-        height: 50px;
-        opacity: .4;
+    .iframe-click-catcher {
+      width: 480px;
+      height: 320px;
     }
+  }
+}
 
-    .icon-close {
-        position: absolute;
-        top: 4px;
-        right: 2px;
-        width: 32px;
-        height: 32px;
-        color: $white;
-        text-align: center;
-        text-shadow: 2px 2px 20px $gray;
-        font-size: 28px;
-        line-height: 28px;
+// Tablet (portrait)
+@media only screen and (min-device-width: 737px) and (orientation: portrait) {
+  #display-interstitial {
+    #display-iframe {
+      width: 768px;
+      height: 1024px;
     }
+    .iframe-click-catcher {
+      width: 768px;
+      height: 1024px;
+    }
+  }
+}
 
-    .close {
-        position: absolute;
-        top: 50%;
-        left: 8px;
-        width: 36px;
-        height: 36px;
-        transform: translate(0, -50%);
+@media only screen and (min-device-width: 737px) and (orientation: landscape) {
+  #display-interstitial {
+    #display-iframe {
+      width: 1024px;
+      height: 768px;
     }
+    .iframe-click-catcher {
+      width: 1024px;
+      height: 768px;
+    }
+  }
+}
 
-    .progress-wrapper {
-        position: absolute;
-        clip: rect(0px, 36px, 36px, 18px);
-        width: 36px;
-        height: 36px;
-    }
+#display-interstitial {
+  width: 100vw;
+  height: 100vh;
 
-    .progress:after {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        display: block;
-        color: white;
-        font-size: 18px;
-        transform: translate(-50%, -50%);
-    }
+  .iframe-click-catcher {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    margin: 0 -50% 0 0;
+    padding: 0;
+    transform: translate(-50%, -50%);
+  }
 
-    .circle-base,
-    .circle-left,
-    .circle-right {
-        position: absolute;
-        width: 28px;
-        height: 28px;
-        border-radius: 100%;
-        background-color: transparent;
-        vertical-align: middle;
-    }
+  #display-iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    border: 1px solid white;
+    transform: translate(-50%, -50%);
+  }
 
-    .circle-base {
-        border: 4px solid $dark-gray;
-    }
+  .close-region {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 9999;
+    width: 50px;
+    height: 50px;
+    opacity: .4;
+  }
 
-    .circle-left,
-    .circle-right {
-        clip: rect(0, 18px, 36px, 0);
-        border: 4px solid $white;
-    }
+  .icon-close {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    width: 32px;
+    height: 32px;
+    color: $white;
+    text-align: center;
+    text-shadow: 2px 2px 20px $gray;
+    font-size: 28px;
+    line-height: 28px;
+  }
 
-    .progress-wrapper,
-    .circle-left,
-    .circle-right {
-        animation-duration: .01s;
-        animation-timing-function: linear;
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
+  .close {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    transform: translate(0, -50%);
+  }
+
+  .progress-wrapper {
+    position: absolute;
+    clip: rect(0px, 36px, 36px, 18px);
+    width: 36px;
+    height: 36px;
+  }
+
+  .progress:after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    color: white;
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+  }
+
+  .circle-base,
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    background-color: transparent;
+    vertical-align: middle;
+  }
+
+  .circle-base {
+    border: 4px solid $dark-gray;
+  }
+
+  .circle-left,
+  .circle-right {
+    clip: rect(0, 18px, 36px, 0);
+    border: 4px solid $white;
+  }
+
+  .progress-wrapper,
+  .circle-left,
+  .circle-right {
+    animation-duration: .01s;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+  }
 }
