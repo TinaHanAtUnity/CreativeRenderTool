@@ -73,9 +73,13 @@ export class HttpKafka {
                 return common;
             }).catch(err => {
                 HttpKafka._deviceInfoUpdating = false;
+                common.common.device = deviceInfo.getStaticDTO();
                 return common;
             });
         } else {
+            if (deviceInfo) {
+                common.common.device = deviceInfo.getStaticDTO();
+            }
             return Promise.resolve(common);
         }
     }
