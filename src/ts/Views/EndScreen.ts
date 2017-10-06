@@ -15,6 +15,7 @@ export interface IEndScreenHandler {
     onEndScreenDownload(): void;
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
+    onKeyEvent(keyCode: number): void;
 }
 
 export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
