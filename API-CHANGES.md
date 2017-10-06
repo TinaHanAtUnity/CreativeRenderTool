@@ -14,6 +14,10 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## Pending
+
+* Added Cache.setFileContent method to Android and iOS
+
 ## 2.1.1
 
 * Added rotation, width and height to Android show options object sent to webview
