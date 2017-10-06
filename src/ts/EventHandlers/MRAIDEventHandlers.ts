@@ -15,9 +15,15 @@ export class MRAIDEventHandlers {
 
     public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request, url: string): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
-        operativeEventManager.sendThirdQuartile(adUnit);
-        operativeEventManager.sendView(adUnit);
-        operativeEventManager.sendClick(adUnit);
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            operativeEventManager.sendThirdQuartile(adUnit);
+        }
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
+            operativeEventManager.sendView(adUnit);
+        }
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
+            operativeEventManager.sendClick(adUnit);
+        }
         adUnit.sendClick();
 
         const campaign = <MRAIDCampaign>adUnit.getCampaign();
