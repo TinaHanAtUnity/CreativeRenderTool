@@ -1,3 +1,9 @@
+# Mon Oct  9 09:08:58 UTC 2017
+
+* Sliding video player interface AB test (groups 10 & 11)
+* Video end card click tracking event for VAST endscreen.
+* Added static device info into kafka messages (Analytics)
+
 # Thu Oct  5 13:30:35 UTC 2017
 
 * Remove endscreen click ab-test
