@@ -1,7 +1,8 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import {ThirdPartyEventManager} from "Managers/ThirdPartyEventManager";
-import {DeviceInfo} from "Models/DeviceInfo";
+import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
+import { DeviceInfo } from "Models/DeviceInfo";
+import sha1 from 'sha1';
 
 export class ComScoreTrackingService {
 
@@ -28,7 +29,9 @@ export class ComScoreTrackingService {
         let advertisingTrackingId: string = 'none';
 
         if(this._deviceInfo.getAdvertisingIdentifier() && !this._deviceInfo.getLimitAdTracking()) {
-            advertisingTrackingId = this.sha1er(this._deviceInfo.getAdvertisingIdentifier());
+            if (this._deviceInfo.getAdvertisingIdentifier()) {
+                advertisingTrackingId = sha1(this._deviceInfo.getAdvertisingIdentifier());
+            }
         }
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -67,9 +70,5 @@ export class ComScoreTrackingService {
         }).join('&');
 
         return `${front}?${back}`;
-    }
-
-    private sha1er(idfa: string): string {
-        return 'placeholderplaceholderplaceholder';
     }
 }
