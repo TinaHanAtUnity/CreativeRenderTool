@@ -2,7 +2,7 @@
 export class Timer {
     private _func: () => void;
     private _duration: number;
-    private _handle: number;
+    private _handle: number = -1;
 
     constructor(func: () => void, duration: number) {
         this._func = func;
@@ -10,9 +10,11 @@ export class Timer {
     }
 
     public start() {
-        this._handle = window.setTimeout(() => {
-            this._func();
-        }, this._duration);
+        if (this._handle === -1) {
+            this._handle = window.setTimeout(() => {
+                this._func();
+            }, this._duration);
+        }
     }
 
     public reset() {
@@ -22,5 +24,6 @@ export class Timer {
 
     public stop() {
         window.clearTimeout(this._handle);
+        this._handle = -1;
     }
 }

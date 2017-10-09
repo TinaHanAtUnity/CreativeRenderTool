@@ -12,6 +12,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Timer } from 'Utilities/Timer';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class VPAIDAdUnit extends AbstractAdUnit {
 
@@ -20,6 +21,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private static _adLoadTimeout: number = 10 * 1000;
+    private _focusManager: FocusManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
@@ -28,9 +30,13 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _timer: Timer;
     private _options: any;
 
-    constructor(view: VPAID, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign, options: any) {
+    private _onAppForegroundHandler: any;
+    private _onAppBackgroundHandler: any;
+
+    constructor(view: VPAID, nativeBridge: NativeBridge, focusManager: FocusManager, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign, options: any) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
 
+        this._focusManager = focusManager;
         this._vpaidCampaign = campaign;
         this._operativeEventManager = operativeEventManager;
         this._thirdPartyEventManager = thirdPartyEventManager;
@@ -65,6 +71,9 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
 
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
+
+        this._onAppBackgroundHandler = () => this.onAppBackground();
+        this._onAppForegroundHandler = () => this.onAppForeground();
     }
 
     public show(): Promise<void> {
@@ -98,6 +107,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onShow() {
         this.setShowing(true);
         this._timer.start();
+
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._focusManager.onAppForeground.subscribe(this._onAppForegroundHandler);
+            this._focusManager.onAppBackground.subscribe(this._onAppBackgroundHandler);
+        } else {
+            this._container.onShow.subscribe(this._onAppForegroundHandler);
+            this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
+        }
     }
 
     private onHide() {
@@ -105,6 +122,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
+
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundHandler);
+            this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundHandler);
+        } else {
+            this._container.onShow.unsubscribe(this._onAppForegroundHandler);
+            this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
+        }
     }
 
     private showView() {
@@ -206,6 +231,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         } else {
             this.sendTrackingEvent('paused');
         }
+    }
+
+    private onAppForeground() {
+        this._view.resumeAd();
+    }
+
+    private onAppBackground() {
+        this._view.pauseAd();
     }
 
     private onAdPlaying() {

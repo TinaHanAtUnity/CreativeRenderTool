@@ -148,6 +148,14 @@
                 return this._creative.stopAd();
             };
 
+            Container.prototype._pauseAd = function() {
+                return this._creative.pauseAd();
+            };
+
+            Container.prototype._resumeAd = function() {
+                return this._creative.resumeAd();
+            };
+
             Container.prototype._sendProgressEvent = function() {
                 window.parent.postMessage({
                     type: 'progress',
@@ -169,6 +177,12 @@
                         break;
                     case 'destroy':
                         this._stopAd();
+                        break;
+                    case 'pause':
+                        this._pauseAd();
+                        break;
+                    case 'resume':
+                        this._resumeAd();
                         break;
                     default:
                         // todo post back error

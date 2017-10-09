@@ -23,6 +23,7 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SdkApi } from 'Native/Api/Sdk';
+import { FocusManager } from 'Managers/FocusManager';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -33,6 +34,7 @@ describe('VPAIDAdUnit', () => {
     let operativeEventManager: OperativeEventManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
+    let focusManager: FocusManager;
     let vpaid: VPAIDModel;
 
     beforeEach(() => {
@@ -43,6 +45,7 @@ describe('VPAIDAdUnit', () => {
         (<any>vpaidView).onCompanionView = new Observable0();
         (<any>vpaidView).onCompanionClick = new Observable0();
         (<any>vpaidView).onStuck = new Observable0();
+        (<any>vpaidView).onSkip = new Observable0();
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
@@ -64,10 +67,18 @@ describe('VPAIDAdUnit', () => {
             muteVideo: false
         });
         campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, operativeEventManager, thirdPartyEventManager, ForceOrientation.NONE, container, placement, campaign, {});
+        focusManager = <FocusManager>sinon.createStubInstance(FocusManager);
+        (<any>focusManager).onAppForeground = new Observable0();
+        (<any>focusManager).onAppBackground = new Observable0();
+        (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+
+        adUnit = new VPAIDAdUnit(vpaidView, nativeBridge, focusManager, operativeEventManager, thirdPartyEventManager, ForceOrientation.NONE, container, placement, campaign, {});
     });
 
     afterEach(() => {
+        if (adUnit.isShowing()) {
+            adUnit.hide();
+        }
         sandbox.reset();
     });
 

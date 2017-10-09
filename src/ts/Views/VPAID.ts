@@ -23,7 +23,6 @@ interface InitAdOptions {
 }
 
 export class VPAID extends View {
-
     private static stuckDelay = 5 * 1000;
 
     public readonly onCompanionClick: Observable0 = new Observable0();
@@ -46,6 +45,7 @@ export class VPAID extends View {
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
     private _stuckTimer: Timer;
+    private _isPaused = false;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
         super(nativeBridge, 'vpaid');
@@ -146,6 +146,22 @@ export class VPAID extends View {
         this._stuckTimer.start();
     }
 
+    public pauseAd() {
+        this._isPaused = true;
+        this._iframe.contentWindow.postMessage({
+            type: 'pause'
+        }, '*');
+        this._stuckTimer.stop();
+    }
+
+    public resumeAd() {
+        this._isPaused = false;
+        this._iframe.contentWindow.postMessage({
+            type: 'resume'
+        }, '*');
+        this._stuckTimer.start();
+    }
+
     public updateTimeoutWidget() {
         const adDuration = this._adDuration;
         const adRemainingTime = this._adRemainingTime;
@@ -164,7 +180,10 @@ export class VPAID extends View {
                 this._adDuration = e.data.adDuration;
                 this._adRemainingTime = e.data.adRemainingTime;
                 this.updateTimeoutWidget();
-                this._stuckTimer.reset();
+
+                if (!this._isPaused) {
+                    this._stuckTimer.reset();
+                }
                 break;
             case 'VPAID':
                 this.onVPAIDEvent.trigger(e.data.eventType, e.data.args);
