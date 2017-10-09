@@ -11,28 +11,22 @@ export enum StoreName {
 
 interface IPerformanceCampaign extends ICampaign {
     appStoreId: string;
-
     gameId: number;
     gameName: string;
     gameIcon: Image;
-
     rating: number;
     ratingCount: number;
-
     landscapeImage: Image;
     portraitImage: Image;
-
     video?: Video;
     streamingVideo?: Video;
-
     videoPortrait?: Video;
     streamingPortraitVideo?: Video;
-
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
-
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
     bypassAppSheet: boolean;
-
     store: StoreName;
 }
 
@@ -54,6 +48,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             streamingPortraitVideo: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            clickUrl: ['string'],
+            videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number']
         });
@@ -85,6 +81,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming));
         }
 
+        this.set('clickUrl', campaign.clickUrl);
+        this.set('videoEventUrls', campaign.videoEventUrls);
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
@@ -166,6 +164,18 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
     public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
         return this.get('clickAttributionUrlFollowsRedirects');
+    }
+
+    public getClickUrl(): string {
+        return this.get('clickUrl');
+    }
+
+    public getVideoEventUrls(): { [eventType: string]: string } {
+        return this.get('videoEventUrls');
+    }
+
+    public getVideoEventUrl(eventType: string): string {
+        return this.get('videoEventUrls')[eventType];
     }
 
     public getBypassAppSheet(): boolean {
