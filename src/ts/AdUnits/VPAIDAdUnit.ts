@@ -41,6 +41,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
         this._view.onCompanionView.subscribe(() => this.onCompanionView());
         this._view.onStuck.subscribe(() => this.onAdStuck());
+        this._view.onSkip.subscribe(() => this.onAdSkipped());
 
         if (campaign.hasEndScreen()) {
             this._view.endScreen.onClick.subscribe(() => this.onCompanionClick());

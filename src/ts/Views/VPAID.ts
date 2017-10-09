@@ -12,6 +12,7 @@ import { Overlay } from 'Views/Overlay';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Timer } from 'Utilities/Timer';
+import { Placement } from 'Models/Placement';
 interface InitAdOptions {
     width: number;
     height: number;
@@ -29,10 +30,13 @@ export class VPAID extends View {
     public readonly onCompanionView: Observable0 = new Observable0();
     public readonly onVPAIDEvent: Observable2<string, any[]> = new Observable2<string, any[]>();
     public readonly onStuck: Observable0 = new Observable0();
+    public readonly onSkip: Observable0 = new Observable0();
     public readonly endScreen: VPAIDEndScreen;
 
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
+    private _placement: Placement;
+
     private _iframe: HTMLIFrameElement;
     private _messageListener: (e: MessageEvent) => void;
 
@@ -43,7 +47,7 @@ export class VPAID extends View {
     private _adRemainingTime: number = -2;
     private _stuckTimer: Timer;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
@@ -55,8 +59,10 @@ export class VPAID extends View {
         this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
 
         this._overlay = new Overlay(nativeBridge, false, language, gameId);
-        this._overlay.setFadeEnabled(false);
+        this._overlay.setFadeEnabled(true);
+        this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
 
+        this._placement = placement;
         this._stuckTimer = new Timer(() => this.onStuck.trigger(), VPAID.stuckDelay);
 
         if (campaign.hasEndScreen()) {
@@ -76,13 +82,17 @@ export class VPAID extends View {
         this._overlay.setSkipEnabled(false);
         this._overlay.setMuteEnabled(false);
 
+        if (this._placement.allowSkip()) {
+            this._overlay.setSkipEnabled(true);
+            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
+        }
+
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
         this._iframe.setAttribute('srcdoc', iframeSrcDoc);
         this._container.insertBefore(this._loadingScreen, this._container.firstChild);
 
         const overlayContainer = this._overlay.container();
-        overlayContainer.style.pointerEvents = 'none';
         overlayContainer.style.position = 'absolute';
         overlayContainer.style.top = '0px';
         overlayContainer.style.left = '0px';
