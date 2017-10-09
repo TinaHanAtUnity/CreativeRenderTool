@@ -17,7 +17,7 @@
   "indentPref": 2,
   "leadingZero": "never",
   "maxErrors": 0,
-  "maxWarnings": 5,
+  "maxWarnings": 0,
   "mixed": true,
   "mixins": [],
   "namingConvention": "lowercase-dash",
