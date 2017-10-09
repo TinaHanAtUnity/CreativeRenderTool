@@ -25,6 +25,7 @@ import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
+import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
 export class CampaignManager {
 
@@ -236,7 +237,7 @@ export class CampaignManager {
             case 'programmatic/vast-paid':
                 // vast-paid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
-                parser = new ProgrammaticVastParser();
+                parser = new ProgrammaticVPAIDParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
