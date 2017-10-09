@@ -24,6 +24,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SdkApi } from 'Native/Api/Sdk';
 import { FocusManager } from 'Managers/FocusManager';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -49,6 +50,7 @@ describe('VPAIDAdUnit', () => {
         nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
         nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
         nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
+        nativeBridge.UrlScheme = <UrlSchemeApi>sinon.createStubInstance(UrlSchemeApi);
         nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
         operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
         thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
@@ -268,34 +270,62 @@ describe('VPAIDAdUnit', () => {
                 }
             };
 
-            beforeEach(() => {
-                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
-            });
-
-            describe('when url is passed', () => {
-                const aURL = 'http://learnmore2.unityads.unity3d.com';
-                beforeEach(triggerVPAIDEvent('AdClickThru', aURL, null, true));
-
-                it('should open the url passed', () => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        action: 'android.intent.action.VIEW',
-                        uri: aURL
-                    });
+            describe('on android', () => {
+                beforeEach(() => {
+                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
                 });
-                it('should send click tracking events', checkClickThroughTracking);
-            });
 
-            describe('when url is not passed', () => {
-                beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
+                describe('when url is passed', () => {
+                    const aURL = 'http://learnmore2.unityads.unity3d.com';
+                    beforeEach(triggerVPAIDEvent('AdClickThru', aURL, null, true));
 
-                it('should open the url from the VAST definition', () => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        action: 'android.intent.action.VIEW',
-                        uri: campaign.getVideoClickThroughURL()
+                    it('should open the url passed', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                            action: 'android.intent.action.VIEW',
+                            uri: aURL
+                        });
                     });
+                    it('should send click tracking events', checkClickThroughTracking);
                 });
-                it('should send click tracking events', checkClickThroughTracking);
+
+                describe('when url is not passed', () => {
+                    beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
+
+                    it('should open the url from the VAST definition', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                            action: 'android.intent.action.VIEW',
+                            uri: campaign.getVideoClickThroughURL()
+                        });
+                    });
+                    it('should send click tracking events', checkClickThroughTracking);
+                });
             });
+
+            describe('on ios', () => {
+                beforeEach(() => {
+                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+                });
+
+                describe('when url is passed', () => {
+                    const aURL = 'http://learnmore2.unityads.unity3d.com';
+                    beforeEach(triggerVPAIDEvent('AdClickThru', aURL, null, true));
+
+                    it('should open the url passed', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, aURL);
+                    });
+                    it('should send click tracking events', checkClickThroughTracking);
+                });
+
+                describe('when url is not passed', () => {
+                    beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
+
+                    it('should open the url from the VAST definition', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, campaign.getVideoClickThroughURL());
+                    });
+                    it('should send click tracking events', checkClickThroughTracking);
+                });
+            });
+
         });
     });
 });
