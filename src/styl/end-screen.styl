@@ -1,732 +1,437 @@
-/* Move this within correct scope */
-@import "game-shared.styl";
+// @stylint off
+#end-screen
 
-#end-screen {
-  .campaign-container {
-    width: 100vw;
-    height: 100vh;
-  }
+  @import "game-shared.styl"
 
-  .btn-close-region {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 1;
-    width: 55px;
-    height: 55px;
-  }
+  .campaign-container
+    width: 100vw
+    height: 100vh
 
-  a.btn-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-    width: 32px;
-    height: 32px;
-    color: $white;
-    text-align: center;
-    text-shadow: 2px 2px 20px $gray;
-    font-size: 28px;
-    line-height: 28px;
-  }
+  .btn-close-region
+    position: fixed
+    z-index: 1
+    top: 0
+    right: 0
+    width: 55px
+    height: 55px
 
-  .game-background {
-    position: fixed;
-    top: 0;
-    bottom: 47%;
-    width: 100%;
-    background-color: $black;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    &.brand {
-      bottom: 0;
-      background-size: contain;
-    }
-  }
+  a.btn-close
+    z-index: 1
+    position: absolute
+    top: 10px
+    right: 10px
+    font-size: 28px
+    width: 32px
+    height: 32px
+    color: #ffffff
+    text-shadow: 2px 2px 20px #7c7c7c
+    text-align: center
+    line-height: 28px
 
-  .end-screen-info-background {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 47%;
-    border-top: 4px solid $end-screen-info-gray;
-    background-color: $end-screen-info-white;
+  .game-background
+    position: fixed
+    top: 0
+    bottom: 47%
+    width: 100%
+    background-size: cover
+    background-position: center
+    background-repeat: no-repeat
+    background-color: #000
+    &.brand
+      background-size: contain
+      bottom: 0
 
-    &.dark {
-      font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
+  .end-screen-info-background
+    position: fixed
+    bottom: 0
+    width: 100%
+    height: 47%
+    border-top: 4px solid #e6e6e6
+    background-color: #fafafa
 
-      @keyframes slideInUp {
-        0% {
-          -webkit-transform: translate3d(0, 200px, 0);
-          transform: translate3d(0, 200px, 0);
-        }
+.end-screen-info
+    position: absolute
+    top: 45%
+    width: 100%
+    -webkit-transform: translate(0, -50%)
+    transform: translate(0, -50%)
 
-        40% {
-          -webkit-transform: translate3d(0, -10px, 0);
-          transform: translate3d(0, -10px, 0);
-          opacity: .25;
-        }
+  .game-info
+    margin-left: 18px
 
-        100% {
-          -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
-          opacity: 1;
-        }
-      }
+  .game-icon
+    float: left
 
-      .game-icon,
-      .name-container,
-      .store-container,
-      .download-container {
-        opacity: 0;
-        animation-fill-mode: forwards;
-        animation-timing-function: ease-out;
-      }
+  .name-container
+    padding-left: 10px
+    padding-right: 10px
+    padding-top: 8px
+    text-overflow: ellipsis
+    -webkit-line-clamp: 2
+    display: -webkit-box
+    -webkit-box-orient: vertical
 
-      &.without-animation {
-        .game-icon,
-        .name-container,
-        .store-container,
-        .download-container {
-          opacity: 1;
-        }
-      }
+  .store-container
+    margin-left: 10px
+    margin-top: 5px
+    float: left
+    display: -webkit-box
+    display: -webkit-flex
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    -webkit-justify-content: center
 
-      &.animate {
-        .game-icon,
-        .name-container,
-        .store-container,
-        .download-container {
-          animation-name: slideInUp;
-        }
+  .download-container
+    text-align: center
+    clear: both
 
-        .game-icon {
-          animation-duration: .75s;
-          animation-delay: 0s;
-        }
+  .btn-download
+    color: #ffffff
+    display: block
+    background: #167dfb
+    left: 0
+    right: 0
 
-        .name-container {
-          animation-duration: .75s;
-          animation-delay: .08s;
-        }
+  .privacy-button
+    position: absolute
+    bottom: 10px
+    left: 15px
+    color: #e6e6e6
+    text-decoration: none
+    font-size: 22px
 
-        .store-container {
-          animation-duration: .75s;
-          animation-delay: .08s;
-        }
-
-        .download-container {
-          animation-duration: .75s;
-          animation-delay: .16s;
-        }
-      }
-
-      .name-container,
-      .game-rating-count {
-        color: $white;
-      }
-
-      .game-rating-count {
-        margin-left: 5pt;
-      }
-
-      .end-screen-underlay {
-        width: 100vw;
-        height: 100vh;
-        filter: brightness(100%) blur(20px);
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        transform: scale(1.5);
-
-        &:before {
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
-          content: "";
-        }
-      }
-
-      .game-icon {
-        top: -20pt;
-        width: 115px;
-        height: 115px;
-      }
-
-      .game-info {
-        margin-left: 0;
-      }
-
-      .unityads-logo {
-        background-image: url("../img/unityads-white.png");
-      }
-
-      .btn-download {
-        margin: 12.5pt auto;
-        padding: 5px;
-        width: 50%;
-        background: linear-gradient($dark-blue-gradient-light, $dark-blue-gradient-dark);
-        font-weight: 600;
-        font-size: 20pt;
-      }
-    }
-  }
-
-  .end-screen-info {
-    position: absolute;
-    top: 45%;
-    width: 100%;
-    transform: translate(0, -50%);
-
-    .game-info {
-      margin-left: 18px;
-    }
-
-    .game-icon {
-      float: left;
-    }
-
-    .name-container {
-      display: flex;
-      padding: 8px 10px 0 10px;
-      text-overflow: ellipsis;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2; // @stylint ignore
-    }
-
-    .store-container {
-      display: flex;
-      float: left;
-      margin-top: 5px;
-      margin-left: 10px;
-      -webkit-box-align: center;
-      -webkit-box-pack: center;
-      -webkit-justify-content: center;
-    }
-
-    .download-container {
-      clear: both;
-      text-align: center;
-    }
-
-    .btn-download {
-      right: 0;
-      left: 0;
-      display: block;
-      background: $blue;
-      color: $white;
-    }
-
-    .privacy-button {
-      position: absolute;
-      bottom: 10px;
-      left: 15px;
-      color: $end-screen-info-gray;
-      text-decoration: none;
-      font-size: 22px;
-    }
-
-    .btn-download {
-      margin: 45px 15px;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 18pt;
-      line-height: 24pt;
-    }
-  }
-}
+  .btn-download
+    margin: 0 15px
+    padding: 10px
+    border-radius: 10px
+    font-size: 18pt
+    line-height: 24pt
+    margin-top: 45px
 
 // END SCREEN landscape specific
-body.landscape {
-  #end-screen {
-    .game-background-portrait,
-    .underlay-portrait {
-      display: none;
-    }
-    .game-background-landscape,
-    .underlay-landscape {
-      display: block;
-    }
+body.landscape
+  #end-screen
+    .game-background-portrait
+      display: none
+    .game-background-landscape
+      display: block
 
-    .game-background {
-      bottom: 0;
-      width: 53%;
-      &.brand {
-        width: 100%;
-      }
-    }
+    .game-background
+      width: 53%
+      bottom: 0
+      &.brand
+        width: 100%
 
-    .end-screen-info-background {
-      right: 0;
-      width: 47%;
-      height: 100%;
-      border-top: none;
-      border-left: 4px solid $end-screen-info-gray;
+    .end-screen-info-background
+      width: 47%
+      height: 100%
+      right: 0
+      border-top: none
+      border-left: 4px solid #e6e6e6
 
-      &.dark {
-        width: 100vw;
-        height: 100vh;
+      .btn-download
+        font-size: 14pt
 
-        .end-screen-info {
-          top: 45%;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          margin: auto;
-        }
-      }
+    a.btn-close
+      color: #7c7c7c
+      text-shadow: 0px 0px 0px #fafafa
 
-      .btn-download {
-        font-size: 14pt;
-      }
-    }
+    .game-info
+      margin-left: auto
 
-    a.btn-close {
-      color: $gray;
-      text-shadow: 0 0 0 $end-screen-info-white;
-    }
+    .game-icon
+      left: 0
+      right: 0
+      position: absolute
+      margin: auto
 
-    .game-info {
-      margin-left: auto;
-    }
+    .name-container
+      padding-top: 95px
+      font-size: 20pt
+      text-overflow: ellipsis
+      -webkit-line-clamp: 2
+      overflow: hidden
+      display: -webkit-box
+      -webkit-box-orient: vertical
+      text-align: center
 
-    .game-icon {
-      position: absolute;
-      right: 0;
-      left: 0;
-      margin: auto;
-    }
+    .store-container
+      float: none
+      clear: both
+      margin: auto
+      padding-top: 0
 
-    .name-container {
-      display: flex;
-      overflow: hidden;
-      padding-top: 95px;
-      text-align: center;
-      text-overflow: ellipsis;
-      font-size: 20pt;
-      -webkit-line-clamp: 2; // @stylint ignore
-      -webkit-box-orient: vertical;
-    }
-
-    .store-container {
-      float: none;
-      clear: both;
-      margin: auto;
-      padding-top: 0;
-    }
-
-    .btn-download {
-      margin-top: 15px;
-      padding: 5px 10px;
-      font-size: 11pt;
-    }
-  }
-}
+    .btn-download
+      font-size: 11pt
+      padding: 5px 10px 5px 10px
+      margin-top: 15px
 
 // END SCREEN portrait specific
-body.portrait {
-  #end-screen {
-    .game-background-portrait,
-    .underlay-portrait {
-      display: block;
-    }
-    .game-background-landscape,
-    .underlay-landscape {
-      display: none;
-    }
-
-    .end-screen-info-background.dark {
-      width: 100vw;
-      height: 100vh;
-
-      .game-icon {
-        float: none;
-        margin: 15pt auto;
-        width: 150px;
-        height: 150px;
-      }
-
-      .name-container {
-        text-align: center;
-      }
-
-      .store-container {
-        float: none;
-      }
-
-      .btn-download {
-        padding: 15px 10px;
-        width: 75%;
-        font-size: 18pt;
-      }
-    }
-  }
-}
+body.portrait
+  #end-screen
+    .game-background-portrait
+      display: block
+    .game-background-landscape
+      display: none
 
 // Device specific
-body.iphone,
-body.ipad,
-body.android {
-// 320 x 426 - Samsung Galaxy Y
-  @media screen and (max-height: 320px) and (max-width: 427px), screen and (max-height: 427px) and (max-width: 320px) {
-    #end-screen {
-      .game-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12pt;
-      }
+body.iphone
+body.ipad
+body.android
+  // 320 x 426 - Samsung Galaxy Y
+  @media screen and (max-height: 320px) and (max-width: 427px), screen and (max-height: 427px) and (max-width: 320px)
+    #end-screen
+      .game-icon
+        width: 60px
+        height: 60px
+        border-radius: 12pt
 
-      .end-screen-info-background.dark .game-icon {
-        width: 120px;
-        height: 120px;
-        border-radius: 15pt;
-      }
+      .name-container
+        font-size: 15pt
 
-      .name-container {
-        font-size: 15pt;
-      }
+      .btn-download
+        padding: 5px
+        font-size: 16pt
 
-      .btn-download {
-        padding: 5px;
-        font-size: 16pt;
-      }
-    }
+    &.landscape
+      #end-screen
+        .name-container
+          font-size: 13pt
 
-    &.landscape {
-      #end-screen {
-        .name-container {
-          font-size: 13pt;
-        }
+        .game-rating
+          font-size: 17px
 
-        .game-rating {
-          font-size: 17px;
-        }
+        .btn-download
+          font-size: 9pt
+          padding: 5px 5px 5px 5px
 
-        .btn-download {
-          padding: 5px; // 320 x 568 - iPhone 5
-          font-size: 9pt;
-        }
-      }
-    }
-  }
+  // 320 x 568 - iPhone 5
+  @media screen and (min-height: 568px) and (min-width: 320px), screen and (min-height: 320px) and (min-width: 568px)
+    #end-screen
+      .store-container
+        margin-top: 10px
 
-  @media screen and (min-height: 568px) and (min-width: 320px), screen and (min-height: 320px) and (min-width: 568px) {
-    #end-screen {
-      .store-container {
-        margin-top: 10px;
-      }
+      .btn-download
+        padding: 15px 10px
 
-      .btn-download {
-        padding: 15px 10px;
-      }
+    &.landscape
+      #end-screen
+        .btn-download
+          font-size: 14pt
 
-      .end-screen-info-background.dark .store-container {
-        margin-top: 5px;
-      }
-    }
+  // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
+  @media screen and (min-height: 360px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 360px)
+    #end-screen
+      .btn-close-region
+        width: 75px
+        height: 75px
 
-    &.landscape {
-      #end-screen .btn-download {
-        font-size: 14pt; // 360 x 640 - Samsung Galaxy Note II, Samsung Galaxy S4
-      }
-    }
-  }
+      .game-icon
+        width: 85px
+        height: 85px
 
-  @media screen and (min-height: 360px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 360px) {
-    #end-screen {
-      .btn-close-region {
-        width: 75px;
-        height: 75px;
-      }
+      .name-container
+        font-size: 20pt
 
-      .game-icon {
-        width: 85px;
-        height: 85px;
-      }
+      .game-rating
+        font-size: 25px
 
-      .name-container {
-        font-size: 20pt;
-      }
+      .game-rating-count
+        font-size: 22px
 
-      .game-rating {
-        font-size: 25px;
-      }
+    &.landscape
+      #end-screen
+        .name-container
+          padding-top: 115px
 
-      .game-rating-count {
-        font-size: 22px;
-      }
-    }
+        .btn-download
+          padding: 10px
 
-    &.landscape #end-screen {
-      .name-container {
-        padding-top: 115px;
-      }
+  // 384 x 360 - LG Optimus G
+  @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px)
+    &.landscape
+      #end-screen
+        .btn-download
+          padding: 15px 10px
+          font-size: 16pt
 
-      .btn-download {
-        padding: 10px;
-      }
+  // 424 x 753 - LG Optimus 4X HD
+  @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px)
+    #end-screen
+      .name-container
+        font-size: 21pt
 
-      .end-screen-info-background.dark .game-icon {
-        width: 125px;
-        height: 125px; // 384 x 360 - LG Optimus G
-      }
-    }
-  }
+      .game-icon
+        width: 100px
+        height: 100px
 
-  @media screen and (min-height: 384px) and (min-width: 640px), screen and (min-height: 640px) and (min-width: 384px) {
-    &.landscape #end-screen {
-      .btn-download {
-        padding: 15px 10px;
-        font-size: 16pt; // 424 x 753 - LG Optimus 4X HD
-      }
-    }
-  }
+      .game-rating
+        font-size: 30px
 
-  @media screen and (min-height: 424px) and (min-width: 753px), screen and (min-height: 753px) and (min-width: 424px) {
-    #end-screen {
-      .name-container {
-        font-size: 21pt;
-      }
+      .game-rating-count
+        font-size: 24px
 
-      .game-icon {
-        width: 100px;
-        height: 100px;
-      }
+      .btn-download
+        padding: 25px 20px
+        font-size: 22pt
+        line-height: 22pt
 
-      .game-rating {
-        font-size: 30px;
-      }
+      .unityads-logo
+        width: 102px
+        height: 24px
 
-      .game-rating-count {
-        font-size: 24px;
-      }
+    &.landscape
+      #end-screen
+        .name-container
+          padding-top: 125px
 
-      .btn-download {
-        padding: 25px 20px;
-        font-size: 22pt;
-        line-height: 22pt;
-      }
+        .btn-download
+          font-size: 19pt
+          line-height: 19pt
 
-      .unityads-logo {
-        width: 102px;
-        height: 24px;
-      }
-    }
+  // 540 x 960 - Motorola Droid 3
+  @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px)
+    #end-screen
+      .btn-close-region
+        width: 95px
+        height: 95px
 
-    &.landscape {
-      #end-screen {
-        .name-container {
-          padding-top: 125px;
-        }
+      a.btn-close
+        top: 20px
+        right: 20px
+        width: 50px
+        height: 50px
+        font-size: 42px
+        line-height: 45px
 
-        .btn-download {
-          font-size: 19pt;
-          line-height: 19pt;
-        }
+      .game-icon
+        width: 130px
+        height: 130px
 
-        .end-screen-info-background.dark .game-icon {
-          width: 125px;
-          height: 125px; // 540 x 960 - Motorola Droid 3
-        }
-      }
-    }
-  }
+      .name-container
+        font-size: 27pt
 
-  @media screen and (min-height: 540px) and (min-width: 960px), screen and (min-height: 960px) and (min-width: 540px) {
-    #end-screen {
-      .btn-close-region {
-        width: 95px;
-        height: 95px;
-      }
+      .game-rating
+        font-size: 40px
 
-      a.btn-close {
-        top: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        font-size: 42px;
-        line-height: 45px;
-      }
+      .game-rating-count
+        font-size: 30px
 
-      .game-icon {
-        width: 130px;
-        height: 130px;
-      }
+      .btn-download
+        padding: 30px 25px 30px 25px
+        font-size: 26pt
+        line-height: 26pt
 
-      .name-container {
-        font-size: 27pt;
-      }
+    &.landscape
+      #end-screen
+        a.btn-close
+          top: 20px
+          right: 20px
 
-      .game-rating {
-        font-size: 40px;
-      }
+        .name-container
+          padding-top: 175px
 
-      .game-rating-count {
-        font-size: 30px;
-      }
+        .btn-download
+          padding: 25px 20px 25px 20px
+          font-size: 21pt
+          line-height: 21pt
 
-      .btn-download {
-        padding: 30px 25px;
-        font-size: 26pt;
-        line-height: 26pt;
-      }
-    }
+  // 960 x 600 - Google Nexus 7
+  @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px)
+    #end-screen
+      .name-container
+        font-size: 29pt
 
-    &.landscape #end-screen {
-      a.btn-close {
-        top: 20px;
-        right: 20px;
-      }
+      .unityads-logo
+        width: 153px
+        height: 36px
 
-      .name-container {
-        padding-top: 175px;
-      }
+  // 1024 x 600 - Samsung Galaxy Tab 7"
+  @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px)
+    #end-screen
+      .name-container
+        font-size: 31pt
 
-      .btn-download {
-        padding: 25px 20px 25px 20px;
-        font-size: 21pt;
-        line-height: 21pt;
-      }
+      .game-rating
+        font-size: 45px
 
-      .end-screen-info-background.dark .game-icon {
-        width: 150px;
-        height: 150px; // 960 x 600 - Google Nexus 7
-      }
-    }
-  }
+      .game-rating-count
+        font-size: 35px
 
-  @media screen and (min-height: 600px) and (min-width: 906px), screen and (min-height: 906px) and (min-width: 600px) {
-    #end-screen {
-      .name-container {
-        font-size: 29pt;
-      }
+    &.landscape
+      #end-screen
+        .btn-download
+          padding: 30px 20px 30px 20px
+          font-size: 24pt
+          line-height: 24pt
 
-      .unityads-logo {
-        width: 153px;
-        height: 36px; // 1024 x 600 - Samsung Galaxy Tab 7"
-      }
-    }
-  }
+  // 1024 x 768 - iPad
+  @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px)
+    #end-screen
+      font-weight: lighter
 
-  @media screen and (min-height: 600px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 600px) {
-    #end-screen {
-      .name-container {
-        font-size: 31pt;
-      }
+      .name-container
+        padding-left: 30px
+        font-size: 38pt
 
-      .game-rating {
-        font-size: 45px;
-      }
+      .store-container
+        margin-left: 30px
 
-      .game-rating-count {
-        font-size: 35px;
-      }
-    }
+      .game-rating
+        font-size: 50px
+        letter-spacing: 15px
 
-    &.landscape #end-screen {
-      .btn-download {
-        padding: 30px 20px 30px 20px;
-        font-size: 24pt;
-        line-height: 24pt; // 1024 x 768 - iPad
-      }
-    }
-  }
+      .game-rating-count
+        font-size: 40px
 
-  @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px) {
-    #end-screen {
-      font-weight: lighter;
+    &.landscape
+      #end-screen
+        .name-container
+          font-size: 32pt
+          padding-left: 10px
 
-      .name-container {
-        padding-left: 30px;
-        font-size: 38pt;
-      }
+        .game-rating
+          font-size: 45px
+          letter-spacing: 5px
 
-      .store-container {
-        margin-left: 30px;
-      }
+  // 800 x 1280 - Samsung Galaxy Tab 10
+  @media screen and (min-height: 800px) and (min-width: 1280px), screen and (min-height: 1280px) and (min-width: 800px)
+    #end-screen
+      font-weight: lighter
 
-      .game-rating {
-        letter-spacing: 15px;
-        font-size: 50px;
-      }
+      .btn-close-region
+        width: 130px
+        height: 130px
 
-      .game-rating-count {
-        font-size: 40px;
-      }
-    }
+      a.btn-close
+        width: 75px
+        height: 75px
+        font-size: 80px
+        line-height: 60px
 
-    &.portrait #end-screen .end-screen-info-background.dark .btn-download {
-      padding: 30px;
-      width: 50%;
-      font-size: 24pt;
-    }
+      .game-icon
+        width: 150px
+        height: 150px
 
-    &.landscape #end-screen {
-      .name-container {
-        padding-left: 10px;
-        font-size: 32pt;
-      }
+      .game-rating
+        font-size: 55px
 
-      .game-rating {
-        letter-spacing: 5px; // 800 x 1280 - Samsung Galaxy Tab 10
-        font-size: 45px;
-      }
-    }
-  }
+      .game-rating-count
+        font-size: 45px
 
-  @media screen and (min-height: 800px) and (min-width: 1280px), screen and (min-height: 1280px) and (min-width: 800px) {
-    #end-screen {
-      font-weight: lighter;
+      .btn-download
+        padding: 45px 25px
+        font-size: 35pt
+        line-height: 35pt
 
-      .btn-close-region {
-        width: 130px;
-        height: 130px;
-      }
+    &.landscape
+      #end-screen
+        .name-container
+          font-size: 37pt
+          padding-top: 200px
 
-      a.btn-close {
-        width: 75px;
-        height: 75px;
-        font-size: 80px;
-        line-height: 60px;
-      }
-
-      .game-icon {
-        width: 150px;
-        height: 150px;
-      }
-
-      .game-rating {
-        font-size: 55px;
-      }
-
-      .game-rating-count {
-        font-size: 45px;
-      }
-
-      .btn-download {
-        padding: 45px 25px;
-        font-size: 35pt;
-        line-height: 35pt;
-      }
-    }
-
-    &.landscape {
-      #end-screen {
-        .name-container {
-          padding-top: 200px;
-          font-size: 37pt;
-        }
-
-        .btn-download {
-          padding: 40px 20px;
-          font-size: 30pt;
-          line-height: 30pt;
-        }
-      }
-    }
-  }
-}
+        .btn-download
+          padding: 40px 20px
+          font-size: 30pt
+          line-height: 30pt
+// @stylint on
