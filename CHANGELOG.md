@@ -1,3 +1,7 @@
+# Tue Oct 10 17:15:40 UTC 2017
+
+* Initial support for VPAID
+
 # Tue Oct 10 09:11:38 UTC 2017
 
 * Removed dark end screen A/B test (groups 8 & 9)
