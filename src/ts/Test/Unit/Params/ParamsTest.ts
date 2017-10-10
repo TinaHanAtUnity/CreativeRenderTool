@@ -199,8 +199,8 @@ class TestHelper {
         let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
 
         let container: AdUnitContainer;
+        const focusManager = new FocusManager(nativeBridge);
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            const focusManager = new FocusManager(nativeBridge);
             deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
@@ -208,7 +208,7 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
     }
 }
 
