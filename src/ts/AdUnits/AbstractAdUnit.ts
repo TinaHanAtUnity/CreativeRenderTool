@@ -10,9 +10,11 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
+import { FocusManager } from 'Managers/FocusManager';
 
 export interface IAdUnitParameters {
     forceOrientation: ForceOrientation;
+    focusManager: FocusManager;
     container: AdUnitContainer;
     deviceInfo: DeviceInfo;
     clientInfo: ClientInfo;

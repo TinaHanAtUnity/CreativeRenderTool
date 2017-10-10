@@ -7,10 +7,6 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-// import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
-// import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
-// import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
-// import { VastEndScreenEventHandlers } from 'EventHandlers/VastEndScreenEventHandlers';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
@@ -29,22 +25,19 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-// import { FinishState } from 'Constants/FinishState';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Views/VPAID';
-import { VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-// import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
-// import { Request } from 'Utilities/Request';
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-// import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { EndScreenEventHandler } from 'EventHandlers/EndScreenEventHandler';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 export class AdUnitFactory {
 
@@ -58,8 +51,8 @@ export class AdUnitFactory {
             return this.createPerformanceAdUnit(nativeBridge, parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, parameters.forceOrientation, parameters.container, parameters.deviceInfo, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.placement, parameters.campaign, parameters.options);
-        } else if (campaign instanceof VPAIDCampaign) {
-            return this.createVPAIDAdUnit(nativeBridge, focusManager, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, configuration, options);
+        } else if (parameters.campaign instanceof VPAIDCampaign) {
+            return this.createVPAIDAdUnit(nativeBridge, parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -111,15 +104,10 @@ export class AdUnitFactory {
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnitParameters.endScreenEventHandler = VastEndScreenEventHandler;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            // this.prepareVastEndScreen(vastEndScreen, nativeBridge, parameters.thirdPartyEventManager, vastAdUnit, parameters.deviceInfo, parameters.clientInfo, parameters.request);
         } else {
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         }
 
-        // this.prepareOverlay(overlay, nativeBridge, parameters.operativeEventManager, vastAdUnit);
-        // overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
-
-        // this.prepareVastOverlayEventHandlers(overlay, nativeBridge, parameters.thirdPartyEventManager, vastAdUnit, parameters.request, parameters.clientInfo);
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, vastAdUnit);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo));
@@ -156,95 +144,8 @@ export class AdUnitFactory {
             endScreen: endScreen
         };
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-        /*
-        mraid.render();
-        document.body.appendChild(mraid.container());
-
-        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, operativeEventManager, thirdPartyEventManager, request, url));
-
-        mraid.onReward.subscribe(() => {
-            operativeEventManager.sendThirdQuartile(mraidAdUnit);
-        });
-
-        mraid.onAnalyticsEvent.subscribe((timeFromShow, timeFromPlayableStart, event, eventData) => MRAIDEventHandlers.onAnalyticsEvent(campaign, timeFromShow, timeFromPlayableStart, event, eventData));
-        if(endScreen) {
-            this.prepareEndScreen(endScreen, nativeBridge, operativeEventManager, thirdPartyEventManager, mraidAdUnit, deviceInfo, clientInfo);
-            if(mraid instanceof PlayableMRAID) {
-                (<PlayableMRAID>mraid).onShowEndScreen.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
-            }
-        }
-
-        mraid.onSkip.subscribe(() => {
-            mraidAdUnit.setFinishState(FinishState.SKIPPED);
-            mraidAdUnit.hide();
-        });
-        mraid.onClose.subscribe(() => {
-            mraidAdUnit.setFinishState(FinishState.COMPLETED);
-            mraidAdUnit.hide();
-        });*/
-
         return mraidAdUnit;
     }
-
-    /*
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit) {
-        overlay.render();
-        document.body.appendChild(overlay.container());
-
-        if(!adUnit.getPlacement().allowSkip()) {
-            overlay.setSkipEnabled(false);
-        } else {
-            overlay.setSkipEnabled(true);
-            overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
-        }
-
-        // overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit));
-        // overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
-    }*/
-/*
-    private static prepareVastOverlayEventHandlers(overlay: Overlay, nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VastAdUnit, request: Request, clientInfo: ClientInfo) {
-        // overlay.onSkip.subscribe((videoProgress) => VastOverlayEventHandlers.onSkip(adUnit));
-        // overlay.onCallButton.subscribe(() => VastOverlayEventHandlers.onCallButton(nativeBridge, thirdPartyEventManager, adUnit, request, clientInfo));
-        // overlay.onMute.subscribe((muted) => VastOverlayEventHandlers.onMute(thirdPartyEventManager, adUnit, muted, clientInfo));
-    }*/
-    /*
-    private static prepareEndScreen(endScreen: EndScreen, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo, clientInfo: ClientInfo) {
-
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-        endScreen.onPrivacy.subscribe((url) => EndScreenEventHandlers.onPrivacy(nativeBridge, url));
-        endScreen.onClose.subscribe(() => EndScreenEventHandlers.onClose(adUnit));
-
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, adUnit, clientInfo));
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
-            adUnit.onClose.subscribe(() => {
-                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-            });
-        } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            endScreen.onDownload.subscribe(() => EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, adUnit, deviceInfo, clientInfo));
-        }
-    }*/
-
-    /*
-    private static prepareVastEndScreen(endScreen: VastEndScreen, nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VastAdUnit, deviceInfo: DeviceInfo, clientInfo: ClientInfo, request: Request) {
-        endScreen.render();
-        endScreen.hide();
-        document.body.appendChild(endScreen.container());
-        endScreen.onClose.subscribe(() => VastEndScreenEventHandlers.onClose(adUnit));
-        endScreen.onShow.subscribe(() => VastEndScreenEventHandlers.onShow(thirdPartyEventManager, adUnit, clientInfo));
-
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, adUnit, request, thirdPartyEventManager, clientInfo));
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => EndScreenEventHandlers.onKeyEvent(keyCode, adUnit));
-            adUnit.onClose.subscribe(() => {
-                nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-            });
-        } else if (nativeBridge.getPlatform() === Platform.IOS) {
-            endScreen.onClick.subscribe(() => VastEndScreenEventHandlers.onClick(nativeBridge, adUnit, request, thirdPartyEventManager, clientInfo));
-        }
-    }*/
 
     private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration));
@@ -349,10 +250,23 @@ export class AdUnitFactory {
         return undefined;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, focusManager: FocusManager, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
-        const vpaid = new VPAID(nativeBridge, campaign, placement, deviceInfo.getLanguage(), clientInfo.getGameId());
-        vpaid.render();
-        const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, focusManager, operativeEventManager, thirdPartyEventManager, forceOrientation, container, placement, campaign, options);
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+        const campaign = <VPAIDCampaign>parameters.campaign;
+        const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+
+        const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
+            ... parameters,
+            vpaid: vpaid,
+            overlay: overlay,
+        };
+
+        if (campaign.hasEndScreen()) {
+            const endScreen = new VPAIDEndScreen(nativeBridge, campaign, parameters.clientInfo.getGameId());
+            vpaidAdUnitParameters.endScreen = endScreen;
+        }
+
+        const vpaidAdUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
         return vpaidAdUnit;
     }
 

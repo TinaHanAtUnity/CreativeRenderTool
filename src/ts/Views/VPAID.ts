@@ -6,13 +6,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { VPAIDCampaign } from "Models/VPAID/VPAIDCampaign";
-import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Overlay } from 'Views/Overlay';
-
-import VastEndScreenTemplate from 'html/VastEndScreen.html';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+
 interface InitAdOptions {
     width: number;
     height: number;
@@ -22,15 +20,17 @@ interface InitAdOptions {
     envVars?: object;
 }
 
-export class VPAID extends View {
-    private static stuckDelay = 5 * 1000;
+export interface IVPAIDHandler {
+    onVPAIDCompanionClick(): void;
+    onVPAIDCompanionView(): void;
+    onVPAIDEvent(eventType: string, args: any[]): void;
+    onVPAIDStuck(): void;
+    onVPAIDSkip(): void;
+}
 
-    public readonly onCompanionClick: Observable0 = new Observable0();
-    public readonly onCompanionView: Observable0 = new Observable0();
-    public readonly onVPAIDEvent: Observable2<string, any[]> = new Observable2<string, any[]>();
-    public readonly onStuck: Observable0 = new Observable0();
-    public readonly onSkip: Observable0 = new Observable0();
-    public readonly endScreen: VPAIDEndScreen;
+export class VPAID extends View<IVPAIDHandler> {
+    private static stuckDelay = 5 * 1000;
+    // public readonly endScreen: VPAIDEndScreen;
 
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
@@ -41,7 +41,7 @@ export class VPAID extends View {
 
     private _loadingScreen: HTMLElement;
 
-    private _overlay: Overlay;
+    // private _overlay: Overlay;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
     private _stuckTimer: Timer;
@@ -58,16 +58,16 @@ export class VPAID extends View {
         this._loadingScreen.classList.add('loading-container');
         this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
 
-        this._overlay = new Overlay(nativeBridge, false, language, gameId);
+        // this._overlay = new Overlay(nativeBridge, false, language, gameId);
         this._overlay.setFadeEnabled(true);
         this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
 
         this._placement = placement;
         this._stuckTimer = new Timer(() => this.onStuck.trigger(), VPAID.stuckDelay);
-
+/*
         if (campaign.hasEndScreen()) {
             this.endScreen = new VPAIDEndScreen(nativeBridge, campaign, gameId);
-        }
+        }*/
 
         this._bindings = [{
             selector: '.companion',
@@ -78,6 +78,7 @@ export class VPAID extends View {
 
     public render() {
         super.render();
+        /*
         this._overlay.render();
         this._overlay.setSkipEnabled(false);
         this._overlay.setMuteEnabled(false);
@@ -85,7 +86,7 @@ export class VPAID extends View {
         if (this._placement.allowSkip()) {
             this._overlay.setSkipEnabled(true);
             this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }
+        }*/
 
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
@@ -216,87 +217,4 @@ export class VPAID extends View {
             }
         };
     }
-}
-
-export class VPAIDEndScreen extends View {
-
-    public readonly onClick = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onShow = new Observable0();
-
-    private _isSwipeToCloseEnabled: boolean = false;
-
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, gameId: string) {
-        super(nativeBridge, 'end-screen');
-
-        this._template = new Template(VastEndScreenTemplate);
-
-        if(campaign) {
-            const landscape = campaign.getCompanionLandscapeUrl();
-            const portrait = campaign.getCompanionPortraitUrl();
-
-            this._templateData = {
-                'endScreenLandscape': (landscape ? landscape : (portrait ? portrait : undefined)),
-                'endScreenPortrait': (portrait ? portrait : (landscape ? landscape : undefined))
-            };
-        }
-
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onClickEvent(event),
-                selector: '.game-background'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
-            }
-        ];
-
-        if(gameId === '1300023' || gameId === '1300024') {
-            this._isSwipeToCloseEnabled = true;
-
-            this._bindings.push({
-                event: 'swipe',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.campaign-container, .game-background'
-            });
-        }
-    }
-
-    public render(): void {
-        super.render();
-
-        if(this._isSwipeToCloseEnabled) {
-            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
-        }
-    }
-
-    public show(): void {
-        super.show();
-
-        this.onShow.trigger();
-
-        if(AbstractAdUnit.getAutoClose()) {
-            setTimeout(() => {
-                this.onClose.trigger();
-            }, AbstractAdUnit.getAutoCloseDelay());
-        }
-    }
-
-    public remove(): void {
-        this.container().parentElement!.removeChild(this.container());
-    }
-
-    private onCloseEvent(event: Event): void {
-        event.preventDefault();
-        this.onClose.trigger();
-    }
-
-    private onClickEvent(event: Event): void {
-        event.preventDefault();
-        this.onClick.trigger();
-    }
-
 }

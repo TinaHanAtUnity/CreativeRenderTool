@@ -286,6 +286,7 @@ export class WebView {
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
+                focusManager: this._focusManager,
                 container: this._container,
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,

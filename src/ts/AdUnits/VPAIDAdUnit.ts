@@ -1,9 +1,9 @@
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
-import { VPAID } from 'Views/VPAID';
+import { IVPAIDHandler, VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
@@ -13,6 +13,17 @@ import { Timer } from 'Utilities/Timer';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
+import { IVPAIDEndScreenHandler, VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { IOverlayHandler, Overlay } from 'Views/Overlay';
+
+export interface IVPAIDAdUnitParameters<T extends IVPAIDEndScreenHandler, T2 extends IVPAIDHandler, T3 extends IOverlayHandler> extends IAdUnitParameters {
+    vpaid: VPAID;
+    endScreen?: VPAIDEndScreen;
+    overlay: Overlay;
+    endScreenHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
+    vpaidEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T2; };
+    overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T3; };
+}
 
 export class VPAIDAdUnit extends AbstractAdUnit {
 
@@ -33,8 +44,10 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
 
-    constructor(view: VPAID, nativeBridge: NativeBridge, focusManager: FocusManager, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign, options: any) {
+    constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters<>) {
         super(nativeBridge, forceOrientation, container, placement, campaign);
+
+        vpaid.render();
 
         this._focusManager = focusManager;
         this._vpaidCampaign = campaign;
@@ -74,6 +87,16 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
+
+        this._overlay.render();
+        this._overlay.setSkipEnabled(false);
+        this._overlay.setMuteEnabled(false);
+
+        if (this._placement.allowSkip()) {
+            this._overlay.setSkipEnabled(true);
+            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
+        }
+        this._overlay.setFadeEnabled(true);
     }
 
     public show(): Promise<void> {
