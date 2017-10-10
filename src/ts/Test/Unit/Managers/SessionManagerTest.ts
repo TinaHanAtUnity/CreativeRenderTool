@@ -195,7 +195,7 @@ describe('SessionManagerTest', () => {
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
     });
 
-    it.skip('Retry failed event', () => {
+    xit('Retry failed event', () => {
         const url: string = 'https://www.example.net/retry_event';
         const data: string = 'Retry test';
         const sessionId: string = 'abcd-1234';
