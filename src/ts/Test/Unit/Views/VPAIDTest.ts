@@ -10,7 +10,7 @@ import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
-describe('VPAID View', () => {
+describe.skip('VPAID View', () => {
     let nativeBridge: NativeBridge;
     let campaign: VPAIDCampaign;
     let vpaid: VPAID;
