@@ -6,7 +6,7 @@
   "commaSpace": "always",
   "commentSpace": "always",
   "cssLiteral": "never",
-  "customProperties": [],
+  "customProperties": ["mixin-*"],
   "depthLimit": false,
   "duplicates": true,
   "efficient": "always",

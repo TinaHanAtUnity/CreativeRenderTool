@@ -1,3 +1,15 @@
+# Mon Oct  9 09:08:58 UTC 2017
+
+* Sliding video player interface AB test (groups 10 & 11)
+* Video end card click tracking event for VAST endscreen.
+* Added static device info into kafka messages (Analytics)
+
+# Thu Oct  5 13:30:35 UTC 2017
+
+* Remove endscreen click ab-test
+* Fix to reporting of duplicate mraid diagnostic events
+* Faster retry logic after error (60-120s, was 1h)
+
 # Mon Oct  2 11:43:28 UTC 2017
 
 * Refactor SessionManager and EventManager

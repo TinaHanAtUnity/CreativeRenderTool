@@ -16,6 +16,9 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
+import EventTestVast from 'xml/EventTestVast.xml';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -56,25 +59,40 @@ describe('VastEndScreenEventHandlersTest', () => {
     describe('when calling onClick', () => {
         let vastAdUnit: VastAdUnit;
         let video: Video;
+        let campaign: VastCampaign;
+        let thirdPartyEventManager: ThirdPartyEventManager;
+        let clientInfo: ClientInfo;
+        const vastXml = EventTestVast;
+        const vastParser = TestFixtures.getVastParser();
+        const vast = vastParser.parseVast(vastXml);
 
         beforeEach(() => {
             const vastEndScreen = <VastEndScreen><any> {
                 hide: sinon.spy()
             };
+
+            thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+            clientInfo = TestFixtures.getClientInfo();
             video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, <Placement><any>{}, <VastCampaign><any>{
-                getVast: sinon.spy(),
-                getVideo: () => video
-            }, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+            campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, <Placement><any>{}, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
         });
 
-        it('should should use video click through url when companion click url is not present', () => {
+        it('should send a tracking event for vast video end card click', () => {
+            sinon.stub(vastAdUnit, 'sendTrackingEvent');
+
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request, thirdPartyEventManager, clientInfo).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+            });
+        });
+
+        it('should use video click through url when companion click url is not present', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('https://bar.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request, thirdPartyEventManager, clientInfo).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://bar.com');
             });
         });
@@ -84,7 +102,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request, thirdPartyEventManager, clientInfo).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://foo.com');
             });
         });
@@ -94,7 +112,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.Intent, 'launch');
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
-            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request).then(() => {
+            return VastEndScreenEventHandlers.onClick(nativeBridge, vastAdUnit, request, thirdPartyEventManager, clientInfo).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
                     'uri': 'https://foo.com'

@@ -464,6 +464,37 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         });
     }
 
+    public getStaticDTO(): any {
+        const dto: any = {
+            'apiLevel': this.getApiLevel(),
+            'osVersion': this.getOsVersion(),
+            'deviceMake': this.getManufacturer(),
+            'deviceModel': this.getModel(),
+            'screenLayout': this.getScreenLayout(),
+            'screenDensity': this.getScreenDensity(),
+            'screenWidth': this.getScreenWidth(),
+            'screenHeight': this.getScreenHeight(),
+            'screenScale': this.getScreenScale(),
+            'userInterfaceIdiom': this.getUserInterfaceIdiom(),
+            'timeZone': this.getTimeZone(),
+            'language': this.getLanguage(),
+            'totalSpaceInternal': this.getTotalSpace(),
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalMemory': this.getTotalMemory(),
+            'rooted': this.isRooted(),
+            'simulator': this.isSimulator(),
+        };
+
+        if(this.getAdvertisingIdentifier()) {
+            dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+            dto.limitAdTracking = this.getLimitAdTracking();
+        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            dto.androidId = this.getAndroidId();
+        }
+
+        return dto;
+    }
+
     private handleDeviceInfoError(error: any) {
         this._nativeBridge.Sdk.logWarning(JSON.stringify(error));
     }
