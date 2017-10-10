@@ -1,0 +1,199 @@
+<html>
+<head>
+    <style>
+        /* just a shadow iframe for loading the VPAID src */
+        iframe {
+            display: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .video-player-slot {
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-player-slot video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-player-slot">
+        <video
+            poster="data:image/svg+xml;base64,"
+            playsinline>
+        </video>
+    </div>
+    <script src="{{VPAID_SRC_URL}}"></script>
+    <script>
+        (function() {
+            // List of all ad events
+            var creativeEvents = [
+                'loaded', 'skipped', 'started', 'stopped',
+                'linearChange', 'expandedChange', 'remaningTimeChange',
+                'volumeChange', 'impression', 'videoStart', 'videoFirstQuartile',
+                'videoMidpoint', 'videoThirdQuartile', 'videoComplete',
+                'clickThru', 'interaction', 'userAcceptInvitation',
+                'userMinimize', 'userClose', 'paused', 'playing',
+                'log', 'error'
+            ];
+
+
+            var Container = function() {
+                this._iframe = document.querySelector('iframe');
+                this._creative = null;
+                this._slot = document.querySelector('.video-player-slot');
+                this._videoSlot = this._slot.querySelector('video');
+
+                var self = this;
+                window.addEventListener('message', function(e) {
+                    self._onMessage(e);
+                });
+                this._videoSlot.addEventListener('timeupdate', function(e) {
+                    self._sendProgressEvent();
+                });
+            };
+
+            Container.prototype.init = function() {
+                var getVPAID = this._getVPAIDFunction();
+                if (getVPAID && typeof getVPAID === 'function') {
+                    this._creative = getVPAID();
+
+                    this._subscribeToAllEvents();
+
+                    window.parent.postMessage({
+                        type: 'ready'
+                    }, '*');
+                } else {
+                    this._triggerError('getVPAIDAd is not defined');
+                }
+            };
+
+            Container.prototype.getHandshakeVersion = function() {
+                return this._creative.handshakeVersion('2.0');
+            };
+
+            Container.prototype.getAdDuration = function() {
+                if (this._creative.getAdDuration) {
+                    return this._creative.getAdDuration();
+                } else {
+                    return this._creative.adDuration || -2;
+                }
+            };
+
+            Container.prototype.getAdRemainingTime = function() {
+                if (this._creative.getAdRemainingTime) {
+                    return this._creative.getAdRemainingTime();
+            } else {
+                    return this._creative.adRemainingTime || -2;
+                }
+            };
+
+            Container.prototype._triggerError = function(e) {
+                window.parent.postMessage({
+                    type: 'VPAID',
+                    eventType: 'AdError',
+                    args: [e]
+                }, '*');
+            }
+
+            Container.prototype._subscribeToAllEvents = function() {
+                var len = creativeEvents.length;
+                for (var i = 0; i < creativeEvents.length; i++) {
+                    var creativeEvent = creativeEvents[i];
+                    var normalizedEventName = 'Ad' + creativeEvent.charAt(0).toUpperCase() + creativeEvent.substring(1);
+                    this._subscribeToEvent(normalizedEventName);
+                }
+            };
+
+            Container.prototype._subscribeToEvent = function(eventName) {
+                this._creative.subscribe(function() {
+                    var args = [eventName].concat(Array.prototype.slice.call(arguments));
+                    this._handleEvent.apply(this, args);
+                }, eventName, this);
+            }
+
+            Container.prototype._getVPAIDFunction = function() {
+                return window.getVPAIDAd;
+            };
+
+            Container.prototype._handleEvent = function() {
+                var eventType = arguments[0];
+                var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [];
+
+                window.parent.postMessage({
+                    type: 'VPAID',
+                    eventType: eventType,
+                    args: args
+                }, '*');
+            };
+
+            Container.prototype._initAd = function(width, height, viewMode, bitrate, creativeData, envVars) {
+                this._version = this._creative.handshakeVersion('2.0');
+                this._creative.initAd(width, height, viewMode, bitrate, creativeData, envVars);
+            }
+
+            Container.prototype._showAd = function() {
+                this._creative.startAd();
+            };
+
+            Container.prototype._stopAd = function() {
+                return this._creative.stopAd();
+            };
+
+            Container.prototype._pauseAd = function() {
+                return this._creative.pauseAd();
+            };
+
+            Container.prototype._resumeAd = function() {
+                return this._creative.resumeAd();
+            };
+
+            Container.prototype._sendProgressEvent = function() {
+                window.parent.postMessage({
+                    type: 'progress',
+                    adDuration: this._videoSlot.duration,
+                    adRemainingTime: this._videoSlot.duration - this._videoSlot.currentTime,
+                }, '*');
+            };
+
+            Container.prototype._onMessage = function(e) {
+                switch (e.data.type) {
+                    case 'init':
+                        this._initAd(e.data.width, e.data.height, e.data.viewMode, e.data.bitrate, e.data.creativeData, {
+                            slot: this._slot,
+                            videoSlot: this._videoSlot
+                        });
+                        break;
+                    case 'show':
+                        this._showAd();
+                        break;
+                    case 'destroy':
+                        this._stopAd();
+                        break;
+                    case 'pause':
+                        this._pauseAd();
+                        break;
+                    case 'resume':
+                        this._resumeAd();
+                        break;
+                    default:
+                        // todo post back error
+                        break;
+                }
+            }
+
+            var container = window.container = new Container();
+            container.init();
+        })();
+    </script>
+</body>
+
+</html>

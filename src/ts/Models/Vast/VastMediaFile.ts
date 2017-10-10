@@ -18,9 +18,9 @@ interface IVastMediaFile {
 export class VastMediaFile extends Model<IVastMediaFile> {
     constructor();
     constructor(fileURL: string, deliveryType: string, codec: string, mimeType: string, bitrate: number,
-                minBitrate: number, maxBitrate: number, width: number, height: number);
+                minBitrate: number, maxBitrate: number, width: number, height: number, apiFramework: string);
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
-                minBitrate?: number, maxBitrate?: number, width?: number, height?: number) {
+                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string) {
         super('VastMediaFile', {
             fileURL: ['string', 'null'],
             deliveryType: ['string'],
@@ -45,7 +45,7 @@ export class VastMediaFile extends Model<IVastMediaFile> {
         this.set('maxBitrate', maxBitrate || 0);
         this.set('width', width || 0);
         this.set('height', height || 0);
-        this.set('apiFramework', null);
+        this.set('apiFramework', apiFramework || null);
         this.set('scalable', null);
         this.set('maintainAspectRatio', null);
     }
