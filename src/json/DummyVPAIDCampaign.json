@@ -1,0 +1,22 @@
+{
+    "correlationId": "4hOSkSWVyCg8K0AxjxlJTx",
+    "placements": {
+        "premium": "000000000000000000000002",
+        "defaultVideoAndPictureZone": "000000000000000000000002",
+        "video": "000000000000000000000002"
+    },
+    "media": {
+        "000000000000000000000002": {
+            "contentType": "programmatic/vast-paid",
+            "content": "%3CVAST%20xmlns%3AMM%3D%22http%3A%2F%2Fapi.mediamind.com%2FV1%2FDataContracts%22%20version%3D%222.0%22%3E%0A%3CAd%20id%3D%2210724976%22%3E%0A%3CInLine%3E%0A%3CAdSystem%3E%0A%3C!%5BCDATA%5B%20MediaMind%20%5D%5D%3E%0A%3C%2FAdSystem%3E%0A%3CAdTitle%3E%0A%3C!%5BCDATA%5B%20html5_new_ad%20%5D%5D%3E%0A%3C%2FAdTitle%3E%0A%3CDescription%3E%0A%3C!%5BCDATA%5B%20html5_new_ad%20%5D%5D%3E%0A%3C%2FDescription%3E%0A%3CImpression%20id%3D%22Impression%22%3E%0A%3C!%5BCDATA%5B%0Ahttp%3A%2F%2Fbs.serving-sys.com%2FServing%3Fcn%3Ddisplay%26c%3D24%26pl%3DVAST%26optOut%3D0%26pos%3D6196%26c%3D24%26ai%3D23227072%26pluid%3D0%26ord%3D189324632%26dg%3D-1%26sdg%3D-1%26ta%3D-1%26usercookie%3Du2%3Dc98d3320-2f10-4487-84c5-8ef21104a746%26sessionid%3D6339552769017550777%26pcp%3D%26vurl%3D%26ebaddid%3D%26ebappname%3D%26ebappid%3D%26ebmblat%3D37.7591%26ebmblong%3D-122.439%0A%5D%5D%3E%0A%3C%2FImpression%3E%0A%3CCreatives%3E%0A%3CCreative%20id%3D%2223227072%22%20AdID%3D%2223227072%22%20sequence%3D%221%22%3E%0A%3CLinear%3E%0A%3CDuration%3E00%3A00%3A15%3C%2FDuration%3E%0A%3CTrackingEvents%2F%3E%0A%3CAdParameters%3E%0A%3C!%5BCDATA%5B%0A%7B%22tag%22%20%3A%20%22http%3A%2F%2Fbs.serving-sys.com%2FServing%3Fcn%3Ddisplay%26c%3D31%26ai%3D23227072%26dg%3D-1%26sdg%3D-1%26vid%3D%5B%25tp_VersionIDsonAd%25%5D%26PluID%3D0%26usercookie%3Du2%3Dc98d3320-2f10-4487-84c5-8ef21104a746%26sessionId%3D6339552769017550777%26filghtId%3D%26ta%3D-1%26optOut%3D0%26%22%2C%22skipoffset%22%3A%225%22%2C%22zIndex%22%3A%22%22%2C%22vpaidPath%22%3A%22http%3A%2F%2Fds.serving-sys.com%2FBurstingCachedScripts%2FVPAID%2FHTML5_1_25_0_0%2F%22%2C%22vpaidFileName%22%3A%22VPAIDAPI.js%22%2C%22aid%22%3A%2223227072%22%2C%22pid%22%3A%2210724976%22%2C%22pn%22%3A%22maorplasment1%22%2C%22cn%22%3A%22maorCampigan2%22%2C%22cid%22%3A%22448800%22%2C%22sn%22%3A%22maortest%22%2C%22sid%22%3A%2292162%22%2C%22adDuration%22%3A%2200%3A00%3A15%22%2C%22tpv%22%3A%22%22%2C%22impOnVidStart%22%3Afalse%2C%22surveyURL%22%3A%22%22%2C%22instreamFeatureFlags%22%3A%7B%7D%7D%0A%5D%5D%3E%0A%3C%2FAdParameters%3E%0A%3CMediaFiles%3E%0A%3CMediaFile%20id%3D%2210313765%22%20height%3D%22480%22%20width%3D%22640%22%20type%3D%22application%2Fjavascript%22%20delivery%3D%22progressive%22%20maintainAspectRatio%3D%22true%22%20scalable%3D%22true%22%20apiFramework%3D%22VPAID%22%3E%0A%3C!%5BCDATA%5B%0Ahttp%3A%2F%2Fds.serving-sys.com%2FBurstingCachedScripts%2FVPAID%2FHTML5_1_25_0_0%2FVPAIDAPI.js%0A%5D%5D%3E%0A%3C%2FMediaFile%3E%0A%3C%2FMediaFiles%3E%0A%3C%2FLinear%3E%0A%3C%2FCreative%3E%0A%3CCreative%20id%3D%2223227072%22%20AdID%3D%2223227072%22%20sequence%3D%221%22%3E%0A%3CCompanionAds%2F%3E%0A%3C%2FCreative%3E%0A%3C%2FCreatives%3E%0A%3C%2FInLine%3E%0A%3C%2FAd%3E%0A%3C%2FVAST%3E",
+            "adType": "VPAID",
+            "trackingUrls": {},
+            "creativeId": "1_f08d00227a80868cc869a11b40bebdd2",
+            "campaignId": "1_f7e7c50d874690515cebae47f2d6fb2c",
+            "seatId": 9029,
+            "advDomain": "triapodi.com",
+            "adType": "DISPLAY",
+            "cacheTTL": 300
+        }
+    }
+}

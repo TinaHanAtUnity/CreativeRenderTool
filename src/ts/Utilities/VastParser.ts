@@ -271,8 +271,17 @@ export class VastParser {
                     parseInt(mediaFileElement.getAttribute('minBitrate') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('maxBitrate') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('width') || 0, 10),
-                    parseInt(mediaFileElement.getAttribute('height') || 0, 10));
+                    parseInt(mediaFileElement.getAttribute('height') || 0, 10),
+                    mediaFileElement.getAttribute('apiFramework'));
                 creative.addMediaFile(mediaFile);
+            }
+        }
+
+        const adParametersElement = this.childByName(creativeElement, 'AdParameters');
+        if (adParametersElement) {
+            const adParameters = this.parseNodeText(adParametersElement);
+            if (adParameters) {
+                creative.setAdParameters(adParameters);
             }
         }
 
