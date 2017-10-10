@@ -22,11 +22,13 @@ export class EndScreen extends View {
     private _privacy: Privacy;
     private _localization: Localization;
     private _isSwipeToCloseEnabled: boolean = false;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
+        this._abGroup = campaign && campaign.getAbGroup();
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
@@ -112,6 +114,11 @@ export class EndScreen extends View {
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
+
+        if (this._abGroup === 8 || this._abGroup === 9) {
+            this._container.id = "new-end-screen";
+        }
+
     }
 
     public show(): void {
