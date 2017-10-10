@@ -36,13 +36,17 @@ import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { MRAIDEventHandlers } from 'EventHandlers/MRAIDEventHandlers';
 import { Request } from 'Utilities/Request';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { VPAID } from 'Views/VPAID';
+import { VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, focusManager: FocusManager, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, placement, campaign, request, configuration, options);
@@ -50,6 +54,8 @@ export class AdUnitFactory {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, request, configuration, options);
         } else if(campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, placement, campaign, configuration, options);
+        } else if (campaign instanceof VPAIDCampaign) {
+            return this.createVPAIDAdUnit(nativeBridge, focusManager, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, configuration, options);
         } else if (campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
         } else {
@@ -329,6 +335,13 @@ export class AdUnitFactory {
             }
         }
         return undefined;
+    }
+
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, focusManager: FocusManager, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: VPAIDCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+        const vpaid = new VPAID(nativeBridge, campaign, placement, deviceInfo.getLanguage(), clientInfo.getGameId());
+        vpaid.render();
+        const vpaidAdUnit = new VPAIDAdUnit(vpaid, nativeBridge, focusManager, operativeEventManager, thirdPartyEventManager, forceOrientation, container, placement, campaign, options);
+        return vpaidAdUnit;
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: DisplayInterstitialCampaign, options: any): AbstractAdUnit {
