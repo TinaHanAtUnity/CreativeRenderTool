@@ -298,8 +298,10 @@ export class Overlay extends View {
         } else {
             if(value) {
                 this._container.classList.add('fade');
+                this._container.style.pointerEvents = 'auto';
                 this._fadeStatus = false;
             } else {
+                this._container.style.pointerEvents = 'none';
                 this._container.classList.remove('fade');
                 this._fadeStatus = true;
             }

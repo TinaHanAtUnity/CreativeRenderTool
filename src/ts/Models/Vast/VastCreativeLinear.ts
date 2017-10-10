@@ -8,7 +8,7 @@ interface IVastCreativeLinear extends IVastCreative {
     videoClickThroughURLTemplate: string | null;
     videoClickTrackingURLTemplates: string[];
     videoCustomClickURLTemplates: string[];
-    adParameters: object | null;
+    adParameters: string | null;
 }
 
 export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
@@ -25,7 +25,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
             videoClickThroughURLTemplate: ['string', 'null'],
             videoClickTrackingURLTemplates: ['array'],
             videoCustomClickURLTemplates: ['array'],
-            adParameters: ['object', 'null']
+            adParameters: ['string', 'null']
         }, 'linear');
 
         this.set('duration', duration || 0);
@@ -35,6 +35,10 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
         this.set('videoClickTrackingURLTemplates', videoClickTrackingURLTemplates || []);
         this.set('videoCustomClickURLTemplates', videoCustomClickURLTemplates || []);
         this.set('adParameters', adParameters || null);
+    }
+
+    public setAdParameters(adParameters: string) {
+        this.set('adParameters', adParameters);
     }
 
     public getDuration(): number {
@@ -81,7 +85,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
         return this.get('videoCustomClickURLTemplates');
     }
 
-    public getAdParameters(): {} | null {
+    public getAdParameters(): string | null {
         return this.get('adParameters');
     }
 
