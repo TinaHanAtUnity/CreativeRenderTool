@@ -1,18 +1,24 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Platform } from 'Constants/Platform';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+// import { Platform } from 'Constants/Platform';
 import { HTML } from 'Models/Assets/HTML';
-import { EndScreen } from 'Views/EndScreen';
+import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
+// import { PlayableMRAID } from 'Views/PlayableMRAID';
+
+export interface IMRAIDAdUnitParameters<T extends IEndScreenHandler> extends IAdUnitParameters {
+    mraid: MRAIDView<IMRAIDViewHandler>;
+    endScreen?: EndScreen;
+    endScreenEventHandler?: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
+}
 
 export class MRAIDAdUnit extends AbstractAdUnit {
 
@@ -31,33 +37,25 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView<IMRAIDViewHandler>, options: any, endScreen?: EndScreen) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
-        this._operativeEventManager = operativeEventManager;
-        this._thirdPartyEventManager = thirdPartyEventManager;
-        this._mraid = mraid;
+    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters<IEndScreenHandler>) {
+        super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+        this._operativeEventManager = parameters.operativeEventManager;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._mraid = parameters.mraid;
+        const campaign = <MRAIDCampaign>parameters.campaign;
         this._additionalTrackingEvents = campaign.getTrackingEventUrls();
-        this._endScreen = endScreen;
-        this._clientInfo = clientInfo;
+        this._endScreen = parameters.endScreen;
+        this._clientInfo = parameters.clientInfo;
+
+        this._mraid.render();
+        document.body.appendChild(this._mraid.container());
 
         this._orientationProperties = {
             allowOrientationChange: true,
             forceOrientation: ForceOrientation.NONE
         };
 
-        mraid.onOrientationProperties.subscribe((properties) => {
-            if(this.isShowing()) {
-                if(nativeBridge.getPlatform() === Platform.IOS) {
-                    container.reorient(true, properties.forceOrientation);
-                } else {
-                    container.reorient(properties.allowOrientationChange, properties.forceOrientation);
-                }
-            } else {
-                this._orientationProperties = properties;
-            }
-        });
-
-        this._options = options;
+        this._options = parameters.options;
         this.setShowing(false);
     }
 
@@ -117,6 +115,10 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
+    }
+
+    public setOrientationProperties(properties: IOrientationProperties): void {
+        this._orientationProperties = properties;
     }
 
     public isCached(): boolean {

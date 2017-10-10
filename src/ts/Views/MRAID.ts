@@ -9,11 +9,7 @@ import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 
-export interface IMRAIDHandler extends IMRAIDViewHandler {
-    onLoaded(): void;
-}
-
-export class MRAID extends MRAIDView<IMRAIDHandler> {
+export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
 
@@ -96,7 +92,7 @@ export class MRAID extends MRAIDView<IMRAIDHandler> {
             this._updateInterval = setInterval(() => {
                 const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
-                    this.onReward.trigger();
+                    this._handlers.forEach(handler => handler.onMraidReward());
                     this._didReward = true;
                 }
                 if(this._closeRemaining > 0) {
@@ -179,9 +175,9 @@ export class MRAID extends MRAIDView<IMRAIDHandler> {
         event.preventDefault();
         event.stopPropagation();
         if(this._canSkip && !this._canClose) {
-            this.onSkip.trigger();
+            this._handlers.forEach(handler => handler.onMraidSkip());
         } else if(this._canClose) {
-            this.onClose.trigger();
+            this._handlers.forEach(handler => handler.onMraidClose());
         }
     }
 
@@ -193,11 +189,11 @@ export class MRAID extends MRAIDView<IMRAIDHandler> {
                 break;
 
             case 'open':
-                this.onClick.trigger(encodeURI(event.data.url));
+                this._handlers.forEach(handler => handler.onMraidClick(event.data.url));
                 break;
 
             case 'close':
-                this.onClose.trigger();
+                this._handlers.forEach(handler => handler.onMraidClose());
                 break;
 
             case 'orientation':
@@ -214,10 +210,10 @@ export class MRAID extends MRAIDView<IMRAIDHandler> {
                     default:
                         break;
                 }
-                this.onOrientationProperties.trigger({
+                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
                     forceOrientation: forceOrientation
-                });
+                }));
                 break;
             default:
                 break;

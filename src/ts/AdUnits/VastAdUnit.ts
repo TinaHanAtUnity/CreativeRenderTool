@@ -28,7 +28,7 @@ class DeviceOrientation {
 
 export interface IVastAdUnitParameters<T extends IVastEndScreenHandler, T2 extends IOverlayHandler> extends IVideoAdUnitParameters {
     endScreen?: VastEndScreen;
-    endScreenEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
+    endScreenEventHandler?: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
     overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
     vastOverlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
 }
@@ -55,8 +55,10 @@ export class VastAdUnit extends VideoAdUnit {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
-            this._vastEndScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
-            this._endScreen.addHandler(this._vastEndScreenEventHandler);
+            if(parameters.endScreenEventHandler) {
+                this._vastEndScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
+                this._endScreen.addHandler(this._vastEndScreenEventHandler);
+            }
 
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
                 const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => this._vastEndScreenEventHandler.onKeyEvent(keyCode));
