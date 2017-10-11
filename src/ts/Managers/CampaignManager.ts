@@ -234,8 +234,8 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
-            case 'programmatic/vast-paid':
-                // vast-paid can be both VPAID or VAST, so in this case we use the VAST parser
+            case 'programmatic/vast-vpaid':
+                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
                 parser = new ProgrammaticVPAIDParser();
                 break;

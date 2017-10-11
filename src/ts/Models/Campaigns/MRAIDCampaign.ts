@@ -200,8 +200,12 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('videoEventUrls');
     }
 
-    public getVideoEventUrl(eventType: string): string {
-        return this.get('videoEventUrls')[eventType];
+    public getVideoEventUrl(eventType: string): string | undefined {
+        if(this.get('videoEventUrls')) {
+            return this.get('videoEventUrls')[eventType];
+        } else {
+            return undefined;
+        }
     }
 
     public getBypassAppSheet(): boolean | undefined {
