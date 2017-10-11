@@ -44,4 +44,15 @@ export class Url {
 
         return false;
     }
+
+    public static isProtocolWhitelisted(url: string): boolean {
+        for (const protocol of this.whitelistedProtocols) {
+            if (url.indexOf(protocol) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
 }

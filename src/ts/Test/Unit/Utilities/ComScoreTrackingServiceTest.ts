@@ -87,95 +87,95 @@ describe('ComScoreTrackingServiceTest', () => {
         });
 
         it('the query parameters c1 should return the correct fixed value 19 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['c1'], '19');
-            assert.equal(queryParamsDictEnd['c1'], '19');
+            assert.equal(queryParamsDictPlay.c1, '19');
+            assert.equal(queryParamsDictEnd.c1, '19');
         });
 
         it('the query parameters c2 should return the correct client id in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['c2'], '23027898');
-            assert.equal(queryParamsDictEnd['c2'], '23027898');
+            assert.equal(queryParamsDictPlay.c2, '23027898');
+            assert.equal(queryParamsDictEnd.c2, '23027898');
         });
 
         it('the query parameters ns_type should return the correct fixed value hidden in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_type'], 'hidden');
-            assert.equal(queryParamsDictEnd['ns_type'], 'hidden');
+            assert.equal(queryParamsDictPlay.ns_type, 'hidden');
+            assert.equal(queryParamsDictEnd.ns_type, 'hidden');
         });
 
         it('the query parameters ns_st_ct should return the correct fixed value va00 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_st_ct'], 'va00');
-            assert.equal(queryParamsDictEnd['ns_st_ct'], 'va00');
+            assert.equal(queryParamsDictPlay.ns_st_ct, 'va00');
+            assert.equal(queryParamsDictEnd.ns_st_ct, 'va00');
         });
 
         it('the query parameters ns_ap_sv should return the correct fixed value 2.1601.11 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_ap_sv'], '2.1601.11');
-            assert.equal(queryParamsDictEnd['ns_ap_sv'], '2.1601.11');
+            assert.equal(queryParamsDictPlay.ns_ap_sv, '2.1601.11');
+            assert.equal(queryParamsDictEnd.ns_ap_sv, '2.1601.11');
         });
 
         it('the query parameters ns_st_it should return the correct fixed value a in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_st_it'], 'a');
-            assert.equal(queryParamsDictEnd['ns_st_it'], 'a');
+            assert.equal(queryParamsDictPlay.ns_st_it, 'a');
+            assert.equal(queryParamsDictEnd.ns_st_it, 'a');
         });
 
         it('the query parameters ns_st_sv should return the correct fixed value 4.0.0 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_st_sv'], '4.0.0');
-            assert.equal(queryParamsDictEnd['ns_st_sv'], '4.0.0');
+            assert.equal(queryParamsDictPlay.ns_st_sv, '4.0.0');
+            assert.equal(queryParamsDictEnd.ns_st_sv, '4.0.0');
         });
 
         it('the query parameters ns_st_ad should return the correct fixed value 1 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_st_ad'], '1');
-            assert.equal(queryParamsDictEnd['ns_st_ad'], '1');
+            assert.equal(queryParamsDictPlay.ns_st_ad, '1');
+            assert.equal(queryParamsDictEnd.ns_st_ad, '1');
         });
 
         it('the query parameters ns_st_sq should return the correct fixed value 1 in url query parameter', () => {
-            assert.equal(queryParamsDictPlay['ns_st_sq'], '1');
-            assert.equal(queryParamsDictEnd['ns_st_sq'], '1');
+            assert.equal(queryParamsDictPlay.ns_st_sq, '1');
+            assert.equal(queryParamsDictEnd.ns_st_sq, '1');
         });
 
         // APPLY THE SHA-1 here
         // it('the query parameters should send sha1d adIdentifier when Device Limit Ad Tracking is turned off', () => {
         //     sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => false);
-        //     assert.equal(queryParamsDictPlay['c12'], sha1value);
-        //     assert.equal(queryParamsDictEnd['c12'], sha1value);
+        //     assert.equal(queryParamsDictPlay.c12, sha1value);
+        //     assert.equal(queryParamsDictEnd.c12, sha1value);
         // });
 
         // it('the query parameters should send deviceUniqueIdHash of "none" when Device Limit Ad Tracking is turned on', () => {
         //     sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => true);
-        //     assert.equal(queryParamsDictPlay['c12'], 'none');
-        //     assert.equal(queryParamsDictEnd['c12'], 'none');
+        //     assert.equal(queryParamsDictPlay.c12, 'none');
+        //     assert.equal(queryParamsDictEnd.c12, 'none');
         // });
 
         it('the query parameters should return the correct platform', () => {
             const platform = TestFixtures.getNativeBridge(Platform.ANDROID).getPlatform();
-            assert.equal(queryParamsDictPlay['ns_ap_pn'], Platform[platform].toLowerCase());
-            assert.equal(queryParamsDictEnd['ns_ap_pn'], Platform[platform].toLowerCase());
+            assert.equal(queryParamsDictPlay.ns_ap_pn, Platform[platform].toLowerCase());
+            assert.equal(queryParamsDictEnd.ns_ap_pn, Platform[platform].toLowerCase());
         });
 
         it('the query parameters should return the device model', () => {
-            assert.equal(queryParamsDictPlay['ns_ap_device'], TestFixtures.getDeviceInfo().getModel());
-            assert.equal(queryParamsDictEnd['ns_ap_device'], TestFixtures.getDeviceInfo().getModel());
+            assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
+            assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
         });
 
         it('the query parameters should return the video eventName', () => {
-            assert.equal(queryParamsDictPlay['ns_st_ev'], 'play');
-            assert.equal(queryParamsDictEnd['ns_st_ev'], 'end');
+            assert.equal(queryParamsDictPlay.ns_st_ev, 'play');
+            assert.equal(queryParamsDictEnd.ns_st_ev, 'end');
         });
 
         it('the query parameters should return the duration of the video', () => {
-            assert.equal(queryParamsDictPlay['ns_st_cl'], '20');
-            assert.equal(queryParamsDictEnd['ns_st_cl'], '20');
+            assert.equal(queryParamsDictPlay.ns_st_cl, '20');
+            assert.equal(queryParamsDictEnd.ns_st_cl, '20');
         });
 
         it('the query parameters should send a Played Time value of "0" for the Playback Identity of "play"', () => {
-            assert.equal(queryParamsDictPlay['ns_st_pt'], '0');
+            assert.equal(queryParamsDictPlay.ns_st_pt, '0');
         });
 
         it('the query parameters should return the correct played time for the "end" playback identity constructed url', () => {
-            assert.equal(queryParamsDictEnd['ns_st_pt'], 15);
+            assert.equal(queryParamsDictEnd.ns_st_pt, 15);
         });
 
         it('the query parameters should send a random number value equal to Date.now()', () => {
-            assert.equal(queryParamsDictPlay['rn'], stubbedDateNowPlay);
-            assert.equal(queryParamsDictEnd['rn'], stubbedDateNowEnd);
+            assert.equal(queryParamsDictPlay.rn, stubbedDateNowPlay);
+            assert.equal(queryParamsDictEnd.rn, stubbedDateNowEnd);
         });
     });
 

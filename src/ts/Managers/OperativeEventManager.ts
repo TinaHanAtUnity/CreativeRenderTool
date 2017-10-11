@@ -368,8 +368,11 @@ export class OperativeEventManager {
 
     private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {
         const campaign = adUnit.getCampaign();
-        if((campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) && campaign.getVideoEventUrl(type)) {
-            return campaign.getVideoEventUrl(type);
+        if(campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) {
+            const url = campaign.getVideoEventUrl(type);
+            if(url) {
+                return url;
+            }
         }
         return [
             OperativeEventManager.VideoEventBaseUrl,
@@ -384,8 +387,10 @@ export class OperativeEventManager {
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
         let url: string;
+        let parameters: any = {};
         if((campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) && campaign.getClickUrl()) {
             url = campaign.getClickUrl();
+            parameters = { redirect: false };
         } else {
             url = [
                 OperativeEventManager.ClickEventBaseUrl,
@@ -393,10 +398,12 @@ export class OperativeEventManager {
                 'click',
                 campaign.getGamerId(),
             ].join('/');
+            parameters = {
+                gameId: this._clientInfo.getGameId(),
+                redirect: false
+            };
         }
-        return Url.addParameters(url, {
-            gameId: this._clientInfo.getGameId(),
-            redirect: false
-        });
+
+        return Url.addParameters(url, parameters);
     }
 }
