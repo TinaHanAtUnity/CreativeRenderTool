@@ -197,7 +197,7 @@ describe('SessionManagerTest', () => {
 
     xit('Retry failed event', () => {
         const url: string = 'https://www.example.net/retry_event';
-        const data: string = 'Retry testing';
+        const data: string = 'Retry test';
         const sessionId: string = 'abcd-1234';
         const eventId: string = '5678-efgh';
 
