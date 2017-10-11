@@ -26,6 +26,11 @@ export class GoogleSignalFactory {
         signal.setSdkVersion(GoogleSignalFactory.getSdkVersion(clientInfo));
         signal.setOsVersion(GoogleSignalFactory.getOsVersion(clientInfo, deviceInfo));
         signal.setTimeZoneOffset(GoogleSignalFactory.getTimeZoneOffset());
+        // todo: signal app active
+        signal.setAppUptime(GoogleSignalFactory.getAppUptime(clientInfo));
+        signal.setAppStartTimeInPST(GoogleSignalFactory.getAppStartTimeInPST(clientInfo));
+        signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
+        signal.setAppVersionName(clientInfo.getApplicationVersion());
 
         const promises = [];
 
@@ -46,6 +51,20 @@ export class GoogleSignalFactory {
         }).catch(() => {
             GoogleSignalFactory.logFailure(nativeBridge, 'connectionType');
         }));
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(clientInfo.getApplicationName()).then(packageInfo => {
+                if(packageInfo.installer) {
+                    signal.setAppInstaller(packageInfo.installer);
+                }
+
+                if(packageInfo.versionCode) {
+                    signal.setAppVersionCode(packageInfo.versionCode);
+                }
+            }).catch(() => {
+                GoogleSignalFactory.logFailure(nativeBridge, 'packageInfo');
+            }));
+        }
 
         return Promise.all(promises).then(() => {
             return signal;
@@ -96,5 +115,23 @@ export class GoogleSignalFactory {
     private static getTimeZoneOffset(): number {
         // the number of minutes from UTC plus one day
         return new Date().getTimezoneOffset() * -1 + 1440;
+    }
+
+    private static getAppUptime(clientInfo: ClientInfo): number {
+        return Math.round((Date.now() - clientInfo.getInitTimestamp()) / 1000);
+    }
+
+    private static getAppStartTimeInPST(clientInfo: ClientInfo): number {
+        return clientInfo.getInitTimestamp() / 1000 - 8 * 3600;
+    }
+
+    private static getRooted(deviceInfo: DeviceInfo): number {
+        if(deviceInfo.isSimulator()) { // not available on Android
+            return 2;
+        } else if(deviceInfo.isRooted()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
