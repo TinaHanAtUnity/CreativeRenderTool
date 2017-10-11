@@ -208,7 +208,7 @@ clean:
 	@echo
 
 	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f \( -name "*.js" -or -name "*.map" \) ! -path 'src/ts/Utilities/sha1.js' | xargs rm -rf
+	find $(TS_SRC) -type f \( -name "*.js" -or -name "*.map" \) | xargs rm -rf
 lint:
 	@echo
 	@echo Running linter

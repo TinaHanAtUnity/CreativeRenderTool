@@ -58,22 +58,26 @@ describe('ComScoreTrackingServiceTest', () => {
     });
 
     describe('when constructing url via setEventUrl()', () => {
+
+        beforeEach(() => {
+            sinon.stub(Date, 'now').onFirstCall().callsFake(() => stubbedDateNowPlay)
+                .onSecondCall().callsFake(() => stubbedDateNowEnd);
+        });
+
+        afterEach(() => {
+            (<sinon.SinonStub>Date.now).restore();
+        });
+
         let urlPlay: string;
         let urlEnd: string;
         let queryParamsDictPlay: any;
         let queryParamsDictEnd: any;
 
         const fillComscoreParams = () => {
-            const stub = sinon.stub(Date, 'now').callsFake(() => stubbedDateNowPlay);
             comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0);
             urlPlay = spy.args[0][2];
-            stub.restore();
-
-            const stub2 = sinon.stub(Date, 'now').callsFake(() => stubbedDateNowEnd);
             comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15);
             urlEnd = spy.args[1][2];
-            stub2.restore();
-
             queryParamsDictPlay = getDictFromQueryString(urlPlay.split('?')[1]);
             queryParamsDictEnd = getDictFromQueryString(urlEnd.split('?')[1]);
         };

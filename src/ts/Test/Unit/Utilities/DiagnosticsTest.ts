@@ -29,7 +29,7 @@ describe('DiagnosticsTest', () => {
 
     after(() => {
         HttpKafka.setRequest(undefined);
-        (<sinon.SinonStub>Date.now).reset();
+        (<sinon.SinonStub>Date.now).restore();
     });
 
     it('should not allow primitives as root values', () => {

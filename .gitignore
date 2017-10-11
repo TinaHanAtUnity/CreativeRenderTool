@@ -10,7 +10,6 @@ build
 
 # Development
 src/**/*.js
-!src/ts/Utilities/sha1.js
 src/**/*.js.map
 src/**/*.css
 
