@@ -65,11 +65,11 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     public show(): void {
         super.show();
 
-        this.onShow.trigger();
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
-                this.onClose.trigger();
+                this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
@@ -80,12 +80,11 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
     }
 
     private onClickEvent(event: Event): void {
         event.preventDefault();
-        this.onClick.trigger();
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenClick());
     }
-
 }

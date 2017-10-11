@@ -26,6 +26,7 @@ export interface IVPAIDHandler {
     onVPAIDEvent(eventType: string, args: any[]): void;
     onVPAIDStuck(): void;
     onVPAIDSkip(): void;
+    onVPAIDProgress(duration: number, remainingTime: number): void;
 }
 
 export class VPAID extends View<IVPAIDHandler> {
@@ -178,9 +179,10 @@ export class VPAID extends View<IVPAIDHandler> {
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'progress':
-                this._adDuration = e.data.adDuration;
-                this._adRemainingTime = e.data.adRemainingTime;
-                this.updateTimeoutWidget();
+                this._handlers.forEach(handler => handler.onVPAIDProgress(e.data.adDuration, e.data.adRemainingTime));
+                // this._adDuration = e.data.adDuration;
+                // this._adRemainingTime = e.data.adRemainingTime;
+                // this.updateTimeoutWidget();
 
                 if (!this._isPaused) {
                     this._stuckTimer.reset();
