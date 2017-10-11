@@ -1,7 +1,25 @@
 // @stylint off
+@import "placeholders.styl"
+
 #end-screen
 
-  @import "game-shared.styl"
+  .game-rating
+    @extend $game-rating-default;
+
+  .game-rating-mask
+    @extend $game-rating-mask-default;
+
+  .game-rating-count
+    @extend $game-rating-count-default;
+
+  .game-icon
+    @extend $game-icon-default;
+
+  .unityads-logo
+    @extend $unityads-logo-default;
+
+  .name-container
+    @extend $name-container-default;
 
   .campaign-container
     width: 100vw
@@ -16,15 +34,13 @@
     height: 55px
 
   a.btn-close
+    @extend $close-button-default;
     z-index: 1
-    position: absolute
     top: 10px
     right: 10px
     font-size: 28px
     width: 32px
     height: 32px
-    color: #ffffff
-    text-shadow: 2px 2px 20px #7c7c7c
     text-align: center
     line-height: 28px
 
@@ -37,6 +53,7 @@
     background-position: center
     background-repeat: no-repeat
     background-color: #000
+    /* TODO: is it in use? */
     &.brand
       background-size: contain
       bottom: 0

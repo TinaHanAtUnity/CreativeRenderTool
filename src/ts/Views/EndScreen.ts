@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import NewEndScreenTemplate from 'html/NewEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,6 +11,8 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+
+const newEndScreenId = "new-end-screen";
 
 export class EndScreen extends View {
 
@@ -30,7 +33,11 @@ export class EndScreen extends View {
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = campaign && campaign.getAbGroup();
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        if(this.getEndscreenAlt() === newEndScreenId) {
+            this._template = new Template(NewEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
 
         /* TODO: Why is there a check for campaign */
         if(campaign && campaign instanceof PerformanceCampaign) {
@@ -115,8 +122,8 @@ export class EndScreen extends View {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
-        if (this._abGroup === 8 || this._abGroup === 9) {
-            this._container.id = "new-end-screen";
+        if (this.getEndscreenAlt() === newEndScreenId) {
+            this._container.id = newEndScreenId;
         }
 
     }
@@ -150,7 +157,11 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: Campaign) {
+    private getEndscreenAlt(campaign?: Campaign) {
+        if(this._abGroup === 8 || this._abGroup === 9) {
+            return newEndScreenId;
+        }
+
         return undefined;
     }
 
