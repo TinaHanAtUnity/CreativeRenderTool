@@ -194,7 +194,7 @@ describe('SessionManagerTest', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
     });
-
+/*
     xit('Retry failed event', () => {
         const url: string = 'https://www.example.net/retry_event';
         const data: string = 'Retry test';
@@ -229,7 +229,7 @@ describe('SessionManagerTest', () => {
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after retry failed event');
             });
         });
-    });
+    });*/
 
     it('Start new session', () => {
         const sessionId: string = 'new-12345';
