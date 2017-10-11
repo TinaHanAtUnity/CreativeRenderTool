@@ -6,10 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { VPAIDCampaign } from "Models/VPAID/VPAIDCampaign";
-import { Overlay } from 'Views/Overlay';
 import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 interface InitAdOptions {
     width: number;
@@ -43,8 +41,7 @@ export class VPAID extends View<IVPAIDHandler> {
     private _loadingScreen: HTMLElement;
 
     // private _overlay: Overlay;
-    private _adDuration: number = -2;
-    private _adRemainingTime: number = -2;
+
     private _stuckTimer: Timer;
     private _isPaused = false;
 
@@ -120,10 +117,6 @@ export class VPAID extends View<IVPAIDHandler> {
         }
     }
 
-    public showEndScreen() {
-        this._container.appendChild(this.endScreen.container());
-    }
-
     public show() {
         super.show();
 
@@ -164,33 +157,16 @@ export class VPAID extends View<IVPAIDHandler> {
         this._stuckTimer.start();
     }
 
-    public updateTimeoutWidget() {
-        const adDuration = this._adDuration;
-        const adRemainingTime = this._adRemainingTime;
-        if ((adDuration && adDuration !== -2) && (adRemainingTime && adRemainingTime !== -2)) {
-            this._overlay.setVideoDurationEnabled(true);
-            this._overlay.setVideoDuration(adDuration * 1000);
-            this._overlay.setVideoProgress((adDuration - adRemainingTime) * 1000);
-        } else {
-            this._overlay.setVideoDurationEnabled(false);
-        }
-    }
-
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'progress':
                 this._handlers.forEach(handler => handler.onVPAIDProgress(e.data.adDuration, e.data.adRemainingTime));
-                // this._adDuration = e.data.adDuration;
-                // this._adRemainingTime = e.data.adRemainingTime;
-                // this.updateTimeoutWidget();
-
                 if (!this._isPaused) {
                     this._stuckTimer.reset();
                 }
                 break;
             case 'VPAID':
                 this._handlers.forEach(handler => handler.onVPAIDEvent(e.data.eventType, e.data.args));
-                // this.onVPAIDEvent.trigger();
                 break;
             case 'ready':
                 this.onVPAIDContainerReady();
