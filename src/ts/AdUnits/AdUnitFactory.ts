@@ -139,6 +139,7 @@ export class AdUnitFactory {
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             endScreen = new EndScreen(nativeBridge, campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            parameters.
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters<IEndScreenHandler> = {
@@ -148,9 +149,6 @@ export class AdUnitFactory {
         };
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
         /*
-        mraid.render();
-        document.body.appendChild(mraid.container());
-
         mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, operativeEventManager, thirdPartyEventManager, request, url));
 
         mraid.onReward.subscribe(() => {
