@@ -16,7 +16,8 @@
     "rootDir": "src/ts",
     "baseUrl": "src/ts",
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "allowJs": true
   },
   "include": [
     "src/ts/**/*.ts"
