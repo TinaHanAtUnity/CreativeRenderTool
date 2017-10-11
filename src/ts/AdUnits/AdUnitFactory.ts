@@ -147,6 +147,33 @@ export class AdUnitFactory {
             endScreen: endScreen
         };
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+        /*
+        mraid.render();
+        document.body.appendChild(mraid.container());
+
+        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, operativeEventManager, thirdPartyEventManager, request, url));
+
+        mraid.onReward.subscribe(() => {
+            operativeEventManager.sendThirdQuartile(mraidAdUnit);
+        });
+
+        mraid.onAnalyticsEvent.subscribe((timeFromShow, timeFromPlayableStart, event, eventData) => MRAIDEventHandlers.onAnalyticsEvent(campaign, timeFromShow, timeFromPlayableStart, event, eventData));
+        if(endScreen) {
+            this.prepareEndScreen(endScreen, nativeBridge, operativeEventManager, thirdPartyEventManager, mraidAdUnit, deviceInfo, clientInfo);
+            if(mraid instanceof PlayableMRAID) {
+                (<PlayableMRAID>mraid).onShowEndScreen.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
+            }
+        }
+
+        mraid.onSkip.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.SKIPPED);
+            mraidAdUnit.hide();
+        });
+        mraid.onClose.subscribe(() => {
+            mraidAdUnit.setFinishState(FinishState.COMPLETED);
+            mraidAdUnit.hide();
+        });*/
+
         return mraidAdUnit;
     }
 
