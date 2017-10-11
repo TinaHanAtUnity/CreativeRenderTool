@@ -112,10 +112,10 @@ describe('ComScoreTrackingServiceTest', () => {
             assert.equal(queryParamsDictEnd.ns_st_ct, 'va00');
         });
 
-        it('the query parameters ns_ap_sv should return the correct fixed value 2.1601.11 in url query parameter', () => {
+        it('the query parameters ns_ap_sv should return the correct fixed value 2.1602.11 in url query parameter', () => {
             fillComscoreParams();
-            assert.equal(queryParamsDictPlay.ns_ap_sv, '2.1601.11');
-            assert.equal(queryParamsDictEnd.ns_ap_sv, '2.1601.11');
+            assert.equal(queryParamsDictPlay.ns_ap_sv, '2.1602.11');
+            assert.equal(queryParamsDictEnd.ns_ap_sv, '2.1602.11');
         });
 
         it('the query parameters ns_st_it should return the correct fixed value a in url query parameter', () => {
@@ -193,8 +193,8 @@ describe('ComScoreTrackingServiceTest', () => {
 
         it('the query parameters should send a random number value equal to Date.now()', () => {
             fillComscoreParams();
-            assert.equal(queryParamsDictPlay.rn, stubbedDateNowPlay);
-            assert.equal(queryParamsDictEnd.rn, stubbedDateNowEnd);
+            assert.equal(queryParamsDictPlay.ns_ts, stubbedDateNowPlay);
+            assert.equal(queryParamsDictEnd.ns_ts, stubbedDateNowEnd);
         });
     });
 

@@ -47,7 +47,7 @@ export class ComScoreTrackingService {
             c2: <string> '23027898',  // Unity client ID.
             ns_type: <string> 'hidden',
             ns_st_ct: <string> 'va00',
-            ns_ap_sv: <string> '2.1601.11',
+            ns_ap_sv: <string> '2.1602.11',
             ns_st_it: <string> 'a',
             ns_st_sv: <string> '4.0.0',
             ns_st_ad: <string> '1',
@@ -59,7 +59,7 @@ export class ComScoreTrackingService {
             ns_st_ev: <string> `${eventName}`,
             ns_st_cl: <string> `${duration}`,
             ns_st_pt: <string> `${playedTime}`,
-            rn: <string> `${Date.now()}`
+            ns_ts: <string> `${Date.now()}`
         };
 
         return this.appendQueryParams('https://sb.scorecardresearch.com/p', queryParamsDict);
