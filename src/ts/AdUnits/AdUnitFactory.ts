@@ -28,7 +28,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAID } from 'Views/VPAID';
+import { IVPAIDHandler, VPAID } from 'Views/VPAID';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -37,7 +37,7 @@ import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { IVPAIDEndScreenHandler, VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 export class AdUnitFactory {
 
@@ -255,7 +255,7 @@ export class AdUnitFactory {
         const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
 
-        const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
+        const vpaidAdUnitParameters: IVPAIDAdUnitParameters<IVPAIDEndScreenHandler, IVPAIDHandler, IOverlayHandler> = {
             ... parameters,
             vpaid: vpaid,
             overlay: overlay,
