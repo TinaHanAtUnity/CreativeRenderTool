@@ -12,6 +12,7 @@ import { Configuration } from 'Models/Configuration';
 import { VideoInfo } from 'Utilities/VideoInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class VideoEventHandlers {
 
@@ -82,15 +83,17 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
+        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
 
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
             operativeEventManager.sendStart(adUnit);
+            comScoreTrackingService.sendEvent('play', adUnit.getCampaign().getSession().getId(), comScoreDuration, position);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
@@ -214,11 +217,14 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit): void {
+        const comScorePlayedTime = adUnit.getVideo().getPosition();
+        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         operativeEventManager.sendView(adUnit);
+        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, comScorePlayedTime);
 
         this.afterVideoCompleted(adUnit);
     }

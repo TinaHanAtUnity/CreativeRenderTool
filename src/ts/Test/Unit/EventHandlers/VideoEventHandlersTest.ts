@@ -29,6 +29,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -46,6 +47,8 @@ describe('VideoEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let comScoreService: ComScoreTrackingService;
+    let spyComScore: sinon.SinonSpy;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -86,6 +89,7 @@ describe('VideoEventHandlersTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
@@ -93,6 +97,11 @@ describe('VideoEventHandlersTest', () => {
             getSession: () => TestFixtures.getSession()
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
+        spyComScore = sinon.spy(comScoreService, 'sendEvent');
+    });
+
+    afterEach(() => {
+        spyComScore.restore();
     });
 
     describe('with onVideoPlay', () => {
@@ -114,7 +123,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video started', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             assert.isTrue(performanceAdUnit.getVideo().hasStarted());
         });
@@ -122,15 +131,22 @@ describe('VideoEventHandlersTest', () => {
         it('should send start event to backend', () => {
             sinon.spy(operativeEventManager, 'sendStart');
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, performanceAdUnit);
+        });
+
+        it('should send comscore play event', () => {
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration() * 1000).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
             sinon.stub(nativeBridge.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, TestFixtures.getPlacement().getId());
         });
@@ -142,14 +158,14 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 5, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 5, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition, 5);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, -5, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, -5, TestFixtures.getConfiguration());
 
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, -5);
@@ -160,7 +176,7 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(4000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 6000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 6000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, performanceAdUnit);
         });
@@ -170,7 +186,7 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(9000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 11000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 11000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, performanceAdUnit);
         });
@@ -180,10 +196,11 @@ describe('VideoEventHandlersTest', () => {
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(14000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 16000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 16000, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, performanceAdUnit);
         });
+
     });
 
     describe('with onVideoCompleted', () => {
@@ -197,25 +214,33 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
 
             assert.isFalse(performanceAdUnit.isActive());
         });
 
-        it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
+        it('should set finish state to COMPLETED', () => {
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
 
             assert.equal(performanceAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, performanceAdUnit);
         });
 
+        it('should send comscore end event', () => {
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration() * 1000).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
+
+        });
+
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
             if(adUnitOverlay) {

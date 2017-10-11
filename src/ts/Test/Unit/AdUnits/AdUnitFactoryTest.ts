@@ -32,6 +32,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -47,6 +48,7 @@ describe('AdUnitFactoryTest', () => {
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let comScoreTrackingService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -66,6 +68,7 @@ describe('AdUnitFactoryTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreTrackingService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
@@ -80,7 +83,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.LANDSCAPE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -93,7 +96,7 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), vastCampaign, config, request, {});
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -116,7 +119,7 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), campaign, config, request, {});
         });
 
         describe('on hide', () => {
@@ -202,7 +205,7 @@ describe('AdUnitFactoryTest', () => {
 
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), campaign, config, request, {});
         });
 
         describe('on click', () => {

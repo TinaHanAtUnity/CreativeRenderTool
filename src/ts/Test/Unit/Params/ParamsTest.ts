@@ -33,6 +33,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
+import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -197,6 +198,7 @@ class TestHelper {
         const config: Configuration = TestFixtures.getConfiguration();
         let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        const comScoreTrackingService: ComScoreTrackingService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         let container: AdUnitContainer;
         if(nativeBridge.getPlatform() === Platform.IOS) {
@@ -208,7 +210,7 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
     }
 }
 

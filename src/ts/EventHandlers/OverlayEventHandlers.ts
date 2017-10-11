@@ -4,14 +4,18 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class OverlayEventHandlers {
 
-    public static onSkip(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit): void {
+    public static onSkip(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, comScoreTrackingService: ComScoreTrackingService): void {
+        const positionAtSkip = adUnit.getVideo().getPosition();
+        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
         nativeBridge.VideoPlayer.pause();
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.SKIPPED);
-        operativeEventManager.sendSkip(adUnit, adUnit.getVideo().getPosition());
+        operativeEventManager.sendSkip(adUnit, positionAtSkip);
+        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
 
         adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 

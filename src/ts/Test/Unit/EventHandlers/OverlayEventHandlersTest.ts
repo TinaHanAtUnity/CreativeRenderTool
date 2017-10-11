@@ -24,6 +24,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -41,6 +42,7 @@ describe('OverlayEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -62,6 +64,7 @@ describe('OverlayEventHandlersTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
@@ -78,8 +81,9 @@ describe('OverlayEventHandlersTest', () => {
             sinon.spy(operativeEventManager, 'sendSkip');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.spy(container, 'reconfigure');
+            sinon.spy(comScoreService, 'sendEvent');
 
-            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, performanceAdUnit);
+            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, performanceAdUnit, comScoreService);
         });
 
         it('should pause video player', () => {
@@ -96,6 +100,12 @@ describe('OverlayEventHandlersTest', () => {
 
         it('should send skip', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
+        });
+
+        it('should send comscore end event', () => {
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration() * 1000).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
         });
 
         it('should call reconfigure', () => {

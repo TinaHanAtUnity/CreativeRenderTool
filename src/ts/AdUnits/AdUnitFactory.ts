@@ -39,17 +39,18 @@ import { Request } from 'Utilities/Request';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, options: any): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, placement: Placement, campaign: Campaign, configuration: Configuration, request: Request, options: any): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, placement, campaign, request, configuration, options);
+            return this.createVastAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, placement, campaign, request, configuration, options);
         } else if(campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, request, configuration, options);
         } else if(campaign instanceof PerformanceCampaign) {
-            return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, placement, campaign, configuration, options);
+            return this.createPerformanceAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, placement, campaign, configuration, options);
         } else if (campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
         } else {
@@ -57,14 +58,14 @@ export class AdUnitFactory {
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, placement: Placement, campaign: PerformanceCampaign, configuration: Configuration, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId(), campaign.getAbGroup());
         const endScreen = new EndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
 
         const video = this.getOrientedVideo(campaign, forceOrientation);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit);
+        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit, comScoreTrackingService);
 
         const landscapeVideo = campaign.getVideo();
         const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
@@ -73,7 +74,7 @@ export class AdUnitFactory {
         overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
         this.preparePerformanceOverlayEventHandlers(overlay, performanceAdUnit);
-        this.prepareVideoPlayer(nativeBridge, container, operativeEventManager, thirdPartyEventManager, configuration, performanceAdUnit);
+        this.prepareVideoPlayer(nativeBridge, container, operativeEventManager, thirdPartyEventManager, comScoreTrackingService, configuration, performanceAdUnit);
         this.prepareEndScreen(endScreen, nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
@@ -91,7 +92,7 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, placement: Placement, campaign: VastCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, thirdPartyEventManager: ThirdPartyEventManager, operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, placement: Placement, campaign: VastCampaign, request: Request, configuration: Configuration, options: any): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, placement.muteVideo(), deviceInfo.getLanguage(), clientInfo.getGameId());
 
         let vastAdUnit: VastAdUnit;
@@ -103,11 +104,11 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, vastAdUnit);
+        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, vastAdUnit, comScoreTrackingService);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, thirdPartyEventManager, vastAdUnit, request, clientInfo);
-        this.prepareVideoPlayer(nativeBridge, container, operativeEventManager, thirdPartyEventManager, configuration, vastAdUnit);
+        this.prepareVideoPlayer(nativeBridge, container, operativeEventManager, thirdPartyEventManager, comScoreTrackingService, configuration, vastAdUnit);
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, vastAdUnit, clientInfo));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, vastAdUnit, clientInfo));
@@ -167,7 +168,7 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, comScoreTrackingService: ComScoreTrackingService) {
         overlay.render();
         document.body.appendChild(overlay.container());
 
@@ -178,7 +179,7 @@ export class AdUnitFactory {
             overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
         }
 
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit));
+        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit, comScoreTrackingService));
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
@@ -228,12 +229,12 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, configuration: Configuration, adUnit: VideoAdUnit) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
-        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, adUnit, position, configuration));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreTrackingService, adUnit, position, configuration));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(operativeEventManager, adUnit));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreTrackingService, adUnit));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);

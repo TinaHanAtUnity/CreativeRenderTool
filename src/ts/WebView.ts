@@ -41,6 +41,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class WebView {
 
@@ -67,6 +68,7 @@ export class WebView {
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
+    private _comScoreTrackingService: ComScoreTrackingService;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -284,7 +286,8 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
+            this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, this._comScoreTrackingService, placement, campaign, this._configuration, this._request, options);
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
             this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());

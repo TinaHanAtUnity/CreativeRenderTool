@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
 import { DeviceInfo } from "Models/DeviceInfo";
-import sha1 from 'sha1';
+// import sha1 from 'sha1';
 
 export class ComScoreTrackingService {
 
@@ -30,7 +30,8 @@ export class ComScoreTrackingService {
 
         if(this._deviceInfo.getAdvertisingIdentifier() && !this._deviceInfo.getLimitAdTracking()) {
             if (this._deviceInfo.getAdvertisingIdentifier()) {
-                advertisingTrackingId = sha1(this._deviceInfo.getAdvertisingIdentifier());
+                // advertisingTrackingId = sha1(this._deviceInfo.getAdvertisingIdentifier());
+                advertisingTrackingId = 'testtest';
             }
         }
 
