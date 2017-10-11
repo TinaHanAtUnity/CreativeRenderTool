@@ -52,6 +52,18 @@ export class GoogleSignalFactory {
             GoogleSignalFactory.logFailure(nativeBridge, 'connectionType');
         }));
 
+        promises.push(deviceInfo.getScreenWidth().then(width => {
+            signal.setScreenWidth(width);
+        }).catch(() => {
+            GoogleSignalFactory.logFailure(nativeBridge, 'screenWidth');
+        }));
+
+        promises.push(deviceInfo.getScreenHeight().then(height => {
+            signal.setScreenHeight(height);
+        }).catch(() => {
+            GoogleSignalFactory.logFailure(nativeBridge, 'screenHeight');
+        }));
+
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.installer) {
