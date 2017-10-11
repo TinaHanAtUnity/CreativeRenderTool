@@ -368,8 +368,11 @@ export class OperativeEventManager {
 
     private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {
         const campaign = adUnit.getCampaign();
-        if((campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) && campaign.getVideoEventUrl(type)) {
-            return campaign.getVideoEventUrl(type);
+        if(campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) {
+            const url = campaign.getVideoEventUrl(type);
+            if(url) {
+                return url;
+            }
         }
         return [
             OperativeEventManager.VideoEventBaseUrl,
