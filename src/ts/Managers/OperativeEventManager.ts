@@ -386,10 +386,15 @@ export class OperativeEventManager {
 
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
-        let url: string;
-        if((campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) && campaign.getClickUrl()) {
-            url = campaign.getClickUrl();
-        } else {
+        let url: string | undefined;
+
+        if(campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) {
+            const clickUrl = campaign.getClickUrl();
+            if(clickUrl) {
+                url = clickUrl;
+            }
+        }
+        if(!url) {
             url = [
                 OperativeEventManager.ClickEventBaseUrl,
                 campaign.getId(),
