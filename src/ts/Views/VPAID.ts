@@ -59,11 +59,11 @@ export class VPAID extends View<IVPAIDHandler> {
         this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
 
         // this._overlay = new Overlay(nativeBridge, false, language, gameId);
-        this._overlay.setFadeEnabled(true);
-        this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
+        // this._overlay.setFadeEnabled(true);
+        // this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
 
         this._placement = placement;
-        this._stuckTimer = new Timer(() => this.onStuck.trigger(), VPAID.stuckDelay);
+        this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
 /*
         if (campaign.hasEndScreen()) {
             this.endScreen = new VPAIDEndScreen(nativeBridge, campaign, gameId);
@@ -72,7 +72,7 @@ export class VPAID extends View<IVPAIDHandler> {
         this._bindings = [{
             selector: '.companion',
             event: 'click',
-            listener: (e: Event) => this.onCompanionClick.trigger()
+            listener: (e: Event) => this._handlers.forEach(handler => handler.onVPAIDCompanionClick())
         }];
     }
 
@@ -92,16 +92,16 @@ export class VPAID extends View<IVPAIDHandler> {
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
         this._iframe.setAttribute('srcdoc', iframeSrcDoc);
         this._container.insertBefore(this._loadingScreen, this._container.firstChild);
-
+/*
         const overlayContainer = this._overlay.container();
         overlayContainer.style.position = 'absolute';
         overlayContainer.style.top = '0px';
         overlayContainer.style.left = '0px';
         this._container.insertBefore(overlayContainer, this._container.lastChild);
-
-        if (this.endScreen) {
-            this.endScreen.render();
-        } else if (this._campaign.hasCompanionAd()) {
+*/
+        // if (this.endScreen) {
+//             this.endScreen.render();
+        if (this._campaign.hasCompanionAd()) {
             const companionContainer = <HTMLDivElement>this._container.querySelector('.companion-container');
             companionContainer.style.display = 'block';
 
@@ -128,7 +128,7 @@ export class VPAID extends View<IVPAIDHandler> {
 
         window.addEventListener('message', this._messageListener);
         if (this._campaign.hasCompanionAd()) {
-            this.onCompanionView.trigger();
+            this._handlers.forEach(handler => handler.onVPAIDCompanionView());
         }
     }
 
@@ -187,7 +187,8 @@ export class VPAID extends View<IVPAIDHandler> {
                 }
                 break;
             case 'VPAID':
-                this.onVPAIDEvent.trigger(e.data.eventType, e.data.args);
+                this._handlers.forEach(handler => handler.onVPAIDEvent(e.data.eventType, e.data.args));
+                // this.onVPAIDEvent.trigger();
                 break;
             case 'ready':
                 this.onVPAIDContainerReady();
