@@ -10,7 +10,6 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { SessionManager } from 'Managers/SessionManager';
 import { Request } from 'Utilities/Request';
 
 describe('ComScoreTrackingServiceTest', () => {
@@ -25,32 +24,32 @@ describe('ComScoreTrackingServiceTest', () => {
     let request: Request;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let focusManager: FocusManager;
-    let sessionManager: SessionManager;
 
     let spy: sinon.SinonSpy;
     let comscoreService: ComScoreTrackingService;
+    let sha1edAdvertisingTrackingId: string;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
         });
+        sinon.stub(nativeBridge, 'getPlatform').callsFake(() => stubbedPlatform);
 
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
         comscoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         spy = sinon.spy(thirdPartyEventManager, 'sendEvent');
+        sha1edAdvertisingTrackingId = '55315d765868baf4ae1b54681af18d4db20a6056';
     });
 
     afterEach(() => {
         spy.reset();
     });
 
-    // DONE
     describe('when calling sendEvent', () => {
         it('thirdPartyManger\'s sendEvent is called', () => {
             comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15);
@@ -64,9 +63,7 @@ describe('ComScoreTrackingServiceTest', () => {
         let queryParamsDictPlay: any;
         let queryParamsDictEnd: any;
 
-        beforeEach(() => {
-            sinon.stub(nativeBridge, 'getPlatform').callsFake(() => stubbedPlatform);
-
+        const fillComscoreParams = () => {
             const stub = sinon.stub(Date, 'now').callsFake(() => stubbedDateNowPlay);
             comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0);
             urlPlay = spy.args[0][2];
@@ -79,101 +76,119 @@ describe('ComScoreTrackingServiceTest', () => {
 
             queryParamsDictPlay = getDictFromQueryString(urlPlay.split('?')[1]);
             queryParamsDictEnd = getDictFromQueryString(urlEnd.split('?')[1]);
-        });
+        };
 
         it('should return the correct scheme, scorecardresearch hostname, and path', () => {
+            fillComscoreParams();
             assert.isAbove(urlPlay.search('https://sb.scorecardresearch.com/p'), -1);
             assert.isAbove(urlEnd.search('https://sb.scorecardresearch.com/p'), -1);
         });
 
         it('the query parameters c1 should return the correct fixed value 19 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.c1, '19');
             assert.equal(queryParamsDictEnd.c1, '19');
         });
 
         it('the query parameters c2 should return the correct client id in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.c2, '23027898');
             assert.equal(queryParamsDictEnd.c2, '23027898');
         });
 
         it('the query parameters ns_type should return the correct fixed value hidden in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_type, 'hidden');
             assert.equal(queryParamsDictEnd.ns_type, 'hidden');
         });
 
         it('the query parameters ns_st_ct should return the correct fixed value va00 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_ct, 'va00');
             assert.equal(queryParamsDictEnd.ns_st_ct, 'va00');
         });
 
         it('the query parameters ns_ap_sv should return the correct fixed value 2.1601.11 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_ap_sv, '2.1601.11');
             assert.equal(queryParamsDictEnd.ns_ap_sv, '2.1601.11');
         });
 
         it('the query parameters ns_st_it should return the correct fixed value a in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_it, 'a');
             assert.equal(queryParamsDictEnd.ns_st_it, 'a');
         });
 
         it('the query parameters ns_st_sv should return the correct fixed value 4.0.0 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_sv, '4.0.0');
             assert.equal(queryParamsDictEnd.ns_st_sv, '4.0.0');
         });
 
         it('the query parameters ns_st_ad should return the correct fixed value 1 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_ad, '1');
             assert.equal(queryParamsDictEnd.ns_st_ad, '1');
         });
 
         it('the query parameters ns_st_sq should return the correct fixed value 1 in url query parameter', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_sq, '1');
             assert.equal(queryParamsDictEnd.ns_st_sq, '1');
         });
 
-        // APPLY THE SHA-1 here
-        // it('the query parameters should send sha1d adIdentifier when Device Limit Ad Tracking is turned off', () => {
-        //     sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => false);
-        //     assert.equal(queryParamsDictPlay.c12, sha1value);
-        //     assert.equal(queryParamsDictEnd.c12, sha1value);
-        // });
+        it('the query parameters should send sha1d adIdentifier when Device Limit Ad Tracking is turned off', () => {
+            sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => false);
+            fillComscoreParams();
+            assert.equal(queryParamsDictPlay.c12, sha1edAdvertisingTrackingId);
+            assert.equal(queryParamsDictEnd.c12, sha1edAdvertisingTrackingId);
+        });
 
-        // it('the query parameters should send deviceUniqueIdHash of "none" when Device Limit Ad Tracking is turned on', () => {
-        //     sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => true);
-        //     assert.equal(queryParamsDictPlay.c12, 'none');
-        //     assert.equal(queryParamsDictEnd.c12, 'none');
-        // });
+        it('the query parameters should send deviceUniqueIdHash of "none" when Device Limit Ad Tracking is turned on', () => {
+            sinon.stub(deviceInfo, 'getLimitAdTracking').callsFake(() => true);
+            fillComscoreParams();
+            assert.equal(queryParamsDictPlay.c12, 'none');
+            assert.equal(queryParamsDictEnd.c12, 'none');
+        });
 
         it('the query parameters should return the correct platform', () => {
             const platform = TestFixtures.getNativeBridge(Platform.ANDROID).getPlatform();
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_ap_pn, Platform[platform].toLowerCase());
             assert.equal(queryParamsDictEnd.ns_ap_pn, Platform[platform].toLowerCase());
         });
 
         it('the query parameters should return the device model', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
             assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
         });
 
         it('the query parameters should return the video eventName', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_ev, 'play');
             assert.equal(queryParamsDictEnd.ns_st_ev, 'end');
         });
 
         it('the query parameters should return the duration of the video', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_cl, '20');
             assert.equal(queryParamsDictEnd.ns_st_cl, '20');
         });
 
         it('the query parameters should send a Played Time value of "0" for the Playback Identity of "play"', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.ns_st_pt, '0');
         });
 
         it('the query parameters should return the correct played time for the "end" playback identity constructed url', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictEnd.ns_st_pt, 15);
         });
 
         it('the query parameters should send a random number value equal to Date.now()', () => {
+            fillComscoreParams();
             assert.equal(queryParamsDictPlay.rn, stubbedDateNowPlay);
             assert.equal(queryParamsDictEnd.rn, stubbedDateNowEnd);
         });

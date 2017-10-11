@@ -62,6 +62,7 @@ let getTestPaths = (root, filter) => {
 System.config({
     baseURL: 'src/ts',
     map: {
+        'sha1': './node_modules/sha1/sha1.js',
         'mocha': './node_modules/mocha/mocha.js',
         'sinon': './node_modules/sinon/pkg/sinon.js',
         'chai': './node_modules/chai/chai.js',
