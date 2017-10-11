@@ -41,6 +41,7 @@ import { IVPAIDEndScreenHandler, VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { VPAIDEndScreenEventHandler } from 'EventHandlers/VPAIDEndScreenEventHandler';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { VPAIDOverlayEventHandler } from 'EventHandlers/VPAIDOverlayEventHandler';
+import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
 
 export class AdUnitFactory {
 
@@ -139,38 +140,20 @@ export class AdUnitFactory {
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             endScreen = new EndScreen(nativeBridge, campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-            parameters.
         }
 
-        const mraidAdUnitParameters: IMRAIDAdUnitParameters<IEndScreenHandler> = {
+        const mraidAdUnitParameters: IMRAIDAdUnitParameters<IMRAIDViewHandler, IEndScreenHandler> = {
             ... parameters,
             mraid: mraid,
+            mraidEventHandler: MRAIDEventHandler,
             endScreen: endScreen
         };
-        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-        /*
-        mraid.onClick.subscribe((url) => MRAIDEventHandlers.onClick(nativeBridge, mraidAdUnit, operativeEventManager, thirdPartyEventManager, request, url));
 
-        mraid.onReward.subscribe(() => {
-            operativeEventManager.sendThirdQuartile(mraidAdUnit);
-        });
-
-        mraid.onAnalyticsEvent.subscribe((timeFromShow, timeFromPlayableStart, event, eventData) => MRAIDEventHandlers.onAnalyticsEvent(campaign, timeFromShow, timeFromPlayableStart, event, eventData));
         if(endScreen) {
-            this.prepareEndScreen(endScreen, nativeBridge, operativeEventManager, thirdPartyEventManager, mraidAdUnit, deviceInfo, clientInfo);
-            if(mraid instanceof PlayableMRAID) {
-                (<PlayableMRAID>mraid).onShowEndScreen.subscribe(() => MRAIDEventHandlers.onShowEndScreen(mraidAdUnit));
-            }
+            mraidAdUnitParameters.endScreenEventHandler = EndScreenEventHandler;
         }
 
-        mraid.onSkip.subscribe(() => {
-            mraidAdUnit.setFinishState(FinishState.SKIPPED);
-            mraidAdUnit.hide();
-        });
-        mraid.onClose.subscribe(() => {
-            mraidAdUnit.setFinishState(FinishState.COMPLETED);
-            mraidAdUnit.hide();
-        });*/
+        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
 
         return mraidAdUnit;
     }
