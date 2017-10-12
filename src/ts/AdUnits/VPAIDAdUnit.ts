@@ -135,6 +135,15 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         }
     }
 
+    public sendImpressionTracking() {
+        const impressionUrls = this._vpaidCampaign.getImpressionUrls();
+        if (impressionUrls) {
+            for (const impressionUrl of impressionUrls) {
+                this.sendThirdPartyEvent('vast impression', impressionUrl);
+            }
+        }
+    }
+
     public sendThirdPartyEvent(eventType: string, url: string) {
         const sessionId = this._vpaidCampaign.getSession().getId();
         const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
