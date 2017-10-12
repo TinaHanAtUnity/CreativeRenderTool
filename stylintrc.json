@@ -4,7 +4,7 @@
   "colons": "always",
   "colors": "always",
   "commaSpace": "always",
-  "commentSpace": "always",
+  "commentSpace": false,
   "cssLiteral": "never",
   "customProperties": ["mixin-*"],
   "depthLimit": false,
