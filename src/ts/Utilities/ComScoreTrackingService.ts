@@ -22,8 +22,8 @@ export class ComScoreTrackingService {
         this._adCounter = 0;
     }
 
-    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number): void {
-        const url = this.setEventUrl(eventName, duration, playedTime);
+    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined): void {
+        const url = this.setEventUrl(eventName, duration, playedTime, creativeId);
         this._thirdPartyEventManager.sendEvent(eventName, sessionId, url);
     }
 
@@ -35,7 +35,7 @@ export class ComScoreTrackingService {
         this._adCounter++;
     }
 
-    private setEventUrl(eventName: string, duration: string, playedTime: number): string {
+    private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined): string {
         const deviceInfo = this._deviceInfo;
         const deviceModel = deviceInfo.getModel();
         const adBreakId = this._adBreakIdentifier;
@@ -77,6 +77,7 @@ export class ComScoreTrackingService {
             ns_st_ec: <string> `${tagUrlCounter}`,
             ns_st_ev: <string> `${eventName}`,
             ns_st_cn: <string> `${adCounter}`,
+            ns_st_ci: <string> `${creativeId}`,
             ns_st_cl: <string> `${duration}`,
             ns_st_pt: <string> `${playedTime}`,
             ns_ts: <string> `${Date.now()}`

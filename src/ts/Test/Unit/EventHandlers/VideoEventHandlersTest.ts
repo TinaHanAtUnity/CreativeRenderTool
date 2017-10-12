@@ -94,7 +94,8 @@ describe('VideoEventHandlersTest', () => {
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
             getStreamingVideo: () => video,
-            getSession: () => TestFixtures.getSession()
+            getSession: () => TestFixtures.getSession(),
+            getCreativeId: () => 'test'
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
         spyComScore = sinon.spy(comScoreService, 'sendEvent');
@@ -118,7 +119,8 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
                 getVideo: () => video,
                 getStreamingVideo: () => video,
-                getSession: () => TestFixtures.getSession()
+                getSession: () => TestFixtures.getSession(),
+                getCreativeId: () => 'test'
             }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
@@ -138,9 +140,7 @@ describe('VideoEventHandlersTest', () => {
 
         it('should send comscore play event', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
-            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
-            const comScoreDuration = (performanceAdUnit.getVideo().getDuration() * 1000).toString(10);
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
+            sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
@@ -233,9 +233,7 @@ describe('VideoEventHandlersTest', () => {
 
         it('should send comscore end event', () => {
             VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
-            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
-            const comScoreDuration = (performanceAdUnit.getVideo().getDuration() * 1000).toString(10);
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip);
+            sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
 
         });
 
