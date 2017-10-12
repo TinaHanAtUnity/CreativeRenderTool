@@ -1,0 +1,86 @@
+@import "vars.styl";
+@import "mixins.styl";
+
+/* End-screen */
+
+$game-rating-default($scale-size, $with-styles = true) {
+  font-size: $default-font-size * $scale-size * 1.5;
+  if($with-styles) {
+    position: relative;
+    display: inline-block;
+    color: $end-screen-info-gray;
+    vertical-align: middle;
+    letter-spacing: 5px;
+  }
+}
+
+$game-rating-mask-default($scale-size, $with-styles = true) {
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+  width: 0;
+  height: 100%;
+  color: $rating-orange;
+  text-align: center;
+  white-space: nowrap;
+}
+
+$game-rating-count-default($scale-size, $with-styles = true) {
+  color: $gray;
+  if($with-styles) {
+    font-size: $default-font-size * $scale-size;
+  }
+}
+
+$game-icon-default($scale-size, $with-styles = true) {
+  $set-image($scale-size * 4.5, $scale-size * 4.5, $scale-size * .75);
+}
+
+$unityads-logo-default($scale-size, $unity-logo-width = 5, $with-styles = true) {
+  $set-image($unity-logo-width * $scale-size, $scale-size, 0, "../img/unityads.png");
+  bottom: $scale-size * $default-size * .25;
+
+  if($with-styles) {
+    position: absolute;
+  }
+}
+
+$name-container-default($scale-size, $with-styles = true) {
+  font-size: $scale-size * $default-font-size * 1.5;
+  if($with-styles) {
+    overflow: hidden;
+    color: $black;
+    text-overflow: ellipsis;
+  }
+}
+
+$close-button-default($scale-size, $with-styles = true) {
+  if($with-styles) {
+    position: absolute;
+    color: $white;
+    text-shadow: 2px 2px 20px $gray;
+  }
+}
+
+$download-container-default($scale-size, $with-styles = true) {
+  padding: $scale-size * $default-size * .75 0;
+  width: $scale-size * $default-size * 15;
+  border-radius: $scale-size * $default-size * .75;
+  font-size: $scale-size * $default-font-size * 1.25;
+
+  if($with-styles) {
+    background: $blue;
+    color: $white;
+    text-align: center;
+  }
+}
+
+$privacy-button-default($scale-size, $with-styles = true) {
+  margin: 0 0 0 $default-size * $default-scale-size * .25;
+  if($with-styles) {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
+
