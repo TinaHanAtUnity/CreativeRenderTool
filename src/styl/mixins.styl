@@ -1,0 +1,13 @@
+@import "vars.styl";
+
+$set-image($width-scale = 1, $height-scale = 1, $border-radius = .5, $url = "") {
+  width: $width-scale * $default-size;
+  height: $height-scale * $default-size;
+  border-radius: $border-radius * $default-size;
+  if($url) {
+    background-image: url($url);
+  }
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

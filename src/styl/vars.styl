@@ -23,6 +23,10 @@ $overlay-gray = #777777;
 
 $default-transition-ts = .25s;
 
-/* Sizes */
-$default-size = 1rem;
-$default-px-size = 32px;
+/* Sizes  1rem = 16px if html {font-size: 100%} */
+
+$default-font-size = 1rem;
+$default-px-size = 16px;
+$default-size = unit($default-px-size/ 16, "rem");
+
+$default-scale-size = 1;

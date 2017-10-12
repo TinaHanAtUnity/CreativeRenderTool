@@ -1,11 +1,13 @@
 /************************
 * GENERAL
 *************************/
+@import "vars.styl";
 
 html {
   width: 100%;
   height: 100%;
   background-color: transparent;
+  font-size: $default-px-size;
 }
 
 body.iphone,
@@ -25,7 +27,6 @@ body.android {
   -webkit-user-drag: none; // @stylint ignore
 }
 
-@import "vars.styl";
 @import "overlay.styl";
 @import "end-screen.styl";
 @import "new-end-screen.styl";
@@ -34,3 +35,4 @@ body.android {
 @import "privacy.styl";
 @import "display-interstitial.styl";
 @import "playable-mraid.styl";
+@import "media-queries.styl";
