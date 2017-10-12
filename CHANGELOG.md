@@ -1,3 +1,8 @@
+# Thu Oct 12 20:04:06 UTC 2017
+
+* Fire VAST Impression on VPAID Ad Units
+* Fixes click URL construction for Operative Events
+
 # Wed Oct 11 01:48:02 UTC 2017
 
 * Fix typo in VPAID content type
