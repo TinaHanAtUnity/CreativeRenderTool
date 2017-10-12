@@ -5,7 +5,7 @@ import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Session } from 'Models/Session';
 
-interface IMRAIDCampaign extends ICampaign {
+export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
@@ -13,6 +13,8 @@ interface IMRAIDCampaign extends ICampaign {
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
 
     gameName: string | undefined;
     gameIcon: Image | undefined;
@@ -35,6 +37,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             additionalTrackingEvents: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            clickUrl: ['string'],
+            videoEventUrls: ['object'],
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
@@ -62,6 +66,13 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
+
+        if(campaign.clickUrl) {
+            this.set('clickUrl', campaign.clickUrl);
+        }
+        if (campaign.videoEventUrls) {
+            this.set('videoEventUrls', campaign.videoEventUrls);
+        }
 
         this.set('meta', campaign.meta);
         this.set('gameName', campaign.gameName);
@@ -179,6 +190,22 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getClickAttributionUrlFollowsRedirects(): boolean | undefined {
         return this.get('clickAttributionUrlFollowsRedirects');
+    }
+
+    public getClickUrl(): string {
+        return this.get('clickUrl');
+    }
+
+    public getVideoEventUrls(): { [eventType: string]: string } {
+        return this.get('videoEventUrls');
+    }
+
+    public getVideoEventUrl(eventType: string): string | undefined {
+        if(this.get('videoEventUrls')) {
+            return this.get('videoEventUrls')[eventType];
+        } else {
+            return undefined;
+        }
     }
 
     public getBypassAppSheet(): boolean | undefined {

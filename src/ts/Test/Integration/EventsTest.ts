@@ -29,12 +29,13 @@ describe('EventsTest', () => {
     const validateRequestLog = (requestLog: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
-        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_start'), 1, 'Did not find a video_start event');
-        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/first_quartile'), 1, 'Did not find a first_quartile event');
-        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/midpoint'), 1, 'Did not find a midpoint event');
-        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/third_quartile'), 1, 'Did not find a third_quartile event');
-        assert.equal(findEventCount(requestLog, '/mobile/gamers/[0-9a-f]+/video/video_end'), 1, 'Did not find a video_end event');
+        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=video_start'), 1, 'Did not find a video_start event');
+        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=first_quartile'), 1, 'Did not find a first_quartile event');
+        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=midpoint'), 1, 'Did not find a midpoint event');
+        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=third_quartile'), 1, 'Did not find a third_quartile event');
+        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=video_end'), 1, 'Did not find a video_end event');
     };
+    // /ack/456?event
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
