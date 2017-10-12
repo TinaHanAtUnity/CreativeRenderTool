@@ -116,6 +116,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdImpression() {
         this._adUnit.sendTrackingEvent('impression');
+        this._adUnit.sendImpressionTracking();
     }
 
     private onAdVideoStart() {
