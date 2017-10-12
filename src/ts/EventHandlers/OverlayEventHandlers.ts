@@ -10,7 +10,7 @@ export class OverlayEventHandlers {
 
     public static onSkip(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, comScoreTrackingService: ComScoreTrackingService): void {
         const positionAtSkip = adUnit.getVideo().getPosition();
-        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
+        const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
         nativeBridge.VideoPlayer.pause();
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.SKIPPED);

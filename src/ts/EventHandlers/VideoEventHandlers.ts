@@ -86,7 +86,7 @@ export class VideoEventHandlers {
     public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
-        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
+        const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
 
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
@@ -219,7 +219,7 @@ export class VideoEventHandlers {
 
     public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit): void {
         const comScorePlayedTime = adUnit.getVideo().getPosition();
-        const comScoreDuration = (adUnit.getVideo().getDuration() * 1000).toString(10);
+        const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
