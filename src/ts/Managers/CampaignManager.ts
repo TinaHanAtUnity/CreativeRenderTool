@@ -24,6 +24,7 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { ProgrammaticGlyphParser } from 'Parsers/ProgrammaticGlyphParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 
 export class CampaignManager {
@@ -232,6 +233,9 @@ export class CampaignManager {
                 break;
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
+                break;
+            case 'programmatic/glyph':
+                parser = new ProgrammaticGlyphParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
