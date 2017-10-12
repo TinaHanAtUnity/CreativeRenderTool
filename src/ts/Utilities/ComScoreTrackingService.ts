@@ -18,21 +18,13 @@ export class ComScoreTrackingService {
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
         this._adBreakIdentifier = Date.now();
-        this._tagCounter = 0;
-        this._adCounter = 0;
+        this._tagCounter = 1;
+        this._adCounter = 1;
     }
 
     public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined): void {
         const url = this.setEventUrl(eventName, duration, playedTime, creativeId);
         this._thirdPartyEventManager.sendEvent(eventName, sessionId, url);
-    }
-
-    public incrementTagCounter(): void {
-        this._tagCounter++;
-    }
-
-    public incrementAdCounter(): void {
-        this._adCounter++;
     }
 
     private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined): string {
