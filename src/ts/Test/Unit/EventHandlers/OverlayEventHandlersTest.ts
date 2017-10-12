@@ -72,7 +72,7 @@ describe('OverlayEventHandlersTest', () => {
             getVideo: () => video,
             getStreamingVideo: () => video,
             getSession: () => TestFixtures.getSession(),
-            getCreativeId: () => 'test'
+            getCreativeId: () => 'vast-sample-creative-id'
         }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 

@@ -95,7 +95,7 @@ describe('VideoEventHandlersTest', () => {
             getVideo: () => video,
             getStreamingVideo: () => video,
             getSession: () => TestFixtures.getSession(),
-            getCreativeId: () => 'test'
+            getCreativeId: () => 'vast-sample-creative-id'
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
         spyComScore = sinon.spy(comScoreService, 'sendEvent');
@@ -120,7 +120,7 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video,
                 getStreamingVideo: () => video,
                 getSession: () => TestFixtures.getSession(),
-                getCreativeId: () => 'test'
+                getCreativeId: () => 'vast-sample-creative-id'
             }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
