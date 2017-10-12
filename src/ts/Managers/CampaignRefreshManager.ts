@@ -8,7 +8,7 @@ import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
-import {Session} from "../Models/Session";
+import { Session } from 'Models/Session';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;

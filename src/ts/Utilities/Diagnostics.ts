@@ -1,6 +1,6 @@
 import { INativeResponse } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
-import {Session} from "../Models/Session";
+import { Session } from 'Models/Session';
 
 export class Diagnostics {
     public static trigger(type: string, error: {}, session?: Session): Promise<INativeResponse> {

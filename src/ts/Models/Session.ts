@@ -37,7 +37,7 @@ export class Session extends Model<ISession> {
     }
 
     public getAdPlan(): string {
-        return this.get('adPlan') !== undefined ? this.getAdPlan() : "";
+        return this.get('adPlan') !== undefined ? this.get('adPlan') + "" : "";
     }
 
     public setAdPlan(adPlan: string) {

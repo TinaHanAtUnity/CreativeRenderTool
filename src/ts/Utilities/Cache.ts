@@ -9,7 +9,7 @@ import { Video } from 'Models/Assets/Video';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { VideoInfo } from 'Utilities/VideoInfo';
-import {Campaign} from "../Models/Campaign";
+import { Campaign } from 'Models/Campaign';
 
 export enum CacheStatus {
     OK,
