@@ -9,11 +9,17 @@ export class ComScoreTrackingService {
     private _nativeBridge: NativeBridge;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _deviceInfo: DeviceInfo;
+    private _adBreakIdentifier: number;
+    private _tagCounter: number;
+    private _adCounter: number;
 
     constructor(thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
         this._thirdPartyEventManager = thirdPartyEventManager;
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
+        this._adBreakIdentifier = Date.now();
+        this._tagCounter = 0;
+        this._adCounter = 0;
     }
 
     public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number): void {
@@ -21,9 +27,20 @@ export class ComScoreTrackingService {
         this._thirdPartyEventManager.sendEvent(eventName, sessionId, url);
     }
 
+    public incrementTagCounter(): void {
+        this._tagCounter++;
+    }
+
+    public incrementAdCounter(): void {
+        this._adCounter++;
+    }
+
     private setEventUrl(eventName: string, duration: string, playedTime: number): string {
         const deviceInfo = this._deviceInfo;
         const deviceModel = deviceInfo.getModel();
+        const adBreakId = this._adBreakIdentifier;
+        const tagUrlCounter = this._tagCounter;
+        const adCounter = this._tagCounter;
 
         let platform: string = 'unknown';
         let advertisingTrackingId: string = 'none';
@@ -56,7 +73,10 @@ export class ComScoreTrackingService {
             c12: <string> `${advertisingTrackingId}`,
             ns_ap_pn: <string> `${platform}`,
             ns_ap_device: <string> `${deviceModel}`,
+            ns_st_id: <string> `${adBreakId}`,
+            ns_st_ec: <string> `${tagUrlCounter}`,
             ns_st_ev: <string> `${eventName}`,
+            ns_st_cn: <string> `${adCounter}`,
             ns_st_cl: <string> `${duration}`,
             ns_st_pt: <string> `${playedTime}`,
             ns_ts: <string> `${Date.now()}`
