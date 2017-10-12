@@ -74,6 +74,10 @@ export class VPAID {
         return this.vast.getTrackingEventUrls(eventName);
     }
 
+    public getImpressionUrls(): string[] | null {
+        return this.vast.getImpressionUrls();
+    }
+
     public addTrackingEventUrl(eventName: string, url: string) {
         this.vast.addTrackingEventUrl(eventName, url);
     }
