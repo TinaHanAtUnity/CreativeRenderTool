@@ -8,14 +8,38 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 export class GoogleSignalFactory {
     public static getAdRequestSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
         return GoogleSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
-            // todo: fill ad request specific info
             return signal;
         });
     }
 
     public static getClickSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
         return GoogleSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
-            // todo: fill click specific info
+            // todo: touchXUp
+            // todo: touchYUp
+            // todo: touchXDown
+            // todo: touchYDown
+            // todo: touch duration
+            // todo: touch pressure
+            // todo: touch diameter
+            // todo: up count
+            // todo: down count
+            // todo: move count
+            // todo: cancel count
+            // todo: time on screen
+
+            if(signal.getScreenWidth() && signal.getScreenHeight()) {
+                if(clientInfo.getPlatform() === Platform.IOS && deviceInfo.getScreenScale()) {
+                    signal.setAdViewWidth(GoogleSignalFactory.getIosViewWidth(signal.getScreenWidth(), deviceInfo.getScreenScale()));
+                    signal.setAdViewHeight(GoogleSignalFactory.getIosViewHeight(signal.getScreenHeight(), deviceInfo.getScreenScale()));
+                } else if(deviceInfo.getScreenDensity()) {
+                    signal.setAdViewWidth(GoogleSignalFactory.getAndroidViewWidth(signal.getScreenWidth(), deviceInfo.getScreenDensity()));
+                    signal.setAdViewHeight(GoogleSignalFactory.getAndroidViewHeight(signal.getScreenHeight(), deviceInfo.getScreenDensity()));
+                }
+            }
+
+            signal.setAdViewX(0);
+            signal.setAdViewY(0);
+
             return signal;
         });
     }
@@ -31,6 +55,7 @@ export class GoogleSignalFactory {
         signal.setAppStartTimeInPST(GoogleSignalFactory.getAppStartTimeInPST(clientInfo));
         signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
+        // todo: device orientation
 
         const promises = [];
 
@@ -145,5 +170,21 @@ export class GoogleSignalFactory {
         } else {
             return 0;
         }
+    }
+
+    private static getIosViewWidth(width: number, scale: number): number {
+        return width / scale;
+    }
+
+    private static getIosViewHeight(height: number, scale: number): number {
+        return height / scale;
+    }
+
+    private static getAndroidViewWidth(width: number, density: number): number {
+        return width / (density / 160);
+    }
+
+    private static getAndroidViewHeight(height: number, density: number): number {
+        return height / (density / 160);
     }
 }
