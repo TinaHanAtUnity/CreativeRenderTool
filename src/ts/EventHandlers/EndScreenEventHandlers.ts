@@ -82,7 +82,7 @@ export class EndScreenEventHandlers {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
-                    });
+                    }, campaign.getSession());
                 }
             }).catch(error => {
                 if(error instanceof RequestError) {
@@ -93,7 +93,7 @@ export class EndScreenEventHandlers {
                         response: (<RequestError>error).nativeResponse
                     });
                 }
-                Diagnostics.trigger('click_attribution_failed', error);
+                Diagnostics.trigger('click_attribution_failed', error, campaign.getSession());
             });
         } else {
             if (clickAttributionUrl) {

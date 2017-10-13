@@ -253,7 +253,7 @@ export class WebView {
                 id: campaign.getId(),
                 willExpireAt: campaign.getWillExpireAt()
             });
-            Diagnostics.trigger('campaign_expired', error);
+            Diagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
 
@@ -279,7 +279,7 @@ export class WebView {
                 const error = new DiagnosticError(new Error('No connection is available'), {
                     id: campaign.getId(),
                 });
-                Diagnostics.trigger('mraid_no_connection', error);
+                Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
             }
 

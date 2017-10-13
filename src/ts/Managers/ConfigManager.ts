@@ -51,7 +51,7 @@ export class ConfigManager {
                             ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
                         }
                     } else {
-                        Diagnostics.trigger('plc_config_failure', {
+                        Diagnostics.trigger('config_failure', {
                             configUrl: url,
                             configResponse: response.response
                         });
