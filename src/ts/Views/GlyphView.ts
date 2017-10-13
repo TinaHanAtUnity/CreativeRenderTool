@@ -80,6 +80,10 @@ export class GlyphView extends View {
         this._videoBridge.notifyCanPlay();
     }
 
+    public onVideoProgress(progress: number) {
+        this._videoBridge.notifyProgress(progress);
+    }
+
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
         }

@@ -91,6 +91,7 @@
             var progress = data.progress;
             if (this._currentTime != progress) {
                 this._currentTime = progress;
+                this.dispatchEvent('timeupdate');
             } else {
                 // TODO update stuck counter.
             }
