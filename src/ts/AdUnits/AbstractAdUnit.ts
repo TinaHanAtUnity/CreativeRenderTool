@@ -12,7 +12,7 @@ import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 
-export interface IAdUnitParameters {
+export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: ForceOrientation;
     focusManager: FocusManager;
     container: AdUnitContainer;
@@ -21,7 +21,7 @@ export interface IAdUnitParameters {
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
     placement: Placement;
-    campaign: Campaign;
+    campaign: T;
     configuration: Configuration;
     request: Request;
     options: any;

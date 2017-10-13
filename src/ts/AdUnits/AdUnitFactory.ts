@@ -2,11 +2,10 @@ import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
-import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitial, IDisplayInterstitialHandler } from 'Views/DisplayInterstitial';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
@@ -15,7 +14,6 @@ import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { IOverlayHandler, Overlay } from 'Views/Overlay';
@@ -42,27 +40,29 @@ import { VPAIDEndScreenEventHandler } from 'EventHandlers/VPAIDEndScreenEventHan
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { VPAIDOverlayEventHandler } from 'EventHandlers/VPAIDOverlayEventHandler';
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
+import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
+import { Campaign } from 'Models/Campaign';
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
-            return this.createVastAdUnit(nativeBridge, parameters);
+            return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
         } else if(parameters.campaign instanceof MRAIDCampaign) {
-            return this.createMRAIDAdUnit(nativeBridge, parameters);
+            return this.createMRAIDAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
         } else if(parameters.campaign instanceof PerformanceCampaign) {
-            return this.createPerformanceAdUnit(nativeBridge, parameters);
+            return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
-            return this.createDisplayInterstitialAdUnit(nativeBridge, parameters.forceOrientation, parameters.container, parameters.deviceInfo, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.placement, parameters.campaign, parameters.options);
+            return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
-            return this.createVPAIDAdUnit(nativeBridge, parameters);
+            return this.createVPAIDAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const endScreen = new EndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
@@ -103,11 +103,11 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const campaign = <VastCampaign>parameters.campaign;
         let vastAdUnit: VastAdUnit;
-        const vastAdUnitParameters: IVastAdUnitParameters<IVastEndScreenHandler, IOverlayHandler> = {
+        const vastAdUnitParameters: IVastAdUnitParameters = {
             ... parameters,
             video: campaign.getVideo(),
             overlay: overlay,
@@ -139,9 +139,9 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): AbstractAdUnit {
         let mraid: MRAIDView<IMRAIDViewHandler>;
-        const campaign = <MRAIDCampaign>parameters.campaign;
+        const campaign = parameters.campaign;
         const resourceUrl = campaign.getResourceUrl();
         let endScreen: EndScreen | undefined;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
@@ -170,7 +170,7 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
         const campaign = <VPAIDCampaign>parameters.campaign;
         const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
@@ -193,7 +193,21 @@ export class AdUnitFactory {
         return vpaidAdUnit;
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit) {
+    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): AbstractAdUnit {
+        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
+
+        const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters<IDisplayInterstitialHandler> = {
+            ... parameters,
+            view: view,
+            displayInterstitialEventHandler: DisplayInterstitialEventHandler
+        };
+
+        const programmaticAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
+
+        return programmaticAdUnit;
+    }
+
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit<Campaign>) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, adUnit, position, configuration));
@@ -215,7 +229,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((url, what, extra) => VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, what, extra, url));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Android.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
         const onVideoSeekToErrorObserver = nativeBridge.VideoPlayer.Android.onSeekToError.subscribe((url) => VideoEventHandlers.onSeekToError(nativeBridge, videoAdUnit, url));
@@ -231,7 +245,7 @@ export class AdUnitFactory {
         });
     }
 
-    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit) {
+    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit<Campaign>) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => VideoEventHandlers.onIosVideoLikelyToKeepUp(nativeBridge, videoAdUnit, container, likelyToKeepUp));
@@ -294,64 +308,5 @@ export class AdUnitFactory {
             }
         }
         return undefined;
-    }
-
-    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: DisplayInterstitialCampaign, options: any): AbstractAdUnit {
-        const view = new DisplayInterstitial(nativeBridge, placement, campaign);
-        const programmaticAdUnit = new DisplayInterstitialAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, options);
-
-        view.render();
-        document.body.appendChild(view.container());
-
-        const onClose = () => {
-            operativeEventManager.sendThirdQuartile(programmaticAdUnit);
-            operativeEventManager.sendView(programmaticAdUnit);
-            programmaticAdUnit.hide();
-        };
-
-        const isWhiteListedLinkType = (href: string) => {
-            const whiteListedProtocols = ['http', 'market', 'itunes'];
-            for (const protocol of whiteListedProtocols) {
-                if (href.indexOf(protocol) === 0) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        const openLink = (href: string) => {
-            operativeEventManager.sendClick(programmaticAdUnit);
-
-            for (let url of campaign.getTrackingUrlsForEvent('click')) {
-                url = url.replace(/%ZONE%/, placement.getId());
-                url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.sendEvent('display click', campaign.getSession().getId(), url);
-            }
-
-            if (isWhiteListedLinkType(href)) {
-                if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': href
-                    });
-                } else {
-                    nativeBridge.UrlScheme.open(href);
-                }
-            }
-        };
-
-        programmaticAdUnit.onStart.subscribe(() => {
-            for (let url of campaign.getTrackingUrlsForEvent('impression')) {
-                url = url.replace(/%ZONE%/, placement.getId());
-                url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.sendEvent('display impression', campaign.getSession().getId(), url);
-            }
-            operativeEventManager.sendStart(programmaticAdUnit);
-        });
-        programmaticAdUnit.onClose.subscribe(onClose);
-        programmaticAdUnit.onSkip.subscribe(onClose);
-        programmaticAdUnit.onRedirect.subscribe(openLink);
-
-        return programmaticAdUnit;
     }
 }

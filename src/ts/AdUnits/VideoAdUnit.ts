@@ -12,13 +12,14 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Campaign } from 'Models/Campaign';
 
-export interface IVideoAdUnitParameters extends IAdUnitParameters {
+export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
     overlay: Overlay;
 }
 
-export abstract class VideoAdUnit extends AbstractAdUnit {
+export abstract class VideoAdUnit<T extends Campaign> extends AbstractAdUnit {
 
     private static _progressInterval: number = 250;
 
@@ -37,7 +38,7 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     private _prepareCalled: boolean;
     private _videoReady: boolean;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters.forceOrientation, parameters.container, parameters.placement, parameters.campaign);
 
         this._video = parameters.video;
@@ -47,8 +48,9 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._deviceInfo = parameters.deviceInfo;
         this._options = parameters.options;
         this._prepareCalled = false;
-
         this._lowMemory = false;
+
+        this.prepareOverlay();
     }
 
     public show(): Promise<void> {

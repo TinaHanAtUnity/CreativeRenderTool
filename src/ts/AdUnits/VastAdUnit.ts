@@ -26,14 +26,16 @@ class DeviceOrientation {
     }
 }
 
-export interface IVastAdUnitParameters<T extends IVastEndScreenHandler, T2 extends IOverlayHandler> extends IVideoAdUnitParameters {
+export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
+    /*
     endScreenEventHandler?: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
     overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
     vastOverlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
+    */
 }
 
-export class VastAdUnit extends VideoAdUnit {
+export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     private _endScreen: VastEndScreen | null;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -41,7 +43,7 @@ export class VastAdUnit extends VideoAdUnit {
     private _overlayEventHandler: IOverlayHandler;
     private _vastOverlayEventHandler: IOverlayHandler;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters<IVastEndScreenHandler, IOverlayHandler>) {
+    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
 
         this.prepareOverlay();
