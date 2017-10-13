@@ -36,6 +36,22 @@ export class NativeVideoPlayerBridge {
         });
     }
 
+    public notifyPlay() {
+        this.sendMessage('play');
+    }
+
+    public notifyPlaying() {
+        this.sendMessage('playing');
+    }
+
+    public notifyPause() {
+        this.sendMessage('pause');
+    }
+
+    public notifyEnd() {
+        this.sendMessage('ended');
+    }
+
     private sendMessage(event: string, data?: any) {
         const eventData = <IPlayerEventData>{
             type: 'player',

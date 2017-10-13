@@ -7,6 +7,10 @@
         window.VideoPlayer.addEventListener('canplay', function() {
             window.VideoPlayer.play();
         });
+        window.VideoPlayer.addEventListener('ended', function() {
+            console.log('end!');
+            window.google.afma.support.close();
+        });
         window.VideoPlayer.src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
     })();
 </script>

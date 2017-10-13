@@ -84,6 +84,22 @@ export class GlyphView extends View {
         this._videoBridge.notifyProgress(progress);
     }
 
+    public notifyPlay() {
+        this._videoBridge.notifyPlay();
+    }
+
+    public notifyPlaying() {
+        this._videoBridge.notifyPlaying();
+    }
+
+    public notifyPause() {
+        this._videoBridge.notifyPause();
+    }
+
+    public notifyEnd() {
+        this._videoBridge.notifyEnd();
+    }
+
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
         }

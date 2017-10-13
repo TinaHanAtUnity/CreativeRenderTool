@@ -6,7 +6,14 @@ import { GlyphView } from 'Views/GlyphView';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Double } from 'Utilities/Double';
-import { IObserver4, IObserver1 } from 'Utilities/IObserver';
+import { IObserver4, IObserver1, IObserver0 } from 'Utilities/IObserver';
+
+enum PlayerState {
+    NONE,
+    PLAYING,
+    PAUSED,
+    ENDED
+}
 
 export class GlyphAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
@@ -15,6 +22,11 @@ export class GlyphAdUnit extends AbstractAdUnit {
 
     private _videoPreparedHandler: IObserver4<string, number, number, number>;
     private _videoProgressHandler: IObserver1<number>;
+    private _videoPlayHandler: IObserver0;
+    private _videoPauseHandler: IObserver0;
+    private _videoCompleteHandler: IObserver0;
+
+    private _playerState: PlayerState = PlayerState.NONE;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, placement: Placement, campaign: GlyphCampaign, view: GlyphView, options: any) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
@@ -27,6 +39,9 @@ export class GlyphAdUnit extends AbstractAdUnit {
         this._view.onPlayVideo.subscribe(() => this.onPlayVideo());
         this._videoPreparedHandler = (url, duration, width, height) => this.onVideoPrepared(url, duration, width, height);
         this._videoProgressHandler = (progress) => this.onVideoProgress(progress);
+        this._videoPlayHandler = () => this.onVideoPlay();
+        this._videoPauseHandler = () => this.onVideoPause();
+        this._videoCompleteHandler = () => this.onVideoComplete();
     }
 
     public show(): Promise<void> {
@@ -53,6 +68,9 @@ export class GlyphAdUnit extends AbstractAdUnit {
         this.setShowing(true);
         this._nativeBridge.VideoPlayer.onPrepared.subscribe(this._videoPreparedHandler);
         this._nativeBridge.VideoPlayer.onProgress.subscribe(this._videoProgressHandler);
+        this._nativeBridge.VideoPlayer.onPlay.subscribe(this._videoPlayHandler);
+        this._nativeBridge.VideoPlayer.onPause.subscribe(this._videoPauseHandler);
+        this._nativeBridge.VideoPlayer.onCompleted.subscribe(this._videoCompleteHandler);
     }
 
     private showView() {
@@ -66,6 +84,9 @@ export class GlyphAdUnit extends AbstractAdUnit {
         this.onClose.trigger();
         this._nativeBridge.VideoPlayer.onPrepared.unsubscribe(this._videoPreparedHandler);
         this._nativeBridge.VideoPlayer.onProgress.unsubscribe(this._videoProgressHandler);
+        this._nativeBridge.VideoPlayer.onPlay.unsubscribe(this._videoPlayHandler);
+        this._nativeBridge.VideoPlayer.onPause.unsubscribe(this._videoPauseHandler);
+        this._nativeBridge.VideoPlayer.onCompleted.unsubscribe(this._videoCompleteHandler);
     }
 
     private hideView() {
@@ -87,5 +108,23 @@ export class GlyphAdUnit extends AbstractAdUnit {
 
     private onPlayVideo() {
         this._nativeBridge.VideoPlayer.play();
+    }
+
+    private onVideoPlay() {
+        if (this._playerState === PlayerState.PAUSED) {
+            this._view.notifyPlay();
+        }
+        this._playerState = PlayerState.PLAYING;
+        this._view.notifyPlaying();
+    }
+
+    private onVideoPause() {
+        this._playerState = PlayerState.PAUSED;
+        this._view.notifyPause();
+    }
+
+    private onVideoComplete() {
+        this._playerState = PlayerState.ENDED;
+        this._view.notifyEnd();
     }
 }

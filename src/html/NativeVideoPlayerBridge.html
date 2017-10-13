@@ -12,11 +12,21 @@
             }
         };
 
+        var currentTimeProperty = {
+            get: function() {
+                return this._currentTime;
+            },
+            set: function(currentTime) {
+                throw new Error('set currentTime not supported')
+            }
+        };
+
         var VideoPlayerBridge = function() {
             this._src = null;
             this._duration = 0;
             this._listeners = {};
             Object.defineProperty(this, 'src', sourceProperty);
+            Object.defineProperty(this, 'currentTime', currentTimeProperty);
 
             var self = this;
             window.addEventListener('message', function(e) {
@@ -68,6 +78,18 @@
                     break;
                 case 'progress':
                     this.handleProgress(data);
+                    break;
+                case 'play':
+                    this.dispatchEvent('play');
+                    break;
+                case 'playing':
+                    this.dispatchEvent('playing');
+                    break;
+                case 'pause':
+                    this.dispatchEvent('pause');
+                    break;
+                case 'ended':
+                    this.dispatchEvent('ended');
                     break;
             }
         };
