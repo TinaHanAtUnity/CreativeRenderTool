@@ -386,12 +386,17 @@ export class OperativeEventManager {
 
     private createClickEventUrl(adUnit: AbstractAdUnit): string {
         const campaign = adUnit.getCampaign();
-        let url: string;
+        let url: string | undefined;
         let parameters: any = {};
-        if((campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) && campaign.getClickUrl()) {
-            url = campaign.getClickUrl();
-            parameters = { redirect: false };
-        } else {
+
+        if(campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) {
+            const clickUrl = campaign.getClickUrl();
+            if(clickUrl) {
+                parameters = { redirect: false };
+                url = clickUrl;
+            }
+        }
+        if(!url) {
             url = [
                 OperativeEventManager.ClickEventBaseUrl,
                 campaign.getId(),
