@@ -57,6 +57,10 @@ $new-end-screen-mixin($scale-size = $default-scale-size) {
         margin: $default-size * $scale-size * .5 0;
       }
     }
+
+    .btn-close-region {
+      padding: $default-size * $scale-size * .25;
+    }
   }
 }
 
@@ -88,13 +92,16 @@ body {
     }
 
     .end-screen-info-background {
-      flex-direction: row;
       width: 100%;
       height: 50%;
     }
 
     .privacy-button {
       left: 0;
+    }
+
+    .game-icon {
+      align-self: center;
     }
   }
 
@@ -128,7 +135,6 @@ body {
     }
 
     .end-screen-info-background {
-      flex-direction: column;
       width: 50%;
       height: 100%;
       text-align: center;
@@ -136,6 +142,11 @@ body {
 
     .privacy-button {
       left: 50%;
+    }
+
+    /* on iOS it does not inherit flexbox properties in correct way */
+    .unityads-logo {
+      width: 50%;
     }
   }
 }
@@ -164,18 +175,16 @@ body {
   }
 
   .end-screen-info-background {
-    height: 100%;
-  }
-
-  .privacy-button {
-    color: $end-screen-info-gray;
-  }
-
-  .end-screen-info-background {
     display: flex;
+    flex-direction: column;
     align-items: center;
     align-content: center;
+    height: 100%;
     justify-content: center;
+  }
+
+  .btn-close-region {
+    right: 0;
   }
 }
 
