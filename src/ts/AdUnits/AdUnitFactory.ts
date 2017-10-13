@@ -62,7 +62,7 @@ export class AdUnitFactory {
         } else if (campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
         } else if (campaign instanceof GlyphCampaign) {
-            return this.createGlyphAdUnit(nativeBridge, forceOrientation, container, deviceInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
+            return this.createGlyphAdUnit(nativeBridge, forceOrientation, container, deviceInfo, clientInfo, operativeEventManager, thirdPartyEventManager, placement, campaign, options);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -408,62 +408,11 @@ export class AdUnitFactory {
         return programmaticAdUnit;
     }
 
-    private static createGlyphAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: DisplayInterstitialCampaign, options: any): AbstractAdUnit {
-        const view = new GlyphView(nativeBridge, placement, campaign);
-        const programmaticAdUnit = new GlyphAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, options);
-
+    private static createGlyphAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: GlyphCampaign, options: any): AbstractAdUnit {
+        const view = new GlyphView(nativeBridge, placement, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), campaign.getAbGroup());
         view.render();
-        document.body.appendChild(view.container());
 
-        const onClose = () => {
-            operativeEventManager.sendThirdQuartile(programmaticAdUnit);
-            operativeEventManager.sendView(programmaticAdUnit);
-            programmaticAdUnit.hide();
-        };
-
-        const isWhiteListedLinkType = (href: string) => {
-            const whiteListedProtocols = ['http', 'market', 'itunes'];
-            for (const protocol of whiteListedProtocols) {
-                if (href.indexOf(protocol) === 0) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        const openLink = (href: string) => {
-            operativeEventManager.sendClick(programmaticAdUnit);
-
-            for (let url of campaign.getTrackingUrlsForEvent('click')) {
-                url = url.replace(/%ZONE%/, placement.getId());
-                url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.sendEvent('display click', campaign.getSession().getId(), url);
-            }
-
-            if (isWhiteListedLinkType(href)) {
-                if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': href
-                    });
-                } else {
-                    nativeBridge.UrlScheme.open(href);
-                }
-            }
-        };
-
-        programmaticAdUnit.onStart.subscribe(() => {
-            for (let url of campaign.getTrackingUrlsForEvent('impression')) {
-                url = url.replace(/%ZONE%/, placement.getId());
-                url = url.replace(/%SDK_VERSION%/, operativeEventManager.getClientInfo().getSdkVersion().toString());
-                thirdPartyEventManager.sendEvent('display impression', campaign.getSession().getId(), url);
-            }
-            operativeEventManager.sendStart(programmaticAdUnit);
-        });
-        programmaticAdUnit.onClose.subscribe(onClose);
-        programmaticAdUnit.onSkip.subscribe(onClose);
-        programmaticAdUnit.onRedirect.subscribe(openLink);
-
+        const programmaticAdUnit = new GlyphAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, options);
         return programmaticAdUnit;
     }
 }

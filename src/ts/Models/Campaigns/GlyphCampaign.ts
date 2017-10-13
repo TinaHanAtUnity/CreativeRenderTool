@@ -4,23 +4,20 @@ import { Session } from 'Models/Session';
 
 interface IGlyphCampaign extends ICampaign {
     dynamicMarkup: string;
-    clickThroughUrl: string | undefined;
     tracking: object | undefined;
 }
 
 export class GlyphCampaign extends Campaign<IGlyphCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('GlyphCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
-            clickThroughUrl: ['string', 'undefined'],
             tracking: ['object', 'undefined']
         });
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
         this.set('dynamicMarkup', markup);
-        this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('adType', adType || undefined);
@@ -33,10 +30,6 @@ export class GlyphCampaign extends Campaign<IGlyphCampaign> {
 
     public getDynamicMarkup(): string {
         return this.get('dynamicMarkup');
-    }
-
-    public getClickThroughUrl(): string | undefined {
-        return this.get('clickThroughUrl');
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {

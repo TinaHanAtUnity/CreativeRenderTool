@@ -154,7 +154,6 @@ describe('VPAIDAdUnit', () => {
         // Generic events that translate to VAST tracking with
         // no additional processing on our end.
         const vpaidToVASTTracking = {
-            AdImpression: 'impression',
             AdVideoStart: 'start',
             AdPaused: 'paused',
             AdPlaying: 'resume'

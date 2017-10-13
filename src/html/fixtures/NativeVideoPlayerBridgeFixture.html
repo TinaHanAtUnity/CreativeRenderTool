@@ -1,0 +1,12 @@
+<script src="unity_video_player.js"></script>
+<script src="unity_afma.js"></script>
+<script src="mraid.js"></script>
+
+<script>
+    (function() {
+        window.VideoPlayer.addEventListener('canplay', function() {
+            window.VideoPlayer.play();
+        });
+        window.VideoPlayer.src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
+    })();
+</script>
