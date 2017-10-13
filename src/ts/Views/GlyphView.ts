@@ -45,9 +45,7 @@ export class GlyphView extends View {
 
         this._bindings = [];
 
-        this._videoBridge = new NativeVideoPlayerBridge();
-        this._videoBridge.onPlay.subscribe(() => this.onPlayVideo.trigger());
-        this._videoBridge.onPrepare.subscribe((url: string) => this.onPrepareVideo.trigger(url));
+        this._videoBridge = new NativeVideoPlayerBridge(this._nativeBridge);
     }
 
     public render() {
@@ -73,31 +71,6 @@ export class GlyphView extends View {
         window.removeEventListener('message', this._messageListener);
         super.hide();
         this._videoBridge.disconnect();
-    }
-
-    public onVideoPrepared(url: string, duration: number, width: number, height: number) {
-        this._videoBridge.notifyPrepared(duration);
-        this._videoBridge.notifyCanPlay();
-    }
-
-    public onVideoProgress(progress: number) {
-        this._videoBridge.notifyProgress(progress);
-    }
-
-    public notifyPlay() {
-        this._videoBridge.notifyPlay();
-    }
-
-    public notifyPlaying() {
-        this._videoBridge.notifyPlaying();
-    }
-
-    public notifyPause() {
-        this._videoBridge.notifyPause();
-    }
-
-    public notifyEnd() {
-        this._videoBridge.notifyEnd();
     }
 
     private onMessage(e: MessageEvent) {
