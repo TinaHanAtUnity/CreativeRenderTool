@@ -46,13 +46,13 @@ export class GoogleSignalFactory {
 
     private static getCommonSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
         const signal: GoogleSignal = new GoogleSignal();
-        signal.setEventTimestamp((Date.now() / 1000) - 8 * 3600); // unixtime in seconds, in Pacific standard timezone
+        signal.setEventTimestamp(GoogleSignalFactory.getEventTimestamp());
         signal.setSdkVersion(GoogleSignalFactory.getSdkVersion(clientInfo));
         signal.setOsVersion(GoogleSignalFactory.getOsVersion(clientInfo, deviceInfo));
         signal.setTimeZoneOffset(GoogleSignalFactory.getTimeZoneOffset());
         // todo: signal app active
         signal.setAppUptime(GoogleSignalFactory.getAppUptime(clientInfo));
-        signal.setAppStartTimeInPST(GoogleSignalFactory.getAppStartTimeInPST(clientInfo));
+        signal.setAppStartTimeInPST(GoogleSignalFactory.getAppStartTime(clientInfo));
         signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
         // todo: device orientation
@@ -115,6 +115,11 @@ export class GoogleSignalFactory {
         });
     }
 
+    private static getEventTimestamp(): number {
+        // todo: DST issues
+        return (Date.now() / 1000) - 8 * 3600;
+    }
+
     private static getSdkVersion(clientInfo: ClientInfo): string {
         if(clientInfo.getPlatform() === Platform.IOS) {
             return 'unity-ios-v' + clientInfo.getSdkVersionName();
@@ -158,7 +163,8 @@ export class GoogleSignalFactory {
         return Math.round((Date.now() - clientInfo.getInitTimestamp()) / 1000);
     }
 
-    private static getAppStartTimeInPST(clientInfo: ClientInfo): number {
+    private static getAppStartTime(clientInfo: ClientInfo): number {
+        // todo: DST issues
         return clientInfo.getInitTimestamp() / 1000 - 8 * 3600;
     }
 
