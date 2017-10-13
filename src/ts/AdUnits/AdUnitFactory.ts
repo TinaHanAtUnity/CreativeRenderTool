@@ -65,24 +65,36 @@ export class AdUnitFactory {
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const endScreen = new EndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
-        const performanceAdUnitParameters: IPerformanceAdUnitParameters<IEndScreenHandler, IOverlayHandler> = {
+
+        const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
             ... parameters,
             video: video,
             overlay: overlay,
-            endScreen: endScreen,
-            endScreenEventHandler: EndScreenEventHandler,
-            overlayEventHandler: OverlayEventHandler,
-            performanceOverlayEventHandler: PerformanceOverlayEventHandler
+            endScreen: endScreen
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+        const overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        overlay.addHandler(overlayEventHandler);
+        const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        overlay.addHandler(performanceOverlayEventHandler);
+        const endScreenEventHandler = new EndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        endScreen.addHandler(endScreenEventHandler);
+
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, performanceAdUnit);
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            performanceAdUnit.onClose.subscribe(() => {
+                if(onBackKeyObserver) {
+                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                }
+            });
+        }
 
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit));
         const onVideoErrorObserver = performanceAdUnit.onError.subscribe(() => PerformanceVideoEventHandlers.onVideoError(performanceAdUnit));
-
         performanceAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             performanceAdUnit.onError.unsubscribe(onVideoErrorObserver);
