@@ -15,7 +15,7 @@ export class Diagnostics {
         kafkaObject.type = type;
         kafkaObject[type] = error;
         kafkaObject.timestamp = Date.now();
-        if (session !== undefined) {
+        if (session !== undefined && session.getAdPlan() !== undefined) {
             kafkaObject.adPlan = session.getAdPlan();
         }
 
