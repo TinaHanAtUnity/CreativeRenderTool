@@ -33,7 +33,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
