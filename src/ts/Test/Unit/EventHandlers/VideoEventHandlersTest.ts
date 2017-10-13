@@ -140,7 +140,10 @@ describe('VideoEventHandlersTest', () => {
 
         it('should send comscore play event', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
-            sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
+
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
@@ -233,8 +236,9 @@ describe('VideoEventHandlersTest', () => {
 
         it('should send comscore end event', () => {
             VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
-            sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
-
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
         });
 
         it('should hide overlay', () => {

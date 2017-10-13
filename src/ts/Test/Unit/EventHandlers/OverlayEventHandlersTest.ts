@@ -104,7 +104,9 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should send comscore end event', () => {
-            sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
         });
 
         it('should call reconfigure', () => {
