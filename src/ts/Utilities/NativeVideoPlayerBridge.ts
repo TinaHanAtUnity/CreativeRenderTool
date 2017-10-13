@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IObserver4, IObserver1, IObserver0 } from 'Utilities/IObserver';
 import { Double } from 'Utilities/Double';
+import { Observable0, Observable1 } from 'Utilities/Observable';
 
 enum PlayerState {
     NONE,
@@ -10,6 +11,13 @@ enum PlayerState {
 }
 
 export class NativeVideoPlayerBridge {
+
+    public readonly onPlay = new Observable0();
+    public readonly onPause = new Observable0();
+    public readonly onComplete = new Observable0();
+    public readonly onPrepare = new Observable1<number>();
+    public readonly onProgress = new Observable1<number>();
+
     private _nativeBridge: NativeBridge;
     private _iframe: HTMLIFrameElement;
     private _messageListener: any;
@@ -116,10 +124,12 @@ export class NativeVideoPlayerBridge {
     private onVideoPrepared(url: string, duration: number, width: number, height: number) {
         this.notifyPrepared(duration / 1000.0);
         this.notifyCanPlay();
+        this.onPrepare.trigger(duration);
     }
 
     private onVideoProgress(progress: number) {
         this.notifyProgress(progress / 1000.0);
+        this.onProgress.trigger(progress);
     }
 
     private onPrepareVideo(url: string) {
@@ -136,16 +146,19 @@ export class NativeVideoPlayerBridge {
         }
         this._playerState = PlayerState.PLAYING;
         this.notifyPlaying();
+        this.onPlay.trigger();
     }
 
     private onVideoPause() {
         this._playerState = PlayerState.PAUSED;
         this.notifyPause();
+        this.onPause.trigger();
     }
 
     private onVideoComplete() {
         this._playerState = PlayerState.ENDED;
         this.notifyEnd();
+        this.onComplete.trigger();
     }
 }
 
