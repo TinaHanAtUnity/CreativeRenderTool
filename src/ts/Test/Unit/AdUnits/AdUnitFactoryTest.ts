@@ -31,6 +31,8 @@ import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
@@ -47,6 +49,7 @@ describe('AdUnitFactoryTest', () => {
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let adUnitParameters: IAdUnitParameters;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -66,6 +69,20 @@ describe('AdUnitFactoryTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        adUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: config,
+            request: request,
+            options: {}
+        };
         sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
@@ -80,7 +97,8 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.LANDSCAPE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -93,7 +111,9 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), vastCampaign, config, request, {});
+            adUnitParameters.campaign = vastCampaign;
+            adUnitParameters.forceOrientation = ForceOrientation.NONE;
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -116,7 +136,8 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnitParameters.campaign = campaign;
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
         describe('on hide', () => {
@@ -202,7 +223,8 @@ describe('AdUnitFactoryTest', () => {
 
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnitParameters.campaign = campaign;
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
         describe('on click', () => {
