@@ -33,11 +33,11 @@ $game-rating-count-default($scale-size, $with-styles = true) {
 }
 
 $game-icon-default($scale-size, $with-styles = true) {
-  $set-image($scale-size * 4.5, $scale-size * 4.5, $scale-size * .75);
+  $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * .75);
 }
 
 $unityads-logo-default($scale-size, $unity-logo-width = 5, $with-styles = true) {
-  $set-image($unity-logo-width * $scale-size, $scale-size, 0, "../img/unityads.png");
+  $set-image(100%, $scale-size * $default-size, 0, "../img/unityads.png", contain);
   bottom: $scale-size * $default-size * .25;
 
   if($with-styles) {
@@ -46,11 +46,16 @@ $unityads-logo-default($scale-size, $unity-logo-width = 5, $with-styles = true) 
 }
 
 $name-container-default($scale-size, $with-styles = true) {
+  max-width: $default-size * $scale-size * 12.5;
   font-size: $scale-size * $default-font-size * 1.5;
   if($with-styles) {
+    display: -webkit-box;
     overflow: hidden;
     color: $black;
     text-overflow: ellipsis;
+
+    -webkit-line-clamp: 2; // @stylint ignore;
+    -webkit-box-orient: vertical;
   }
 }
 
@@ -58,13 +63,13 @@ $close-button-default($scale-size, $with-styles = true) {
   if($with-styles) {
     position: absolute;
     color: $white;
-    text-shadow: 2px 2px 20px $gray;
+    text-shadow: 2px 2px 20px darken($end-screen-info-gray, 80%);
   }
 }
 
 $download-container-default($scale-size, $with-styles = true) {
   padding: $scale-size * $default-size * .75 0;
-  width: $scale-size * $default-size * 15;
+  width: $scale-size * $default-size * 14;
   border-radius: $scale-size * $default-size * .75;
   font-size: $scale-size * $default-font-size * 1.25;
 
@@ -80,6 +85,7 @@ $privacy-button-default($scale-size, $with-styles = true) {
   if($with-styles) {
     position: absolute;
     bottom: 0;
+    color: $end-screen-info-gray;
   }
 }
 
