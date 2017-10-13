@@ -87,7 +87,7 @@ export class MRAIDEventHandlers {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
-                    });
+                    }, campaign.getSession());
                 }
             }).catch(error => {
                 if(error instanceof RequestError) {
@@ -98,7 +98,7 @@ export class MRAIDEventHandlers {
                         response: (<RequestError>error).nativeResponse
                     });
                 }
-                Diagnostics.trigger('mraid_click_attribution_failed', error);
+                Diagnostics.trigger('mraid_click_attribution_failed', error, campaign.getSession());
             });
         } else {
             if (clickAttributionUrl) {

@@ -8,6 +8,7 @@ import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
+import { Session } from 'Models/Session';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
@@ -149,17 +150,16 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], rawAdPlan?: string) {
+    private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger('plc_request_failed', {
+        Diagnostics.trigger('auction_request_failed', {
             error: error,
-            rawAdResponse: rawAdPlan
-        });
+        }, session);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
         const minimumRefreshTimestamp = Date.now() + CampaignRefreshManager.ErrorRefillDelay * 1000;
