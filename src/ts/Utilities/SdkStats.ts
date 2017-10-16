@@ -131,7 +131,7 @@ export class SdkStats {
     private static _sessionManager: SessionManager;
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
-    private static _topic: string = 'events.cachingstats.json';
+    private static _topic: string = 'events.sdktimeline.json';
 
     private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;
