@@ -1,3 +1,55 @@
+# Mon Oct 16 20:19:29 UTC 2017
+
+* Adds ad response to all diagnostic messages
+
+# Thu Oct 12 20:04:06 UTC 2017
+
+* Fire VAST Impression on VPAID Ad Units
+* Fixes click URL construction for Operative Events
+
+# Wed Oct 11 01:48:02 UTC 2017
+
+* Fix typo in VPAID content type
+* Fix operative events with programmatic MRAID
+
+# Tue Oct 10 17:15:40 UTC 2017
+
+* Initial support for VPAID
+
+# Tue Oct 10 09:11:38 UTC 2017
+
+* Removed dark end screen A/B test (groups 8 & 9)
+* Use event urls from comet response.
+
+# Mon Oct  9 09:08:58 UTC 2017
+
+* Sliding video player interface AB test (groups 10 & 11)
+* Video end card click tracking event for VAST endscreen.
+* Added static device info into kafka messages (Analytics)
+
+# Thu Oct  5 13:30:35 UTC 2017
+
+* Remove endscreen click ab-test
+* Fix to reporting of duplicate mraid diagnostic events
+* Faster retry logic after error (60-120s, was 1h)
+
+# Mon Oct  2 11:43:28 UTC 2017
+
+* Refactor SessionManager and EventManager
+* Accept unsafe but legal URL characters in campaign assets
+
+# Thu Sep 28 13:54:13 UTC 2017
+
+* Enable creative testing without backend
+* Fix retrying after campaign parsing or caching failure
+* Remove parsed ad plan from diagnostics (ES indexing)
+
+# Wed Sep 27 13:10:22 UTC 2017
+
+* Dark end screen theme AB Test (groups 8 & 9)
+* Remove additional click zones from end screen AB test (groups 10 & 11)
+* Clean up parts of the campaign parsing refactoring
+
 # Wed Sep 20 12:10:38 UTC 2017
 
 * Initial display ads support

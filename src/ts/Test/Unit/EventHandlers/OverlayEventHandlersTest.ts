@@ -8,7 +8,7 @@ import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { FinishState } from 'Constants/FinishState';
@@ -18,10 +18,12 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 describe('OverlayEventHandlersTest', () => {
 
@@ -34,6 +36,11 @@ describe('OverlayEventHandlersTest', () => {
     let video: Video;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let operativeEventManager: OperativeEventManager;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let request: Request;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -47,7 +54,14 @@ describe('OverlayEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        request = new Request(nativeBridge, wakeUpManager);
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
@@ -61,11 +75,11 @@ describe('OverlayEventHandlersTest', () => {
     describe('When calling onSkip', () => {
         beforeEach(() => {
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
-            sinon.spy(sessionManager, 'sendSkip');
+            sinon.spy(operativeEventManager, 'sendSkip');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.spy(container, 'reconfigure');
 
-            OverlayEventHandlers.onSkip(nativeBridge, sessionManager, performanceAdUnit);
+            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, performanceAdUnit);
         });
 
         it('should pause video player', () => {
@@ -81,7 +95,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
         });
 
         it('should call reconfigure', () => {

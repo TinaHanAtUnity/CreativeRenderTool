@@ -5,7 +5,7 @@ import DisplayContainer from 'html/display/DisplayContainer.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 

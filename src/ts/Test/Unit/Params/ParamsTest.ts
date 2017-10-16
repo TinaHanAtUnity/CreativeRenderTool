@@ -13,7 +13,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
@@ -31,6 +31,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Session } from 'Models/Session';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -187,25 +189,26 @@ class TestHelper {
     }
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
-        const eventManager: EventManager = new EventManager(nativeBridge, request);
-        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(nativeBridge.getPlatform()), TestFixtures.getDeviceInfo(nativeBridge.getPlatform()), eventManager, metaDataManager);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge);
         return sessionManager;
     }
 
-    public static getAdUnit(nativeBridge: NativeBridge, sessionManager: SessionManager, request: Request): AbstractAdUnit {
+    public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit {
         const config: Configuration = TestFixtures.getConfiguration();
-        const deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
+        let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
 
         let container: AdUnitContainer;
+        const focusManager = new FocusManager(nativeBridge);
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            const focusManager = new FocusManager(nativeBridge);
+            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
         } else {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, ForceOrientation.PORTRAIT, container, deviceInfo, sessionManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+        return AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
     }
 }
 
@@ -253,14 +256,12 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager: EventManager = <EventManager><any>{
-                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
-                startNewSession: sinon.stub().returns(Promise.resolve([]))
-            };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            const sessionManager = new SessionManager(nativeBridge);
+            sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
@@ -279,14 +280,12 @@ describe('Event parameters should match specifications', () => {
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
-            const eventManager: EventManager = <EventManager><any>{
-                getUniqueEventId: sinon.stub().returns(Promise.resolve('abcde-12345')),
-                startNewSession: sinon.stub().returns(Promise.resolve([]))
-            };
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+            const sessionManager = new SessionManager(nativeBridge);
+            sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
@@ -305,10 +304,15 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
+            const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+            const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             sessionManager.setGameSessionId(1234);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
-            return sessionManager.sendClick(adUnit).then(() => {
+            const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+            const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+            return operativeEventManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -322,10 +326,15 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
+            const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
+            const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
+            const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             sessionManager.setGameSessionId(1234);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
-            return sessionManager.sendClick(adUnit).then(() => {
+            const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+            const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+            return operativeEventManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -341,6 +350,7 @@ describe('Event parameters should match specifications', () => {
         let requestSpy: any;
         let sessionManager: SessionManager;
         let adUnit: AbstractAdUnit;
+        let operativeEventManager: OperativeEventManager;
 
         describe('on Android', () => {
             beforeEach(() => {
@@ -348,13 +358,18 @@ describe('Event parameters should match specifications', () => {
                 const focusManager = new FocusManager(nativeBridge);
                 request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
+                const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
+                const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+                const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
                 sessionManager.setGameSessionId(1234);
-                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
+                operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+                const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+                adUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
             });
 
             it('with start event', () => {
-                return sessionManager.sendStart(adUnit).then(() => {
+                return operativeEventManager.sendStart(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -364,7 +379,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return sessionManager.sendFirstQuartile(adUnit).then(() => {
+                return operativeEventManager.sendFirstQuartile(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -374,7 +389,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return sessionManager.sendMidpoint(adUnit).then(() => {
+                return operativeEventManager.sendMidpoint(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -384,7 +399,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return sessionManager.sendThirdQuartile(adUnit).then(() => {
+                return operativeEventManager.sendThirdQuartile(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -394,7 +409,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return sessionManager.sendView(adUnit).then(() => {
+                return operativeEventManager.sendView(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -410,13 +425,18 @@ describe('Event parameters should match specifications', () => {
                 const focusManager = new FocusManager(nativeBridge);
                 request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
+                const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
+                const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
+                const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
                 sessionManager.setGameSessionId(1234);
-                adUnit = TestHelper.getAdUnit(nativeBridge, sessionManager, request);
+                operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+                const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+                adUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
             });
 
             it('with start event', () => {
-                return sessionManager.sendStart(adUnit).then(() => {
+                return operativeEventManager.sendStart(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -426,7 +446,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return sessionManager.sendFirstQuartile(adUnit).then(() => {
+                return operativeEventManager.sendFirstQuartile(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -436,7 +456,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return sessionManager.sendMidpoint(adUnit).then(() => {
+                return operativeEventManager.sendMidpoint(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -446,7 +466,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return sessionManager.sendThirdQuartile(adUnit).then(() => {
+                return operativeEventManager.sendThirdQuartile(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -456,7 +476,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return sessionManager.sendView(adUnit).then(() => {
+                return operativeEventManager.sendView(adUnit).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 

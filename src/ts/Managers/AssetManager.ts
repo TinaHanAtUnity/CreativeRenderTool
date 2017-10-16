@@ -6,7 +6,7 @@ import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 
 enum CacheType {
@@ -69,7 +69,7 @@ export class AssetManager {
 
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
             const requiredChain = this.cache(requiredAssets, campaign, CacheType.REQUIRED).then(() => {
-                return this.validateVideos(requiredAssets);
+                return this.validateVideos(requiredAssets, campaign);
             });
 
             if(this._cacheMode === CacheMode.FORCED) {
@@ -191,7 +191,7 @@ export class AssetManager {
 
                     return Promise.resolve();
                 });
-                this.executeAssetQueue();
+                this.executeAssetQueue(campaign);
                 return promise;
             });
         }
@@ -214,7 +214,7 @@ export class AssetManager {
         });
     }
 
-    private executeAssetQueue(): void {
+    private executeAssetQueue(campaign: Campaign): void {
         if(!this._caching) {
             let currentAsset: IAssetQueueObject | undefined = this._requiredQueue.shift();
             if(!currentAsset) {
@@ -224,14 +224,14 @@ export class AssetManager {
             if(currentAsset) {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
-                this._cache.cache(asset.url, asset.diagnostics).then(([fileId, fileUrl]) => {
+                this._cache.cache(asset.url, asset.diagnostics, campaign).then(([fileId, fileUrl]) => {
                     asset.resolve([fileId, fileUrl]);
                     this._caching = false;
-                    this.executeAssetQueue();
+                    this.executeAssetQueue(campaign);
                 }).catch(error => {
                     asset.reject(error);
                     this._caching = false;
-                    this.executeAssetQueue();
+                    this.executeAssetQueue(campaign);
                 });
             }
         }
@@ -256,11 +256,11 @@ export class AssetManager {
         return true;
     }
 
-    private validateVideos(assets: Asset[]): Promise<void[]> {
+    private validateVideos(assets: Asset[], campaign: Campaign): Promise<void[]> {
         const promises = [];
         for(const asset of assets) {
             if(asset instanceof Video) {
-                promises.push(this._cache.isVideoValid(asset).then(valid => {
+                promises.push(this._cache.isVideoValid(asset, campaign).then(valid => {
                     if(!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }
@@ -279,7 +279,7 @@ export class AssetManager {
             required: required,
             id: campaign.getId(),
             campaignDTO: campaign.getDTO()
-        });
+        }, campaign.getSession());
     }
 
     private getOrientedVideo(campaign: PerformanceCampaign): Promise<Video> {

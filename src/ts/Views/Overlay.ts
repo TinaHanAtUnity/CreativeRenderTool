@@ -50,14 +50,16 @@ export class Overlay extends View {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
+    private _abGroup: number;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
         super(nativeBridge, 'overlay');
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
 
         this._muted = muted;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted: this._muted
@@ -84,6 +86,13 @@ export class Overlay extends View {
                 listener: (event: Event) => this.onClick(event)
             }
         ];
+
+        if(gameId === '1300023' || gameId === '1300024') {
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onSkipEvent(event)
+            });
+        }
     }
 
     public render(): void {
@@ -268,12 +277,34 @@ export class Overlay extends View {
     }
 
     private fade(value: boolean) {
-        if(value) {
-            this._container.classList.add('fade');
-            this._fadeStatus = false;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            if (value) {
+                this._skipElement.classList.remove('slide-back-in-place');
+                this._skipElement.classList.add('slide-up');
+                this._progressElement.classList.remove('slide-back-in-place');
+                this._progressElement.classList.add('slide-up');
+                this._muteButtonElement.classList.remove('slide-back-in-place');
+                this._muteButtonElement.classList.add('slide-down');
+                this._fadeStatus = false;
+            } else {
+                this._skipElement.classList.remove('slide-up');
+                this._skipElement.classList.add('slide-back-in-place');
+                this._progressElement.classList.remove('slide-up');
+                this._progressElement.classList.add('slide-back-in-place');
+                this._muteButtonElement.classList.remove('slide-down');
+                this._muteButtonElement.classList.add('slide-back-in-place');
+                this._fadeStatus = true;
+            }
         } else {
-            this._container.classList.remove('fade');
-            this._fadeStatus = true;
+            if(value) {
+                this._container.classList.add('fade');
+                this._container.style.pointerEvents = 'auto';
+                this._fadeStatus = false;
+            } else {
+                this._container.style.pointerEvents = 'none';
+                this._container.classList.remove('fade');
+                this._fadeStatus = true;
+            }
         }
     }
 }

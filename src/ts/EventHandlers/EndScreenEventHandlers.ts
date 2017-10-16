@@ -1,57 +1,59 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
-import { SessionManager } from 'Managers/SessionManager';
 import { Platform } from 'Constants/Platform';
 import { AbstractAdUnit} from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IosUtils } from 'Utilities/IosUtils';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { StoreName } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { EventType } from 'Models/Session';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class EndScreenEventHandlers {
 
-    public static onDownloadAndroid(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit): void {
+    public static onDownloadAndroid(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: AbstractAdUnit, clientInfo: ClientInfo): void {
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        sessionManager.sendClick(adUnit);
+        operativeEventManager.sendClick(adUnit);
         if(campaign.getClickAttributionUrl()) {
-            EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
 
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign);
+                EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign);
             }
         } else {
-            EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign);
+            EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign);
         }
     }
 
-    public static onDownloadIos(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo): void {
+    public static onDownloadIos(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: AbstractAdUnit, deviceInfo: DeviceInfo, clientInfo: ClientInfo): void {
         const campaign = <PerformanceCampaign>adUnit.getCampaign();
 
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        sessionManager.sendClick(adUnit);
+        operativeEventManager.sendClick(adUnit);
         if(campaign.getClickAttributionUrl()) {
-            EndScreenEventHandlers.handleClickAttribution(nativeBridge, sessionManager, campaign);
+            EndScreenEventHandlers.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
 
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
+                EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
             }
         } else {
-            EndScreenEventHandlers.openAppStore(nativeBridge, sessionManager, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
+            EndScreenEventHandlers.openAppStore(nativeBridge, clientInfo, campaign, IosUtils.isAppSheetBroken(deviceInfo.getOsVersion()));
         }
     }
 
-    public static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign) {
+    public static handleClickAttribution(nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, campaign: PerformanceCampaign) {
         const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
@@ -60,12 +62,11 @@ export class EndScreenEventHandlers {
             currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
         }
 
-        const eventManager = sessionManager.getEventManager();
         const platform = nativeBridge.getPlatform();
         const clickAttributionUrl = campaign.getClickAttributionUrl();
 
         if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -81,7 +82,7 @@ export class EndScreenEventHandlers {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
-                    });
+                    }, campaign.getSession());
                 }
             }).catch(error => {
                 if(error instanceof RequestError) {
@@ -92,11 +93,11 @@ export class EndScreenEventHandlers {
                         response: (<RequestError>error).nativeResponse
                     });
                 }
-                Diagnostics.trigger('click_attribution_failed', error);
+                Diagnostics.trigger('click_attribution_failed', error, campaign.getSession());
             });
         } else {
             if (clickAttributionUrl) {
-                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+                thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
             }
         }
     }
@@ -128,11 +129,11 @@ export class EndScreenEventHandlers {
         }
     }
 
-    private static openAppStore(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
+    private static openAppStore(nativeBridge: NativeBridge, clientInfo: ClientInfo, campaign: PerformanceCampaign, isAppSheetBroken?: boolean) {
         const platform = nativeBridge.getPlatform();
 
         if(platform === Platform.ANDROID) {
-            const packageName = sessionManager.getClientInfo().getApplicationName();
+            const packageName = clientInfo.getApplicationName();
             nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': EndScreenEventHandlers.getAppStoreUrl(campaign, packageName)

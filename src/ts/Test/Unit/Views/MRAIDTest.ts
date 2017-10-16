@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { MRAID } from 'Views/MRAID';
 import { TestFixtures } from '../TestHelpers/TestFixtures';

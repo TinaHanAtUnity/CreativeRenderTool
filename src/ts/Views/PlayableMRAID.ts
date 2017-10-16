@@ -2,7 +2,7 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
@@ -160,7 +160,7 @@ export class PlayableMRAID extends MRAIDView {
                     const resourceUrl = this._campaign.getResourceUrl();
                     Diagnostics.trigger('playable_prepare_timeout', {
                         'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
-                    });
+                    }, this._campaign.getSession());
 
                     this._prepareTimeout = undefined;
                 }, 4500);

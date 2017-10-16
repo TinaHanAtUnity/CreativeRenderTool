@@ -9,6 +9,7 @@ import { Video } from 'Models/Assets/Video';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { VideoInfo } from 'Utilities/VideoInfo';
+import { Campaign } from 'Models/Campaign';
 import { SdkStats } from 'Utilities/SdkStats';
 
 export enum CacheStatus {
@@ -121,7 +122,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<string[]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -354,7 +355,7 @@ export class Cache {
         });
     }
 
-    public isVideoValid(video: Video): Promise<boolean> {
+    public isVideoValid(video: Video, campaign: Campaign): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
                 const isValid = (width > 0 && height > 0 && duration > 0);
@@ -364,14 +365,14 @@ export class Cache {
                         width: width,
                         height: height,
                         duration: duration
-                    });
+                    }, campaign.getSession());
                 }
                 return isValid;
             }).catch(error => {
                 Diagnostics.trigger('video_validation_failed', {
                     url: video.getOriginalUrl(),
                     error: error
-                });
+                }, campaign.getSession());
                 return false;
             });
         });

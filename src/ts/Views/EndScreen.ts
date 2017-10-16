@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import EndScreenDarkTemplate from 'html/EndScreenDark.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -9,8 +8,8 @@ import { Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
 export class EndScreen extends View {
 
@@ -22,24 +21,17 @@ export class EndScreen extends View {
     private _gameName: string;
     private _privacy: Privacy;
     private _localization: Localization;
-    private _abGroup: number;
+    private _isSwipeToCloseEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
 
-        /* TODO: Redundant check, the same as on line 42? */
-        this._abGroup = campaign && campaign.getAbGroup();
-
-        if (this._abGroup === 8 || this._abGroup === 9) {
-            this._template = new Template(EndScreenDarkTemplate, this._localization);
-        } else {
-            this._template = new Template(EndScreenTemplate, this._localization);
-        }
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         /* TODO: Why is there a check for campaign */
-        if(campaign && campaign instanceof  PerformanceCampaign) {
+        if(campaign && campaign instanceof PerformanceCampaign) {
             this._gameName = campaign.getGameName();
 
             const adjustedRating: number = campaign.getRating() * 20;
@@ -102,6 +94,24 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+
+        if(gameId === '1300023' || gameId === '1300024') {
+            this._isSwipeToCloseEnabled = true;
+
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.campaign-container, .game-background, .btn.download'
+            });
+        }
+    }
+
+    public render(): void {
+        super.render();
+
+        if(this._isSwipeToCloseEnabled) {
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
     }
 
     public show(): void {
@@ -120,15 +130,6 @@ export class EndScreen extends View {
            setTimeout(() => {
                this.onClose.trigger();
            }, AbstractAdUnit.getAutoCloseDelay());
-        }
-
-        const darkEndScreenInfo = <HTMLElement>this._container.querySelector(".end-screen-info-background.dark");
-        if (darkEndScreenInfo) {
-            if (this._abGroup === 9) {
-                darkEndScreenInfo.classList.add("animate");
-            } else {
-                darkEndScreenInfo.classList.add("without-animation");
-            }
         }
     }
 

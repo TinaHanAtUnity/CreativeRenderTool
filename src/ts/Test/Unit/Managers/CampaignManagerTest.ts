@@ -5,8 +5,8 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
-import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -20,10 +20,10 @@ import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { FocusManager } from 'Managers/FocusManager';
@@ -60,6 +60,7 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 
 describe('CampaignManager', () => {
@@ -72,7 +73,7 @@ describe('CampaignManager', () => {
     let warningSpy: sinon.SinonSpy;
     let configuration: Configuration;
     let metaDataManager: MetaDataManager;
-    let eventManager: EventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let sessionManager: SessionManager;
     let focusManager: FocusManager;
 
@@ -186,8 +187,8 @@ describe('CampaignManager', () => {
         request = new Request(nativeBridge, wakeUpManager);
         deviceInfo = new DeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
     });
 
     describe('on VAST campaign', () => {
@@ -896,6 +897,27 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
+            });
+        });
+
+        it('should trigger onError when there is no clickThroughURL', () => {
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayCampaignNoClick
+            }));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            let triggeredError: any;
+
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'No clickThroughURL for programmatic/static-interstitial');
             });
         });
     });

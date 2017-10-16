@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import { View } from 'Views/View';
 import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';

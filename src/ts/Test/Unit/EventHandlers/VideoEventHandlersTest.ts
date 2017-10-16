@@ -12,7 +12,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request } from 'Utilities/Request';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
@@ -22,11 +22,13 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -39,6 +41,11 @@ describe('VideoEventHandlersTest', () => {
     let video: Video;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let operativeEventManager: OperativeEventManager;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let request: Request;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -71,7 +78,14 @@ describe('VideoEventHandlersTest', () => {
             container: sinon.spy()
         };
 
-        sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge), new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        request = new Request(nativeBridge, wakeUpManager);
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         video = new Video('');
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
             getVideo: () => video,
@@ -100,23 +114,23 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video started', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             assert.isTrue(performanceAdUnit.getVideo().hasStarted());
         });
 
         it('should send start event to backend', () => {
-            sinon.spy(sessionManager, 'sendStart');
+            sinon.spy(operativeEventManager, 'sendStart');
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendStart, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, performanceAdUnit);
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
             sinon.stub(nativeBridge.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
 
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, TestFixtures.getPlacement().getId());
         });
@@ -128,47 +142,47 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('with positive position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 5, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 5, TestFixtures.getConfiguration());
 
             sinon.assert.calledWith(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition, 5);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, 5);
         });
 
         it('with negative position, should set video position and video progress', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, -5, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, -5, TestFixtures.getConfiguration());
 
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.getVideo().setPosition);
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoProgress, -5);
         });
 
         it('should send first quartile event', () => {
-            sinon.spy(sessionManager, 'sendFirstQuartile');
+            sinon.spy(operativeEventManager, 'sendFirstQuartile');
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(4000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 6000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 6000, TestFixtures.getConfiguration());
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendFirstQuartile, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, performanceAdUnit);
         });
 
         it('should send midpoint event', () => {
-            sinon.spy(sessionManager, 'sendMidpoint');
+            sinon.spy(operativeEventManager, 'sendMidpoint');
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(9000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 11000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 11000, TestFixtures.getConfiguration());
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendMidpoint, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, performanceAdUnit);
         });
 
         it('should send third quartile event', () => {
-            sinon.spy(sessionManager, 'sendThirdQuartile');
+            sinon.spy(operativeEventManager, 'sendThirdQuartile');
 
             performanceAdUnit.getVideo().setDuration(20000);
             performanceAdUnit.getVideo().setPosition(14000);
-            VideoEventHandlers.onVideoProgress(nativeBridge, sessionManager, performanceAdUnit, 16000, TestFixtures.getConfiguration());
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, 16000, TestFixtures.getConfiguration());
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendThirdQuartile, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, performanceAdUnit);
         });
     });
 
@@ -179,29 +193,29 @@ describe('VideoEventHandlersTest', () => {
             prom = Promise.resolve(false);
 
             sinon.spy(nativeBridge, 'invoke');
-            sinon.spy(sessionManager, 'sendView');
+            sinon.spy(operativeEventManager, 'sendView');
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
 
             assert.isFalse(performanceAdUnit.isActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
 
             assert.equal(performanceAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendView, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, performanceAdUnit);
         });
 
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(sessionManager, performanceAdUnit);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, performanceAdUnit);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
             if(adUnitOverlay) {

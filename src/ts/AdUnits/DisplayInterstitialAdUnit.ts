@@ -4,25 +4,25 @@ import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { Observable1, Observable0 } from 'Utilities/Observable';
-import { SessionManager } from 'Managers/SessionManager';
-import { DisplayInterstitialCampaign } from 'Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     public readonly onRedirect = new Observable1<string>();
     public readonly onSkip = new Observable0();
 
-    private _sessionManager: SessionManager;
+    private _operativeEventManager: OperativeEventManager;
     private _view: DisplayInterstitial;
     private _options: any;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, sessionManager: SessionManager, placement: Placement, campaign: DisplayInterstitialCampaign, view: DisplayInterstitial, options: any) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, placement: Placement, campaign: DisplayInterstitialCampaign, view: DisplayInterstitial, options: any) {
         super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
-        this._sessionManager = sessionManager;
+        this._operativeEventManager = operativeEventManager;
         this._view = view;
 
         this._options = options;
@@ -37,7 +37,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this._view.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._sessionManager.sendStart(this);
+        this._operativeEventManager.sendStart(this);
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
