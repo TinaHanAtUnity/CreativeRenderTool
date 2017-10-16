@@ -113,8 +113,8 @@ export class AdUnitFactory {
             level1: campaign.getAdvertiserDomain(),
             level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            site: campaign.getAdvertiserBundleId(),
-            placement: placement.getName()
+            slicer1: campaign.getAdvertiserBundleId(),
+            slicer2: placement.getName()
         };
 
         const moatData = {
