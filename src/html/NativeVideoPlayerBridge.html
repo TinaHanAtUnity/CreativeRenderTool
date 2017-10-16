@@ -28,6 +28,15 @@
             }
         };
 
+        var durationProperty = {
+            get: function() {
+                return this._duration;
+            },
+            set: function(duration) {
+                throw new Error('set duration not supported');
+            }
+        }
+
         var VideoPlayerBridge = function() {
             this._src = null;
             this._duration = 0;
@@ -37,6 +46,7 @@
             Object.defineProperty(this, 'src', sourceProperty);
             Object.defineProperty(this, 'currentTime', currentTimeProperty);
             Object.defineProperty(this, 'style', styleProperty);
+            Object.defineProperty(this, 'duration', durationProperty);
 
             var self = this;
             window.addEventListener('message', function(e) {
