@@ -4,8 +4,8 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { SessionManager } from 'Managers/SessionManager';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Asset } from 'Models/Assets/Asset';
@@ -13,6 +13,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IFileInfo } from 'Native/Api/Cache';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -230,6 +232,10 @@ export class SdkStats {
             return 'vast';
         } else if(campaign instanceof MRAIDCampaign) {
             return 'mraid';
+        } else if(campaign instanceof DisplayInterstitialCampaign) {
+            return 'display';
+        } else if(campaign instanceof VPAIDCampaign) {
+            return 'vpaid';
         } else {
             return 'unknown';
         }
