@@ -5,6 +5,7 @@ import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
 import { GlyphView } from 'Views/GlyphView';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { FinishState } from 'Constants/FinishState';
 
 export class GlyphAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
@@ -17,12 +18,15 @@ export class GlyphAdUnit extends AbstractAdUnit {
         this._view = view;
 
         this._options = options;
+
+        this._view.onSkip.subscribe(() => this.onSkip());
     }
 
     public show(): Promise<void> {
-        this.onShow();
-        this.showView();
-        return this._container.open(this, true, false, this._forceOrientation, true, false, true, false, this._options);
+        return this._container.open(this, true, false, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onShow();
+            this.showView();
+        });
     }
 
     public hide(): Promise<void> {
@@ -57,5 +61,10 @@ export class GlyphAdUnit extends AbstractAdUnit {
     private hideView() {
         this._view.hide();
         document.body.removeChild(this._view.container());
+    }
+
+    private onSkip() {
+        this.setFinishState(FinishState.SKIPPED);
+        this.hide();
     }
 }

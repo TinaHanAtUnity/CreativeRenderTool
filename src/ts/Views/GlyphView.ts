@@ -10,9 +10,12 @@ import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
 import { Template } from 'Utilities/Template';
 import { Overlay } from 'Views/Overlay';
 import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
+import { Observable0 } from 'Utilities/Observable';
 
 export class GlyphView extends View {
     public readonly videoBridge: NativeVideoPlayerBridge;
+    public readonly onSkip: Observable0 = new Observable0();
+
     private _placement: Placement;
     private _campaign: GlyphCampaign;
     private _iframe: HTMLIFrameElement;
@@ -35,6 +38,9 @@ export class GlyphView extends View {
         this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge);
         this.videoBridge.onProgress.subscribe((progress) => this.onVideoProgress(progress));
         this.videoBridge.onPrepare.subscribe((duration) => this.onVideoPrepared(duration));
+
+        this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
+        this._overlay.onMute.subscribe((muted) => muted ? this.onMute() : this.onUnmute());
     }
 
     public render() {
@@ -52,6 +58,7 @@ export class GlyphView extends View {
     public hide() {
         window.removeEventListener('message', this._messageListener);
         super.hide();
+        this.videoBridge.stopVideo();
         this.videoBridge.disconnect();
     }
 
@@ -67,7 +74,18 @@ export class GlyphView extends View {
         this._overlay.render();
         this._overlay.setFadeEnabled(true);
         this._overlay.setVideoDurationEnabled(true);
-        this._container.insertBefore(this._overlay.container(), this._container.firstChild);
+        this._overlay.setMuteEnabled(true);
+
+        if (this._placement.allowSkip()) {
+            this._overlay.setSkipEnabled(true);
+            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
+        } else {
+            this._overlay.setSkipEnabled(false);
+        }
+
+        const overlayEl = this._overlay.container();
+        overlayEl.style.position = 'absolute';
+        this._container.insertBefore(overlayEl, this._container.firstChild);
     }
 
     private onMessage(e: MessageEvent) {
@@ -125,5 +143,13 @@ export class GlyphView extends View {
 
     private updateTimerDuration(duration: number) {
         this._overlay.setVideoDuration(duration);
+    }
+
+    private onMute() {
+        this.videoBridge.muteVideo();
+    }
+
+    private onUnmute() {
+        this.videoBridge.unmuteVideo();
     }
 }

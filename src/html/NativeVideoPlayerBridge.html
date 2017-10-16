@@ -96,6 +96,7 @@
 
         VideoPlayerBridge.prototype.handleVideoPrepared = function(data) {
             this._duration = data.duration;
+            this.dispatchEvent('durationchange');
         };
 
         VideoPlayerBridge.prototype.dispatchEvent = function(event, data) {

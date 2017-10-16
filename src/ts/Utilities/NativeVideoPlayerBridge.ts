@@ -61,6 +61,10 @@ export class NativeVideoPlayerBridge {
         this._nativeBridge.VideoPlayer.onCompleted.unsubscribe(this._videoCompleteHandler);
     }
 
+    public stopVideo() {
+        this._nativeBridge.VideoPlayer.stop();
+    }
+
     public notifyCanPlay() {
         this.sendMessage('canplay');
     }
@@ -91,6 +95,21 @@ export class NativeVideoPlayerBridge {
 
     public notifyEnd() {
         this.sendMessage('ended');
+    }
+
+    public muteVideo() {
+        this.setVolume(0.0);
+    }
+
+    public unmuteVideo() {
+        this.setVolume(1.0);
+    }
+
+    private setVolume(volume: number) {
+        this._nativeBridge.VideoPlayer.setVolume(new Double(volume));
+        this.sendMessage('volumechange', {
+            volume: volume
+        });
     }
 
     private sendMessage(event: string, data?: any) {
@@ -133,6 +152,7 @@ export class NativeVideoPlayerBridge {
     }
 
     private onPrepareVideo(url: string) {
+        this.sendMessage('loadstart');
         this._nativeBridge.VideoPlayer.prepare(url, new Double(1.0), 10000);
     }
 
