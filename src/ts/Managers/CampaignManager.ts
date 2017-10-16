@@ -197,7 +197,7 @@ export class CampaignManager {
         }
     }
 
-    private handleCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertizerCampaignId?: string, advertizerBundleId?: string, advertizerDomain?: string): Promise<void> {
+    private handleCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string): Promise<void> {
         const abGroup: number = this._configuration.getAbGroup();
         const gamerId: string = this._configuration.getGamerId();
 
@@ -218,7 +218,7 @@ export class CampaignManager {
                     return this.handleError(new Error('No vast content'), placements);
                 }
 
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId, advertizerCampaignId, advertizerBundleId, advertizerDomain).then((vastCampaign) => {
+                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId, advertiserCampaignId, advertiserBundleId, advertiserDomain).then((vastCampaign) => {
                     return this.setupCampaignAssets(placements, vastCampaign);
                 });
 
@@ -295,11 +295,11 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertizerCampaignId?: string, advertizerBundleId?: string, advertizerDomain?: string): Promise<VastCampaign> {
+    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string): Promise<VastCampaign> {
         const decodedVast = decodeURIComponent(content).trim();
         return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
             const campaignId = this.getProgrammaticCampaignId();
-            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId, advertizerCampaignId, advertizerBundleId, advertizerDomain);
+            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId, advertiserCampaignId, advertiserBundleId, advertiserDomain);
             if(campaign.getVast().getImpressionUrls().length === 0) {
                 return Promise.reject(new Error('Campaign does not have an impression url'));
             }

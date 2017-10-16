@@ -105,15 +105,15 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        if (campaign.getAdvertizerDomain() !== undefined) {
+        if (campaign.getAdvertiserDomain() !== undefined) {
             vastAdUnit.initMoat();
         }
 
         const moatIds = {
-            level1: campaign.getAdvertizerDomain(),
-            level2: campaign.getAdvertizerCampaignId(),
+            level1: campaign.getAdvertiserDomain(),
+            level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            site: campaign.getAdvertizerBundleId(),
+            site: campaign.getAdvertiserBundleId(),
             placement: placement.getName()
         };
 

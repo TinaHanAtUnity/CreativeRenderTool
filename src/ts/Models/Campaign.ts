@@ -11,9 +11,9 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
-    advertizerDomain: string | undefined;
-    advertizerCampaignId: string | undefined;
-    advertizerBundleId: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserCampaignId: string | undefined;
+    advertiserBundleId: string | undefined;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -27,9 +27,9 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
-        advertizerDomain: ['string', 'undefined'],
-        advertizerCampaignId: ['string', 'undefined'],
-        advertizerBundleId: ['string', 'undefined']
+        advertiserDomain: ['string', 'undefined'],
+        advertiserCampaignId: ['string', 'undefined'],
+        advertiserBundleId: ['string', 'undefined']
     };
 
     constructor(name: string, schema: ISchema<T>) {
@@ -68,16 +68,16 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('meta');
     }
 
-    public getAdvertizerDomain(): string | undefined {
-        return this.get('advertizerDomain');
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
     }
 
-    public getAdvertizerCampaignId(): string | undefined {
-        return this.get('advertizerCampaignId');
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
     }
 
-    public getAdvertizerBundleId(): string | undefined {
-        return this.get('advertizerBundleId');
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
     }
 
     public getWillExpireAt(): number {
