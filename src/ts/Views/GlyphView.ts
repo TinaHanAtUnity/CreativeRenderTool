@@ -5,7 +5,6 @@ import NativeVideoPlayerBridgeContainer from 'html/NativeVideoPlayerBridge.html'
 import MRAIDContainer from 'html/glyph/MRAIDContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
 import { Template } from 'Utilities/Template';
@@ -13,25 +12,13 @@ import { Overlay } from 'Views/Overlay';
 import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
 
 export class GlyphView extends View {
-
-    public readonly onOpenURL = new Observable1<string>();
-    public readonly onReward = new Observable0();
-    public readonly onSkip = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onPrepareVideo = new Observable1<string>();
-    public readonly onPlayVideo = new Observable0();
-
+    public readonly videoBridge: NativeVideoPlayerBridge;
     private _placement: Placement;
     private _campaign: GlyphCampaign;
-
-    private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
-
-    private _markup: string;
 
     private _messageListener: EventListener;
     private _overlay: Overlay;
-    private _videoBridge: NativeVideoPlayerBridge;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: GlyphCampaign, language: string, gameId: string, abGroup: number) {
         super(nativeBridge, 'glyph');
@@ -45,15 +32,30 @@ export class GlyphView extends View {
 
         this._bindings = [];
 
-        this._videoBridge = new NativeVideoPlayerBridge(this._nativeBridge);
+        this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge);
+        this.videoBridge.onProgress.subscribe((progress) => this.onVideoProgress(progress));
+        this.videoBridge.onPrepare.subscribe((duration) => this.onVideoPrepared(duration));
     }
 
     public render() {
         super.render();
+        this.setupIFrame();
+        this.setupOverlay();
+    }
 
-        this._markup = this._campaign.getDynamicMarkup();
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+    public show(): void {
+        super.show();
+        window.addEventListener('message', this._messageListener);
+        this.videoBridge.connect(this._iframe);
+    }
 
+    public hide() {
+        window.removeEventListener('message', this._messageListener);
+        super.hide();
+        this.videoBridge.disconnect();
+    }
+
+    private setupIFrame() {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#glyph-iframe');
         const markup = this.getIFrameSrcDoc();
         iframe.srcdoc = markup;
@@ -61,16 +63,11 @@ export class GlyphView extends View {
         this._iframe = iframe;
     }
 
-    public show(): void {
-        super.show();
-        window.addEventListener('message', this._messageListener);
-        this._videoBridge.connect(this._iframe);
-    }
-
-    public hide() {
-        window.removeEventListener('message', this._messageListener);
-        super.hide();
-        this._videoBridge.disconnect();
+    private setupOverlay() {
+        this._overlay.render();
+        this._overlay.setFadeEnabled(true);
+        this._overlay.setVideoDurationEnabled(true);
+        this._container.insertBefore(this._overlay.container(), this._container.firstChild);
     }
 
     private onMessage(e: MessageEvent) {
@@ -112,5 +109,21 @@ export class GlyphView extends View {
 
     private injectScript(e: HTMLElement, script: string) {
         e.innerHTML = script + e.innerHTML;
+    }
+
+    private onVideoProgress(progress: number) {
+        this.updateTimerProgress(progress);
+    }
+
+    private updateTimerProgress(progress: number) {
+        this._overlay.setVideoProgress(progress);
+    }
+
+    private onVideoPrepared(duration: number) {
+        this.updateTimerDuration(duration);
+    }
+
+    private updateTimerDuration(duration: number) {
+        this._overlay.setVideoDuration(duration);
     }
 }
