@@ -13,7 +13,7 @@ interface IVastCampaign extends ICampaign {
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertizerCampaignId?: string, advertizerBundleId?: string, advertizerDomain?: string) {
         super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
@@ -50,6 +50,9 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('correlationId', correlationId || undefined);
         this.set('creativeId', creativeId || undefined);
         this.set('seatId', seatId || undefined);
+        this.set('advertizerDomain', advertizerDomain || undefined);
+        this.set('advertizerCampaignId', advertizerCampaignId || undefined);
+        this.set('advertizerBundleId', advertizerBundleId || undefined);
 
         this.processCustomTracking(tracking);
     }

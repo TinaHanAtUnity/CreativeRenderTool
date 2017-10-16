@@ -105,7 +105,19 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        vastAdUnit.initMoat();
+        if (campaign.getAdvertizerDomain() !== undefined) {
+            console.log(campaign.getAdvertizerDomain());
+            vastAdUnit.initMoat();
+        }
+
+        const moatIds = {
+            level1: campaign.getAdvertizerDomain(),
+            level2: campaign.getAdvertizerCampaignId(),
+            level3: campaign.getCreativeId(),
+            site: campaign.getAdvertizerBundleId(),
+            placement: placement.getName()
+        };
+
         const moatData = {
             SDK: 'UnityAds',
             Version: '1.0',
@@ -122,7 +134,7 @@ export class AdUnitFactory {
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, sessionManager, vastAdUnit, request);
         this.prepareVideoPlayer(nativeBridge, container, sessionManager, configuration, vastAdUnit);
 
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData));
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData, moatIds));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(sessionManager, vastAdUnit));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoPlaying(sessionManager, vastAdUnit));
         const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));
