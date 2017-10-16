@@ -1,3 +1,7 @@
+# Mon Oct 16 20:19:29 UTC 2017
+
+* Adds ad response to all diagnostic messages.
+
 # Thu Oct 12 20:04:06 UTC 2017
 
 * Fire VAST Impression on VPAID Ad Units
