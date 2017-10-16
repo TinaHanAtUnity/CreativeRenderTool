@@ -106,7 +106,6 @@ export class AdUnitFactory {
         }
 
         if (campaign.getAdvertizerDomain() !== undefined) {
-            console.log(campaign.getAdvertizerDomain());
             vastAdUnit.initMoat();
         }
 
