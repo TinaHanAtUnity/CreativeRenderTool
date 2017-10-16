@@ -1,5 +1,6 @@
 <script>
     (function() {
+
         var sourceProperty = {
             get: function() {
                 return this._src;
@@ -21,12 +22,21 @@
             }
         };
 
+        var styleProperty = {
+            get: function() {
+                return this._element.style;
+            }
+        };
+
         var VideoPlayerBridge = function() {
             this._src = null;
             this._duration = 0;
             this._listeners = {};
+            this._element = document.createElement('p');
+
             Object.defineProperty(this, 'src', sourceProperty);
             Object.defineProperty(this, 'currentTime', currentTimeProperty);
+            Object.defineProperty(this, 'style', styleProperty);
 
             var self = this;
             window.addEventListener('message', function(e) {
