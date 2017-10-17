@@ -1,15 +1,13 @@
 import { IVPAIDEndScreenHandler } from 'Views/VPAIDEndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-import { IVPAIDHandler } from 'Views/VPAID';
-import { IOverlayHandler } from 'Views/Overlay';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 export class VPAIDEndScreenEventHandler implements IVPAIDEndScreenHandler {
     private _adUnit: VPAIDAdUnit;
     private _vpaidCampaign: VPAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters<IVPAIDEndScreenHandler, IVPAIDHandler, IOverlayHandler>) {
+    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._adUnit = adUnit;
         this._vpaidCampaign = <VPAIDCampaign>parameters.campaign;
     }

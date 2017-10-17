@@ -3,12 +3,11 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventType } from 'Models/Session';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { Request } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -27,7 +26,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _campaign: MRAIDCampaign;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;

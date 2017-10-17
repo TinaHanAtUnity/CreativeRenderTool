@@ -1,8 +1,8 @@
 import { IVPAIDHandler, VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-import { IVPAIDEndScreenHandler, VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { IOverlayHandler, Overlay } from 'Views/Overlay';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { Overlay } from 'Views/Overlay';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
@@ -25,7 +25,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters<IVPAIDEndScreenHandler, IVPAIDHandler, IOverlayHandler>) {
+    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;

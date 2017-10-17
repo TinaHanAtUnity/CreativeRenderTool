@@ -12,10 +12,11 @@ import { Configuration } from 'Models/Configuration';
 import { VideoInfo } from 'Utilities/VideoInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Campaign } from 'Models/Campaign';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit<Campaign>, duration: number): void {
         if(adUnit.getVideo().getErrorStatus() || !adUnit.isPrepareCalled()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
@@ -82,7 +83,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit<Campaign>, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
@@ -209,12 +210,12 @@ export class VideoEventHandlers {
         }
     }
 
-    public static onVideoPlay(nativeBridge: NativeBridge, adUnit: VideoAdUnit): void {
+    public static onVideoPlay(nativeBridge: NativeBridge, adUnit: VideoAdUnit<Campaign>): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPlay'});
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit<Campaign>): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
@@ -223,7 +224,7 @@ export class VideoEventHandlers {
         this.afterVideoCompleted(adUnit);
     }
 
-    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, what: number, extra: number, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onAndroidGenericVideoError', what: what, extra: extra});
         nativeBridge.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
 
@@ -235,7 +236,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIosGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string, description: string) {
+    public static onIosGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, url: string, description: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onIosGenericVideoError', description: description});
         nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
@@ -246,7 +247,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string): void {
+    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, url: string): void {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPrepareTimeout'});
         nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
 
@@ -256,7 +257,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onPrepareError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onPrepareError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onPrepareError'});
         nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 
@@ -266,7 +267,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onSeekToError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onSeekToError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onSeekToError'});
         nativeBridge.Sdk.logError('Unity Ads video player seek to error '  + url);
 
@@ -276,7 +277,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onPauseError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onPauseError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onPauseError'});
         nativeBridge.Sdk.logError('Unity Ads video player pause error '  + url);
 
@@ -286,7 +287,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIllegalStateError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    public static onIllegalStateError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onIllegalStateError'});
         nativeBridge.Sdk.logError('Unity Ads video player illegal state error');
 
@@ -295,14 +296,14 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIosVideoLikelyToKeepUp(nativeBridge: NativeBridge, adUnit: VideoAdUnit, container: AdUnitContainer, likelyToKeepUp: boolean): void {
+    public static onIosVideoLikelyToKeepUp(nativeBridge: NativeBridge, adUnit: VideoAdUnit<Campaign>, container: AdUnitContainer, likelyToKeepUp: boolean): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onIosVideoLikelyToKeepUp', likelyToKeepUp: likelyToKeepUp, hasStarted: adUnit.getVideo().hasStarted()});
         if(!container.isPaused() && adUnit.getVideo().hasStarted() && likelyToKeepUp) {
             nativeBridge.VideoPlayer.play();
         }
     }
 
-    protected static afterVideoCompleted(adUnit: VideoAdUnit) {
+    protected static afterVideoCompleted(adUnit: VideoAdUnit<Campaign>) {
         adUnit.getContainer().addDiagnosticsEvent({type: 'afterVideoCompleted'});
         adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
@@ -313,12 +314,12 @@ export class VideoEventHandlers {
         adUnit.onFinish.trigger();
     }
 
-    protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit) {
+    protected static updateViewsOnVideoError(videoAdUnit: VideoAdUnit<Campaign>) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'updateViewsOnVideoError'});
         videoAdUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
     }
 
-    private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, errorType?: string, errorData?: any) {
+    private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>, errorType?: string, errorData?: any) {
         if(!videoAdUnit.getVideo().getErrorStatus()) {
             videoAdUnit.getVideo().setErrorStatus(true);
 

@@ -6,6 +6,7 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { Request } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _nativeBridge: NativeBridge;
@@ -13,7 +14,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _clientInfo: ClientInfo;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._clientInfo = parameters.clientInfo;

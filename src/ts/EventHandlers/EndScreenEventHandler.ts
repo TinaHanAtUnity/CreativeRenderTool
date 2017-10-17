@@ -5,10 +5,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
-import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { KeyCode } from 'Constants/Android/KeyCode';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventType } from 'Models/Session';
@@ -16,16 +13,26 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
+import { Campaign } from 'Models/Campaign';
 
-export class EndScreenEventHandler implements IEndScreenHandler {
+export interface IEndScreenDownloadParameters {
+    clickAttributionUrl: string | undefined;
+    clickAttributionUrlFollowsRedirects: boolean | undefined;
+    bypassAppSheet: boolean | undefined;
+    appStoreId: string | undefined;
+    store: StoreName | undefined;
+    gamerId: string;
+}
+
+export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> implements IEndScreenHandler {
+    protected _adUnit: T2;
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _adUnit: AbstractAdUnit;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
 
-    constructor(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -34,11 +41,11 @@ export class EndScreenEventHandler implements IEndScreenHandler {
         this._deviceInfo = parameters.deviceInfo;
     }
 
-    public onEndScreenDownload(): void {
+    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this.onDownloadIos();
+            this.onDownloadIos(parameters);
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this.onDownloadAndroid();
+            this.onDownloadAndroid(parameters);
         }
     }
 
@@ -57,54 +64,40 @@ export class EndScreenEventHandler implements IEndScreenHandler {
         this._adUnit.hide();
     }
 
-    public onDownloadAndroid(): void {
-        const campaign = <PerformanceCampaign>this._adUnit.getCampaign();
+    public abstract onKeyEvent(keyCode: number): void;
 
+    private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._adUnit.getPlacement().getId());
 
         this._operativeEventManager.sendClick(this._adUnit);
-        if(campaign.getClickAttributionUrl()) {
-            this.handleClickAttribution();
+        if(parameters.clickAttributionUrl) {
+            this.handleClickAttribution(parameters);
 
-            if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                this.openAppStore();
+            if(!parameters.clickAttributionUrlFollowsRedirects) {
+                this.openAppStore(parameters);
             }
         } else {
-            this.openAppStore();
+            this.openAppStore(parameters);
         }
     }
 
-    public onDownloadIos(): void {
-        const campaign = <PerformanceCampaign>this._adUnit.getCampaign();
-
+    private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._adUnit.getPlacement().getId());
 
         this._operativeEventManager.sendClick(this._adUnit);
-        if(campaign.getClickAttributionUrl()) {
-            this.handleClickAttribution();
+        if(parameters.clickAttributionUrl) {
+            this.handleClickAttribution(parameters);
 
-            if(!campaign.getClickAttributionUrlFollowsRedirects()) {
-                this.openAppStore(IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+            if(!parameters.clickAttributionUrlFollowsRedirects) {
+                this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
             }
         } else {
-            this.openAppStore(IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+            this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
         }
     }
 
-    public onKeyEvent(keyCode: number): void {
-        if (this._adUnit instanceof VideoAdUnit) {
-            if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
-                this._adUnit.hide();
-            }
-        } else if (this._adUnit instanceof MRAIDAdUnit) {
-            if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isShowingMRAID()) {
-                this._adUnit.hide();
-            }
-        }
-    }
-
-    private handleClickAttribution() {
-        const campaign = <PerformanceCampaign>this._adUnit.getCampaign();
+    private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
+        const campaign = this._adUnit.getCampaign();
         const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
@@ -114,10 +107,9 @@ export class EndScreenEventHandler implements IEndScreenHandler {
         }
 
         const platform = this._nativeBridge.getPlatform();
-        const clickAttributionUrl = campaign.getClickAttributionUrl();
 
-        if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+        if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
+            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
@@ -130,8 +122,8 @@ export class EndScreenEventHandler implements IEndScreenHandler {
                     }
                 } else {
                     Diagnostics.trigger('click_attribution_misconfigured', {
-                        url: campaign.getClickAttributionUrl(),
-                        followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                        url: parameters.clickAttributionUrl,
+                        followsRedirects: parameters.clickAttributionUrlFollowsRedirects,
                         response: response
                     });
                 }
@@ -140,65 +132,84 @@ export class EndScreenEventHandler implements IEndScreenHandler {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
                         auctionId: campaign.getSession().getId(),
-                        url: campaign.getClickAttributionUrl(),
+                        url: parameters.clickAttributionUrl,
                         response: (<RequestError>error).nativeResponse
                     });
                 }
                 Diagnostics.trigger('click_attribution_failed', error);
             });
         } else {
-            if (clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
+            if (parameters.clickAttributionUrl) {
+                this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
             }
         }
     }
 
-    private openAppStore(isAppSheetBroken?: boolean) {
+    private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {
         const platform = this._nativeBridge.getPlatform();
-        const campaign = <PerformanceCampaign>this._adUnit.getCampaign();
+        let packageName: string | undefined;
 
         if(platform === Platform.ANDROID) {
-            const packageName = this._clientInfo.getApplicationName();
+            packageName = this._clientInfo.getApplicationName();
+        }
+
+        const appStoreUrl = this.getAppStoreUrl(parameters, packageName);
+        if(!appStoreUrl) {
+            Diagnostics.trigger('no_appstore_url', {
+                message: 'cannot generate appstore url'
+            });
+            return;
+        }
+
+        if(platform === Platform.ANDROID) {
             this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
-                'uri': this.getAppStoreUrl(campaign, packageName)
+                'uri': appStoreUrl
             });
         } else if(platform === Platform.IOS) {
-            if(isAppSheetBroken || campaign.getBypassAppSheet()) {
-                this._nativeBridge.UrlScheme.open(this.getAppStoreUrl(campaign));
+            if(isAppSheetBroken || parameters.bypassAppSheet) {
+                this._nativeBridge.UrlScheme.open(appStoreUrl);
             } else {
                 this._nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
                     if(canOpenAppSheet) {
+                        if(!parameters.appStoreId) {
+                            Diagnostics.trigger('no_appstore_id', {
+                                message: 'trying to open ios appstore without appstore id'
+                            });
+                            return;
+                        }
                         const options = {
-                            id: parseInt(campaign.getAppStoreId(), 10)
+                            id: parseInt(parameters.appStoreId, 10)
                         };
                         this._nativeBridge.AppSheet.present(options).then(() => {
                             this._nativeBridge.AppSheet.destroy(options);
                         }).catch(([error]) => {
                             if(error === 'APPSHEET_NOT_FOUND') {
-                                this._nativeBridge.UrlScheme.open(this.getAppStoreUrl(campaign));
+                                this._nativeBridge.UrlScheme.open(appStoreUrl);
                             }
                         });
                     } else {
-                        this._nativeBridge.UrlScheme.open(this.getAppStoreUrl(campaign));
+                        this._nativeBridge.UrlScheme.open(appStoreUrl);
                     }
                 });
             }
         }
     }
 
-    private getAppStoreUrl(campaign: PerformanceCampaign, packageName?: string) {
-        const store = campaign.getStore();
-        switch (store) {
+    private getAppStoreUrl(parameters: IEndScreenDownloadParameters, packageName?: string): string | undefined {
+        if(!parameters.appStoreId) {
+            return;
+        }
+
+        switch (parameters.store) {
             case StoreName.APPLE:
-                return 'https://itunes.apple.com/app/id' + campaign.getAppStoreId();
+                return 'https://itunes.apple.com/app/id' + parameters.appStoreId;
             case StoreName.GOOGLE:
-                return 'market://details?id=' + campaign.getAppStoreId();
+                return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + campaign.getAppStoreId() + '&channel=unityAds&from=' + packageName + '&trace=' + campaign.getGamerId();
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + parameters.gamerId;
             default:
                 return "";
         }
-
     }
 }

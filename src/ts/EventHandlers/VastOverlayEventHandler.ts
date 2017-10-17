@@ -5,6 +5,7 @@ import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VastOverlayEventHandler implements IOverlayHandler {
     private _nativeBridge: NativeBridge;
@@ -12,7 +13,7 @@ export class VastOverlayEventHandler implements IOverlayHandler {
     private _clientInfo: ClientInfo;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._request = parameters.request;

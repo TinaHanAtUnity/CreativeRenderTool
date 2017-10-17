@@ -1,12 +1,11 @@
 import { IOverlayHandler } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class PerformanceOverlayEventHandler implements IOverlayHandler {
     private _adUnit: PerformanceAdUnit;
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
         this._adUnit = adUnit;
     }
 

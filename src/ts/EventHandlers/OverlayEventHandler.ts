@@ -6,13 +6,14 @@ import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
+import { Campaign } from 'Models/Campaign';
 
-export class OverlayEventHandler implements IOverlayHandler {
+export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
-    private _adUnit: VideoAdUnit;
+    private _adUnit: VideoAdUnit<T>;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._adUnit = adUnit;
