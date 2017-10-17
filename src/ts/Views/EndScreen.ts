@@ -7,77 +7,30 @@ import { IPrivacyHandler, Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 
 export interface IEndScreenHandler {
-    onEndScreenDownload(): void;
+    onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
 
-export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
+export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
+    protected _localization: Localization;
     private _coppaCompliant: boolean;
-    private _gameName: string;
+    private _gameName: string | undefined;
     private _privacy: Privacy;
-    private _localization: Localization;
     private _isSwipeToCloseEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
 
         this._template = new Template(EndScreenTemplate, this._localization);
-
-        /* TODO: Why is there a check for campaign */
-        if(campaign && campaign instanceof PerformanceCampaign) {
-            this._gameName = campaign.getGameName();
-
-            const adjustedRating: number = campaign.getRating() * 20;
-            this._templateData = {
-                'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon().getUrl(),
-                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-                'endScreenLandscape': campaign.getPortrait().getUrl(),
-                'endScreenPortrait': campaign.getLandscape().getUrl(),
-                'rating': adjustedRating.toString(),
-                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
-            };
-        } else if(campaign && campaign instanceof MRAIDCampaign) {
-            const gameName = campaign.getGameName();
-            if(gameName) {
-                this._gameName = gameName;
-            }
-            this._templateData = {
-                'gameName': campaign.getGameName(),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
-            };
-            const gameIcon = campaign.getGameIcon();
-            if(gameIcon) {
-                this._templateData.gameIcon = gameIcon.getUrl();
-            }
-            const rating = campaign.getRating();
-            if(rating) {
-                const adjustedRating: number = rating * 20;
-                this._templateData.rating = adjustedRating.toString();
-            }
-            const ratingCount = campaign.getRatingCount();
-            if(ratingCount) {
-                this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
-            }
-            const portrait = campaign.getPortrait();
-            if(portrait) {
-                this._templateData.endScreenLandscape = portrait.getUrl();
-            }
-            const landscape = campaign.getLandscape();
-            if(landscape) {
-                this._templateData.endScreenPortrait = landscape.getUrl();
-            }
-        }
+        this._gameName = gameName;
 
         this._bindings = [
             {
@@ -131,7 +84,6 @@ export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandle
         if(AbstractAdUnit.getAutoClose()) {
            setTimeout(() => {
                this._handlers.forEach(handler => handler.onEndScreenClose());
-               // this.onClose.trigger();
            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
@@ -159,14 +111,11 @@ export class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
     }
 
-    private getEndscreenAlt(campaign: Campaign) {
+    protected getEndscreenAlt(campaign: Campaign) {
         return undefined;
     }
 
-    private onDownloadEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onEndScreenDownload());
-    }
+    protected abstract onDownloadEvent(event: Event): void;
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
