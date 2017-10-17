@@ -13,8 +13,8 @@ export interface IMRAIDCampaign extends ICampaign {
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
-    clickUrl: string;
-    videoEventUrls: { [eventType: string]: string };
+    clickUrl: string | undefined;
+    videoEventUrls: { [eventType: string]: string } | undefined;
 
     gameName: string | undefined;
     gameIcon: Image | undefined;
@@ -37,8 +37,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             additionalTrackingEvents: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
-            clickUrl: ['string'],
-            videoEventUrls: ['object'],
+            clickUrl: ['string', 'undefined'],
+            videoEventUrls: ['object', 'undefined'],
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
@@ -192,17 +192,18 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('clickAttributionUrlFollowsRedirects');
     }
 
-    public getClickUrl(): string {
+    public getClickUrl(): string | undefined {
         return this.get('clickUrl');
     }
 
-    public getVideoEventUrls(): { [eventType: string]: string } {
+    public getVideoEventUrls(): { [eventType: string]: string } | undefined {
         return this.get('videoEventUrls');
     }
 
     public getVideoEventUrl(eventType: string): string | undefined {
-        if(this.get('videoEventUrls')) {
-            return this.get('videoEventUrls')[eventType];
+        const videoEventUrls = this.getVideoEventUrls();
+        if(videoEventUrls) {
+            return videoEventUrls[eventType];
         } else {
             return undefined;
         }

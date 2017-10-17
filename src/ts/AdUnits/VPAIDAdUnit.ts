@@ -100,7 +100,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.setFinishState(FinishState.ERROR);
         Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
             id: this._vpaidCampaign.getId()
-        }));
+        }), this._vpaidCampaign.getSession());
         this.hide();
     }
 
@@ -181,7 +181,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onAdStuck() {
         Diagnostics.trigger('vpaid_ad_stuck', new DiagnosticError(new Error('Ad playback stuck'), {
             campaignId: this._campaign.getId()
-        }));
+        }), this._campaign.getSession());
         this.setFinishState(FinishState.ERROR);
         this.hide();
     }

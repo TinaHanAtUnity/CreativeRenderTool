@@ -61,7 +61,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable3<WebViewError, string[], string | undefined>();
+    public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
     public readonly onAdPlanReceived = new Observable2<number, boolean>();
 
     protected _nativeBridge: NativeBridge;
@@ -124,6 +124,7 @@ export class CampaignManager {
                 }).then(response => {
                     if(response) {
                         this._rawResponse = response.response;
+                        session.setAdPlan(this._rawResponse);
                         return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -131,7 +132,7 @@ export class CampaignManager {
                     this._requesting = false;
                 }).catch((error) => {
                     this._requesting = false;
-                    return this.handleError(error, this._configuration.getPlacementIds());
+                    return this.handleError(error, this._configuration.getPlacementIds(), session);
                 });
             });
         });
@@ -201,10 +202,10 @@ export class CampaignManager {
                                 return Promise.resolve();
                             }
 
-                            return this.handleError(error, fill[mediaId]);
+                            return this.handleError(error, fill[mediaId], session);
                         }));
                     } catch(error) {
-                        this.handleError(error, fill[mediaId]);
+                        this.handleError(error, fill[mediaId], session);
                     }
                 }
             }
@@ -266,9 +267,9 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[]): Promise<void> {
+    private handleError(error: any, placementIds: string[], session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, this._rawResponse);
+        this.onError.trigger(error, placementIds, session);
 
         return Promise.resolve();
     }

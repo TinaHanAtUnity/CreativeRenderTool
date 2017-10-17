@@ -35,6 +35,11 @@ export abstract class Model<T extends object> {
         return this._data[key];
     }
 
+    protected handleError(error: WebViewError) {
+        Diagnostics.trigger('set_model_value_failed', error);
+        throw error;
+    }
+
     private getTypeOf(value: any): string {
         let valueType: string = typeof value;
         if (Array.isArray(value)) {
@@ -57,10 +62,5 @@ export abstract class Model<T extends object> {
         }
 
         return false;
-    }
-
-    private handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error);
-        throw error;
     }
 }
