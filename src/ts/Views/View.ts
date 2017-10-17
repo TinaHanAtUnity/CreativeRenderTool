@@ -33,12 +33,12 @@ export abstract class View<T extends object> {
         this._id = id;
     }
 
-   public addHandler(handler: T): T {
+   public addEventHandler(handler: T): T {
         this._handlers.push(handler);
         return handler;
     }
 
-    public removeHandler(handler: T): void {
+    public removeEventHandler(handler: T): void {
         if(this._handlers.length) {
             if(typeof handler !== 'undefined') {
                 this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);

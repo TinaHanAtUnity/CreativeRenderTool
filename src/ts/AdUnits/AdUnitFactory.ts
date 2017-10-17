@@ -78,11 +78,11 @@ export class AdUnitFactory {
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         const overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        overlay.addHandler(overlayEventHandler);
+        overlay.addEventHandler(overlayEventHandler);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        overlay.addHandler(performanceOverlayEventHandler);
+        overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        endScreen.addHandler(endScreenEventHandler);
+        endScreen.addEventHandler(endScreenEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, performanceAdUnit);
 
@@ -124,7 +124,7 @@ export class AdUnitFactory {
 
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-            vastEndScreen.addHandler(vastEndScreenHandler);
+            vastEndScreen.addEventHandler(vastEndScreenHandler);
 
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
                 const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
@@ -135,9 +135,9 @@ export class AdUnitFactory {
         }
 
         const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addHandler(vastOverlayHandler);
+        overlay.addEventHandler(vastOverlayHandler);
         const overlayEventHandler = new OverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addHandler(overlayEventHandler);
+        overlay.addEventHandler(overlayEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, vastAdUnit);
 
@@ -178,11 +178,11 @@ export class AdUnitFactory {
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
 
         const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
-        mraid.addHandler(mraidEventHandler);
+        mraid.addEventHandler(mraidEventHandler);
 
         if(endScreen) {
             const endScreenEventHandler = new MRAIDEndScreenEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
-            endScreen.addHandler(endScreenEventHandler);
+            endScreen.addEventHandler(endScreenEventHandler);
         }
 
         return mraidAdUnit;
@@ -207,13 +207,13 @@ export class AdUnitFactory {
         const vpaidAdUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
 
         const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        vpaid.addHandler(vpaidEventHandler);
+        vpaid.addEventHandler(vpaidEventHandler);
         const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        overlay.addHandler(overlayEventHandler);
+        overlay.addEventHandler(overlayEventHandler);
 
         if(parameters.campaign.hasEndScreen() && endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-            endScreen.addHandler(endScreenEventHandler);
+            endScreen.addEventHandler(endScreenEventHandler);
         }
 
         return vpaidAdUnit;
@@ -229,7 +229,7 @@ export class AdUnitFactory {
 
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
-        view.addHandler(displayInterstitialEventHandler);
+        view.addEventHandler(displayInterstitialEventHandler);
 
         return displayInterstitialAdUnit;
     }

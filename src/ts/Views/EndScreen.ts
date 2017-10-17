@@ -100,7 +100,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public onPrivacyClose(): void {
         if(this._privacy) {
-            this._privacy.removeHandler(this);
+            this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
@@ -127,6 +127,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
-        this._privacy.addHandler(this);
+        this._privacy.addEventHandler(this);
     }
 }
