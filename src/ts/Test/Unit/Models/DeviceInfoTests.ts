@@ -7,7 +7,6 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { WebViewError } from 'Errors/WebViewError';
 
 describe('DeviceInfoTest', () => {
 
@@ -45,7 +44,7 @@ describe('DeviceInfoTest', () => {
 
     });
 
-    it('should not let floating values as screenWidth or screenHeight', (done) => {
+    it('should represent float values for screenWidth or screenHeight as integers from flooring actual values', (done) => {
         nativeBridge = <NativeBridge><any>{
             getPlatform: () => {
                 return Platform.TEST;
@@ -58,17 +57,16 @@ describe('DeviceInfoTest', () => {
 
         deviceInfo = new DeviceInfo(nativeBridge);
 
-        Promise.all([
-            deviceInfo.getScreenWidth(),
-            deviceInfo.getScreenHeight()
-        ]).then(() => {
-            assert.fail('should not pass');
-        }).catch(err => {
-            if(err instanceof WebViewError) {
-                done();
-            } else {
-                done(err);
-            }
+        Promise.all<any>([
+            deviceInfo.getScreenHeight(),
+            deviceInfo.getScreenWidth()
+        ]).then(([
+            adjustedHeight,
+            adjustedWidth
+        ]) => {
+            assert.equal(adjustedHeight, 1200);
+            assert.equal(adjustedWidth, 800);
+            done();
         });
     });
 
