@@ -32,6 +32,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
@@ -49,7 +50,7 @@ describe('AdUnitFactoryTest', () => {
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
-    let adUnitParameters: IAdUnitParameters;
+    let adUnitParameters: IAdUnitParameters<Campaign>;
 
     before(() => {
         sandbox = sinon.sandbox.create();
