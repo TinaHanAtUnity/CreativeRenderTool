@@ -4,11 +4,8 @@ import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { IVastEndScreenHandler, VastEndScreen } from 'Views/VastEndScreen';
+import { VastEndScreen } from 'Views/VastEndScreen';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { IOverlayHandler } from 'Views/Overlay';
-import { Platform } from 'Constants/Platform';
 
 enum Orientation {
     LANDSCAPE,
@@ -28,27 +25,17 @@ class DeviceOrientation {
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
-    /*
-    endScreenEventHandler?: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
-    overlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
-    vastOverlayEventHandler: { new(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters): T2; };
-    */
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     private _endScreen: VastEndScreen | null;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _vastEndScreenEventHandler: IVastEndScreenHandler;
-    private _overlayEventHandler: IOverlayHandler;
-    private _vastOverlayEventHandler: IOverlayHandler;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
 
-        this.prepareOverlay();
-        const campaign = <VastCampaign>parameters.campaign;
-        parameters.overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
+        parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
 
         this._endScreen = parameters.endScreen || null;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -57,23 +44,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
-            if(parameters.endScreenEventHandler) {
-                this._vastEndScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
-                this._endScreen.addHandler(this._vastEndScreenEventHandler);
-            }
-
-            if (nativeBridge.getPlatform() === Platform.ANDROID) {
-                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => this._vastEndScreenEventHandler.onKeyEvent(keyCode));
-                this.onClose.subscribe(() => {
-                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-                });
-            }
         }
-
-        this._overlayEventHandler = new parameters.overlayEventHandler(nativeBridge, this, parameters);
-        parameters.overlay.addHandler(this._overlayEventHandler);
-        this._vastOverlayEventHandler = new parameters.vastOverlayEventHandler(nativeBridge, this, parameters);
-        parameters.overlay.addHandler(this._vastOverlayEventHandler);
     }
 
     public hide(): Promise<void> {

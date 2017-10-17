@@ -5,18 +5,17 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
-import { DisplayInterstitial, IDisplayInterstitialHandler } from 'Views/DisplayInterstitial';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
-import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
-import { IVastEndScreenHandler, VastEndScreen } from 'Views/VastEndScreen';
+import { VastEndScreen } from 'Views/VastEndScreen';
 import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { IOverlayHandler, Overlay } from 'Views/Overlay';
+import { Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
@@ -26,22 +25,25 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { IVPAIDHandler, VPAID } from 'Views/VPAID';
+import { VPAID } from 'Views/VPAID';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { EndScreenEventHandler } from 'EventHandlers/EndScreenEventHandler';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
-import { IVPAIDEndScreenHandler, VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { VPAIDEndScreenEventHandler } from 'EventHandlers/VPAIDEndScreenEventHandler';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { VPAIDOverlayEventHandler } from 'EventHandlers/VPAIDOverlayEventHandler';
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { Campaign } from 'Models/Campaign';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
+import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
+import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 
 export class AdUnitFactory {
 
@@ -64,7 +66,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        const endScreen = new EndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -79,7 +81,7 @@ export class AdUnitFactory {
         overlay.addHandler(overlayEventHandler);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         overlay.addHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new EndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addHandler(endScreenEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, performanceAdUnit);
@@ -105,24 +107,37 @@ export class AdUnitFactory {
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        const campaign = <VastCampaign>parameters.campaign;
-        let vastAdUnit: VastAdUnit;
+        let vastEndScreen: VastEndScreen | undefined;
+
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... parameters,
-            video: campaign.getVideo(),
+            video: parameters.campaign.getVideo(),
             overlay: overlay,
-            overlayEventHandler: OverlayEventHandler,
-            vastOverlayEventHandler: VastOverlayEventHandler
         };
 
-        if (campaign.hasEndscreen()) {
-            const vastEndScreen = new VastEndScreen(nativeBridge, campaign, parameters.clientInfo.getGameId());
+        if(parameters.campaign.hasEndscreen()) {
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnitParameters.endScreenEventHandler = VastEndScreenEventHandler;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-        } else {
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         }
+
+        const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+
+        if(parameters.campaign.hasEndscreen() && vastEndScreen) {
+            const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+            vastEndScreen.addHandler(vastEndScreenHandler);
+
+            if (nativeBridge.getPlatform() === Platform.ANDROID) {
+                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
+                vastAdUnit.onClose.subscribe(() => {
+                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                });
+            }
+        }
+
+        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        overlay.addHandler(vastOverlayHandler);
+        const overlayEventHandler = new OverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        overlay.addHandler(overlayEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, vastAdUnit);
 
@@ -140,71 +155,83 @@ export class AdUnitFactory {
     }
 
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): AbstractAdUnit {
+        const resourceUrl = parameters.campaign.getResourceUrl();
+        let endScreen: MRAIDEndScreen | undefined;
+
         let mraid: MRAIDView<IMRAIDViewHandler>;
-        const campaign = parameters.campaign;
-        const resourceUrl = campaign.getResourceUrl();
-        let endScreen: EndScreen | undefined;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, campaign, parameters.deviceInfo.getLanguage());
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage());
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, campaign);
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign);
         }
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new EndScreen(nativeBridge, campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         }
 
-        const mraidAdUnitParameters: IMRAIDAdUnitParameters<IMRAIDViewHandler, IEndScreenHandler> = {
+        const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
             mraid: mraid,
-            mraidEventHandler: MRAIDEventHandler,
             endScreen: endScreen
         };
 
-        if(endScreen) {
-            mraidAdUnitParameters.endScreenEventHandler = EndScreenEventHandler;
-        }
-
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+
+        const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
+        mraid.addHandler(mraidEventHandler);
+
+        if(endScreen) {
+            const endScreenEventHandler = new MRAIDEndScreenEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
+            endScreen.addHandler(endScreenEventHandler);
+        }
 
         return mraidAdUnit;
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
-        const campaign = <VPAIDCampaign>parameters.campaign;
         const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        let endScreen: VPAIDEndScreen | undefined;
 
-        const vpaidAdUnitParameters: IVPAIDAdUnitParameters<IVPAIDEndScreenHandler, IVPAIDHandler, IOverlayHandler> = {
+        const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
-            vpaidEventHandler: VPAIDEventHandler,
             overlay: overlay,
-            overlayEventHandler: VPAIDOverlayEventHandler
         };
 
-        if (campaign.hasEndScreen()) {
-            const endScreen = new VPAIDEndScreen(nativeBridge, campaign, parameters.clientInfo.getGameId());
+        if(parameters.campaign.hasEndScreen()) {
+            endScreen = new VPAIDEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId());
             vpaidAdUnitParameters.endScreen = endScreen;
-            vpaidAdUnitParameters.endScreenHandler = VPAIDEndScreenEventHandler;
         }
 
         const vpaidAdUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
+
+        const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
+        vpaid.addHandler(vpaidEventHandler);
+        const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
+        overlay.addHandler(overlayEventHandler);
+
+        if(parameters.campaign.hasEndScreen() && endScreen) {
+            const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
+            endScreen.addHandler(endScreenEventHandler);
+        }
+
         return vpaidAdUnit;
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): AbstractAdUnit {
         const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
 
-        const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters<IDisplayInterstitialHandler> = {
+        const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
             view: view,
-            displayInterstitialEventHandler: DisplayInterstitialEventHandler
         };
 
-        const programmaticAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
+        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
+        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
+        view.addHandler(displayInterstitialEventHandler);
 
-        return programmaticAdUnit;
+        return displayInterstitialAdUnit;
     }
 
     private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit<Campaign>) {

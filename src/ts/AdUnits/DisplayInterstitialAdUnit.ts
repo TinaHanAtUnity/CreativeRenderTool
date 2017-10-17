@@ -3,29 +3,27 @@ import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitial, IDisplayInterstitialHandler } from 'Views/DisplayInterstitial';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
-export interface IDisplayInterstitialAdUnitParameters<T extends IDisplayInterstitialHandler> extends IAdUnitParameters {
+export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
-    displayInterstitialEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
 }
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _displayInterstitialEventHandler: IDisplayInterstitialHandler;
     private _view: DisplayInterstitial;
     private _options: any;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters<IDisplayInterstitialHandler>) {
+    constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
         this._operativeEventManager = parameters.operativeEventManager;
         this._view = parameters.view;
@@ -35,9 +33,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
         this._options = parameters.options;
         this.setShowing(false);
-
-        this._displayInterstitialEventHandler = new parameters.displayInterstitialEventHandler(nativeBridge, this, parameters);
-        this._view.addHandler(this._displayInterstitialEventHandler);
     }
 
     public show(): Promise<void> {

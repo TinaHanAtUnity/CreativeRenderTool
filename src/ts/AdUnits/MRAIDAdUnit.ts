@@ -6,17 +6,15 @@ import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { HTML } from 'Models/Assets/HTML';
-import { EndScreen, IEndScreenHandler } from 'Views/EndScreen';
+import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 
-export interface IMRAIDAdUnitParameters<T extends IMRAIDViewHandler, T2 extends IEndScreenHandler> extends IAdUnitParameters {
+export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
-    mraidEventHandler: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T; };
     endScreen?: EndScreen;
-    endScreenEventHandler?: { new(nativeBridge: NativeBridge, adUnit: AbstractAdUnit, parameters: IAdUnitParameters): T2; };
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit {
@@ -24,11 +22,9 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _mraidEventHandler: IMRAIDViewHandler;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
-    private _endScreenEventHandler: IEndScreenHandler;
     private _showingMRAID: boolean;
     private _clientInfo: ClientInfo;
 
@@ -38,30 +34,23 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters<IMRAIDViewHandler, IEndScreenHandler>) {
+    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
         super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._mraid = parameters.mraid;
-        const campaign = <MRAIDCampaign>parameters.campaign;
-        this._additionalTrackingEvents = campaign.getTrackingEventUrls();
+        this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
         this._endScreen = parameters.endScreen;
         this._clientInfo = parameters.clientInfo;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
 
-        this._mraidEventHandler = new parameters.mraidEventHandler(nativeBridge, this, parameters);
-        this._mraid.addHandler(this._mraidEventHandler);
-
         if(this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
-            if(parameters.endScreenEventHandler) {
-                this._endScreenEventHandler = new parameters.endScreenEventHandler(nativeBridge, this, parameters);
-                this._endScreen.addHandler(this._endScreenEventHandler);
-            }
         }
 
         this._orientationProperties = {
