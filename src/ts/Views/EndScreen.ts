@@ -86,11 +86,17 @@ export class EndScreen extends View {
             }
         }
 
+        let downloadSelectors = '.game-background, .btn-download, .game-icon';
+
+        if(this.getEndscreenAlt() === newEndScreenId) {
+            downloadSelectors = '.game-background, .download-container, .game-icon';
+        }
+
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: downloadSelectors
             },
             {
                 event: 'click',
