@@ -21,6 +21,7 @@ export class CampaignRefreshManager {
     private _currentAdUnit: AbstractAdUnit;
     private _refillTimestamp: number;
     private _needsRefill = true;
+    private _noFills: number;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
@@ -28,11 +29,12 @@ export class CampaignRefreshManager {
         this._campaignManager = campaignManager;
         this._configuration = configuration;
         this._refillTimestamp = 0;
+        this._noFills = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, noFillOnly) => this.onAdPlanReceived(refreshDelay, noFillOnly));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -53,12 +55,12 @@ export class CampaignRefreshManager {
         });
     }
 
-    public refresh(): Promise<INativeResponse | void> {
+    public refresh(performanceDisabled?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
-            return this._campaignManager.request();
+            return this._campaignManager.request(performanceDisabled);
         } else if(this.checkForExpiredCampaigns()) {
             return this.onCampaignExpired();
         }
@@ -169,7 +171,37 @@ export class CampaignRefreshManager {
         }
     }
 
-    private onAdPlanReceived(refreshDelay: number) {
+    private onAdPlanReceived(refreshDelay: number, noFillOnly: boolean) {
+        if(noFillOnly) { // todo: add check for A/B group
+            this._noFills++;
+
+            let delay: number = 0;
+
+            if(this._noFills === 1) {
+                delay = 60;
+            } else if(this._noFills === 2) {
+                delay = 120;
+            } else if(this._noFills === 3) {
+                delay = 240;
+            } else if(this._noFills === 4) {
+                delay = 480;
+            } else if(this._noFills === 5) {
+                delay = 960;
+            }
+
+            if(delay > 0) {
+                this._refillTimestamp = Date.now() + delay * 1000;
+                delay = delay + Math.random() * 60; // add 0-60 second random delay
+                this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
+                setTimeout(() => {
+                    this.refresh(true);
+                }, delay * 1000);
+                return;
+            }
+        } else {
+            this._noFills = 0;
+        }
+
         if(refreshDelay > 0) {
             this._refillTimestamp = Date.now() + refreshDelay * 1000;
             this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + refreshDelay + ' seconds');
