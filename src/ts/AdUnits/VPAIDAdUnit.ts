@@ -317,11 +317,13 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
         this._thirdPartyEventManager.sendEvent(eventType, sessionId, url).then(() => {
-            Diagnostics.trigger('vpaid_impression', {
+            Diagnostics.trigger('vpaid_tpe', {
+                eventType: eventType,
                 url: url
             }, this.getCampaign().getSession());
         }).catch((e) => {
-            Diagnostics.trigger('vpaid_impression_error', {
+            Diagnostics.trigger('vpaid_tpe_error', {
+                eventType: eventType,
                 url: url,
                 error: e
             }, this.getCampaign().getSession());
