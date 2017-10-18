@@ -11,6 +11,9 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserCampaignId: string | undefined;
+    advertiserBundleId: string | undefined;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -23,7 +26,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
-        meta: ['string', 'undefined']
+        meta: ['string', 'undefined'],
+        advertiserDomain: ['string', 'undefined'],
+        advertiserCampaignId: ['string', 'undefined'],
+        advertiserBundleId: ['string', 'undefined']
     };
 
     constructor(name: string, schema: ISchema<T>) {
@@ -60,6 +66,18 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getMeta(): string | undefined {
         return this.get('meta');
+    }
+
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
+    }
+
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
+    }
+
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
     }
 
     public getWillExpireAt(): number {
