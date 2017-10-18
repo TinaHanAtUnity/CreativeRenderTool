@@ -6,6 +6,7 @@ $new-end-screen-mixin($scale-size = $default-scale-size) {
   #new-end-screen {
     .btn-close-region {
       $close-button-default($scale-size);
+      padding: $default-size * $scale-size * .25;
     }
     .download-container {
       $download-container-default($scale-size);
@@ -37,6 +38,7 @@ $new-end-screen-mixin($scale-size = $default-scale-size) {
 
     .privacy-button {
       $privacy-button-default($scale-size);
+      margin: 0 0 0 $default-size * $scale-size * .25;
     }
   }
 
@@ -58,8 +60,12 @@ $new-end-screen-mixin($scale-size = $default-scale-size) {
       }
     }
 
-    .btn-close-region {
-      padding: $default-size * $scale-size * .25;
+    .store-container {
+      margin-top: $default-size * $scale-size * .4;
+    }
+
+    .row-container {
+      bottom: $default-size * $scale-size;
     }
   }
 }
@@ -144,10 +150,13 @@ body {
       left: 50%;
     }
 
-    /* on iOS it does not inherit flexbox properties in correct way */
     .unityads-logo {
       width: 50%;
     }
+  }
+
+  .row-container {
+    position: relative;
   }
 }
 
