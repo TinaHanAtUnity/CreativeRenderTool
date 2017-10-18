@@ -154,7 +154,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._timer.stop();
         this._view.updateTimeoutWidget();
         this._view.showAd();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
 
     private onAdError() {
@@ -317,14 +316,23 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url).then(() => {
+            Diagnostics.trigger('vpaid_impression', {
+                url: url
+            }, this.getCampaign().getSession());
+        }).catch((e) => {
+            Diagnostics.trigger('vpaid_impression_error', {
+                url: url,
+                error: e
+            }, this.getCampaign().getSession());
+        });
     }
 
     private sendImpressionTracking() {
         const impressionUrls = this._vpaidCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vast impression', impressionUrl);
+                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
             }
         }
     }
