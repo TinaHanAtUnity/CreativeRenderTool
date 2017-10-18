@@ -1,6 +1,10 @@
 # Mon Oct 16 20:19:29 UTC 2017
 
+<<<<<<< HEAD
 * Adds ad response to all diagnostic messages.
+=======
+* Adds ad response to all diagnostic messages
+>>>>>>> master
 
 # Thu Oct 12 20:04:06 UTC 2017
 
