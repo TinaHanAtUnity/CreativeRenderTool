@@ -10,7 +10,7 @@ import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
@@ -22,6 +22,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
@@ -41,6 +42,7 @@ describe('VastVideoEventHandlers tests', () => {
     let testAdUnit: VastAdUnit;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let vastAdUnitParameters: IVastAdUnitParameters;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -77,7 +79,28 @@ describe('VastVideoEventHandlers tests', () => {
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
-        testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+
+        vastAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            endScreen: undefined,
+            overlay: <Overlay><any>{hide: sinon.spy()},
+            video: campaign.getVideo()
+        };
+
+        testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         sinon.spy(testAdUnit, 'hide');
     });
 
@@ -113,7 +136,8 @@ describe('VastVideoEventHandlers tests', () => {
             ]
         };
         const campaignWithTrackers = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1, 10, customTracking);
-        const adUnitWithTrackers = new VastAdUnit(nativeBridge, ForceOrientation.NONE,  container, placement, campaignWithTrackers, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        vastAdUnitParameters.campaign = campaignWithTrackers;
+        const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
         const mockEventManager = sinon.mock(thirdPartyEventManager);
         mockEventManager.expects('sendEvent').withArgs('vast start', '12345', 'http://customTrackingUrl/start');
@@ -156,7 +180,8 @@ describe('VastVideoEventHandlers tests', () => {
             vastEndScreen = <VastEndScreen><any> {
                 show: sinon.spy()
             };
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+            vastAdUnitParameters.endScreen = vastEndScreen;
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should show end screen when onVideoCompleted', () => {

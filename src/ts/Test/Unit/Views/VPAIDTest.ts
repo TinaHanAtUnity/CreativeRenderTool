@@ -115,7 +115,7 @@ describe.skip('VPAID View', () => {
             document.body.removeChild(vpaid.container());
             vpaid.hide();
         });
-
+/*
         it('should forward the event to the observer', () => {
             const spy = sinon.spy();
             const eventType = 'AdEvent';
@@ -138,6 +138,6 @@ describe.skip('VPAID View', () => {
                     }
                 });
             });
-        });
+        });*/
     });
 });

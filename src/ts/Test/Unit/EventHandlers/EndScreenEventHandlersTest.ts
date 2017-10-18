@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { EndScreenEventHandlers } from 'EventHandlers/EndScreenEventHandlers';
+import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
@@ -11,7 +11,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -22,6 +22,7 @@ import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -36,6 +37,8 @@ describe('EndScreenEventHandlersTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
+    let performanceAdUnitParameters: IPerformanceAdUnitParameters;
+    let endScreenEventHandler: PerformanceEndScreenEventHandler;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -73,21 +76,47 @@ describe('EndScreenEventHandlersTest', () => {
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
+            const video = new Video('');
 
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                TestFixtures.getCampaign(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+            performanceAdUnitParameters = {
+                forceOrientation: ForceOrientation.LANDSCAPE,
+                focusManager: focusManager,
+                container: container,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                placement: TestFixtures.getPlacement(),
+                campaign: TestFixtures.getCampaign(),
+                configuration: TestFixtures.getConfiguration(),
+                request: request,
+                options: {},
+                endScreen: endScreen,
+                overlay: overlay,
+                video: video
+            };
+
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         });
 
         it('should send a click with session manager', () => {
-            EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                store: performanceAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+            });
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -96,7 +125,14 @@ describe('EndScreenEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -107,8 +143,8 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
@@ -116,7 +152,14 @@ describe('EndScreenEventHandlersTest', () => {
                 (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
                 sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
@@ -129,7 +172,14 @@ describe('EndScreenEventHandlersTest', () => {
             beforeEach(() => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
 
             });
 
@@ -183,16 +233,47 @@ describe('EndScreenEventHandlersTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
+            const video = new Video('');
+
             const campaign = TestFixtures.getCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
-            performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+
+            performanceAdUnitParameters = {
+                forceOrientation: ForceOrientation.LANDSCAPE,
+                focusManager: focusManager,
+                container: container,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                placement: TestFixtures.getPlacement(),
+                campaign: TestFixtures.getCampaign(),
+                configuration: TestFixtures.getConfiguration(),
+                request: request,
+                options: {},
+                endScreen: endScreen,
+                overlay: overlay,
+                video: video
+            };
+
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         });
 
         it('should send a click with session manager', () => {
             deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-            EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                store: performanceAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            // EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
         });
@@ -202,8 +283,7 @@ describe('EndScreenEventHandlersTest', () => {
             it('with response that contains location, it should open url scheme', () => {
                 const campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
-                    campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
 
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -212,7 +292,14 @@ describe('EndScreenEventHandlersTest', () => {
                     headers: [['location', 'appstore://foobar.com']]
                 }));
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'appstore://foobar.com');
@@ -226,7 +313,14 @@ describe('EndScreenEventHandlersTest', () => {
                 (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
                 sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.UrlScheme.open);
@@ -242,8 +336,14 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
-
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
             });
 
             it('should launch app store view', () => {
@@ -259,8 +359,14 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
-
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
             });
 
             it('should launch app store view', () => {
@@ -275,7 +381,15 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
             });
 
             it('should open app sheet', () => {
@@ -292,8 +406,6 @@ describe('EndScreenEventHandlersTest', () => {
             it('should send a click with session manager', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
             });
-
         });
-
     });
 });

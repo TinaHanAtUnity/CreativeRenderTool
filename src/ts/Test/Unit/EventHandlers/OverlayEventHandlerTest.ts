@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { OverlayEventHandlers } from 'EventHandlers/OverlayEventHandlers';
+import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { EndScreen } from 'Views/EndScreen';
@@ -14,7 +14,7 @@ import { Request } from 'Utilities/Request';
 import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -41,6 +41,9 @@ describe('OverlayEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let overlay: Overlay;
+    let performanceAdUnitParameters: IPerformanceAdUnitParameters;
+    let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -64,12 +67,33 @@ describe('OverlayEventHandlersTest', () => {
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <PerformanceCampaign><any>{
-            getVast: sinon.spy(),
-            getVideo: () => video,
-            getStreamingVideo: () => video,
-            getSession: () => TestFixtures.getSession()
-        }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
+        overlay = <Overlay><any> {};
+
+        performanceAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: <PerformanceCampaign><any>{
+                getVast: sinon.spy(),
+                getVideo: () => video,
+                getStreamingVideo: () => video,
+                getSession: () => TestFixtures.getSession()
+            },
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            endScreen: endScreen,
+            overlay: overlay,
+            video: video
+        };
+
+        performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+        overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
     });
 
     describe('When calling onSkip', () => {
@@ -79,7 +103,7 @@ describe('OverlayEventHandlersTest', () => {
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.spy(container, 'reconfigure');
 
-            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, performanceAdUnit);
+            overlayEventHandler.onOverlaySkip(1);
         });
 
         it('should pause video player', () => {
@@ -103,7 +127,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should hide overlay', () => {
-            const overlay = performanceAdUnit.getOverlay();
+            // const overlay = performanceAdUnit.getOverlay();
             if(overlay) {
                 sinon.assert.called(<sinon.SinonSpy>overlay.hide);
             }
@@ -117,13 +141,13 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should set volume to zero when muted', () => {
-            OverlayEventHandlers.onMute(nativeBridge, true);
+            overlayEventHandler.onOverlayMute(true);
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0.0));
         });
 
         it('should set volume to 1 when not muted', () => {
-            OverlayEventHandlers.onMute(nativeBridge, false);
+            overlayEventHandler.onOverlayMute(false);
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1.0));
         });

@@ -228,43 +228,6 @@ describe('AdUnitFactoryTest', () => {
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
-        describe('on click', () => {
-            it('should open an intent on Android', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                    'action': 'android.intent.action.VIEW',
-                    'uri': 'http://google.com'
-                });
-            });
-
-            it('should open the url on iOS', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-                sandbox.stub(nativeBridge.UrlScheme, 'open');
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
-            });
-
-            it('should send a tracking event', () => {
-                sandbox.stub(operativeEventManager, 'sendClick');
-
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            });
-
-            it('should not redirect if the protocol is whitelisted', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                adUnit.onRedirect.trigger('tel://127.0.0.1:5000');
-
-                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
-            });
-        });
-
         describe('on close', () => {
             it('should hide the adUnit', () => {
                 sandbox.stub(adUnit, 'hide');
@@ -280,16 +243,6 @@ describe('AdUnitFactoryTest', () => {
             it('should send the third quartile diagnostic event', () => {
                 adUnit.onClose.trigger();
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
-            });
-        });
-
-        describe('on skip', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(adUnit, 'hide');
-
-                adUnit.onSkip.trigger();
-
-                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
             });
         });
 
