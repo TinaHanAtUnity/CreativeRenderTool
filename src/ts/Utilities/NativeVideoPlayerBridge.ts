@@ -182,7 +182,7 @@ export class NativeVideoPlayerBridge {
     }
 }
 
-interface IPlayerEventData {
+export interface IPlayerEventData {
     type?: string;
     event: string;
     data: any;
