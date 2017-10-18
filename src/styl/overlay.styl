@@ -3,6 +3,7 @@
   height: 100%;
   background-color: transparent;
   color: $white;
+  pointer-events: none;
 
   .skip-hit-area {
     position: fixed;
@@ -10,6 +11,7 @@
     left: 0;
     width: 70px;
     height: 55px;
+    pointer-events: auto;
   }
 
   .skip {
@@ -59,6 +61,7 @@
     display: none;
     width: 70px;
     height: 55px;
+    pointer-events: auto;
 
     .mute-icon,
     .unmute-icon {
@@ -91,6 +94,7 @@
     display: none;
     font-weight: bold;
     transform: translate(0, -50%);
+    pointer-events: auto;
   }
 
   .buffering-spinner {
@@ -161,7 +165,7 @@
     top: 50%;
     left: 50%;
     display: block;
-    color: white;
+    color: $white;
     content: attr(data-seconds);
     font-size: 18px;
     transform: translate(-50%, -50%);

@@ -25,6 +25,7 @@ import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
+import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
 export class CampaignManager {
 
@@ -59,8 +60,8 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable3<WebViewError, string[], string | undefined>();
-    public readonly onAdPlanReceived = new Observable2<number, boolean>();
+    public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
+    public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
@@ -122,6 +123,7 @@ export class CampaignManager {
                 }).then(response => {
                     if(response) {
                         this._rawResponse = response.response;
+                        session.setAdPlan(this._rawResponse);
                         return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -129,7 +131,7 @@ export class CampaignManager {
                     this._requesting = false;
                 }).catch((error) => {
                     this._requesting = false;
-                    return this.handleError(error, this._configuration.getPlacementIds());
+                    return this.handleError(error, this._configuration.getPlacementIds(), session);
                 });
             });
         });
@@ -174,11 +176,8 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
-            let campaigns: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    campaigns++;
-
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
@@ -187,7 +186,7 @@ export class CampaignManager {
                 }
             }
 
-            this.onAdPlanReceived.trigger(refreshDelay, campaigns === 1 ? true : false);
+            this.onAdPlanReceived.trigger(refreshDelay);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -199,10 +198,10 @@ export class CampaignManager {
                                 return Promise.resolve();
                             }
 
-                            return this.handleError(error, fill[mediaId]);
+                            return this.handleError(error, fill[mediaId], session);
                         }));
                     } catch(error) {
-                        this.handleError(error, fill[mediaId]);
+                        this.handleError(error, fill[mediaId], session);
                     }
                 }
             }
@@ -233,6 +232,11 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
+            case 'programmatic/vast-vpaid':
+                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
+                // which can parse both.
+                parser = new ProgrammaticVPAIDParser();
+                break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
@@ -256,9 +260,9 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[]): Promise<void> {
+    private handleError(error: any, placementIds: string[], session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, this._rawResponse);
+        this.onError.trigger(error, placementIds, session);
 
         return Promise.resolve();
     }

@@ -1,3 +1,26 @@
+# Mon Oct 16 20:19:29 UTC 2017
+
+* Adds ad response to all diagnostic messages
+
+# Thu Oct 12 20:04:06 UTC 2017
+
+* Fire VAST Impression on VPAID Ad Units
+* Fixes click URL construction for Operative Events
+
+# Wed Oct 11 01:48:02 UTC 2017
+
+* Fix typo in VPAID content type
+* Fix operative events with programmatic MRAID
+
+# Tue Oct 10 17:15:40 UTC 2017
+
+* Initial support for VPAID
+
+# Tue Oct 10 09:11:38 UTC 2017
+
+* Removed dark end screen A/B test (groups 8 & 9)
+* Use event urls from comet response.
+
 # Mon Oct  9 09:08:58 UTC 2017
 
 * Sliding video player interface AB test (groups 10 & 11)

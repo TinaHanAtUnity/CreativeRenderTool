@@ -35,7 +35,7 @@ export class VideoEventHandlers {
                 url: url,
                 originalUrl: originalUrl
             });
-            Diagnostics.trigger('video_too_long', error);
+            Diagnostics.trigger('video_too_long', error, campaign.getSession());
         }
 
         const overlay = adUnit.getOverlay();
@@ -122,7 +122,7 @@ export class VideoEventHandlers {
                     lastPosition: lastPosition,
                     duration: adUnit.getVideo().getDuration()
                 });
-                Diagnostics.trigger('video_player_too_large_progress', error);
+                Diagnostics.trigger('video_player_too_large_progress', error, adUnit.getCampaign().getSession());
 
                 return;
             }
@@ -323,7 +323,7 @@ export class VideoEventHandlers {
             videoAdUnit.getVideo().setErrorStatus(true);
 
             if(errorType && errorData) {
-                Diagnostics.trigger(errorType, errorData);
+                Diagnostics.trigger(errorType, errorData, videoAdUnit.getCampaign().getSession());
             }
 
             videoAdUnit.setActive(false);
