@@ -360,6 +360,8 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this._deviceInfo.getHeadset());
+        promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
 
         const body: any = {
@@ -379,10 +381,12 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
+            body.wiredHeadset = headset;
+            body.volume = volume;
 
             if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
