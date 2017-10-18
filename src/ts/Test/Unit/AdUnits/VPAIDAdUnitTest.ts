@@ -54,6 +54,7 @@ describe('VPAIDAdUnit', () => {
         nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
         operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
         thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
+        (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
         container = <AdUnitContainer>sinon.createStubInstance(Activity);
 
         vpaid = new VPAIDParser().parse(VPAIDTestXML);
