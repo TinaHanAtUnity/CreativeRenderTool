@@ -1,16 +1,15 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -21,12 +20,15 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
 describe('PerformanceOverlayEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
+    let nativeBridge: NativeBridge;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
@@ -42,13 +44,9 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             handleCallback
         });
 
-        overlay = <Overlay><any> {};
-
-        endScreen = <EndScreen><any> {
-            show: sinon.spy(),
-        };
-
         const metaDataManager = new MetaDataManager(nativeBridge);
+        const campaign = TestFixtures.getCampaign();
+        const configuration = TestFixtures.getConfiguration();
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         const focusManager = new FocusManager(nativeBridge);
@@ -59,6 +57,8 @@ describe('PerformanceOverlayEventHandlersTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -69,11 +69,7 @@ describe('PerformanceOverlayEventHandlersTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: <PerformanceCampaign><any>{
-                getVideo: () => video,
-                getStreamingVideo: () => video,
-                getSession: () => TestFixtures.getSession()
-            },
+            campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
             request: request,
             options: {},
@@ -88,9 +84,10 @@ describe('PerformanceOverlayEventHandlersTest', () => {
 
     describe('with onSkip', () => {
         it('should show end screen', () => {
+            assert.isDefined(endScreen, 'endScreen not defined');
+            sinon.spy(endScreen, 'show');
             performanceOverlayEventHandler.onOverlaySkip(1);
 
-            endScreen = performanceAdUnit.getEndScreen();
             if(endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
@@ -98,11 +95,8 @@ describe('PerformanceOverlayEventHandlersTest', () => {
 
         it('should trigger onFinish', () => {
             const spy = sinon.spy(performanceAdUnit.onFinish, 'trigger');
-
             performanceOverlayEventHandler.onOverlaySkip(1);
-
             sinon.assert.called(spy);
         });
     });
-
 });

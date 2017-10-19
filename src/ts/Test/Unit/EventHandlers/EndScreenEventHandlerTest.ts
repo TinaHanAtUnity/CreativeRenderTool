@@ -4,7 +4,6 @@ import * as sinon from 'sinon';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -23,12 +22,13 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
 describe('EndScreenEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
@@ -57,7 +57,7 @@ describe('EndScreenEventHandlersTest', () => {
                 show: sinon.spy(),
             };
 
-            endScreen = <EndScreen><any> {
+            endScreen = <PerformanceEndScreen><any> {
                 hide: sinon.spy(),
             };
 
@@ -215,7 +215,7 @@ describe('EndScreenEventHandlersTest', () => {
                 show: sinon.spy(),
             };
 
-            endScreen = <EndScreen><any> {
+            endScreen = <PerformanceEndScreen><any> {
                 hide: sinon.spy(),
             };
 
