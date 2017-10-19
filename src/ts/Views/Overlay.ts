@@ -285,8 +285,10 @@ export class Overlay extends View {
                 this._progressElement.classList.add('slide-up');
                 this._muteButtonElement.classList.remove('slide-back-in-place');
                 this._muteButtonElement.classList.add('slide-down');
+                this._container.style.pointerEvents = 'auto';
                 this._fadeStatus = false;
             } else {
+                this._container.style.pointerEvents = 'none';
                 this._skipElement.classList.remove('slide-up');
                 this._skipElement.classList.add('slide-back-in-place');
                 this._progressElement.classList.remove('slide-up');
