@@ -24,7 +24,6 @@ export class CampaignRefreshManager {
     private _refillTimestamp: number;
     private _needsRefill = true;
 
-
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
