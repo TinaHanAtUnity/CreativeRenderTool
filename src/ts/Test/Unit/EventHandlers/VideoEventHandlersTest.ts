@@ -15,7 +15,6 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request } from 'Utilities/Request';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -29,12 +28,13 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
 describe('VideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen;
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
@@ -74,7 +74,7 @@ describe('VideoEventHandlersTest', () => {
             setFadeEnabled: sinon.spy()
         };
 
-        endScreen = <EndScreen><any> {
+        endScreen = <PerformanceEndScreen><any> {
             show: sinon.spy(),
             hide: sinon.spy(),
             container: sinon.spy()

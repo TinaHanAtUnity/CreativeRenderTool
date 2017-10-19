@@ -62,7 +62,6 @@ describe('VastAdUnit', () => {
 
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        const overlay = <Overlay><any>sinon.createStubInstance(Overlay);
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -74,6 +73,7 @@ describe('VastAdUnit', () => {
         const sessionManager = new SessionManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -84,7 +84,7 @@ describe('VastAdUnit', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: placement,
-            campaign: new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12),
+            campaign: vastCampaign,
             configuration: TestFixtures.getConfiguration(),
             request: request,
             options: {},
@@ -179,8 +179,8 @@ describe('VastAdUnit', () => {
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -282,12 +282,9 @@ describe('VastAdUnit', () => {
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            vastEndScreen = <VastEndScreen><any> {
-                hide: sinon.spy(),
-                remove: sinon.spy()
-            };
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
@@ -330,6 +327,8 @@ describe('VastAdUnit', () => {
         });
 
         it('should hide and then remove endscreen on hide', () => {
+            sinon.stub(vastEndScreen, 'hide');
+            sinon.stub(vastEndScreen, 'remove');
             vastAdUnit.hide();
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);

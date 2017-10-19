@@ -6,7 +6,6 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
-import { Placement } from 'Models/Placement';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
@@ -46,16 +45,14 @@ describe('VastEndScreenEventHandlersTest', () => {
             return Promise.resolve(url);
         });
 
-        const campaign = <VastCampaign><any>{
-            getVast: sinon.spy(),
-            getVideo: () => video
-        };
+        const campaign = TestFixtures.getCompanionVastCampaign();
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const video = new Video('');
+        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -71,16 +68,14 @@ describe('VastEndScreenEventHandlersTest', () => {
             request: request,
             options: {},
             endScreen: undefined,
-            overlay: <Overlay><any>{hide: sinon.spy()},
+            overlay: overlay,
             video: video
         };
     });
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const vastEndScreen = <VastEndScreen><any> {
-                hide: sinon.spy()
-            };
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -101,17 +96,15 @@ describe('VastEndScreenEventHandlersTest', () => {
         const vast = vastParser.parseVast(vastXml);
 
         beforeEach(() => {
-            const vastEndScreen = <VastEndScreen><any> {
-                hide: sinon.spy()
-            };
 
             video = new Video('');
             campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
+            vastAdUnitParameters.placement = TestFixtures.getPlacement();
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnitParameters.placement = <Placement><any>{};
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         });

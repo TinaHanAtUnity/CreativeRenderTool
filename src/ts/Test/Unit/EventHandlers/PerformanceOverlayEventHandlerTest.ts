@@ -22,7 +22,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
-describe('PerformanceOverlayEventHandlersTest', () => {
+describe('PerformanceOverlayEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();

@@ -51,7 +51,7 @@ describe('DisplayInterstitialEventHandler', () => {
         campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-        sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+        // sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
         sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
         const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
@@ -162,7 +162,6 @@ describe('DisplayInterstitialEventHandler', () => {
 
         it('should send a tracking event', () => {
             sandbox.stub(operativeEventManager, 'sendClick');
-
             displayInterstitialEventHandler.onDisplayInterstitialClick('http://google.com');
 
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
@@ -180,10 +179,31 @@ describe('DisplayInterstitialEventHandler', () => {
     describe('on skip', () => {
         it('should hide the adUnit', () => {
             sandbox.stub(displayInterstitialAdUnit, 'hide');
-
             displayInterstitialEventHandler.onDisplayInterstitialSkip();
 
             sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
         });
     });
+
+    describe('on close', () => {
+        it('should hide the adUnit', () => {
+            sandbox.stub(displayInterstitialAdUnit, 'hide');
+            displayInterstitialEventHandler.onDisplayInterstitialClose();
+
+            sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
+        });
+        it('should send the view diagnostic event', () => {
+            sinon.stub(operativeEventManager, 'sendView');
+            displayInterstitialEventHandler.onDisplayInterstitialClose();
+
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
+        });
+        it('should send the third quartile diagnostic event', () => {
+            sinon.stub(operativeEventManager, 'sendThirdQuartile');
+            displayInterstitialEventHandler.onDisplayInterstitialClose();
+
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
+        });
+    });
+
 });

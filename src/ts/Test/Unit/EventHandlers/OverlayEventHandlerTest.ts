@@ -7,7 +7,6 @@ import { SessionManager } from 'Managers/SessionManager';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -24,15 +23,16 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
-describe('OverlayEventHandlersTest', () => {
+describe('OverlayEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, performanceAdUnit: PerformanceAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
-    let endScreen: EndScreen;
+    let endScreen: PerformanceEndScreen;
     let video: Video;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
@@ -51,10 +51,6 @@ describe('OverlayEventHandlersTest', () => {
             handleCallback
         });
 
-        endScreen = <EndScreen><any> {
-            hide: sinon.spy(),
-        };
-
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -67,7 +63,8 @@ describe('OverlayEventHandlersTest', () => {
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        overlay = <Overlay><any> {};
+        endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -78,12 +75,7 @@ describe('OverlayEventHandlersTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: <PerformanceCampaign><any>{
-                getVast: sinon.spy(),
-                getVideo: () => video,
-                getStreamingVideo: () => video,
-                getSession: () => TestFixtures.getSession()
-            },
+            campaign: TestFixtures.getCampaign(),
             configuration: TestFixtures.getConfiguration(),
             request: request,
             options: {},
@@ -102,6 +94,7 @@ describe('OverlayEventHandlersTest', () => {
             sinon.spy(operativeEventManager, 'sendSkip');
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.spy(container, 'reconfigure');
+            sinon.spy(overlay, 'hide');
 
             overlayEventHandler.onOverlaySkip(1);
         });
@@ -127,10 +120,7 @@ describe('OverlayEventHandlersTest', () => {
         });
 
         it('should hide overlay', () => {
-            // const overlay = performanceAdUnit.getOverlay();
-            if(overlay) {
-                sinon.assert.called(<sinon.SinonSpy>overlay.hide);
-            }
+            sinon.assert.called(<sinon.SinonSpy>overlay.hide);
         });
 
     });

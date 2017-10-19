@@ -24,7 +24,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
-describe('EndScreenEventHandlersTest', () => {
+describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -51,32 +51,22 @@ describe('EndScreenEventHandlersTest', () => {
 
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            overlay = <Overlay><any> {
-                setSkipEnabled: sinon.spy(),
-                setSkipDuration: sinon.spy(),
-                show: sinon.spy(),
-            };
-
-            endScreen = <PerformanceEndScreen><any> {
-                hide: sinon.spy(),
-            };
-
             metaDataManager = new MetaDataManager(nativeBridge);
-
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
+
             const video = new Video('');
+            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
                 forceOrientation: ForceOrientation.LANDSCAPE,
@@ -208,36 +198,25 @@ describe('EndScreenEventHandlersTest', () => {
             }, Platform.IOS);
 
             container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-
-            overlay = <Overlay><any> {
-                setSkipEnabled: sinon.spy(),
-                setSkipDuration: sinon.spy(),
-                show: sinon.spy(),
-            };
-
-            endScreen = <PerformanceEndScreen><any> {
-                hide: sinon.spy(),
-            };
-
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
             const video = new Video('');
-
             const campaign = TestFixtures.getCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
+
+            endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
                 forceOrientation: ForceOrientation.LANDSCAPE,
@@ -248,7 +227,7 @@ describe('EndScreenEventHandlersTest', () => {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
-                campaign: TestFixtures.getCampaign(),
+                campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
                 options: {},
@@ -262,7 +241,10 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
+            sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+            performanceAdUnitParameters.deviceInfo = deviceInfo;
+            performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -273,14 +255,16 @@ describe('EndScreenEventHandlersTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            // EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
-
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
-            deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
             it('with response that contains location, it should open url scheme', () => {
+                sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+                performanceAdUnitParameters.deviceInfo = deviceInfo;
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+
                 const campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
@@ -331,10 +315,18 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects and OS version 8.1', () => {
             beforeEach(() => {
-                deviceInfo = <DeviceInfo><any>{getOsVersion: () => '8.1'};
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(deviceInfo, 'getOsVersion').returns('8.1');
+                const campaign = TestFixtures.getCampaign();
+                campaign.set('store', StoreName.APPLE);
+                campaign.set('appStoreId', '11111');
+                sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(campaign, 'getBypassAppSheet').returns(false);
+                sinon.stub(campaign, 'getStore').returns(StoreName.APPLE);
+
+                performanceAdUnitParameters.deviceInfo = deviceInfo;
+                performanceAdUnitParameters.campaign = campaign;
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -347,6 +339,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should launch app store view', () => {
+                sinon.assert.called(<sinon.SinonSpy>nativeBridge.UrlScheme.open);
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://itunes.apple.com/app/id11111');
             });
 
@@ -354,10 +347,20 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('with no follow redirects and bypass app sheet', () => {
             beforeEach(() => {
-                deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
+                sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+
+                const campaign = TestFixtures.getCampaign();
+                campaign.set('store', StoreName.APPLE);
+                campaign.set('appStoreId', '11111');
+                sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(campaign, 'getBypassAppSheet').returns(true);
+                sinon.stub(campaign, 'getStore').returns(StoreName.APPLE);
+
+                performanceAdUnitParameters.deviceInfo = deviceInfo;
+                performanceAdUnitParameters.campaign = campaign;
+
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -377,7 +380,10 @@ describe('EndScreenEventHandlersTest', () => {
 
         describe('open app sheet', () => {
             beforeEach(() => {
-                deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
+                sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+                performanceAdUnitParameters.deviceInfo = deviceInfo;
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));

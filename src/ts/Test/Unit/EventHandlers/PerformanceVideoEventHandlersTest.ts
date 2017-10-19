@@ -4,13 +4,11 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { EndScreen } from 'Views/EndScreen';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -19,12 +17,13 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: EndScreen | undefined;
+    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
@@ -35,12 +34,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleInvocation,
             handleCallback
         });
-
-        overlay = <Overlay><any> {};
-
-        endScreen = <EndScreen><any> {
-            show: sinon.spy(),
-        };
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
@@ -55,6 +48,10 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
 
+        const campaign = TestFixtures.getCampaign();
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
             focusManager: focusManager,
@@ -64,10 +61,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: <PerformanceCampaign><any>{
-                getVideo: () => video,
-                getStreamingVideo: () => video
-            },
+            campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
             request: request,
             options: {},
@@ -81,24 +75,17 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
     describe('with onVideoCompleted', () => {
         it('should show end screen', () => {
+            sinon.spy(endScreen, 'show');
             PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit);
-
-            endScreen = performanceAdUnit.getEndScreen();
-            if(endScreen) {
-                sinon.assert.called(<sinon.SinonSpy>endScreen.show);
-            }
+            sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
     });
 
     describe('with onVideoError', () => {
         it('should show end screen', () => {
+            sinon.spy(endScreen, 'show');
             PerformanceVideoEventHandlers.onVideoError(performanceAdUnit);
-
-            endScreen = performanceAdUnit.getEndScreen();
-            if(endScreen) {
-                sinon.assert.called(<sinon.SinonSpy>endScreen.show);
-            }
+            sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
     });
-
 });
