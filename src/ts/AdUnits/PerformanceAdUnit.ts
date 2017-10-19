@@ -1,15 +1,15 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { EndScreen } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: EndScreen;
+    endScreen: PerformanceEndScreen;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: EndScreen;
+    private _endScreen: PerformanceEndScreen;
 
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
         parameters.endScreen.render();
@@ -42,7 +42,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return 'performance';
     }
 
-    public getEndScreen(): EndScreen | undefined {
+    public getEndScreen(): PerformanceEndScreen | undefined {
         return this._endScreen;
     }
 
