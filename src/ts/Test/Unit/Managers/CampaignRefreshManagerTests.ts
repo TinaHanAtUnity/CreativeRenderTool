@@ -138,7 +138,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
-            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
+            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager);
         });
 
         it('get campaign should return undefined', () => {
@@ -520,6 +520,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
+
     });
 });
 
