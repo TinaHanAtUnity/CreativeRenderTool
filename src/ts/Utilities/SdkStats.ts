@@ -145,7 +145,7 @@ export class SdkStats {
     private static isTestActive(): boolean {
         const abGroup: number = SdkStats._configuration.getAbGroup();
 
-        if(abGroup === 1 || abGroup === 2 || abGroup === 12 || abGroup === 13 || abGroup === 16 || abGroup === 17) {
+        if(abGroup === 1 || abGroup === 2 || abGroup === 12 || abGroup === 13) {
             return true;
         }
 
