@@ -17,6 +17,7 @@ export class VastOverlayEventHandler implements IOverlayHandler {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._request = parameters.request;
+        this._clientInfo = parameters.clientInfo;
     }
 
     public onOverlaySkip(position: number): void {

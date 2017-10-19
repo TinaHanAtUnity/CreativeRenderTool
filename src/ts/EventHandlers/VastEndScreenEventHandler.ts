@@ -18,6 +18,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
+        this._request = parameters.request;
     }
 
     public onVastEndScreenClick(): Promise<void> {
