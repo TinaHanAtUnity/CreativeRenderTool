@@ -1,3 +1,14 @@
+# Thu Oct 19 20:45:59 UTC 2017
+
+* Trigger onStart when VPAIDAdUnit shows
+* Removes VPAIDAdUnit debug diagnostics
+
+# Wed Oct 18 21:19:54 UTC 2017
+
+* Add diagnostics to all VPAID third party events, success and failed
+* Stop quick retry test on parsing errors from group 5
+* Fix handling for non-integer screen width and height values
+
 # Mon Oct 16 20:19:29 UTC 2017
 
 <<<<<<< HEAD

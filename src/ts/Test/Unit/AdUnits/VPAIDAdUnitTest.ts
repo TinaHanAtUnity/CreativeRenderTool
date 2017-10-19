@@ -54,6 +54,7 @@ describe('VPAIDAdUnit', () => {
         nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
         operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
         thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
+        (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
         container = <AdUnitContainer>sinon.createStubInstance(Activity);
 
         vpaid = new VPAIDParser().parse(VPAIDTestXML);
@@ -85,8 +86,11 @@ describe('VPAIDAdUnit', () => {
     });
 
     describe('show', () => {
+        let spy: sinon.SinonSpy;
 
         beforeEach(() => {
+            spy = sinon.spy();
+            adUnit.onStart.subscribe(spy);
             (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
             (<sinon.SinonStub>container.open).returns(Promise.resolve());
         });
@@ -100,6 +104,12 @@ describe('VPAIDAdUnit', () => {
         it('should open the container', () => {
             return adUnit.show().then(() => {
                 sinon.assert.called(<sinon.SinonSpy>container.open);
+            });
+        });
+
+        it('should trigger onStart', () => {
+            return adUnit.show().then(() => {
+                sinon.assert.called(spy);
             });
         });
     });
@@ -172,6 +182,20 @@ describe('VPAIDAdUnit', () => {
             it('should show the ad on the view', () => {
                 sinon.assert.called(<sinon.SinonSpy>vpaidView.showAd);
             });
+        });
+
+        describe('on AdStarted', () => {
+            beforeEach(triggerVPAIDEvent('AdStarted'));
+
+            it('should send the start event', () => {
+                sinon.assert.called(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent);
+            });
+
+            it('should send the start operative event', () => {
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendStart);
+            });
+
+            it('should trigger creativeView tracking', verifyTrackingEvent('creativeView'));
         });
 
         describe('on AdVideoFirstQuartile', () => {
