@@ -9,6 +9,7 @@ import { Observable1, Observable4 } from 'Utilities/Observable';
 import { Double } from 'Utilities/Double';
 
 describe('NativeVideoPlayerBridge', () => {
+    const src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
     let nativeVideoPlayerBridge: NativeVideoPlayerBridge;
     let nativeBridge: NativeBridge;
     let iframeWindow: WindowMessageRecorder;
@@ -57,10 +58,9 @@ describe('NativeVideoPlayerBridge', () => {
     };
 
     describe('preparing the video player', () => {
-        const src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
 
         beforeEach(() => {
-            return  sendMessageToBridge('prepare', {
+            return sendMessageToBridge('prepare', {
                 url: src
             });
         });
@@ -71,6 +71,31 @@ describe('NativeVideoPlayerBridge', () => {
 
         it('should send the "loadstart" event', () => {
             assertEventSent('loadstart');
+        });
+    });
+
+    describe('when the video player is prepared', () => {
+        const duration = 30 * 1000;
+        let spy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            spy = sinon.spy();
+            nativeVideoPlayerBridge.onPrepare.subscribe(spy);
+            videoPlayer.onPrepared.trigger(src, duration, 500, 300);
+        });
+
+        it('should send the "prepared" event', () => {
+            assertEventSent('prepared', {
+                duration: duration / 1000.0
+            });
+        });
+
+        it('should send the "canplay" event', () => {
+            assertEventSent('canplay');
+        });
+
+        it('should trigger the onPrepare observer', () => {
+            sinon.assert.calledWith(spy, duration);
         });
     });
 });
