@@ -19,6 +19,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
+import { SdkStats } from 'Utilities/SdkStats';
 import { CometCampaignParser } from 'Parsers/CometCampaignParser';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
@@ -105,6 +106,8 @@ export class CampaignManager {
             return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
+                SdkStats.setAdRequestTimestamp();
+                const requestTimestamp: number = Date.now();
                 return Promise.resolve().then((): Promise<INativeResponse> => {
                     if(CampaignManager.CampaignResponse) {
                         return Promise.resolve({
@@ -122,6 +125,8 @@ export class CampaignManager {
                     });
                 }).then(response => {
                     if(response) {
+                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+                        SdkStats.increaseAdRequestOrdinal();
                         this._rawResponse = response.response;
                         session.setAdPlan(this._rawResponse);
                         return this.parseCampaigns(response, session);
@@ -143,6 +148,14 @@ export class CampaignManager {
 
     public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
+    }
+
+    public getFullyCachedCampaigns(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
+        });
     }
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
@@ -427,14 +440,6 @@ export class CampaignManager {
 
                 return body;
             });
-        });
-    }
-
-    private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
         });
     }
 }

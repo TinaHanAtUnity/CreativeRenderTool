@@ -9,6 +9,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
 import { Session } from 'Models/Session';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
@@ -190,11 +191,19 @@ export class CampaignRefreshManager {
                 this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
                 this.sendPlacementStateChanges(placementId);
+                if(placementState === PlacementState.READY) {
+                    SdkStats.setReadyEventTimestamp(placementId);
+                    SdkStats.sendReadyEvent(placementId);
+                }
             });
         } else {
             this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
             this.sendPlacementStateChanges(placementId);
+            if(placementState === PlacementState.READY) {
+                SdkStats.setReadyEventTimestamp(placementId);
+                SdkStats.sendReadyEvent(placementId);
+            }
         }
     }
 }
