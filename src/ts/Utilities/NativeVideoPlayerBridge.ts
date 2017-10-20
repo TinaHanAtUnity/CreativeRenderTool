@@ -3,6 +3,7 @@ import { IObserver4, IObserver1, IObserver0 } from 'Utilities/IObserver';
 import { Double } from 'Utilities/Double';
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { Platform } from 'Constants/Platform';
 
 enum PlayerState {
     NONE,
@@ -30,6 +31,7 @@ export class NativeVideoPlayerBridge {
     private _videoPlayHandler: IObserver0;
     private _videoPauseHandler: IObserver0;
     private _videoCompleteHandler: IObserver0;
+    private _videoGenericErrorHandler: IObserver0;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer) {
         this._nativeBridge = nativeBridge;
@@ -40,6 +42,7 @@ export class NativeVideoPlayerBridge {
         this._videoPlayHandler = () => this.onVideoPlay();
         this._videoPauseHandler = () => this.onVideoPause();
         this._videoCompleteHandler = () => this.onVideoComplete();
+        this._videoGenericErrorHandler = () => this.onVideoError();
 
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
     }
@@ -53,6 +56,11 @@ export class NativeVideoPlayerBridge {
         this._nativeBridge.VideoPlayer.onPlay.subscribe(this._videoPlayHandler);
         this._nativeBridge.VideoPlayer.onPause.subscribe(this._videoPauseHandler);
         this._nativeBridge.VideoPlayer.onCompleted.subscribe(this._videoCompleteHandler);
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.VideoPlayer.Android.onGenericError.subscribe(this._videoGenericErrorHandler);
+        } else {
+            this._nativeBridge.VideoPlayer.Ios.onGenericError.subscribe(this._videoGenericErrorHandler);
+        }
     }
 
     public disconnect() {
@@ -63,6 +71,11 @@ export class NativeVideoPlayerBridge {
         this._nativeBridge.VideoPlayer.onPlay.unsubscribe(this._videoPlayHandler);
         this._nativeBridge.VideoPlayer.onPause.unsubscribe(this._videoPauseHandler);
         this._nativeBridge.VideoPlayer.onCompleted.unsubscribe(this._videoCompleteHandler);
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.VideoPlayer.Android.onGenericError.unsubscribe(this._videoGenericErrorHandler);
+        } else {
+            this._nativeBridge.VideoPlayer.Ios.onGenericError.unsubscribe(this._videoGenericErrorHandler);
+        }
     }
 
     public stopVideo() {
@@ -198,6 +211,10 @@ export class NativeVideoPlayerBridge {
 
     private notifyEnd() {
         this.sendMessage('ended');
+    }
+
+    private onVideoError() {
+        this.sendMessage('error', new Error('A video error occurred'));
     }
 }
 
