@@ -56,6 +56,7 @@ export class GoogleSignalFactory {
         signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
         // todo: device orientation
+        signal.setAppIdName(clientInfo.getApplicationName());
 
         const promises = [];
 
@@ -66,7 +67,7 @@ export class GoogleSignalFactory {
         }));
 
         promises.push(deviceInfo.getBatteryStatus().then(batteryStatus => {
-            signal.setBatteryState(batteryStatus);
+            signal.setBatteryState(GoogleSignalFactory.getBatteryStatus(clientInfo, batteryStatus));
         }).catch(() => {
             GoogleSignalFactory.logFailure(nativeBridge, 'batteryStatus');
         }));
@@ -192,5 +193,26 @@ export class GoogleSignalFactory {
 
     private static getAndroidViewHeight(height: number, density: number): number {
         return height / (density / 160);
+    }
+
+    private static getBatteryStatus(clientInfo: ClientInfo, status: number) {
+        if(clientInfo.getPlatform() === Platform.IOS) {
+            return status;
+        } else {
+            switch(status) {
+                case 1: // BATTERY_STATUS_UNKNOWN
+                    return 0; // unknown
+                case 2: // BATTERY_STATUS_CHARGING
+                    return 2; // charging
+                case 3: // BATTERY_STATUS_DISCHARGING
+                    return 1; // unplugged
+                case 4: // BATTERY_STATUS_NOT_CHARGING
+                    return 1; // unplugged
+                case 5: // BATTERY_STATUS_FULL
+                    return 3; // full
+                default:
+                    return 0; // unknown
+            }
+        }
     }
 }
