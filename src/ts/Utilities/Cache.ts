@@ -10,6 +10,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { VideoInfo } from 'Utilities/VideoInfo';
 import { Campaign } from 'Models/Campaign';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export enum CacheStatus {
     OK,
@@ -551,6 +552,7 @@ export class Cache {
         if(size === 0) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
             this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
+            SdkStats.setCachingStartTimestamp(callback.fileId);
         } else {
             this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
         }
@@ -583,6 +585,7 @@ export class Cache {
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, size, totalSize, this.getFileIdExtension(callback.fileId)));
                 this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, callback);
                 this.fulfillCallback(url, CacheStatus.OK);
+                SdkStats.setCachingFinishTimestamp(callback.fileId);
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
