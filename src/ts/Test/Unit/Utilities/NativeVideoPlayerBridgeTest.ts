@@ -148,6 +148,16 @@ describe('NativeVideoPlayerBridge', () => {
         });
     });
 
+    describe('pause', () => {
+        beforeEach(() => {
+            return sendMessageToBridge('pause');
+        });
+
+        it('should call pause on the native video player', () => {
+            sinon.assert.called(<sinon.SinonSpy>videoPlayer.pause);
+        });
+    });
+
     describe('when the video player is pausing', () => {
         let spy: sinon.SinonSpy;
 

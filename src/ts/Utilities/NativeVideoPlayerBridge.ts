@@ -138,8 +138,16 @@ export class NativeVideoPlayerBridge {
             case 'play':
                 this.onPlayVideo();
                 break;
+            case 'pause':
+                this.onPauseVideo();
+                break;
         }
     }
+
+    private onPauseVideo() {
+        this._nativeBridge.VideoPlayer.pause();
+    }
+
     private onVideoPrepared(url: string, duration: number, width: number, height: number) {
         this.notifyPrepared(duration / 1000.0);
         this.notifyCanPlay();
