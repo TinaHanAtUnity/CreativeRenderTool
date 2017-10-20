@@ -474,8 +474,6 @@ export class DeviceInfo extends Model<IDeviceInfo> {
             'deviceModel': this.getModel(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'screenWidth': this.getScreenWidth(),
-            'screenHeight': this.getScreenHeight(),
             'screenScale': this.getScreenScale(),
             'userInterfaceIdiom': this.getUserInterfaceIdiom(),
             'timeZone': this.getTimeZone(),

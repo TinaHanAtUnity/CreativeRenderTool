@@ -37,6 +37,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { SdkStats } from 'Utilities/SdkStats';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -106,6 +107,7 @@ export class WebView {
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
+            SdkStats.setInitTimestamp();
 
             return this._deviceInfo.fetch();
         }).then(() => {
@@ -189,6 +191,8 @@ export class WebView {
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
+            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager);
+
             return this._campaignRefreshManager.refresh();
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -244,6 +248,8 @@ export class WebView {
             this.showError(true, placementId, 'Campaign not found');
             return;
         }
+
+        SdkStats.sendShowEvent(placementId);
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');

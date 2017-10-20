@@ -106,6 +106,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onShow() {
         this.setShowing(true);
+        this.onStart.trigger();
         this._timer.start();
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
