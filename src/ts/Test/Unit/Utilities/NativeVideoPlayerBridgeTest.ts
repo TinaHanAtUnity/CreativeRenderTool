@@ -98,6 +98,55 @@ describe('NativeVideoPlayerBridge', () => {
             sinon.assert.calledWith(spy, duration);
         });
     });
+
+    describe('play', () => {
+        beforeEach(() => {
+            return sendMessageToBridge('play');
+        });
+
+        it('should call play on the native video player', () => {
+            sinon.assert.called(<sinon.SinonSpy>nativeBridge.VideoPlayer.play);
+        });
+    });
+
+    describe('when the video player is playing', () => {
+        let spy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            spy = sinon.spy();
+            nativeVideoPlayerBridge.onPlay.subscribe(spy);
+            videoPlayer.onPlay.trigger(src);
+        });
+
+        it('should send the "playing" event', () => {
+            assertEventSent('playing');
+        });
+
+        it('should trigger the "onPlay" observer', () => {
+            sinon.assert.called(spy);
+        });
+    });
+
+    describe('when the video player has progress', () => {
+        let spy: sinon.SinonSpy;
+        const progress = 1234;
+
+        beforeEach(() => {
+            spy = sinon.spy();
+            nativeVideoPlayerBridge.onProgress.subscribe(spy);
+            videoPlayer.onProgress.trigger(progress);
+        });
+
+        it('should send the "progress" event', () => {
+            assertEventSent('progress', {
+                progress: progress / 1000.0
+            });
+        });
+
+        it('should trigger the "progress" observer', () => {
+            sinon.assert.calledWith(spy, progress);
+        });
+    });
 });
 
 class WindowMessageRecorder {
