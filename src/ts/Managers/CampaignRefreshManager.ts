@@ -11,6 +11,7 @@ import { INativeResponse } from 'Utilities/Request';
 import { Session } from 'Models/Session';
 import { FocusManager } from 'Managers/FocusManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { Platform } from 'Constants/Platform';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
@@ -24,6 +25,13 @@ export class CampaignRefreshManager {
     private _focusManager: FocusManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
+    private _refreshAllowed = true;
+
+    // constant value that determines the delay for refreshing ads after backend has processed a start event
+    // set to five seconds because backend should usually process start event in less than one second but
+    // we want to be safe in case of error situations on the backend and mistimings on the device
+    // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
+    private _startRefreshMagicConstant: number = 5000;
 
     constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
@@ -37,7 +45,14 @@ export class CampaignRefreshManager {
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
-        this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+        } else {
+            this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
+            this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
+        }
+        this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -56,9 +71,19 @@ export class CampaignRefreshManager {
             this.invalidateCampaigns(true, this._configuration.getPlacementIds());
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
         });
+        this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
+        this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
+        this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+    }
+
+    public setRefreshAllowed(bool: boolean){
+        this._refreshAllowed = bool;
     }
 
     public refresh(): Promise<INativeResponse | void> {
+        if(!this._refreshAllowed) {
+            return Promise.resolve();
+        }
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
@@ -212,6 +237,36 @@ export class CampaignRefreshManager {
     }
 
     private onActivityResumed(activity: string): void {
+        this.refresh();
+    }
+
+    private onAppForeground(): void {
+        this.refresh();
+    }
+
+    private onScreenOn(): void {
+        this.refresh();
+    }
+
+    private onAdUnitFinish(): void {
+        this.refresh();
+    }
+
+    private onAdUnitClose(): void {
+        this.refresh();
+    }
+
+    private onAdUnitStartProcessed(): void {
+        if(this._currentAdUnit) {
+            setTimeout(() => {
+                if(this._currentAdUnit && this._currentAdUnit.isCached()) {
+                    this.refresh();
+                }
+            }, this._startRefreshMagicConstant);
+        }
+    }
+
+    private onNetworkConnected() {
         this.refresh();
     }
 }
