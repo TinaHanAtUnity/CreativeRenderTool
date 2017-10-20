@@ -1,5 +1,13 @@
 <script>
     (function() {
+
+        var supportedMimeTypes = {
+            android: ['video/3gpp', 'video/3gpp2', 'video/mp4', 'video/webm'],
+            ios: ['video/3gpp', 'video/x-m4v', 'video/mp4', 'video/quicktime'],
+        };
+        var android = /(android)/i.test(navigator.userAgent);
+        var mimeTypes = android ? supportedMimeTypes.android : supportedMimeTypes.ios;
+
         var sourceProperty = {
             get: function() {
                 return this._src;
@@ -126,7 +134,7 @@
         };
 
         _element.canPlayType = function(mimeType) {
-            return 'probably';
+            return mimeTypes.indexOf(mimeType) !== -1 ? 'probably' : 'maybe';
         };
 
         window.VideoPlayer = _element;
