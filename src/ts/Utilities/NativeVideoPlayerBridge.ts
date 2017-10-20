@@ -65,38 +65,6 @@ export class NativeVideoPlayerBridge {
         this._nativeBridge.VideoPlayer.stop();
     }
 
-    public notifyCanPlay() {
-        this.sendMessage('canplay');
-    }
-
-    public notifyPrepared(duration: number) {
-        this.sendMessage('prepared', {
-            duration: duration
-        });
-    }
-
-    public notifyProgress(progress: number) {
-        this.sendMessage('progress', {
-            progress: progress
-        });
-    }
-
-    public notifyPlay() {
-        this.sendMessage('play');
-    }
-
-    public notifyPlaying() {
-        this.sendMessage('playing');
-    }
-
-    public notifyPause() {
-        this.sendMessage('pause');
-    }
-
-    public notifyEnd() {
-        this.sendMessage('ended');
-    }
-
     public muteVideo() {
         this.setVolume(0.0);
     }
@@ -144,6 +112,15 @@ export class NativeVideoPlayerBridge {
         }
     }
 
+    private onPrepareVideo(url: string) {
+        this.sendMessage('loadstart');
+        this._nativeBridge.VideoPlayer.prepare(url, new Double(1.0), 10000);
+    }
+
+    private onPlayVideo() {
+        this._nativeBridge.VideoPlayer.play();
+    }
+
     private onPauseVideo() {
         this._nativeBridge.VideoPlayer.pause();
     }
@@ -154,18 +131,25 @@ export class NativeVideoPlayerBridge {
         this.onPrepare.trigger(duration);
     }
 
+    private notifyCanPlay() {
+        this.sendMessage('canplay');
+    }
+
+    private notifyPrepared(duration: number) {
+        this.sendMessage('prepared', {
+            duration: duration
+        });
+    }
+
     private onVideoProgress(progress: number) {
         this.notifyProgress(progress / 1000.0);
         this.onProgress.trigger(progress);
     }
 
-    private onPrepareVideo(url: string) {
-        this.sendMessage('loadstart');
-        this._nativeBridge.VideoPlayer.prepare(url, new Double(1.0), 10000);
-    }
-
-    private onPlayVideo() {
-        this._nativeBridge.VideoPlayer.play();
+    private notifyProgress(progress: number) {
+        this.sendMessage('progress', {
+            progress: progress
+        });
     }
 
     private onVideoPlay() {
@@ -177,16 +161,32 @@ export class NativeVideoPlayerBridge {
         this.onPlay.trigger();
     }
 
+    private notifyPlay() {
+        this.sendMessage('play');
+    }
+
+    private notifyPlaying() {
+        this.sendMessage('playing');
+    }
+
     private onVideoPause() {
         this._playerState = PlayerState.PAUSED;
         this.notifyPause();
         this.onPause.trigger();
     }
 
+    private notifyPause() {
+        this.sendMessage('pause');
+    }
+
     private onVideoComplete() {
         this._playerState = PlayerState.ENDED;
         this.notifyEnd();
         this.onComplete.trigger();
+    }
+
+    private notifyEnd() {
+        this.sendMessage('ended');
     }
 }
 
