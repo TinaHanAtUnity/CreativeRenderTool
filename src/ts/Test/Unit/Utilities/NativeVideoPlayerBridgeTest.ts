@@ -147,6 +147,24 @@ describe('NativeVideoPlayerBridge', () => {
             sinon.assert.calledWith(spy, progress);
         });
     });
+
+    describe('when the video player is pausing', () => {
+        let spy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            spy = sinon.spy();
+            nativeVideoPlayerBridge.onPause.subscribe(spy);
+            videoPlayer.onPause.trigger(src);
+        });
+
+        it('should send the "pause" event', () => {
+            assertEventSent('pause');
+        });
+
+        it('should trigger the "pause" observer', () => {
+            sinon.assert.called(spy);
+        });
+    });
 });
 
 class WindowMessageRecorder {
