@@ -78,16 +78,12 @@ export class GoogleSignalFactory {
             GoogleSignalFactory.logFailure(nativeBridge, 'connectionType');
         }));
 
-        promises.push(deviceInfo.getScreenWidth().then(width => {
+        promises.push([deviceInfo.getScreenWidth(),deviceInfo.getScreenHeight()].then(([width, height]) => {
             signal.setScreenWidth(width);
+            signal.setScreenHeight(height);
+            signal.setDeviceOrientation(GoogleSignalFactory.getDeviceScreenOrientation(width, height));
         }).catch(() => {
             GoogleSignalFactory.logFailure(nativeBridge, 'screenWidth');
-        }));
-
-        promises.push(deviceInfo.getScreenHeight().then(height => {
-            signal.setScreenHeight(height);
-        }).catch(() => {
-            GoogleSignalFactory.logFailure(nativeBridge, 'screenHeight');
         }));
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -195,7 +191,7 @@ export class GoogleSignalFactory {
         return height / (density / 160);
     }
 
-    private static getBatteryStatus(clientInfo: ClientInfo, status: number) {
+    private static getBatteryStatus(clientInfo: ClientInfo, status: number): number {
         if(clientInfo.getPlatform() === Platform.IOS) {
             return status;
         } else {
@@ -213,6 +209,16 @@ export class GoogleSignalFactory {
                 default:
                     return 0; // unknown
             }
+        }
+    }
+
+    private static getDeviceScreenOrientation(width: number, height: number): number {
+        if(width === height) {
+            return 20; // square
+        } else if(width > height) {
+            return 3; // landscape left
+        } else {
+            return 1; // portrait
         }
     }
 }
