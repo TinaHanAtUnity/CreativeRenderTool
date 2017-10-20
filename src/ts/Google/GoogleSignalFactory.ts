@@ -114,7 +114,7 @@ export class GoogleSignalFactory {
 
     private static getEventTimestamp(): number {
         // todo: DST issues
-        return (Date.now() / 1000) - 8 * 3600;
+        return Math.round(Date.now() / 1000) - 8 * 3600;
     }
 
     private static getSdkVersion(clientInfo: ClientInfo): string {
@@ -162,7 +162,7 @@ export class GoogleSignalFactory {
 
     private static getAppStartTime(clientInfo: ClientInfo): number {
         // todo: DST issues
-        return clientInfo.getInitTimestamp() / 1000 - 8 * 3600;
+        return Math.round(clientInfo.getInitTimestamp() / 1000) - 8 * 3600;
     }
 
     private static getRooted(deviceInfo: DeviceInfo): number {
