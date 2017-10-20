@@ -390,6 +390,19 @@
     "description": "All placements received in configuration",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "wiredHeadset",
+    "type": "boolean",
+    "description": "If wired headset is connected to device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "volume",
+    "type": "number",
+    "description": "On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index",
+    "provider": "SDK",
+    "platforms": "all"
   }
-
 ]
