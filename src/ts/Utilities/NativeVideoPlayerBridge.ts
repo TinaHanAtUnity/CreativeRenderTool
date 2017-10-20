@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IObserver4, IObserver1, IObserver0 } from 'Utilities/IObserver';
 import { Double } from 'Utilities/Double';
 import { Observable0, Observable1 } from 'Utilities/Observable';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 enum PlayerState {
     NONE,
@@ -22,6 +23,7 @@ export class NativeVideoPlayerBridge {
     private _iframe: HTMLIFrameElement;
     private _messageListener: any;
     private _playerState: PlayerState = PlayerState.NONE;
+    private _container: AdUnitContainer;
 
     private _videoPreparedHandler: IObserver4<string, number, number, number>;
     private _videoProgressHandler: IObserver1<number>;
@@ -29,8 +31,10 @@ export class NativeVideoPlayerBridge {
     private _videoPauseHandler: IObserver0;
     private _videoCompleteHandler: IObserver0;
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer) {
         this._nativeBridge = nativeBridge;
+        this._container = container;
+
         this._videoPreparedHandler = (url, duration, width, height) => this.onVideoPrepared(url, duration, width, height);
         this._videoProgressHandler = (progress) => this.onVideoProgress(progress);
         this._videoPlayHandler = () => this.onVideoPlay();
@@ -109,6 +113,9 @@ export class NativeVideoPlayerBridge {
             case 'pause':
                 this.onPauseVideo();
                 break;
+            case 'resize':
+                this.onResize((<ClientRect>data));
+                break;
         }
     }
 
@@ -123,6 +130,10 @@ export class NativeVideoPlayerBridge {
 
     private onPauseVideo() {
         this._nativeBridge.VideoPlayer.pause();
+    }
+
+    private onResize(rect: ClientRect) {
+        this._container.setViewFrame('videoplayer', rect.left, rect.top, rect.width, rect.height);
     }
 
     private onVideoPrepared(url: string, duration: number, width: number, height: number) {

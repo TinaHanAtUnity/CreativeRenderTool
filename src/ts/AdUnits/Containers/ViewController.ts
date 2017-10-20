@@ -130,6 +130,10 @@ export class ViewController extends AdUnitContainer {
         return this._paused;
     }
 
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.IosAdUnit.setViewFrame(view, new Double(x), new Double(y), new Double(width), new Double(height));
+    }
+
     private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: ForceOrientation) {
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
         if(forceOrientation === ForceOrientation.LANDSCAPE) {

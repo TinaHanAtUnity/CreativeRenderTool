@@ -11,6 +11,7 @@ import { Template } from 'Utilities/Template';
 import { Overlay } from 'Views/Overlay';
 import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
 import { Observable0 } from 'Utilities/Observable';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 export class GlyphView extends View {
     public readonly videoBridge: NativeVideoPlayerBridge;
@@ -23,7 +24,7 @@ export class GlyphView extends View {
     private _messageListener: EventListener;
     private _overlay: Overlay;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: GlyphCampaign, language: string, gameId: string, abGroup: number) {
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: GlyphCampaign, language: string, gameId: string, abGroup: number) {
         super(nativeBridge, 'glyph');
 
         this._placement = placement;
@@ -35,7 +36,7 @@ export class GlyphView extends View {
 
         this._bindings = [];
 
-        this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge);
+        this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge, container);
         this.videoBridge.onProgress.subscribe((progress) => this.onVideoProgress(progress));
         this.videoBridge.onPrepare.subscribe((duration) => this.onVideoPrepared(duration));
 

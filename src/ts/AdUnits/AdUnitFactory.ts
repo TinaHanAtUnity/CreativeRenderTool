@@ -409,7 +409,7 @@ export class AdUnitFactory {
     }
 
     private static createGlyphAdUnit(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: GlyphCampaign, options: any): AbstractAdUnit {
-        const view = new GlyphView(nativeBridge, placement, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), campaign.getAbGroup());
+        const view = new GlyphView(nativeBridge, container, placement, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), campaign.getAbGroup());
         view.render();
 
         const programmaticAdUnit = new GlyphAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, options);

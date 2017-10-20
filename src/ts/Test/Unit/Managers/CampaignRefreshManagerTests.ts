@@ -539,6 +539,9 @@ export class TestContainer extends AdUnitContainer {
     public isPaused(): boolean {
         return false;
     }
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
+    }
 }
 
 export class TestAdUnit extends AbstractAdUnit {

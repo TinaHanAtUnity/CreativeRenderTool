@@ -7,6 +7,7 @@ import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable1, Observable4 } from 'Utilities/Observable';
 import { Double } from 'Utilities/Double';
+import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
 describe('NativeVideoPlayerBridge', () => {
     const src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
@@ -14,6 +15,7 @@ describe('NativeVideoPlayerBridge', () => {
     let nativeBridge: NativeBridge;
     let iframeWindow: WindowMessageRecorder;
     let videoPlayer: VideoPlayerApi;
+    let container: AdUnitContainer;
 
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
@@ -25,13 +27,15 @@ describe('NativeVideoPlayerBridge', () => {
         (<any>videoPlayer).onPlay = new Observable1<string>();
         (<any>videoPlayer).onPause = new Observable1<string>();
 
+        container = sinon.createStubInstance(AdUnitContainer);
+
         nativeBridge.VideoPlayer = videoPlayer;
 
         const iframe = {};
         iframeWindow = new WindowMessageRecorder();
         (<any>iframe).contentWindow = iframeWindow;
 
-        nativeVideoPlayerBridge = new NativeVideoPlayerBridge(nativeBridge);
+        nativeVideoPlayerBridge = new NativeVideoPlayerBridge(nativeBridge, container);
         nativeVideoPlayerBridge.connect(<HTMLIFrameElement>iframe);
     });
 

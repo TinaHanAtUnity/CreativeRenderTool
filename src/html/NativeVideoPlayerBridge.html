@@ -1,6 +1,5 @@
 <script>
     (function() {
-
         var sourceProperty = {
             get: function() {
                 return this._src;
@@ -37,40 +36,21 @@
             }
         }
 
-        var VideoPlayerBridge = function() {
-            this._src = null;
-            this._duration = 0;
-            this._listeners = {};
-            this._element = document.createElement('p');
+        _element = document.createElement('div');
+        Object.defineProperty(_element, 'src', sourceProperty);
+        Object.defineProperty(_element, 'currentTime', currentTimeProperty);
+        Object.defineProperty(_element, 'duration', durationProperty);
 
-            Object.defineProperty(this, 'src', sourceProperty);
-            Object.defineProperty(this, 'currentTime', currentTimeProperty);
-            Object.defineProperty(this, 'style', styleProperty);
-            Object.defineProperty(this, 'duration', durationProperty);
-
-            var self = this;
-            window.addEventListener('message', function(e) {
-                self.onMessage(e);
-            });
+        var originalSetProperty = _element.style.setProperty;
+        _element.style.setProperty = function(name, value, priority) {
+            return originalSetProperty.call(_element,style, [name, value, priority]);
         };
 
-        VideoPlayerBridge.prototype.addEventListener = function(event, listener) {
-            if (event in this._listeners) {
-                this._listeners[event].push(listener);
-            } else {
-                this._listeners[event] = [listener];
-            }
-        };
-        VideoPlayerBridge.prototype.removeEventListener = function(event, listener) {
-            if (event in this._listeners) {
-                var index = this._listeners[event].indexOf(listener);
-                if (index !== -1) {
-                    this._listeners[event].splice(index, 1);
-                }
-            }
-        };
+        window.addEventListener('message', function(e) {
+            _element.onMessage(e);
+        });
 
-        VideoPlayerBridge.prototype.sendVideoEvent = function(event, data) {
+        _element.sendVideoEvent = function(event, data) {
             var eventData = {
                 type: 'player',
                 event: event
@@ -82,68 +62,73 @@
             window.parent.postMessage(eventData, '*');
         };
 
-        VideoPlayerBridge.prototype.onMessage = function(e) {
+        _element.onMessage = function(e) {
             if (e.data.type && e.data.type === 'player') {
                 this.handleEvent(e.data.event, e.data.data);
             }
         };
 
-        VideoPlayerBridge.prototype.handleEvent = function(event, data) {
+        _element.handleEvent = function(event, data) {
             switch (event) {
                 case 'prepared':
                     this.handleVideoPrepared(data);
                     break;
                 case 'canplay':
-                    this.dispatchEvent('canplay');
+                    this.dispatchEvent(new Event('canplay'));
                     break;
                 case 'progress':
                     this.handleProgress(data);
                     break;
                 case 'play':
-                    this.dispatchEvent('play');
+                    this.dispatchEvent(new Event('play'));
                     break;
                 case 'playing':
-                    this.dispatchEvent('playing');
+                    this.dispatchEvent(new Event('playing'));
                     break;
                 case 'pause':
-                    this.dispatchEvent('pause');
+                    this.dispatchEvent(new Event('pause'));
                     break;
                 case 'ended':
-                    this.dispatchEvent('ended');
+                    this.dispatchEvent(new Event('ended'));
+                    break;
+                case 'error':
+                    var e = new ErrorEvent('error');
+                    e.error = data;
+                    this.dispatchEvent(e);
                     break;
             }
         };
 
-        VideoPlayerBridge.prototype.handleVideoPrepared = function(data) {
+        _element.handleVideoPrepared = function(data) {
             this._duration = data.duration;
-            this.dispatchEvent('durationchange');
+            this.dispatchEvent(new Event('durationchange'));
         };
 
-        VideoPlayerBridge.prototype.dispatchEvent = function(event, data) {
-            if (event in this._listeners) {
-                var listeners = this._listeners[event],
-                    len = listeners.length;
-                for (var i = 0; i < len; i++) {
-                    var listener = listeners[i];
-                    listener(data);
+        _element.handleProgress = function(data) {
+            var progress = data.progress;
+            if (this._currentTime != progress) {
+                this._currentTime = progress;
+                this.dispatchEvent(new Event('timeupdate'));
+                this._lastUpdate = Date.now();
+                this._stalledSent = false;
+            } else {
+                if (Date.now() - this._lastUpdate > 5 * 5000) {
+                    this.dispatchEvent(new Event('stalled'));
                 }
             }
         };
 
-        VideoPlayerBridge.prototype.handleProgress = function(data) {
-            var progress = data.progress;
-            if (this._currentTime != progress) {
-                this._currentTime = progress;
-                this.dispatchEvent('timeupdate');
-            } else {
-                // TODO update stuck counter.
-            }
-        };
-
-        VideoPlayerBridge.prototype.play = function() {
+        _element.play = function() {
             this.sendVideoEvent('play');
         };
 
-        window.VideoPlayer = new VideoPlayerBridge();
+        _element.load = function() {
+        };
+
+        _element.canPlayType = function(mimeType) {
+            return 'probably';
+        };
+
+        window.VideoPlayer = _element;
     })();
 </script>
