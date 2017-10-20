@@ -78,7 +78,7 @@ export class GoogleSignalFactory {
             GoogleSignalFactory.logFailure(nativeBridge, 'connectionType');
         }));
 
-        promises.push([deviceInfo.getScreenWidth(),deviceInfo.getScreenHeight()].then(([width, height]) => {
+        promises.push(Promise.all([deviceInfo.getScreenWidth(),deviceInfo.getScreenHeight()]).then(([width, height]) => {
             signal.setScreenWidth(width);
             signal.setScreenHeight(height);
             signal.setDeviceOrientation(GoogleSignalFactory.getDeviceScreenOrientation(width, height));
