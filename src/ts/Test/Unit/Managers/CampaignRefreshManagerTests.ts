@@ -520,7 +520,6 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
-
     });
 });
 
