@@ -141,6 +141,7 @@ export class WebView {
                 this._focusManager.setListenAppBackground(true);
             } else {
                 this._focusManager.setListenScreen(true);
+                this._focusManager.setListenAndroidLifecycle(true);
             }
 
             return this.setupTestEnvironment();
@@ -161,10 +162,6 @@ export class WebView {
             }
 
             if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._focusManager.setListenAndroidLifecycle(true);
-                }
-
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
