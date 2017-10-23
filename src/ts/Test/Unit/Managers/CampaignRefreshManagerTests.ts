@@ -138,7 +138,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
-            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
+            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager);
         });
 
         it('get campaign should return undefined', () => {
@@ -442,9 +442,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
-                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
 
@@ -463,7 +462,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
             });
         });
@@ -490,9 +489,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'Unsupported content-type: wrong/contentType', 'Incorrect error message');
-                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
 
@@ -518,9 +516,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'plc_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
                 assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
-                assert.isDefined(receivedError.rawAdResponse, 'Raw Ad Response should be defined in error');
             });
         });
     });
