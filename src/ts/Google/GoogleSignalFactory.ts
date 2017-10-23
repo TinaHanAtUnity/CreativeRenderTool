@@ -52,7 +52,7 @@ export class GoogleSignalFactory {
         signal.setTimeZoneOffset(GoogleSignalFactory.getTimeZoneOffset());
         // todo: signal app active
         signal.setAppUptime(GoogleSignalFactory.getAppUptime(clientInfo));
-        signal.setAppStartTimeInPST(GoogleSignalFactory.getAppStartTime(clientInfo));
+        signal.setAppStartTime(GoogleSignalFactory.getAppStartTime(clientInfo));
         signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
         // todo: device orientation
@@ -113,8 +113,7 @@ export class GoogleSignalFactory {
     }
 
     private static getEventTimestamp(): number {
-        // todo: DST issues
-        return Math.round(Date.now() / 1000) - 8 * 3600;
+        return Math.round(Date.now() / 1000);
     }
 
     private static getSdkVersion(clientInfo: ClientInfo): string {
@@ -161,8 +160,7 @@ export class GoogleSignalFactory {
     }
 
     private static getAppStartTime(clientInfo: ClientInfo): number {
-        // todo: DST issues
-        return Math.round(clientInfo.getInitTimestamp() / 1000) - 8 * 3600;
+        return Math.round(clientInfo.getInitTimestamp() / 1000);
     }
 
     private static getRooted(deviceInfo: DeviceInfo): number {

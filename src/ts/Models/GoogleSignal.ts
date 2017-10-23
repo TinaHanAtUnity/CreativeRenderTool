@@ -26,7 +26,7 @@ interface IGoogleSignal {
     usbConnected: number;
     appActive: boolean;
     appUptime: number;
-    appStartTimeInPST: number;
+    appStartTime: number;
     rooted: number;
     eventTimestamp: number;
     apkHash: string;
@@ -81,7 +81,7 @@ export class GoogleSignal extends Model<IGoogleSignal> {
             usbConnected: ['number'],
             appActive: ['boolean'],
             appUptime: ['number'],
-            appStartTimeInPST: ['number'],
+            appStartTime: ['number'],
             rooted: ['number'],
             eventTimestamp: ['number'],
             apkHash: ['string'],
@@ -309,12 +309,12 @@ export class GoogleSignal extends Model<IGoogleSignal> {
         this.set('appUptime', appUptime);
     }
 
-    public getAppStartTimeInPST(): number {
-        return this.get('appStartTimeInPST');
+    public getAppStartTime(): number {
+        return this.get('appStartTime');
     }
 
-    public setAppStartTimeInPST(appStartTimeInPST: number): void {
-        this.set('appStartTimeInPST', appStartTimeInPST);
+    public setAppStartTime(appStartTime: number): void {
+        this.set('appStartTime', appStartTime);
     }
 
     public getRooted(): number {
