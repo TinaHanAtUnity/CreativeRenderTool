@@ -9,6 +9,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
 import { Session } from 'Models/Session';
+import { FocusManager } from 'Managers/FocusManager';
 import { SdkStats } from 'Utilities/SdkStats';
 
 export class CampaignRefreshManager {
@@ -20,20 +21,23 @@ export class CampaignRefreshManager {
     private _campaignManager: CampaignManager;
     private _configuration: Configuration;
     private _currentAdUnit: AbstractAdUnit;
+    private _focusManager: FocusManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
         this._configuration = configuration;
+        this._focusManager = focusManager;
         this._refillTimestamp = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
+        this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -205,5 +209,9 @@ export class CampaignRefreshManager {
                 SdkStats.sendReadyEvent(placementId);
             }
         }
+    }
+
+    private onActivityResumed(activity: string): void {
+        this.refresh();
     }
 }

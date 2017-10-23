@@ -143,6 +143,7 @@ export class WebView {
                 this._focusManager.setListenAppBackground(true);
             } else {
                 this._focusManager.setListenScreen(true);
+                this._focusManager.setListenAndroidLifecycle(true);
             }
 
             return this.setupTestEnvironment();
@@ -163,10 +164,6 @@ export class WebView {
             }
 
             if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._focusManager.setListenAndroidLifecycle(true);
-                }
-
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
@@ -190,7 +187,7 @@ export class WebView {
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
-            this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration);
+            this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager);
 
