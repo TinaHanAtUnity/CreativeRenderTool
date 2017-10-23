@@ -25,6 +25,8 @@ export class NativeVideoPlayerBridge {
     private _messageListener: any;
     private _playerState: PlayerState = PlayerState.NONE;
     private _container: AdUnitContainer;
+    private _videoUrl: string;
+    private _progress: number = 0;
 
     private _videoPreparedHandler: IObserver4<string, number, number, number>;
     private _videoProgressHandler: IObserver1<number>;
@@ -32,6 +34,7 @@ export class NativeVideoPlayerBridge {
     private _videoPauseHandler: IObserver0;
     private _videoCompleteHandler: IObserver0;
     private _videoGenericErrorHandler: IObserver0;
+    private _containerShowHandler: IObserver0;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer) {
         this._nativeBridge = nativeBridge;
@@ -43,6 +46,7 @@ export class NativeVideoPlayerBridge {
         this._videoPauseHandler = () => this.onVideoPause();
         this._videoCompleteHandler = () => this.onVideoComplete();
         this._videoGenericErrorHandler = () => this.onVideoError();
+        this._containerShowHandler = () => this.onShow();
 
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
     }
@@ -51,6 +55,7 @@ export class NativeVideoPlayerBridge {
         this._iframe = iframe;
         window.addEventListener('message', this._messageListener);
 
+        this._container.onShow.subscribe(this._containerShowHandler);
         this._nativeBridge.VideoPlayer.onPrepared.subscribe(this._videoPreparedHandler);
         this._nativeBridge.VideoPlayer.onProgress.subscribe(this._videoProgressHandler);
         this._nativeBridge.VideoPlayer.onPlay.subscribe(this._videoPlayHandler);
@@ -66,6 +71,7 @@ export class NativeVideoPlayerBridge {
     public disconnect() {
         window.removeEventListener('message', this._messageListener);
 
+        this._container.onShow.unsubscribe(this._containerShowHandler);
         this._nativeBridge.VideoPlayer.onPrepared.unsubscribe(this._videoPreparedHandler);
         this._nativeBridge.VideoPlayer.onProgress.unsubscribe(this._videoProgressHandler);
         this._nativeBridge.VideoPlayer.onPlay.unsubscribe(this._videoPlayHandler);
@@ -78,6 +84,10 @@ export class NativeVideoPlayerBridge {
         }
     }
 
+    public pauseVideo() {
+        this._nativeBridge.VideoPlayer.pause();
+    }
+
     public stopVideo() {
         this._nativeBridge.VideoPlayer.stop();
     }
@@ -88,6 +98,18 @@ export class NativeVideoPlayerBridge {
 
     public unmuteVideo() {
         this.setVolume(1.0);
+    }
+
+    public seek(time: number) {
+        this._nativeBridge.VideoPlayer.seekTo(time);
+        this._progress = time;
+    }
+
+    private onShow() {
+        if (this._playerState === PlayerState.PLAYING) {
+            // must prepare and show
+            this._nativeBridge.VideoPlayer.prepare(this._videoUrl, new Double(1.0), 10000);
+        }
     }
 
     private setVolume(volume: number) {
@@ -133,6 +155,7 @@ export class NativeVideoPlayerBridge {
     }
 
     private onPrepareVideo(url: string) {
+        this._videoUrl = url;
         this.sendMessage('loadstart');
         this._nativeBridge.VideoPlayer.prepare(url, new Double(1.0), 10000);
     }
@@ -150,9 +173,22 @@ export class NativeVideoPlayerBridge {
     }
 
     private onVideoPrepared(url: string, duration: number, width: number, height: number) {
-        this.notifyPrepared(duration / 1000.0);
-        this.notifyCanPlay();
-        this.onPrepare.trigger(duration);
+        if (this._playerState === PlayerState.PLAYING) {
+            this.resumeAfterPaused();
+        } else {
+            this._progress = 0;
+            this.notifyPrepared(duration / 1000.0);
+            this.notifyCanPlay();
+            this.onPrepare.trigger(duration);
+        }
+    }
+
+    private resumeAfterPaused() {
+        this._nativeBridge.VideoPlayer.seekTo(this._progress).then(() => {
+            setTimeout(() => {
+                this._nativeBridge.VideoPlayer.play();
+            }, 250);
+        });
     }
 
     private notifyCanPlay() {
@@ -166,6 +202,7 @@ export class NativeVideoPlayerBridge {
     }
 
     private onVideoProgress(progress: number) {
+        this._progress += progress;
         this.notifyProgress(progress / 1000.0);
         this.onProgress.trigger(progress);
     }
