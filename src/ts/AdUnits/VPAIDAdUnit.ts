@@ -126,7 +126,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         const impressionUrls = this._vpaidCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vast impression', impressionUrl);
+                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
             }
         }
     }
@@ -143,12 +143,13 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this.setFinishState(FinishState.ERROR);
         Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
             id: this._vpaidCampaign.getId()
-        }));
+        }), this._vpaidCampaign.getSession());
         this.hide();
     }
 
     private onShow() {
         this.setShowing(true);
+        this.onStart.trigger();
         this._timer.start();
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {

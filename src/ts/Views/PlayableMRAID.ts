@@ -157,7 +157,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     const resourceUrl = this._campaign.getResourceUrl();
                     Diagnostics.trigger('playable_prepare_timeout', {
                         'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
-                    });
+                    }, this._campaign.getSession());
 
                     this._prepareTimeout = undefined;
                 }, 4500);

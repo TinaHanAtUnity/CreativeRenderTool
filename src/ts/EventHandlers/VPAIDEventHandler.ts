@@ -30,7 +30,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
-        this._vpaidCampaign = <VPAIDCampaign>parameters.campaign;
+        this._vpaidCampaign = parameters.campaign;
         this._placement = parameters.placement;
         this._vpaidView = parameters.vpaid;
         this._overlay = parameters.overlay;
@@ -101,11 +101,31 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         }
     }
 
+    private onAdLoaded() {
+        this._adUnit.getAdUnitNotLoadedTimer().stop();
+        this.onVPAIDProgress(this._adDuration, this._adRemainingTime);
+        this._vpaidView.showAd();
+    }
+
+    private onAdError() {
+        this._adUnit.sendTrackingEvent('error');
+        this._adUnit.setFinishState(FinishState.ERROR);
+        this._adUnit.hide();
+    }
+
     private onAdSkipped() {
         this._adUnit.sendTrackingEvent('skip');
         this._operativeEventManager.sendSkip(this._adUnit);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
+    }
+
+    private onAdStopped() {
+        if (this._vpaidCampaign.hasEndScreen() && this._vpaidEndScreen) {
+            this._vpaidView.container().appendChild(this._vpaidEndScreen.container());
+        } else {
+            this._adUnit.hide();
+        }
     }
 
     private onAdStarted() {
@@ -151,14 +171,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
             this._adUnit.sendTrackingEvent('paused');
         }
     }
-
-    private onAdLoaded() {
-        this._adUnit.getAdUnitNotLoadedTimer().stop();
-        this.onVPAIDProgress(this._adDuration, this._adRemainingTime);
-        this._vpaidView.showAd();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-    }
-
+/*
     private onAdError() {
         this._adUnit.sendTrackingEvent('error');
         this._adUnit.setFinishState(FinishState.ERROR);
@@ -171,7 +184,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         } else {
             this._adUnit.hide();
         }
-    }
+    }*/
 
     private onAdPlaying() {
         this._adUnit.sendTrackingEvent('resume');

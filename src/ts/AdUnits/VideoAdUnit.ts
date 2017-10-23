@@ -240,7 +240,7 @@ export abstract class VideoAdUnit<T extends Campaign> extends AbstractAdUnit<T> 
                             url: this.getVideo().getUrl(),
                             originalUrl: this.getVideo().getOriginalUrl(),
                             campaignId: this._campaign.getId()
-                        }));
+                        }), this._campaign.getSession());
 
                         // Modify asset cached status to false
                         this.getVideo().setCachedUrl(undefined);
@@ -253,7 +253,7 @@ export abstract class VideoAdUnit<T extends Campaign> extends AbstractAdUnit<T> 
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
-                    }));
+                    }), this._campaign.getSession());
 
                     // Modify asset cached status to false
                     this.getVideo().setCachedUrl(undefined);

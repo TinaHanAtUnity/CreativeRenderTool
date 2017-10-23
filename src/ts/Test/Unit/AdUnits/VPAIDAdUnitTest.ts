@@ -108,6 +108,15 @@ describe('VPAIDAdUnit', () => {
     });
 
     describe('show', () => {
+        let spy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            spy = sinon.spy();
+            adUnit.onStart.subscribe(spy);
+            (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
+            (<sinon.SinonStub>container.open).returns(Promise.resolve());
+        });
+
         it('should show the view', () => {
             return adUnit.show().then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vpaidView.show);
@@ -117,6 +126,12 @@ describe('VPAIDAdUnit', () => {
         it('should open the container', () => {
             return adUnit.show().then(() => {
                 sinon.assert.called(<sinon.SinonSpy>container.open);
+            });
+        });
+
+        it('should trigger onStart', () => {
+            return adUnit.show().then(() => {
+                sinon.assert.called(spy);
             });
         });
     });
