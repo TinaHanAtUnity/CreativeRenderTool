@@ -227,33 +227,12 @@ describe('AdUnitFactoryTest', () => {
             adUnitParameters.campaign = campaign;
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
-/*
-        describe('on close', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(adUnit, 'hide');
-
-                adUnit.onClose.trigger();
-
-                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
-            });
-            it('should send the view diagnostic event', () => {
-                adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
-            });
-            it('should send the third quartile diagnostic event', () => {
-                adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
-            });
-        });*/
 
         describe('on show', () => {
-            beforeEach(() => {
-                // sinon.spy(thirdPartyEventManager, 'sendEvent');
-            });
-
             it('should send tracking events', () => {
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                adUnit.hide();
             });
         });
     });

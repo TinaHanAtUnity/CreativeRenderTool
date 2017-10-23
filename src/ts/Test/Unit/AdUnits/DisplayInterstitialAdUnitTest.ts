@@ -82,6 +82,9 @@ describe('DisplayInterstitialAdUnit', () => {
     });
 
     afterEach(() => {
+        if(adUnit.isShowing()) {
+            adUnit.hide();
+        }
         sandbox.restore();
     });
 

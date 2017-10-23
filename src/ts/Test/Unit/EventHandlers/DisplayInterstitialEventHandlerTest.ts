@@ -87,6 +87,7 @@ describe('DisplayInterstitialEventHandler', () => {
     });
 
     afterEach(() => {
+        view.hide();
         sandbox.restore();
     });
 
