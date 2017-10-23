@@ -536,7 +536,7 @@ export class GoogleSignal extends Model<IGoogleSignal> {
             'usbConnected': this.getUsbConnected(),
             'appActive': this.getAppActive(),
             'appUptime': this.getAppUptime(),
-            'appStartTimeInPST': this.getAppStartTimeInPST(),
+            'appStartTime': this.getAppStartTime(),
             'rooted': this.getRooted(),
             'eventTimestamp': this.getEventTimestamp(),
             'apkHash': this.getApkHash(),
