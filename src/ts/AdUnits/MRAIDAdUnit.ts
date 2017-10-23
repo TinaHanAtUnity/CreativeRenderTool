@@ -17,7 +17,7 @@ export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign>
     endScreen?: EndScreen;
 }
 
-export class MRAIDAdUnit extends AbstractAdUnit {
+export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;

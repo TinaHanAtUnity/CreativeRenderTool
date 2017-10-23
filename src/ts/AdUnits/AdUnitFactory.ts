@@ -47,7 +47,7 @@ import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndSc
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit<Campaign> {
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
@@ -64,7 +64,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
@@ -105,7 +105,7 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
-    private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit {
+    private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit<VastCampaign> {
         const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         let vastEndScreen: VastEndScreen | undefined;
 
@@ -154,7 +154,7 @@ export class AdUnitFactory {
         return vastAdUnit;
     }
 
-    private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): AbstractAdUnit {
+    private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): AbstractAdUnit<MRAIDCampaign> {
         const resourceUrl = parameters.campaign.getResourceUrl();
         let endScreen: MRAIDEndScreen | undefined;
 
@@ -188,7 +188,7 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit<VPAIDCampaign> {
         const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         let endScreen: VPAIDEndScreen | undefined;
@@ -219,7 +219,7 @@ export class AdUnitFactory {
         return vpaidAdUnit;
     }
 
-    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): AbstractAdUnit {
+    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): AbstractAdUnit<DisplayInterstitialCampaign> {
         const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
 
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {

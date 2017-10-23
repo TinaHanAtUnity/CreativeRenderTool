@@ -13,7 +13,7 @@ export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<
     view: DisplayInterstitial;
 }
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -26,6 +26,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
         this._operativeEventManager = parameters.operativeEventManager;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._view = parameters.view;
 
         this._view.render();
@@ -82,10 +83,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     public openLink(href: string): void {
         this._operativeEventManager.sendClick(this);
 
-        for (let url of (<DisplayInterstitialCampaign>this.getCampaign()).getTrackingUrlsForEvent('click')) {
+        for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
             url = url.replace(/%ZONE%/, this.getPlacement().getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display click', (<DisplayInterstitialCampaign>this.getCampaign()).getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
         }
 
         if (this.isWhiteListedLinkType(href)) {
@@ -130,10 +131,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private sendStartEvents(): void {
-        for (let url of (<DisplayInterstitialCampaign>this._campaign).getTrackingUrlsForEvent('impression')) {
-            url = url.replace(/%ZONE%/, (<DisplayInterstitialCampaign>this.getCampaign()).getId());
+        for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
+            url = url.replace(/%ZONE%/, (this.getCampaign()).getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display impression', (<DisplayInterstitialCampaign>this.getCampaign()).getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
         }
         this._operativeEventManager.sendStart(this);
     }

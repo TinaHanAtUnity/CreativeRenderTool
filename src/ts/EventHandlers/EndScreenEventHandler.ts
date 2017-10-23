@@ -24,7 +24,7 @@ export interface IEndScreenDownloadParameters {
     gamerId: string;
 }
 
-export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> implements IEndScreenHandler {
+export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit<T>> implements IEndScreenHandler {
     protected _adUnit: T2;
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;

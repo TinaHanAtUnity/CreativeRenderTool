@@ -20,7 +20,7 @@ export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign>
     overlay: Overlay;
 }
 
-export class VPAIDAdUnit extends AbstractAdUnit {
+export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -59,6 +59,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
 
+        parameters.overlay.render();
         const overlayContainer = parameters.overlay.container();
         overlayContainer.style.position = 'absolute';
         overlayContainer.style.top = '0px';

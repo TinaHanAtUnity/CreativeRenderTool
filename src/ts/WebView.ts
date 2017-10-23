@@ -37,6 +37,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Campaign } from 'Models/Campaign';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -59,7 +60,7 @@ export class WebView {
     private _cache: Cache;
     private _container: AdUnitContainer;
 
-    private _currentAdUnit: AbstractAdUnit;
+    private _currentAdUnit: AbstractAdUnit<Campaign>;
 
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;

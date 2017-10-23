@@ -6,6 +6,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
+import { Campaign } from 'Models/Campaign';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -46,7 +47,7 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit<Campaign>, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
         this.resetDiagnosticsEvents();
         this.addDiagnosticsEvent({type: 'open'});
         this._activityId++;
