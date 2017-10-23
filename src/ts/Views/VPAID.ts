@@ -29,7 +29,6 @@ export interface IVPAIDHandler {
 
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
-    // public readonly endScreen: VPAIDEndScreen;
 
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
@@ -39,9 +38,6 @@ export class VPAID extends View<IVPAIDHandler> {
     private _messageListener: (e: MessageEvent) => void;
 
     private _loadingScreen: HTMLElement;
-
-    // private _overlay: Overlay;
-
     private _stuckTimer: Timer;
     private _isPaused = false;
 
@@ -56,16 +52,8 @@ export class VPAID extends View<IVPAIDHandler> {
         this._loadingScreen.classList.add('loading-container');
         this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
 
-        // this._overlay = new Overlay(nativeBridge, false, language, gameId);
-        // this._overlay.setFadeEnabled(true);
-        // this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
-
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
-/*
-        if (campaign.hasEndScreen()) {
-            this.endScreen = new VPAIDEndScreen(nativeBridge, campaign, gameId);
-        }*/
 
         this._bindings = [{
             selector: '.companion',
@@ -76,29 +64,12 @@ export class VPAID extends View<IVPAIDHandler> {
 
     public render() {
         super.render();
-        /*
-        this._overlay.render();
-        this._overlay.setSkipEnabled(false);
-        this._overlay.setMuteEnabled(false);
-
-        if (this._placement.allowSkip()) {
-            this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }*/
 
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
         this._iframe.setAttribute('srcdoc', iframeSrcDoc);
         this._container.insertBefore(this._loadingScreen, this._container.firstChild);
-/*
-        const overlayContainer = this._overlay.container();
-        overlayContainer.style.position = 'absolute';
-        overlayContainer.style.top = '0px';
-        overlayContainer.style.left = '0px';
-        this._container.insertBefore(overlayContainer, this._container.lastChild);
-*/
-        // if (this.endScreen) {
-//             this.endScreen.render();
+
         if (this._campaign.hasCompanionAd()) {
             const companionContainer = <HTMLDivElement>this._container.querySelector('.companion-container');
             companionContainer.style.display = 'block';
