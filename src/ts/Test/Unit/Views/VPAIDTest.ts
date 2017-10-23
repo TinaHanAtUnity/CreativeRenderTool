@@ -60,8 +60,8 @@ describe.skip('VPAID View', () => {
                     try {
                         assert.isTrue(e.data.type === 'init');
                         resolve();
-                    } catch {
-                        reject();
+                    } catch(e) {
+                        reject(e);
                     }
                 });
             });
