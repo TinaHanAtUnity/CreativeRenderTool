@@ -185,9 +185,7 @@ export class NativeVideoPlayerBridge {
 
     private resumeAfterPaused() {
         this._nativeBridge.VideoPlayer.seekTo(this._progress).then(() => {
-            setTimeout(() => {
-                this._nativeBridge.VideoPlayer.play();
-            }, 250);
+            this._nativeBridge.VideoPlayer.play();
         });
     }
 
