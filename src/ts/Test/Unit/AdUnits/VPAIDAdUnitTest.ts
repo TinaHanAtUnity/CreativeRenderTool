@@ -9,20 +9,17 @@ import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
-import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { ListenerApi } from 'Native/Api/Listener';
 import { Platform } from 'Constants/Platform';
-import { IntentApi } from 'Native/Api/Intent';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { SdkApi } from 'Native/Api/Sdk';
 import { FocusManager } from 'Managers/FocusManager';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Overlay } from 'Views/Overlay';
+import { SessionManager } from 'Managers/SessionManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import VPAIDTestXML from 'xml/VPAID.xml';
 import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
@@ -45,21 +42,17 @@ describe('VPAIDAdUnit', () => {
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
 
-        vpaidView = <VPAID>sinon.createStubInstance(VPAID);
-        (<any>vpaidView).onVPAIDEvent = new Observable2<string, any[]>();
-        (<any>vpaidView).onCompanionView = new Observable0();
-        (<any>vpaidView).onCompanionClick = new Observable0();
-        (<any>vpaidView).onStuck = new Observable0();
-        (<any>vpaidView).onSkip = new Observable0();
-        nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
-        nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
-        nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
-        nativeBridge.UrlScheme = <UrlSchemeApi>sinon.createStubInstance(UrlSchemeApi);
-        nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
+        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        nativeBridge = TestFixtures.getNativeBridge();
+        sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+        focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
-        thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
-        container = <AdUnitContainer>sinon.createStubInstance(Activity);
+
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        sinon.stub(container, 'open').returns(Promise.resolve());
+        sinon.stub(container, 'close').returns(Promise.resolve());
+
         request = new Request(nativeBridge, wakeUpManager);
         vpaid = new VPAIDParser().parse(VPAIDTestXML);
         const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
@@ -73,15 +66,19 @@ describe('VPAIDAdUnit', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-        focusManager = <FocusManager>sinon.createStubInstance(FocusManager);
-        (<any>focusManager).onAppForeground = new Observable0();
-        (<any>focusManager).onAppBackground = new Observable0();
-        (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
 
-        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        overlay = <Overlay><any> {};
+        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+
+        vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
+        sinon.stub(vpaidView, 'container').returns(document.createElement('div'));
+        sinon.stub(vpaidView, 'show').returns(Promise.resolve());
+        sinon.stub(vpaidView, 'hide').returns(Promise.resolve());
+
+        const sessionManager = new SessionManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(nativeBridge);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         vpaidAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -111,12 +108,6 @@ describe('VPAIDAdUnit', () => {
     });
 
     describe('show', () => {
-
-        beforeEach(() => {
-            (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
-            (<sinon.SinonStub>container.open).returns(Promise.resolve());
-        });
-
         it('should show the view', () => {
             return adUnit.show().then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vpaidView.show);
@@ -133,10 +124,6 @@ describe('VPAIDAdUnit', () => {
     describe('hide', () => {
 
         beforeEach(() => {
-            (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
-            (<sinon.SinonStub>container.open).returns(Promise.resolve());
-            (<sinon.SinonStub>container.close).returns(Promise.resolve());
-            (<sinon.SinonStub>nativeBridge.Listener.sendFinishEvent).returns(Promise.resolve());
             return adUnit.show();
         });
 

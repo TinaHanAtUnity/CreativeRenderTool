@@ -21,7 +21,6 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/Perform
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -58,27 +57,7 @@ describe('VideoEventHandlersTest', () => {
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-
-        overlay = <Overlay><any> {
-            setVideoProgress: sinon.spy(),
-            setVideoDuration: sinon.spy(),
-            isMuted: sinon.spy(),
-            hide: sinon.spy(),
-            setSpinnerEnabled: sinon.spy(),
-            setSkipVisible: sinon.spy(),
-            setMuteEnabled: sinon.spy(),
-            setVideoDurationEnabled: sinon.spy(),
-            setDebugMessage: sinon.spy(),
-            setDebugMessageVisible: sinon.spy(),
-            setCallButtonVisible: sinon.spy(),
-            setFadeEnabled: sinon.spy()
-        };
-
-        endScreen = <PerformanceEndScreen><any> {
-            show: sinon.spy(),
-            hide: sinon.spy(),
-            container: sinon.spy()
-        };
+        const configuration = TestFixtures.getConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
@@ -90,7 +69,12 @@ describe('VideoEventHandlersTest', () => {
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         video = new Video('');
 
-        const vast = new Vast([], []);
+        const vastCampaign = TestFixtures.getEventVastCampaign();
+        const performanceCampaign = TestFixtures.getCampaign();
+        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
+
+        // const vast = new Vast([], []);
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
             focusManager: focusManager,
@@ -100,8 +84,8 @@ describe('VideoEventHandlersTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12),
-            configuration: TestFixtures.getConfiguration(),
+            campaign: vastCampaign,
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,
@@ -118,12 +102,8 @@ describe('VideoEventHandlersTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: <PerformanceCampaign><any>{
-                getVideo: () => video,
-                getStreamingVideo: () => video,
-                getSession: () => TestFixtures.getSession()
-            },
-            configuration: TestFixtures.getConfiguration(),
+            campaign: performanceCampaign,
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: endScreen,
@@ -175,6 +155,7 @@ describe('VideoEventHandlersTest', () => {
     describe('with onVideoProgress', () => {
         beforeEach(() => {
             sinon.spy(performanceAdUnit.getVideo(), 'setPosition');
+            sinon.spy(overlay, 'setVideoProgress');
         });
 
         it('with positive position, should set video position and video progress', () => {
@@ -230,6 +211,7 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.spy(nativeBridge, 'invoke');
             sinon.spy(operativeEventManager, 'sendView');
+            sinon.spy(overlay, 'hide');
         });
 
         it('should set video to inactive', () => {
@@ -273,6 +255,8 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video duration for overlay', () => {
+            sinon.stub(overlay, 'setVideoDuration');
+
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setVideoDuration, 10);
@@ -312,6 +296,7 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set debug message visibility to true if the debug overlay is enabled in the metadata', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
+            sinon.stub(overlay, 'setDebugMessageVisible');
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessageVisible, true);
@@ -321,6 +306,8 @@ describe('VideoEventHandlersTest', () => {
 
         it('should set debug message to performance ad if the ad unit is not VAST', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
+            sinon.stub(overlay, 'setDebugMessage');
+
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Performance Ad');
@@ -329,6 +316,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set debug message to programmatic ad if the ad unit is VAST', () => {
+            sinon.stub(overlay, 'setDebugMessage');
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
             const vast = new Vast([], []);
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
@@ -344,6 +332,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should not set debug message when the debug overlay is disabled in the metadata', () => {
+            sinon.stub(overlay, 'setDebugMessage');
             const stub = sinon.stub(TestEnvironment, 'get').returns(false);
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
@@ -353,6 +342,8 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
+            sinon.stub(overlay, 'setCallButtonVisible');
+
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
@@ -366,6 +357,8 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
+            sinon.stub(overlay, 'setCallButtonVisible');
+
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
@@ -379,12 +372,16 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should not set call button visibility to true if the ad unit is not VAST', () => {
+            sinon.stub(overlay, 'setCallButtonVisible');
+
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setCallButtonVisible);
         });
 
         it('should set fade enabled to false if the ad unit is VAST and has a click trough URL', () => {
+            sinon.stub(overlay, 'setFadeEnabled');
+
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
@@ -398,6 +395,8 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should not set fade enabled to false if the ad unit is VAST but there is no click trough URL', () => {
+            sinon.stub(overlay, 'setFadeEnabled');
+
             const vastCampaign = <VastCampaign><any>{
                 getVideo: () => video
             };
@@ -411,6 +410,8 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should fade out overlay controls if the ad unit is not VAST', () => {
+            sinon.stub(overlay, 'setFadeEnabled');
+
             VideoEventHandlers.onVideoPrepared(nativeBridge, performanceAdUnit, 10);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setFadeEnabled);
@@ -426,6 +427,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.stub(performanceAdUnit, 'hide');
             sinon.spy(container, 'reconfigure');
+            sinon.spy(overlay, 'hide');
         });
 
         afterEach(() => {
@@ -456,6 +458,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.stub(performanceAdUnit, 'hide');
             sinon.spy(container, 'reconfigure');
+            sinon.spy(overlay, 'hide');
         });
 
         afterEach(() => {

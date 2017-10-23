@@ -143,7 +143,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidEventHandler.onMraidClick('http://example.net');
+                mraidEventHandler.onMraidClick('market://foobar.com');
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -157,15 +157,16 @@ describe('MRAIDEventHandlersTest', () => {
                 const mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 mraidView = new MRAID(nativeBridge, placement, mraidCampaign);
                 mraidAdUnitParameters.mraid = mraidView;
-
-                mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-
+                mraidAdUnitParameters.campaign = mraidCampaign;
+                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
-                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
                 sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+                mraidAdUnitParameters.operativeEventManager = operativeEventManager;
 
+                mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+                mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
                 mraidEventHandler.onMraidClick('http://example.net');
 
                 return resolvedPromise.then(() => {

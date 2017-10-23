@@ -246,18 +246,13 @@ describe('AdUnitFactoryTest', () => {
             });
         });*/
 
-        describe('on start', () => {
-            let testThirdPartyEventManager: any;
-
+        describe('on show', () => {
             beforeEach(() => {
-                testThirdPartyEventManager = {
-                    thirdPartyEvent: sinon.stub().returns(Promise.resolve())
-                };
+                // sinon.spy(thirdPartyEventManager, 'sendEvent');
             });
 
             it('should send tracking events', () => {
-                adUnit.onStart.trigger();
-
+                adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
             });
         });

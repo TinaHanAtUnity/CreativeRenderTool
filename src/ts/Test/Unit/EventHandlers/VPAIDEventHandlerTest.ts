@@ -10,22 +10,19 @@ import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
-import { Observable2, Observable0 } from 'Utilities/Observable';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { ListenerApi } from 'Native/Api/Listener';
 import { Platform } from 'Constants/Platform';
-import { IntentApi } from 'Native/Api/Intent';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { SdkApi } from 'Native/Api/Sdk';
 import { FocusManager } from 'Managers/FocusManager';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Overlay } from 'Views/Overlay';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { FinishState } from 'Constants/FinishState';
+import { SessionManager } from 'Managers/SessionManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import VPAIDTestXML from 'xml/VPAID.xml';
 import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
@@ -49,21 +46,16 @@ describe('VPAIDEventHandlerTest', () => {
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
 
-        vpaidView = <VPAID>sinon.createStubInstance(VPAID);
-        (<any>vpaidView).onVPAIDEvent = new Observable2<string, any[]>();
-        (<any>vpaidView).onCompanionView = new Observable0();
-        (<any>vpaidView).onCompanionClick = new Observable0();
-        (<any>vpaidView).onStuck = new Observable0();
-        (<any>vpaidView).onSkip = new Observable0();
-        nativeBridge = <NativeBridge>sinon.createStubInstance(NativeBridge);
-        nativeBridge.Listener = <ListenerApi>sinon.createStubInstance(ListenerApi);
-        nativeBridge.Intent = <IntentApi>sinon.createStubInstance(IntentApi);
-        nativeBridge.UrlScheme = <UrlSchemeApi>sinon.createStubInstance(UrlSchemeApi);
-        nativeBridge.Sdk = <SdkApi>sinon.createStubInstance(SdkApi);
+        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+
+        nativeBridge = TestFixtures.getNativeBridge();
+
+        focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        operativeEventManager = <OperativeEventManager>sinon.createStubInstance(OperativeEventManager);
-        thirdPartyEventManager = <ThirdPartyEventManager>sinon.createStubInstance(ThirdPartyEventManager);
-        container = <AdUnitContainer>sinon.createStubInstance(Activity);
+
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+
         request = new Request(nativeBridge, wakeUpManager);
         vpaid = new VPAIDParser().parse(VPAIDTestXML);
         const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
@@ -77,15 +69,18 @@ describe('VPAIDEventHandlerTest', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-        focusManager = <FocusManager>sinon.createStubInstance(FocusManager);
-        (<any>focusManager).onAppForeground = new Observable0();
-        (<any>focusManager).onAppBackground = new Observable0();
-        (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
 
-        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        overlay = <Overlay><any> {};
+        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+        vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
+
+        const sessionManager = new SessionManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(nativeBridge);
+
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sinon.spy(thirdPartyEventManager, 'sendEvent');
+
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         vpaidAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -106,6 +101,8 @@ describe('VPAIDEventHandlerTest', () => {
 
         adUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
         vpaidEventHandler = new VPAIDEventHandler(nativeBridge, adUnit, vpaidAdUnitParameters);
+        vpaidView.addEventHandler(vpaidEventHandler);
+        adUnit.show();
     });
 
     afterEach(() => {
@@ -116,11 +113,9 @@ describe('VPAIDEventHandlerTest', () => {
     });
 
     it('should forward the event to the observer', () => {
-        const spy = sinon.spy();
         const eventType = 'AdEvent';
         const args = ['foo', 1, true, 'bar'];
-        vpaidEventHandler.onVPAIDEvent = spy;
-        // vpaid.onVPAIDEvent.subscribe(spy);
+        sinon.spy(vpaidEventHandler, 'onVPAIDEvent');
 
         window.postMessage({
             type: 'VPAID',
@@ -131,17 +126,16 @@ describe('VPAIDEventHandlerTest', () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 try {
-                    sinon.assert.calledWith(spy, eventType, args);
+                    sinon.assert.calledWith(<sinon.SinonSpy>vpaidEventHandler.onVPAIDEvent, eventType, args);
                     resolve();
                 } catch(e) {
-                    reject();
+                    reject(e);
                 }
             });
         });
     });
 
     describe('VPAID events', () => {
-        const sdkVersion = 210;
         const verifyTrackingEvent = (eventType: string): (() => void) => {
             return () => {
                 sinon.assert.called(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
@@ -159,9 +153,11 @@ describe('VPAIDEventHandlerTest', () => {
         };
 
         beforeEach(() => {
-            (<sinon.SinonStub>operativeEventManager.getClientInfo).returns({
-                getSdkVersion: () => sdkVersion
-            });
+            sinon.spy(vpaidView, 'showAd');
+            sinon.spy(operativeEventManager, 'sendFirstQuartile');
+            sinon.spy(operativeEventManager, 'sendMidpoint');
+            sinon.spy(operativeEventManager, 'sendThirdQuartile');
+            sinon.spy(operativeEventManager, 'sendView');
         });
 
         // Generic events that translate to VAST tracking with
@@ -225,10 +221,12 @@ describe('VPAIDEventHandlerTest', () => {
 
         describe('on AdSkipped', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
-                (<sinon.SinonStub>container.open).returns(Promise.resolve());
-                (<sinon.SinonStub>container.close).returns(Promise.resolve());
-                (<sinon.SinonStub>nativeBridge.Listener.sendFinishEvent).returns(Promise.resolve());
+                sinon.spy(operativeEventManager, 'sendSkip');
+                sinon.spy(vpaidView, 'hide');
+                sinon.stub(vpaidView, 'container').returns(document.createElement('div'));
+                sinon.stub(container, 'open').returns(Promise.resolve());
+                sinon.stub(container, 'close').returns(Promise.resolve());
+                sinon.stub(nativeBridge.Listener, 'sendFinishEvent').returns(Promise.resolve());
                 return adUnit.show();
             });
             beforeEach(triggerVPAIDEvent('AdSkipped'));
@@ -252,10 +250,11 @@ describe('VPAIDEventHandlerTest', () => {
 
         describe('on AdError', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
-                (<sinon.SinonStub>container.open).returns(Promise.resolve());
-                (<sinon.SinonStub>container.close).returns(Promise.resolve());
-                (<sinon.SinonStub>nativeBridge.Listener.sendFinishEvent).returns(Promise.resolve());
+                sinon.spy(vpaidView, 'hide');
+                sinon.stub(vpaidView, 'container').returns(document.createElement('div'));
+                sinon.stub(container, 'open').returns(Promise.resolve());
+                sinon.stub(container, 'close').returns(Promise.resolve());
+                sinon.stub(nativeBridge.Listener, 'sendFinishEvent').returns(Promise.resolve());
                 return adUnit.show();
             });
             beforeEach(triggerVPAIDEvent('AdError'));
@@ -275,7 +274,6 @@ describe('VPAIDEventHandlerTest', () => {
         });
 
         describe('on AdClickThru', () => {
-
             const checkClickThroughTracking = () => {
                 const urls = campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
@@ -285,7 +283,8 @@ describe('VPAIDEventHandlerTest', () => {
 
             describe('on android', () => {
                 beforeEach(() => {
-                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+                    sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                    sinon.spy(nativeBridge.Intent, 'launch');
                 });
 
                 describe('when url is passed', () => {
@@ -316,7 +315,8 @@ describe('VPAIDEventHandlerTest', () => {
 
             describe('on ios', () => {
                 beforeEach(() => {
-                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+                    sinon.spy(nativeBridge.UrlScheme, 'open');
+                    sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                 });
 
                 describe('when url is passed', () => {

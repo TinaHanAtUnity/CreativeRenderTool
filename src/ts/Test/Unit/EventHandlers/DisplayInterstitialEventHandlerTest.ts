@@ -83,6 +83,7 @@ describe('DisplayInterstitialEventHandler', () => {
 
         displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
         displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
+        view.addEventHandler(displayInterstitialEventHandler);
     });
 
     afterEach(() => {
