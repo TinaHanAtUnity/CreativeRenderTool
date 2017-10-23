@@ -344,6 +344,7 @@ export class WebView {
                     this.reinitialize();
                 }
             } else {
+                this._campaignRefreshManager.refresh();
                 this._sessionManager.sendUnsentSessions(this._operativeEventManager);
             }
         });

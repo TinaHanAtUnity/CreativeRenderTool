@@ -51,8 +51,6 @@ export class CampaignRefreshManager {
             this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
             this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
         }
-        this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
-
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -264,9 +262,5 @@ export class CampaignRefreshManager {
                 }
             }, this._startRefreshMagicConstant);
         }
-    }
-
-    private onNetworkConnected() {
-        this.refresh();
     }
 }
