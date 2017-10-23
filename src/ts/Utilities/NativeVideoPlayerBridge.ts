@@ -200,7 +200,7 @@ export class NativeVideoPlayerBridge {
     }
 
     private onVideoProgress(progress: number) {
-        this._progress += progress;
+        this._progress = progress;
         this.notifyProgress(progress / 1000.0);
         this.onProgress.trigger(progress);
     }
