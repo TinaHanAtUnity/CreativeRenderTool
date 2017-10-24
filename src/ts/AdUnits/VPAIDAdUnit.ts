@@ -106,6 +106,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onShow() {
         this.setShowing(true);
+        this.onStart.trigger();
         this._timer.start();
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -154,7 +155,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._timer.stop();
         this._view.updateTimeoutWidget();
         this._view.showAd();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
 
     private onAdError() {
@@ -324,7 +324,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         const impressionUrls = this._vpaidCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vast impression', impressionUrl);
+                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
             }
         }
     }
