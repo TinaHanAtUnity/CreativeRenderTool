@@ -49,11 +49,6 @@
         Object.defineProperty(_element, 'currentTime', currentTimeProperty);
         Object.defineProperty(_element, 'duration', durationProperty);
 
-        var originalSetProperty = _element.style.setProperty;
-        _element.style.setProperty = function(name, value, priority) {
-            return originalSetProperty.call(_element,style, [name, value, priority]);
-        };
-
         window.addEventListener('message', function(e) {
             _element.onMessage(e);
         });
