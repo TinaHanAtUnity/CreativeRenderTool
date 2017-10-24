@@ -12,9 +12,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     private _endScreen: PerformanceEndScreen;
 
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
-        parameters.endScreen.render();
-        parameters.endScreen.hide();
-        document.body.appendChild(parameters.endScreen.container());
+        super(nativeBridge, parameters);
 
         const campaign = parameters.campaign;
         const landscapeVideo = campaign.getVideo();
@@ -22,10 +20,12 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         const portraitVideo = campaign.getPortraitVideo();
         const portraitVideoCached = portraitVideo && portraitVideo.isCached();
 
-        super(nativeBridge, parameters);
+        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
 
         this._endScreen = parameters.endScreen;
-        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
+        this._endScreen.render();
+        this._endScreen.hide();
+        document.body.appendChild(this._endScreen.container());
     }
 
     public hide(): Promise<void> {
