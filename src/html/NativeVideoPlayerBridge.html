@@ -14,9 +14,6 @@
             },
             set: function(src) {
                 this._src = src;
-                this.sendVideoEvent('prepare', {
-                    url: src
-                });
             }
         };
 
@@ -94,6 +91,9 @@
                 case 'ended':
                     this.dispatchEvent(new Event('ended'));
                     break;
+                case 'loadstart':
+                    this.dispatchEvent(new Event('loadstart'));
+                    break;
                 case 'error':
                     var e = new ErrorEvent('error');
                     e.error = data;
@@ -130,6 +130,9 @@
         };
 
         _element.load = function() {
+            this.sendVideoEvent('prepare', {
+                url: this._src
+            });
         };
 
         _element.canPlayType = function(mimeType) {
