@@ -1,3 +1,13 @@
+# Mon Oct 23 21:35:15 UTC 2017
+
+* Integrate SDKStats into Webview
+* Send audio and headphone state with ad request
+
+# Thu Oct 19 20:45:59 UTC 2017
+
+* Trigger onStart when VPAIDAdUnit shows
+* Removes VPAIDAdUnit debug diagnostics
+
 # Wed Oct 18 21:19:54 UTC 2017
 
 * Add diagnostics to all VPAID third party events, success and failed
