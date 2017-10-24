@@ -1,25 +1,34 @@
 import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
+import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
+import RussianLoadingScreen from 'json/locale/ru/loadingscreen.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
 import JapaneseOverlay from 'json/locale/ja/overlay.json';
 import KoreanEndscreen from 'json/locale/ko/endscreen.json';
 import KoreanOverlay from 'json/locale/ko/overlay.json';
 import ItalianEndscreen from 'json/locale/it/endscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
+import ItalianLoadingScreen from 'json/locale/it/loadingscreen.json';
 import GermanEndscreen from 'json/locale/de/endscreen.json';
 import GermanOverlay from 'json/locale/de/overlay.json';
+import GermanLoadingScreen from 'json/locale/de/loadingscreen.json';
 import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
+import ChineseSimplifiedLoadingScreen from 'json/locale/zh_Hans/loadingscreen.json';
+import ChineseTraditionalLoadingScreen from 'json/locale/zh_Hant/loadingscreen.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
+import FinnishLoadingScreen from 'json/locale/fi/loadingscreen.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
+import SpanishLoadingScreen from 'json/locale/es/loadingscreen.json';
 import FrenchEndscreen from 'json/locale/fr/endscreen.json';
 import FrenchOverlay from 'json/locale/fr/overlay.json';
+import FrenchLoadingScreen from 'json/locale/fr/loadingscreen.json';
 import TurkishEndscreen from 'json/locale/tr/endscreen.json';
 import TurkishOverlay from 'json/locale/tr/overlay.json';
 import DanishEndscreen from 'json/locale/da_DK/endscreen.json';
@@ -32,6 +41,9 @@ import IcelandicEndscreen from 'json/locale/is/endscreen.json';
 import IcelandicOverlay from 'json/locale/is/overlay.json';
 import RomanianEndscreen from 'json/locale/ro/endscreen.json';
 import RomanianOverlay from 'json/locale/ro/overlay.json';
+import PortugueseEndscreen from 'json/locale/pt/endscreen.json';
+import PortugueseOverlay from 'json/locale/pt/overlay.json';
+import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -93,11 +105,13 @@ export class Localization {
     private static _languageMap: ILanguageMap = {
         'en.*': {
             'endscreen': JSON.parse(EnglishEndscreen),
-            'overlay': JSON.parse(EnglishOverlay)
+            'overlay': JSON.parse(EnglishOverlay),
+            'loadingscreen': JSON.parse(EnglishLoadingScreen)
         },
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
-            'overlay': JSON.parse(RussianOverlay)
+            'overlay': JSON.parse(RussianOverlay),
+            'loadingscreen': JSON.parse(RussianLoadingScreen)
         },
         'ja.*': {
             'endscreen': JSON.parse(JapaneseEndscreen),
@@ -109,31 +123,38 @@ export class Localization {
         },
         'it.*': {
             'endscreen': JSON.parse(ItalianEndscreen),
-            'overlay': JSON.parse(ItalianOverlay)
+            'overlay': JSON.parse(ItalianOverlay),
+            'loadingscreen': JSON.parse(ItalianLoadingScreen)
         },
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
-            'overlay': JSON.parse(GermanOverlay)
+            'overlay': JSON.parse(GermanOverlay),
+            'loadingscreen': JSON.parse(GermanLoadingScreen)
         },
         'zh(_Hant)?(_TW|_HK|_MO|_Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
-            'overlay': JSON.parse(ChineseTraditionalOverlay)
+            'overlay': JSON.parse(ChineseTraditionalOverlay),
+            'loadingscreen': JSON.parse(ChineseTraditionalLoadingScreen)
         },
         'zh(_Hans)?(_\\D\\D)?$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
-            'overlay': JSON.parse(ChineseSimplifiedOverlay)
+            'overlay': JSON.parse(ChineseSimplifiedOverlay),
+            'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)
         },
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),
-            'overlay': JSON.parse(FinnishOverlay)
+            'overlay': JSON.parse(FinnishOverlay),
+            'loadingscreen': JSON.parse(FinnishLoadingScreen)
         },
         'es.*': {
             'endscreen': JSON.parse(SpanishEndscreen),
-            'overlay': JSON.parse(SpanishOverlay)
+            'overlay': JSON.parse(SpanishOverlay),
+            'loadingscreen': JSON.parse(SpanishLoadingScreen)
         },
         'fr.*': {
             'endscreen': JSON.parse(FrenchEndscreen),
-            'overlay': JSON.parse(FrenchOverlay)
+            'overlay': JSON.parse(FrenchOverlay),
+            'loadingscreen': JSON.parse(FrenchLoadingScreen)
         },
         'tr.*': {
             'endscreen': JSON.parse(TurkishEndscreen),
@@ -158,6 +179,11 @@ export class Localization {
         'ro.*': {
             'endscreen': JSON.parse(RomanianEndscreen),
             'overlay': JSON.parse(RomanianOverlay)
+        },
+        'pt.*': {
+            'endscreen': JSON.parse(PortugueseEndscreen),
+            'overlay': JSON.parse(PortugueseOverlay),
+            'loadingscreen': JSON.parse(PortugueseLoadingScreen)
         },
     };
 

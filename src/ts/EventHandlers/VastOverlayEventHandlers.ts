@@ -1,9 +1,10 @@
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
-import { SessionManager } from 'Managers/SessionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Request } from 'Utilities/Request';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class VastOverlayEventHandlers {
 
@@ -17,7 +18,7 @@ export class VastOverlayEventHandlers {
         }
     }
 
-    public static onMute(sessionManager: SessionManager, adUnit: VastAdUnit, muted: boolean): void {
+    public static onMute(thirdPartyEventManager: ThirdPartyEventManager, adUnit: VastAdUnit, muted: boolean, clientInfo: ClientInfo): void {
         adUnit.setMuted(muted);
         if (muted) {
             const moat = adUnit.getMoat();
@@ -25,21 +26,21 @@ export class VastOverlayEventHandlers {
                 moat.triggerVideoEvent('AdVolumeChange', 0);
                 moat.triggerViewabilityEvent('volume', 0.0);
             }
-            adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'mute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+            adUnit.sendTrackingEvent(thirdPartyEventManager, 'mute', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
         } else {
             const moat = adUnit.getMoat();
             if(moat) {
                 moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
                 moat.triggerViewabilityEvent('volume', adUnit.getVolume() * 100);
             }
-            adUnit.sendTrackingEvent(sessionManager.getEventManager(), 'unmute', sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+            adUnit.sendTrackingEvent(thirdPartyEventManager, 'unmute', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
         }
     }
 
-    public static onCallButton(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VastAdUnit, request: Request): Promise<void> {
+    public static onCallButton(nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VastAdUnit, request: Request, clientInfo: ClientInfo): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
 
-        adUnit.sendVideoClickTrackingEvent(sessionManager.getEventManager(), sessionManager.getSession().getId(), sessionManager.getClientInfo().getSdkVersion());
+        adUnit.sendVideoClickTrackingEvent(thirdPartyEventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
 
         const clickThroughURL = adUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

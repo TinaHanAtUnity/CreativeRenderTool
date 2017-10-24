@@ -152,6 +152,10 @@ class TestCampaign extends Campaign {
     public getOptionalAssets() {
         return this._optional;
     }
+
+    public isConnectionNeeded() {
+        return false;
+    }
 }
 
 describe('AssetManagerTest', () => {
@@ -328,7 +332,7 @@ describe('AssetManagerTest', () => {
             const asset = new HTML('https://www.google.fi');
             const campaign = new TestCampaign([asset], []);
             const spy = sinon.spy(cache, 'cache');
-            cacheApi.setDownloadDelay(10000);
+            cacheApi.setDownloadDelay(500);
 
             let fastConnectionDetected: boolean = false;
 
@@ -341,7 +345,7 @@ describe('AssetManagerTest', () => {
             setTimeout(() => {
                 fastConnectionDetected = true;
                 cache.onFastConnectionDetected.trigger();
-            }, 300);
+            }, 200);
 
             return promise;
         });
@@ -351,7 +355,7 @@ describe('AssetManagerTest', () => {
             const assetManager = new AssetManager(cache, CacheMode.ADAPTIVE, deviceInfo);
             const asset = new HTML('https://www.google.fi');
             const campaign = new TestCampaign([asset], []);
-            cacheApi.setDownloadDelay(10000);
+            cacheApi.setDownloadDelay(500);
             cache.onFastConnectionDetected.trigger();
 
             return assetManager.setup(campaign).then(() => {

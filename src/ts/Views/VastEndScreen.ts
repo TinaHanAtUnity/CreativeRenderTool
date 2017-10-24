@@ -13,7 +13,9 @@ export class VastEndScreen extends View {
     public readonly onClose = new Observable0();
     public readonly onShow = new Observable0();
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign) {
+    private _isSwipeToCloseEnabled: boolean = false;
+
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string) {
         super(nativeBridge, 'end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
@@ -40,6 +42,24 @@ export class VastEndScreen extends View {
                 selector: '.btn-close-region'
             }
         ];
+
+        if(gameId === '1300023' || gameId === '1300024') {
+            this._isSwipeToCloseEnabled = true;
+
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.campaign-container, .game-background'
+            });
+        }
+    }
+
+    public render(): void {
+        super.render();
+
+        if(this._isSwipeToCloseEnabled) {
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
     }
 
     public show(): void {

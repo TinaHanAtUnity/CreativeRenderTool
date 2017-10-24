@@ -2,9 +2,10 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
-import { StoreName } from 'Models/PerformanceCampaign';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { Session } from 'Models/Session';
 
-interface IMRAIDCampaign extends ICampaign {
+export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
@@ -12,6 +13,8 @@ interface IMRAIDCampaign extends ICampaign {
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
+    clickUrl: string | undefined;
+    videoEventUrls: { [eventType: string]: string } | undefined;
 
     gameName: string | undefined;
     gameIcon: Image | undefined;
@@ -25,7 +28,7 @@ interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -34,6 +37,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             additionalTrackingEvents: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            clickUrl: ['string', 'undefined'],
+            videoEventUrls: ['object', 'undefined'],
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
@@ -46,6 +51,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         });
 
         this.set('id', campaign.id);
+        this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 
@@ -61,8 +67,19 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
+        if(campaign.clickUrl) {
+            this.set('clickUrl', campaign.clickUrl);
+        }
+        if (campaign.videoEventUrls) {
+            this.set('videoEventUrls', campaign.videoEventUrls);
+        }
+
         this.set('meta', campaign.meta);
         this.set('gameName', campaign.gameName);
+
+        if(cacheTTL) {
+            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
+        }
 
         if(campaign.gameIcon) {
             this.set('gameIcon', new Image(campaign.gameIcon));
@@ -175,6 +192,23 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('clickAttributionUrlFollowsRedirects');
     }
 
+    public getClickUrl(): string | undefined {
+        return this.get('clickUrl');
+    }
+
+    public getVideoEventUrls(): { [eventType: string]: string } | undefined {
+        return this.get('videoEventUrls');
+    }
+
+    public getVideoEventUrl(eventType: string): string | undefined {
+        const videoEventUrls = this.getVideoEventUrls();
+        if(videoEventUrls) {
+            return videoEventUrls[eventType];
+        } else {
+            return undefined;
+        }
+    }
+
     public getBypassAppSheet(): boolean | undefined {
         return this.get('bypassAppSheet');
     }
@@ -185,6 +219,14 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getAppStoreId(): string | undefined {
         return this.get('appStoreId');
+    }
+
+    public isConnectionNeeded(): boolean {
+        const resourceUrl = this.getResourceUrl();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            return false;
+        }
+        return true;
     }
 
     public getDTO(): { [key: string]: any } {

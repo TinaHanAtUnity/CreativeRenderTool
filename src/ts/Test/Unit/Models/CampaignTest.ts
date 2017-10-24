@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Configuration } from 'Models/Configuration';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
@@ -19,7 +19,7 @@ describe('PerformanceCampaign', () => {
             const configuration = new Configuration(configurationJson);
             const json: any = JSON.parse(OnCometVideoPlcCampaign);
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const campaign = new PerformanceCampaign(campaignObject, configuration.getGamerId(), configuration.getAbGroup());
+            const campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup());
             assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
             assert.equal(campaign.getGamerId(), configuration.getGamerId());
             assert.equal(campaign.getAppStoreId(), campaignObject.appStoreId);
@@ -41,7 +41,7 @@ describe('VastCampaign', () => {
             const vastXml = SimpleVast;
             const vastParser = TestFixtures.getVastParser();
             const parsedVast = vastParser.parseVast(vastXml);
-            const campaign = new VastCampaign(parsedVast, '12345', 'gamerId', 1);
+            const campaign = new VastCampaign(parsedVast, '12345', TestFixtures.getSession(), 'gamerId', 1);
             assert.equal(campaign.getAbGroup(), 1);
             assert.equal(campaign.getGamerId(), 'gamerId');
             assert.equal(campaign.getId(), '12345');
@@ -68,7 +68,7 @@ describe('VastCampaign', () => {
             const vastXml = CacheSimpleVast;
             const vastParser = TestFixtures.getVastParser();
             const parsedVast = vastParser.parseVast(vastXml);
-            const campaign = new VastCampaign(parsedVast, 'campaignId', 'gamerId', 1);
+            const campaign = new VastCampaign(parsedVast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
             campaign.getVideo().setCachedUrl('file://some/cache/path.mp4');
             assert.equal(campaign.getVideo().getUrl(), 'file://some/cache/path.mp4');
         });

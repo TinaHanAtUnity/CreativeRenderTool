@@ -1,3 +1,118 @@
+# Mon Oct 23 21:35:15 UTC 2017
+
+* Integrate SDKStats into Webview
+* Send audio and headphone state with ad request
+
+# Thu Oct 19 20:45:59 UTC 2017
+
+* Trigger onStart when VPAIDAdUnit shows
+* Removes VPAIDAdUnit debug diagnostics
+
+# Wed Oct 18 21:19:54 UTC 2017
+
+* Add diagnostics to all VPAID third party events, success and failed
+* Stop quick retry test on parsing errors from group 5
+* Fix handling for non-integer screen width and height values
+
+# Mon Oct 16 20:19:29 UTC 2017
+
+* Adds ad response to all diagnostic messages
+
+# Thu Oct 12 20:04:06 UTC 2017
+
+* Fire VAST Impression on VPAID Ad Units
+* Fixes click URL construction for Operative Events
+
+# Wed Oct 11 01:48:02 UTC 2017
+
+* Fix typo in VPAID content type
+* Fix operative events with programmatic MRAID
+
+# Tue Oct 10 17:15:40 UTC 2017
+
+* Initial support for VPAID
+
+# Tue Oct 10 09:11:38 UTC 2017
+
+* Removed dark end screen A/B test (groups 8 & 9)
+* Use event urls from comet response.
+
+# Mon Oct  9 09:08:58 UTC 2017
+
+* Sliding video player interface AB test (groups 10 & 11)
+* Video end card click tracking event for VAST endscreen.
+* Added static device info into kafka messages (Analytics)
+
+# Thu Oct  5 13:30:35 UTC 2017
+
+* Remove endscreen click ab-test
+* Fix to reporting of duplicate mraid diagnostic events
+* Faster retry logic after error (60-120s, was 1h)
+
+# Mon Oct  2 11:43:28 UTC 2017
+
+* Refactor SessionManager and EventManager
+* Accept unsafe but legal URL characters in campaign assets
+
+# Thu Sep 28 13:54:13 UTC 2017
+
+* Enable creative testing without backend
+* Fix retrying after campaign parsing or caching failure
+* Remove parsed ad plan from diagnostics (ES indexing)
+
+# Wed Sep 27 13:10:22 UTC 2017
+
+* Dark end screen theme AB Test (groups 8 & 9)
+* Remove additional click zones from end screen AB test (groups 10 & 11)
+* Clean up parts of the campaign parsing refactoring
+
+# Wed Sep 20 12:10:38 UTC 2017
+
+* Initial display ads support
+* Send analytics test data from gameIds 14850 and 14851
+* Do not show 3rd party MRAIDs if no connectivity is available
+* Include ad request response in plc_request_failed diagnostics
+* Refactor campaign response parsers
+* Make sure that string replacement patterns are not removed on string.replace operations
+* Reject files larger than 20MB
+* Call AdUnit.hide on display interstitial tests
+* Browser build fixes
+
+# Thu Sep 14 09:43:51 UTC 2017
+
+* Refactored AuctionResponse to be a typed model.
+* Added Chinese translations to the playable loading screen.
+* 2.0.6+ fixed issue on iOS with opening in incorrect orientation.
+
+# Tue Sep 12 08:50:43 UTC 2017
+
+* Add auctionId to ad requests and all operative events, remove sessionId from operative events
+
+# Mon Sep 11 12:02:52 UTC 2017
+
+* Remove handle_campaign_failed diagnostic message
+* Always send cached parameter in operative events
+* Send timestamp for all diagnostic events
+* Increase minimum config.json check delay from 15 minutes to 60 minutes for all versions 2.1.0 and earlier to reduce reinit crashes
+
+# Thu Sep  7 13:35:33 UTC 2017
+
+* Add handle_campaign_failed diagnostic message
+
+# Thu Sep  7 10:05:12 UTC 2017
+
+* Store gamerId and send stored gamerId only for iOS devices with limit ad tracking
+
+# Wed Sep  6 08:32:29 UTC 2017
+
+* Update to TypeScript 2.5 and update other dependencies
+* Update rollup config for changed parameters
+* Fix ClientInfo settings in browser build
+* Improve playable analytics
+* Fix edge cases with programmatic MRAID expiration
+* Remove test.auctionUrl test setting
+* Refactor code so that unit tests will not have pending timers
+
 # Mon Sep  4 12:30:36 UTC 2017
 
 * Refactor campaign handling code to drop support for yield and use auction unconditionally

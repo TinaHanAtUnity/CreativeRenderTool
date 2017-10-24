@@ -25,17 +25,6 @@ export class UnityAds {
 
         Sdk.setGameId(gameId);
         Sdk.setTestMode(testMode);
-        Sdk.setAppName('com.test.app.name');
-        Sdk.setAppVersion('1.2.3-appversion');
-        Sdk.setSdkVersion(2000);
-        Sdk.setSdkVersionName('2.0.0-sdkversion');
-        Sdk.setDebuggable(false);
-        Sdk.setConfigUrl('https://test.config.url');
-        Sdk.setWebViewUrl('https://test.webview.url');
-        Sdk.setWebViewHash(null);
-        Sdk.setWebViewVersion('2.0.0.-webviewversion');
-        Sdk.setInitTimeStamp(12345);
-        Sdk.setReinitialized(false);
 
         UnityAds._listener = listener;
 

@@ -15,6 +15,7 @@ import { AppSheet } from 'Native/Backend/Api/AppSheet';
 import { Platform } from 'Constants/Platform';
 import { Intent } from 'Native/Backend/Api/Intent';
 import { UrlScheme } from 'Native/Backend/Api/UrlScheme';
+import { Lifecycle } from 'Native/Backend/Api/Lifecycle';
 
 interface IInvocation {
     className: string;
@@ -51,6 +52,7 @@ export class Backend implements IWebViewBridge {
         '.*Connectivity': Connectivity,
         '.*DeviceInfo': DeviceInfo,
         '.*Intent': Intent,
+        '.*Lifecycle': Lifecycle,
         '.*Listener': Listener,
         '.*Notification': Notification,
         '.*Placement': Placement,

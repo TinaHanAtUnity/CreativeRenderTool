@@ -15,6 +15,7 @@ export enum EventType {
 
 export interface ISession {
     id: string;
+    adPlan: string | undefined;
     eventSent: { [key: number]: boolean };
 }
 
@@ -23,6 +24,7 @@ export class Session extends Model<ISession> {
     constructor(id: string) {
         super('Session', {
             id: ['string'],
+            adPlan: ['string', 'undefined'],
             eventSent: ['object']
         });
 
@@ -32,6 +34,14 @@ export class Session extends Model<ISession> {
 
     public getId(): string {
         return this.get('id');
+    }
+
+    public getAdPlan(): string | undefined {
+        return this.get('adPlan');
+    }
+
+    public setAdPlan(adPlan: string) {
+        this.set('adPlan', adPlan);
     }
 
     public getEventSent(eventType: EventType) {

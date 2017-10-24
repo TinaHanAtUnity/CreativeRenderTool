@@ -98,17 +98,17 @@ export class Sdk {
         Sdk._reinitialized = reinitialized;
     }
 
-    private static _gameId: string;
-    private static _testMode: boolean;
-    private static _appName: string;
-    private static _appVersion: string;
-    private static _sdkVersion: number;
-    private static _sdkVersionName: string;
-    private static _debuggable: boolean;
-    private static _configUrl: string;
-    private static _webViewUrl: string;
-    private static _webViewHash: string | null;
-    private static _webViewVersion: string;
-    private static _initTimeStamp: number;
-    private static _reinitialized: boolean;
+    private static _gameId: string = '345';
+    private static _testMode: boolean = true;
+    private static _appName: string = 'com.test.app.name';
+    private static _appVersion: string = '1.2.3-appversion';
+    private static _sdkVersion: number = 2000;
+    private static _sdkVersionName: string = '2.0.0-sdkversion';
+    private static _debuggable: boolean = false;
+    private static _configUrl: string = 'https://test.config.url';
+    private static _webViewUrl: string = 'https://test.webview.url';
+    private static _webViewHash: string | null = null;
+    private static _webViewVersion: string = '2.0.0.-webviewversion';
+    private static _initTimeStamp: number = 12345;
+    private static _reinitialized: boolean = false;
 }

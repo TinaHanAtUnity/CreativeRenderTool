@@ -4,7 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDView } from 'Views/MRAIDView';
 import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
@@ -27,6 +27,7 @@ export class MRAID extends MRAIDView {
 
     private _closeRemaining: number;
     private _showTimestamp: number;
+    private _updateInterval: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
         super(nativeBridge, 'mraid');
@@ -68,7 +69,7 @@ export class MRAID extends MRAIDView {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
-            const updateInterval = setInterval(() => {
+            this._updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -82,13 +83,13 @@ export class MRAID extends MRAIDView {
                     this.updateProgressCircle(this._closeElement, 1);
                 }
                 if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    clearInterval(this._updateInterval);
                     this._canClose = true;
                 }
             }, 1000);
         } else {
             this._closeRemaining = MRAID.CloseLength;
-            const updateInterval = setInterval(() => {
+            this._updateInterval = setInterval(() => {
                 const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this.onReward.trigger();
@@ -99,7 +100,7 @@ export class MRAID extends MRAIDView {
                     this.updateProgressCircle(this._closeElement, progress);
                 }
                 if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    clearInterval(this._updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
@@ -128,6 +129,10 @@ export class MRAID extends MRAIDView {
         if(this._messageListener) {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
+        }
+        if(this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = undefined;
         }
         super.hide();
     }
@@ -209,9 +214,6 @@ export class MRAID extends MRAIDView {
                     allowOrientationChange: event.data.properties.allowOrientationChange,
                     forceOrientation: forceOrientation
                 });
-                break;
-            case 'analyticsEvent':
-                this.onAnalyticsEvent.trigger(event.data.event, (Date.now() - this._showTimestamp) / 1000);
                 break;
             default:
                 break;

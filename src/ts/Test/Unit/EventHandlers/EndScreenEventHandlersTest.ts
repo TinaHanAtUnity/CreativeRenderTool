@@ -8,7 +8,7 @@ import { EndScreen } from 'Views/EndScreen';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -16,11 +16,12 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { PerformanceCampaign, StoreName } from "Models/PerformanceCampaign";
-import { Session } from 'Models/Session';
+import { PerformanceCampaign, StoreName } from "Models/Campaigns/PerformanceCampaign";
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ClientInfo } from 'Models/ClientInfo';
 
 describe('EndScreenEventHandlersTest', () => {
 
@@ -31,6 +32,10 @@ describe('EndScreenEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let operativeEventManager: OperativeEventManager;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
+    let thirdPartyEventManager: ThirdPartyEventManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -55,13 +60,18 @@ describe('EndScreenEventHandlersTest', () => {
 
             metaDataManager = new MetaDataManager(nativeBridge);
 
-            sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
-            sessionManager.setSession(new Session('sessionId'));
+            const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+            const request = new Request(nativeBridge, wakeUpManager);
+            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+
+            thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge);
+            operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
@@ -69,9 +79,9 @@ describe('EndScreenEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
+            EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
@@ -79,14 +89,14 @@ describe('EndScreenEventHandlersTest', () => {
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                     TestFixtures.getCampaignFollowsRedirects(), new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
 
-                sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
                     response: 'foo response',
                     responseCode: 200,
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -103,10 +113,10 @@ describe('EndScreenEventHandlersTest', () => {
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
-                (<sinon.SinonSpy>sessionManager.sendClick).restore();
-                sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
+                sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
@@ -119,12 +129,12 @@ describe('EndScreenEventHandlersTest', () => {
             beforeEach(() => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
-                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, sessionManager, performanceAdUnit);
+                EndScreenEventHandlers.onDownloadAndroid(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, clientInfo);
 
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
             });
 
             it('should launch market view', () => {
@@ -140,7 +150,6 @@ describe('EndScreenEventHandlersTest', () => {
 
     describe('with onDownloadIos', () => {
         let resolvedPromise: Promise<INativeResponse>;
-        let deviceInfo: DeviceInfo;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -160,13 +169,18 @@ describe('EndScreenEventHandlersTest', () => {
                 hide: sinon.spy(),
             };
 
-            sessionManager = new SessionManager(nativeBridge, TestFixtures.getClientInfo(), new DeviceInfo(nativeBridge),
-                new EventManager(nativeBridge, new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager))), metaDataManager);
-            sessionManager.setSession(new Session('sessionId'));
+            const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+            const request = new Request(nativeBridge, wakeUpManager);
+            clientInfo = TestFixtures.getClientInfo(Platform.IOS);
+            deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+
+            thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge);
+            operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
             const campaign = TestFixtures.getCampaign();
@@ -178,9 +192,9 @@ describe('EndScreenEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             deviceInfo = <DeviceInfo><any>{getOsVersion: () => '9.0'};
-            EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+            EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
         });
 
         describe('with follow redirects', () => {
@@ -191,14 +205,14 @@ describe('EndScreenEventHandlersTest', () => {
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(),
                     campaign, new Video(''), overlay, TestFixtures.getDeviceInfo(Platform.IOS), null, endScreen);
 
-                sinon.stub(sessionManager.getEventManager(), 'clickAttributionEvent').returns(Promise.resolve({
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
                     response: 'foo response',
                     responseCode: 200,
                     headers: [['location', 'appstore://foobar.com']]
                 }));
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'appstore://foobar.com');
@@ -209,10 +223,10 @@ describe('EndScreenEventHandlersTest', () => {
                 const response = TestFixtures.getOkNativeResponse();
                 response.headers = [];
                 resolvedPromise = Promise.resolve(response);
-                (<sinon.SinonSpy>sessionManager.sendClick).restore();
-                sinon.stub(sessionManager, 'sendClick').returns(resolvedPromise);
+                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
+                sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.UrlScheme.open);
@@ -228,7 +242,7 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
             });
 
@@ -245,7 +259,7 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(true);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.APPLE);
 
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
 
             });
 
@@ -261,7 +275,7 @@ describe('EndScreenEventHandlersTest', () => {
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
-                EndScreenEventHandlers.onDownloadIos(nativeBridge, sessionManager, performanceAdUnit, deviceInfo);
+                EndScreenEventHandlers.onDownloadIos(nativeBridge, operativeEventManager, thirdPartyEventManager, performanceAdUnit, deviceInfo, clientInfo);
             });
 
             it('should open app sheet', () => {
@@ -276,7 +290,7 @@ describe('EndScreenEventHandlersTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>sessionManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
             });
 
         });

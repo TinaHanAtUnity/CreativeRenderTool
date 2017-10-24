@@ -6,10 +6,13 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
+import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { Session } from 'Models/Session';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
@@ -19,6 +22,10 @@ import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCam
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 export class TestFixtures {
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
+    }
 
     public static getPlacement(): Placement {
         return new Placement({
@@ -36,32 +43,32 @@ export class TestFixtures {
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
         const json = JSON.parse(OnCometVideoPlcCampaignFollowsRedirects);
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new PerformanceCampaign(performanceJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
+        return new PerformanceCampaign(performanceJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
     }
 
     public static getCampaign(): PerformanceCampaign {
         const json = JSON.parse(OnCometVideoPlcCampaign);
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new PerformanceCampaign(performanceJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
+        return new PerformanceCampaign(performanceJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup());
     }
 
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
         const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+        return new MRAIDCampaign(playableMraidJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined, playableMraidJson.mraidUrl);
     }
 
     public static getPlayableMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
         const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(playableMraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), playableMraidJson.mraidUrl);
+        return new MRAIDCampaign(playableMraidJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined, playableMraidJson.mraidUrl);
     }
 
     public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
         const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         mraidJson.id = 'testId';
-        return new MRAIDCampaign(mraidJson, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
+        return new MRAIDCampaign(mraidJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), 3600, mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
@@ -137,5 +144,9 @@ export class TestFixtures {
             targetGameId: 5678,
             targetCampaignId: '123456abcdef'
         };
+    }
+
+    public static getSession(): Session {
+        return new Session('12345');
     }
 }

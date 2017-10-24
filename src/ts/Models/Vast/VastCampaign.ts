@@ -3,6 +3,7 @@ import { Video } from 'Models/Assets/Video';
 import { Asset } from 'Models/Assets/Asset';
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Image } from 'Models/Assets/Image';
+import { Session } from 'Models/Session';
 
 interface IVastCampaign extends ICampaign {
     vast: Vast;
@@ -13,7 +14,7 @@ interface IVastCampaign extends ICampaign {
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
-    constructor(vast: Vast, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string) {
+    constructor(vast: Vast, campaignId: string, session: Session, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string) {
         super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
@@ -42,6 +43,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('landscape', landscapeAsset);
 
         this.set('id', campaignId);
+        this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         const timeout = cacheTTL || 3600;
@@ -92,6 +94,10 @@ export class VastCampaign extends Campaign<IVastCampaign> {
 
     public getPortrait(): Asset | undefined {
         return this.get('portrait');
+    }
+
+    public isConnectionNeeded(): boolean {
+        return false;
     }
 
     public getDTO(): { [key: string]: any } {

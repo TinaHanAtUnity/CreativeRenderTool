@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
+import { Session } from 'Models/Session';
 
 export enum StoreName {
     APPLE,
@@ -10,33 +11,27 @@ export enum StoreName {
 
 interface IPerformanceCampaign extends ICampaign {
     appStoreId: string;
-
     gameId: number;
     gameName: string;
     gameIcon: Image;
-
     rating: number;
     ratingCount: number;
-
     landscapeImage: Image;
     portraitImage: Image;
-
     video?: Video;
     streamingVideo?: Video;
-
     videoPortrait?: Video;
     streamingPortraitVideo?: Video;
-
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
-
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
     bypassAppSheet: boolean;
-
     store: StoreName;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
-    constructor(campaign: any, gamerId: string, abGroup: number) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number) {
         super('PerformanceCampaign', {
             ... Campaign.Schema,
             appStoreId: ['string'],
@@ -53,11 +48,14 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             streamingPortraitVideo: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
+            clickUrl: ['string'],
+            videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number']
         });
 
         this.set('id', campaign.id);
+        this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
 
@@ -83,6 +81,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming));
         }
 
+        this.set('clickUrl', campaign.clickUrl);
+        this.set('videoEventUrls', campaign.videoEventUrls);
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
@@ -166,6 +166,18 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('clickAttributionUrlFollowsRedirects');
     }
 
+    public getClickUrl(): string {
+        return this.get('clickUrl');
+    }
+
+    public getVideoEventUrls(): { [eventType: string]: string } {
+        return this.get('videoEventUrls');
+    }
+
+    public getVideoEventUrl(eventType: string): string {
+        return this.get('videoEventUrls')[eventType];
+    }
+
     public getBypassAppSheet(): boolean {
         return this.get('bypassAppSheet');
     }
@@ -184,6 +196,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             this.getPortrait(),
             this.getLandscape()
         ];
+    }
+
+    public isConnectionNeeded(): boolean {
+        return false;
     }
 
     public getDTO(): { [key: string]: any } {

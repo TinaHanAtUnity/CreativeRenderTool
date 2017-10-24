@@ -12,7 +12,7 @@ import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 
 export abstract class VideoAdUnit extends AbstractAdUnit {
@@ -227,7 +227,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                             url: this.getVideo().getUrl(),
                             originalUrl: this.getVideo().getOriginalUrl(),
                             campaignId: this._campaign.getId()
-                        }));
+                        }), this._campaign.getSession());
+
+                        // Modify asset cached status to false
+                        this.getVideo().setCachedUrl(undefined);
 
                         // cached file not found (deleted by the system?), use streaming fallback
                         return streamingUrl;
@@ -237,7 +240,10 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()
-                    }));
+                    }), this._campaign.getSession());
+
+                    // Modify asset cached status to false
+                    this.getVideo().setCachedUrl(undefined);
 
                     // cached file not found (deleted by the system?), use streaming fallback
                     return streamingUrl;

@@ -80,13 +80,13 @@ Tests can also be launched manually: http://qa-jenkins.us-east-1.applifier.info:
 #### Android
 http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-android-api/
 
-Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans/
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android/
 
 
 #### iOS
 http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-ios-api/
 
-Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-iOS-sans/
+Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-iOS/
 
 #### Running deployment tests
 
