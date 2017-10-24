@@ -121,6 +121,14 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSupportedAbis');
     }
 
+    public getUptime(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getUptime');
+    }
+
+    public getElapsedRealtime(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getElapsedRealtime');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
