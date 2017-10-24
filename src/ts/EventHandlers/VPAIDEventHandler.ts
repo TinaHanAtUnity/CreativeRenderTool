@@ -171,20 +171,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
             this._adUnit.sendTrackingEvent('paused');
         }
     }
-/*
-    private onAdError() {
-        this._adUnit.sendTrackingEvent('error');
-        this._adUnit.setFinishState(FinishState.ERROR);
-        this._adUnit.hide();
-    }
-
-    private onAdStopped() {
-        if (this._vpaidCampaign.hasEndScreen() && this._vpaidEndScreen) {
-            this._vpaidView.container().appendChild(this._vpaidEndScreen.container());
-        } else {
-            this._adUnit.hide();
-        }
-    }*/
 
     private onAdPlaying() {
         this._adUnit.sendTrackingEvent('resume');
