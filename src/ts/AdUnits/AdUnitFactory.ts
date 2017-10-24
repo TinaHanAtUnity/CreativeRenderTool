@@ -176,7 +176,6 @@ export class AdUnitFactory {
         };
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-
         const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
 
