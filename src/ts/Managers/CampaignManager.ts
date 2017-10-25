@@ -129,11 +129,7 @@ export class CampaignManager {
                         SdkStats.increaseAdRequestOrdinal();
                         this._rawResponse = response.response;
                         session.setAdPlan(this._rawResponse);
-                        const parseTimestamp = Date.now();
-                        return this.parseCampaigns(response, session).then((result) => {
-                            SdkStats.setParseDuration(Date.now() - parseTimestamp);
-                            return result;
-                        });
+                        return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
                 }).then(() => {
@@ -258,7 +254,9 @@ export class CampaignManager {
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
+        const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            SdkStats.setParseDuration(Date.now() - parseTimestamp);
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
