@@ -418,7 +418,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('kafkaUrl')) {
-                HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaurl'));
+                HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
             if(TestEnvironment.get('abGroup')) {
