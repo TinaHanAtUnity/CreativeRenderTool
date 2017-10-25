@@ -61,7 +61,7 @@ export class Overlay extends View {
         this._template = new Template(OverlayTemplate, this._localization);
 
         this._muted = muted;
-        this._abGroup = 10;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted: this._muted
@@ -69,7 +69,6 @@ export class Overlay extends View {
 
         switch(this._abGroup) {
             case 10:
-                console.log('ab group' + this._abGroup);
                 this._callButtonSelector = '.outer-call-button';
                 break;
             case 11:
