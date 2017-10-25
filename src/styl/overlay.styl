@@ -87,6 +87,58 @@
     }
   }
 
+  .outer-call-button {
+    position: fixed;
+    right: 10px;
+    bottom: 15px;
+    display: none;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+    background: $white;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: bold;
+    pointer-events: auto;
+  }
+
+  .inner-call-button {
+    bottom: 0;
+    left: 0;
+    display: inherit;
+    padding: 10px 10px 10px 10px;
+    border-radius: 5px;
+    background: $overlay-button-blue;
+    color: $white;
+    font-weight: bold;
+    pointer-events: auto;
+  }
+
+  .outer-call-button-tag {
+    position: fixed;
+    right: -110px;
+    bottom: 15px;
+    display: none;
+    padding: 5px 60px 5px 5px;
+    border-radius: 5px;
+    background: $white;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: bold;
+    pointer-events: auto;
+  }
+
+  .inner-call-button-tag {
+    bottom: 0;
+    left: 0;
+    display: inherit;
+    padding: 10px 60px 10px 15px;
+    border-radius: 5px;
+    background: $overlay-button-blue;
+    color: $white;
+    font-weight: bold;
+    pointer-events: auto;
+  }
+
   .call-button {
     position: fixed;
     right: 10px;
@@ -214,15 +266,15 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 }
 
 .slide-up {
-  slide-animation(.4s, "ease-in", -150%);
+  slide-animation(.4s, ease-in, -150%);
 }
 
 .slide-down {
-  slide-animation(.4s, "ease-in", 150%);
+  slide-animation(.4s, ease-in, 150%);
 }
 
 .slide-back-in-place {
-  slide-animation(.2s, "ease-in-out", 0);
+  slide-animation(.2s, ease-in-out, 0);
 }
 
 @keyframes right-spin {
