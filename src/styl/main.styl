@@ -1,35 +1,40 @@
 /************************
 * GENERAL
 *************************/
+@import "vars.styl";
 
-html
-  width: 100%
-  height: 100%
-  background-color: transparent
+html {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  font-size: $default-px-size;
+}
 
-body.iphone
-body.ipad
-body.android
-  width: 100%
-  height: 100%
-  margin: 0
-  padding: 0
-  font-family: Helvetica, sans-serif
-  color: #000
-  background-color: transparent
-  -webkit-text-size-adjust: none
-  -webkit-touch-callout: none
-  -webkit-tap-highlight-color: rgba(0,0,0,0)
-  -webkit-user-select: none
-  -webkit-user-drag: none
+body.iphone,
+body.ipad,
+body.android {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: $black;
+  font-family: Helvetica, sans-serif;
+  -webkit-text-size-adjust: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none; // @stylint ignore
+  -webkit-user-drag: none; // @stylint ignore
+}
 
-
-@import "overlay.styl"
-@import "end-screen.styl"
-@import "icons.styl"
-@import "mraid.styl"
-@import "privacy.styl"
-@import "display-interstitial.styl"
-@import "playable-mraid.styl"
-@import "vpaid.styl"
-@import "loading.styl"
+@import "overlay.styl";
+@import "end-screen.styl";
+@import "new-end-screen.styl";
+@import "icons.styl";
+@import "mraid.styl";
+@import "privacy.styl";
+@import "display-interstitial.styl";
+@import "playable-mraid.styl";
+@import "media-queries.styl";
+@import "vpaid.styl";
+@import "loading.styl";
