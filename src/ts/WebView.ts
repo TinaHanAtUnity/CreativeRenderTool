@@ -449,9 +449,8 @@ export class WebView {
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
-            if(TestEnvironment.get('configurationServerUrl')) {
-                ConfigManager.setTestBaseUrl(TestEnvironment.get('configurationServerUrl'));
-                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('configurationServerUrl'));
+            if(TestEnvironment.get('configUrl')) {
+                ConfigManager.setTestBaseUrl(TestEnvironment.get('configUrl'));
             }
 
             if(TestEnvironment.get('kafkaUrl')) {
