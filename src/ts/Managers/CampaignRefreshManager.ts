@@ -74,7 +74,7 @@ export class CampaignRefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
-    public setRefreshAllowed(bool: boolean){
+    public setRefreshAllowed(bool: boolean) {
         this._refreshAllowed = bool;
     }
 
