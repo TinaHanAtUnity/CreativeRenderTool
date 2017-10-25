@@ -11,18 +11,40 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
-const resizeHandler = (event?: Event) => {
-    const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
-    const newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-    if(currentOrientation) {
-        if(currentOrientation !== newOrientation) {
-            document.body.classList.remove(currentOrientation);
-            document.body.classList.add(newOrientation);
-        }
+const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+let runningResizeEvent = false;
+
+const changeOrientation = () => {
+
+    let orientation: string = "";
+    if (typeof window.orientation !== "undefined") {
+        orientation = (Math.abs(<number>window.orientation) === 90) ? "landscape" : "portrait";
     } else {
-        document.body.classList.add(newOrientation);
+        orientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+    }
+
+    document.body.classList.remove("landscape");
+    document.body.classList.remove("portrait");
+    document.body.classList.add(orientation);
+
+    runningResizeEvent = false;
+};
+
+const resizeHandler = (event?: Event) => {
+
+    if (runningResizeEvent) {
+        return;
+    }
+
+    runningResizeEvent = true;
+
+    if (typeof animationFrame === 'function') {
+        animationFrame(changeOrientation);
+    } else {
+        setTimeout(changeOrientation, 100);
     }
 };
+
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
 

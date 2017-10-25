@@ -277,34 +277,24 @@ export class Overlay extends View {
     }
 
     private fade(value: boolean) {
-        if (this._abGroup === 10 || this._abGroup === 11) {
-            if (value) {
-                this._skipElement.classList.remove('slide-back-in-place');
-                this._skipElement.classList.add('slide-up');
-                this._progressElement.classList.remove('slide-back-in-place');
-                this._progressElement.classList.add('slide-up');
-                this._muteButtonElement.classList.remove('slide-back-in-place');
-                this._muteButtonElement.classList.add('slide-down');
-                this._fadeStatus = false;
-            } else {
-                this._skipElement.classList.remove('slide-up');
-                this._skipElement.classList.add('slide-back-in-place');
-                this._progressElement.classList.remove('slide-up');
-                this._progressElement.classList.add('slide-back-in-place');
-                this._muteButtonElement.classList.remove('slide-down');
-                this._muteButtonElement.classList.add('slide-back-in-place');
-                this._fadeStatus = true;
-            }
+        if (value) {
+            this._skipElement.classList.remove('slide-back-in-place');
+            this._skipElement.classList.add('slide-up');
+            this._progressElement.classList.remove('slide-back-in-place');
+            this._progressElement.classList.add('slide-up');
+            this._muteButtonElement.classList.remove('slide-back-in-place');
+            this._muteButtonElement.classList.add('slide-down');
+            this._container.style.pointerEvents = 'auto';
+            this._fadeStatus = false;
         } else {
-            if(value) {
-                this._container.classList.add('fade');
-                this._container.style.pointerEvents = 'auto';
-                this._fadeStatus = false;
-            } else {
-                this._container.style.pointerEvents = 'none';
-                this._container.classList.remove('fade');
-                this._fadeStatus = true;
-            }
+            this._container.style.pointerEvents = 'none';
+            this._skipElement.classList.remove('slide-up');
+            this._skipElement.classList.add('slide-back-in-place');
+            this._progressElement.classList.remove('slide-up');
+            this._progressElement.classList.add('slide-back-in-place');
+            this._muteButtonElement.classList.remove('slide-down');
+            this._muteButtonElement.classList.add('slide-back-in-place');
+            this._fadeStatus = true;
         }
     }
 }
