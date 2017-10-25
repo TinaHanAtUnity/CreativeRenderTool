@@ -4,7 +4,6 @@ import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -24,7 +23,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private _onSystemKillObserver: IObserver0;
 
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
-        super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._view = parameters.view;

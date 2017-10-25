@@ -35,7 +35,7 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
     constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
-        super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
 
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;

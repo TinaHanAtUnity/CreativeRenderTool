@@ -39,7 +39,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private _onAppBackgroundHandler: any;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
-        super(nativeBridge, parameters.forceOrientation, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
 
         this._focusManager = parameters.focusManager;
         this._vpaidCampaign = parameters.campaign;

@@ -39,7 +39,7 @@ export abstract class VideoAdUnit<T extends Campaign> extends AbstractAdUnit<T> 
     private _videoReady: boolean;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
-        super(nativeBridge, parameters.forceOrientation, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
 
         this._video = parameters.video;
         this._videoReady = false;
