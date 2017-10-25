@@ -29,7 +29,6 @@ import { VPAID } from 'Views/VPAID';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
@@ -77,8 +76,6 @@ export class AdUnitFactory {
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-        const overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -136,8 +133,6 @@ export class AdUnitFactory {
 
         const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         overlay.addEventHandler(vastOverlayHandler);
-        const overlayEventHandler = new OverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, vastAdUnit);
 

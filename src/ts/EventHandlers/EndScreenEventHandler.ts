@@ -14,6 +14,7 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
+import { Placement } from 'Models/Placement';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -31,6 +32,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _placement: Placement;
+    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
@@ -39,6 +42,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._adUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
+        this._placement = parameters.placement;
+        this._campaign = parameters.campaign;
     }
 
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
@@ -67,7 +72,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     public abstract onKeyEvent(keyCode: number): void;
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
-        this._nativeBridge.Listener.sendClickEvent(this._adUnit.getPlacement().getId());
+        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         this._operativeEventManager.sendClick(this._adUnit);
         if(parameters.clickAttributionUrl) {
@@ -82,7 +87,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
-        this._nativeBridge.Listener.sendClickEvent(this._adUnit.getPlacement().getId());
+        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         this._operativeEventManager.sendClick(this._adUnit);
         if(parameters.clickAttributionUrl) {
@@ -97,8 +102,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const campaign = this._adUnit.getCampaign();
-        const currentSession = campaign.getSession();
+        const currentSession = this._campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
                 return;
@@ -131,7 +135,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        auctionId: campaign.getSession().getId(),
+                        auctionId: currentSession.getId(),
                         url: parameters.clickAttributionUrl,
                         response: (<RequestError>error).nativeResponse
                     });
