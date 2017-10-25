@@ -1,207 +1,253 @@
-#overlay
-  background-color: transparent
-  width: 100%
-  height: 100%
-  color: #FFF
+#overlay {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: $white;
   pointer-events: none;
 
-  .skip-hit-area
-    position: fixed
-    top: 0
-    left: 0
-    width: 70px
-    height: 55px
+  .skip-hit-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 70px;
+    height: 55px;
+    pointer-events: auto;
+  }
+
+  .skip {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .skip-icon {
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    width: 27px;
+    height: 29px;
+    font-size: 27px;
+    transform: translate(0, -50%);
+  }
+
+  .skip {
+    .circle-left,
+    .circle-right {
+      border: 4px solid $overlay-gray;
+    }
+
+    .skip-icon {
+      color: $overlay-gray;
+    }
+  }
+
+  .skip.enabled {
+    .circle-left,
+    .circle-right {
+      border: 4px solid $white;
+    }
+
+    .skip-icon {
+      color: $white;
+    }
+  }
+
+  .mute-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: none;
+    width: 70px;
+    height: 55px;
     pointer-events: auto;
 
-  .skip
-    position: absolute
-    top: 10px
-    left: 10px
-    width: 36px
-    height: 36px
+    .mute-icon,
+    .unmute-icon {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      height: 27px;
+      font-size: 27px;
+    }
 
-  .skip-icon
-    position: absolute
-    top: 50%
-    left: 15%
-    width: 27px
-    height: 29px
-    font-size: 27px
-    -webkit-transform: translate(0, -50%)
+    .unmute-icon {
+      display: none;
+    }
 
-  .skip
-    .circle-left
-    .circle-right
-      border: 4px solid #777777
+    &.muted {
+      .mute-icon {
+        display: none;
+      }
 
-    .skip-icon
-      color: #777777
+      .unmute-icon {
+        display: block;
+      }
+    }
+  }
 
-  .skip.enabled
-    .circle-left
-    .circle-right
-      border: 4px solid #FFF
-
-    .skip-icon
-      color: #FFF
-
-  .mute-button
-    position: fixed
-    display: none
-    bottom: 0
-    left: 0
-    width: 70px
-    height: 55px
+  .call-button {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    display: none;
+    font-weight: bold;
+    transform: translate(0, -50%);
     pointer-events: auto;
+  }
 
-    .mute-icon
-    .unmute-icon
-      position: absolute
-      left: 10px
-      bottom: 10px
-      height: 27px
-      font-size: 27px
+  .buffering-spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    margin: auto;
+    width: 100px;
+    height: 65px;
+  }
 
-    .unmute-icon
-      display: none
+  .spinner-animation {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    border: 4px solid $white;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-radius: 200px;
+    animation: spinner 1s linear infinite;
+  }
 
-    &.muted
-      .mute-icon
-        display: none
+  .debug-message-text {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: none;
+  }
 
-      .unmute-icon
-        display: block
+  @keyframes spinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-  .call-button
-    display: none
-    position: fixed
-    right: 10px
-    bottom: 10px
-    font-weight: bold
-    -webkit-transform: translate(0, -50%)
-    pointer-events: auto;
+  .spinner-text {
+    margin-top: 10px;
+    color: $white;
+    text-align: center;
+    text-shadow: 1px 1px $black;
+    font-weight: bold;
+  }
 
-  .buffering-spinner
-    display: none
-    position: absolute
-    margin: auto
-    top: 0
-    left: 0
-    bottom: 0
-    right: 0
-    width: 100px
-    height: 65px
+  .progress {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: none;
+    width: 36px;
+    height: 36px;
+  }
 
-  .spinner-animation
-    width: 24px
-    height: 24px
-    margin: 0 auto
-    border: 4px solid #fff
-    border-left-color: transparent
-    border-right-color: transparent
-    border-radius: 200px
-    -webkit-animation: spinner 1s linear infinite
+  .progress-wrapper {
+    position: absolute;
+    clip: rect(0, 36px, 36px, 18px);
+    width: 36px;
+    height: 36px;
+  }
 
-  .debug-message-text
-    display: none
-    position: absolute
-    top: 50%
-    right: 10px
+  .progress:after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    color: $white;
+    content: attr(data-seconds);
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+  }
 
-  @-webkit-keyframes spinner
-    from
-      -webkit-transform: rotate(0deg)
-    to
-      -webkit-transform: rotate(360deg)
+  .circle-base,
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    background-color: transparent;
+    vertical-align: middle;
+  }
 
-  .spinner-text
-    margin-top: 10px
-    text-align: center
-    color: #FFF
-    font-weight: bold
-    text-shadow: 1px 1px #000
+  .circle-base {
+    border: 4px solid rgba(105, 105, 105, .4);
+  }
 
-  .progress
-    display: none
-    position: fixed
-    top: 10px
-    right: 10px
-    width: 36px
-    height: 36px
+  .circle-left,
+  .circle-right {
+    clip: rect(0px, 18px, 36px, 0);
+    border: 4px solid $white;
+  }
 
-  .progress-wrapper
-    position: absolute
-    width: 36px
-    height: 36px
-    clip: rect(0px, 36px, 36px, 18px)
+  .progress-wrapper,
+  .circle-left,
+  .circle-right {
+    animation-duration: .01s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+  }
 
-  .progress:after
-    position: absolute
-    display: block
-    left: 50%
-    top: 50%
-    content: attr(data-seconds)
-    font-size: 18px
-    color: white
-    -webkit-transform: translate(-50%, -50%)
+}
 
-  .circle-base
-  .circle-left
-  .circle-right
-    position: absolute
-    vertical-align: middle
-    background-color: transparent
-    width: 28px
-    height: 28px
-    border-radius: 100%
+.fade {
+  opacity: 0;
+  transition: opacity .45s ease-in-out;
+}
 
-  .circle-base
-    border: 4px solid rgba(105, 105, 105, 0.4)
+slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
+  transform: translateY($translation);
+  transition: transform $duration $function;
+}
 
-  .circle-left
-  .circle-right
-    border: 4px solid #fff
-    clip: rect(0px, 18px, 36px, 0px)
+.slide-up {
+  slide-animation(.4s, "ease-in", -150%);
+}
 
-  .progress-wrapper
-  .circle-left
-  .circle-right
-    -webkit-animation-iteration-count: 1;
-    -webkit-animation-fill-mode: forwards;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-duration: 0.01s;
+.slide-down {
+  slide-animation(.4s, "ease-in", 150%);
+}
 
-  @-webkit-keyframes right-spin
-    from
-      -webkit-transform: rotate(0deg)
-    to
-      -webkit-transform: rotate(180deg)
-  @-webkit-keyframes left-spin
-    from
-      -webkit-transform: rotate(0deg)
-    to
-      -webkit-transform: rotate(360deg)
-  @-webkit-keyframes close-progress-wrapper
-    to
-      clip: rect(auto, auto, auto, auto)
+.slide-back-in-place {
+  slide-animation(.2s, "ease-in-out", 0);
+}
 
-.fade
-  opacity: 0
-  transition: opacity 0.45s ease-in-out
+@keyframes right-spin {
+  from {
+    transform: rotate(0deg);
+  }
 
-slide-animation($duration = 0.4s, $function = ease-in, $translation = 0%)
-  -webkit-transform: translateY($translation)
-  -transform: translateY($translation)
-  -webkit-transition: -webkit-transform $duration $function
-  transition: -webkit-transform $duration $function
-  transition: transform $duration $function
-  transition: transform $duration $function, -webkit-transform $duration $function
+  to {
+    transform: rotate(180deg);
+  }
+}
 
-.slide-up
-  slide-animation 0.4s ease-in -150%
+@keyframes left-spin {
+  from {
+    transform: rotate(0deg);
+  }
 
-.slide-down
-  slide-animation 0.4s ease-in 150%
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-.slide-back-in-place
-  slide-animation 0.2s ease-in-out 0%
+@keyframes close-progress-wrapper {
+  to {
+    clip: rect(auto, auto, auto, auto);
+  }
+}
+
