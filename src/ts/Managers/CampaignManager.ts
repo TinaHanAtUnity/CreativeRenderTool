@@ -129,7 +129,11 @@ export class CampaignManager {
                         SdkStats.increaseAdRequestOrdinal();
                         this._rawResponse = response.response;
                         session.setAdPlan(this._rawResponse);
-                        return this.parseCampaigns(response, session);
+                        const parseTimestamp = Date.now();
+                        return this.parseCampaigns(response, session).then((result) => {
+                            SdkStats.setParseDuration(Date.now() - parseTimestamp);
+                            return result;
+                        });
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
                 }).then(() => {
