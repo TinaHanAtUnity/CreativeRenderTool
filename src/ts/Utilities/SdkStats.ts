@@ -108,6 +108,7 @@ export class SdkStats {
 
     public static setAdRequestTimestamp(): void {
         SdkStats._latestAdRequestTimestamp = Date.now();
+        SdkStats._parseDuration = {};
     }
 
     public static setAdRequestDuration(duration: number): void {
@@ -126,8 +127,8 @@ export class SdkStats {
         SdkStats._cachingFinished[fileId] = Date.now();
     }
 
-    public static setParseDuration(duration: number): void {
-        SdkStats._parseDuration = duration;
+    public static setParseDuration(placementId: string, duration: number): void {
+        SdkStats._parseDuration[placementId] = duration;
     }
 
     private static _nativeBridge: NativeBridge;
@@ -143,7 +144,7 @@ export class SdkStats {
     private static _initTimestamp: number;
     private static _latestAdRequestTimestamp: number;
     private static _latestAdRequestDuration: number;
-    private static _parseDuration: number;
+    private static _parseDuration: { [id: string]: number } = {};
     private static _readyEventSent: { [id: string]: number } = {};
     private static _cachingStarted: { [id: string]: number } = {};
     private static _cachingFinished: { [id: string]: number } = {};
@@ -207,7 +208,7 @@ export class SdkStats {
                 eventType: eventType,
                 adRequestOrdinal: SdkStats._adRequestOrdinal,
                 delayInitToRequest: SdkStats._latestAdRequestTimestamp - SdkStats._initTimestamp,
-                parseDuration: SdkStats._parseDuration,
+                parseDuration: SdkStats._parseDuration[placementId],
                 requestDuration: SdkStats._latestAdRequestDuration,
                 delayInitToReady: SdkStats._readyEventSent[placementId] - SdkStats._initTimestamp
             };
