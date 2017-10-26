@@ -22,12 +22,12 @@ export class ComScoreTrackingService {
         this._adCounter = 1;
     }
 
-    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined): void {
-        const url = this.setEventUrl(eventName, duration, playedTime, creativeId);
+    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined): void {
+        const url = this.setEventUrl(eventName, duration, playedTime, creativeId, category);
         this._thirdPartyEventManager.sendEvent(eventName, sessionId, url);
     }
 
-    private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined): string {
+    private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined): string {
         const deviceInfo = this._deviceInfo;
         const deviceModel = deviceInfo.getModel();
         const adBreakId = this._adBreakIdentifier;
@@ -72,6 +72,8 @@ export class ComScoreTrackingService {
             ns_st_ci: <string> `${creativeId}`,
             ns_st_cl: <string> `${duration}`,
             ns_st_pt: <string> `${playedTime}`,
+            c3: <string> `${category}`,
+            ns_st_ge: <string> `${category}`,
             ns_ts: <string> `${Date.now()}`
         };
 

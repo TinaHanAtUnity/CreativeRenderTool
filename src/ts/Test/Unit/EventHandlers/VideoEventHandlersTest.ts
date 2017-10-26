@@ -95,7 +95,8 @@ describe('VideoEventHandlersTest', () => {
             getVideo: () => video,
             getStreamingVideo: () => video,
             getSession: () => TestFixtures.getSession(),
-            getCreativeId: () => 'vast-sample-creative-id'
+            getCreativeId: () => 'vast-sample-creative-id',
+            getCategory: () => 'test-category'
         }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
         spyComScore = sinon.spy(comScoreService, 'sendEvent');
@@ -120,7 +121,8 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video,
                 getStreamingVideo: () => video,
                 getSession: () => TestFixtures.getSession(),
-                getCreativeId: () => 'vast-sample-creative-id'
+                getCreativeId: () => 'vast-sample-creative-id',
+                getCategory: () => 'test-category'
             }, video, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
         });
 
@@ -143,7 +145,7 @@ describe('VideoEventHandlersTest', () => {
 
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId(), performanceAdUnit.getCampaign().getCategory());
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
@@ -238,7 +240,7 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId(), performanceAdUnit.getCampaign().getCategory());
         });
 
         it('should hide overlay', () => {

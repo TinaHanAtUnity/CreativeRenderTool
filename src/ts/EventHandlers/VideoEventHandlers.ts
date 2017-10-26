@@ -93,7 +93,7 @@ export class VideoEventHandlers {
             adUnit.getVideo().setStarted(true);
 
             operativeEventManager.sendStart(adUnit);
-            comScoreTrackingService.sendEvent('play', adUnit.getCampaign().getSession().getId(), comScoreDuration, position, adUnit.getCampaign().getCreativeId());
+            comScoreTrackingService.sendEvent('play', adUnit.getCampaign().getSession().getId(), comScoreDuration, position, adUnit.getCampaign().getCreativeId(), adUnit.getCampaign().getCategory());
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
@@ -224,7 +224,7 @@ export class VideoEventHandlers {
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         operativeEventManager.sendView(adUnit);
-        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, comScorePlayedTime, adUnit.getCampaign().getCreativeId());
+        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, comScorePlayedTime, adUnit.getCampaign().getCreativeId(), adUnit.getCampaign().getCategory());
 
         this.afterVideoCompleted(adUnit);
     }

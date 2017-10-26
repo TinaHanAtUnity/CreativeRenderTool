@@ -72,7 +72,8 @@ describe('OverlayEventHandlersTest', () => {
             getVideo: () => video,
             getStreamingVideo: () => video,
             getSession: () => TestFixtures.getSession(),
-            getCreativeId: () => 'vast-sample-creative-id'
+            getCreativeId: () => 'vast-sample-creative-id',
+            getCategory: () => 'test-category'
         }, video, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, endScreen);
     });
 
@@ -106,7 +107,7 @@ describe('OverlayEventHandlersTest', () => {
         it('should send comscore end event', () => {
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId());
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', performanceAdUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, performanceAdUnit.getCampaign().getCreativeId(), performanceAdUnit.getCampaign().getCategory());
         });
 
         it('should call reconfigure', () => {

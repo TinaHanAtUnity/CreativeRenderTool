@@ -15,7 +15,7 @@ export class OverlayEventHandlers {
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.SKIPPED);
         operativeEventManager.sendSkip(adUnit, positionAtSkip);
-        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, adUnit.getCampaign().getCreativeId());
+        comScoreTrackingService.sendEvent('end', adUnit.getCampaign().getSession().getId(), comScoreDuration, positionAtSkip, adUnit.getCampaign().getCreativeId(), adUnit.getCampaign().getCategory());
 
         adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
