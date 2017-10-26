@@ -14,6 +14,7 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
+    category: string | undefined;
     session: Session;
 }
 
@@ -28,6 +29,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
+        category: ['string', 'undefined'],
         session: ['object']
     };
 
@@ -73,6 +75,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
+    }
+
+    public getCategory(): string | undefined {
+        return this.get('category');
     }
 
     public isExpired(): boolean {
