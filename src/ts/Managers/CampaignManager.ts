@@ -254,7 +254,12 @@ export class CampaignManager {
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
+        const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            const parseDuration = Date.now() - parseTimestamp;
+            for(const placement of response.getPlacements()) {
+                SdkStats.setParseDuration(placement, parseDuration);
+            }
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
