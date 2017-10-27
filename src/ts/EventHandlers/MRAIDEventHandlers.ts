@@ -1,28 +1,35 @@
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { SessionManager } from 'Managers/SessionManager';
 import { EventType } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { RequestError } from 'Errors/RequestError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class MRAIDEventHandlers {
 
-    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, sessionManager: SessionManager, request: Request, url: string): Promise<void> {
+    public static onClick(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request, url: string): Promise<void> {
         nativeBridge.Listener.sendClickEvent(adUnit.getPlacement().getId());
-        sessionManager.sendThirdQuartile(adUnit);
-        sessionManager.sendView(adUnit);
-        sessionManager.sendClick(adUnit);
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            operativeEventManager.sendThirdQuartile(adUnit);
+        }
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
+            operativeEventManager.sendView(adUnit);
+        }
+        if(!adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
+            operativeEventManager.sendClick(adUnit);
+        }
         adUnit.sendClick();
 
         const campaign = <MRAIDCampaign>adUnit.getCampaign();
 
         if(campaign.getClickAttributionUrl()) {
-            this.handleClickAttribution(nativeBridge, sessionManager, campaign);
+            this.handleClickAttribution(nativeBridge, thirdPartyEventManager, campaign);
             if(!campaign.getClickAttributionUrlFollowsRedirects()) {
                 return MRAIDEventHandlers.followUrl(request, url).then((storeUrl) => {
                     MRAIDEventHandlers.openUrl(nativeBridge, storeUrl);
@@ -36,10 +43,13 @@ export class MRAIDEventHandlers {
         return Promise.resolve();
     }
 
-    public static onAnalyticsEvent(campaign: MRAIDCampaign, event: any, delayFromStart: number) {
+    public static onAnalyticsEvent(campaign: MRAIDCampaign, timeFromShow: number, timeFromPlayableStart: number, event: any, eventData: any) {
         const kafkaObject: any = {};
         kafkaObject.type = event;
-        kafkaObject.delayFromStart = delayFromStart;
+        kafkaObject.eventData = eventData;
+        kafkaObject.timeFromShow = timeFromShow;
+        kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
+
         const resourceUrl = campaign.getResourceUrl();
         if(resourceUrl) {
              kafkaObject.url = resourceUrl.getOriginalUrl();
@@ -56,8 +66,8 @@ export class MRAIDEventHandlers {
         }
     }
 
-    private static handleClickAttribution(nativeBridge: NativeBridge, sessionManager: SessionManager, campaign: MRAIDCampaign) {
-        const currentSession = sessionManager.getSession();
+    private static handleClickAttribution(nativeBridge: NativeBridge, thirdPartyEventManager: ThirdPartyEventManager, campaign: MRAIDCampaign) {
+        const currentSession = campaign.getSession();
         if(currentSession) {
             if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
                 return;
@@ -65,11 +75,10 @@ export class MRAIDEventHandlers {
             currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
         }
 
-        const eventManager = sessionManager.getEventManager();
         const clickAttributionUrl = campaign.getClickAttributionUrl();
 
         if(campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            eventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(nativeBridge, location);
@@ -78,22 +87,22 @@ export class MRAIDEventHandlers {
                         url: campaign.getClickAttributionUrl(),
                         followsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
-                    });
+                    }, campaign.getSession());
                 }
             }).catch(error => {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: (<RequestError>error).nativeRequest,
-                        sessionId: sessionManager.getSession().getId(),
+                        auctionId: campaign.getSession().getId(),
                         url: campaign.getClickAttributionUrl(),
                         response: (<RequestError>error).nativeResponse
                     });
                 }
-                Diagnostics.trigger('mraid_click_attribution_failed', error);
+                Diagnostics.trigger('mraid_click_attribution_failed', error, campaign.getSession());
             });
         } else {
             if (clickAttributionUrl) {
-                eventManager.clickAttributionEvent(clickAttributionUrl, false);
+                thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
             }
         }
     }

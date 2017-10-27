@@ -7,9 +7,9 @@ import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { PlacementState } from 'Models/Placement';
-import { SessionManager } from 'Managers/SessionManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('IntegrationTest', () => {
 
@@ -18,7 +18,7 @@ describe('IntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 2) {
+                if(++readyCount === 1) {
                     done();
                 }
             },
@@ -40,39 +40,18 @@ describe('IntegrationTest', () => {
         };
 
         DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
-        DeviceInfo.setLimitAdTrackingFlag(true);
-        DeviceInfo.setAndroidId('de88c6a5d783745b');
         DeviceInfo.setManufacturer('LGE');
         DeviceInfo.setModel('Nexus 5');
         DeviceInfo.setOsVersion('6.0.1');
-        DeviceInfo.setApiLevel(23);
-        DeviceInfo.setRooted(false);
         DeviceInfo.setScreenWidth(1080);
         DeviceInfo.setScreenHeight(1776);
-        DeviceInfo.setScreenDensity(480);
-        DeviceInfo.setScreenLayout(268435794);
-        DeviceInfo.setScreenBrightness(1);
-        DeviceInfo.setSystemLanguage('en_US');
         DeviceInfo.setTimeZone('GMT+02:00');
-        DeviceInfo.setTotalMemory(1899508);
-        DeviceInfo.setFreeMemory(1000000);
-        DeviceInfo.setTotalSpace(13162172);
-        DeviceInfo.setFreeSpace(10159440);
-        DeviceInfo.setConnectionType('wifi');
-        DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator('24412');
-        DeviceInfo.setNetworkOperatorName('DNA');
-        DeviceInfo.setHeadset(false);
-        DeviceInfo.setDeviceVolume(1);
-        DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus(1);
-        DeviceInfo.setRingerMode(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '345', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -80,7 +59,7 @@ describe('IntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 2) {
+                if(++readyCount === 1) {
                     done();
                 }
             },
@@ -102,38 +81,18 @@ describe('IntegrationTest', () => {
         };
 
         DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setLimitAdTrackingFlag(true);
         DeviceInfo.setManufacturer('Apple');
         DeviceInfo.setModel('iPhone7,2');
         DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setRooted(false);
         DeviceInfo.setScreenWidth(357);
         DeviceInfo.setScreenHeight(647);
-        DeviceInfo.setScreenScale(2);
-        DeviceInfo.setScreenBrightness(1);
-        DeviceInfo.setSystemLanguage('en_US');
         DeviceInfo.setTimeZone('+0200');
-        DeviceInfo.setTotalMemory(1899508);
-        DeviceInfo.setFreeMemory(1000000);
-        DeviceInfo.setTotalSpace(13162172);
-        DeviceInfo.setFreeSpace(10159440);
-        DeviceInfo.setConnectionType('wifi');
-        DeviceInfo.setNetworkType(0);
-        DeviceInfo.setNetworkOperator('24412');
-        DeviceInfo.setNetworkOperatorName('DNA');
-        DeviceInfo.setHeadset(false);
-        DeviceInfo.setDeviceVolume(1);
-        DeviceInfo.setBatteryLevel(1);
-        DeviceInfo.setBatteryStatus(1);
-        DeviceInfo.setUserInterfaceIdiom(0);
-        DeviceInfo.setSimulator(false);
-        DeviceInfo.setStatusBarHeight(0);
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        SessionManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '345', listener, true);
+        UnityAds.initialize(Platform.IOS, '456', listener, true);
     });
 
 });

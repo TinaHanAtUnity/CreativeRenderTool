@@ -5,7 +5,8 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -19,10 +20,10 @@ import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
 import { WebViewError } from 'Errors/WebViewError';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { HTML } from 'Models/Assets/HTML';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { FocusManager } from 'Managers/FocusManager';
@@ -58,6 +59,9 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVastPlcCampaignMissingErrorUrls.json';
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
+import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -69,7 +73,7 @@ describe('CampaignManager', () => {
     let warningSpy: sinon.SinonSpy;
     let configuration: Configuration;
     let metaDataManager: MetaDataManager;
-    let eventManager: EventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let sessionManager: SessionManager;
     let focusManager: FocusManager;
 
@@ -148,6 +152,7 @@ describe('CampaignManager', () => {
                 getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
                 getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
                 getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345')),
                 Ios: {
                     getScreenScale: sinon.stub().returns(Promise.resolve(2)),
                     isSimulator: sinon.stub().returns(Promise.resolve(true)),
@@ -182,8 +187,8 @@ describe('CampaignManager', () => {
         request = new Request(nativeBridge, wakeUpManager);
         deviceInfo = new DeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        eventManager = new EventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
     });
 
     describe('on VAST campaign', () => {
@@ -196,7 +201,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -233,7 +238,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(1);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
                 if (!triggeredCampaign && campaign) {
@@ -312,7 +317,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(2);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
                 assert.equal(1, 2, error.message);
@@ -424,7 +429,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             campaignManager.onError.subscribe((err: Error) => {
                 assert.equal(err.message, 'VAST wrapper depth exceeded');
                 done();
@@ -440,8 +445,8 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
-            let triggeredError: Error;
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            let triggeredError: any;
             campaignManager.onError.subscribe((error: Error) => {
                 triggeredError = error;
             });
@@ -461,7 +466,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredError: WebViewError | Error;
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
@@ -554,7 +559,7 @@ describe('CampaignManager', () => {
                 mockRequest.expects('post').returns(Promise.resolve(response));
 
                 const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
                 let noFillTriggered = false;
                 let triggeredError: any;
                 campaignManager.onNoFill.subscribe(() => {
@@ -567,7 +572,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return campaignManager.request().then(() => {
                     mockRequest.verify();
-                    return verifyErrorForResponse(response, 'No vast content');
+                    return verifyErrorForResponse(response, 'model: AuctionResponse key: content with value: null: null is not in: string');
                 });
             });
 
@@ -586,7 +591,7 @@ describe('CampaignManager', () => {
                 };
 
                 // when the parser's max wrapper depth is set to 0 to disallow wrapping
-                vastParser.setMaxWrapperDepth(0);
+                ProgrammaticVastParser.setVastParserMaxDepth(0);
 
                 // then we should get an error because there was no video URL,
                 // because the video url would have been in the wrapped xml
@@ -600,7 +605,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -634,7 +639,7 @@ describe('CampaignManager', () => {
                 // when the campaign manager requests the placement
                 return verifyCampaignForResponse(response).then(() => {
                     // then the SDK's logWarning function is called with an appropriate message
-                    assert.isTrue(warningSpy.calledWith(`Campaign does not have an error url for game id ${clientInfo.getGameId()}`));
+                    assert.isTrue(warningSpy.calledWith('Campaign does not have an error url!'));
                 });
             });
 
@@ -661,7 +666,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
@@ -715,7 +720,7 @@ describe('CampaignManager', () => {
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const asset = new HTML(content.inlinedUrl);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
@@ -739,6 +744,12 @@ describe('CampaignManager', () => {
                 assert.deepEqual(triggeredCampaign.getRequiredAssets(), [asset]);
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getDynamicMarkup(), content.dynamicMarkup);
+                const willExpireAt = triggeredCampaign.getWillExpireAt();
+                assert.isDefined(willExpireAt, 'Will expire at should be defined');
+                if(willExpireAt) {
+                    const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
+                    assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+                }
             });
         });
 
@@ -751,7 +762,7 @@ describe('CampaignManager', () => {
             const json = JSON.parse(OnProgrammaticMraidPlcCampaignJson);
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
@@ -773,6 +784,12 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getResource(), content.markup);
+                const willExpireAt = triggeredCampaign.getWillExpireAt();
+                assert.isDefined(willExpireAt, 'Will expire at should be defined');
+                if(willExpireAt) {
+                    const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
+                    assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
+                }
             });
         });
 
@@ -786,7 +803,7 @@ describe('CampaignManager', () => {
 
             let doneCalled = false;
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
                 if (!doneCalled) {
@@ -800,7 +817,7 @@ describe('CampaignManager', () => {
 
             campaignManager.request().then(() => {
                 mockRequest.verify();
-                assert.equal(triggeredError.message, 'No mraid content');
+                assert.equal(triggeredError.message, 'model: AuctionResponse key: content with value: null: null is not in: string');
             });
         });
 
@@ -813,7 +830,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredError: any;
 
             campaignManager.onError.subscribe(error => {
@@ -835,7 +852,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredError: any;
 
             campaignManager.onError.subscribe(error => {
@@ -845,6 +862,62 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 mockRequest.verify();
                 assert.equal(triggeredError.message, 'MRAID Campaign missing inlinedUrl');
+            });
+        });
+    });
+
+    describe('static interstitial display', () => {
+        it('should process the programmatic/static-interstitial content-type', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayCampaign
+            }));
+
+            const json = JSON.parse(OnStaticInterstitialDisplayCampaign);
+            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            let triggeredCampaign: DisplayInterstitialCampaign;
+            let triggeredError: any;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: DisplayInterstitialCampaign) => {
+                triggeredCampaign = campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
+            });
+        });
+
+        it('should trigger onError when there is no clickThroughURL', () => {
+
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayCampaignNoClick
+            }));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            let triggeredError: any;
+
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                mockRequest.verify();
+                assert.equal(triggeredError.message, 'No clickThroughURL for programmatic/static-interstitial');
             });
         });
     });
@@ -860,7 +933,7 @@ describe('CampaignManager', () => {
 
         beforeEach(() => {
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+            campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                 triggeredCampaign = campaign;
@@ -1005,7 +1078,7 @@ describe('CampaignManager', () => {
                     return Platform.ANDROID;
                 };
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
@@ -1034,7 +1107,7 @@ describe('CampaignManager', () => {
                     return Platform.IOS;
                 };
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
@@ -1062,7 +1135,7 @@ describe('CampaignManager', () => {
 
     it('test previous campaign', () => {
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
         let previousCampaign = campaignManager.getPreviousPlacementId();
 
         assert.equal(previousCampaign, undefined);
@@ -1081,7 +1154,7 @@ describe('CampaignManager', () => {
         });
 
         const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
 
         return campaignManager.request().then(() => {
             const requestBody = JSON.parse(requestData);

@@ -36,32 +36,33 @@ describe('DiagnosticsTest', () => {
         const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
+        sinon.stub(Date, 'now').returns(123456);
         HttpKafka.setRequest(request);
 
         Diagnostics.trigger('test', 123);
         return resolvedPromise.then(() => {
-            sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":123}}}');
+            sinon.assert.calledWithMatch(<sinon.SinonStub>request.post,
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":123},"timestamp":123456}}');
             return Diagnostics.trigger('test', false);
         }).then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":false}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":false},"timestamp":123456}}');
             return Diagnostics.trigger('test', []);
         }).then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":[]}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":[]},"timestamp":123456}}');
             return Diagnostics.trigger('test', <any>null);
         }).then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":null}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":null},"timestamp":123456}}');
             return Diagnostics.trigger('test', <any>undefined);
         }).then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{},"timestamp":123456}}');
             return Diagnostics.trigger('test', 'lol');
         }).then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":"lol"}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":"lol"},"timestamp":123456}}');
         });
     });
 
@@ -75,7 +76,7 @@ describe('DiagnosticsTest', () => {
         Diagnostics.trigger('test', {'test': true});
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true},"timestamp":123456}}');
         });
     });
 
@@ -111,7 +112,7 @@ describe('DiagnosticsTest', () => {
 
         return resolvedPromise.then(() => {
             sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false},"device":null,"country":"FI"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true}}}');
+                'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","platform":"android","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false},"device":null,"country":"FI"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true},"timestamp":123456}}');
         });
     });
 });

@@ -31,13 +31,15 @@ const setClientInfo = () => {
     const fields = [
         ['appName', 'setAppName'],
         ['appVersion', 'setAppVersion'],
-        ['sdkVersion', 'setSdkVersion'],
+        ['sdkVersion', 'setSdkVersion', toInt],
         ['sdkVersionName', 'setSdkVersionName'],
         ['debuggable', 'setDebuggable', toBoolean],
         ['configUrl', 'setConfigUrl'],
         ['webViewUrl', 'setWebViewUrl'],
         ['webViewHash', 'setWebViewHash'],
-        ['webViewVersion', 'setWebViewVersion']
+        ['webViewVersion', 'setWebViewVersion'],
+        ['initTimeStamp', 'setInitTimeStamp', toInt],
+        ['reinitialized', 'setReinitialized', toBoolean]
     ];
     fields.forEach(([field, setter, parser]: [string, string, (element: HTMLInputElement) => any]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById(field);

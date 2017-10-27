@@ -1,11 +1,14 @@
 import { Asset } from 'Models/Assets/Asset';
 import { ISchema, Model } from 'Models/Model';
+import { Session } from 'Models/Session';
+import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface ICampaign {
     id: string;
     gamerId: string;
     abGroup: number;
-    willExpireAt: number;
+    willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
@@ -14,6 +17,7 @@ export interface ICampaign {
     advertiserDomain: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
+    session: Session;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -21,7 +25,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         id: ['string'],
         gamerId: ['string'],
         abGroup: ['number'],
-        willExpireAt: ['number'],
+        willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
@@ -29,7 +33,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         meta: ['string', 'undefined'],
         advertiserDomain: ['string', 'undefined'],
         advertiserCampaignId: ['string', 'undefined'],
-        advertiserBundleId: ['string', 'undefined']
+        advertiserBundleId: ['string', 'undefined'],
+        session: ['object']
     };
 
     constructor(name: string, schema: ISchema<T>) {
@@ -38,6 +43,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getId(): string {
         return this.get('id');
+    }
+
+    public getSession(): Session {
+        return this.get('session');
     }
 
     public getGamerId(): string {
@@ -80,7 +89,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('advertiserBundleId');
     }
 
-    public getWillExpireAt(): number {
+    public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
     }
 
@@ -100,5 +109,11 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public abstract getRequiredAssets(): Asset[];
     public abstract getOptionalAssets(): Asset[];
+    public abstract isConnectionNeeded(): boolean;
+
+    protected handleError(error: WebViewError) {
+        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        throw error;
+    }
 
 }

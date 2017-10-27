@@ -9,6 +9,8 @@ import { Video } from 'Models/Assets/Video';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { VideoInfo } from 'Utilities/VideoInfo';
+import { Campaign } from 'Models/Campaign';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export enum CacheStatus {
     OK,
@@ -81,6 +83,7 @@ export class Cache {
 
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
+    private _maxFileSize: number = 20971520;
 
     private _currentDownloadPosition: number = -1;
     private _lastProgressEvent: number;
@@ -119,7 +122,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string, diagnostics: ICacheDiagnostics): Promise<string[]> {
+    public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
         return this._nativeBridge.Cache.isCaching().then(isCaching => {
             if(isCaching) {
                 throw CacheStatus.FAILED;
@@ -352,7 +355,7 @@ export class Cache {
         });
     }
 
-    public isVideoValid(video: Video): Promise<boolean> {
+    public isVideoValid(video: Video, campaign: Campaign): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
                 const isValid = (width > 0 && height > 0 && duration > 0);
@@ -362,14 +365,14 @@ export class Cache {
                         width: width,
                         height: height,
                         duration: duration
-                    });
+                    }, campaign.getSession());
                 }
                 return isValid;
             }).catch(error => {
                 Diagnostics.trigger('video_validation_failed', {
                     url: video.getOriginalUrl(),
                     error: error
-                });
+                }, campaign.getSession());
                 return false;
             });
         });
@@ -549,8 +552,21 @@ export class Cache {
         if(size === 0) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
             this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
+            SdkStats.setCachingStartTimestamp(callback.fileId);
         } else {
             this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
+        }
+
+        // reject all files larger than 20 megabytes
+        if(totalSize > this._maxFileSize) {
+            this._nativeBridge.Cache.stop();
+            Diagnostics.trigger('too_large_file', {
+                url: url,
+                size: size,
+                totalSize: totalSize,
+                responseCode: responseCode,
+                headers: headers
+            });
         }
     }
 
@@ -569,6 +585,7 @@ export class Cache {
                 this.writeCacheResponse(callback.fileId, this.createCacheResponse(true, size, totalSize, this.getFileIdExtension(callback.fileId)));
                 this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, callback);
                 this.fulfillCallback(url, CacheStatus.OK);
+                SdkStats.setCachingFinishTimestamp(callback.fileId);
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
@@ -622,7 +639,10 @@ export class Cache {
         if(callback) {
             this.writeCacheResponse(callback.fileId, this.createCacheResponse(false, size, totalSize, this.getFileIdExtension(callback.fileId)));
             this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback);
-            if(!callback.paused) {
+            if(callback.contentLength > this._maxFileSize) {
+                // files larger than 20 megabytes should be handled as failures
+                this.fulfillCallback(url, CacheStatus.FAILED);
+            } else if(!callback.paused) {
                 this.fulfillCallback(url, CacheStatus.STOPPED);
             }
         }

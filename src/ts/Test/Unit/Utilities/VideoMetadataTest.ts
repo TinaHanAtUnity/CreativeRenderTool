@@ -48,7 +48,7 @@ describe('VideoMetadataTest', () => {
             ]));
 
             const video: Video = new Video(validVideo);
-            return cache.isVideoValid(video).then(valid => {
+            return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on Android');
             });
         });
@@ -58,7 +58,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Android, 'getMetaData').withArgs(invalidId, metadataKeys).returns(Promise.resolve([CacheError.FILE_IO_ERROR, 'File not found']));
 
             const video: Video = new Video(invalidVideo);
-            return cache.isVideoValid(video).then(valid => {
+            return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on Android');
             });
         });
@@ -78,7 +78,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(validId).returns(Promise.resolve([640, 360, 10000]));
 
             const video: Video = new Video(validVideo);
-            return cache.isVideoValid(video).then(valid => {
+            return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on iOS');
             });
         });
@@ -88,7 +88,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(invalidId).returns(Promise.reject(['INVALID_ARGUMENT']));
 
             const video: Video = new Video(invalidVideo);
-            return cache.isVideoValid(video).then(valid => {
+            return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on iOS');
             });
         });

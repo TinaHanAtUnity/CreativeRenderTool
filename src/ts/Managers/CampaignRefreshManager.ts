@@ -8,29 +8,36 @@ import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Utilities/Request';
+import { Session } from 'Models/Session';
+import { FocusManager } from 'Managers/FocusManager';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
+    public static ErrorRefillDelay = 3600;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
     private _configuration: Configuration;
     private _currentAdUnit: AbstractAdUnit;
+    private _focusManager: FocusManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
         this._configuration = configuration;
+        this._focusManager = focusManager;
         this._refillTimestamp = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds) => this.onError(error, placementIds));
-        this._campaignManager.onAdPlanReceived.subscribe(refreshDelay => this.onAdPlanReceived(refreshDelay));
+        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
+        this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -139,15 +146,23 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[]) {
+    private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger('plc_request_failed', error);
+        Diagnostics.trigger('auction_request_failed', {
+            error: error,
+        }, session);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
+
+        const minimumRefreshTimestamp = Date.now() + CampaignRefreshManager.ErrorRefillDelay * 1000;
+        if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
+            this._refillTimestamp = minimumRefreshTimestamp;
+            this._nativeBridge.Sdk.logInfo('Unity Ads will refresh ads in ' + CampaignRefreshManager.ErrorRefillDelay + ' seconds');
+        }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
@@ -180,11 +195,23 @@ export class CampaignRefreshManager {
                 this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
                 this.sendPlacementStateChanges(placementId);
+                if(placementState === PlacementState.READY) {
+                    SdkStats.setReadyEventTimestamp(placementId);
+                    SdkStats.sendReadyEvent(placementId);
+                }
             });
         } else {
             this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
             this.sendPlacementStateChanges(placementId);
+            if(placementState === PlacementState.READY) {
+                SdkStats.setReadyEventTimestamp(placementId);
+                SdkStats.sendReadyEvent(placementId);
+            }
         }
+    }
+
+    private onActivityResumed(activity: string): void {
+        this.refresh();
     }
 }

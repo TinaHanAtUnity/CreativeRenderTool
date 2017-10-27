@@ -6,6 +6,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
 import { FocusManager } from 'Managers/FocusManager';
+import { Configuration } from 'Models/Configuration';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;
@@ -13,6 +14,7 @@ export class AnalyticsManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _configuration: Configuration;
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
@@ -24,16 +26,18 @@ export class AnalyticsManager {
     private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: Configuration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._configuration = configuration;
         this._storage = new AnalyticsStorage(nativeBridge);
 
-        this._endpoint = 'https://fake-ads-backend.applifier.info/ack/' + clientInfo.getGameId();
+        // staging endpoint
+        this._endpoint = 'https://stg-lender.cdp.internal.unity3d.com/v1/events';
     }
 
     public init(): Promise<void> {
@@ -178,7 +182,7 @@ export class AnalyticsManager {
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo);
+        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return this._request.post(this._endpoint, data);

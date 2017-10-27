@@ -38,10 +38,21 @@ export class Url {
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional
-        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\#\$\&-\;\=\?-\[\]_a-z\~]|%[0-9a-fA-F]{2})+$/i))) {
+        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\#\$\&-\;\=\?-\[\]_a-z~{}|\\^`]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
 
         return false;
     }
+
+    public static isProtocolWhitelisted(url: string): boolean {
+        for (const protocol of this.whitelistedProtocols) {
+            if (url.indexOf(protocol) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
 }

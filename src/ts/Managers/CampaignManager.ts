@@ -1,14 +1,11 @@
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable3 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { VastParser } from 'Utilities/VastParser';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { DiagnosticError } from 'Errors/DiagnosticError';
 import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
@@ -20,8 +17,16 @@ import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
+import { SdkStats } from 'Utilities/SdkStats';
+import { CometCampaignParser } from 'Parsers/CometCampaignParser';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
+import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
+import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
+import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { CampaignParser } from 'Parsers/CampaignParser';
+import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
 export class CampaignManager {
 
@@ -56,7 +61,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable2<WebViewError, string[]>();
+    public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
     public readonly onAdPlanReceived = new Observable1<number>();
 
     protected _nativeBridge: NativeBridge;
@@ -68,10 +73,10 @@ export class CampaignManager {
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
-    private _vastParser: VastParser;
     private _previousPlacementId: string | undefined;
+    private _rawResponse: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, vastParser: VastParser, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -79,9 +84,7 @@ export class CampaignManager {
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._vastParser = vastParser;
         this._metaDataManager = metaDataManager;
-
         this._requesting = false;
     }
 
@@ -95,24 +98,46 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-            const body = JSON.stringify(requestBody);
-            return this._request.post(requestUrl, body, [], {
-                retries: 2,
-                retryDelay: 10000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }).then(response => {
-                if(response) {
-                    return this.parseCampaigns(response);
-                }
-                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
-            }).then(() => {
-                this._requesting = false;
-            }).catch((error) => {
-                this._requesting = false;
-                return this.handleError(error, this._configuration.getPlacementIds());
+        if(this._rawResponse) {
+            delete this._rawResponse;
+        }
+
+        return this._sessionManager.create().then((session) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+                this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+                const body = JSON.stringify(requestBody);
+                SdkStats.setAdRequestTimestamp();
+                const requestTimestamp: number = Date.now();
+                return Promise.resolve().then((): Promise<INativeResponse> => {
+                    if(CampaignManager.CampaignResponse) {
+                        return Promise.resolve({
+                            url: requestUrl,
+                            response: CampaignManager.CampaignResponse,
+                            responseCode: 200,
+                            headers: []
+                        });
+                    }
+                    return this._request.post(requestUrl, body, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    });
+                }).then(response => {
+                    if(response) {
+                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+                        SdkStats.increaseAdRequestOrdinal();
+                        this._rawResponse = response.response;
+                        session.setAdPlan(this._rawResponse);
+                        return this.parseCampaigns(response, session);
+                    }
+                    throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+                }).then(() => {
+                    this._requesting = false;
+                }).catch((error) => {
+                    this._requesting = false;
+                    return this.handleError(error, this._configuration.getPlacementIds(), session);
+                });
             });
         });
     }
@@ -125,20 +150,27 @@ export class CampaignManager {
         return this._previousPlacementId;
     }
 
-    private parseCampaigns(response: INativeResponse) {
-        const json: any = CampaignManager.CampaignResponse ? JsonParser.parse(CampaignManager.CampaignResponse) : JsonParser.parse(response.response);
+    public getFullyCachedCampaigns(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
+        });
+    }
 
-        if('placements' in json) {
+    private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
+        const json = JsonParser.parse(response.response);
+        if ('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
 
             const placements = this._configuration.getPlacements();
-            for(const placement in placements) {
-                if(placements.hasOwnProperty(placement)) {
+            for (const placement in placements) {
+                if (placements.hasOwnProperty(placement)) {
                     const mediaId: string = json.placements[placement];
 
-                    if(mediaId) {
-                        if(fill[mediaId]) {
+                    if (mediaId) {
+                        if (fill[mediaId]) {
                             fill[mediaId].push(placement);
                         } else {
                             fill[mediaId] = [placement];
@@ -152,36 +184,16 @@ export class CampaignManager {
             let refreshDelay: number = 0;
             const promises: Array<Promise<void>> = [];
 
-            for(const placement of noFill) {
+            for (const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
-            for(const mediaId in fill) {
-                if(fill.hasOwnProperty(mediaId)) {
-                    promises.push(this.handleCampaign(fill[mediaId],
-                        json.media[mediaId].contentType,
-                        json.media[mediaId].content,
-                        json.media[mediaId].trackingUrls,
-                        json.media[mediaId].cacheTTL,
-                        json.media[mediaId].adType,
-                        json.media[mediaId].creativeId,
-                        json.media[mediaId].seatId,
-                        json.correlationId,
-                        json.media[mediaId].campaignId,
-                        json.media[mediaId].targetBundleId,
-                        json.media[mediaId].advDomain).catch(error => {
-                        if(error === CacheStatus.STOPPED) {
-                            return Promise.resolve();
-                        }
-
-                        return this.handleError(error, fill[mediaId]);
-                    }));
-
-                    // todo: the only reason to calculate ad plan behavior like this is to match the old yield ad plan behavior, this should be refactored in the future
+            for (const mediaId in fill) {
+                if (fill.hasOwnProperty(mediaId)) {
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    if (contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
@@ -189,81 +201,62 @@ export class CampaignManager {
 
             this.onAdPlanReceived.trigger(refreshDelay);
 
-            return Promise.all(promises).catch(error => {
-                return this.handleError(error, this._configuration.getPlacementIds());
-            });
+            for (const mediaId in fill) {
+                if (fill.hasOwnProperty(mediaId)) {
+                    let auctionResponse: AuctionResponse;
+                    try {
+                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
+                        promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
+                            if (error === CacheStatus.STOPPED) {
+                                return Promise.resolve();
+                            }
+
+                            return this.handleError(error, fill[mediaId], session);
+                        }));
+                    } catch (error) {
+                        this.handleError(error, fill[mediaId], session);
+                    }
+                }
+            }
+
+            return Promise.all(promises);
         } else {
-            return this.handleError(new Error('No placements found'), this._configuration.getPlacementIds());
+            throw new Error('No placements found');
         }
     }
 
-    private handleCampaign(placements: string[], contentType: string, content: string, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string): Promise<void> {
-        const abGroup: number = this._configuration.getAbGroup();
-        const gamerId: string = this._configuration.getGamerId();
+    private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+        let parser: CampaignParser;
 
-        this._nativeBridge.Sdk.logDebug('Parsing PLC campaign ' + contentType + ': ' + content);
-        switch (contentType) {
+        switch (response.getContentType()) {
             case 'comet/campaign':
-                const json = JsonParser.parse(content);
-                if(json && json.mraidUrl) {
-                    const campaign = new MRAIDCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, json.mraidUrl);
-                    return this.setupCampaignAssets(placements, campaign);
-                } else {
-                    const campaign = new PerformanceCampaign(json, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup);
-                    return this.setupCampaignAssets(placements, campaign);
-                }
-
+                parser = new CometCampaignParser();
+                break;
             case 'programmatic/vast':
-                if(!content) {
-                    return this.handleError(new Error('No vast content'), placements);
-                }
-
-                return this.parseVastCampaignHelper(content, gamerId, abGroup, trackingUrls, cacheTTL, adType, creativeId, seatId, correlationId, advertiserCampaignId, advertiserBundleId, advertiserDomain).then((vastCampaign) => {
-                    return this.setupCampaignAssets(placements, vastCampaign);
-                });
-
+                parser = new ProgrammaticVastParser();
+                break;
             case 'programmatic/mraid-url':
-                // todo: handle ad plan expiration with cacheTTL or something similar
-                const jsonMraidUrl = JsonParser.parse(content);
-                if(!jsonMraidUrl) {
-                    return this.handleError(new Error('No mraid-url content'), placements);
-                }
-
-                if(!jsonMraidUrl.inlinedUrl) {
-                    const MRAIDError = new DiagnosticError(
-                        new Error('MRAID Campaign missing inlinedUrl'),
-                        {mraid: jsonMraidUrl}
-                    );
-                    return this.handleError(MRAIDError, placements);
-                }
-
-                jsonMraidUrl.id = this.getProgrammaticCampaignId();
-                const mraidUrlCampaign = new MRAIDCampaign(jsonMraidUrl, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, jsonMraidUrl.inlinedUrl, undefined, trackingUrls, adType, creativeId, seatId, correlationId);
-                return this.setupCampaignAssets(placements, mraidUrlCampaign);
-
+                parser = new ProgrammaticMraidUrlParser();
+                break;
             case 'programmatic/mraid':
-                // todo: handle ad plan expiration with cacheTTL or something similar
-                const jsonMraid = JsonParser.parse(content);
-                if(!jsonMraid) {
-                    return this.handleError(new Error('No mraid content'), placements);
-                }
-
-                if(!jsonMraid.markup) {
-                    const MRAIDError = new DiagnosticError(
-                        new Error('MRAID Campaign missing markup'),
-                        {mraid: jsonMraid}
-                    );
-                    return this.handleError(MRAIDError, placements);
-                }
-
-                jsonMraid.id = this.getProgrammaticCampaignId();
-                const markup = decodeURIComponent(jsonMraid.markup);
-                const mraidCampaign = new MRAIDCampaign(jsonMraid, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, undefined, markup, trackingUrls, adType, creativeId, seatId, correlationId);
-                return this.setupCampaignAssets(placements, mraidCampaign);
-
+                parser = new ProgrammaticMraidParser();
+                break;
+            case 'programmatic/static-interstitial':
+                parser = new ProgrammaticStaticInterstitialParser();
+                break;
+            case 'programmatic/vast-vpaid':
+                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
+                // which can parse both.
+                parser = new ProgrammaticVPAIDParser();
+                break;
             default:
-                return this.handleError(new Error('Unsupported content-type: ' + contentType), placements);
+                throw new Error('Unsupported content-type: ' + response.getContentType());
         }
+
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            return this.setupCampaignAssets(response.getPlacements(), campaign);
+        });
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {
@@ -280,9 +273,9 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[]): Promise<void> {
+    private handleError(error: any, placementIds: string[], session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds);
+        this.onError.trigger(error, placementIds, session);
 
         return Promise.resolve();
     }
@@ -295,48 +288,11 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private parseVastCampaignHelper(content: any, gamerId: string, abGroup: number, trackingUrls?: { [eventName: string]: string[] }, cacheTTL?: number, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string): Promise<VastCampaign> {
-        const decodedVast = decodeURIComponent(content).trim();
-        return this._vastParser.retrieveVast(decodedVast, this._nativeBridge, this._request).then(vast => {
-            const campaignId = this.getProgrammaticCampaignId();
-            const campaign = new VastCampaign(vast, campaignId, gamerId, CampaignManager.AbGroup ? CampaignManager.AbGroup : abGroup, cacheTTL, trackingUrls, adType, creativeId, seatId, correlationId, advertiserCampaignId, advertiserBundleId, advertiserDomain);
-            if(campaign.getVast().getImpressionUrls().length === 0) {
-                return Promise.reject(new Error('Campaign does not have an impression url'));
-            }
-            // todo throw an Error if required events are missing. (what are the required events?)
-            if(campaign.getVast().getErrorURLTemplates().length === 0) {
-                this._nativeBridge.Sdk.logWarning(`Campaign does not have an error url for game id ${this._clientInfo.getGameId()}`);
-            }
-            if(!campaign.getVideo().getUrl()) {
-                const videoUrlError = new DiagnosticError(
-                    new Error('Campaign does not have a video url'),
-                    {rootWrapperVast: content}
-                );
-                return Promise.reject(videoUrlError);
-            }
-            if(this._nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
-                const videoUrlError = new DiagnosticError(
-                    new Error('Campaign video url needs to be https for iOS'),
-                    {rootWrapperVast: content}
-                );
-                return Promise.reject(videoUrlError);
-            }
-            return Promise.resolve(campaign);
-        });
+    private getAbGroup(): number {
+        return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private getProgrammaticCampaignId(): string {
-        switch (this._nativeBridge.getPlatform()) {
-            case Platform.IOS:
-                return '00005472656d6f7220694f53';
-            case Platform.ANDROID:
-                return '005472656d6f7220416e6472';
-            default:
-                return 'UNKNOWN';
-        }
-    }
-
-    private createRequestUrl(): Promise<string> {
+    private createRequestUrl(session: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -351,6 +307,7 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
+            auctionId: session.getId(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
@@ -416,6 +373,8 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this._deviceInfo.getHeadset());
+        promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
 
         const body: any = {
@@ -435,10 +394,12 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
+            body.wiredHeadset = headset;
+            body.volume = volume;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
@@ -479,14 +440,6 @@ export class CampaignManager {
 
                 return body;
             });
-        });
-    }
-
-    private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
         });
     }
 }

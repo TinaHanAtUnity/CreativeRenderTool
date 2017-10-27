@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "coppaCompliant": false,
+  "assetCaching": "disabled",
+  "projectId": "0a379f5a-c4fa-4f7f-a5c1-e49fd3dd63d4",
+  "placements": [{
+    "id": "defaultVideoAndPictureZone",
+    "name": "Placement",
+    "default": true,
+    "allowSkip": true,
+    "disableBackButton": true,
+    "muteVideo": false,
+    "useDeviceOrientationForVideo": false,
+    "adTypes": ["MRAID", "VIDEO"],
+    "skipInSeconds": 5
+  }, {
+    "id": "incentivizedZone",
+    "name": "Placement",
+    "default": false,
+    "allowSkip": false,
+    "disableBackButton": true,
+    "muteVideo": false,
+    "useDeviceOrientationForVideo": false,
+    "adTypes": ["MRAID", "VIDEO"]
+  }],
+  "properties": "tynbvvQLwnpf382fQqw4MzIk8YYdMj8DWebgn+QoOgpVVRYNFXY=",
+  "country": "FI",
+  "gamerId": "59a964fd13dcc10984985e6d",
+  "abGroup": 0
+}

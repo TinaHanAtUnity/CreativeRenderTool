@@ -10,7 +10,7 @@ import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEve
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 
 describe('PerformanceVideoEventHandlersTest', () => {

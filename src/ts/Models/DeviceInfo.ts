@@ -103,8 +103,8 @@ export class DeviceInfo extends Model<IDeviceInfo> {
         promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this.set('osVersion', osVersion)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this.set('model', model)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this.set('screenWidth', screenWidth)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this.set('screenHeight', screenHeight)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this.set('screenWidth', Math.floor(screenWidth))).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this.set('screenHeight', Math.floor(screenHeight))).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this.set('language', language)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this.set('rooted', rooted)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
@@ -227,15 +227,17 @@ export class DeviceInfo extends Model<IDeviceInfo> {
 
     public getScreenWidth(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => {
-            this.set('screenWidth', screenWidth);
-            return screenWidth;
+            const adjustedScreenWidth = Math.floor(screenWidth);
+            this.set('screenWidth', adjustedScreenWidth);
+            return adjustedScreenWidth;
         });
     }
 
     public getScreenHeight(): Promise<number> {
         return this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => {
-            this.set('screenHeight', screenHeight);
-            return screenHeight;
+            const adjustedScreenHeight = Math.floor(screenHeight);
+            this.set('screenHeight', adjustedScreenHeight);
+            return adjustedScreenHeight;
         });
     }
 
@@ -462,6 +464,35 @@ export class DeviceInfo extends Model<IDeviceInfo> {
                 return sendDto();
             }
         });
+    }
+
+    public getStaticDTO(): any {
+        const dto: any = {
+            'apiLevel': this.getApiLevel(),
+            'osVersion': this.getOsVersion(),
+            'deviceMake': this.getManufacturer(),
+            'deviceModel': this.getModel(),
+            'screenLayout': this.getScreenLayout(),
+            'screenDensity': this.getScreenDensity(),
+            'screenScale': this.getScreenScale(),
+            'userInterfaceIdiom': this.getUserInterfaceIdiom(),
+            'timeZone': this.getTimeZone(),
+            'language': this.getLanguage(),
+            'totalSpaceInternal': this.getTotalSpace(),
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalMemory': this.getTotalMemory(),
+            'rooted': this.isRooted(),
+            'simulator': this.isSimulator(),
+        };
+
+        if(this.getAdvertisingIdentifier()) {
+            dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+            dto.limitAdTracking = this.getLimitAdTracking();
+        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            dto.androidId = this.getAndroidId();
+        }
+
+        return dto;
     }
 
     private handleDeviceInfoError(error: any) {

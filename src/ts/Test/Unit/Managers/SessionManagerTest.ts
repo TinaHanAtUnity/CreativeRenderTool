@@ -3,13 +3,19 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { Request } from 'Utilities/Request';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { RequestApi } from 'Native/Api/Request';
-import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { Platform } from 'Constants/Platform';
+import { SessionManager } from 'Managers/SessionManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 class TestStorageApi extends StorageApi {
 
@@ -149,33 +155,23 @@ class TestRequestApi extends RequestApi {
         }
         return Promise.resolve(id);
     }
-
 }
 
-class TestDeviceInfoApi extends DeviceInfoApi {
-
-    private _testId: string;
-
-    public getUniqueEventId(): Promise<string> {
-        return Promise.resolve(this._testId);
-    }
-
-    public setTestId(testId: string) {
-        this._testId = testId;
-    }
-
-}
-
-describe('EventManagerTest', () => {
+describe('SessionManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
     let storageApi: TestStorageApi;
     let requestApi: TestRequestApi;
-    let request: Request;
-    let eventManager: EventManager;
     let focusManager: FocusManager;
+    let operativeEventManager: OperativeEventManager;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let request: Request;
+    let metaDataManager: MetaDataManager;
+    let sessionManager: SessionManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -183,87 +179,23 @@ describe('EventManagerTest', () => {
             handleCallback
         });
 
+        metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
-        eventManager = new EventManager(nativeBridge, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        request = new Request(nativeBridge, wakeUpManager);
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge);
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
     });
 
-    it('Send successful operative event', () => {
-        const eventId: string = '1234';
-        const sessionId: string = '5678';
-        const url: string = 'https://www.example.net/operative_event';
-        const data: string = 'Test data';
-
-        const requestSpy = sinon.spy(request, 'post');
-
-        return eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
-            assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
-            assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
-
-            const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
-            const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            return storageApi.get<string>(StorageType.PRIVATE, urlKey).catch(error => {
-                const errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event url should be deleted');
-            }).then(() => {
-                return storageApi.get(StorageType.PRIVATE, dataKey);
-            }).catch(error => {
-                const errorCode = error.shift();
-                assert.equal('COULDNT_GET_VALUE', errorCode, 'Successful operative event data should be deleted');
-            }).then(() => {
-                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after successful operative event');
-            });
-        });
-    });
-
-    it('Send failed operative event', () => {
-        const clock = sinon.useFakeTimers();
-
-        const eventId: string = '1234';
-        const sessionId: string = '5678';
-        const url: string = 'https://www.example.net/fail';
-        const data: string = 'Test data';
-
-        const requestSpy = sinon.spy(request, 'post');
-
-        const event = eventManager.operativeEvent('test', eventId, sessionId, url, data).then(() => {
-            assert.fail('Send failed operative event failed to fail');
-        }).catch(() => {
-            assert(requestSpy.calledOnce, 'Failed operative event did not try sending POST request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Operative event url does not match');
-            assert.equal(data, requestSpy.getCall(0).args[1], 'Operative event data does not match');
-
-            const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
-            const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
-                assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
-            }).then(() => {
-                return storageApi.get<string>(StorageType.PRIVATE, dataKey);
-            }).then(storedData => {
-                assert.equal(data, storedData, 'Failed operative event data was not correctly stored');
-                assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after failed operative event');
-            });
-        });
-        clock.tick(30000);
-        clock.restore();
-        return event;
-    });
-
-    it('Send click attribution event', () => {
-        const url: string = 'https://www.example.net/third_party_event';
-
-        const requestSpy = sinon.spy(request, 'get');
-
-        return eventManager.clickAttributionEvent(url, false).then(() => {
-            assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
-        });
-    });
-
-    it('Retry failed event', () => {
+    xit('Retry failed event', () => {
         const url: string = 'https://www.example.net/retry_event';
         const data: string = 'Retry test';
         const sessionId: string = 'abcd-1234';
@@ -279,7 +211,7 @@ describe('EventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
-        return eventManager.sendUnsentSessions().then(() => {
+        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
@@ -303,7 +235,7 @@ describe('EventManagerTest', () => {
         const sessionId: string = 'new-12345';
         const sessionTsKey: string = 'session.' + sessionId + '.ts';
 
-        return eventManager.startNewSession(sessionId).then(() => {
+        return sessionManager.startNewSession(sessionId).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(timestamp => {
                 assert.equal(true, Date.now() >= timestamp, 'New session timestamp must be in present or past');
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after starting new session');
@@ -318,7 +250,7 @@ describe('EventManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
 
-        return eventManager.sendUnsentSessions().then(() => {
+        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(() => {
                 assert.fail('Old session found in storage but it should have been deleted');
             }).catch(error => {
@@ -334,7 +266,7 @@ describe('EventManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, randomKey, 'test');
 
-        return eventManager.sendUnsentSessions().then(() => {
+        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, randomKey).then(() => {
                 assert.fail('Session without timestamp found in storage but it should have been deleted');
             }).catch(error => {
@@ -342,16 +274,6 @@ describe('EventManagerTest', () => {
             }).then(() => {
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after deleting session without timestamp');
             });
-        });
-    });
-
-    it('Get unique event id', () => {
-        const testId: string = '1234-5678';
-        const deviceInfoApi: TestDeviceInfoApi = nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
-        deviceInfoApi.setTestId(testId);
-
-        return eventManager.getUniqueEventId().then(uniqueId => {
-            assert.equal(testId, uniqueId, 'Unique id does not match what native API returned');
         });
     });
 });
