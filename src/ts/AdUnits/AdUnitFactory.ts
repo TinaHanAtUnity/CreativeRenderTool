@@ -70,7 +70,7 @@ export class AdUnitFactory {
         const video = this.getOrientedVideo(campaign, forceOrientation);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit);
+        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit, configuration.getAbGroup());
 
         const landscapeVideo = campaign.getVideo();
         const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
@@ -173,7 +173,7 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, abGroup: number = 0) {
         overlay.render();
         document.body.appendChild(overlay.container());
 
@@ -184,7 +184,13 @@ export class AdUnitFactory {
             overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
         }
 
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit));
+        overlay.onSkip.subscribe((videoProgress) => {
+            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit);
+            if (abGroup === 5) {
+                adUnit.setFinishState(FinishState.SKIPPED);
+                adUnit.hide();
+            }
+        });
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
