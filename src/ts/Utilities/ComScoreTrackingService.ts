@@ -22,12 +22,12 @@ export class ComScoreTrackingService {
         this._adCounter = 1;
     }
 
-    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined): void {
-        const url = this.setEventUrl(eventName, duration, playedTime, creativeId, category);
+    public sendEvent(eventName: string, sessionId: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined, subCategory: string | undefined): void {
+        const url = this.setEventUrl(eventName, duration, playedTime, creativeId, category, subCategory);
         this._thirdPartyEventManager.sendEvent(eventName, sessionId, url);
     }
 
-    private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined): string {
+    private setEventUrl(eventName: string, duration: string, playedTime: number, creativeId: string | undefined, category: string | undefined, subCategory: string | undefined): string {
         const deviceInfo = this._deviceInfo;
         const deviceModel = deviceInfo.getModel();
         const adBreakId = this._adBreakIdentifier;
@@ -48,6 +48,14 @@ export class ComScoreTrackingService {
             platform = 'ios';
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             platform = 'android';
+        }
+
+        if (typeof category === 'undefined') {
+            category = '';
+        }
+
+        if (typeof subCategory === 'undefined') {
+            subCategory = '';
         }
 
         const queryParamsDict = {
@@ -73,7 +81,7 @@ export class ComScoreTrackingService {
             ns_st_cl: <string> `${duration}`,
             ns_st_pt: <string> `${playedTime}`,
             c3: <string> `${category}`,
-            ns_st_ge: <string> `${category}`,
+            ns_st_ge: <string> `${subCategory}`,
             ns_ts: <string> `${Date.now()}`
         };
 
