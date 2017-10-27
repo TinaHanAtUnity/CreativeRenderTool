@@ -29,12 +29,11 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
-
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { Campaign } from 'Models/Campaign';
+
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -195,7 +194,7 @@ class TestHelper {
         return sessionManager;
     }
 
-    public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit<Campaign> {
+    public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit {
         const config: Configuration = TestFixtures.getConfiguration();
         let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
@@ -328,7 +327,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            const adUnit: AbstractAdUnit<Campaign> = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
             return operativeEventManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -350,7 +349,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            const adUnit: AbstractAdUnit<Campaign> = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
             return operativeEventManager.sendClick(adUnit).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -366,7 +365,7 @@ describe('Event parameters should match specifications', () => {
         let request: Request;
         let requestSpy: any;
         let sessionManager: SessionManager;
-        let adUnit: AbstractAdUnit<Campaign>;
+        let adUnit: AbstractAdUnit;
         let operativeEventManager: OperativeEventManager;
 
         describe('on Android', () => {

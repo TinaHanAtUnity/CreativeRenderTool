@@ -2,7 +2,7 @@ import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 
-export class TestAdUnit extends AbstractAdUnit<Campaign> {
+export class TestAdUnit extends AbstractAdUnit {
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         super(nativeBridge, parameters);

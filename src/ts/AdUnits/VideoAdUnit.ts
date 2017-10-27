@@ -19,7 +19,7 @@ export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParam
     overlay: Overlay;
 }
 
-export abstract class VideoAdUnit<T extends Campaign> extends AbstractAdUnit<T> {
+export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit<T> {
 
     private static _progressInterval: number = 250;
 

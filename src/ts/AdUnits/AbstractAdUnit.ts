@@ -27,7 +27,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     options: any;
 }
 
-export abstract class AbstractAdUnit<T extends Campaign> {
+export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;
