@@ -52,6 +52,8 @@ export class Overlay extends View<IOverlayHandler> {
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
     private _abGroup: number;
+    private _callButtonStatus: boolean = false;
+    private _callButtonSelector: string = '.call-button';
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
         super(nativeBridge, 'overlay');
@@ -65,6 +67,17 @@ export class Overlay extends View<IOverlayHandler> {
         this._templateData = {
             muted: this._muted
         };
+
+        switch(this._abGroup) {
+            case 10:
+                this._callButtonSelector = '.outer-call-button';
+                break;
+            case 11:
+                this._callButtonSelector = '.outer-call-button-tag';
+                break;
+            default:
+                break;
+        }
 
         this._bindings = [
             {
@@ -80,7 +93,7 @@ export class Overlay extends View<IOverlayHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => this.onCallButtonEvent(event),
-                selector: '.call-button'
+                selector: this._callButtonSelector
             },
             {
                 event: 'click',
@@ -102,8 +115,11 @@ export class Overlay extends View<IOverlayHandler> {
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._callButtonElement = <HTMLElement>this._container.querySelector(this._callButtonSelector);
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            this._callButtonElement.classList.add('slide-down');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -138,6 +154,12 @@ export class Overlay extends View<IOverlayHandler> {
     public setVideoProgress(value: number): void {
         if(Overlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
+        }
+
+        if((!this._callButtonStatus) && (this._abGroup === 10 || this._abGroup === 11)) {
+            this._callButtonStatus = true;
+            this._callButtonElement.classList.remove('slide-down');
+            this._callButtonElement.classList.add('slide-back-in-place');
         }
 
         if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
@@ -278,34 +300,24 @@ export class Overlay extends View<IOverlayHandler> {
     }
 
     private fade(value: boolean) {
-        if (this._abGroup === 10 || this._abGroup === 11) {
-            if (value) {
-                this._skipElement.classList.remove('slide-back-in-place');
-                this._skipElement.classList.add('slide-up');
-                this._progressElement.classList.remove('slide-back-in-place');
-                this._progressElement.classList.add('slide-up');
-                this._muteButtonElement.classList.remove('slide-back-in-place');
-                this._muteButtonElement.classList.add('slide-down');
-                this._fadeStatus = false;
-            } else {
-                this._skipElement.classList.remove('slide-up');
-                this._skipElement.classList.add('slide-back-in-place');
-                this._progressElement.classList.remove('slide-up');
-                this._progressElement.classList.add('slide-back-in-place');
-                this._muteButtonElement.classList.remove('slide-down');
-                this._muteButtonElement.classList.add('slide-back-in-place');
-                this._fadeStatus = true;
-            }
+        if (value) {
+            this._skipElement.classList.remove('slide-back-in-place');
+            this._skipElement.classList.add('slide-up');
+            this._progressElement.classList.remove('slide-back-in-place');
+            this._progressElement.classList.add('slide-up');
+            this._muteButtonElement.classList.remove('slide-back-in-place');
+            this._muteButtonElement.classList.add('slide-down');
+            this._container.style.pointerEvents = 'auto';
+            this._fadeStatus = false;
         } else {
-            if(value) {
-                this._container.classList.add('fade');
-                this._container.style.pointerEvents = 'auto';
-                this._fadeStatus = false;
-            } else {
-                this._container.style.pointerEvents = 'none';
-                this._container.classList.remove('fade');
-                this._fadeStatus = true;
-            }
+            this._container.style.pointerEvents = 'none';
+            this._skipElement.classList.remove('slide-up');
+            this._skipElement.classList.add('slide-back-in-place');
+            this._progressElement.classList.remove('slide-up');
+            this._progressElement.classList.add('slide-back-in-place');
+            this._muteButtonElement.classList.remove('slide-down');
+            this._muteButtonElement.classList.add('slide-back-in-place');
+            this._fadeStatus = true;
         }
     }
 }

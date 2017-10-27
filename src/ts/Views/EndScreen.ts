@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import NewEndScreenTemplate from 'html/NewEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -16,6 +17,8 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
+const newEndScreenId = "new-end-screen";
+
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
@@ -23,20 +26,32 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gameName: string | undefined;
     private _privacy: Privacy;
     private _isSwipeToCloseEnabled: boolean = false;
+    private _abGroup: number;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
-
-        this._template = new Template(EndScreenTemplate, this._localization);
+        this._abGroup = abGroup;
         this._gameName = gameName;
+
+        if (this.getEndscreenAlt() === newEndScreenId) {
+            this._template = new Template(NewEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
+
+        let downloadSelectors = '.game-background, .btn-download, .game-icon';
+
+        if (this.getEndscreenAlt() === newEndScreenId) {
+            downloadSelectors = '.game-background, .download-container, .game-icon';
+        }
 
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: downloadSelectors
             },
             {
                 event: 'click',
@@ -50,7 +65,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }
         ];
 
-        if(gameId === '1300023' || gameId === '1300024') {
+        if (gameId === '1300023' || gameId === '1300024') {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -64,9 +79,14 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public render(): void {
         super.render();
 
-        if(this._isSwipeToCloseEnabled) {
+        if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
+
+        if (this.getEndscreenAlt() === newEndScreenId) {
+            this._container.id = newEndScreenId;
+        }
+
     }
 
     public show(): void {
@@ -81,17 +101,17 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
-        if(AbstractAdUnit.getAutoClose()) {
-           setTimeout(() => {
-               this._handlers.forEach(handler => handler.onEndScreenClose());
-           }, AbstractAdUnit.getAutoCloseDelay());
+        if (AbstractAdUnit.getAutoClose()) {
+            setTimeout(() => {
+                this._handlers.forEach(handler => handler.onEndScreenClose());
+            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 
     public hide(): void {
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
@@ -99,7 +119,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     public onPrivacyClose(): void {
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -111,7 +131,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
     }
 
-    protected getEndscreenAlt(campaign: Campaign) {
+    protected getEndscreenAlt(campaign?: Campaign) {
+        if (this._abGroup === 8 || this._abGroup === 9) {
+            return newEndScreenId;
+        }
+
         return undefined;
     }
 
