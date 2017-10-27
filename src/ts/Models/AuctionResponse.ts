@@ -10,7 +10,8 @@ export interface IAuctionResponse {
     creativeId: string | undefined;
     seatId: number | undefined;
     correlationId: string;
-    category: string | undefined;
+    appCategory: string | undefined;
+    appSubCategory: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -25,7 +26,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             creativeId: ['string', 'undefined'],
             seatId: ['integer', 'undefined'],
             correlationId: ['string'],
-            category: ['string', 'undefined']
+            appCategory: ['string', 'undefined'],
+            appSubCategory: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -37,7 +39,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
-        this.set('category', data.category);
+        this.set('appCategory', data.appCategory);
+        this.set('appSubCategory', data.appSubCategory);
     }
 
     public getPlacements(): string[] {
@@ -77,7 +80,11 @@ export class AuctionResponse extends Model<IAuctionResponse> {
     }
 
     public getCategory(): string | undefined {
-        return this.get('category');
+        return this.get('appCategory');
+    }
+
+    public getSubCategory(): string | undefined {
+        return this.get('appSubCategory');
     }
 
     public getDTO(): {[key: string]: any } {
@@ -91,7 +98,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'creativeId': this.getCreativeId(),
             'seatId': this.getSeatId(),
             'correlationId': this.getCorrelationId(),
-            'category': this.getCategory()
+            'appCategory': this.getCategory(),
+            'appSubCategory': this.getSubCategory()
         };
     }
 }
