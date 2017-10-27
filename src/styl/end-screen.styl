@@ -1,6 +1,54 @@
+// @stylint off
+@import "components.styl"
+
 #end-screen
 
-  @import "game-shared.styl"
+  .game-rating
+    position: relative;
+    display: inline-block;
+    color: $end-screen-info-gray;
+    vertical-align: middle;
+    letter-spacing: 5px;
+    font-size: 20px;
+
+  .game-rating-mask
+    position: absolute;
+    left: 0;
+    overflow: hidden;
+    width: 0;
+    height: 100%;
+    color: $rating-orange;
+    white-space: nowrap;
+    font-size: inherit;
+
+  .game-rating-count
+    color: $gray;
+    font-size: 17px;
+
+  .game-icon
+    margin-bottom: 20px;
+    width: 75px;
+    height: 75px;
+    border-radius: 18pt;
+    background-color: $white;
+    background-size: cover;
+
+  .unityads-logo
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    width: 68px;
+    height: 16px;
+    background-image: url("../img/unityads.png");
+    background-position: center;
+    background-size: cover;
+    transform: translate(-50%, 0);
+
+  .name-container
+    overflow: hidden;
+    color: $black;
+    text-overflow: ellipsis;
+    font-size: 17pt;
 
   .campaign-container
     width: 100vw
@@ -15,15 +63,15 @@
     height: 55px
 
   a.btn-close
+    position: absolute;
+    color: $white;
+    text-shadow: 2px 2px 20px $gray;
     z-index: 1
-    position: absolute
     top: 10px
     right: 10px
     font-size: 28px
     width: 32px
     height: 32px
-    color: #ffffff
-    text-shadow: 2px 2px 20px #7c7c7c
     text-align: center
     line-height: 28px
 
@@ -36,6 +84,7 @@
     background-position: center
     background-repeat: no-repeat
     background-color: #000
+    /* TODO: is it in use? */
     &.brand
       background-size: contain
       bottom: 0
@@ -48,64 +97,64 @@
     border-top: 4px solid #e6e6e6
     background-color: #fafafa
 
-.end-screen-info
-    position: absolute
-    top: 45%
-    width: 100%
-    -webkit-transform: translate(0, -50%)
-    transform: translate(0, -50%)
+  .end-screen-info
+      position: absolute
+      top: 45%
+      width: 100%
+      -webkit-transform: translate(0, -50%)
+      transform: translate(0, -50%)
 
-  .game-info
-    margin-left: 18px
+    .game-info
+      margin-left: 18px
 
-  .game-icon
-    float: left
+    .game-icon
+      float: left
 
-  .name-container
-    padding-left: 10px
-    padding-right: 10px
-    padding-top: 8px
-    text-overflow: ellipsis
-    -webkit-line-clamp: 2
-    display: -webkit-box
-    -webkit-box-orient: vertical
+    .name-container
+      padding-left: 10px
+      padding-right: 10px
+      padding-top: 8px
+      text-overflow: ellipsis
+      -webkit-line-clamp: 2
+      display: -webkit-box
+      -webkit-box-orient: vertical
 
-  .store-container
-    margin-left: 10px
-    margin-top: 5px
-    float: left
-    display: -webkit-box
-    display: -webkit-flex
-    -webkit-box-align: center
-    -webkit-box-pack: center
-    -webkit-justify-content: center
+    .store-container
+      margin-left: 10px
+      margin-top: 5px
+      float: left
+      display: -webkit-box
+      display: -webkit-flex
+      -webkit-box-align: center
+      -webkit-box-pack: center
+      -webkit-justify-content: center
 
-  .download-container
-    text-align: center
-    clear: both
+    .download-container
+      text-align: center
+      clear: both
 
-  .btn-download
-    color: #ffffff
-    display: block
-    background: #167dfb
-    left: 0
-    right: 0
+    .btn-download
+      color: #ffffff
+      display: block
+      background: #167dfb
+      left: 0
+      right: 0
 
-  .privacy-button
-    position: absolute
-    bottom: 10px
-    left: 15px
-    color: #e6e6e6
-    text-decoration: none
-    font-size: 22px
+    .privacy-button
+      position: absolute
+      bottom: 10px
+      left: 15px
+      color: #e6e6e6
+      text-decoration: none
+      font-size: 22px
 
-  .btn-download
-    margin: 0 15px
-    padding: 10px
-    border-radius: 10px
-    font-size: 18pt
-    line-height: 24pt
-    margin-top: 45px
+    .btn-download
+      margin: 0 15px
+      padding: 10px
+      border-radius: 10px
+      font-size: 18pt
+      line-height: 24pt
+      margin-top: 45px
 
 // END SCREEN landscape specific
 body.landscape
@@ -433,3 +482,4 @@ body.android
           padding: 40px 20px
           font-size: 30pt
           line-height: 30pt
+// @stylint on

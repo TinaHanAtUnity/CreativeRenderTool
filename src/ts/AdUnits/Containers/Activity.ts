@@ -30,6 +30,9 @@ export class Activity extends AdUnitContainer {
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
 
+    private _onFocusGainedObserver: any;
+    private _onFocusLostObserver: any;
+
     private _androidOptions: IAndroidOptions;
 
     constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
@@ -74,6 +77,9 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + ForceOrientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
+        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onSystemInterrupt.trigger(false));
+        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onSystemInterrupt.trigger(true));
+
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, views, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
@@ -81,6 +87,8 @@ export class Activity extends AdUnitContainer {
         this.addDiagnosticsEvent({type: 'closeTried'});
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
+            this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
+            this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
             this.addDiagnosticsEvent({type: 'close'});
             return this._nativeBridge.AndroidAdUnit.close();
         } else {

@@ -1,3 +1,16 @@
+# Wed Oct 25 22:15:26 UTC 2017
+
+* Check ad plan refreshing when any app activity resumes
+* CTA styling A/B test on groups 10 and 11
+* Refactor endscreen layout
+* Add support for configUrl test metadata parameter
+* Fix kafkaUrl test metadata parameter
+
+# Mon Oct 23 21:35:15 UTC 2017
+
+* Integrate SDKStats into Webview
+* Send audio and headphone state with ad request
+
 # Thu Oct 19 20:45:59 UTC 2017
 
 * Trigger onStart when VPAIDAdUnit shows
