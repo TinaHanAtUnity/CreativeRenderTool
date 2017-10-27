@@ -13,6 +13,7 @@ import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 import { Session } from 'Models/Session';
+import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
@@ -148,5 +149,16 @@ export class TestFixtures {
 
     public static getSession(): Session {
         return new Session('12345');
+    }
+
+    public static getPackageInfo(): IPackageInfo {
+        return {
+            installer: 'com.install.er',
+            firstInstallTime: 12345,
+            lastUpdateTime: 67890,
+            versionCode: 123,
+            versionName: '1.2.3',
+            packageName: 'com.package.name'
+        };
     }
 }
