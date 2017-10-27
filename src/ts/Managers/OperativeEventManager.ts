@@ -19,6 +19,7 @@ import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { Campaign } from 'Models/Campaign';
 
 export class OperativeEventManager {
 
@@ -60,7 +61,7 @@ export class OperativeEventManager {
         this._request = request;
     }
 
-    public sendStart(adUnit: AbstractAdUnit): Promise<void> {
+    public sendStart(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.START)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.START]
@@ -86,7 +87,7 @@ export class OperativeEventManager {
         });
     }
 
-    public sendFirstQuartile(adUnit: AbstractAdUnit): Promise<void> {
+    public sendFirstQuartile(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.FIRST_QUARTILE)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.FIRST_QUARTILE]
@@ -103,7 +104,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
-    public sendMidpoint(adUnit: AbstractAdUnit): Promise<void> {
+    public sendMidpoint(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.MIDPOINT)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.MIDPOINT]
@@ -120,7 +121,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
-    public sendThirdQuartile(adUnit: AbstractAdUnit): Promise<void> {
+    public sendThirdQuartile(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.THIRD_QUARTILE]
@@ -137,7 +138,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
-    public sendSkip(adUnit: AbstractAdUnit, videoProgress?: number): Promise<void> {
+    public sendSkip(adUnit: AbstractAdUnit<Campaign>, videoProgress?: number): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.SKIP)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.SKIP]
@@ -174,7 +175,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
-    public sendView(adUnit: AbstractAdUnit): Promise<void> {
+    public sendView(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.VIEW]
@@ -190,7 +191,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(adUnit, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId()).then(fulfilled);
     }
 
-    public sendClick(adUnit: AbstractAdUnit): Promise<void> {
+    public sendClick(adUnit: AbstractAdUnit<Campaign>): Promise<void> {
         if(adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
             Diagnostics.trigger('operative_event_not_sent', {
                 event: EventType[EventType.CLICK]
@@ -245,7 +246,7 @@ export class OperativeEventManager {
         });
     }
 
-    private createUniqueEventMetadata(adUnit: AbstractAdUnit, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    private createUniqueEventMetadata(adUnit: AbstractAdUnit<Campaign>, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(adUnit, id, gameSession, gamerSid, previousPlacementId);
         });
@@ -276,7 +277,7 @@ export class OperativeEventManager {
         ]);
     }
 
-    private getInfoJson(adUnit: AbstractAdUnit, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
+    private getInfoJson(adUnit: AbstractAdUnit<Campaign>, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'auctionId': adUnit.getCampaign().getSession().getId(),
@@ -366,7 +367,7 @@ export class OperativeEventManager {
         });
     }
 
-    private createVideoEventUrl(adUnit: AbstractAdUnit, type: string): string {
+    private createVideoEventUrl(adUnit: AbstractAdUnit<Campaign>, type: string): string {
         const campaign = adUnit.getCampaign();
         if(campaign instanceof PerformanceCampaign || campaign instanceof MRAIDCampaign) {
             const url = campaign.getVideoEventUrl(type);
@@ -384,7 +385,7 @@ export class OperativeEventManager {
         ].join('/');
     }
 
-    private createClickEventUrl(adUnit: AbstractAdUnit): string {
+    private createClickEventUrl(adUnit: AbstractAdUnit<Campaign>): string {
         const campaign = adUnit.getCampaign();
         let url: string | undefined;
         let parameters: any = {};

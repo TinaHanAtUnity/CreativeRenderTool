@@ -1,33 +1,32 @@
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 
-import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 
-export interface IVastEndScreenHandler {
-    onVastEndScreenClick(): void;
-    onVastEndScreenClose(): void;
-    onVastEndScreenShow(): void;
-    onKeyEvent(keyCode: number): void;
+export interface IVPAIDEndScreenHandler {
+    onVPAIDEndScreenClick(): void;
+    onVPAIDEndScreenClose(): void;
+    onVPAIDEndScreenShow(): void;
 }
 
-export class VastEndScreen extends View<IVastEndScreenHandler> {
+export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     private _isSwipeToCloseEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, gameId: string) {
         super(nativeBridge, 'end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
 
         if(campaign) {
-            const landscape = campaign.getLandscape();
-            const portrait = campaign.getPortrait();
+            const landscape = campaign.getCompanionLandscapeUrl();
+            const portrait = campaign.getCompanionPortraitUrl();
 
             this._templateData = {
-                'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
-                'endScreenPortrait': (portrait ? portrait.getUrl() : (landscape ? landscape.getUrl() : undefined))
+                'endScreenLandscape': (landscape ? landscape : (portrait ? portrait : undefined)),
+                'endScreenPortrait': (portrait ? portrait : (landscape ? landscape : undefined))
             };
         }
 
@@ -66,11 +65,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
     public show(): void {
         super.show();
 
-        this._handlers.forEach(handler => handler.onVastEndScreenShow());
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
-                this._handlers.forEach(handler => handler.onVastEndScreenClose());
+                this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
@@ -81,11 +80,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onVastEndScreenClose());
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
     }
 
     private onClickEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onVastEndScreenClick());
+        this._handlers.forEach(handler => handler.onVPAIDEndScreenClick());
     }
 }

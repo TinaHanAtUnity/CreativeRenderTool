@@ -524,7 +524,7 @@ describe('CampaignRefreshManager', () => {
 });
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: AbstractAdUnit<Campaign>, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
@@ -544,7 +544,7 @@ export class TestContainer extends AdUnitContainer {
     }
 }
 
-export class TestAdUnit extends AbstractAdUnit {
+export class TestAdUnit extends AbstractAdUnit<Campaign> {
     public show(): Promise<void> {
         return Promise.resolve();
     }

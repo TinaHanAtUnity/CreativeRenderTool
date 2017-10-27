@@ -2,22 +2,23 @@ import OverlayTemplate from 'html/Overlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
-import { Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { View } from 'Views/View';
 
-export class Overlay extends View {
+export interface IOverlayHandler {
+    onOverlaySkip(position: number): void;
+    onOverlayMute(isMuted: boolean): void;
+    onOverlayCallButton(): void;
+}
+
+export class Overlay extends View<IOverlayHandler> {
 
     public static setAutoSkip(value: boolean) {
         Overlay.AutoSkip = value;
     }
 
     protected static AutoSkip: boolean = false;
-
-    public readonly onSkip = new Observable1<number>();
-    public readonly onMute = new Observable1<boolean>();
-    public readonly onCallButton = new Observable1<boolean>();
 
     private _localization: Localization;
 
@@ -152,7 +153,7 @@ export class Overlay extends View {
 
     public setVideoProgress(value: number): void {
         if(Overlay.AutoSkip) {
-            this.onSkip.trigger(value);
+            this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 
         if((!this._callButtonStatus) && (this._abGroup === 10 || this._abGroup === 11)) {
@@ -219,7 +220,7 @@ export class Overlay extends View {
         event.preventDefault();
         event.stopPropagation();
         if(this._skipEnabled && this._videoProgress > this._skipDuration) {
-            this.onSkip.trigger(this._videoProgress);
+            this._handlers.forEach(handler => handler.onOverlaySkip(this._videoProgress));
         }
     }
 
@@ -234,14 +235,14 @@ export class Overlay extends View {
             this._muteButtonElement.classList.add('muted');
             this._muted = true;
         }
-        this.onMute.trigger(this._muted);
+        this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
     private onCallButtonEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
-        this.onCallButton.trigger(true);
+        this._handlers.forEach(handler => handler.onOverlayCallButton());
     }
 
     private onClick(event: Event) {

@@ -1,25 +1,23 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { Placement } from 'Models/Placement';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
-import { GlyphView } from 'Views/GlyphView';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { GlyphView, IGlyphEventHandler } from 'Views/GlyphView';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
-
-export class GlyphAdUnit extends AbstractAdUnit {
+export interface IGlyphAdUnitParameters extends IAdUnitParameters<GlyphCampaign> {
+    view: GlyphView;
+}
+export class GlyphAdUnit extends AbstractAdUnit<GlyphCampaign> implements IGlyphEventHandler {
     private _operativeEventManager: OperativeEventManager;
     private _view: GlyphView;
     private _options: any;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, placement: Placement, campaign: GlyphCampaign, view: GlyphView, options: any) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
-        this._operativeEventManager = operativeEventManager;
-        this._view = view;
-
-        this._options = options;
-
-        this._view.onSkip.subscribe(() => this.onSkip());
+    constructor(nativeBridge: NativeBridge, parameters: IGlyphAdUnitParameters) {
+        super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+        this._operativeEventManager = parameters.operativeEventManager;
+        this._view = parameters.view;
+        this._options = parameters.options;
     }
 
     public show(): Promise<void> {
@@ -43,6 +41,11 @@ export class GlyphAdUnit extends AbstractAdUnit {
         return 'Glyph';
     }
 
+    public onSkip() {
+        this.setFinishState(FinishState.SKIPPED);
+        this.hide();
+    }
+
     private onShow() {
         this.setShowing(true);
     }
@@ -61,10 +64,5 @@ export class GlyphAdUnit extends AbstractAdUnit {
     private hideView() {
         this._view.hide();
         document.body.removeChild(this._view.container());
-    }
-
-    private onSkip() {
-        this.setFinishState(FinishState.SKIPPED);
-        this.hide();
     }
 }

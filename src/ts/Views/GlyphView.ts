@@ -8,14 +8,16 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
 import { Template } from 'Utilities/Template';
-import { Overlay } from 'Views/Overlay';
+import { Overlay, IOverlayHandler } from 'Views/Overlay';
 import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
-import { Observable0 } from 'Utilities/Observable';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
-export class GlyphView extends View {
+export interface IGlyphEventHandler {
+    onSkip(): void;
+}
+
+export class GlyphView extends View<IGlyphEventHandler> implements IOverlayHandler {
     public readonly videoBridge: NativeVideoPlayerBridge;
-    public readonly onSkip: Observable0 = new Observable0();
 
     private _placement: Placement;
     private _campaign: GlyphCampaign;
@@ -30,6 +32,8 @@ export class GlyphView extends View {
         this._placement = placement;
         this._campaign = campaign;
         this._overlay = new Overlay(nativeBridge, false, language, gameId, abGroup);
+        this._overlay.addEventHandler(this);
+
         this._template = new Template(GlyphContainer);
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
@@ -39,9 +43,6 @@ export class GlyphView extends View {
         this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge, container);
         this.videoBridge.onProgress.subscribe((progress) => this.onVideoProgress(progress));
         this.videoBridge.onPrepare.subscribe((duration) => this.onVideoPrepared(duration));
-
-        this._overlay.onSkip.subscribe(() => this.onSkip.trigger());
-        this._overlay.onMute.subscribe((muted) => muted ? this.onMute() : this.onUnmute());
     }
 
     public render() {
@@ -61,6 +62,18 @@ export class GlyphView extends View {
         super.hide();
         this.videoBridge.stopVideo();
         this.videoBridge.disconnect();
+    }
+
+    public onOverlayCallButton() {
+        // EMPTY
+    }
+
+    public onOverlayMute(isMuted: boolean) {
+        isMuted ? this.onMute() : this.onUnmute();
+    }
+
+    public onOverlaySkip() {
+        this._handlers.forEach((handler) => handler.onSkip());
     }
 
     private setupIFrame() {
