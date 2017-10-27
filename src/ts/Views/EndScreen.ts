@@ -1,5 +1,6 @@
 import EndScreenTemplate from 'html/EndScreen.html';
 import NewEndScreenTemplate from 'html/NewEndScreen.html';
+import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -12,7 +13,9 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
+/* TODO: Only for A/B tests */
 const newEndScreenId = "new-end-screen";
+const darkEndScreenId = "dark-end-screen";
 
 export class EndScreen extends View {
 
@@ -35,6 +38,8 @@ export class EndScreen extends View {
 
         if(this.getEndscreenAlt() === newEndScreenId) {
             this._template = new Template(NewEndScreenTemplate, this._localization);
+        } else if (this.getEndscreenAlt() === darkEndScreenId) {
+            this._template = new Template(DarkEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
         }
@@ -128,10 +133,9 @@ export class EndScreen extends View {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
-        if (this.getEndscreenAlt() === newEndScreenId) {
+        if (this.getEndscreenAlt() === newEndScreenId || this.getEndscreenAlt() === darkEndScreenId) {
             this._container.id = newEndScreenId;
         }
-
     }
 
     public show(): void {
@@ -164,6 +168,11 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign?: Campaign) {
+
+        if(this._abGroup === 10 || this._abGroup === 11) {
+            return darkEndScreenId;
+        }
+
         if(this._abGroup === 8 || this._abGroup === 9) {
             return newEndScreenId;
         }
