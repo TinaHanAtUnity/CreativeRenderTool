@@ -36,12 +36,10 @@ export class Privacy extends View<IPrivacyHandler> {
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
-        // this.onPrivacy.trigger();
     }
 
     private onOkEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacyClose());
-        // this.onClose.trigger();
     }
 }
