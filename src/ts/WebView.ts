@@ -79,12 +79,6 @@ export class WebView {
 
     private _creativeUrl?: string;
 
-    // constant value that determines the delay for refreshing ads after backend has processed a start event
-    // set to five seconds because backend should usually process start event in less than one second but
-    // we want to be safe in case of error situations on the backend and mistimings on the device
-    // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
-    private _startRefreshMagicConstant: number = 5000;
-
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -194,11 +188,6 @@ export class WebView {
             return this._campaignRefreshManager.refresh();
         }).then(() => {
             this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
-            } else {
-                this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
-            }
 
             this._initialized = true;
 
@@ -265,6 +254,7 @@ export class WebView {
 
         this.shouldReinitialize().then((reinitialize) => {
             this._mustReinitialize = reinitialize;
+            this._campaignRefreshManager.setRefreshAllowed(!reinitialize);
         });
 
         if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
@@ -303,8 +293,6 @@ export class WebView {
                 options: options
             });
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
-            this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
-            this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && campaign instanceof PerformanceCampaign) {
@@ -338,30 +326,12 @@ export class WebView {
         }
     }
 
-    private onAdUnitStartProcessed(): void {
-        if(this._currentAdUnit) {
-            setTimeout(() => {
-                if(!this._mustReinitialize && this._currentAdUnit && this._currentAdUnit.isCached()) {
-                    this._campaignRefreshManager.refresh();
-                }
-            }, this._startRefreshMagicConstant);
-        }
-    }
-
-    private onAdUnitFinish(): void {
-        if(!this._mustReinitialize) {
-            this._campaignRefreshManager.refresh();
-        }
-    }
-
     private onAdUnitClose(): void {
         this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
         if(this._mustReinitialize) {
             this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
-        } else {
-            this._campaignRefreshManager.refresh();
         }
     }
 
@@ -374,29 +344,23 @@ export class WebView {
      */
 
     private onNetworkConnected() {
-        if(!this.isShowing() && this._initialized) {
-            this.shouldReinitialize().then((reinitialize) => {
-                if(reinitialize) {
-                    if(this.isShowing()) {
-                        this._mustReinitialize = true;
-                    } else {
-                        this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
-                        this.reinitialize();
-                    }
-                } else {
-                    this._campaignRefreshManager.refresh();
-                    this._sessionManager.sendUnsentSessions(this._operativeEventManager);
-                }
-            });
+        if(this.isShowing() || !this._initialized) {
+            return;
         }
-    }
-
-    private onScreenOn(): void {
-        this._campaignRefreshManager.refresh();
-    }
-
-    private onAppForeground(): void {
-        this._campaignRefreshManager.refresh();
+        this.shouldReinitialize().then((reinitialize) => {
+            if(reinitialize) {
+                if(this.isShowing()) {
+                    this._mustReinitialize = true;
+                    this._campaignRefreshManager.setRefreshAllowed(false);
+                } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
+                    this.reinitialize();
+                }
+            } else {
+                this._campaignRefreshManager.refresh();
+                this._sessionManager.sendUnsentSessions(this._operativeEventManager);
+            }
+        });
     }
 
     /*
