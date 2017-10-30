@@ -51,8 +51,6 @@ export class Overlay extends View {
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
     private _abGroup: number;
-    private _callButtonStatus: boolean = false;
-    private _callButtonSelector: string = '.call-button';
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
         super(nativeBridge, 'overlay');
@@ -66,17 +64,6 @@ export class Overlay extends View {
         this._templateData = {
             muted: this._muted
         };
-
-        switch(this._abGroup) {
-            case 10:
-                this._callButtonSelector = '.outer-call-button';
-                break;
-            case 11:
-                this._callButtonSelector = '.outer-call-button-tag';
-                break;
-            default:
-                break;
-        }
 
         this._bindings = [
             {
@@ -92,7 +79,7 @@ export class Overlay extends View {
             {
                 event: 'click',
                 listener: (event: Event) => this.onCallButtonEvent(event),
-                selector: this._callButtonSelector
+                selector: '.call-button'
             },
             {
                 event: 'click',
@@ -114,11 +101,8 @@ export class Overlay extends View {
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector(this._callButtonSelector);
+        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        if (this._abGroup === 10 || this._abGroup === 11) {
-            this._callButtonElement.classList.add('slide-down');
-        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -153,12 +137,6 @@ export class Overlay extends View {
     public setVideoProgress(value: number): void {
         if(Overlay.AutoSkip) {
             this.onSkip.trigger(value);
-        }
-
-        if((!this._callButtonStatus) && (this._abGroup === 10 || this._abGroup === 11)) {
-            this._callButtonStatus = true;
-            this._callButtonElement.classList.remove('slide-down');
-            this._callButtonElement.classList.add('slide-back-in-place');
         }
 
         if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
