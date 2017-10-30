@@ -14,6 +14,8 @@ enum AdUnitEvent {
     KEY_DOWN,
     ON_RESTORE,
     ON_STOP,
+    ON_FOCUS_GAINED,
+    ON_FOCUS_LOST
 }
 
 export enum AndroidAdUnitError {
@@ -38,6 +40,8 @@ export class AndroidAdUnitApi extends NativeApi {
     public readonly onKeyDown = new Observable5<number, number, number, number, number>();
     public readonly onRestore = new Observable1<number>();
     public readonly onStop = new Observable1<number>();
+    public readonly onFocusGained = new Observable1<number>();
+    public readonly onFocusLost = new Observable1<number>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit');
@@ -119,6 +123,14 @@ export class AndroidAdUnitApi extends NativeApi {
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
                 this.onStop.trigger(parameters[0]);
+                break;
+
+            case AdUnitEvent[AdUnitEvent.ON_FOCUS_GAINED]:
+                this.onFocusGained.trigger(parameters[0]);
+                break;
+
+            case AdUnitEvent[AdUnitEvent.ON_FOCUS_LOST]:
+                this.onFocusLost.trigger(parameters[0]);
                 break;
 
             default:
