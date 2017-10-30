@@ -102,9 +102,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         nameContainer.innerHTML = this._gameName + ' ';
 
         if (AbstractAdUnit.getAutoClose()) {
+            /*
             setTimeout(() => {
                 this._handlers.forEach(handler => handler.onEndScreenClose());
-            }, AbstractAdUnit.getAutoCloseDelay());
+            }, AbstractAdUnit.getAutoCloseDelay());*/
         }
     }
 

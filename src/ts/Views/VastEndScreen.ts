@@ -69,9 +69,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
         this._handlers.forEach(handler => handler.onVastEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
+            /*
             setTimeout(() => {
                 this._handlers.forEach(handler => handler.onVastEndScreenClose());
-            }, AbstractAdUnit.getAutoCloseDelay());
+            }, AbstractAdUnit.getAutoCloseDelay());*/
         }
     }
 

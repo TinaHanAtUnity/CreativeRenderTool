@@ -112,10 +112,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     private onShow(): void {
         if(AbstractAdUnit.getAutoClose()) {
+            /*
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
+            */
         }
     }
 

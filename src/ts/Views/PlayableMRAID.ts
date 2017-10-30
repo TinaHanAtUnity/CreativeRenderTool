@@ -7,7 +7,7 @@ import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { Diagnostics } from 'Utilities/Diagnostics';
+// import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -143,6 +143,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
+        /*
         this._loadingScreenTimeout = setTimeout(() => {
             if(this._iframeLoaded) {
                 this.showMRAIDAd();
@@ -163,7 +164,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }, 4500);
             }
             this._loadingScreenTimeout = undefined;
-        }, 2500);
+        }, 2500);*/
     }
 
     private showMRAIDAd() {
