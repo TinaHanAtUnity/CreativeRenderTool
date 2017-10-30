@@ -143,12 +143,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
-        this._loadingScreenTimeout = setTimeout(() => {
+        // this._loadingScreenTimeout = setTimeout(() => {
             if(this._iframeLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
-                this._prepareTimeout = setTimeout(() => {
+                // this._prepareTimeout = setTimeout(() => {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this._closeElement.style.display = 'block';
@@ -160,10 +160,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     }, this._campaign.getSession());
 
                     this._prepareTimeout = undefined;
-                }, 4500);
+                // }, 4500);
             }
             this._loadingScreenTimeout = undefined;
-        }, 2500);
+        // }, 2500);
     }
 
     private showMRAIDAd() {
