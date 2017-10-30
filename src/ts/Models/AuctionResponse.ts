@@ -43,7 +43,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('correlationId', correlationId);
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
-        this.set('advertiserBundleId', data.targetBundleId);
+        this.set('advertiserBundleId', data.bundleId);
     }
 
     public getPlacements(): string[] {
