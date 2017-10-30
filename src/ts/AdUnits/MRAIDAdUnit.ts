@@ -161,12 +161,10 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
         this._mraid.setViewableState(true);
 
         if(AbstractAdUnit.getAutoClose()) {
-            /*
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
-            */
         }
     }
 
