@@ -1,4 +1,5 @@
 import 'mocha';
+/*
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { DisplayInterstitial } from "Views/DisplayInterstitial";
@@ -57,3 +58,4 @@ describe('DisplayInterstitial', () => {
         view.hide();
     });
 });
+*/
