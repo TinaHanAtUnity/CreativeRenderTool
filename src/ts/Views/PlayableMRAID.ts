@@ -144,25 +144,25 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
         // this._loadingScreenTimeout = setTimeout(() => {
-            if(this._iframeLoaded) {
-                this.showMRAIDAd();
-            } else {
-                // start the prepare timeout and wait for the onload event
-                // this._prepareTimeout = setTimeout(() => {
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this._closeElement.style.display = 'block';
-                    this.updateProgressCircle(this._closeElement, 1);
+        if(this._iframeLoaded) {
+            this.showMRAIDAd();
+        } else {
+            // start the prepare timeout and wait for the onload event
+            // this._prepareTimeout = setTimeout(() => {
+                this._canClose = true;
+                this._closeElement.style.opacity = '1';
+                this._closeElement.style.display = 'block';
+                this.updateProgressCircle(this._closeElement, 1);
 
-                    const resourceUrl = this._campaign.getResourceUrl();
-                    Diagnostics.trigger('playable_prepare_timeout', {
-                        'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
-                    }, this._campaign.getSession());
+                const resourceUrl = this._campaign.getResourceUrl();
+                Diagnostics.trigger('playable_prepare_timeout', {
+                    'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
+                }, this._campaign.getSession());
 
-                    this._prepareTimeout = undefined;
-                // }, 4500);
-            }
-            this._loadingScreenTimeout = undefined;
+                this._prepareTimeout = undefined;
+            // }, 4500);
+        }
+        this._loadingScreenTimeout = undefined;
         // }, 2500);
     }
 
