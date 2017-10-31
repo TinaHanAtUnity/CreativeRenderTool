@@ -1,3 +1,19 @@
+# Tue Oct 31 10:55:28 UTC 2017
+
+* Add versionCode (for Android SDK 2.1.1+) and simulator (iOS only) to ad request parameters
+* Remove ab test for brand ad cta
+* Adjust performance ad to dismiss completely when video is skipped in group 5
+* Add parse duration to SdkStats
+* Refactor ad plan refreshing triggers to CampaignRefreshManager
+
+# Wed Oct 25 22:15:26 UTC 2017
+
+* Check ad plan refreshing when any app activity resumes
+* CTA styling A/B test on groups 10 and 11
+* Refactor endscreen layout
+* Add support for configUrl test metadata parameter
+* Fix kafkaUrl test metadata parameter
+
 # Mon Oct 23 21:35:15 UTC 2017
 
 * Integrate SDKStats into Webview

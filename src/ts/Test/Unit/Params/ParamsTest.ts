@@ -29,11 +29,12 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
-
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
 import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
+import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
+
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -81,6 +82,12 @@ class TestRequestApi extends RequestApi {
 class TestDeviceInfoApi extends DeviceInfoApi {
     public getUniqueEventId(): Promise<string> {
         return Promise.resolve('1234-ABCD');
+    }
+}
+
+class TestAndroidDeviceInfoApi extends AndroidDeviceInfoApi {
+    public getPackageInfo(packageName: string): Promise<IPackageInfo> {
+        return Promise.resolve(TestFixtures.getPackageInfo());
     }
 }
 
@@ -184,6 +191,7 @@ class TestHelper {
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
         nativeBridge.Request = new TestRequestApi(nativeBridge);
         nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
+        nativeBridge.DeviceInfo.Android = new TestAndroidDeviceInfoApi(nativeBridge);
         nativeBridge.IosAdUnit = new IosAdUnitApi(nativeBridge);
         nativeBridge.AndroidAdUnit = new AndroidAdUnitApi(nativeBridge);
         return nativeBridge;

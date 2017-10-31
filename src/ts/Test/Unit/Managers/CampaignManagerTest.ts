@@ -170,7 +170,8 @@ describe('CampaignManager', () => {
                     getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
                     getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    isAppInstalled: sinon.stub().returns(Promise.resolve(true))
+                    isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
+                    getPackageInfo: sinon.stub().returns(Promise.resolve(TestFixtures.getPackageInfo()))
                 }
             },
             Lifecycle: {

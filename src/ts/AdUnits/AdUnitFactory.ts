@@ -71,7 +71,7 @@ export class AdUnitFactory {
         const video = this.getOrientedVideo(campaign, forceOrientation);
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options, endScreen);
 
-        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit, comScoreTrackingService);
+        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, performanceAdUnit, configuration.getAbGroup(), comScoreTrackingService);
 
         const landscapeVideo = campaign.getVideo();
         const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
@@ -110,7 +110,7 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, vastAdUnit, comScoreTrackingService);
+        this.prepareOverlay(overlay, nativeBridge, operativeEventManager, vastAdUnit, configuration.getAbGroup(), comScoreTrackingService);
         overlay.setSpinnerEnabled(!campaign.getVideo().isCached());
 
         this.prepareVastOverlayEventHandlers(overlay, nativeBridge, thirdPartyEventManager, vastAdUnit, request, clientInfo);
@@ -174,7 +174,7 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, comScoreTrackingService: ComScoreTrackingService) {
+    private static prepareOverlay(overlay: Overlay, nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit, abGroup: number = 0, comScoreTrackingService: ComScoreTrackingService) {
         overlay.render();
         document.body.appendChild(overlay.container());
 
@@ -185,7 +185,13 @@ export class AdUnitFactory {
             overlay.setSkipDuration(adUnit.getPlacement().allowSkipInSeconds());
         }
 
-        overlay.onSkip.subscribe((videoProgress) => OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit, comScoreTrackingService));
+        overlay.onSkip.subscribe((videoProgress) => {
+            OverlayEventHandlers.onSkip(nativeBridge, operativeEventManager, adUnit, comScoreTrackingService);
+            if (abGroup === 5) {
+                adUnit.setFinishState(FinishState.SKIPPED);
+                adUnit.hide();
+            }
+        });
         overlay.onMute.subscribe((muted) => OverlayEventHandlers.onMute(nativeBridge, muted));
     }
 
