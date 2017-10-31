@@ -1,4 +1,5 @@
 import 'mocha';
+/*
 import * as sinon from 'sinon';
 
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
@@ -226,3 +227,4 @@ describe('MRAIDEventHandlersTest', () => {
         });
     });
 });
+*/
