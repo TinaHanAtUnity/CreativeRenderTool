@@ -110,7 +110,7 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        if (campaign.getAdvertiserDomain() !== undefined) {
+        if (campaign.getAdvertiserDomain() !== undefined && (nativeBridge.getPlatform() === Platform.IOS || (nativeBridge.getPlatform() === Platform.ANDROID && clientInfo.getSdkVersion() >= 2101))) {
             vastAdUnit.initMoat();
         }
 
