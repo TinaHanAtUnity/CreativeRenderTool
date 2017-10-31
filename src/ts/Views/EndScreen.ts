@@ -13,7 +13,7 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
-/* TODO: Only for A/B tests */
+/* NOTE: Only for A/B tests */
 const newEndScreenId = "new-end-screen";
 const darkEndScreenId = "dark-end-screen";
 
@@ -133,7 +133,10 @@ export class EndScreen extends View {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
-        if (this.getEndscreenAlt() === newEndScreenId || this.getEndscreenAlt() === darkEndScreenId) {
+        const endScreenAlt = this.getEndscreenAlt();
+
+        /* NOTE: This also should go once new end screen will replace current end screen */
+        if (endScreenAlt === newEndScreenId || endScreenAlt === darkEndScreenId) {
             this._container.id = newEndScreenId;
         }
     }
