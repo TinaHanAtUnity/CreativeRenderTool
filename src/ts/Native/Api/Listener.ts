@@ -28,10 +28,6 @@ export class ListenerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'sendPlacementStateChangedEvent', [placementId, oldState, newState]);
     }
 
-    public sendInitiatePurchaseEvent(eventString: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendInitiatePurchaseEvent', [eventString]);
-    }
-
     public sendErrorEvent(error: string, message: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'sendErrorEvent', [error, message]);
     }

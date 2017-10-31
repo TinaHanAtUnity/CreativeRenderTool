@@ -280,7 +280,7 @@ test-coveralls: test-coverage
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
 watch:
-	watchman-make -p 'src/ts/**/*.ts' 'src/styl/**/*.styl' 'src/html/**/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
+	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
 setup: clean
 	rm -rf node_modules && npm install

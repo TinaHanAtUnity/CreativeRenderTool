@@ -165,12 +165,12 @@ export class CampaignManager {
             const noFill: string[] = [];
 
             const placements = this._configuration.getPlacements();
-            for (const placement in placements) {
-                if (placements.hasOwnProperty(placement)) {
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
                     const mediaId: string = json.placements[placement];
 
-                    if (mediaId) {
-                        if (fill[mediaId]) {
+                    if(mediaId) {
+                        if(fill[mediaId]) {
                             fill[mediaId].push(placement);
                         } else {
                             fill[mediaId] = [placement];
@@ -184,7 +184,7 @@ export class CampaignManager {
             let refreshDelay: number = 0;
             const promises: Array<Promise<void>> = [];
 
-            for (const placement of noFill) {
+            for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
@@ -193,7 +193,7 @@ export class CampaignManager {
                 if(fill.hasOwnProperty(mediaId)) {
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if (contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
@@ -393,7 +393,7 @@ export class CampaignManager {
             simulator: this._deviceInfo.isSimulator()
         };
 
-        if(this.getPreviousPlacementId()) {
+        if (this.getPreviousPlacementId()) {
             body.previousPlacementId = this.getPreviousPlacementId();
         }
 
