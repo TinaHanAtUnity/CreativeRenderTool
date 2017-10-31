@@ -1,3 +1,11 @@
+# Wed Oct 25 22:15:26 UTC 2017
+
+* Check ad plan refreshing when any app activity resumes
+* CTA styling A/B test on groups 10 and 11
+* Refactor endscreen layout
+* Add support for configUrl test metadata parameter
+* Fix kafkaUrl test metadata parameter
+
 # Mon Oct 23 21:35:15 UTC 2017
 
 * Integrate SDKStats into Webview
@@ -504,7 +512,7 @@
 
 # Fri Mar 10 11:27:36 UTC 2017
 
-* Converted current MZ playables to use MRAID 
+* Converted current MZ playables to use MRAID
 
 # Wed Mar  8 07:19:27 UTC 2017
 
@@ -571,7 +579,7 @@
 
 # Mon Jan 30 13:59:36 UTC 2017
 
-* Fixed several overlay UX issues 
+* Fixed several overlay UX issues
 
 # Wed Jan 25 09:58:18 UTC 201
 

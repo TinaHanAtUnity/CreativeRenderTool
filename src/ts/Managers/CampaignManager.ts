@@ -160,7 +160,7 @@ export class CampaignManager {
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
         const json = JsonParser.parse(response.response);
-        if ('placements' in json) {
+        if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
 
@@ -189,8 +189,8 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
-            for (const mediaId in fill) {
-                if (fill.hasOwnProperty(mediaId)) {
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
                     if (contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
@@ -201,19 +201,19 @@ export class CampaignManager {
 
             this.onAdPlanReceived.trigger(refreshDelay);
 
-            for (const mediaId in fill) {
-                if (fill.hasOwnProperty(mediaId)) {
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
-                            if (error === CacheStatus.STOPPED) {
+                            if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             }
 
                             return this.handleError(error, fill[mediaId], session);
                         }));
-                    } catch (error) {
+                    } catch(error) {
                         this.handleError(error, fill[mediaId], session);
                     }
                 }
@@ -254,7 +254,12 @@ export class CampaignManager {
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
+        const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            const parseDuration = Date.now() - parseTimestamp;
+            for(const placement of response.getPlacements()) {
+                SdkStats.setParseDuration(placement, parseDuration);
+            }
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
@@ -376,6 +381,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getHeadset());
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
+        promises.push(this.getVersionCode());
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -383,7 +389,8 @@ export class CampaignManager {
             coppa: this._configuration.isCoppaCompliant(),
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
-            timeZone: this._deviceInfo.getTimeZone()
+            timeZone: this._deviceInfo.getTimeZone(),
+            simulator: this._deviceInfo.isSimulator()
         };
 
         if(this.getPreviousPlacementId()) {
@@ -394,7 +401,7 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
@@ -403,6 +410,10 @@ export class CampaignManager {
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
+            }
+
+            if(versionCode) {
+                body.versionCode = versionCode;
             }
 
             const metaDataPromises: Array<Promise<any>> = [];
@@ -441,5 +452,21 @@ export class CampaignManager {
                 return body;
             });
         });
+    }
+
+    private getVersionCode(): Promise<number | undefined> {
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                if(packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
     }
 }

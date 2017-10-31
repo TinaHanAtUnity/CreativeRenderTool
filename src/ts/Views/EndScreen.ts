@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import NewEndScreenTemplate from 'html/NewEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -11,6 +12,8 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
+const newEndScreenId = "new-end-screen";
+
 export class EndScreen extends View {
 
     public readonly onDownload = new Observable0();
@@ -22,13 +25,19 @@ export class EndScreen extends View {
     private _privacy: Privacy;
     private _localization: Localization;
     private _isSwipeToCloseEnabled: boolean = false;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string, gameId: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
+        this._abGroup = campaign && campaign.getAbGroup();
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        if(this.getEndscreenAlt() === newEndScreenId) {
+            this._template = new Template(NewEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
 
         /* TODO: Why is there a check for campaign */
         if(campaign && campaign instanceof PerformanceCampaign) {
@@ -77,11 +86,17 @@ export class EndScreen extends View {
             }
         }
 
+        let downloadSelectors = '.game-background, .btn-download, .game-icon';
+
+        if(this.getEndscreenAlt() === newEndScreenId) {
+            downloadSelectors = '.game-background, .download-container, .game-icon';
+        }
+
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: downloadSelectors
             },
             {
                 event: 'click',
@@ -112,6 +127,11 @@ export class EndScreen extends View {
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
+
+        if (this.getEndscreenAlt() === newEndScreenId) {
+            this._container.id = newEndScreenId;
+        }
+
     }
 
     public show(): void {
@@ -143,7 +163,11 @@ export class EndScreen extends View {
         }
     }
 
-    private getEndscreenAlt(campaign: Campaign) {
+    private getEndscreenAlt(campaign?: Campaign) {
+        if(this._abGroup === 8 || this._abGroup === 9) {
+            return newEndScreenId;
+        }
+
         return undefined;
     }
 
