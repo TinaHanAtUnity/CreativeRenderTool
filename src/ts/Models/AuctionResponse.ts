@@ -28,9 +28,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             adType: ['string'],
             creativeId: ['string', 'undefined'],
             seatId: ['integer', 'undefined'],
-            correlationId: ['string'],
             appCategory: ['string', 'undefined'],
-            appSubCategory: ['string', 'undefined']
+            appSubCategory: ['string', 'undefined'],
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
