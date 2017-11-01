@@ -60,8 +60,8 @@ describe.skip('VPAID View', () => {
                     try {
                         assert.isTrue(e.data.type === 'init');
                         resolve();
-                    } catch {
-                        reject();
+                    } catch(e) {
+                        reject(e);
                     }
                 });
             });
@@ -91,8 +91,8 @@ describe.skip('VPAID View', () => {
                     try {
                         assert.isTrue(e.data.type === 'show');
                         resolve();
-                    } catch {
-                        reject();
+                    } catch(e) {
+                        reject(e);
                     }
                 });
             });
@@ -114,30 +114,6 @@ describe.skip('VPAID View', () => {
         afterEach(() => {
             document.body.removeChild(vpaid.container());
             vpaid.hide();
-        });
-
-        it('should forward the event to the observer', () => {
-            const spy = sinon.spy();
-            const eventType = 'AdEvent';
-            const args = ['foo', 1, true, 'bar'];
-            vpaid.onVPAIDEvent.subscribe(spy);
-
-            window.postMessage({
-                type: 'VPAID',
-                eventType: eventType,
-                args: args
-            }, '*');
-
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    try {
-                        sinon.assert.calledWith(spy, eventType, args);
-                        resolve();
-                    } catch {
-                        reject();
-                    }
-                });
-            });
         });
     });
 });
