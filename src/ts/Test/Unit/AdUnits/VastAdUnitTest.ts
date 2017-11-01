@@ -237,7 +237,7 @@ describe('VastAdUnit', () => {
                 assert.fail('Missing duration in VAST ad');
             } else {
                 const quartilePosition = duration * 0.25 * quartile * 1000;
-                vastAdUnit.sendProgressEvents(thirdPartyEventManager, '123', 2000, quartilePosition + 100, quartilePosition - 100);
+                vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
                 mockEventManager.verify();
             }
         };
@@ -330,8 +330,12 @@ describe('VastAdUnit', () => {
             sinon.stub(vastEndScreen, 'hide');
             sinon.stub(vastEndScreen, 'remove');
             vastAdUnit.hide();
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
         });
     });
 });

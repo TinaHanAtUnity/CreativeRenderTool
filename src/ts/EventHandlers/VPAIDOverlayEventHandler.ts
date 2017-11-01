@@ -27,4 +27,8 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     public onOverlayCallButton(): void {
         // EMPTY
     }
+
+    public onOverlayPauseForTesting(paused: boolean): void {
+        // EMPTY
+    }
 }

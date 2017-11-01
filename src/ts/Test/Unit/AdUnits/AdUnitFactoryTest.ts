@@ -66,7 +66,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'close').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
-        deviceInfo = <DeviceInfo>{getLanguage: () => 'en'};
+        deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);

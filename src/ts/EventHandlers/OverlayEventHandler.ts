@@ -42,4 +42,8 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     public onOverlayCallButton(): void {
         // EMPTY
     }
+
+    public onOverlayPauseForTesting(paused: boolean): void {
+        // EMPTY
+    }
 }

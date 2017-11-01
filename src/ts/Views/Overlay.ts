@@ -9,6 +9,7 @@ import { View } from 'Views/View';
 export interface IOverlayHandler {
     onOverlaySkip(position: number): void;
     onOverlayMute(isMuted: boolean): void;
+    onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
 }
 
@@ -81,6 +82,11 @@ export class Overlay extends View<IOverlayHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onCallButtonEvent(event),
                 selector: '.call-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPauseForTestingEvent(event),
+                selector: '.debug-message-text'
             },
             {
                 event: 'click',
@@ -221,6 +227,13 @@ export class Overlay extends View<IOverlayHandler> {
         event.stopPropagation();
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
+    }
+
+    private onPauseForTestingEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.resetFadeTimer();
+        this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
     private onClick(event: Event) {
