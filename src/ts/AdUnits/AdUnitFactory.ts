@@ -110,7 +110,9 @@ export class AdUnitFactory {
             vastAdUnit = new VastAdUnit(nativeBridge, forceOrientation, container, placement, campaign, overlay, deviceInfo, options);
         }
 
-        if (campaign.getAdvertiserDomain() !== undefined && (nativeBridge.getPlatform() === Platform.IOS || (nativeBridge.getPlatform() === Platform.ANDROID && clientInfo.getSdkVersion() >= 2101))) {
+        const hasAdvertiserDomain = campaign.getAdvertiserDomain() !== undefined;
+        const deviceSupportsMoat = (nativeBridge.getPlatform() === Platform.IOS || (nativeBridge.getPlatform() === Platform.ANDROID && clientInfo.getSdkVersion() >= 2101));
+        if (hasAdvertiserDomain && deviceSupportsMoat) {
             vastAdUnit.initMoat();
         }
 
