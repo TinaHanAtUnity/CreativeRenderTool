@@ -51,7 +51,7 @@ export class ComScoreTrackingService {
         }
 
         if (typeof category === 'undefined') {
-            category = 'null';
+            category = '*null';
         }
 
         if (typeof creativeId === 'undefined') {
