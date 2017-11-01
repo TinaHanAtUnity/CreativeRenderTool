@@ -52,16 +52,14 @@ export class VastAdUnit extends VideoAdUnit {
                 this.setVolume(volume / maxVolume);
             });
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            Promise.all([
-                nativeBridge.DeviceInfo.Ios.getDeviceVolume(),
-                nativeBridge.DeviceInfo.Ios.getDeviceMaxVolume()
-            ]).then(([volume, maxVolume]) => {
-                this.setVolume(volume / maxVolume);
+            nativeBridge.DeviceInfo.Ios.getDeviceVolume().then((volume) => {
+                this.setVolume(volume);
             });
         }
     }
 
     public hide(): Promise<void> {
+        // note: this timeout is required for the MOAT integration to function as expected
         return new Promise((resolve, reject) => {
             setTimeout(resolve, 500);
         }).then(() => {
