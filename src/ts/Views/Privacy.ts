@@ -3,13 +3,13 @@ import PrivacyTemplate from 'html/Privacy.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0, Observable1 } from 'Utilities/Observable';
 
-export class Privacy extends View {
+export interface IPrivacyHandler {
+    onPrivacy(url: string): void;
+    onPrivacyClose(): void;
+}
 
-    public readonly onPrivacy = new Observable1<string> ();
-    public readonly onClose = new Observable0();
-
+export class Privacy extends View<IPrivacyHandler> {
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
         super(nativeBridge, 'privacy');
 
@@ -35,12 +35,11 @@ export class Privacy extends View {
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this.onPrivacy.trigger((<HTMLLinkElement>event.target).href);
+        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
     }
 
     private onOkEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        this._handlers.forEach(handler => handler.onPrivacyClose());
     }
-
 }

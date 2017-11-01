@@ -20,9 +20,11 @@ export class VastVideoEventHandlers {
             }
             adUnit.getCampaign().getSession().setEventSent(EventType.IMPRESSION);
         }
-        adUnit.sendImpressionEvent(thirdPartyEventManager, adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
-        adUnit.sendTrackingEvent(thirdPartyEventManager, 'creativeView', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
-        adUnit.sendTrackingEvent(thirdPartyEventManager, 'start', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+
+        adUnit.sendImpressionEvent(adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+        adUnit.sendTrackingEvent('creativeView', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+        adUnit.sendTrackingEvent('start', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+
         const moat = adUnit.getMoat();
         if(moat) {
             moat.triggerViewabilityEvent('exposure', true);
@@ -53,7 +55,7 @@ export class VastVideoEventHandlers {
             }
             adUnit.getCampaign().getSession().setEventSent(EventType.VAST_COMPLETE);
         }
-        adUnit.sendTrackingEvent(thirdPartyEventManager, 'complete', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
+        adUnit.sendTrackingEvent('complete', adUnit.getCampaign().getSession().getId(), clientInfo.getSdkVersion());
 
         const moat = adUnit.getMoat();
         if(moat) {
