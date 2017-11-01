@@ -9,10 +9,7 @@ import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitia
 import { Platform } from "Constants/Platform";
 import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
 import { FocusManager } from 'Managers/FocusManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
@@ -51,19 +48,15 @@ describe('DisplayInterstitialEventHandler', () => {
         campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-        // sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
         sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
         const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        const focusManager = new FocusManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        const request = new Request(nativeBridge, wakeUpManager);
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const focusManager = sinon.createStubInstance(FocusManager);
+        const request = sinon.createStubInstance(Request);
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
+        operativeEventManager = sinon.createStubInstance(OperativeEventManager);
 
         displayInterstitialAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -163,9 +156,7 @@ describe('DisplayInterstitialEventHandler', () => {
         });
 
         it('should send a tracking event', () => {
-            sandbox.stub(operativeEventManager, 'sendClick');
             displayInterstitialEventHandler.onDisplayInterstitialClick('http://google.com');
-
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
         });
 
@@ -182,7 +173,6 @@ describe('DisplayInterstitialEventHandler', () => {
         it('should hide the adUnit', () => {
             sandbox.stub(displayInterstitialAdUnit, 'hide');
             displayInterstitialEventHandler.onDisplayInterstitialSkip();
-
             sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
         });
     });
@@ -195,15 +185,11 @@ describe('DisplayInterstitialEventHandler', () => {
             sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
         });
         it('should send the view diagnostic event', () => {
-            sinon.stub(operativeEventManager, 'sendView');
             displayInterstitialEventHandler.onDisplayInterstitialClose();
-
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
         });
         it('should send the third quartile diagnostic event', () => {
-            sinon.stub(operativeEventManager, 'sendThirdQuartile');
             displayInterstitialEventHandler.onDisplayInterstitialClose();
-
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
         });
     });
