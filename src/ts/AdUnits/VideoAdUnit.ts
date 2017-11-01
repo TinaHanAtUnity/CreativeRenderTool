@@ -23,7 +23,6 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
     protected _onSystemKillObserver: any;
     protected _onSystemInterruptObserver: any;
     protected _onLowMemoryWarningObserver: any;
-    protected _onPauseObserver: any;
 
     protected _options: any;
     private _video: Video;
@@ -58,7 +57,6 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
-        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
         return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
     }
@@ -164,12 +162,6 @@ export abstract class VideoAdUnit extends AbstractAdUnit {
                 this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }
-        }
-    }
-
-    protected onSystemPause(): void {
-        if(this.isShowing()) {
-            this.setShowing(false);
         }
     }
 

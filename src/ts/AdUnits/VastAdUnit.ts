@@ -30,6 +30,7 @@ class DeviceOrientation {
 }
 
 export class VastAdUnit extends VideoAdUnit {
+    protected _onPauseObserver: any;
 
     private _endScreen: VastEndScreen | null;
     private _moat?: MOAT;
@@ -41,6 +42,7 @@ export class VastAdUnit extends VideoAdUnit {
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
         super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
+        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             Promise.all([
