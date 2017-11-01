@@ -9,6 +9,9 @@ import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitCont
 import { Placement } from 'Models/Placement';
 import { Overlay } from 'Views/Overlay';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { MOAT } from 'Views/MOAT';
+import { StreamType } from 'Constants/Android/StreamType';
+import { Platform } from 'Constants/Platform';
 
 enum Orientation {
     LANDSCAPE,
@@ -27,22 +30,51 @@ class DeviceOrientation {
 }
 
 export class VastAdUnit extends VideoAdUnit {
+    protected _onPauseObserver: any;
 
     private _endScreen: VastEndScreen | null;
+    private _moat?: MOAT;
+    private _volume: number;
+    private _muted: boolean = false;
+    private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _realDuration: number;
 
     constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
         super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
         this._endScreen = endScreen || null;
+        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            Promise.all([
+                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_MUSIC),
+                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
+            ]).then(([volume, maxVolume]) => {
+                this.setVolume(volume / maxVolume);
+            });
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.DeviceInfo.Ios.getDeviceVolume().then((volume) => {
+                this.setVolume(volume);
+            });
+        }
     }
 
     public hide(): Promise<void> {
-        const endScreen = this.getEndScreen();
-        if (endScreen) {
-            endScreen.hide();
-            endScreen.remove();
-        }
+        // note: this timeout is required for the MOAT integration to function as expected
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, 500);
+        }).then(() => {
+            const endScreen = this.getEndScreen();
+            if (endScreen) {
+                endScreen.hide();
+                endScreen.remove();
+            }
 
-        return super.hide();
+            if(this._moat) {
+                this._moat.container().parentElement!.removeChild(this._moat.container());
+            }
+
+            return super.hide();
+        });
     }
 
     public description(): string {
@@ -51,6 +83,45 @@ export class VastAdUnit extends VideoAdUnit {
 
     public getVast(): Vast {
         return (<VastCampaign> this.getCampaign()).getVast();
+    }
+
+    public getMoat(): MOAT | undefined {
+        return this._moat;
+    }
+
+    public getEvents() {
+        return this._events;
+    }
+
+    public setEvents(events: Array<[number, string]>) {
+        this._events = events;
+    }
+
+    public getRealDuration() {
+        return this._realDuration;
+    }
+
+    public setRealDuration(duration: number) {
+        this._realDuration = duration;
+    }
+
+    public getVolume() {
+        if(this._muted) {
+            return 0;
+        }
+        return this._volume;
+    }
+
+    public setVolume(volume: number) {
+        this._volume = volume;
+    }
+
+    public setMuted(muted: boolean) {
+        this._muted = muted;
+    }
+
+    public getMuted() {
+        return this._muted;
     }
 
     public getDuration(): number | null {
@@ -99,6 +170,12 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
+    public initMoat() {
+        this._moat = new MOAT(this._nativeBridge);
+        this._moat.render();
+        document.body.appendChild(this._moat.container());
+    }
+
     public sendVideoClickTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
@@ -120,6 +197,21 @@ export class VastAdUnit extends VideoAdUnit {
             for (const url of urls) {
                 this.sendThirdPartyEvent(thirdPartyEventManager, 'companion', sessionId, sdkVersion, url);
             }
+        }
+    }
+
+    protected onSystemInterrupt(interruptStarted: boolean): void {
+        super.onSystemInterrupt(interruptStarted);
+        if (this._moat) {
+            if (!interruptStarted) {
+                this._moat.resume(this.getVolume());
+            }
+        }
+    }
+
+    protected onSystemPause(): void {
+        if (this._moat && !this._container.isPaused()) {
+            this._moat.pause(this.getVolume());
         }
     }
 

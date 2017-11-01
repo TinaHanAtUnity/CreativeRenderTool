@@ -18,6 +18,7 @@ export class Overlay extends View {
     public readonly onSkip = new Observable1<number>();
     public readonly onMute = new Observable1<boolean>();
     public readonly onCallButton = new Observable1<boolean>();
+    public readonly onPauseForTesting = new Observable1<boolean>();
 
     private _localization: Localization;
 
@@ -80,6 +81,11 @@ export class Overlay extends View {
                 event: 'click',
                 listener: (event: Event) => this.onCallButtonEvent(event),
                 selector: '.call-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPauseForTestingEvent(event),
+                selector: '.debug-message-text'
             },
             {
                 event: 'click',
@@ -220,6 +226,13 @@ export class Overlay extends View {
         event.stopPropagation();
         this.resetFadeTimer();
         this.onCallButton.trigger(true);
+    }
+
+    private onPauseForTestingEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.resetFadeTimer();
+        this.onPauseForTesting.trigger(true);
     }
 
     private onClick(event: Event) {
