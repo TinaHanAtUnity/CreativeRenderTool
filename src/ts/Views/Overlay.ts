@@ -163,10 +163,10 @@ export class Overlay extends View<IOverlayHandler> {
         }
 
         if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            // this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
-            // }, 3000);
+            }, 3000);
         }
 
         this._videoProgress = value;

@@ -68,9 +68,9 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
         this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
-            // setTimeout(() => {
+            setTimeout(() => {
                 this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
-           // }, AbstractAdUnit.getAutoCloseDelay());
+            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 
