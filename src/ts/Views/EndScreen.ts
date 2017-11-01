@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import NewEndScreenTemplate from 'html/NewEndScreen.html';
 import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -13,8 +12,6 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
-/* NOTE: Only for A/B tests */
-const newEndScreenId = "new-end-screen";
 const darkEndScreenId = "dark-end-screen";
 
 export class EndScreen extends View {
@@ -36,9 +33,7 @@ export class EndScreen extends View {
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = campaign && campaign.getAbGroup();
 
-        if(this.getEndscreenAlt() === newEndScreenId) {
-            this._template = new Template(NewEndScreenTemplate, this._localization);
-        } else if (this.getEndscreenAlt() === darkEndScreenId) {
+        if (this.getEndscreenAlt() === darkEndScreenId) {
             this._template = new Template(DarkEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
@@ -91,17 +86,11 @@ export class EndScreen extends View {
             }
         }
 
-        let downloadSelectors = '.game-background, .btn-download, .game-icon';
-
-        if(this.getEndscreenAlt() === newEndScreenId) {
-            downloadSelectors = '.game-background, .download-container, .game-icon';
-        }
-
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: downloadSelectors
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -131,13 +120,6 @@ export class EndScreen extends View {
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
-        }
-
-        const endScreenAlt = this.getEndscreenAlt();
-
-        /* NOTE: This also should go once new end screen will replace current end screen */
-        if (endScreenAlt === newEndScreenId || endScreenAlt === darkEndScreenId) {
-            this._container.id = newEndScreenId;
         }
     }
 
@@ -171,13 +153,8 @@ export class EndScreen extends View {
     }
 
     private getEndscreenAlt(campaign?: Campaign) {
-
         if(this._abGroup === 10 || this._abGroup === 11) {
             return darkEndScreenId;
-        }
-
-        if(this._abGroup === 8 || this._abGroup === 9) {
-            return newEndScreenId;
         }
 
         return undefined;
