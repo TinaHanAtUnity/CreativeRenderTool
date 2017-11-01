@@ -36,6 +36,8 @@ export class PlayableMRAID extends MRAIDView {
     private _closeRemaining: number;
     private _showTimestamp: number;
     private _playableStartTimestamp: number;
+    private backgroundTime: number = 0;
+    private _backgroundTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'playable-mraid');
@@ -130,6 +132,15 @@ export class PlayableMRAID extends MRAIDView {
                 type: 'viewable',
                 value: viewable
             }, '*');
+
+            // background time for analytics
+            if(!viewable) {
+                this._backgroundTimestamp = Date.now();
+            } else {
+                if (this._backgroundTimestamp) {
+                    this.backgroundTime += Date.now() - this._backgroundTimestamp;
+                }
+            }
         }
     }
 
@@ -222,7 +233,7 @@ export class PlayableMRAID extends MRAIDView {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                this.onAnalyticsEvent.trigger((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined);
+                this.onAnalyticsEvent.trigger((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, this.backgroundTime,'playable_start', undefined);
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -299,8 +310,8 @@ export class PlayableMRAID extends MRAIDView {
                 break;
             case 'analyticsEvent':
                 const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
-                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp) / 1000;
-                this.onAnalyticsEvent.trigger(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData);
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this.backgroundTime) / 1000;
+                this.onAnalyticsEvent.trigger(timeFromShow, timeFromPlayableStart, this.backgroundTime, event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {

@@ -173,7 +173,7 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         it('should send a analytics event', () => {
-            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 'win_screen', {'level': 2});
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 0,'win_screen', {'level': 2});
 
             const kafkaObject: any = {};
             kafkaObject.type = 'win_screen';
@@ -188,7 +188,7 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         it('should send a analytics event without extra event data', () => {
-            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 'win_screen', undefined);
+            MRAIDEventHandlers.onAnalyticsEvent(mraidCampaign, 15, 12, 0,'win_screen', undefined);
 
             const kafkaObject: any = {};
             kafkaObject.type = 'win_screen';
