@@ -134,8 +134,7 @@ export class AdUnitFactory {
 
         const campaign = parameters.campaign;
         const hasAdvertiserDomain = campaign.getAdvertiserDomain() !== undefined;
-        const deviceSupportsMoat = (nativeBridge.getPlatform() === Platform.IOS || (nativeBridge.getPlatform() === Platform.ANDROID && parameters.clientInfo.getSdkVersion() >= 2101));
-        if (hasAdvertiserDomain && deviceSupportsMoat) {
+        if (hasAdvertiserDomain) {
             vastAdUnit.initMoat();
         }
 
