@@ -10,6 +10,9 @@ export interface IAuctionResponse {
     creativeId: string | undefined;
     seatId: number | undefined;
     correlationId: string;
+    advertiserCampaignId: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserBundleId: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -23,7 +26,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             adType: ['string'],
             creativeId: ['string', 'undefined'],
             seatId: ['integer', 'undefined'],
-            correlationId: ['string']
+            correlationId: ['string'],
+            advertiserCampaignId: ['string', 'undefined'],
+            advertiserDomain: ['string', 'undefined'],
+            advertiserBundleId: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -35,6 +41,9 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
+        this.set('advertiserCampaignId', data.campaignId);
+        this.set('advertiserDomain', data.advDomain);
+        this.set('advertiserBundleId', data.bundleId);
     }
 
     public getPlacements(): string[] {
@@ -71,6 +80,18 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getCorrelationId(): string {
         return this.get('correlationId');
+    }
+
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
+    }
+
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
+    }
+
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
     }
 
     public getDTO(): {[key: string]: any } {

@@ -6,13 +6,13 @@ import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 import { Session } from 'Models/Session';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -21,6 +21,9 @@ import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaig
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import EventTestVast from 'xml/EventTestVast.xml';
 
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
@@ -70,6 +73,19 @@ export class TestFixtures {
         const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         mraidJson.id = 'testId';
         return new MRAIDCampaign(mraidJson, this.getSession(), this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), 3600, mraidJson.inlinedUrl, '<div>resource</div>', json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].trackingUrls);
+    }
+
+    public static getCompanionVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vast = vastParser.parseVast(VastCompanionXml);
+        return new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+    }
+
+    public static getEventVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = EventTestVast;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {

@@ -1,3 +1,7 @@
+# Wed Nov  1 20:09:28 UTC 2017
+
+* Moat integration
+
 # Tue Oct 31 10:55:28 UTC 2017
 
 * Add versionCode (for Android SDK 2.1.1+) and simulator (iOS only) to ad request parameters
