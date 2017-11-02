@@ -4,8 +4,32 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Configuration } from 'Models/Configuration';
+import { Request } from 'Utilities/Request';
+import { FocusManager } from 'Managers/FocusManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
-export abstract class AbstractAdUnit {
+export interface IAdUnitParameters<T extends Campaign> {
+    forceOrientation: ForceOrientation;
+    focusManager: FocusManager;
+    container: AdUnitContainer;
+    deviceInfo: DeviceInfo;
+    clientInfo: ClientInfo;
+    thirdPartyEventManager: ThirdPartyEventManager;
+    operativeEventManager: OperativeEventManager;
+    comScoreTrackingService: ComScoreTrackingService;
+    placement: Placement;
+    campaign: T;
+    configuration: Configuration;
+    request: Request;
+    options: any;
+}
+
+export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;
@@ -36,17 +60,17 @@ export abstract class AbstractAdUnit {
     protected readonly _forceOrientation: ForceOrientation;
     protected readonly _container: AdUnitContainer;
     protected readonly _placement: Placement;
-    protected readonly _campaign: Campaign;
+    protected readonly _campaign: T;
 
     private _showing: boolean;
     private _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: Campaign) {
+    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
-        this._forceOrientation = forceOrientation;
-        this._container = container;
-        this._placement = placement;
-        this._campaign = campaign;
+        this._forceOrientation = parameters.forceOrientation;
+        this._container = parameters.container;
+        this._placement = parameters.placement;
+        this._campaign = parameters.campaign;
 
         this._showing = false;
         this._finishState = FinishState.ERROR;

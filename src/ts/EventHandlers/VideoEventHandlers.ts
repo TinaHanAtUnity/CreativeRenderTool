@@ -109,7 +109,6 @@ export class VideoEventHandlers {
 
         if(adUnit.getCampaign().getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
-                thirdPartyEventManager,
                 adUnit.getCampaign().getSession().getId(),
                 operativeEventManager.getClientInfo().getSdkVersion(),
                 position,

@@ -12,24 +12,64 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { FocusManager } from 'Managers/FocusManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Request } from 'Utilities/Request';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let container: Activity;
     let testAdUnit: TestAdUnit;
+    let adUnitParams: IAdUnitParameters<PerformanceCampaign>;
     const testDisplay: any = {
         rotation: Rotation.ROTATION_0,
         width: 800,
         height: 600
     };
 
+    beforeEach(() => {
+        nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+        const clientInfo = TestFixtures.getClientInfo();
+        const focusManager = new FocusManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        const request = new Request(nativeBridge, wakeUpManager);
+        const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge);
+        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
+        adUnitParams = {
+            forceOrientation: ForceOrientation.NONE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {}
+        };
+    });
+
     describe('should open ad unit', () => {
         let stub: any;
 
         beforeEach(() => {
-            nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.Sdk, 'logInfo').returns(Promise.resolve());
             stub = sinon.stub(nativeBridge.AndroidAdUnit, 'open').returns(Promise.resolve());
         });
@@ -80,9 +120,7 @@ describe('AndroidAdUnitTest', () => {
         let options: any;
 
         beforeEach(() => {
-            nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.AndroidAdUnit, 'open').returns(Promise.resolve());
             options = { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, display: testDisplay };
         });

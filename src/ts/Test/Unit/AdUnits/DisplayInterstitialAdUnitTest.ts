@@ -1,9 +1,9 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { DisplayInterstitialAdUnit } from "AdUnits/DisplayInterstitialAdUnit";
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from "AdUnits/DisplayInterstitialAdUnit";
 import { NativeBridge } from "Native/NativeBridge";
-import { AdUnitContainer } from "AdUnits/Containers/AdUnitContainer";
+import { AdUnitContainer, ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
 import { SessionManager } from "Managers/SessionManager";
 import { Placement } from "Models/Placement";
 import { Request } from 'Utilities/Request';
@@ -20,6 +20,7 @@ import { FocusManager } from "Managers/FocusManager";
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 describe('DisplayInterstitialAdUnit', () => {
@@ -35,6 +36,8 @@ describe('DisplayInterstitialAdUnit', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -54,6 +57,7 @@ describe('DisplayInterstitialAdUnit', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
         view.render();
@@ -61,10 +65,30 @@ describe('DisplayInterstitialAdUnit', () => {
         sandbox.stub(view, 'show');
         sandbox.stub(view, 'hide');
 
-        adUnit = new DisplayInterstitialAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, {});
+        displayInterstitialAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            view: view
+        };
+
+        adUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
     });
 
     afterEach(() => {
+        if(adUnit.isShowing()) {
+            adUnit.hide();
+        }
         sandbox.restore();
     });
 

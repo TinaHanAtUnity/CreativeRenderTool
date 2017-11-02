@@ -31,8 +31,11 @@ import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { Campaign } from 'Models/Campaign';
+
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
 describe('AdUnitFactoryTest', () => {
 
@@ -48,7 +51,8 @@ describe('AdUnitFactoryTest', () => {
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
-    let comScoreTrackingService: ComScoreTrackingService;
+    let adUnitParameters: IAdUnitParameters<Campaign>;
+    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -68,7 +72,23 @@ describe('AdUnitFactoryTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        comScoreTrackingService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
+        adUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: config,
+            request: request,
+            options: {}
+        };
         sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
@@ -83,7 +103,8 @@ describe('AdUnitFactoryTest', () => {
     describe('Performance AdUnit', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.LANDSCAPE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+
+            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -96,7 +117,9 @@ describe('AdUnitFactoryTest', () => {
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), vastCampaign, config, request, {});
+            adUnitParameters.campaign = vastCampaign;
+            adUnitParameters.forceOrientation = ForceOrientation.NONE;
+            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
 
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
@@ -119,7 +142,8 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnitParameters.campaign = campaign;
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
         describe('on hide', () => {
@@ -205,87 +229,15 @@ describe('AdUnitFactoryTest', () => {
 
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.NONE, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, comScoreTrackingService, TestFixtures.getPlacement(), campaign, config, request, {});
+            adUnitParameters.campaign = campaign;
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
-        describe('on click', () => {
-            it('should open an intent on Android', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                    'action': 'android.intent.action.VIEW',
-                    'uri': 'http://google.com'
-                });
-            });
-
-            it('should open the url on iOS', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-                sandbox.stub(nativeBridge.UrlScheme, 'open');
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
-            });
-
-            it('should send a tracking event', () => {
-                sandbox.stub(operativeEventManager, 'sendClick');
-
-                adUnit.onRedirect.trigger('http://google.com');
-
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            });
-
-            it('should not redirect if the protocol is whitelisted', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                adUnit.onRedirect.trigger('tel://127.0.0.1:5000');
-
-                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
-            });
-        });
-
-        describe('on close', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(adUnit, 'hide');
-
-                adUnit.onClose.trigger();
-
-                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
-            });
-            it('should send the view diagnostic event', () => {
-                adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
-            });
-            it('should send the third quartile diagnostic event', () => {
-                adUnit.onClose.trigger();
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
-            });
-        });
-
-        describe('on skip', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(adUnit, 'hide');
-
-                adUnit.onSkip.trigger();
-
-                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
-            });
-        });
-
-        describe('on start', () => {
-            let testThirdPartyEventManager: any;
-
-            beforeEach(() => {
-                testThirdPartyEventManager = {
-                    thirdPartyEvent: sinon.stub().returns(Promise.resolve())
-                };
-            });
-
+        describe('on show', () => {
             it('should send tracking events', () => {
-                adUnit.onStart.trigger();
-
+                adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                adUnit.hide();
             });
         });
     });

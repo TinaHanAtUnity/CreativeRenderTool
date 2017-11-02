@@ -5,8 +5,9 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Platform } from 'Constants/Platform';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
-export class MOAT extends View {
+export class MOAT extends View<VastCampaign> {
     private _iframe: HTMLIFrameElement;
     private _resizeHandler: any;
     private _resizeDelayer: any;

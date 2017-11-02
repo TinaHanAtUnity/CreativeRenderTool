@@ -1,12 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Placement } from 'Models/Placement';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
-import { MRAIDView, IOrientationProperties } from 'Views/MRAIDView';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Platform } from 'Constants/Platform';
+import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -14,11 +12,16 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 
-export class MRAIDAdUnit extends AbstractAdUnit {
+export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
+    mraid: MRAIDView<IMRAIDViewHandler>;
+    endScreen?: EndScreen;
+}
+
+export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView;
+    private _mraid: MRAIDView<IMRAIDViewHandler>;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
@@ -31,33 +34,31 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onPauseObserver: any;
     private _additionalTrackingEvents: { [eventName: string]: string[] };
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, clientInfo: ClientInfo, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, placement: Placement, campaign: MRAIDCampaign, mraid: MRAIDView, options: any, endScreen?: EndScreen) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
-        this._operativeEventManager = operativeEventManager;
-        this._thirdPartyEventManager = thirdPartyEventManager;
-        this._mraid = mraid;
-        this._additionalTrackingEvents = campaign.getTrackingEventUrls();
-        this._endScreen = endScreen;
-        this._clientInfo = clientInfo;
+    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
+        super(nativeBridge, parameters);
+
+        this._operativeEventManager = parameters.operativeEventManager;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._mraid = parameters.mraid;
+        this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
+        this._endScreen = parameters.endScreen;
+        this._clientInfo = parameters.clientInfo;
+
+        this._mraid.render();
+        document.body.appendChild(this._mraid.container());
+
+        if(this._endScreen) {
+            this._endScreen.render();
+            this._endScreen.hide();
+            document.body.appendChild(this._endScreen.container());
+        }
 
         this._orientationProperties = {
             allowOrientationChange: true,
             forceOrientation: ForceOrientation.NONE
         };
 
-        mraid.onOrientationProperties.subscribe((properties) => {
-            if(this.isShowing()) {
-                if(nativeBridge.getPlatform() === Platform.IOS) {
-                    container.reorient(true, properties.forceOrientation);
-                } else {
-                    container.reorient(properties.allowOrientationChange, properties.forceOrientation);
-                }
-            } else {
-                this._orientationProperties = properties;
-            }
-        });
-
-        this._options = options;
+        this._options = parameters.options;
         this.setShowing(false);
     }
 
@@ -119,6 +120,10 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         });
     }
 
+    public setOrientationProperties(properties: IOrientationProperties): void {
+        this._orientationProperties = properties;
+    }
+
     public isCached(): boolean {
         const asset: HTML | undefined = (<MRAIDCampaign>this.getCampaign()).getResourceUrl();
         if(asset) {
@@ -140,7 +145,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         return this._endScreen;
     }
 
-    public getMRAIDView(): MRAIDView {
+    public getMRAIDView(): MRAIDView<IMRAIDViewHandler> {
         return this._mraid;
     }
 

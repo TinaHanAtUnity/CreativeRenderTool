@@ -38,11 +38,11 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class WebView {
 
@@ -66,10 +66,10 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
-    private _comScoreTrackingService: ComScoreTrackingService;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -281,7 +281,21 @@ export class WebView {
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._focusManager, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, this._comScoreTrackingService, placement, campaign, this._configuration, this._request, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
+                forceOrientation: orientation,
+                focusManager: this._focusManager,
+                container: this._container,
+                deviceInfo: this._deviceInfo,
+                clientInfo: this._clientInfo,
+                thirdPartyEventManager: this._thirdPartyEventManager,
+                operativeEventManager: this._operativeEventManager,
+                comScoreTrackingService: this._comScoreTrackingService,
+                placement: placement,
+                campaign: campaign,
+                configuration: this._configuration,
+                request: this._request,
+                options: options
+            });
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
