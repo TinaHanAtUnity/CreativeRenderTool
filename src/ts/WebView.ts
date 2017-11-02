@@ -278,7 +278,20 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, this._focusManager, orientation, this._container, this._deviceInfo, this._clientInfo, this._thirdPartyEventManager, this._operativeEventManager, placement, campaign, this._configuration, this._request, options);
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
+                forceOrientation: orientation,
+                focusManager: this._focusManager,
+                container: this._container,
+                deviceInfo: this._deviceInfo,
+                clientInfo: this._clientInfo,
+                thirdPartyEventManager: this._thirdPartyEventManager,
+                operativeEventManager: this._operativeEventManager,
+                placement: placement,
+                campaign: campaign,
+                configuration: this._configuration,
+                request: this._request,
+                options: options
+            });
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
