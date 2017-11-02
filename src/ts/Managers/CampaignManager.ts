@@ -233,7 +233,7 @@ export class CampaignManager {
             case 'comet/campaign':
                 parser = new CometCampaignParser();
                 break;
-            case 'comet/xpromo':
+            case 'xpromo/video':
                 parser = new CometCampaignParser();
                 break;
             case 'programmatic/vast':

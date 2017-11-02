@@ -987,7 +987,7 @@ describe('CampaignManager', () => {
         });
 
         describe('XPromo campaign', () => {
-            it('should process correct Auction comet/xpromo Campaign content type', () => {
+            it('should process correct Auction xpromo/video Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
                     response: OnCometXPromoPlcCampaignJson
                 }));
