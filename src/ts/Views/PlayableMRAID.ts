@@ -33,6 +33,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _closeRemaining: number;
     private _showTimestamp: number;
     private _playableStartTimestamp: number;
+    private _backgroundTime: number = 0;
+    private _backgroundTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
         super(nativeBridge, 'playable-mraid');
@@ -127,6 +129,15 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
+
+            // background time for analytics
+            if(!viewable) {
+                this._backgroundTimestamp = Date.now();
+            } else {
+                if (this._backgroundTimestamp) {
+                    this._backgroundTime += Date.now() - this._backgroundTimestamp;
+                }
+            }
         }
     }
 
@@ -219,7 +230,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined));
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, this._backgroundTime / 1000, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -296,8 +307,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
             case 'analyticsEvent':
                 const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
-                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp) / 1000;
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData));
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, this._backgroundTime / 1000, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
