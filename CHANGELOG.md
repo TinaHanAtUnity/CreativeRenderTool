@@ -1,3 +1,10 @@
+# Pending
+
+* Switch to "new" end screen
+* AB Test "new" dark end screen in groups 10 & 11
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+
 # Thu Nov  2 20:13:31 UTC 2017
 
 * Refactor view event handlers
