@@ -3,16 +3,17 @@ import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 
-export class VastEndScreen extends View {
+export interface IVastEndScreenHandler {
+    onVastEndScreenClick(): void;
+    onVastEndScreenClose(): void;
+    onVastEndScreenShow(): void;
+    onKeyEvent(keyCode: number): void;
+}
 
-    public readonly onClick = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onShow = new Observable0();
-
+export class VastEndScreen extends View<IVastEndScreenHandler> {
     private _isSwipeToCloseEnabled: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string) {
@@ -65,11 +66,11 @@ export class VastEndScreen extends View {
     public show(): void {
         super.show();
 
-        this.onShow.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
-                this.onClose.trigger();
+                this._handlers.forEach(handler => handler.onVastEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
@@ -80,12 +81,11 @@ export class VastEndScreen extends View {
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenClose());
     }
 
     private onClickEvent(event: Event): void {
         event.preventDefault();
-        this.onClick.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenClick());
     }
-
 }

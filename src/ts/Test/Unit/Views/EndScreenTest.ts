@@ -2,10 +2,11 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Localization } from 'Utilities/Localization';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 
 describe('EndScreen', () => {
@@ -26,13 +27,13 @@ describe('EndScreen', () => {
     });
 
     xit('should render', () => {
-        const endScreen = new EndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'en', 'testGameId');
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'en', 'testGameId');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const endScreen = new EndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'fi', 'testGameId');
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'fi', 'testGameId');
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');

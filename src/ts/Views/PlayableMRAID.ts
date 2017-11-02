@@ -8,14 +8,11 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { MRAIDView } from 'Views/MRAIDView';
-import { Observable0 } from 'Utilities/Observable';
+import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 
-export class PlayableMRAID extends MRAIDView {
+export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
-
-    public readonly onShowEndScreen = new Observable0();
 
     private _localization: Localization;
 
@@ -197,7 +194,7 @@ export class PlayableMRAID extends MRAIDView {
             const updateInterval = setInterval(() => {
                 const progress = (PlayableMRAID.CloseLength - this._closeRemaining) / PlayableMRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
-                    this.onReward.trigger();
+                    this._handlers.forEach(handler => handler.onMraidReward());
                     this._didReward = true;
                 }
                 if(this._closeRemaining > 0) {
@@ -222,7 +219,7 @@ export class PlayableMRAID extends MRAIDView {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                this.onAnalyticsEvent.trigger((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined);
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -264,19 +261,19 @@ export class PlayableMRAID extends MRAIDView {
         event.preventDefault();
         event.stopPropagation();
         if(this._canSkip && !this._canClose) {
-            this.onSkip.trigger();
+            this._handlers.forEach(handler => handler.onMraidSkip());
         } else if(this._canClose) {
-            this.onClose.trigger();
+            this._handlers.forEach(handler => handler.onMraidClose());
         }
     }
 
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
-                this.onClick.trigger(encodeURI(event.data.url));
+                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
                 break;
             case 'close':
-                this.onClose.trigger();
+                this._handlers.forEach(handler => handler.onMraidClose());
                 break;
             case 'orientation':
                 let forceOrientation = ForceOrientation.NONE;
@@ -292,15 +289,15 @@ export class PlayableMRAID extends MRAIDView {
                     default:
                         break;
                 }
-                this.onOrientationProperties.trigger({
+                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
                     forceOrientation: forceOrientation
-                });
+                }));
                 break;
             case 'analyticsEvent':
                 const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
                 const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp) / 1000;
-                this.onAnalyticsEvent.trigger(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData);
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
@@ -310,7 +307,7 @@ export class PlayableMRAID extends MRAIDView {
                         }
                         break;
                     case 'showEndScreen':
-                        this.onShowEndScreen.trigger();
+                        this._handlers.forEach(handler => handler.onMraidShowEndScreen());
                         break;
                     default:
                         break;

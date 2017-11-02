@@ -14,7 +14,7 @@ import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
@@ -31,6 +31,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -216,7 +217,22 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+        const parameters: IAdUnitParameters<PerformanceCampaign> = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: config,
+            request: request,
+            options: {},
+        };
+
+        return AdUnitFactory.createAdUnit(nativeBridge, parameters);
     }
 }
 
