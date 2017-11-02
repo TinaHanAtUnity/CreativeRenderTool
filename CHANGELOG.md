@@ -1,3 +1,8 @@
+# Thu Nov  2 20:13:31 UTC 2017
+
+* Refactor view event handlers
+* Remove ab test to dismiss performance ad completely when video is skipped in group 5
+
 # Wed Nov  1 20:09:28 UTC 2017
 
 * Moat integration
