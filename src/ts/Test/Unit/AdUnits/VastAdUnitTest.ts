@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
@@ -18,6 +18,11 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -28,6 +33,9 @@ describe('VastAdUnit', () => {
     let vastAdUnit: VastAdUnit;
     let campaign: VastCampaign;
     let focusManager: FocusManager;
+    let vastAdUnitParameters: IVastAdUnitParameters;
+    let deviceInfo: DeviceInfo;
+    let clientInfo: ClientInfo;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -51,14 +59,41 @@ describe('VastAdUnit', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        const overlay = <Overlay><any>sinon.createStubInstance(Overlay);
+
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+        const video = vastCampaign.getVideo();
+        const sessionManager = new SessionManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(nativeBridge);
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+
+        vastAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: activity,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: placement,
+            campaign: vastCampaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            endScreen: undefined,
+            overlay: overlay,
+            video: video
+        };
+
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
     });
 
     afterEach(() => sandbox.restore);
@@ -70,7 +105,7 @@ describe('VastAdUnit', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
-            vastAdUnit.sendTrackingEvent(thirdPartyEventManager, 'eventName', 'sessionId', 1234);
+            vastAdUnit.sendTrackingEvent('eventName', 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast eventName', 'sessionId', 'http://foo.biz/' + placement.getId() + '/123');
@@ -82,7 +117,7 @@ describe('VastAdUnit', () => {
             const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
-            vastAdUnit.sendTrackingEvent(thirdPartyEventManager, 'start', 'sessionId', 1234);
+            vastAdUnit.sendTrackingEvent('start', 'sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast start', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/' + placement.getId() + '/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
@@ -102,7 +137,7 @@ describe('VastAdUnit', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(thirdPartyEventManager, 'sessionId', 1234);
+            vastAdUnit.sendImpressionEvent('sessionId', 1234);
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
         });
@@ -110,7 +145,7 @@ describe('VastAdUnit', () => {
         it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
             const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(thirdPartyEventManager, 'sessionId', 1234);
+            vastAdUnit.sendImpressionEvent('sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/1234/456');
@@ -119,7 +154,7 @@ describe('VastAdUnit', () => {
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(thirdPartyEventManager, 'sessionId', 1234);
+            vastAdUnit.sendImpressionEvent('sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
@@ -128,7 +163,7 @@ describe('VastAdUnit', () => {
         it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
             sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent(thirdPartyEventManager, 'sessionId', 1234);
+            vastAdUnit.sendImpressionEvent('sessionId', 1234);
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/1234/456');
@@ -140,15 +175,15 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const placement = TestFixtures.getPlacement();
             const video = new Video('');
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            vastAdUnitParameters.overlay = overlay;
+            vastAdUnitParameters.campaign = campaign;
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct http:// url', () => {
@@ -179,14 +214,14 @@ describe('VastAdUnit', () => {
         it('should call video click tracking url', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent(thirdPartyEventManager, 'foo', 1234);
+            vastAdUnit.sendVideoClickTrackingEvent('foo', 1234);
             sinon.assert.calledTwice(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
             sandbox.stub(vast, 'getVideoClickTrackingURLs').returns([]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent(thirdPartyEventManager, 'foo', 1234);
+            vastAdUnit.sendVideoClickTrackingEvent('foo', 1234);
             sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
         });
     });
@@ -202,7 +237,7 @@ describe('VastAdUnit', () => {
                 assert.fail('Missing duration in VAST ad');
             } else {
                 const quartilePosition = duration * 0.25 * quartile * 1000;
-                vastAdUnit.sendProgressEvents(thirdPartyEventManager, '123', 2000, quartilePosition + 100, quartilePosition - 100);
+                vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
                 mockEventManager.verify();
             }
         };
@@ -232,7 +267,7 @@ describe('VastAdUnit', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
-            vastAdUnit.sendVideoClickTrackingEvent(thirdPartyEventManager, '123', 1234);
+            vastAdUnit.sendVideoClickTrackingEvent('123', 1234);
             mockEventManager.verify();
         });
     });
@@ -243,19 +278,17 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const placement = TestFixtures.getPlacement();
             const video = new Video('');
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(campaign, 'getVideo').returns(video);
-            const overlay = <Overlay><any> sinon.createStubInstance(Overlay);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            vastEndScreen = <VastEndScreen><any> {
-                hide: sinon.spy(),
-                remove: sinon.spy()
-            };
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, activity, placement, campaign, overlay, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastAdUnitParameters.overlay = overlay;
+            vastAdUnitParameters.campaign = campaign;
+            vastAdUnitParameters.endScreen = vastEndScreen;
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct companion click through url', () => {
@@ -289,14 +322,20 @@ describe('VastAdUnit', () => {
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
-            vastAdUnit.sendCompanionTrackingEvent(thirdPartyEventManager, '123', 1234);
+            vastAdUnit.sendCompanionTrackingEvent('123', 1234);
             mockEventManager.verify();
         });
 
         it('should hide and then remove endscreen on hide', () => {
+            sinon.stub(vastEndScreen, 'hide');
+            sinon.stub(vastEndScreen, 'remove');
             vastAdUnit.hide();
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
-            sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
+                sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
         });
     });
 });

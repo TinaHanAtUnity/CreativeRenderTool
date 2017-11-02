@@ -82,6 +82,10 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
         return true;
     }
 
+    public getImpressionUrls(): string[] | null {
+        return this.getVPAID().getImpressionUrls();
+    }
+
     private addTrackingToVAST(tracking: any) {
         if (tracking) {
             for (const trackingEventName in tracking) {
