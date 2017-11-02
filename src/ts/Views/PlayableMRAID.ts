@@ -230,7 +230,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, this._backgroundTime, 'playable_start', undefined));
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent((this._playableStartTimestamp - this._showTimestamp) / 1000, 0, this._backgroundTime / 1000, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
@@ -308,7 +308,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'analyticsEvent':
                 const timeFromShow = (Date.now() - this._showTimestamp) / 1000;
                 const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, this._backgroundTime, event.data.event, event.data.eventData));
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, this._backgroundTime / 1000, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
