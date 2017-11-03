@@ -1,4 +1,4 @@
-# Pending
+# Fri Nov  3 07:28:14 UTC 2017
 
 * Switch to "new" end screen
 * AB Test "new" dark end screen in groups 10 & 11
