@@ -385,6 +385,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getHeadset());
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
+        promises.push(this.getVersionCode());
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -392,7 +393,8 @@ export class CampaignManager {
             coppa: this._configuration.isCoppaCompliant(),
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
-            timeZone: this._deviceInfo.getTimeZone()
+            timeZone: this._deviceInfo.getTimeZone(),
+            simulator: this._deviceInfo.isSimulator()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -403,15 +405,19 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
 
-            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
+            if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
+            }
+
+            if(versionCode) {
+                body.versionCode = versionCode;
             }
 
             const metaDataPromises: Array<Promise<any>> = [];
@@ -450,5 +456,21 @@ export class CampaignManager {
                 return body;
             });
         });
+    }
+
+    private getVersionCode(): Promise<number | undefined> {
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                if(packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
     }
 }

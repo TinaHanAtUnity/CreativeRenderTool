@@ -64,6 +64,10 @@ export class GlyphView extends View<IGlyphEventHandler> implements IOverlayHandl
         this.videoBridge.disconnect();
     }
 
+    public onOverlayPauseForTesting(paused: boolean) {
+        // EMPTY
+    }
+
     public onOverlayCallButton() {
         // EMPTY
     }

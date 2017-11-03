@@ -21,7 +21,7 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
@@ -34,6 +34,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -51,6 +52,8 @@ describe('CampaignRefreshManager', () => {
     let campaignRefreshManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let adUnitParams: IAdUnitParameters<Campaign>;
+    let operativeEventManager: OperativeEventManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -127,11 +130,27 @@ describe('CampaignRefreshManager', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        deviceInfo = new DeviceInfo(nativeBridge);
+        // deviceInfo = new DeviceInfo(nativeBridge);
         sessionManager = new SessionManager(nativeBridge);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+
+        adUnitParams = {
+            forceOrientation: ForceOrientation.NONE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: configuration,
+            request: request,
+            options: {}
+        };
     });
 
     describe('PLC campaigns', () => {
@@ -308,7 +327,9 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            adUnitParams.campaign = campaign;
+            adUnitParams.placement = placement;
+            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
@@ -346,7 +367,9 @@ describe('CampaignRefreshManager', () => {
             let campaign: Campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
             const campaign2 = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            adUnitParams.campaign = campaign;
+            adUnitParams.placement = placement;
+            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
@@ -524,7 +547,7 @@ describe('CampaignRefreshManager', () => {
 });
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit<Campaign>, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
@@ -544,7 +567,7 @@ export class TestContainer extends AdUnitContainer {
     }
 }
 
-export class TestAdUnit extends AbstractAdUnit<Campaign> {
+export class TestAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         return Promise.resolve();
     }

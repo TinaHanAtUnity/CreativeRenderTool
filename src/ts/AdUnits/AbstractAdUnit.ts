@@ -27,7 +27,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     options: any;
 }
 
-export abstract class AbstractAdUnit<T extends Campaign> {
+export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;
@@ -63,12 +63,12 @@ export abstract class AbstractAdUnit<T extends Campaign> {
     private _showing: boolean;
     private _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: T) {
+    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
-        this._forceOrientation = forceOrientation;
-        this._container = container;
-        this._placement = placement;
-        this._campaign = campaign;
+        this._forceOrientation = parameters.forceOrientation;
+        this._container = parameters.container;
+        this._placement = parameters.placement;
+        this._campaign = parameters.campaign;
 
         this._showing = false;
         this._finishState = FinishState.ERROR;

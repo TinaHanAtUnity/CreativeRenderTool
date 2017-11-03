@@ -9,9 +9,9 @@ import { Double } from 'Utilities/Double';
 import { Campaign } from 'Models/Campaign';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
-    private _nativeBridge: NativeBridge;
-    private _operativeEventManager: OperativeEventManager;
+    protected _nativeBridge: NativeBridge;
     private _adUnit: VideoAdUnit<T>;
+    private _operativeEventManager: OperativeEventManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
@@ -40,6 +40,10 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     }
 
     public onOverlayCallButton(): void {
+        // EMPTY
+    }
+
+    public onOverlayPauseForTesting(paused: boolean): void {
         // EMPTY
     }
 }

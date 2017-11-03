@@ -39,19 +39,34 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private _onAppBackgroundHandler: any;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
-        super(nativeBridge, parameters.forceOrientation, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
 
         this._focusManager = parameters.focusManager;
         this._vpaidCampaign = parameters.campaign;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
-
         this._view = parameters.vpaid;
-        this._view.render();
+
+        parameters.overlay.render();
+        parameters.overlay.setFadeEnabled(true);
+        parameters.overlay.setSkipEnabled(false);
+        parameters.overlay.setMuteEnabled(false);
+        const overlayContainer = parameters.overlay.container();
+        overlayContainer.style.position = 'absolute';
+        overlayContainer.style.top = '0px';
+        overlayContainer.style.left = '0px';
+        document.body.appendChild(overlayContainer);
+
+        if (this._placement.allowSkip()) {
+            parameters.overlay.setSkipEnabled(true);
+            parameters.overlay.setSkipDuration(this._placement.allowSkipInSeconds());
+        }
 
         if(this._vpaidCampaign.hasEndScreen() && parameters.endScreen) {
             parameters.endScreen.render();
+            parameters.endScreen.hide();
+            document.body.appendChild(parameters.endScreen.container());
         }
 
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
@@ -59,22 +74,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
 
-        parameters.overlay.render();
-        const overlayContainer = parameters.overlay.container();
-        overlayContainer.style.position = 'absolute';
-        overlayContainer.style.top = '0px';
-        overlayContainer.style.left = '0px';
-        this._view.container().insertBefore(overlayContainer, this._view.container().lastChild);
-
-        parameters.overlay.render();
-        parameters.overlay.setSkipEnabled(false);
-        parameters.overlay.setMuteEnabled(false);
-
-        if (this._placement.allowSkip()) {
-            parameters.overlay.setSkipEnabled(true);
-            parameters.overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }
-        parameters.overlay.setFadeEnabled(true);
+        this._view.render();
     }
 
     public show(): Promise<void> {

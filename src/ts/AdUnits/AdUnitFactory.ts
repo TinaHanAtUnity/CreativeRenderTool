@@ -25,6 +25,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { StreamType } from 'Constants/Android/StreamType';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
@@ -32,7 +33,6 @@ import { VPAID } from 'Views/VPAID';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceOverlayEventHandler } from 'EventHandlers/PerformanceOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
@@ -50,7 +50,7 @@ import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndSc
 
 export class AdUnitFactory {
 
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit<Campaign> {
+    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
@@ -82,8 +82,6 @@ export class AdUnitFactory {
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-        const overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -139,20 +137,68 @@ export class AdUnitFactory {
             }
         }
 
+        const campaign = parameters.campaign;
+        const hasAdvertiserDomain = campaign.getAdvertiserDomain() !== undefined;
+        if (hasAdvertiserDomain) {
+            vastAdUnit.initMoat();
+        }
+
+        const moatIds = {
+            level1: campaign.getAdvertiserDomain(),
+            level2: campaign.getAdvertiserCampaignId(),
+            level3: campaign.getCreativeId(),
+            slicer1: campaign.getAdvertiserBundleId(),
+            slicer2: parameters.placement.getName()
+        };
+
+        const moatData = {
+            SDK: 'UnityAds',
+            Version: '1.0',
+            SDKVersion: parameters.clientInfo.getSdkVersionName(),
+            IFA: parameters.deviceInfo.getAdvertisingIdentifier(),
+            LimitAdTracking: parameters.deviceInfo.getLimitAdTracking(),
+            COPPA: parameters.configuration.isCoppaCompliant(),
+            bundle: parameters.clientInfo.getApplicationName()
+        };
+
         const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         overlay.addEventHandler(vastOverlayHandler);
-        const overlayEventHandler = new OverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
 
         this.prepareVideoPlayer(nativeBridge, parameters.container, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.configuration, vastAdUnit);
 
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData, moatIds));
+        const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));
+        const onStopObserver = nativeBridge.VideoPlayer.onStop.subscribe(() => VastVideoEventHandlers.onVideoStopped(vastAdUnit));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VastVideoEventHandlers.onVideoProgress(vastAdUnit, position));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo));
         const onVideoErrorObserver = vastAdUnit.onError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
 
+        let onVolumeChangeObserver: any;
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
+            onVolumeChangeObserver = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
+            onVolumeChangeObserver = nativeBridge.DeviceInfo.Ios.onVolumeChanged.subscribe((volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        }
+
         vastAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
             nativeBridge.VideoPlayer.onPlay.unsubscribe(onPlayObserver);
+            nativeBridge.VideoPlayer.onPause.unsubscribe(onPauseObserver);
+            nativeBridge.VideoPlayer.onStop.unsubscribe(onStopObserver);
+            nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
+            if(onVolumeChangeObserver) {
+                if(nativeBridge.getPlatform() === Platform.ANDROID) {
+                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
+                    nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
+                } else if(nativeBridge.getPlatform() === Platform.IOS) {
+                    nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
+                    nativeBridge.DeviceInfo.Ios.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
+                }
+            }
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
         });
 
@@ -238,7 +284,7 @@ export class AdUnitFactory {
         return displayInterstitialAdUnit;
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit<Campaign>) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, configuration: Configuration, adUnit: VideoAdUnit) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, adUnit, position, configuration));
@@ -260,7 +306,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit<Campaign>) {
+    private static prepareAndroidVideoPlayer(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Android.onGenericError.subscribe((url, what, extra) => VideoEventHandlers.onAndroidGenericVideoError(nativeBridge, videoAdUnit, what, extra, url));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Android.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
         const onVideoSeekToErrorObserver = nativeBridge.VideoPlayer.Android.onSeekToError.subscribe((url) => VideoEventHandlers.onSeekToError(nativeBridge, videoAdUnit, url));
@@ -276,7 +322,7 @@ export class AdUnitFactory {
         });
     }
 
-    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit<Campaign>) {
+    private static prepareIosVideoPlayer(nativeBridge: NativeBridge, container: AdUnitContainer, videoAdUnit: VideoAdUnit) {
         const onGenericErrorObserver = nativeBridge.VideoPlayer.Ios.onGenericError.subscribe((url, description) => VideoEventHandlers.onIosGenericVideoError(nativeBridge, videoAdUnit, url, description));
         const onVideoPrepareErrorObserver = nativeBridge.VideoPlayer.Ios.onPrepareError.subscribe((url) => VideoEventHandlers.onPrepareError(nativeBridge, videoAdUnit, url));
         const onLikelyToKeepUpObserver = nativeBridge.VideoPlayer.Ios.onLikelyToKeepUp.subscribe((url, likelyToKeepUp) => VideoEventHandlers.onIosVideoLikelyToKeepUp(nativeBridge, videoAdUnit, container, likelyToKeepUp));

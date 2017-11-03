@@ -21,7 +21,7 @@ export class CampaignRefreshManager {
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
     private _configuration: Configuration;
-    private _currentAdUnit: AbstractAdUnit<Campaign>;
+    private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
@@ -62,7 +62,7 @@ export class CampaignRefreshManager {
         return undefined;
     }
 
-    public setCurrentAdUnit(adUnit: AbstractAdUnit<Campaign>): void {
+    public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
         this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);

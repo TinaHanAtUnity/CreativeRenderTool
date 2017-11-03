@@ -1,6 +1,5 @@
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { Campaign } from 'Models/Campaign';
 
 export enum ForceOrientation {
     NONE,
@@ -35,7 +34,7 @@ export abstract class AdUnitContainer {
 
     private _diagnosticsEvents: any[] = [];
 
-    public abstract open(adUnit: AbstractAdUnit<Campaign>, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
+    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
     public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
     public abstract reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]>;

@@ -2,7 +2,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
 import { GlyphView, IGlyphEventHandler } from 'Views/GlyphView';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 export interface IGlyphAdUnitParameters extends IAdUnitParameters<GlyphCampaign> {
@@ -14,7 +13,7 @@ export class GlyphAdUnit extends AbstractAdUnit<GlyphCampaign> implements IGlyph
     private _options: any;
 
     constructor(nativeBridge: NativeBridge, parameters: IGlyphAdUnitParameters) {
-        super(nativeBridge, ForceOrientation.NONE, parameters.container, parameters.placement, parameters.campaign);
+        super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._view = parameters.view;
         this._options = parameters.options;

@@ -55,7 +55,6 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo();
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
 
         placement = new Placement({
             id: 'testPlacement',
@@ -78,6 +77,8 @@ describe('VastOverlayEventHandlersTest', () => {
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
+
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,

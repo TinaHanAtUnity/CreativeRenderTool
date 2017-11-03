@@ -1,27 +1,23 @@
-import { IOverlayHandler } from 'Views/Overlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 
-export class PerformanceOverlayEventHandler implements IOverlayHandler {
-    private _adUnit: PerformanceAdUnit;
+export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
+    private _performanceAdUnit: PerformanceAdUnit;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        this._adUnit = adUnit;
+        super(nativeBridge, adUnit, parameters);
+        this._performanceAdUnit = adUnit;
     }
 
     public onOverlaySkip(position: number): void {
-        const endScreen = this._adUnit.getEndScreen();
+        super.onOverlaySkip(position);
+
+        const endScreen = this._performanceAdUnit.getEndScreen();
         if (endScreen) {
             endScreen.show();
         }
-        this._adUnit.onFinish.trigger();
-    }
-
-    public onOverlayMute(isMuted: boolean): void {
-        // EMPTY
-    }
-
-    public onOverlayCallButton(): void {
-        // EMPTY
+        this._performanceAdUnit.onFinish.trigger();
     }
 }

@@ -122,7 +122,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdStopped() {
         if (this._vpaidCampaign.hasEndScreen() && this._vpaidEndScreen) {
-            this._vpaidView.container().appendChild(this._vpaidEndScreen.container());
+            this._vpaidEndScreen.show();
         } else {
             this._adUnit.hide();
         }

@@ -6,7 +6,7 @@ export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;
 
     constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, coppaCompliant: boolean, language: string, gameId: string) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName());
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
 
         this._templateData = {
             'gameName': campaign.getGameName(),
