@@ -13,6 +13,7 @@
     "@types/jsdom": "11.0.2",
     "@types/mocha": "2.2.42",
     "@types/sinon": "2.3.3",
+    "autoprefixer-stylus": "0.14.0",
     "chai": "4.1.2",
     "coveralls": "2.13.1",
     "es6-promise": "4.1.1",
@@ -38,6 +39,7 @@
     "tslint": "5.7.0",
     "tslint-microsoft-contrib": "5.0.1",
     "typescript": "^2.5.2",
+    "stylint": "1.5.9",
     "xmldom": "0.1.27",
     "xmlhttprequest": "1.8.0"
   },

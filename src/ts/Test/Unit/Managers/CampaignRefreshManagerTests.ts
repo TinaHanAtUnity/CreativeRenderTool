@@ -7,10 +7,10 @@ import { CampaignManager } from 'Managers/CampaignManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
+import { INativeResponse, Request } from 'Utilities/Request';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastParser } from 'Utilities/VastParser';
@@ -19,13 +19,13 @@ import { AssetManager } from 'Managers/AssetManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
-import { EventManager } from 'Managers/EventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { VastAd } from 'Models/Vast/VastAd';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
@@ -33,6 +33,8 @@ import { Campaign } from 'Models/Campaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -45,11 +47,13 @@ describe('CampaignRefreshManager', () => {
     let request: Request;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
-    let eventManager: EventManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let campaignRefreshManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
+    let adUnitParams: IAdUnitParameters<Campaign>;
+    let operativeEventManager: OperativeEventManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -94,7 +98,8 @@ describe('CampaignRefreshManager', () => {
             Sdk: {
                 logWarning: sinon.spy(),
                 logInfo: sinon.spy(),
-                logError: sinon.spy()
+                logError: sinon.spy(),
+                logDebug: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
@@ -107,7 +112,8 @@ describe('CampaignRefreshManager', () => {
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0))
+                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345'))
             },
             Lifecycle: {
                 onActivityResumed: new Observable1(),
@@ -123,18 +129,35 @@ describe('CampaignRefreshManager', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        eventManager = new EventManager(nativeBridge, request);
-        deviceInfo = new DeviceInfo(nativeBridge);
-        sessionManager = new SessionManager(nativeBridge, clientInfo, deviceInfo, eventManager, metaDataManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        // deviceInfo = new DeviceInfo(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge);
+        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
+        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+
+        adUnitParams = {
+            forceOrientation: ForceOrientation.NONE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: configuration,
+            request: request,
+            options: {}
+        };
     });
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, vastParser, metaDataManager);
-            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager);
         });
 
         it('get campaign should return undefined', () => {
@@ -304,7 +327,9 @@ describe('CampaignRefreshManager', () => {
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             const campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            adUnitParams.campaign = campaign;
+            adUnitParams.placement = placement;
+            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
@@ -342,7 +367,9 @@ describe('CampaignRefreshManager', () => {
             let campaign: Campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
             const campaign2 = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
             const placement: Placement = configuration.getPlacement('premium');
-            const currentAdUnit = new TestAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
+            adUnitParams.campaign = campaign;
+            adUnitParams.placement = placement;
+            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
@@ -400,7 +427,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error, ['premium', 'video'], undefined, undefined);
+                campaignManager.onError.trigger(error, ['premium', 'video'], undefined);
                 return Promise.resolve();
             });
 
@@ -411,6 +438,109 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
+            });
+        });
+
+        it('should send diagnostics when campaign caching fails', () => {
+            sinon.stub(assetManager, 'setup').callsFake(() => {
+                throw new Error('test error');
+            });
+
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                return Promise.resolve(<INativeResponse> {
+                    response: OnCometVideoPlcCampaign,
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+            });
+        });
+
+        it('should send diagnostics when campaign request fails', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                return Promise.reject(new Error('test error'));
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+            });
+        });
+
+        it('should send diagnostics when campaign response content type is wrong', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                const json = JSON.parse(OnCometVideoPlcCampaign);
+                json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 'wrong/contentType';
+                return Promise.resolve(<INativeResponse> {
+                    response: JSON.stringify(json),
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'Unsupported content-type: wrong/contentType', 'Incorrect error message');
+            });
+        });
+
+        it('should send diagnostics when campaign response parsing fails because of wrong types', () => {
+            let receivedErrorType: string;
+            let receivedError: any;
+
+            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+                receivedErrorType = type;
+                receivedError = error;
+            });
+
+            sinon.stub(request, 'post').callsFake(() => {
+                const json = JSON.parse(OnCometVideoPlcCampaign);
+                json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 1;
+                return Promise.resolve(<INativeResponse> {
+                    response: JSON.stringify(json),
+                    url: 'www.test.com',
+                    responseCode: 200,
+                    headers: []
+                });
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                diagnosticsStub.restore();
+                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
     });

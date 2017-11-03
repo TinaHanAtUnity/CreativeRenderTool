@@ -1,28 +1,40 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { EndScreen } from 'Views/EndScreen';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { Placement } from 'Models/Placement';
-import { Overlay } from 'Views/Overlay';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { Video } from 'Models/Assets/Video';
+import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
-export class PerformanceAdUnit extends VideoAdUnit {
+export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
+    endScreen: PerformanceEndScreen;
+}
 
-    private _endScreen: EndScreen | undefined;
+export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: PerformanceCampaign, video: Video, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen: EndScreen) {
-        super(nativeBridge, forceOrientation, container, placement, campaign, video, overlay, deviceInfo, options);
-        this._endScreen = endScreen;
+    private _endScreen: PerformanceEndScreen;
+
+    constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
+        super(nativeBridge, parameters);
+
+        const campaign = parameters.campaign;
+        const landscapeVideo = campaign.getVideo();
+        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
+        const portraitVideo = campaign.getPortraitVideo();
+        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
+
+        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
+
+        this._endScreen = parameters.endScreen;
+        this._endScreen.render();
+        this._endScreen.hide();
+        document.body.appendChild(this._endScreen.container());
     }
 
     public hide(): Promise<void> {
         const endScreen = this.getEndScreen();
-        if (endScreen) {
+        if(endScreen) {
             endScreen.hide();
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
+
         return super.hide();
     }
 
@@ -30,7 +42,7 @@ export class PerformanceAdUnit extends VideoAdUnit {
         return 'performance';
     }
 
-    public getEndScreen(): EndScreen | undefined {
+    public getEndScreen(): PerformanceEndScreen | undefined {
         return this._endScreen;
     }
 
@@ -38,5 +50,4 @@ export class PerformanceAdUnit extends VideoAdUnit {
         super.unsetReferences();
         delete this._endScreen;
     }
-
 }

@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { DisplayInterstitial } from "Views/DisplayInterstitial";
 import { NativeBridge } from "Native/NativeBridge";
 import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign } from "Models/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from "Constants/Platform";
@@ -55,55 +55,5 @@ describe('DisplayInterstitial', () => {
         view.render();
         view.show();
         view.hide();
-    });
-
-    it('should redirect when the redirect message is sent', () => {
-
-        const spy = sinon.spy();
-        view.onClick.subscribe(spy);
-
-        view.render();
-        view.show();
-
-        window.postMessage({ type: 'redirect', href: 'https://unity3d.com' }, '*');
-
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                try {
-                    assert.isTrue(spy.calledWith('https://unity3d.com'));
-                    view.hide();
-                    resolve();
-                } catch (e) {
-                    view.hide();
-                    reject(e);
-                }
-            }, 100);
-        });
-    });
-
-    // Disabled because of missing .click() support on Android < 4.4
-    xit('should redirect when the click catcher is clicked', () => {
-        campaign.set('clickThroughUrl', 'https://unity3d.com');
-
-        const spy = sinon.spy();
-        view.onClick.subscribe(spy);
-
-        view.render();
-        view.show();
-
-        (<HTMLElement>view.container().querySelector('.iframe-click-catcher')!).click();
-
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                try {
-                    assert.isTrue(spy.calledWith('https://unity3d.com'));
-                    view.hide();
-                    resolve();
-                } catch (e) {
-                    view.hide();
-                    reject(e);
-                }
-            }, 100);
-        });
     });
 });

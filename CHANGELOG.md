@@ -1,3 +1,103 @@
+# Fri Nov  3 07:28:14 UTC 2017
+
+* Switch to "new" end screen
+* AB Test "new" dark end screen in groups 10 & 11
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+
+# Thu Nov  2 20:13:31 UTC 2017
+
+* Refactor view event handlers
+* Remove ab test to dismiss performance ad completely when video is skipped in group 5
+
+# Wed Nov  1 20:09:28 UTC 2017
+
+* Moat integration
+
+# Tue Oct 31 10:55:28 UTC 2017
+
+* Add versionCode (for Android SDK 2.1.1+) and simulator (iOS only) to ad request parameters
+* Remove ab test for brand ad cta
+* Adjust performance ad to dismiss completely when video is skipped in group 5
+* Add parse duration to SdkStats
+* Refactor ad plan refreshing triggers to CampaignRefreshManager
+
+# Wed Oct 25 22:15:26 UTC 2017
+
+* Check ad plan refreshing when any app activity resumes
+* CTA styling A/B test on groups 10 and 11
+* Refactor endscreen layout
+* Add support for configUrl test metadata parameter
+* Fix kafkaUrl test metadata parameter
+
+# Mon Oct 23 21:35:15 UTC 2017
+
+* Integrate SDKStats into Webview
+* Send audio and headphone state with ad request
+
+# Thu Oct 19 20:45:59 UTC 2017
+
+* Trigger onStart when VPAIDAdUnit shows
+* Removes VPAIDAdUnit debug diagnostics
+
+# Wed Oct 18 21:19:54 UTC 2017
+
+* Add diagnostics to all VPAID third party events, success and failed
+* Stop quick retry test on parsing errors from group 5
+* Fix handling for non-integer screen width and height values
+
+# Mon Oct 16 20:19:29 UTC 2017
+
+* Adds ad response to all diagnostic messages
+
+# Thu Oct 12 20:04:06 UTC 2017
+
+* Fire VAST Impression on VPAID Ad Units
+* Fixes click URL construction for Operative Events
+
+# Wed Oct 11 01:48:02 UTC 2017
+
+* Fix typo in VPAID content type
+* Fix operative events with programmatic MRAID
+
+# Tue Oct 10 17:15:40 UTC 2017
+
+* Initial support for VPAID
+
+# Tue Oct 10 09:11:38 UTC 2017
+
+* Removed dark end screen A/B test (groups 8 & 9)
+* Use event urls from comet response.
+
+# Mon Oct  9 09:08:58 UTC 2017
+
+* Sliding video player interface AB test (groups 10 & 11)
+* Video end card click tracking event for VAST endscreen.
+* Added static device info into kafka messages (Analytics)
+
+# Thu Oct  5 13:30:35 UTC 2017
+
+* Remove endscreen click ab-test
+* Fix to reporting of duplicate mraid diagnostic events
+* Faster retry logic after error (60-120s, was 1h)
+
+# Mon Oct  2 11:43:28 UTC 2017
+
+* Refactor SessionManager and EventManager
+* Accept unsafe but legal URL characters in campaign assets
+
+# Thu Sep 28 13:54:13 UTC 2017
+
+* Enable creative testing without backend
+* Fix retrying after campaign parsing or caching failure
+* Remove parsed ad plan from diagnostics (ES indexing)
+
+# Wed Sep 27 13:10:22 UTC 2017
+
+* Dark end screen theme AB Test (groups 8 & 9)
+* Remove additional click zones from end screen AB test (groups 10 & 11)
+* Clean up parts of the campaign parsing refactoring
+
 # Wed Sep 20 12:10:38 UTC 2017
 
 * Initial display ads support

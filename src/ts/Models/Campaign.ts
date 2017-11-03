@@ -1,6 +1,8 @@
 import { Asset } from 'Models/Assets/Asset';
 import { ISchema, Model } from 'Models/Model';
 import { Session } from 'Models/Session';
+import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface ICampaign {
     id: string;
@@ -12,6 +14,9 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserCampaignId: string | undefined;
+    advertiserBundleId: string | undefined;
     session: Session;
 }
 
@@ -26,6 +31,9 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
+        advertiserDomain: ['string', 'undefined'],
+        advertiserCampaignId: ['string', 'undefined'],
+        advertiserBundleId: ['string', 'undefined'],
         session: ['object']
     };
 
@@ -69,6 +77,18 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('meta');
     }
 
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
+    }
+
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
+    }
+
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
+    }
+
     public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
     }
@@ -90,5 +110,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public abstract getRequiredAssets(): Asset[];
     public abstract getOptionalAssets(): Asset[];
     public abstract isConnectionNeeded(): boolean;
+
+    protected handleError(error: WebViewError) {
+        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        throw error;
+    }
 
 }

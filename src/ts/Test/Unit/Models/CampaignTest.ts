@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Configuration } from 'Models/Configuration';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';

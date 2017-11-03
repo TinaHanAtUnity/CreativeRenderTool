@@ -3,12 +3,14 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Request } from 'Utilities/Request';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
-    public parse(nativeBridge: NativeBridge, request: Request): Promise<Campaign> {
-        const jsonMraidUrl = JsonParser.parse(this.getAuctionResponse().getContent());
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+        const jsonMraidUrl = JsonParser.parse(response.getContent());
 
         if(!jsonMraidUrl) {
             throw new Error('Corrupted mraid-url content');
@@ -22,6 +24,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         }
 
         jsonMraidUrl.id = this.getProgrammaticCampaignId(nativeBridge);
-        return Promise.resolve(new MRAIDCampaign(jsonMraidUrl, this.getSession(), this.getGamerId(), this.getAbGroup(), this.getAuctionResponse().getCacheTTL(), jsonMraidUrl.inlinedUrl, undefined, this.getAuctionResponse().getTrackingUrls(), this.getAuctionResponse().getAdType(), this.getAuctionResponse().getCreativeId(), this.getAuctionResponse().getSeatId(), this.getAuctionResponse().getCorrelationId()));
+        return Promise.resolve(new MRAIDCampaign(jsonMraidUrl, session, gamerId, abGroup, response.getCacheTTL(), jsonMraidUrl.inlinedUrl, undefined, response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }

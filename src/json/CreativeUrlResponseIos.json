@@ -1,0 +1,17 @@
+{
+  "correlationId": "S8z40tOCRnTjCmX59PWh48",
+  "placements": {
+    "defaultVideoAndPictureZone": "000000000000000000000000",
+    "incentivizedZone": "000000000000000000000000"
+  },
+  "media": {
+    "000000000000000000000000": {
+      "contentType": "comet/campaign",
+      "content": "{\"id\":\"000000000000000000000000\",\"platform\":\"ios\",\"store\":\"apple\",\"appStoreId\":\"453467175\",\"gameId\":11017,\"gameName\":\"Test game ios\",\"gameIcon\":\"https://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\",\"rating\":4.5,\"ratingCount\":10000,\"bypassAppSheet\":false,\"mraidUrl\":\"{CREATIVE_URL_PLACEHOLDER}\"}",
+      "trackingUrls": {},
+      "campaignId": "000000000000000000000000",
+      "seatId": 9000,
+      "adType": "MRAID"
+    }
+  }
+}

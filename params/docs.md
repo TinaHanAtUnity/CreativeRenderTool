@@ -67,6 +67,10 @@
 | previousPlacementId | string | Previously shown placementId | SDK | all |
 | properties | string | Gamer specific parameters | Server | all |
 | placements | object | All placements received in configuration | Server | all |
+| wiredHeadset | boolean | If wired headset is connected to device | SDK | all |
+| volume | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
+| versionCode | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
+| simulator | boolean | If device is a simulator, not a real device | SDK | ios |
 
 
 
@@ -139,6 +143,10 @@
 | previousPlacementId | no | False | True | string | Previously shown placementId | SDK | all |
 | properties | all | False | True | string | Gamer specific parameters | Server | all |
 | placements | all | False | True | object | All placements received in configuration | Server | all |
+| wiredHeadset | all | False | True | boolean | If wired headset is connected to device | SDK | all |
+| volume | all | False | True | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
+| versionCode | no | False | True | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
+| simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
 
 
 

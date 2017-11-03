@@ -3,10 +3,15 @@ import { IViewBinding } from 'Views/IViewBinding';
 import { Tap } from 'Utilities/Tap';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
+import { Swipe } from 'Utilities/Swipe';
 
-export class View {
+export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
+        if(binding.event === 'swipe') {
+            binding.swipe = new Swipe(<HTMLElement>element);
+        }
+
         if(attachTap && binding.event === 'click') {
             binding.tap = new Tap(<HTMLElement>element);
         }
@@ -19,12 +24,28 @@ export class View {
     protected _templateData: { [key: string]: string | number | boolean | undefined; };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
+    protected _handlers: T[] = [];
 
     protected _id: string;
 
     constructor(nativeBridge: NativeBridge, id: string) {
         this._nativeBridge = nativeBridge;
         this._id = id;
+    }
+
+   public addEventHandler(handler: T): T {
+        this._handlers.push(handler);
+        return handler;
+    }
+
+    public removeEventHandler(handler: T): void {
+        if(this._handlers.length) {
+            if(typeof handler !== 'undefined') {
+                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
+            } else {
+                this._handlers = [];
+            }
+        }
     }
 
     public render(): void {

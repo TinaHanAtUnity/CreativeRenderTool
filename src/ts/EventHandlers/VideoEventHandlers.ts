@@ -2,7 +2,6 @@ import { Double } from 'Utilities/Double';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -11,6 +10,8 @@ import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Configuration } from 'Models/Configuration';
 import { VideoInfo } from 'Utilities/VideoInfo';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class VideoEventHandlers {
 
@@ -34,7 +35,7 @@ export class VideoEventHandlers {
                 url: url,
                 originalUrl: originalUrl
             });
-            Diagnostics.trigger('video_too_long', error);
+            Diagnostics.trigger('video_too_long', error, campaign.getSession());
         }
 
         const overlay = adUnit.getOverlay();
@@ -81,7 +82,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, sessionManager: SessionManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
@@ -89,7 +90,7 @@ export class VideoEventHandlers {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
-            sessionManager.sendStart(adUnit);
+            operativeEventManager.sendStart(adUnit);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
@@ -100,9 +101,8 @@ export class VideoEventHandlers {
 
         if(adUnit.getCampaign().getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
-                sessionManager.getEventManager(),
                 adUnit.getCampaign().getSession().getId(),
-                sessionManager.getClientInfo().getSdkVersion(),
+                operativeEventManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideo().getPosition());
         }
@@ -121,7 +121,7 @@ export class VideoEventHandlers {
                     lastPosition: lastPosition,
                     duration: adUnit.getVideo().getDuration()
                 });
-                Diagnostics.trigger('video_player_too_large_progress', error);
+                Diagnostics.trigger('video_player_too_large_progress', error, adUnit.getCampaign().getSession());
 
                 return;
             }
@@ -195,11 +195,11 @@ export class VideoEventHandlers {
             adUnit.getVideo().setPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideo().getQuartile() === 1) {
-                sessionManager.sendFirstQuartile(adUnit);
+                operativeEventManager.sendFirstQuartile(adUnit);
             } else if(previousQuartile === 1 && adUnit.getVideo().getQuartile() === 2) {
-                sessionManager.sendMidpoint(adUnit);
+                operativeEventManager.sendMidpoint(adUnit);
             } else if(previousQuartile === 2 && adUnit.getVideo().getQuartile() === 3) {
-                sessionManager.sendThirdQuartile(adUnit);
+                operativeEventManager.sendThirdQuartile(adUnit);
             }
         }
 
@@ -213,11 +213,11 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(sessionManager: SessionManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        sessionManager.sendView(adUnit);
+        operativeEventManager.sendView(adUnit);
 
         this.afterVideoCompleted(adUnit);
     }
@@ -322,7 +322,7 @@ export class VideoEventHandlers {
             videoAdUnit.getVideo().setErrorStatus(true);
 
             if(errorType && errorData) {
-                Diagnostics.trigger(errorType, errorData);
+                Diagnostics.trigger(errorType, errorData, videoAdUnit.getCampaign().getSession());
             }
 
             videoAdUnit.setActive(false);

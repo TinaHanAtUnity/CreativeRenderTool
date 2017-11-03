@@ -246,6 +246,30 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "wiredHeadset",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "volume",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "versionCode",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "simulator",
+      "required": "ios",
+      "queryString": false,
+      "body": true
     }
   ]
 }

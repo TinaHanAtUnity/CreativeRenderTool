@@ -1,95 +1,50 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import EndScreenDarkTemplate from 'html/EndScreenDark.html';
+import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0, Observable1 } from 'Utilities/Observable';
-import { Privacy } from 'Views/Privacy';
+import { IPrivacyHandler, Privacy } from 'Views/Privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
-import { PerformanceCampaign } from 'Models/PerformanceCampaign';
-import { MRAIDCampaign } from 'Models/MRAIDCampaign';
+import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 
-export class EndScreen extends View {
+const darkEndScreenId = "dark-end-screen";
 
-    public readonly onDownload = new Observable0();
-    public readonly onPrivacy = new Observable1<string>();
-    public readonly onClose = new Observable0();
+export interface IEndScreenHandler {
+    onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
+    onEndScreenPrivacy(url: string): void;
+    onEndScreenClose(): void;
+    onKeyEvent(keyCode: number): void;
+}
 
+export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
+    protected _localization: Localization;
     private _coppaCompliant: boolean;
-    private _gameName: string;
+    private _gameName: string | undefined;
     private _privacy: Privacy;
-    private _localization: Localization;
+    private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, coppaCompliant: boolean, language: string) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
+        this._abGroup = abGroup;
+        this._gameName = gameName;
 
-        /* TODO: Redundant check, the same as on line 42? */
-        this._abGroup = campaign && campaign.getAbGroup();
-
-        if (this._abGroup === 8 || this._abGroup === 9) {
-            this._template = new Template(EndScreenDarkTemplate, this._localization);
+        if (this.getEndscreenAlt() === darkEndScreenId) {
+            this._template = new Template(DarkEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
-        }
-
-        /* TODO: Why is there a check for campaign */
-        if(campaign && campaign instanceof  PerformanceCampaign) {
-            this._gameName = campaign.getGameName();
-
-            const adjustedRating: number = campaign.getRating() * 20;
-            this._templateData = {
-                'gameName': campaign.getGameName(),
-                'gameIcon': campaign.getGameIcon().getUrl(),
-                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-                'endScreenLandscape': campaign.getPortrait().getUrl(),
-                'endScreenPortrait': campaign.getLandscape().getUrl(),
-                'rating': adjustedRating.toString(),
-                'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
-            };
-        } else if(campaign && campaign instanceof MRAIDCampaign) {
-            const gameName = campaign.getGameName();
-            if(gameName) {
-                this._gameName = gameName;
-            }
-            this._templateData = {
-                'gameName': campaign.getGameName(),
-                'endscreenAlt': this.getEndscreenAlt(campaign)
-            };
-            const gameIcon = campaign.getGameIcon();
-            if(gameIcon) {
-                this._templateData.gameIcon = gameIcon.getUrl();
-            }
-            const rating = campaign.getRating();
-            if(rating) {
-                const adjustedRating: number = rating * 20;
-                this._templateData.rating = adjustedRating.toString();
-            }
-            const ratingCount = campaign.getRatingCount();
-            if(ratingCount) {
-                this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
-            }
-            const portrait = campaign.getPortrait();
-            if(portrait) {
-                this._templateData.endScreenLandscape = portrait.getUrl();
-            }
-            const landscape = campaign.getLandscape();
-            if(landscape) {
-                this._templateData.endScreenPortrait = landscape.getUrl();
-            }
         }
 
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -102,6 +57,24 @@ export class EndScreen extends View {
                 selector: '.privacy-button'
             }
         ];
+
+        if (gameId === '1300023' || gameId === '1300024') {
+            this._isSwipeToCloseEnabled = true;
+
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.campaign-container, .game-background, .btn.download'
+            });
+        }
+    }
+
+    public render(): void {
+        super.render();
+
+        if (this._isSwipeToCloseEnabled) {
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
     }
 
     public show(): void {
@@ -116,44 +89,49 @@ export class EndScreen extends View {
         const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
-        if(AbstractAdUnit.getAutoClose()) {
-           setTimeout(() => {
-               this.onClose.trigger();
-           }, AbstractAdUnit.getAutoCloseDelay());
-        }
-
-        const darkEndScreenInfo = <HTMLElement>this._container.querySelector(".end-screen-info-background.dark");
-        if (darkEndScreenInfo) {
-            if (this._abGroup === 9) {
-                darkEndScreenInfo.classList.add("animate");
-            } else {
-                darkEndScreenInfo.classList.add("without-animation");
-            }
+        if (AbstractAdUnit.getAutoClose()) {
+            setTimeout(() => {
+                this._handlers.forEach(handler => handler.onEndScreenClose());
+            }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
 
     public hide(): void {
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
             delete this._privacy;
         }
     }
 
-    private getEndscreenAlt(campaign: Campaign) {
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.removeEventHandler(this);
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
+    }
+
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
+    }
+
+    protected getEndscreenAlt(campaign?: Campaign) {
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            return darkEndScreenId;
+        }
+
         return undefined;
     }
 
-    private onDownloadEvent(event: Event): void {
-        event.preventDefault();
-        this.onDownload.trigger();
-    }
+    protected abstract onDownloadEvent(event: Event): void;
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
     private onPrivacyEvent(event: Event): void {
@@ -161,15 +139,6 @@ export class EndScreen extends View {
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
-        this._privacy.onPrivacy.subscribe((url) => {
-            this.onPrivacy.trigger(url);
-        });
-        this._privacy.onClose.subscribe(() => {
-            if(this._privacy) {
-                this._privacy.hide();
-                this._privacy.container().parentElement!.removeChild(this._privacy.container());
-                delete this._privacy;
-            }
-        });
+        this._privacy.addEventHandler(this);
     }
 }

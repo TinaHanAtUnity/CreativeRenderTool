@@ -3,17 +3,20 @@ import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { Observable0 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 
-export class VastEndScreen extends View {
+export interface IVastEndScreenHandler {
+    onVastEndScreenClick(): void;
+    onVastEndScreenClose(): void;
+    onVastEndScreenShow(): void;
+    onKeyEvent(keyCode: number): void;
+}
 
-    public readonly onClick = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onShow = new Observable0();
+export class VastEndScreen extends View<IVastEndScreenHandler> {
+    private _isSwipeToCloseEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign) {
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string) {
         super(nativeBridge, 'end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
@@ -40,16 +43,34 @@ export class VastEndScreen extends View {
                 selector: '.btn-close-region'
             }
         ];
+
+        if(gameId === '1300023' || gameId === '1300024') {
+            this._isSwipeToCloseEnabled = true;
+
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.campaign-container, .game-background'
+            });
+        }
+    }
+
+    public render(): void {
+        super.render();
+
+        if(this._isSwipeToCloseEnabled) {
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
     }
 
     public show(): void {
         super.show();
 
-        this.onShow.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenShow());
 
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
-                this.onClose.trigger();
+                this._handlers.forEach(handler => handler.onVastEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
     }
@@ -60,12 +81,11 @@ export class VastEndScreen extends View {
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        this.onClose.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenClose());
     }
 
     private onClickEvent(event: Event): void {
         event.preventDefault();
-        this.onClick.trigger();
+        this._handlers.forEach(handler => handler.onVastEndScreenClick());
     }
-
 }
