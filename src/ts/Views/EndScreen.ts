@@ -1,5 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import NewEndScreenTemplate from 'html/NewEndScreen.html';
+import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,6 +10,8 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 
+const darkEndScreenId = "dark-end-screen";
+
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
     onEndScreenPrivacy(url: string): void;
@@ -17,10 +19,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const newEndScreenId = "new-end-screen";
-
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
-
     protected _localization: Localization;
     private _coppaCompliant: boolean;
     private _gameName: string | undefined;
@@ -35,23 +34,17 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            this._template = new Template(NewEndScreenTemplate, this._localization);
+        if (this.getEndscreenAlt() === darkEndScreenId) {
+            this._template = new Template(DarkEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
-        }
-
-        let downloadSelectors = '.game-background, .btn-download, .game-icon';
-
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            downloadSelectors = '.game-background, .download-container, .game-icon';
         }
 
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: downloadSelectors
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -82,11 +75,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
-
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            this._container.id = newEndScreenId;
-        }
-
     }
 
     public show(): void {
@@ -132,8 +120,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._abGroup === 8 || this._abGroup === 9) {
-            return newEndScreenId;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            return darkEndScreenId;
         }
 
         return undefined;

@@ -1,3 +1,15 @@
+# Fri Nov  3 07:28:14 UTC 2017
+
+* Switch to "new" end screen
+* AB Test "new" dark end screen in groups 10 & 11
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+
+# Thu Nov  2 20:13:31 UTC 2017
+
+* Refactor view event handlers
+* Remove ab test to dismiss performance ad completely when video is skipped in group 5
+
 # Wed Nov  1 20:09:28 UTC 2017
 
 * Moat integration
