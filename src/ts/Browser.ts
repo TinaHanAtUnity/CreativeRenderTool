@@ -229,7 +229,8 @@ const initialize = () => {
 };
 
 if(window.parent !== window) {
-    if(typeof location !== 'undefined' && location.search.indexOf('headless=1') !== -1) {
+    const getHeadlessName = 'getHeadless';
+    if(window.parent[getHeadlessName]()) {
         initialize();
     } else {
         initializeButton.addEventListener('click', (event: Event) => {
