@@ -404,5 +404,19 @@
     "description": "On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "versionCode",
+    "type": "number",
+    "description": "Application internal version code for Android apps, available only for SDK 2.1.1 and later",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "simulator",
+    "type": "boolean",
+    "description": "If device is a simulator, not a real device",
+    "provider": "SDK",
+    "platforms": "ios"
   }
 ]

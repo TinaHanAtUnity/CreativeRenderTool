@@ -8,6 +8,7 @@ ROLLUP = $(BIN)/rollup
 ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
+STYLINT = $(BIN)/stylint
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
 ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
 SYSTEM_JS = node_modules/systemjs/dist/system.src.js
@@ -186,11 +187,16 @@ build-js:
 
 build-css:
 	@echo
-	@echo Transpiling .styl to .css
+	@echo Lint .styl
 	@echo
 
+	$(STYLINT) src/styl -c stylintrc.json
+
+	@echo
+	@echo Transpiling .styl to .css
+	@echo
 	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
+	$(STYLUS) -o $(BUILD_DIR)/css -u autoprefixer-stylus --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
 
 build-static:
 	@echo

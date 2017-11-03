@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { SessionManager } from 'Managers/SessionManager';
-import { VastOverlayEventHandlers } from 'EventHandlers/VastOverlayEventHandlers';
+import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -16,14 +16,12 @@ import { Activity } from 'AdUnits/Containers/Activity';
 
 import { Placement } from 'Models/Placement';
 import { ClientInfo } from 'Models/ClientInfo';
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
+import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
-
-import EventTestVast from 'xml/EventTestVast.xml';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -34,13 +32,16 @@ describe('VastOverlayEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, testAdUnit: VastAdUnit;
+    let nativeBridge: NativeBridge;
+    let vastAdUnit: VastAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
+    let vastAdUnitParameters: IVastAdUnitParameters;
+    let vastOverlayEventHandler: VastOverlayEventHandler;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -50,13 +51,8 @@ describe('VastOverlayEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        const vastParser = TestFixtures.getVastParser();
-        const vastXml = EventTestVast;
-        const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
-
+        campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
 
@@ -82,26 +78,50 @@ describe('VastOverlayEventHandlersTest', () => {
             return Promise.resolve(url);
         });
 
-        testAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+
+        vastAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            endScreen: undefined,
+            overlay: overlay,
+            video: campaign.getVideo()
+        };
+
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+        vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
     });
 
     describe('When calling onSkip', () => {
         beforeEach(() => {
-            sinon.spy(testAdUnit, 'hide');
-            VastOverlayEventHandlers.onSkip(testAdUnit);
+            sinon.spy(vastAdUnit, 'hide');
+
         });
 
         it('should hide ad unit', () => {
-            sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
+            vastOverlayEventHandler.onOverlaySkip(1);
+            sinon.assert.called(<sinon.SinonSpy>vastAdUnit.hide);
         });
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = <VastEndScreen><any> {
-                    show: sinon.spy()
-                };
-                const vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, placement, campaign, <Overlay><any>{hide: sinon.spy()}, TestFixtures.getDeviceInfo(Platform.ANDROID), null, vastEndScreen);
-                VastOverlayEventHandlers.onSkip(vastAdUnit);
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+                sinon.spy(vastEndScreen, 'show');
+                vastAdUnitParameters.endScreen = vastEndScreen;
+                vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+                sinon.spy(vastAdUnit, 'hide');
+                vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+                vastOverlayEventHandler.onOverlaySkip(1);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             });
         });
@@ -111,9 +131,9 @@ describe('VastOverlayEventHandlersTest', () => {
         const testMuteEvent = function(muted: boolean) {
             const eventName = muted ? 'mute' : 'unmute';
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=testPlacement`);
+            mockEventManager.expects('sendEvent').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=fooId`);
 
-            VastOverlayEventHandlers.onMute(thirdPartyEventManager, testAdUnit, muted, clientInfo);
+            vastOverlayEventHandler.onOverlayMute(muted);
             mockEventManager.verify();
         };
 
@@ -133,16 +153,9 @@ describe('VastOverlayEventHandlersTest', () => {
     });
 
     describe('When calling onCallButton', () => {
-        let vastAdUnit: VastAdUnit;
-        let video: Video;
-
         beforeEach(() => {
-            video = new Video('');
-            vastAdUnit = new VastAdUnit(nativeBridge, ForceOrientation.NONE, container, TestFixtures.getPlacement(), <VastCampaign><any>{
-                getVast: sinon.spy(),
-                getVideo: () => video,
-                getSession: () => TestFixtures.getSession()
-            }, <Overlay><any>{}, TestFixtures.getDeviceInfo(Platform.ANDROID), null);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
@@ -151,7 +164,7 @@ describe('VastOverlayEventHandlersTest', () => {
         it('should call video click through tracking url', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, thirdPartyEventManager, vastAdUnit, request, clientInfo).then(() => {
+            vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
             });
         });
@@ -159,7 +172,7 @@ describe('VastOverlayEventHandlersTest', () => {
         it('should open click trough link in iOS web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, thirdPartyEventManager, vastAdUnit, request, clientInfo).then(() => {
+            vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foo.com');
             });
         });
@@ -167,7 +180,7 @@ describe('VastOverlayEventHandlersTest', () => {
         it('should open click trough link in Android web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
             sinon.stub(nativeBridge.Intent, 'launch');
-            VastOverlayEventHandlers.onCallButton(nativeBridge, thirdPartyEventManager, vastAdUnit, request, clientInfo).then(() => {
+            vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
                     'uri': 'http://foo.com'
