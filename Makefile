@@ -279,6 +279,12 @@ test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
+test-browser:
+	@echo
+	@echo Running browserbuild tests
+	@echo
+	node test-utils/headless.js
+
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
