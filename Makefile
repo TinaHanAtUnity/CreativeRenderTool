@@ -285,11 +285,11 @@ test-browser:
 	@echo
 	node test-utils/headless.js
 
-ifeq ($(TRAVIS_PULL_REQUEST), true)
-travis-browser-test: build-browser start-nginx test-browser stop-nginx
-else
+ifeq ($(TRAVIS_PULL_REQUEST), false)
 travis-browser-test:
 	@echo "Skipping travis browser tests, this is not a PR"
+else
+travis-browser-test: build-browser start-nginx test-browser stop-nginx
 endif
 
 watch:
