@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -9,8 +8,6 @@ import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
-
-const darkEndScreenId = "dark-end-screen";
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -34,11 +31,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        if (this.getEndscreenAlt() === darkEndScreenId) {
-            this._template = new Template(DarkEndScreenTemplate, this._localization);
-        } else {
-            this._template = new Template(EndScreenTemplate, this._localization);
-        }
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         this._bindings = [
             {
@@ -120,10 +113,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._abGroup === 10 || this._abGroup === 11) {
-            return darkEndScreenId;
-        }
-
         return undefined;
     }
 
