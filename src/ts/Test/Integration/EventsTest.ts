@@ -16,6 +16,9 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('EventsTest', () => {
 
+    let currentGameId: number;
+    const videoEvents = ['video_start', 'first_quartile', 'midpoint', 'third_quartile', 'video_end'];
+
     const findEventCount = (requestLog: string[], regexp: string) => {
         let count = 0;
         requestLog.forEach(log => {
@@ -26,24 +29,50 @@ describe('EventsTest', () => {
         return count;
     };
 
-    const validateRequestLog = (requestLog: string[]) => {
+    const validateRequestLog = (requestLog: string[], validationRegexps: string[]) => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
-        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 2, 'Did not find 2 fill requests');
-        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=video_start'), 1, 'Did not find a video_start event');
-        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=first_quartile'), 1, 'Did not find a first_quartile event');
-        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=midpoint'), 1, 'Did not find a midpoint event');
-        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=third_quartile'), 1, 'Did not find a third_quartile event');
-        assert.equal(findEventCount(requestLog, '/ack/\\d+\\?event=video_end'), 1, 'Did not find a video_end event');
+        assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 3, 'Did not find 3 fill requests');
+
+        for(const regexp of validationRegexps) {
+            for(const eventName of videoEvents) {
+                let eventRegexp = regexp.replace('{EVENT_NAME}', eventName);
+                eventRegexp = eventRegexp.replace('{GAME_ID}', currentGameId.toString());
+                assert.equal(findEventCount(requestLog, eventRegexp), 1, 'Did not find a ' + eventName + ' event');
+            }
+        }
     };
-    // /ack/456?event
+
+    beforeEach((done) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = (event: Event) => {
+            const responseObj: any = JSON.parse(xhr.responseText);
+            currentGameId = responseObj.game_id;
+            done();
+        };
+        xhr.open('GET', 'https://fake-ads-backend.applifier.info/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
+        xhr.send();
+    });
+
+    afterEach((done) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = (event: Event) => {
+            done();
+        };
+        xhr.open('GET', 'https://fake-ads-backend.applifier.info/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
+        xhr.send();
+    });
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
+        const validationRegexps = ['/ack/{GAME_ID}\\?campaignId=000000000000000000000000&event={EVENT_NAME}', '/mobile/gamers/[0-9a-f]+/video/{EVENT_NAME}/005472656d6f7220416e6472/{GAME_ID}'];
         let readyCount = 0;
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
                 if(++readyCount === 1) {
+                    UnityAds.show(placement);
+                }
+                if(startCount === 1) {
                     UnityAds.show(placement);
                 }
             },
@@ -52,11 +81,13 @@ describe('EventsTest', () => {
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    setTimeout(() => {
-                        validateRequestLog(Request.getLog());
-                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
-                        done();
-                    }, 2500);
+                    if(startCount === 2) {
+                        setTimeout(() => {
+                            validateRequestLog(Request.getLog(), validationRegexps);
+                            assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
+                            done();
+                        }, 2500);
+                    }
                 }
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
@@ -86,16 +117,20 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
+        UnityAds.initialize(Platform.ANDROID, currentGameId.toString(), listener, true);
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
+        const validationRegexps = ['/ack/{GAME_ID}\\?campaignId=000000000000000000000000&event={EVENT_NAME}', '/mobile/gamers/[0-9a-f]+/video/{EVENT_NAME}/00005472656d6f7220694f53/{GAME_ID}'];
         let readyCount = 0;
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
                 if(++readyCount === 1) {
+                    UnityAds.show(placement);
+                }
+                if(startCount === 1) {
                     UnityAds.show(placement);
                 }
             },
@@ -104,11 +139,13 @@ describe('EventsTest', () => {
             },
             onUnityAdsFinish: (placement: string, state: FinishState) => {
                 if(state === FinishState.COMPLETED) {
-                    setTimeout(() => {
-                        validateRequestLog(Request.getLog());
-                        assert.equal(startCount, 1, 'onUnityAdsStart was not called exactly 1 time');
-                        done();
-                    }, 2500);
+                    if(startCount === 2) {
+                        setTimeout(() => {
+                            validateRequestLog(Request.getLog(), validationRegexps);
+                            assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
+                            done();
+                        }, 2500);
+                    }
                 }
             },
             onUnityAdsError: (error: UnityAdsError, message: string) => {
@@ -138,7 +175,6 @@ describe('EventsTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '456', listener, true);
+        UnityAds.initialize(Platform.IOS, currentGameId.toString(), listener, true);
     });
-
 });
