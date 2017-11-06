@@ -18,7 +18,7 @@ export interface IMRAIDViewHandler {
     onMraidSkip(): void;
     onMraidClose(): void;
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
-    onMraidAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, event: string, eventData: any): void;
+    onMraidAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
 }
 

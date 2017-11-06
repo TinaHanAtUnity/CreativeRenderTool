@@ -44,7 +44,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .btn-download, .game-icon'
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -120,7 +120,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._abGroup === 8 || this._abGroup === 9) {
+        if (this._abGroup === 10 || this._abGroup === 11) {
             return darkEndScreenId;
         }
 
