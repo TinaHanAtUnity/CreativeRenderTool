@@ -88,7 +88,7 @@ puppeteer.launch().then(async browser => {
     const page = await browser.newPage();
     await page.setViewport(SCREEN_VIEWPORT_PROP);
     await page.goto(SERVER_ADDRESS).catch(function(e) {
-        console.log("## Failed to connect to server at " + SERVER_ADDRESS + ");");
+        console.log("## Failed to connect to server at " + SERVER_ADDRESS);
         console.log("   Consider running `make clean build-browser start-nginx");
         process.exit(255);
     });

@@ -285,6 +285,13 @@ test-browser:
 	@echo
 	node test-utils/headless.js
 
+ifeq ($(TRAVIS_PULL_REQUEST), true)
+travis-browser-test: build-browser start-nginx test-browser stop-nginx
+else
+travis-browser-test:
+	@echo "Skipping travis browser tests, this is not a PR"
+endif
+
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
