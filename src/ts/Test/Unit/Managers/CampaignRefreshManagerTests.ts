@@ -151,6 +151,8 @@ describe('CampaignRefreshManager', () => {
             request: request,
             options: {}
         };
+
+        CampaignRefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
     });
 
     describe('PLC campaigns', () => {
