@@ -27,6 +27,7 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { GoogleSignalFactory} from 'Google/GoogleSignalFactory';
 
 export class CampaignManager {
 
@@ -86,6 +87,8 @@ export class CampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._requesting = false;
+
+        GoogleSignalFactory.createSomething();
     }
 
     public request(): Promise<INativeResponse | void> {

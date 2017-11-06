@@ -5,7 +5,14 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
+import { unity_proto } from 'Google/proto/unity_proto.js';
+
 export class GoogleSignalFactory {
+
+    public static createSomething() {
+        return unity_proto.UnityInfo.create();
+    }
+
     public static getAdRequestSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
         return GoogleSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
             return signal;
