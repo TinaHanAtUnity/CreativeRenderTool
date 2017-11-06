@@ -26,6 +26,7 @@ window.addEventListener('resize', resizeHandler, false);
 
 const toInt = (element: HTMLInputElement): number => parseInt(element.value, 10);
 const toBoolean = (element: HTMLInputElement): boolean => element.checked;
+const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
 const setClientInfo = () => {
     const fields = [
@@ -182,18 +183,14 @@ if(window.parent !== window) {
             onUnityAdsReady: (placement: string) => {
                 console.log('onUnityAdsReady: ' + placement);
                 const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                if(typeof location !== 'undefined' && location.search.indexOf('headless=1') !== -1) {
+                const placementButtonlistener = (placementButtonEvent: Event) => {
+                    placementButtonEvent.preventDefault();
+                    placementButton.disabled = true;
+                    placementButton.removeEventListener('click', placementButtonlistener, false);
                     UnityAds.show(placement);
-                } else {
-                    const placementButtonlistener = (placementButtonEvent: Event) => {
-                        placementButtonEvent.preventDefault();
-                        placementButton.disabled = true;
-                        placementButton.removeEventListener('click', placementButtonlistener, false);
-                        UnityAds.show(placement);
-                    };
-                    placementButton.disabled = false;
-                    placementButton.addEventListener('click', placementButtonlistener, false);
-                }
+                };
+                placementButton.disabled = false;
+                placementButton.addEventListener('click', placementButtonlistener, false);
             },
             onUnityAdsStart: (placement: string) => {
                 console.log('onUnityAdsStart: ' + placement);
@@ -229,8 +226,7 @@ if(window.parent !== window) {
         }
     };
 
-    const getHeadlessName = 'getHeadless';
-    if(window.parent[getHeadlessName]()) {
+    if(window.parent[JS_FUNC_NAME_GET_HEADLESS]()) {
         initialize();
     } else {
         initializeButton.addEventListener('click', (event: Event) => {

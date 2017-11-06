@@ -53,7 +53,7 @@ let checkMessage = function(message) {
     return allMatched;
 };
 
-// Returns count of failed steps
+// Returns count of failed steps (max 99)
 let evaluateSuccess = function() {
     let passedSteps = 0;
     let totalSteps = 0;
@@ -78,6 +78,9 @@ let evaluateSuccess = function() {
     });
     const failedSteps = totalSteps - passedSteps;
     console.log("Total steps: " + totalSteps + ". Passed steps: " + passedSteps + ". Failed steps: " + failedSteps + ".");
+    if(failedSteps > 99) {
+        return 99;
+    }
     return failedSteps;
 };
 
@@ -101,6 +104,7 @@ puppeteer.launch().then(async browser => {
         setTimeout(reject, TEST_TIMEOUT);
     });
     page.on("console", (message) => {
+        console.log("* Browser output: " + message);
         if(checkMessage(message)) {
             if(!testRunning) {
                 return;
